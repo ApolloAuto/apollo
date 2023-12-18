@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"

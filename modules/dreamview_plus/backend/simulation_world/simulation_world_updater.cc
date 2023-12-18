@@ -21,9 +21,9 @@
 #include "cyber/common/file.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/fuel_monitor_manager.h"
-#include "modules/dreamview_plus/backend/sim_control_manager/sim_control_manager.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -58,8 +58,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *plugin_ws, const MapService *map_service,
     PluginManager *plugin_manager, WebSocketHandler *sim_world_ws,
     HMI *hmi, bool routing_from_file)
-    : enable_pnc_monitor_(false),
-      sim_world_service_(map_service, routing_from_file),
+    : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
       map_ws_(map_ws),
@@ -69,7 +68,438 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       sim_world_ws_(sim_world_ws),
       hmi_(hmi),
       command_id_(0) {
+  RegisterRoutingMessageHandlers();
   RegisterMessageHandlers();
+}
+
+void SimulationWorldUpdater::RegisterRoutingMessageHandlers() {
+  websocket_->RegisterMessageHandler(
+      "SendRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to send routing request: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        Json end;
+        std::vector<std::string> json_path = {"data", "info", "end"};
+        if (!JsonUtil::GetJsonByPath(json, json_path, &end)) {
+          AERROR << "Failed to find end: end not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss end";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        std::string parking_space_id =
+            map_service_->GetParkingSpaceId(end["x"], end["y"]);
+        if (parking_space_id != "-1") {
+          // If the parking space ID can be obtained, it means it is a parking
+          // routing
+          auto valet_parking_command = std::make_shared<ValetParkingCommand>();
+          bool succeed = ConstructValetParkingCommand(
+              json, valet_parking_command.get(), parking_space_id);
+          if (succeed) {
+            sim_world_service_.PublishValetParkingCommand(
+                valet_parking_command);
+            sim_world_service_.PublishMonitorMessage(
+                MonitorMessageItem::INFO, "Valet parking command sent.");
+            response["data"]["info"]["code"] = 0;
+            response["data"]["info"]["message"] = "Success";
+          } else {
+            sim_world_service_.PublishMonitorMessage(
+                MonitorMessageItem::ERROR,
+                "Failed to send a Valet parking command.");
+            response["data"]["info"]["code"] = -1;
+            response["data"]["info"]["message"] =
+                "Failed to send a Valet parking command";
+          }
+          websocket_->SendData(conn, response.dump());
+        } else {
+          // Otherwise, it is a normal routing
+          auto lane_follow_command = std::make_shared<LaneFollowCommand>();
+          bool succeed =
+              ConstructLaneFollowCommand(json, lane_follow_command.get());
+          if (succeed) {
+            sim_world_service_.PublishLaneFollowCommand(lane_follow_command);
+            sim_world_service_.PublishMonitorMessage(
+                MonitorMessageItem::INFO, "Lane follow command sent.");
+            response["data"]["info"]["code"] = 0;
+            response["data"]["info"]["message"] = "Success";
+          } else {
+            sim_world_service_.PublishMonitorMessage(
+                MonitorMessageItem::ERROR,
+                "Failed to send a Lane follow command.");
+            response["data"]["info"]["code"] = -1;
+            response["data"]["info"]["message"] =
+                "Failed to send a Lane follow command";
+          }
+          websocket_->SendData(conn, response.dump());
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SendDefaultCycleRoutingRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to prepare a cycle lane follow command: requestId "
+                    "not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        Json info;
+        std::vector<std::string> json_path = {"data", "info"};
+        if (!JsonUtil::GetJsonByPath(json, json_path, &info)) {
+          AERROR << "Failed to prepare a cycle lane follow command: info not "
+                    "found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss info";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        auto task = std::make_shared<Task>();
+        auto *cycle_routing_task = task->mutable_cycle_routing_task();
+        auto *lane_follow_command =
+            cycle_routing_task->mutable_lane_follow_command();
+        if (!ContainsKey(info, "cycleNumber") ||
+            !info.find("cycleNumber")->is_number()) {
+          AERROR
+              << "Failed to prepare a cycle lane follow command: Invalid cycle "
+                 "number";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Invalid cycle number";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        bool succeed = ConstructLaneFollowCommand(json, lane_follow_command);
+        if (succeed) {
+          cycle_routing_task->set_cycle_num(
+              static_cast<int>(info["cycleNumber"]));
+          task->set_task_name("cycle_routing_task");
+          task->set_task_type(apollo::task_manager::TaskType::CYCLE_ROUTING);
+          sim_world_service_.PublishTask(task);
+          AINFO << "The task is : " << task->DebugString();
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO,
+              "Default cycle lane follow command sent.");
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to send a default cycle lane follow command.");
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to send a default cycle lane follow command";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  // websocket_->RegisterMessageHandler(
+  //     "SendParkGoRoutingRequest",
+  //     [this](const Json &json, WebSocketHandler::Connection *conn) {
+  //       auto task = std::make_shared<Task>();
+  //       auto *park_go_routing_task = task->mutable_park_go_routing_task();
+  //       if (!ContainsKey(json, "parkTime") ||
+  //           !json.find("parkTime")->is_number()) {
+  //         AERROR << "Failed to prepare a park go routing request: Invalid
+  //         park "
+  //                   "time";
+  //         return;
+  //       }
+  //       bool succeed = ConstructRoutingRequest(
+  //           json, park_go_routing_task->mutable_routing_request());
+  //       if (succeed) {
+  //         park_go_routing_task->set_park_time(
+  //             static_cast<int>(json["parkTime"]));
+  //         task->set_task_name("park_go_routing_task");
+  //         task->set_task_type(apollo::task_manager::TaskType::PARK_GO_ROUTING);
+  //         sim_world_service_.PublishTask(task);
+  //         AINFO << "The task is : " << task->DebugString();
+  //         sim_world_service_.PublishMonitorMessage(
+  //             MonitorMessageItem::INFO, "Park go routing request sent.");
+  //       } else {
+  //         sim_world_service_.PublishMonitorMessage(
+  //             MonitorMessageItem::ERROR,
+  //             "Failed to send a park go routing request.");
+  //       }
+  //     });
+
+  // websocket_->RegisterMessageHandler(
+  //     "SendParkingRoutingRequest",
+  //     [this](const Json &json, WebSocketHandler::Connection *conn) {
+  //       Json response;
+  //       response["action"] = "response";
+  //       std::string request_id;
+  //       if (!JsonUtil::GetStringByPath(json,
+  //           "data.requestId", &request_id)) {
+  //         AERROR
+  //             << "Failed to send parking routing request:
+  //           requestId not found.";
+  //         response["data"]["info"]["code"] = -1;
+  //         response["data"]["info"]["message"] = "Miss requestId";
+  //         websocket_->SendData(conn, response.dump());
+  //         return;
+  //       }
+  //       response["data"]["requestId"] = request_id;
+  //       auto valet_parking_command = std::make_shared<ValetParkingCommand>();
+  //       bool succeed =
+  //           ConstructValetParkingCommand(json, valet_parking_command.get());
+  //       if (succeed) {
+  //         sim_world_service_.PublishValetParkingCommand(valet_parking_command);
+  //         sim_world_service_.PublishMonitorMessage(
+  //             MonitorMessageItem::INFO, "Valet parking command sent.");
+  //         response["data"]["info"]["code"] = 0;
+  //         response["data"]["info"]["message"] = "Success";
+  //       } else {
+  //         sim_world_service_.PublishMonitorMessage(
+  //             MonitorMessageItem::ERROR,
+  //             "Failed to send a Valet parking command.");
+  //         response["data"]["info"]["code"] = -1;
+  //         response["data"]["info"]["message"] =
+  //             "Failed to send a Valet parking command";
+  //       }
+  //       websocket_->SendData(conn, response.dump());
+  //     });
+
+  websocket_->RegisterMessageHandler(
+      "GetDefaultRoutings",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to get default routings: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        response["data"]["info"]["threshold"] =
+            FLAGS_loop_routing_end_to_start_distance_threshold;
+        Json default_routing_list = Json::array();
+        if (LoadUserDefinedRoutings(DefaultRoutingFile(), &default_routings_)) {
+          for (const auto &landmark : default_routings_.landmark()) {
+            Json drouting;
+            drouting["name"] = landmark.name();
+
+            Json point_list;
+            for (const auto &point : landmark.waypoint()) {
+              point_list.push_back(GetPointJsonFromLaneWaypoint(point));
+            }
+            drouting["point"] = point_list;
+            if (landmark.has_cycle_number()) {
+              drouting["cycleNumber"] = landmark.cycle_number();
+            }
+
+            default_routing_list.push_back(drouting);
+          }
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to load default "
+              "routing. Please make sure the "
+              "file exists at " +
+                  DefaultRoutingFile());
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to load default "
+              "routing. Please make sure the "
+              "file exists at " +
+              DefaultRoutingFile();
+        }
+        response["data"]["info"]["data"]["defaultRoutings"] =
+            default_routing_list;
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "GetParkAndGoRoutings",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["type"] = "ParkAndGoRoutings";
+        Json park_go_routing_list = Json::array();
+        if (LoadUserDefinedRoutings(ParkGoRoutingFile(), &park_go_routings_)) {
+          for (const auto &landmark : park_go_routings_.landmark()) {
+            Json park_go_routing;
+            park_go_routing["name"] = landmark.name();
+
+            Json point_list;
+            for (const auto &point : landmark.waypoint()) {
+              point_list.push_back(GetPointJsonFromLaneWaypoint(point));
+            }
+            park_go_routing["point"] = point_list;
+            park_go_routing_list.push_back(park_go_routing);
+          }
+          //  } else {
+          //   sim_world_service_.PublishMonitorMessage(
+          //       MonitorMessageItem::ERROR,
+          //       "Failed to load park go "
+          //       "routing. Please make sure the "
+          //       "file exists at " +
+          //           ParkGoRoutingFile());
+        }
+        response["parkAndGoRoutings"] = park_go_routing_list;
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SaveDefaultRouting",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to save default routing: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+
+        bool succeed = AddDefaultRouting(json);
+        if (succeed) {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::INFO, "Successfully add a routing.");
+          if (!default_routing_) {
+            AERROR << "Failed to add a routing" << std::endl;
+          }
+          Json ret_data = JsonUtil::ProtoToTypedJson("AddDefaultRoutingPath",
+                                                     *default_routing_);
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+          response["data"]["info"]["data"] = ret_data["data"];
+        } else {
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
+                                                   "Failed to add a routing.");
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Failed to add a routing";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "DeleteDefaultRouting",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id, routing_name;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to delete default routing: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.info.name", &routing_name)) {
+          AERROR << "Failed to delete default routing: name not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss name";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        bool ret = DeleteDefaultRouting(routing_name);
+        if (!ret) {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to delete default routing";
+        } else {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SendScenarioSimulationRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to send scenario simulation request: requestId not "
+                    "found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool fromScenario;
+        if (!JsonUtil::GetBooleanByPath(json, "data.info.fromScenario",
+                                        &fromScenario)) {
+          AERROR << "Failed to send scene simulation request: fromScenario not "
+                    "found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss fromScenario";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        Json to_send_json = json;
+        if (fromScenario) {
+          // If the user does not set a route,
+          // the default start and end points of the scene are used
+          Json extrem_point = hmi_->GetCurrentScenarioExtremPoint();
+          if (extrem_point.find("end") == extrem_point.end()) {
+            AERROR << "Failed to find end point.";
+            response["data"]["info"]["code"] = -1;
+            response["data"]["info"]["message"] = "Failed to find end point";
+            websocket_->SendData(conn, response.dump());
+            return;
+          }
+          to_send_json["data"]["info"]["end"] = extrem_point["end"];
+        }
+        // Otherwise, use the route set by the user
+
+        auto lane_follow_command = std::make_shared<LaneFollowCommand>();
+        bool succeed =
+            ConstructLaneFollowCommand(to_send_json, lane_follow_command.get());
+        if (succeed) {
+          sim_world_service_.PublishLaneFollowCommand(lane_follow_command);
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
+                                                   "Lane follow command sent.");
+        } else {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Failed to send a Lane follow command.");
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to send a Lane follow command";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        if (!hmi_->StartScenarioSimulation()) {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to send scene simulation request";
+        } else {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        }
+        if (!isProcessRunning("sim_obstacle")) {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR,
+              "Sim obstacle not start, Please check if there is a binary "
+              "package.");
+        }
+        websocket_->SendData(conn, response.dump());
+      });
 }
 
 void SimulationWorldUpdater::RegisterMessageHandlers() {
@@ -376,234 +806,24 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         return;
       });
 
-  // websocket_->RegisterMessageHandler(
-  //     "SetStartPoint",
-  //     [this](const Json &json, WebSocketHandler::Connection *conn) {
-  //       auto point = json["point"];
-  //       auto sim_control_manager = SimControlManager::Instance();
-
-  //       if (!sim_control_manager->IsEnabled()) {
-  //         AWARN << "Set start point need start sim_control.";
-  //       } else {
-  //         if (!ContainsKey(point, "heading")) {
-  //           AWARN << "Set start point need set heading.";
-  //           return;
-  //         }
-  //         sim_control_manager->ReSetPoinstion(point["x"], point["y"],
-  //                                              point["heading"]);
-
-  //         // Send a ActionCommand to clear the trajectory of planning.
-  //         if (isProcessRunning("planning.dag")) {
-  //           auto action_command = std::make_shared<ActionCommand>();
-  //           action_command->set_command_id(++command_id_);
-  //           action_command->set_command(ActionCommandType::CLEAR_PLANNING);
-  //           sim_world_service_.PublishActionCommand(action_command);
-  //         }
-  //       }
-  //     });
-
-  websocket_->RegisterMessageHandler(
-      "SendRoutingRequest",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to send routing request: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        Json end;
-        std::vector<std::string> json_path = {"data", "info", "end"};
-        if (!JsonUtil::GetJsonByPath(json, json_path, &end)) {
-          AERROR << "Failed to find end: end not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss end";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        std::string parking_space_id =
-            map_service_->GetParkingSpaceId(end["x"], end["y"]);
-        if (parking_space_id != "-1") {
-          // If the parking space ID can be obtained, it means it is a parking
-          // routing
-          auto valet_parking_command = std::make_shared<ValetParkingCommand>();
-          bool succeed = ConstructValetParkingCommand(
-              json, valet_parking_command.get(), parking_space_id);
-          if (succeed) {
-            sim_world_service_.PublishValetParkingCommand(valet_parking_command);
-            sim_world_service_.PublishMonitorMessage(
-                MonitorMessageItem::INFO, "Valet parking command sent.");
-            response["data"]["info"]["code"] = 0;
-            response["data"]["info"]["message"] = "Success";
-          } else {
-            sim_world_service_.PublishMonitorMessage(
-                MonitorMessageItem::ERROR,
-                "Failed to send a Valet parking command.");
-            response["data"]["info"]["code"] = -1;
-            response["data"]["info"]["message"] =
-                "Failed to send a Valet parking command";
-          }
-          websocket_->SendData(conn, response.dump());
-        } else {
-          // Otherwise, it is a normal routing
-          auto lane_follow_command = std::make_shared<LaneFollowCommand>();
-          bool succeed =
-              ConstructLaneFollowCommand(json, lane_follow_command.get());
-          if (succeed) {
-            sim_world_service_.PublishLaneFollowCommand(lane_follow_command);
-            sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                    "Lane follow command sent.");
-            response["data"]["info"]["code"] = 0;
-            response["data"]["info"]["message"] = "Success";
-          } else {
-            sim_world_service_.PublishMonitorMessage(
-                MonitorMessageItem::ERROR,
-                "Failed to send a Lane follow command.");
-            response["data"]["info"]["code"] = -1;
-            response["data"]["info"]["message"] =
-                "Failed to send a Lane follow command";
-          }
-          websocket_->SendData(conn, response.dump());
-        }
-      });
-
-  websocket_->RegisterMessageHandler(
-      "SendDefaultCycleRoutingRequest",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to prepare a cycle lane follow command: requestId "
-                    "not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        Json info;
-        std::vector<std::string> json_path = {"data", "info"};
-        if (!JsonUtil::GetJsonByPath(json, json_path, &info)) {
-          AERROR << "Failed to prepare a cycle lane follow command: info not "
-                    "found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss info";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        auto task = std::make_shared<Task>();
-        auto *cycle_routing_task = task->mutable_cycle_routing_task();
-        auto *lane_follow_command =
-            cycle_routing_task->mutable_lane_follow_command();
-        if (!ContainsKey(info, "cycleNumber") ||
-            !info.find("cycleNumber")->is_number()) {
-          AERROR
-              << "Failed to prepare a cycle lane follow command: Invalid cycle "
-                 "number";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Invalid cycle number";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        bool succeed = ConstructLaneFollowCommand(json, lane_follow_command);
-        if (succeed) {
-          cycle_routing_task->set_cycle_num(
-              static_cast<int>(info["cycleNumber"]));
-          task->set_task_name("cycle_routing_task");
-          task->set_task_type(apollo::task_manager::TaskType::CYCLE_ROUTING);
-          sim_world_service_.PublishTask(task);
-          AINFO << "The task is : " << task->DebugString();
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::INFO,
-              "Default cycle lane follow command sent.");
-          response["data"]["info"]["code"] = 0;
-          response["data"]["info"]["message"] = "Success";
-        } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR,
-              "Failed to send a default cycle lane follow command.");
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] =
-              "Failed to send a default cycle lane follow command";
-        }
-        websocket_->SendData(conn, response.dump());
-      });
-
-  // websocket_->RegisterMessageHandler(
-  //     "SendParkGoRoutingRequest",
-  //     [this](const Json &json, WebSocketHandler::Connection *conn) {
-  //       auto task = std::make_shared<Task>();
-  //       auto *park_go_routing_task = task->mutable_park_go_routing_task();
-  //       if (!ContainsKey(json, "parkTime") ||
-  //           !json.find("parkTime")->is_number()) {
-  //         AERROR << "Failed to prepare a park go routing request: Invalid
-  //         park "
-  //                   "time";
-  //         return;
-  //       }
-  //       bool succeed = ConstructRoutingRequest(
-  //           json, park_go_routing_task->mutable_routing_request());
-  //       if (succeed) {
-  //         park_go_routing_task->set_park_time(
-  //             static_cast<int>(json["parkTime"]));
-  //         task->set_task_name("park_go_routing_task");
-  //         task->set_task_type(apollo::task_manager::TaskType::PARK_GO_ROUTING);
-  //         sim_world_service_.PublishTask(task);
-  //         AINFO << "The task is : " << task->DebugString();
-  //         sim_world_service_.PublishMonitorMessage(
-  //             MonitorMessageItem::INFO, "Park go routing request sent.");
-  //       } else {
-  //         sim_world_service_.PublishMonitorMessage(
-  //             MonitorMessageItem::ERROR,
-  //             "Failed to send a park go routing request.");
-  //       }
-  //     });
-
-  // websocket_->RegisterMessageHandler(
-  //     "SendParkingRoutingRequest",
-  //     [this](const Json &json, WebSocketHandler::Connection *conn) {
-  //       Json response;
-  //       response["action"] = "response";
-  //       std::string request_id;
-  //       if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-  //         AERROR
-  //             << "Failed to send parking routing request: requestId not found.";
-  //         response["data"]["info"]["code"] = -1;
-  //         response["data"]["info"]["message"] = "Miss requestId";
-  //         websocket_->SendData(conn, response.dump());
-  //         return;
-  //       }
-  //       response["data"]["requestId"] = request_id;
-  //       auto valet_parking_command = std::make_shared<ValetParkingCommand>();
-  //       bool succeed =
-  //           ConstructValetParkingCommand(json, valet_parking_command.get());
-  //       if (succeed) {
-  //         sim_world_service_.PublishValetParkingCommand(valet_parking_command);
-  //         sim_world_service_.PublishMonitorMessage(
-  //             MonitorMessageItem::INFO, "Valet parking command sent.");
-  //         response["data"]["info"]["code"] = 0;
-  //         response["data"]["info"]["message"] = "Success";
-  //       } else {
-  //         sim_world_service_.PublishMonitorMessage(
-  //             MonitorMessageItem::ERROR,
-  //             "Failed to send a Valet parking command.");
-  //         response["data"]["info"]["code"] = -1;
-  //         response["data"]["info"]["message"] =
-  //             "Failed to send a Valet parking command";
-  //       }
-  //       websocket_->SendData(conn, response.dump());
-  //     });
-
   websocket_->RegisterMessageHandler(
       "RequestRoutePath",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response = sim_world_service_.GetRoutePathAsJson();
-        response["type"] = "RoutePath";
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to request route path: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        Json result = sim_world_service_.GetRoutePathAsJson();
+        response["data"]["info"]["code"] = 0;
+        response["data"]["info"]["message"] = "Success";
+        response["data"]["info"]["data"] = result;
         websocket_->SendData(conn, response.dump());
       });
 
@@ -661,90 +881,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   //     });
 
   websocket_->RegisterMessageHandler(
-      "GetDefaultRoutings",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to get default routings: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        response["data"]["info"]["threshold"] =
-            FLAGS_loop_routing_end_to_start_distance_threshold;
-        Json default_routing_list = Json::array();
-        if (LoadUserDefinedRoutings(DefaultRoutingFile(), &default_routings_)) {
-          for (const auto &landmark : default_routings_.landmark()) {
-            Json drouting;
-            drouting["name"] = landmark.name();
-
-            Json point_list;
-            for (const auto &point : landmark.waypoint()) {
-              point_list.push_back(GetPointJsonFromLaneWaypoint(point));
-            }
-            drouting["point"] = point_list;
-            if (landmark.has_cycle_number()) {
-              drouting["cycleNumber"] = landmark.cycle_number();
-            }
-
-            default_routing_list.push_back(drouting);
-          }
-          response["data"]["info"]["code"] = 0;
-          response["data"]["info"]["message"] = "Success";
-        } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR,
-              "Failed to load default "
-              "routing. Please make sure the "
-              "file exists at " +
-                  DefaultRoutingFile());
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] =
-              "Failed to load default "
-              "routing. Please make sure the "
-              "file exists at " +
-              DefaultRoutingFile();
-        }
-        response["data"]["info"]["data"]["defaultRoutings"] =
-            default_routing_list;
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "GetParkAndGoRoutings",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["type"] = "ParkAndGoRoutings";
-        Json park_go_routing_list = Json::array();
-        if (LoadUserDefinedRoutings(ParkGoRoutingFile(), &park_go_routings_)) {
-          for (const auto &landmark : park_go_routings_.landmark()) {
-            Json park_go_routing;
-            park_go_routing["name"] = landmark.name();
-
-            Json point_list;
-            for (const auto &point : landmark.waypoint()) {
-              point_list.push_back(GetPointJsonFromLaneWaypoint(point));
-            }
-            park_go_routing["point"] = point_list;
-            park_go_routing_list.push_back(park_go_routing);
-          }
-          //  } else {
-          //   sim_world_service_.PublishMonitorMessage(
-          //       MonitorMessageItem::ERROR,
-          //       "Failed to load park go "
-          //       "routing. Please make sure the "
-          //       "file exists at " +
-          //           ParkGoRoutingFile());
-        }
-        response["parkAndGoRoutings"] = park_go_routing_list;
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         Json response({});
         std::string request_id;
@@ -786,138 +922,11 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
-      "TriggerPncMonitor",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response({});
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Miss requestId to trigger pnc monitor.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        bool planning;
-        if (JsonUtil::GetBooleanByPath(json, "data.info.planning", &planning)) {
-          enable_pnc_monitor_ = planning;
-          response["data"]["info"]["code"] = 0;
-          response["data"]["info"]["message"] = "Success";
-          response["data"]["requestId"] = request_id;
-        } else {
-          AERROR << "Failed to trigger pnc monitor: planning error.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss planning";
-          response["data"]["requestId"] = request_id;
-        }
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "RequestDataCollectionProgress",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
-        if (monitors) {
-          const auto iter = monitors->find("DataCollectionMonitor");
-          if (iter != monitors->end() && iter->second->IsEnabled()) {
-            Json response;
-            response["type"] = "DataCollectionProgress";
-            response["data"] = iter->second->GetProgressAsJson();
-            websocket_->SendData(conn, response.dump());
-          }
-        }
-      });
-
-  websocket_->RegisterMessageHandler(
       "GetParkingRoutingDistance",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         Json response;
         response["type"] = "ParkingRoutingDistance";
         response["threshold"] = FLAGS_parking_routing_distance_threshold;
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "RequestPreprocessProgress",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
-        if (monitors) {
-          const auto iter = monitors->find("PreprocessMonitor");
-          if (iter != monitors->end() && iter->second->IsEnabled()) {
-            Json response;
-            response["type"] = "PreprocessProgress";
-            response["data"] = iter->second->GetProgressAsJson();
-            websocket_->SendData(conn, response.dump());
-          }
-        }
-      });
-
-  websocket_->RegisterMessageHandler(
-      "SaveDefaultRouting",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to save default routing: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-
-        bool succeed = AddDefaultRouting(json);
-        if (succeed) {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::INFO, "Successfully add a routing.");
-          if (!default_routing_) {
-            AERROR << "Failed to add a routing" << std::endl;
-          }
-          Json ret_data = JsonUtil::ProtoToTypedJson("AddDefaultRoutingPath",
-                                                     *default_routing_);
-          response["data"]["info"]["code"] = 0;
-          response["data"]["info"]["message"] = "Success";
-          response["data"]["info"]["data"] = ret_data["data"];
-        } else {
-          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
-                                                   "Failed to add a routing.");
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Failed to add a routing";
-        }
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
-      "DeleteDefaultRouting",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id, routing_name;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to delete default routing: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.info.name", &routing_name)) {
-          AERROR << "Failed to delete default routing: name not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss name";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        bool ret = DeleteDefaultRouting(routing_name);
-        if (!ret) {
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] =
-              "Failed to delete default routing";
-        } else {
-          response["data"]["info"]["code"] = 0;
-          response["data"]["info"]["message"] = "Success";
-        }
         websocket_->SendData(conn, response.dump());
       });
 
@@ -970,76 +979,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   //     });
 
   websocket_->RegisterMessageHandler(
-      "SendScenarioSimulationRequest",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to send scenario simulation request: requestId not "
-                    "found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        bool fromScenario;
-        if (!JsonUtil::GetBooleanByPath(json, "data.info.fromScenario",
-                                        &fromScenario)) {
-          AERROR << "Failed to send scene simulation request: fromScenario not "
-                    "found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss fromScenario";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        Json to_send_json = json;
-        if (fromScenario) {
-          // If the user does not set a route,
-          // the default start and end points of the scene are used
-          double x, y;
-          hmi_->GetCurrentScenarioEndPoint(x, y);
-          Json end_point;
-          end_point["x"] = x;
-          end_point["y"] = y;
-          end_point["z"] = 0;
-          to_send_json["data"]["info"]["end"] = end_point;
-        }
-        // Otherwise, use the route set by the user
-
-        auto lane_follow_command = std::make_shared<LaneFollowCommand>();
-        bool succeed =
-            ConstructLaneFollowCommand(to_send_json, lane_follow_command.get());
-        if (succeed) {
-          sim_world_service_.PublishLaneFollowCommand(lane_follow_command);
-          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::INFO,
-                                                   "Lane follow command sent.");
-        } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR,
-              "Failed to send a Lane follow command.");
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] =
-              "Failed to send a Lane follow command";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        // start sim obstacle
-        if (!hmi_->StartSimObstacle()) {
-          AERROR << "Failed to start sim obstacle.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] =
-              "Failed to start sim obstacle";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["info"]["code"] = 0;
-        response["data"]["info"]["message"] = "Success";
-        websocket_->SendData(conn, response.dump());
-      });
-
-  websocket_->RegisterMessageHandler(
       "StopScenarioSimulation",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         Json response;
@@ -1054,11 +993,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        if (!hmi_->StopSimObstacle()) {
-          AERROR << "Failed to stop sim obstacle.";
+        if (!hmi_->StopScenarioSimulation()) {
+          AERROR << "Failed to stop scenario simulation.";
           response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Failed to stop sim obstacle.";
+          response["data"]["info"]["message"] =
+              "Failed to stop scenario simulation";
         } else {
+          // Stop the vehicle at the current frame.
+          SimControlManager::Instance()->Reset();
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
         }
@@ -1104,6 +1046,41 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         if (!plugin_manager_->SendMsgToPlugin(iter->dump())) {
           AERROR << "Failed to send msg to plugin";
         }
+      });
+
+  websocket_->RegisterMessageHandler(
+      "ResetScenarioSimulation",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to reset scenario simulation: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        Json extrem_point = hmi_->GetCurrentScenarioExtremPoint();
+        if (extrem_point.find("start") == extrem_point.end()) {
+          AERROR << "Failed to reset scenario simulation: failed to find start "
+                    "point.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Failed to find start point";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        double x, y;
+        JsonUtil::GetNumber(extrem_point["start"], "x", &x);
+        JsonUtil::GetNumber(extrem_point["start"], "y", &y);
+        SimControlManager::Instance()->Restart(x, y);
+        if (!hmi_->StopScenarioSimulation()) {
+          AWARN << "Failed to stop scenario simulation.";
+        }
+        response["data"]["info"]["code"] = 0;
+        response["data"]["info"]["message"] = "Success";
+        websocket_->SendData(conn, response.dump());
       });
 }
 
@@ -1285,8 +1262,7 @@ void SimulationWorldUpdater::OnTimer(const std::string &channel_name) {
     last_pushed_adc_timestamp_sec_ =
         sim_world_service_.world().auto_driving_car().timestamp_sec();
     sim_world_service_.GetWireFormatString(
-        FLAGS_sim_map_radius, &simulation_world_,
-        &simulation_world_with_planning_data_);
+        FLAGS_sim_map_radius, &simulation_world_with_planning_data_);
     sim_world_service_.GetRelativeMap().SerializeToString(
         &relative_map_string_);
   }
@@ -1301,8 +1277,7 @@ void SimulationWorldUpdater::PublishMessage(const std::string &channel_name) {
   std::string to_send;
   {
     boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
-    to_send = enable_pnc_monitor_ ? simulation_world_with_planning_data_
-                                  : simulation_world_;
+    to_send = simulation_world_with_planning_data_;
   }
   StreamData stream_data;
   std::string stream_data_string;

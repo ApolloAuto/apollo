@@ -1,7 +1,8 @@
 import { Factory } from '../base';
-import { reducer, initState, IInitState } from './reducer';
+import { reducer, initState, IInitState, mosaicId } from './reducer';
 import { CombineAction } from './actions';
 import { createLocalStoragePersistor } from '../base/Persistor';
+import { CURRENT_MODE, usePickHmiStore } from '../HmiStore';
 
 export * from './actions';
 
@@ -11,10 +12,18 @@ export const { StoreProvider: PanelLayoutStoreProvider, useStore: usePanelLayout
 >({
     initialState: initState,
     reducer,
-    persistor: createLocalStoragePersistor('dv-panel-layout-stoer'),
+    persistor: createLocalStoragePersistor('dv-panel-layout-stoer-v1'),
 });
 
 export function useMosaicId() {
     const [store] = usePanelLayoutStore();
-    return store.mosaicId;
+    const [hmi] = usePickHmiStore();
+    return store[hmi.currentMode]?.mosaicId || mosaicId;
+}
+
+export function useGetCurrentLayout() {
+    const [hmi] = usePickHmiStore();
+    const [store] = usePanelLayoutStore();
+
+    return store[hmi.currentMode]?.layout;
 }

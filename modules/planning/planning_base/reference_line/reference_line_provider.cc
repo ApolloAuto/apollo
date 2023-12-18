@@ -36,7 +36,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 /**
  * @namespace apollo::planning
@@ -662,8 +662,10 @@ bool ReferenceLineProvider::CreateReferenceLine(
         iter = segments->erase(iter);
       } else {
         common::SLPoint sl;
-        if (!reference_lines->back().XYToSL(vehicle_state.heading(),
-              common::math::Vec2d(vehicle_state.x(), vehicle_state.y()), &sl)) {
+        if (!reference_lines->back().XYToSL(
+                vehicle_state.heading(),
+                common::math::Vec2d(vehicle_state.x(), vehicle_state.y()),
+                &sl)) {
           AWARN << "Failed to project point: {" << vehicle_state.x() << ","
                 << vehicle_state.y() << "} to stitched reference line";
         }
@@ -713,8 +715,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   common::SLPoint sl_point;
   Vec2d vec2d(state.x(), state.y());
   LaneWaypoint waypoint;
-  if (!prev_segment->GetProjection(vec2d, state.heading(),
-                                   &sl_point, &waypoint)) {
+  if (!prev_segment->GetProjection(vec2d, state.heading(), &sl_point,
+                                   &waypoint)) {
     AWARN << "Vehicle current point: " << vec2d.DebugString()
           << " not on previous reference line";
     return SmoothRouteSegment(*segments, reference_line);

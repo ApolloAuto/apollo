@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import Logger from '@dreamview/log';
 import { MosaicDirection } from 'react-mosaic-component';
 import { OnResizeCallback } from 'react-resize-detector/build/types/types';
+import CountedSubject from '@dreamview/dreamview-core/src/util/CountedSubject';
 import { SubscribeInfo } from '../../../type/RenderToolBar';
 import { KeyHandlers } from '../../KeyListener';
 
@@ -33,7 +34,9 @@ export interface IPanelContext {
     closeSubcription: (name: string) => void;
     setKeyUpHandlers: (handlers: KeyHandlers[]) => void;
     setKeyDownHandlers: (handlers: KeyHandlers[]) => void;
+    removeKeyDownHandlers: (handlers: KeyHandlers[]) => void;
     registerFullScreenHooks: (hookConfig: FullScreenHookConfig) => void;
+    subscribeToData: <T>(newChannelInfo: SubscribeInfo) => CountedSubject<T>;
 }
 
 export const PanelContext = createContext<IPanelContext | undefined>(undefined);

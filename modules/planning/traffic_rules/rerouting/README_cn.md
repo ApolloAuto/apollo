@@ -53,7 +53,7 @@ apollo::planning::Rerouting
 
 ##### 配置加载 Rerouting 插件
 
-在 `modules/planning/planning_base/conf/traffic_rule_config.pb.txt` 增加`Rerouting`插件的配置，配置参数中`name` 表示rule的名称，这个由用户自定义，表达清楚是哪个rule即可，`type` 是rule的类名称，即`Rerouting`。
+在 `modules/planning/planning_component/conf/traffic_rule_config.pb.txt` 增加`Rerouting`插件的配置，配置参数中`name` 表示rule的名称，这个由用户自定义，表达清楚是哪个rule即可，`type` 是rule的类名称，即`Rerouting`。
 
 ```
 rule {

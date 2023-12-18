@@ -24,7 +24,7 @@
 
 #include "modules/common_msgs/map_msgs/map_lane.pb.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/common.h"
 
 namespace apollo {

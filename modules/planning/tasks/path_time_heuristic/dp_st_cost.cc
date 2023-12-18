@@ -23,9 +23,9 @@
 #include <limits>
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed/st_point.h"
-#include "modules/planning/planning_base/task_base/utils/st_gap_estimator.h"
+#include "modules/planning/planning_interface_base/task_base/utils/st_gap_estimator.h"
 
 namespace apollo {
 namespace planning {

@@ -8,7 +8,7 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
-    dag_files: "/apollo/modules/planning/planning_base/dag/planning.dag"
+    dag_files: "/apollo/modules/planning/planning_component/dag/planning.dag"
     dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
     dag_files: "/apollo/modules/storytelling/dag/storytelling.dag"

@@ -26,7 +26,7 @@
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/trajectory_fallback_task.h"
+#include "modules/planning/planning_interface_base/task_base/trajectory_fallback_task.h"
 
 namespace apollo {
 namespace planning {

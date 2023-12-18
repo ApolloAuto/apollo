@@ -21,6 +21,7 @@
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/util/util.h"
 

@@ -21,6 +21,7 @@ import RoutingEditingFunctionalFavorite from './RoutingEditingFunctionalFavorite
 import { useVizStore } from '../../VizStore';
 import { RouteInfo, RouteOrigin, PointType } from '../RouteManager/type';
 import useWebSocketServices from '../../../../../services/hooks/useWebSocketServices';
+import { usePickHmiStore, HMIModeOperation } from '../../../../../store/HmiStore';
 
 interface IRoutingEditingFunctionalAreaProps {
     carviz: RoutingEditor;
@@ -31,17 +32,21 @@ interface IRoutingEditingFunctionalAreaProps {
 function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps) {
     const { carviz, changeActiveName, activeName } = props;
 
+    const [hmi, dispatch] = usePickHmiStore();
+
     const [{ routeManager, routingEditor }] = useVizStore();
 
     const { isMainConnected, mainApi } = useWebSocketServices();
-
-    const { classes, cx } = useStyle();
 
     const { t } = useTranslation('routeEditing');
 
     const routeManagerMix = routeManager.currentRouteMix;
 
     const [checkedItem, setCheckedItem] = useState<Nullable<FunctionalNameEnum>>(null);
+
+    const relocateDisState = hmi.currentOperation === HMIModeOperation.AUTO_DRIVE;
+
+    const { classes, cx } = useStyle({ relocateDisState });
 
     const routeChange = useCallback(
         (operation: FunctionalOperation, point: PointData | CreatePathwayMarkerCallbackRes) => {
@@ -125,6 +130,9 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
 
     const handleClicked = useCallback(
         (name: FunctionalNameEnum) => () => {
+            if (name === FunctionalNameEnum.RELOCATE && relocateDisState) {
+                return;
+            }
             if (checkedItem === name) {
                 if (Object.values(MutexToolNameEnum).includes(name as any)) {
                     carviz?.deactiveAll();
@@ -191,7 +199,11 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
             <RoutingEditingFunctionalRelocate />
         ) : (
             <FunctionalItemNoActive
-                functionalItemNoActiveText={FunctionalItemNoActiveEnum.FunctionalRelocateNoActive}
+                functionalItemNoActiveText={
+                    relocateDisState
+                        ? FunctionalItemNoActiveEnum.FunctionalRelocateNoActiveDis
+                        : FunctionalItemNoActiveEnum.FunctionalRelocateNoActive
+                }
             />
         );
     const functionalWay =
@@ -233,11 +245,12 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                             : classes['custom-popover-ordinary'],
                     )}
                 >
-                    <div>
+                    <div className={cx({ [classes['func-relocate-ele']]: relocateDisState })}>
                         <RoutingEditingFunctionalItem
                             functionalName={FunctionalNameEnum.RELOCATE}
                             checkedItem={checkedItem}
                             onClick={handleClicked(FunctionalNameEnum.RELOCATE)}
+                            disable={relocateDisState}
                         />
                     </div>
                 </Popover>

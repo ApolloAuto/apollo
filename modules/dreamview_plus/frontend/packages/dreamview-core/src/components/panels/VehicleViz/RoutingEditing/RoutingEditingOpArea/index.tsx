@@ -28,7 +28,7 @@ export function RoutingEditingOpArea() {
 
     const [commonRoutingClicked, setCommonRoutingClicked] = useState(false);
 
-    const [routingDisable, setRoutingDisable] = useState(!(hmi.currentMap && hmi.currentVehicle));
+    const [routingDisable, setRoutingDisable] = useState(true);
 
     const handleHoverChange = (commonRoutingIsOpen: boolean) => {
         setCommonRoutingHovered(commonRoutingIsOpen);
@@ -60,8 +60,10 @@ export function RoutingEditingOpArea() {
 
     useEffect(() => {
         if (
+            hmi.currentOperation === HMIModeOperation.PLAY_RECORDER ||
             hmi.currentOperation === HMIModeOperation.SCENARIO ||
-            hmi.currentOperation === HMIModeOperation.SIM_CONTROL
+            hmi.currentOperation === HMIModeOperation.SIM_CONTROL ||
+            hmi.currentOperation === HMIModeOperation.AUTO_DRIVE
         ) {
             setRoutingDisable(false);
         } else {

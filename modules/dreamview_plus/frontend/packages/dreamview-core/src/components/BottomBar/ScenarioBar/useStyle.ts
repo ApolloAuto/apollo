@@ -23,7 +23,6 @@ export default function useStyle() {
             padding: `0 ${theme.tokens.padding.speace3}`,
             color: theme.tokens.colors.fontColor3,
             '& .ic-play-container': {
-                width: '72px',
                 height: '40px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -32,20 +31,6 @@ export default function useStyle() {
             '& .anticon': {
                 fontSize: theme.tokens.font.size.large,
                 color: theme.tokens.colors.fontColor2,
-            },
-            '& .ic-play-btn': {
-                cursor: 'pointer',
-                fontSize: '24px !important',
-                marginRight: '6px',
-            },
-            '& .ic-stop-btn': {
-                cursor: 'pointer',
-                fontSize: '24px !important',
-                marginRight: '6px',
-                color: '#F75660 !important',
-                '&:active': {
-                    color: 'rgba(247,56,96,0.8) !important',
-                },
             },
             '& .record-start-record-btn': {
                 cursor: 'pointer',

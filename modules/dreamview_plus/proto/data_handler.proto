@@ -10,17 +10,22 @@ message WebsocketInfo {
   optional string websocket_pipe = 2;
 }
 
+message ChannelInfo {
+  optional string channel_name = 1;
+  optional string proto_path = 2;
+  optional string msg_type = 3;
+}
+
 message DataHandlerInfo {
   optional string data_name = 1;
-  // The full path of proto,eg:apollo.dreamview.SimulationWorld
+  // proto file location
   optional string proto_path = 2;
-  // proto_desc only carries proto information when it is passed to the front
-  // end and it is not required when registering at the back end
-  optional bytes proto_desc = 3;
+  // The message type of proto,eg:apollo.dreamview.SimulationWorld
+  optional string msg_type = 3;
   optional WebsocketInfo websocket_info = 4;
   // camera point_cloud may exists data source comes from multiplay channels
   optional bool different_for_channels = 5 [default = false];
-  repeated string channels = 6;
+  repeated ChannelInfo channels = 6;
 }
 
 message DataHandlerConf {

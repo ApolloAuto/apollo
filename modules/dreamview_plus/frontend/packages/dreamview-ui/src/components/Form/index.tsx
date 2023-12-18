@@ -23,6 +23,9 @@ Form.defaultProps = {};
 
 Form.displayName = 'Form';
 
+Form.useFormInstance = InternalForm.useFormInstance;
+
 Form.Item = InternalForm.Item;
+Form.List = InternalForm.List;
 
 Form.useForm = () => InternalForm.useForm();

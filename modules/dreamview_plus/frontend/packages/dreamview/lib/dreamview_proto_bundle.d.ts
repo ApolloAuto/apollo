@@ -1516,6 +1516,3894 @@ export namespace apollo {
     /** Namespace dreamview. */
     namespace dreamview {
 
+        /** Properties of a CameraUpdate. */
+        interface ICameraUpdate {
+
+            /** CameraUpdate localization */
+            localization?: (number[]|null);
+
+            /** CameraUpdate localization2cameraTf */
+            localization2cameraTf?: (number[]|null);
+
+            /** CameraUpdate image */
+            image?: (Uint8Array|null);
+
+            /** CameraUpdate imageAspectRatio */
+            imageAspectRatio?: (number|null);
+
+            /** CameraUpdate bbox2d */
+            bbox2d?: (apollo.perception.IBBox2D[]|null);
+
+            /** CameraUpdate obstaclesId */
+            obstaclesId?: (number[]|null);
+
+            /** CameraUpdate obstaclesSubType */
+            obstaclesSubType?: (apollo.dreamview.CameraUpdate.SubType[]|null);
+
+            /** CameraUpdate kImageScale */
+            kImageScale?: (number|null);
+        }
+
+        /** Represents a CameraUpdate. */
+        class CameraUpdate implements ICameraUpdate {
+
+            /**
+             * Constructs a new CameraUpdate.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.ICameraUpdate);
+
+            /** CameraUpdate localization. */
+            public localization: number[];
+
+            /** CameraUpdate localization2cameraTf. */
+            public localization2cameraTf: number[];
+
+            /** CameraUpdate image. */
+            public image: Uint8Array;
+
+            /** CameraUpdate imageAspectRatio. */
+            public imageAspectRatio: number;
+
+            /** CameraUpdate bbox2d. */
+            public bbox2d: apollo.perception.IBBox2D[];
+
+            /** CameraUpdate obstaclesId. */
+            public obstaclesId: number[];
+
+            /** CameraUpdate obstaclesSubType. */
+            public obstaclesSubType: apollo.dreamview.CameraUpdate.SubType[];
+
+            /** CameraUpdate kImageScale. */
+            public kImageScale: number;
+
+            /**
+             * Creates a new CameraUpdate instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CameraUpdate instance
+             */
+            public static create(properties?: apollo.dreamview.ICameraUpdate): apollo.dreamview.CameraUpdate;
+
+            /**
+             * Encodes the specified CameraUpdate message. Does not implicitly {@link apollo.dreamview.CameraUpdate.verify|verify} messages.
+             * @param message CameraUpdate message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.ICameraUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified CameraUpdate message, length delimited. Does not implicitly {@link apollo.dreamview.CameraUpdate.verify|verify} messages.
+             * @param message CameraUpdate message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.ICameraUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CameraUpdate message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CameraUpdate
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.CameraUpdate;
+
+            /**
+             * Decodes a CameraUpdate message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns CameraUpdate
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.CameraUpdate;
+
+            /**
+             * Verifies a CameraUpdate message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CameraUpdate message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CameraUpdate
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.CameraUpdate;
+
+            /**
+             * Creates a plain object from a CameraUpdate message. Also converts values to other types if specified.
+             * @param message CameraUpdate
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.CameraUpdate, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CameraUpdate to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for CameraUpdate
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace CameraUpdate {
+
+            /** SubType enum. */
+            enum SubType {
+                ST_UNKNOWN = 0,
+                ST_UNKNOWN_MOVABLE = 1,
+                ST_UNKNOWN_UNMOVABLE = 2,
+                ST_CAR = 3,
+                ST_VAN = 4,
+                ST_TRUCK = 5,
+                ST_BUS = 6,
+                ST_CYCLIST = 7,
+                ST_MOTORCYCLIST = 8,
+                ST_TRICYCLIST = 9,
+                ST_PEDESTRIAN = 10,
+                ST_TRAFFICCONE = 11
+            }
+        }
+
+        /** Properties of a WebsocketInfo. */
+        interface IWebsocketInfo {
+
+            /** WebsocketInfo websocketName */
+            websocketName?: (string|null);
+
+            /** WebsocketInfo websocketPipe */
+            websocketPipe?: (string|null);
+        }
+
+        /** Represents a WebsocketInfo. */
+        class WebsocketInfo implements IWebsocketInfo {
+
+            /**
+             * Constructs a new WebsocketInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IWebsocketInfo);
+
+            /** WebsocketInfo websocketName. */
+            public websocketName: string;
+
+            /** WebsocketInfo websocketPipe. */
+            public websocketPipe: string;
+
+            /**
+             * Creates a new WebsocketInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WebsocketInfo instance
+             */
+            public static create(properties?: apollo.dreamview.IWebsocketInfo): apollo.dreamview.WebsocketInfo;
+
+            /**
+             * Encodes the specified WebsocketInfo message. Does not implicitly {@link apollo.dreamview.WebsocketInfo.verify|verify} messages.
+             * @param message WebsocketInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IWebsocketInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified WebsocketInfo message, length delimited. Does not implicitly {@link apollo.dreamview.WebsocketInfo.verify|verify} messages.
+             * @param message WebsocketInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IWebsocketInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WebsocketInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WebsocketInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.WebsocketInfo;
+
+            /**
+             * Decodes a WebsocketInfo message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns WebsocketInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.WebsocketInfo;
+
+            /**
+             * Verifies a WebsocketInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a WebsocketInfo message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns WebsocketInfo
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.WebsocketInfo;
+
+            /**
+             * Creates a plain object from a WebsocketInfo message. Also converts values to other types if specified.
+             * @param message WebsocketInfo
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.WebsocketInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this WebsocketInfo to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for WebsocketInfo
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ChannelInfo. */
+        interface IChannelInfo {
+
+            /** ChannelInfo channelName */
+            channelName?: (string|null);
+
+            /** ChannelInfo protoPath */
+            protoPath?: (string|null);
+
+            /** ChannelInfo msgType */
+            msgType?: (string|null);
+        }
+
+        /** Represents a ChannelInfo. */
+        class ChannelInfo implements IChannelInfo {
+
+            /**
+             * Constructs a new ChannelInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IChannelInfo);
+
+            /** ChannelInfo channelName. */
+            public channelName: string;
+
+            /** ChannelInfo protoPath. */
+            public protoPath: string;
+
+            /** ChannelInfo msgType. */
+            public msgType: string;
+
+            /**
+             * Creates a new ChannelInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ChannelInfo instance
+             */
+            public static create(properties?: apollo.dreamview.IChannelInfo): apollo.dreamview.ChannelInfo;
+
+            /**
+             * Encodes the specified ChannelInfo message. Does not implicitly {@link apollo.dreamview.ChannelInfo.verify|verify} messages.
+             * @param message ChannelInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IChannelInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ChannelInfo message, length delimited. Does not implicitly {@link apollo.dreamview.ChannelInfo.verify|verify} messages.
+             * @param message ChannelInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IChannelInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ChannelInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ChannelInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ChannelInfo;
+
+            /**
+             * Decodes a ChannelInfo message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ChannelInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ChannelInfo;
+
+            /**
+             * Verifies a ChannelInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ChannelInfo message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ChannelInfo
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ChannelInfo;
+
+            /**
+             * Creates a plain object from a ChannelInfo message. Also converts values to other types if specified.
+             * @param message ChannelInfo
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ChannelInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ChannelInfo to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ChannelInfo
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a DataHandlerInfo. */
+        interface IDataHandlerInfo {
+
+            /** DataHandlerInfo dataName */
+            dataName?: (string|null);
+
+            /** DataHandlerInfo protoPath */
+            protoPath?: (string|null);
+
+            /** DataHandlerInfo msgType */
+            msgType?: (string|null);
+
+            /** DataHandlerInfo websocketInfo */
+            websocketInfo?: (apollo.dreamview.IWebsocketInfo|null);
+
+            /** DataHandlerInfo differentForChannels */
+            differentForChannels?: (boolean|null);
+
+            /** DataHandlerInfo channels */
+            channels?: (apollo.dreamview.IChannelInfo[]|null);
+        }
+
+        /** Represents a DataHandlerInfo. */
+        class DataHandlerInfo implements IDataHandlerInfo {
+
+            /**
+             * Constructs a new DataHandlerInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IDataHandlerInfo);
+
+            /** DataHandlerInfo dataName. */
+            public dataName: string;
+
+            /** DataHandlerInfo protoPath. */
+            public protoPath: string;
+
+            /** DataHandlerInfo msgType. */
+            public msgType: string;
+
+            /** DataHandlerInfo websocketInfo. */
+            public websocketInfo?: (apollo.dreamview.IWebsocketInfo|null);
+
+            /** DataHandlerInfo differentForChannels. */
+            public differentForChannels: boolean;
+
+            /** DataHandlerInfo channels. */
+            public channels: apollo.dreamview.IChannelInfo[];
+
+            /**
+             * Creates a new DataHandlerInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DataHandlerInfo instance
+             */
+            public static create(properties?: apollo.dreamview.IDataHandlerInfo): apollo.dreamview.DataHandlerInfo;
+
+            /**
+             * Encodes the specified DataHandlerInfo message. Does not implicitly {@link apollo.dreamview.DataHandlerInfo.verify|verify} messages.
+             * @param message DataHandlerInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IDataHandlerInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified DataHandlerInfo message, length delimited. Does not implicitly {@link apollo.dreamview.DataHandlerInfo.verify|verify} messages.
+             * @param message DataHandlerInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IDataHandlerInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DataHandlerInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DataHandlerInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.DataHandlerInfo;
+
+            /**
+             * Decodes a DataHandlerInfo message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns DataHandlerInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.DataHandlerInfo;
+
+            /**
+             * Verifies a DataHandlerInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a DataHandlerInfo message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns DataHandlerInfo
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.DataHandlerInfo;
+
+            /**
+             * Creates a plain object from a DataHandlerInfo message. Also converts values to other types if specified.
+             * @param message DataHandlerInfo
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.DataHandlerInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this DataHandlerInfo to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for DataHandlerInfo
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a DataHandlerConf. */
+        interface IDataHandlerConf {
+
+            /** DataHandlerConf dataHandlerInfo */
+            dataHandlerInfo?: ({ [k: string]: apollo.dreamview.IDataHandlerInfo }|null);
+        }
+
+        /** Represents a DataHandlerConf. */
+        class DataHandlerConf implements IDataHandlerConf {
+
+            /**
+             * Constructs a new DataHandlerConf.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IDataHandlerConf);
+
+            /** DataHandlerConf dataHandlerInfo. */
+            public dataHandlerInfo: { [k: string]: apollo.dreamview.IDataHandlerInfo };
+
+            /**
+             * Creates a new DataHandlerConf instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DataHandlerConf instance
+             */
+            public static create(properties?: apollo.dreamview.IDataHandlerConf): apollo.dreamview.DataHandlerConf;
+
+            /**
+             * Encodes the specified DataHandlerConf message. Does not implicitly {@link apollo.dreamview.DataHandlerConf.verify|verify} messages.
+             * @param message DataHandlerConf message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IDataHandlerConf, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified DataHandlerConf message, length delimited. Does not implicitly {@link apollo.dreamview.DataHandlerConf.verify|verify} messages.
+             * @param message DataHandlerConf message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IDataHandlerConf, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DataHandlerConf message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DataHandlerConf
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.DataHandlerConf;
+
+            /**
+             * Decodes a DataHandlerConf message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns DataHandlerConf
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.DataHandlerConf;
+
+            /**
+             * Verifies a DataHandlerConf message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a DataHandlerConf message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns DataHandlerConf
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.DataHandlerConf;
+
+            /**
+             * Creates a plain object from a DataHandlerConf message. Also converts values to other types if specified.
+             * @param message DataHandlerConf
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.DataHandlerConf, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this DataHandlerConf to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for DataHandlerConf
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a StreamData. */
+        interface IStreamData {
+
+            /** StreamData type */
+            type?: (string|null);
+
+            /** StreamData action */
+            action?: (string|null);
+
+            /** StreamData dataName */
+            dataName?: (string|null);
+
+            /** StreamData channelName */
+            channelName?: (string|null);
+
+            /** StreamData data */
+            data?: (Uint8Array|null);
+        }
+
+        /** Represents a StreamData. */
+        class StreamData implements IStreamData {
+
+            /**
+             * Constructs a new StreamData.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IStreamData);
+
+            /** StreamData type. */
+            public type: string;
+
+            /** StreamData action. */
+            public action: string;
+
+            /** StreamData dataName. */
+            public dataName: string;
+
+            /** StreamData channelName. */
+            public channelName: string;
+
+            /** StreamData data. */
+            public data: Uint8Array;
+
+            /**
+             * Creates a new StreamData instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns StreamData instance
+             */
+            public static create(properties?: apollo.dreamview.IStreamData): apollo.dreamview.StreamData;
+
+            /**
+             * Encodes the specified StreamData message. Does not implicitly {@link apollo.dreamview.StreamData.verify|verify} messages.
+             * @param message StreamData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IStreamData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified StreamData message, length delimited. Does not implicitly {@link apollo.dreamview.StreamData.verify|verify} messages.
+             * @param message StreamData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IStreamData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a StreamData message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns StreamData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.StreamData;
+
+            /**
+             * Decodes a StreamData message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns StreamData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.StreamData;
+
+            /**
+             * Verifies a StreamData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a StreamData message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns StreamData
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.StreamData;
+
+            /**
+             * Creates a plain object from a StreamData message. Also converts values to other types if specified.
+             * @param message StreamData
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.StreamData, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this StreamData to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for StreamData
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of an Obstacles. */
+        interface IObstacles {
+
+            /** Obstacles obstacle */
+            obstacle?: (apollo.dreamview.IObject[]|null);
+
+            /** Obstacles autoDrivingCar */
+            autoDrivingCar?: (apollo.dreamview.IObject|null);
+
+            /** Obstacles sensorMeasurements */
+            sensorMeasurements?: ({ [k: string]: apollo.dreamview.ISensorMeasurements }|null);
+        }
+
+        /** Represents an Obstacles. */
+        class Obstacles implements IObstacles {
+
+            /**
+             * Constructs a new Obstacles.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IObstacles);
+
+            /** Obstacles obstacle. */
+            public obstacle: apollo.dreamview.IObject[];
+
+            /** Obstacles autoDrivingCar. */
+            public autoDrivingCar?: (apollo.dreamview.IObject|null);
+
+            /** Obstacles sensorMeasurements. */
+            public sensorMeasurements: { [k: string]: apollo.dreamview.ISensorMeasurements };
+
+            /**
+             * Creates a new Obstacles instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Obstacles instance
+             */
+            public static create(properties?: apollo.dreamview.IObstacles): apollo.dreamview.Obstacles;
+
+            /**
+             * Encodes the specified Obstacles message. Does not implicitly {@link apollo.dreamview.Obstacles.verify|verify} messages.
+             * @param message Obstacles message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IObstacles, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Obstacles message, length delimited. Does not implicitly {@link apollo.dreamview.Obstacles.verify|verify} messages.
+             * @param message Obstacles message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IObstacles, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Obstacles message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Obstacles
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Obstacles;
+
+            /**
+             * Decodes an Obstacles message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Obstacles
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Obstacles;
+
+            /**
+             * Verifies an Obstacles message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an Obstacles message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Obstacles
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Obstacles;
+
+            /**
+             * Creates a plain object from an Obstacles message. Also converts values to other types if specified.
+             * @param message Obstacles
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Obstacles, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Obstacles to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Obstacles
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of an Options. */
+        interface IOptions {
+
+            /** Options legendDisplay */
+            legendDisplay?: (boolean|null);
+
+            /** Options x */
+            x?: (apollo.dreamview.Options.IAxis|null);
+
+            /** Options y */
+            y?: (apollo.dreamview.Options.IAxis|null);
+
+            /** Options aspectRatio */
+            aspectRatio?: (number|null);
+
+            /** Options syncXyWindowSize */
+            syncXyWindowSize?: (boolean|null);
+        }
+
+        /** Represents an Options. */
+        class Options implements IOptions {
+
+            /**
+             * Constructs a new Options.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IOptions);
+
+            /** Options legendDisplay. */
+            public legendDisplay: boolean;
+
+            /** Options x. */
+            public x?: (apollo.dreamview.Options.IAxis|null);
+
+            /** Options y. */
+            public y?: (apollo.dreamview.Options.IAxis|null);
+
+            /** Options aspectRatio. */
+            public aspectRatio: number;
+
+            /** Options syncXyWindowSize. */
+            public syncXyWindowSize: boolean;
+
+            /**
+             * Creates a new Options instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Options instance
+             */
+            public static create(properties?: apollo.dreamview.IOptions): apollo.dreamview.Options;
+
+            /**
+             * Encodes the specified Options message. Does not implicitly {@link apollo.dreamview.Options.verify|verify} messages.
+             * @param message Options message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Options message, length delimited. Does not implicitly {@link apollo.dreamview.Options.verify|verify} messages.
+             * @param message Options message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Options message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Options
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Options;
+
+            /**
+             * Decodes an Options message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Options
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Options;
+
+            /**
+             * Verifies an Options message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an Options message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Options
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Options;
+
+            /**
+             * Creates a plain object from an Options message. Also converts values to other types if specified.
+             * @param message Options
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Options, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Options to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Options
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace Options {
+
+            /** Properties of an Axis. */
+            interface IAxis {
+
+                /** Axis min */
+                min?: (number|null);
+
+                /** Axis max */
+                max?: (number|null);
+
+                /** Axis labelString */
+                labelString?: (string|null);
+
+                /** Axis windowSize */
+                windowSize?: (number|null);
+
+                /** Axis stepSize */
+                stepSize?: (number|null);
+
+                /** Axis midValue */
+                midValue?: (number|null);
+            }
+
+            /** Represents an Axis. */
+            class Axis implements IAxis {
+
+                /**
+                 * Constructs a new Axis.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.Options.IAxis);
+
+                /** Axis min. */
+                public min: number;
+
+                /** Axis max. */
+                public max: number;
+
+                /** Axis labelString. */
+                public labelString: string;
+
+                /** Axis windowSize. */
+                public windowSize: number;
+
+                /** Axis stepSize. */
+                public stepSize: number;
+
+                /** Axis midValue. */
+                public midValue: number;
+
+                /**
+                 * Creates a new Axis instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Axis instance
+                 */
+                public static create(properties?: apollo.dreamview.Options.IAxis): apollo.dreamview.Options.Axis;
+
+                /**
+                 * Encodes the specified Axis message. Does not implicitly {@link apollo.dreamview.Options.Axis.verify|verify} messages.
+                 * @param message Axis message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.Options.IAxis, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Axis message, length delimited. Does not implicitly {@link apollo.dreamview.Options.Axis.verify|verify} messages.
+                 * @param message Axis message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.Options.IAxis, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes an Axis message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Axis
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Options.Axis;
+
+                /**
+                 * Decodes an Axis message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Axis
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Options.Axis;
+
+                /**
+                 * Verifies an Axis message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates an Axis message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Axis
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.Options.Axis;
+
+                /**
+                 * Creates a plain object from an Axis message. Also converts values to other types if specified.
+                 * @param message Axis
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.Options.Axis, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Axis to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for Axis
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+        }
+
+        /** Properties of a Line. */
+        interface ILine {
+
+            /** Line label */
+            label?: (string|null);
+
+            /** Line hideLabelInLegend */
+            hideLabelInLegend?: (boolean|null);
+
+            /** Line point */
+            point?: (apollo.common.IPoint2D[]|null);
+
+            /** Line properties */
+            properties?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a Line. */
+        class Line implements ILine {
+
+            /**
+             * Constructs a new Line.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.ILine);
+
+            /** Line label. */
+            public label: string;
+
+            /** Line hideLabelInLegend. */
+            public hideLabelInLegend: boolean;
+
+            /** Line point. */
+            public point: apollo.common.IPoint2D[];
+
+            /** Line properties. */
+            public properties: { [k: string]: string };
+
+            /**
+             * Creates a new Line instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Line instance
+             */
+            public static create(properties?: apollo.dreamview.ILine): apollo.dreamview.Line;
+
+            /**
+             * Encodes the specified Line message. Does not implicitly {@link apollo.dreamview.Line.verify|verify} messages.
+             * @param message Line message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.ILine, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Line message, length delimited. Does not implicitly {@link apollo.dreamview.Line.verify|verify} messages.
+             * @param message Line message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.ILine, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Line message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Line
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Line;
+
+            /**
+             * Decodes a Line message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Line
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Line;
+
+            /**
+             * Verifies a Line message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Line message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Line
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Line;
+
+            /**
+             * Creates a plain object from a Line message. Also converts values to other types if specified.
+             * @param message Line
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Line, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Line to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Line
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a Polygon. */
+        interface IPolygon {
+
+            /** Polygon label */
+            label?: (string|null);
+
+            /** Polygon hideLabelInLegend */
+            hideLabelInLegend?: (boolean|null);
+
+            /** Polygon point */
+            point?: (apollo.common.IPoint2D[]|null);
+
+            /** Polygon properties */
+            properties?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a Polygon. */
+        class Polygon implements IPolygon {
+
+            /**
+             * Constructs a new Polygon.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IPolygon);
+
+            /** Polygon label. */
+            public label: string;
+
+            /** Polygon hideLabelInLegend. */
+            public hideLabelInLegend: boolean;
+
+            /** Polygon point. */
+            public point: apollo.common.IPoint2D[];
+
+            /** Polygon properties. */
+            public properties: { [k: string]: string };
+
+            /**
+             * Creates a new Polygon instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Polygon instance
+             */
+            public static create(properties?: apollo.dreamview.IPolygon): apollo.dreamview.Polygon;
+
+            /**
+             * Encodes the specified Polygon message. Does not implicitly {@link apollo.dreamview.Polygon.verify|verify} messages.
+             * @param message Polygon message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IPolygon, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Polygon message, length delimited. Does not implicitly {@link apollo.dreamview.Polygon.verify|verify} messages.
+             * @param message Polygon message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IPolygon, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Polygon message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Polygon
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Polygon;
+
+            /**
+             * Decodes a Polygon message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Polygon
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Polygon;
+
+            /**
+             * Verifies a Polygon message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Polygon message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Polygon
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Polygon;
+
+            /**
+             * Creates a plain object from a Polygon message. Also converts values to other types if specified.
+             * @param message Polygon
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Polygon, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Polygon to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Polygon
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a Car. */
+        interface ICar {
+
+            /** Car label */
+            label?: (string|null);
+
+            /** Car hideLabelInLegend */
+            hideLabelInLegend?: (boolean|null);
+
+            /** Car x */
+            x?: (number|null);
+
+            /** Car y */
+            y?: (number|null);
+
+            /** Car heading */
+            heading?: (number|null);
+
+            /** Car color */
+            color?: (string|null);
+        }
+
+        /** Represents a Car. */
+        class Car implements ICar {
+
+            /**
+             * Constructs a new Car.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.ICar);
+
+            /** Car label. */
+            public label: string;
+
+            /** Car hideLabelInLegend. */
+            public hideLabelInLegend: boolean;
+
+            /** Car x. */
+            public x: number;
+
+            /** Car y. */
+            public y: number;
+
+            /** Car heading. */
+            public heading: number;
+
+            /** Car color. */
+            public color: string;
+
+            /**
+             * Creates a new Car instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Car instance
+             */
+            public static create(properties?: apollo.dreamview.ICar): apollo.dreamview.Car;
+
+            /**
+             * Encodes the specified Car message. Does not implicitly {@link apollo.dreamview.Car.verify|verify} messages.
+             * @param message Car message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.ICar, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Car message, length delimited. Does not implicitly {@link apollo.dreamview.Car.verify|verify} messages.
+             * @param message Car message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.ICar, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Car message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Car
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Car;
+
+            /**
+             * Decodes a Car message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Car
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Car;
+
+            /**
+             * Verifies a Car message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Car message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Car
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Car;
+
+            /**
+             * Creates a plain object from a Car message. Also converts values to other types if specified.
+             * @param message Car
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Car, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Car to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Car
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a Chart. */
+        interface IChart {
+
+            /** Chart title */
+            title?: (string|null);
+
+            /** Chart options */
+            options?: (apollo.dreamview.IOptions|null);
+
+            /** Chart line */
+            line?: (apollo.dreamview.ILine[]|null);
+
+            /** Chart polygon */
+            polygon?: (apollo.dreamview.IPolygon[]|null);
+
+            /** Chart car */
+            car?: (apollo.dreamview.ICar[]|null);
+        }
+
+        /** Represents a Chart. */
+        class Chart implements IChart {
+
+            /**
+             * Constructs a new Chart.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IChart);
+
+            /** Chart title. */
+            public title: string;
+
+            /** Chart options. */
+            public options?: (apollo.dreamview.IOptions|null);
+
+            /** Chart line. */
+            public line: apollo.dreamview.ILine[];
+
+            /** Chart polygon. */
+            public polygon: apollo.dreamview.IPolygon[];
+
+            /** Chart car. */
+            public car: apollo.dreamview.ICar[];
+
+            /**
+             * Creates a new Chart instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Chart instance
+             */
+            public static create(properties?: apollo.dreamview.IChart): apollo.dreamview.Chart;
+
+            /**
+             * Encodes the specified Chart message. Does not implicitly {@link apollo.dreamview.Chart.verify|verify} messages.
+             * @param message Chart message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IChart, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Chart message, length delimited. Does not implicitly {@link apollo.dreamview.Chart.verify|verify} messages.
+             * @param message Chart message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IChart, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Chart message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Chart
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Chart;
+
+            /**
+             * Decodes a Chart message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Chart
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Chart;
+
+            /**
+             * Verifies a Chart message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Chart message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Chart
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Chart;
+
+            /**
+             * Creates a plain object from a Chart message. Also converts values to other types if specified.
+             * @param message Chart
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Chart, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Chart to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Chart
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** HMIAction enum. */
+        enum HMIAction {
+            NONE = 0,
+            SETUP_MODE = 1,
+            RESET_MODE = 2,
+            ENTER_AUTO_MODE = 3,
+            DISENGAGE = 4,
+            CHANGE_MODE = 5,
+            CHANGE_MAP = 6,
+            CHANGE_VEHICLE = 7,
+            START_MODULE = 8,
+            STOP_MODULE = 9,
+            CHANGE_SCENARIO = 10,
+            CHANGE_SCENARIO_SET = 11,
+            LOAD_SCENARIOS = 12,
+            DELETE_SCENARIO_SET = 13,
+            LOAD_DYNAMIC_MODELS = 14,
+            CHANGE_DYNAMIC_MODEL = 15,
+            DELETE_DYNAMIC_MODEL = 16,
+            CHANGE_RECORD = 17,
+            DELETE_RECORD = 18,
+            LOAD_RECORDS = 19,
+            STOP_RECORD = 20,
+            CHANGE_OPERATION = 21,
+            DELETE_VEHICLE_CONF = 22,
+            DELETE_V2X_CONF = 23,
+            DELETE_MAP = 24
+        }
+
+        /** Properties of a HMIConfig. */
+        interface IHMIConfig {
+
+            /** HMIConfig modes */
+            modes?: ({ [k: string]: string }|null);
+
+            /** HMIConfig maps */
+            maps?: ({ [k: string]: string }|null);
+
+            /** HMIConfig vehicles */
+            vehicles?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a HMIConfig. */
+        class HMIConfig implements IHMIConfig {
+
+            /**
+             * Constructs a new HMIConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IHMIConfig);
+
+            /** HMIConfig modes. */
+            public modes: { [k: string]: string };
+
+            /** HMIConfig maps. */
+            public maps: { [k: string]: string };
+
+            /** HMIConfig vehicles. */
+            public vehicles: { [k: string]: string };
+
+            /**
+             * Creates a new HMIConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HMIConfig instance
+             */
+            public static create(properties?: apollo.dreamview.IHMIConfig): apollo.dreamview.HMIConfig;
+
+            /**
+             * Encodes the specified HMIConfig message. Does not implicitly {@link apollo.dreamview.HMIConfig.verify|verify} messages.
+             * @param message HMIConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IHMIConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified HMIConfig message, length delimited. Does not implicitly {@link apollo.dreamview.HMIConfig.verify|verify} messages.
+             * @param message HMIConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IHMIConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a HMIConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns HMIConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.HMIConfig;
+
+            /**
+             * Decodes a HMIConfig message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns HMIConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.HMIConfig;
+
+            /**
+             * Verifies a HMIConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a HMIConfig message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns HMIConfig
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.HMIConfig;
+
+            /**
+             * Creates a plain object from a HMIConfig message. Also converts values to other types if specified.
+             * @param message HMIConfig
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.HMIConfig, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this HMIConfig to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for HMIConfig
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a VehicleData. */
+        interface IVehicleData {
+
+            /** VehicleData dataFiles */
+            dataFiles?: (apollo.dreamview.VehicleData.IDataFile[]|null);
+        }
+
+        /** Represents a VehicleData. */
+        class VehicleData implements IVehicleData {
+
+            /**
+             * Constructs a new VehicleData.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IVehicleData);
+
+            /** VehicleData dataFiles. */
+            public dataFiles: apollo.dreamview.VehicleData.IDataFile[];
+
+            /**
+             * Creates a new VehicleData instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns VehicleData instance
+             */
+            public static create(properties?: apollo.dreamview.IVehicleData): apollo.dreamview.VehicleData;
+
+            /**
+             * Encodes the specified VehicleData message. Does not implicitly {@link apollo.dreamview.VehicleData.verify|verify} messages.
+             * @param message VehicleData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IVehicleData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified VehicleData message, length delimited. Does not implicitly {@link apollo.dreamview.VehicleData.verify|verify} messages.
+             * @param message VehicleData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IVehicleData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a VehicleData message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns VehicleData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.VehicleData;
+
+            /**
+             * Decodes a VehicleData message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns VehicleData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.VehicleData;
+
+            /**
+             * Verifies a VehicleData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a VehicleData message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns VehicleData
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.VehicleData;
+
+            /**
+             * Creates a plain object from a VehicleData message. Also converts values to other types if specified.
+             * @param message VehicleData
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.VehicleData, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this VehicleData to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for VehicleData
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace VehicleData {
+
+            /** Properties of a DataFile. */
+            interface IDataFile {
+
+                /** DataFile sourcePath */
+                sourcePath?: (string|null);
+
+                /** DataFile destPath */
+                destPath?: (string|null);
+            }
+
+            /** Represents a DataFile. */
+            class DataFile implements IDataFile {
+
+                /**
+                 * Constructs a new DataFile.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.VehicleData.IDataFile);
+
+                /** DataFile sourcePath. */
+                public sourcePath: string;
+
+                /** DataFile destPath. */
+                public destPath: string;
+
+                /**
+                 * Creates a new DataFile instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DataFile instance
+                 */
+                public static create(properties?: apollo.dreamview.VehicleData.IDataFile): apollo.dreamview.VehicleData.DataFile;
+
+                /**
+                 * Encodes the specified DataFile message. Does not implicitly {@link apollo.dreamview.VehicleData.DataFile.verify|verify} messages.
+                 * @param message DataFile message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.VehicleData.IDataFile, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DataFile message, length delimited. Does not implicitly {@link apollo.dreamview.VehicleData.DataFile.verify|verify} messages.
+                 * @param message DataFile message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.VehicleData.IDataFile, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DataFile message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DataFile
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.VehicleData.DataFile;
+
+                /**
+                 * Decodes a DataFile message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DataFile
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.VehicleData.DataFile;
+
+                /**
+                 * Verifies a DataFile message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DataFile message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DataFile
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.VehicleData.DataFile;
+
+                /**
+                 * Creates a plain object from a DataFile message. Also converts values to other types if specified.
+                 * @param message DataFile
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.VehicleData.DataFile, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DataFile to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DataFile
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+        }
+
+        /** Properties of a ProcessMonitorConfig. */
+        interface IProcessMonitorConfig {
+
+            /** ProcessMonitorConfig commandKeywords */
+            commandKeywords?: (string[]|null);
+        }
+
+        /** Represents a ProcessMonitorConfig. */
+        class ProcessMonitorConfig implements IProcessMonitorConfig {
+
+            /**
+             * Constructs a new ProcessMonitorConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IProcessMonitorConfig);
+
+            /** ProcessMonitorConfig commandKeywords. */
+            public commandKeywords: string[];
+
+            /**
+             * Creates a new ProcessMonitorConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProcessMonitorConfig instance
+             */
+            public static create(properties?: apollo.dreamview.IProcessMonitorConfig): apollo.dreamview.ProcessMonitorConfig;
+
+            /**
+             * Encodes the specified ProcessMonitorConfig message. Does not implicitly {@link apollo.dreamview.ProcessMonitorConfig.verify|verify} messages.
+             * @param message ProcessMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IProcessMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ProcessMonitorConfig message, length delimited. Does not implicitly {@link apollo.dreamview.ProcessMonitorConfig.verify|verify} messages.
+             * @param message ProcessMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IProcessMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProcessMonitorConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProcessMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ProcessMonitorConfig;
+
+            /**
+             * Decodes a ProcessMonitorConfig message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ProcessMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ProcessMonitorConfig;
+
+            /**
+             * Verifies a ProcessMonitorConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ProcessMonitorConfig message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ProcessMonitorConfig
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ProcessMonitorConfig;
+
+            /**
+             * Creates a plain object from a ProcessMonitorConfig message. Also converts values to other types if specified.
+             * @param message ProcessMonitorConfig
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ProcessMonitorConfig, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ProcessMonitorConfig to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ProcessMonitorConfig
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ModuleMonitorConfig. */
+        interface IModuleMonitorConfig {
+
+            /** ModuleMonitorConfig nodeName */
+            nodeName?: (string[]|null);
+        }
+
+        /** Represents a ModuleMonitorConfig. */
+        class ModuleMonitorConfig implements IModuleMonitorConfig {
+
+            /**
+             * Constructs a new ModuleMonitorConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IModuleMonitorConfig);
+
+            /** ModuleMonitorConfig nodeName. */
+            public nodeName: string[];
+
+            /**
+             * Creates a new ModuleMonitorConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ModuleMonitorConfig instance
+             */
+            public static create(properties?: apollo.dreamview.IModuleMonitorConfig): apollo.dreamview.ModuleMonitorConfig;
+
+            /**
+             * Encodes the specified ModuleMonitorConfig message. Does not implicitly {@link apollo.dreamview.ModuleMonitorConfig.verify|verify} messages.
+             * @param message ModuleMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IModuleMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ModuleMonitorConfig message, length delimited. Does not implicitly {@link apollo.dreamview.ModuleMonitorConfig.verify|verify} messages.
+             * @param message ModuleMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IModuleMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ModuleMonitorConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ModuleMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ModuleMonitorConfig;
+
+            /**
+             * Decodes a ModuleMonitorConfig message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ModuleMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ModuleMonitorConfig;
+
+            /**
+             * Verifies a ModuleMonitorConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ModuleMonitorConfig message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ModuleMonitorConfig
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ModuleMonitorConfig;
+
+            /**
+             * Creates a plain object from a ModuleMonitorConfig message. Also converts values to other types if specified.
+             * @param message ModuleMonitorConfig
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ModuleMonitorConfig, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ModuleMonitorConfig to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ModuleMonitorConfig
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ChannelMonitorConfig. */
+        interface IChannelMonitorConfig {
+
+            /** ChannelMonitorConfig name */
+            name?: (string|null);
+
+            /** ChannelMonitorConfig delayFatal */
+            delayFatal?: (number|null);
+
+            /** ChannelMonitorConfig mandatoryFields */
+            mandatoryFields?: (string[]|null);
+
+            /** ChannelMonitorConfig minFrequencyAllowed */
+            minFrequencyAllowed?: (number|null);
+
+            /** ChannelMonitorConfig maxFrequencyAllowed */
+            maxFrequencyAllowed?: (number|null);
+        }
+
+        /** Represents a ChannelMonitorConfig. */
+        class ChannelMonitorConfig implements IChannelMonitorConfig {
+
+            /**
+             * Constructs a new ChannelMonitorConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IChannelMonitorConfig);
+
+            /** ChannelMonitorConfig name. */
+            public name: string;
+
+            /** ChannelMonitorConfig delayFatal. */
+            public delayFatal: number;
+
+            /** ChannelMonitorConfig mandatoryFields. */
+            public mandatoryFields: string[];
+
+            /** ChannelMonitorConfig minFrequencyAllowed. */
+            public minFrequencyAllowed: number;
+
+            /** ChannelMonitorConfig maxFrequencyAllowed. */
+            public maxFrequencyAllowed: number;
+
+            /**
+             * Creates a new ChannelMonitorConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ChannelMonitorConfig instance
+             */
+            public static create(properties?: apollo.dreamview.IChannelMonitorConfig): apollo.dreamview.ChannelMonitorConfig;
+
+            /**
+             * Encodes the specified ChannelMonitorConfig message. Does not implicitly {@link apollo.dreamview.ChannelMonitorConfig.verify|verify} messages.
+             * @param message ChannelMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IChannelMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ChannelMonitorConfig message, length delimited. Does not implicitly {@link apollo.dreamview.ChannelMonitorConfig.verify|verify} messages.
+             * @param message ChannelMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IChannelMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ChannelMonitorConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ChannelMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ChannelMonitorConfig;
+
+            /**
+             * Decodes a ChannelMonitorConfig message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ChannelMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ChannelMonitorConfig;
+
+            /**
+             * Verifies a ChannelMonitorConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ChannelMonitorConfig message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ChannelMonitorConfig
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ChannelMonitorConfig;
+
+            /**
+             * Creates a plain object from a ChannelMonitorConfig message. Also converts values to other types if specified.
+             * @param message ChannelMonitorConfig
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ChannelMonitorConfig, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ChannelMonitorConfig to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ChannelMonitorConfig
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ResourceMonitorConfig. */
+        interface IResourceMonitorConfig {
+
+            /** ResourceMonitorConfig diskSpaces */
+            diskSpaces?: (apollo.dreamview.ResourceMonitorConfig.IDiskSpace[]|null);
+
+            /** ResourceMonitorConfig cpuUsages */
+            cpuUsages?: (apollo.dreamview.ResourceMonitorConfig.ICPUUsage[]|null);
+
+            /** ResourceMonitorConfig memoryUsages */
+            memoryUsages?: (apollo.dreamview.ResourceMonitorConfig.IMemoryUsage[]|null);
+
+            /** ResourceMonitorConfig diskLoadUsages */
+            diskLoadUsages?: (apollo.dreamview.ResourceMonitorConfig.IDiskLoad[]|null);
+        }
+
+        /** Represents a ResourceMonitorConfig. */
+        class ResourceMonitorConfig implements IResourceMonitorConfig {
+
+            /**
+             * Constructs a new ResourceMonitorConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IResourceMonitorConfig);
+
+            /** ResourceMonitorConfig diskSpaces. */
+            public diskSpaces: apollo.dreamview.ResourceMonitorConfig.IDiskSpace[];
+
+            /** ResourceMonitorConfig cpuUsages. */
+            public cpuUsages: apollo.dreamview.ResourceMonitorConfig.ICPUUsage[];
+
+            /** ResourceMonitorConfig memoryUsages. */
+            public memoryUsages: apollo.dreamview.ResourceMonitorConfig.IMemoryUsage[];
+
+            /** ResourceMonitorConfig diskLoadUsages. */
+            public diskLoadUsages: apollo.dreamview.ResourceMonitorConfig.IDiskLoad[];
+
+            /**
+             * Creates a new ResourceMonitorConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResourceMonitorConfig instance
+             */
+            public static create(properties?: apollo.dreamview.IResourceMonitorConfig): apollo.dreamview.ResourceMonitorConfig;
+
+            /**
+             * Encodes the specified ResourceMonitorConfig message. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.verify|verify} messages.
+             * @param message ResourceMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IResourceMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ResourceMonitorConfig message, length delimited. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.verify|verify} messages.
+             * @param message ResourceMonitorConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IResourceMonitorConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ResourceMonitorConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ResourceMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ResourceMonitorConfig;
+
+            /**
+             * Decodes a ResourceMonitorConfig message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ResourceMonitorConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ResourceMonitorConfig;
+
+            /**
+             * Verifies a ResourceMonitorConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ResourceMonitorConfig message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ResourceMonitorConfig
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ResourceMonitorConfig;
+
+            /**
+             * Creates a plain object from a ResourceMonitorConfig message. Also converts values to other types if specified.
+             * @param message ResourceMonitorConfig
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ResourceMonitorConfig, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ResourceMonitorConfig to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ResourceMonitorConfig
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace ResourceMonitorConfig {
+
+            /** Properties of a DiskSpace. */
+            interface IDiskSpace {
+
+                /** DiskSpace path */
+                path?: (string|null);
+
+                /** DiskSpace insufficientSpaceWarning */
+                insufficientSpaceWarning?: (number|null);
+
+                /** DiskSpace insufficientSpaceError */
+                insufficientSpaceError?: (number|null);
+            }
+
+            /** Represents a DiskSpace. */
+            class DiskSpace implements IDiskSpace {
+
+                /**
+                 * Constructs a new DiskSpace.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.ResourceMonitorConfig.IDiskSpace);
+
+                /** DiskSpace path. */
+                public path: string;
+
+                /** DiskSpace insufficientSpaceWarning. */
+                public insufficientSpaceWarning: number;
+
+                /** DiskSpace insufficientSpaceError. */
+                public insufficientSpaceError: number;
+
+                /**
+                 * Creates a new DiskSpace instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DiskSpace instance
+                 */
+                public static create(properties?: apollo.dreamview.ResourceMonitorConfig.IDiskSpace): apollo.dreamview.ResourceMonitorConfig.DiskSpace;
+
+                /**
+                 * Encodes the specified DiskSpace message. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.DiskSpace.verify|verify} messages.
+                 * @param message DiskSpace message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.ResourceMonitorConfig.IDiskSpace, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DiskSpace message, length delimited. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.DiskSpace.verify|verify} messages.
+                 * @param message DiskSpace message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.ResourceMonitorConfig.IDiskSpace, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DiskSpace message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DiskSpace
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ResourceMonitorConfig.DiskSpace;
+
+                /**
+                 * Decodes a DiskSpace message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DiskSpace
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ResourceMonitorConfig.DiskSpace;
+
+                /**
+                 * Verifies a DiskSpace message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DiskSpace message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DiskSpace
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.ResourceMonitorConfig.DiskSpace;
+
+                /**
+                 * Creates a plain object from a DiskSpace message. Also converts values to other types if specified.
+                 * @param message DiskSpace
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.ResourceMonitorConfig.DiskSpace, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DiskSpace to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DiskSpace
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a CPUUsage. */
+            interface ICPUUsage {
+
+                /** CPUUsage highCpuUsageWarning */
+                highCpuUsageWarning?: (number|null);
+
+                /** CPUUsage highCpuUsageError */
+                highCpuUsageError?: (number|null);
+
+                /** CPUUsage processDagPath */
+                processDagPath?: (string|null);
+            }
+
+            /** Represents a CPUUsage. */
+            class CPUUsage implements ICPUUsage {
+
+                /**
+                 * Constructs a new CPUUsage.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.ResourceMonitorConfig.ICPUUsage);
+
+                /** CPUUsage highCpuUsageWarning. */
+                public highCpuUsageWarning: number;
+
+                /** CPUUsage highCpuUsageError. */
+                public highCpuUsageError: number;
+
+                /** CPUUsage processDagPath. */
+                public processDagPath: string;
+
+                /**
+                 * Creates a new CPUUsage instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns CPUUsage instance
+                 */
+                public static create(properties?: apollo.dreamview.ResourceMonitorConfig.ICPUUsage): apollo.dreamview.ResourceMonitorConfig.CPUUsage;
+
+                /**
+                 * Encodes the specified CPUUsage message. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.CPUUsage.verify|verify} messages.
+                 * @param message CPUUsage message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.ResourceMonitorConfig.ICPUUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified CPUUsage message, length delimited. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.CPUUsage.verify|verify} messages.
+                 * @param message CPUUsage message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.ResourceMonitorConfig.ICPUUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a CPUUsage message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns CPUUsage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ResourceMonitorConfig.CPUUsage;
+
+                /**
+                 * Decodes a CPUUsage message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns CPUUsage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ResourceMonitorConfig.CPUUsage;
+
+                /**
+                 * Verifies a CPUUsage message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a CPUUsage message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns CPUUsage
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.ResourceMonitorConfig.CPUUsage;
+
+                /**
+                 * Creates a plain object from a CPUUsage message. Also converts values to other types if specified.
+                 * @param message CPUUsage
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.ResourceMonitorConfig.CPUUsage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this CPUUsage to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for CPUUsage
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a MemoryUsage. */
+            interface IMemoryUsage {
+
+                /** MemoryUsage highMemoryUsageWarning */
+                highMemoryUsageWarning?: (number|null);
+
+                /** MemoryUsage highMemoryUsageError */
+                highMemoryUsageError?: (number|null);
+
+                /** MemoryUsage processDagPath */
+                processDagPath?: (string|null);
+            }
+
+            /** Represents a MemoryUsage. */
+            class MemoryUsage implements IMemoryUsage {
+
+                /**
+                 * Constructs a new MemoryUsage.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.ResourceMonitorConfig.IMemoryUsage);
+
+                /** MemoryUsage highMemoryUsageWarning. */
+                public highMemoryUsageWarning: number;
+
+                /** MemoryUsage highMemoryUsageError. */
+                public highMemoryUsageError: number;
+
+                /** MemoryUsage processDagPath. */
+                public processDagPath: string;
+
+                /**
+                 * Creates a new MemoryUsage instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns MemoryUsage instance
+                 */
+                public static create(properties?: apollo.dreamview.ResourceMonitorConfig.IMemoryUsage): apollo.dreamview.ResourceMonitorConfig.MemoryUsage;
+
+                /**
+                 * Encodes the specified MemoryUsage message. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.MemoryUsage.verify|verify} messages.
+                 * @param message MemoryUsage message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.ResourceMonitorConfig.IMemoryUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified MemoryUsage message, length delimited. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.MemoryUsage.verify|verify} messages.
+                 * @param message MemoryUsage message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.ResourceMonitorConfig.IMemoryUsage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a MemoryUsage message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns MemoryUsage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ResourceMonitorConfig.MemoryUsage;
+
+                /**
+                 * Decodes a MemoryUsage message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns MemoryUsage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ResourceMonitorConfig.MemoryUsage;
+
+                /**
+                 * Verifies a MemoryUsage message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a MemoryUsage message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns MemoryUsage
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.ResourceMonitorConfig.MemoryUsage;
+
+                /**
+                 * Creates a plain object from a MemoryUsage message. Also converts values to other types if specified.
+                 * @param message MemoryUsage
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.ResourceMonitorConfig.MemoryUsage, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this MemoryUsage to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for MemoryUsage
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            /** Properties of a DiskLoad. */
+            interface IDiskLoad {
+
+                /** DiskLoad highDiskLoadWarning */
+                highDiskLoadWarning?: (number|null);
+
+                /** DiskLoad highDiskLoadError */
+                highDiskLoadError?: (number|null);
+
+                /** DiskLoad deviceName */
+                deviceName?: (string|null);
+            }
+
+            /** Represents a DiskLoad. */
+            class DiskLoad implements IDiskLoad {
+
+                /**
+                 * Constructs a new DiskLoad.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: apollo.dreamview.ResourceMonitorConfig.IDiskLoad);
+
+                /** DiskLoad highDiskLoadWarning. */
+                public highDiskLoadWarning: number;
+
+                /** DiskLoad highDiskLoadError. */
+                public highDiskLoadError: number;
+
+                /** DiskLoad deviceName. */
+                public deviceName: string;
+
+                /**
+                 * Creates a new DiskLoad instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns DiskLoad instance
+                 */
+                public static create(properties?: apollo.dreamview.ResourceMonitorConfig.IDiskLoad): apollo.dreamview.ResourceMonitorConfig.DiskLoad;
+
+                /**
+                 * Encodes the specified DiskLoad message. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.DiskLoad.verify|verify} messages.
+                 * @param message DiskLoad message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: apollo.dreamview.ResourceMonitorConfig.IDiskLoad, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified DiskLoad message, length delimited. Does not implicitly {@link apollo.dreamview.ResourceMonitorConfig.DiskLoad.verify|verify} messages.
+                 * @param message DiskLoad message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: apollo.dreamview.ResourceMonitorConfig.IDiskLoad, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a DiskLoad message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns DiskLoad
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ResourceMonitorConfig.DiskLoad;
+
+                /**
+                 * Decodes a DiskLoad message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns DiskLoad
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ResourceMonitorConfig.DiskLoad;
+
+                /**
+                 * Verifies a DiskLoad message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a DiskLoad message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns DiskLoad
+                 */
+                public static fromObject(object: { [k: string]: any }): apollo.dreamview.ResourceMonitorConfig.DiskLoad;
+
+                /**
+                 * Creates a plain object from a DiskLoad message. Also converts values to other types if specified.
+                 * @param message DiskLoad
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: apollo.dreamview.ResourceMonitorConfig.DiskLoad, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this DiskLoad to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+
+                /**
+                 * Gets the default type url for DiskLoad
+                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+                 * @returns The default type url
+                 */
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+        }
+
+        /** Properties of a MonitoredComponent. */
+        interface IMonitoredComponent {
+
+            /** MonitoredComponent process */
+            process?: (apollo.dreamview.IProcessMonitorConfig|null);
+
+            /** MonitoredComponent channel */
+            channel?: (apollo.dreamview.IChannelMonitorConfig|null);
+
+            /** MonitoredComponent resource */
+            resource?: (apollo.dreamview.IResourceMonitorConfig|null);
+
+            /** MonitoredComponent requiredForSafety */
+            requiredForSafety?: (boolean|null);
+
+            /** MonitoredComponent module */
+            module?: (apollo.dreamview.IModuleMonitorConfig|null);
+        }
+
+        /** Represents a MonitoredComponent. */
+        class MonitoredComponent implements IMonitoredComponent {
+
+            /**
+             * Constructs a new MonitoredComponent.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IMonitoredComponent);
+
+            /** MonitoredComponent process. */
+            public process?: (apollo.dreamview.IProcessMonitorConfig|null);
+
+            /** MonitoredComponent channel. */
+            public channel?: (apollo.dreamview.IChannelMonitorConfig|null);
+
+            /** MonitoredComponent resource. */
+            public resource?: (apollo.dreamview.IResourceMonitorConfig|null);
+
+            /** MonitoredComponent requiredForSafety. */
+            public requiredForSafety: boolean;
+
+            /** MonitoredComponent module. */
+            public module?: (apollo.dreamview.IModuleMonitorConfig|null);
+
+            /**
+             * Creates a new MonitoredComponent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns MonitoredComponent instance
+             */
+            public static create(properties?: apollo.dreamview.IMonitoredComponent): apollo.dreamview.MonitoredComponent;
+
+            /**
+             * Encodes the specified MonitoredComponent message. Does not implicitly {@link apollo.dreamview.MonitoredComponent.verify|verify} messages.
+             * @param message MonitoredComponent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IMonitoredComponent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified MonitoredComponent message, length delimited. Does not implicitly {@link apollo.dreamview.MonitoredComponent.verify|verify} messages.
+             * @param message MonitoredComponent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IMonitoredComponent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a MonitoredComponent message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns MonitoredComponent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.MonitoredComponent;
+
+            /**
+             * Decodes a MonitoredComponent message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns MonitoredComponent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.MonitoredComponent;
+
+            /**
+             * Verifies a MonitoredComponent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a MonitoredComponent message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns MonitoredComponent
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.MonitoredComponent;
+
+            /**
+             * Creates a plain object from a MonitoredComponent message. Also converts values to other types if specified.
+             * @param message MonitoredComponent
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.MonitoredComponent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this MonitoredComponent to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for MonitoredComponent
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a Module. */
+        interface IModule {
+
+            /** Module startCommand */
+            startCommand?: (string|null);
+
+            /** Module stopCommand */
+            stopCommand?: (string|null);
+
+            /** Module processMonitorConfig */
+            processMonitorConfig?: (apollo.dreamview.IProcessMonitorConfig|null);
+
+            /** Module requiredForSafety */
+            requiredForSafety?: (boolean|null);
+        }
+
+        /** Represents a Module. */
+        class Module implements IModule {
+
+            /**
+             * Constructs a new Module.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IModule);
+
+            /** Module startCommand. */
+            public startCommand: string;
+
+            /** Module stopCommand. */
+            public stopCommand: string;
+
+            /** Module processMonitorConfig. */
+            public processMonitorConfig?: (apollo.dreamview.IProcessMonitorConfig|null);
+
+            /** Module requiredForSafety. */
+            public requiredForSafety: boolean;
+
+            /**
+             * Creates a new Module instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Module instance
+             */
+            public static create(properties?: apollo.dreamview.IModule): apollo.dreamview.Module;
+
+            /**
+             * Encodes the specified Module message. Does not implicitly {@link apollo.dreamview.Module.verify|verify} messages.
+             * @param message Module message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IModule, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Module message, length delimited. Does not implicitly {@link apollo.dreamview.Module.verify|verify} messages.
+             * @param message Module message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IModule, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Module message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Module
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Module;
+
+            /**
+             * Decodes a Module message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Module
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Module;
+
+            /**
+             * Verifies a Module message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Module message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Module
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Module;
+
+            /**
+             * Creates a plain object from a Module message. Also converts values to other types if specified.
+             * @param message Module
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.Module, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Module to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for Module
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a CyberModule. */
+        interface ICyberModule {
+
+            /** CyberModule dagFiles */
+            dagFiles?: (string[]|null);
+
+            /** CyberModule requiredForSafety */
+            requiredForSafety?: (boolean|null);
+
+            /** CyberModule processGroup */
+            processGroup?: (string|null);
+        }
+
+        /** Represents a CyberModule. */
+        class CyberModule implements ICyberModule {
+
+            /**
+             * Constructs a new CyberModule.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.ICyberModule);
+
+            /** CyberModule dagFiles. */
+            public dagFiles: string[];
+
+            /** CyberModule requiredForSafety. */
+            public requiredForSafety: boolean;
+
+            /** CyberModule processGroup. */
+            public processGroup: string;
+
+            /**
+             * Creates a new CyberModule instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CyberModule instance
+             */
+            public static create(properties?: apollo.dreamview.ICyberModule): apollo.dreamview.CyberModule;
+
+            /**
+             * Encodes the specified CyberModule message. Does not implicitly {@link apollo.dreamview.CyberModule.verify|verify} messages.
+             * @param message CyberModule message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.ICyberModule, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified CyberModule message, length delimited. Does not implicitly {@link apollo.dreamview.CyberModule.verify|verify} messages.
+             * @param message CyberModule message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.ICyberModule, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CyberModule message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CyberModule
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.CyberModule;
+
+            /**
+             * Decodes a CyberModule message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns CyberModule
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.CyberModule;
+
+            /**
+             * Verifies a CyberModule message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CyberModule message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CyberModule
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.CyberModule;
+
+            /**
+             * Creates a plain object from a CyberModule message. Also converts values to other types if specified.
+             * @param message CyberModule
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.CyberModule, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CyberModule to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for CyberModule
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a HMIMode. */
+        interface IHMIMode {
+
+            /** HMIMode cyberModules */
+            cyberModules?: ({ [k: string]: apollo.dreamview.ICyberModule }|null);
+
+            /** HMIMode modules */
+            modules?: ({ [k: string]: apollo.dreamview.IModule }|null);
+
+            /** HMIMode monitoredComponents */
+            monitoredComponents?: ({ [k: string]: apollo.dreamview.IMonitoredComponent }|null);
+
+            /** HMIMode otherComponents */
+            otherComponents?: ({ [k: string]: apollo.dreamview.IProcessMonitorConfig }|null);
+
+            /** HMIMode operations */
+            operations?: (apollo.dreamview.HMIModeOperation[]|null);
+
+            /** HMIMode defaultOperation */
+            defaultOperation?: (apollo.dreamview.HMIModeOperation|null);
+
+            /** HMIMode layout */
+            layout?: (string|null);
+
+            /** HMIMode dataRecorderComponent */
+            dataRecorderComponent?: (apollo.dreamview.IMonitoredComponent|null);
+
+            /** HMIMode terminalComponent */
+            terminalComponent?: (apollo.dreamview.IMonitoredComponent|null);
+        }
+
+        /** Represents a HMIMode. */
+        class HMIMode implements IHMIMode {
+
+            /**
+             * Constructs a new HMIMode.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IHMIMode);
+
+            /** HMIMode cyberModules. */
+            public cyberModules: { [k: string]: apollo.dreamview.ICyberModule };
+
+            /** HMIMode modules. */
+            public modules: { [k: string]: apollo.dreamview.IModule };
+
+            /** HMIMode monitoredComponents. */
+            public monitoredComponents: { [k: string]: apollo.dreamview.IMonitoredComponent };
+
+            /** HMIMode otherComponents. */
+            public otherComponents: { [k: string]: apollo.dreamview.IProcessMonitorConfig };
+
+            /** HMIMode operations. */
+            public operations: apollo.dreamview.HMIModeOperation[];
+
+            /** HMIMode defaultOperation. */
+            public defaultOperation: apollo.dreamview.HMIModeOperation;
+
+            /** HMIMode layout. */
+            public layout: string;
+
+            /** HMIMode dataRecorderComponent. */
+            public dataRecorderComponent?: (apollo.dreamview.IMonitoredComponent|null);
+
+            /** HMIMode terminalComponent. */
+            public terminalComponent?: (apollo.dreamview.IMonitoredComponent|null);
+
+            /**
+             * Creates a new HMIMode instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HMIMode instance
+             */
+            public static create(properties?: apollo.dreamview.IHMIMode): apollo.dreamview.HMIMode;
+
+            /**
+             * Encodes the specified HMIMode message. Does not implicitly {@link apollo.dreamview.HMIMode.verify|verify} messages.
+             * @param message HMIMode message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IHMIMode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified HMIMode message, length delimited. Does not implicitly {@link apollo.dreamview.HMIMode.verify|verify} messages.
+             * @param message HMIMode message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IHMIMode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a HMIMode message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns HMIMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.HMIMode;
+
+            /**
+             * Decodes a HMIMode message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns HMIMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.HMIMode;
+
+            /**
+             * Verifies a HMIMode message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a HMIMode message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns HMIMode
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.HMIMode;
+
+            /**
+             * Creates a plain object from a HMIMode message. Also converts values to other types if specified.
+             * @param message HMIMode
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.HMIMode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this HMIMode to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for HMIMode
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ScenarioInfo. */
+        interface IScenarioInfo {
+
+            /** ScenarioInfo scenarioId */
+            scenarioId?: (string|null);
+
+            /** ScenarioInfo scenarioName */
+            scenarioName?: (string|null);
+
+            /** ScenarioInfo mapName */
+            mapName?: (string|null);
+
+            /** ScenarioInfo startPoint */
+            startPoint?: (apollo.common.IPoint2D|null);
+
+            /** ScenarioInfo endPoint */
+            endPoint?: (apollo.common.IPoint2D|null);
+        }
+
+        /** Represents a ScenarioInfo. */
+        class ScenarioInfo implements IScenarioInfo {
+
+            /**
+             * Constructs a new ScenarioInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IScenarioInfo);
+
+            /** ScenarioInfo scenarioId. */
+            public scenarioId: string;
+
+            /** ScenarioInfo scenarioName. */
+            public scenarioName: string;
+
+            /** ScenarioInfo mapName. */
+            public mapName: string;
+
+            /** ScenarioInfo startPoint. */
+            public startPoint?: (apollo.common.IPoint2D|null);
+
+            /** ScenarioInfo endPoint. */
+            public endPoint?: (apollo.common.IPoint2D|null);
+
+            /**
+             * Creates a new ScenarioInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ScenarioInfo instance
+             */
+            public static create(properties?: apollo.dreamview.IScenarioInfo): apollo.dreamview.ScenarioInfo;
+
+            /**
+             * Encodes the specified ScenarioInfo message. Does not implicitly {@link apollo.dreamview.ScenarioInfo.verify|verify} messages.
+             * @param message ScenarioInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IScenarioInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ScenarioInfo message, length delimited. Does not implicitly {@link apollo.dreamview.ScenarioInfo.verify|verify} messages.
+             * @param message ScenarioInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IScenarioInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ScenarioInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ScenarioInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ScenarioInfo;
+
+            /**
+             * Decodes a ScenarioInfo message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ScenarioInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ScenarioInfo;
+
+            /**
+             * Verifies a ScenarioInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ScenarioInfo message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ScenarioInfo
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ScenarioInfo;
+
+            /**
+             * Creates a plain object from a ScenarioInfo message. Also converts values to other types if specified.
+             * @param message ScenarioInfo
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ScenarioInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ScenarioInfo to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ScenarioInfo
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a ScenarioSet. */
+        interface IScenarioSet {
+
+            /** ScenarioSet scenarioSetName */
+            scenarioSetName?: (string|null);
+
+            /** ScenarioSet scenarios */
+            scenarios?: (apollo.dreamview.IScenarioInfo[]|null);
+        }
+
+        /** Represents a ScenarioSet. */
+        class ScenarioSet implements IScenarioSet {
+
+            /**
+             * Constructs a new ScenarioSet.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IScenarioSet);
+
+            /** ScenarioSet scenarioSetName. */
+            public scenarioSetName: string;
+
+            /** ScenarioSet scenarios. */
+            public scenarios: apollo.dreamview.IScenarioInfo[];
+
+            /**
+             * Creates a new ScenarioSet instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ScenarioSet instance
+             */
+            public static create(properties?: apollo.dreamview.IScenarioSet): apollo.dreamview.ScenarioSet;
+
+            /**
+             * Encodes the specified ScenarioSet message. Does not implicitly {@link apollo.dreamview.ScenarioSet.verify|verify} messages.
+             * @param message ScenarioSet message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IScenarioSet, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified ScenarioSet message, length delimited. Does not implicitly {@link apollo.dreamview.ScenarioSet.verify|verify} messages.
+             * @param message ScenarioSet message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IScenarioSet, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ScenarioSet message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ScenarioSet
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ScenarioSet;
+
+            /**
+             * Decodes a ScenarioSet message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns ScenarioSet
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ScenarioSet;
+
+            /**
+             * Verifies a ScenarioSet message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ScenarioSet message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ScenarioSet
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ScenarioSet;
+
+            /**
+             * Creates a plain object from a ScenarioSet message. Also converts values to other types if specified.
+             * @param message ScenarioSet
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.ScenarioSet, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ScenarioSet to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for ScenarioSet
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** PlayRecordStatus enum. */
+        enum PlayRecordStatus {
+            RUNNING = 0,
+            PAUSED = 1,
+            CLOSED = 2
+        }
+
+        /** Properties of a RecordStatus. */
+        interface IRecordStatus {
+
+            /** RecordStatus currentRecordId */
+            currentRecordId?: (string|null);
+
+            /** RecordStatus playRecordStatus */
+            playRecordStatus?: (apollo.dreamview.PlayRecordStatus|null);
+
+            /** RecordStatus currTimeS */
+            currTimeS?: (number|null);
+        }
+
+        /** Represents a RecordStatus. */
+        class RecordStatus implements IRecordStatus {
+
+            /**
+             * Constructs a new RecordStatus.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IRecordStatus);
+
+            /** RecordStatus currentRecordId. */
+            public currentRecordId: string;
+
+            /** RecordStatus playRecordStatus. */
+            public playRecordStatus: apollo.dreamview.PlayRecordStatus;
+
+            /** RecordStatus currTimeS. */
+            public currTimeS: number;
+
+            /**
+             * Creates a new RecordStatus instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RecordStatus instance
+             */
+            public static create(properties?: apollo.dreamview.IRecordStatus): apollo.dreamview.RecordStatus;
+
+            /**
+             * Encodes the specified RecordStatus message. Does not implicitly {@link apollo.dreamview.RecordStatus.verify|verify} messages.
+             * @param message RecordStatus message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IRecordStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified RecordStatus message, length delimited. Does not implicitly {@link apollo.dreamview.RecordStatus.verify|verify} messages.
+             * @param message RecordStatus message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IRecordStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RecordStatus message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RecordStatus
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.RecordStatus;
+
+            /**
+             * Decodes a RecordStatus message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns RecordStatus
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.RecordStatus;
+
+            /**
+             * Verifies a RecordStatus message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RecordStatus message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RecordStatus
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.RecordStatus;
+
+            /**
+             * Creates a plain object from a RecordStatus message. Also converts values to other types if specified.
+             * @param message RecordStatus
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.RecordStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RecordStatus to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for RecordStatus
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** HMIModeOperation enum. */
+        enum HMIModeOperation {
+            None = 0,
+            SIM_DEBUG = 1,
+            Sim_Control = 2,
+            Auto_Drive = 3,
+            TRACE = 4,
+            Scenario_Sim = 5,
+            Record = 6,
+            Waypoint_Follow = 7
+        }
+
+        /** Properties of a HMIStatus. */
+        interface IHMIStatus {
+
+            /** HMIStatus header */
+            header?: (apollo.common.IHeader|null);
+
+            /** HMIStatus modes */
+            modes?: (string[]|null);
+
+            /** HMIStatus currentMode */
+            currentMode?: (string|null);
+
+            /** HMIStatus maps */
+            maps?: (string[]|null);
+
+            /** HMIStatus currentMap */
+            currentMap?: (string|null);
+
+            /** HMIStatus vehicles */
+            vehicles?: (string[]|null);
+
+            /** HMIStatus currentVehicle */
+            currentVehicle?: (string|null);
+
+            /** HMIStatus modules */
+            modules?: ({ [k: string]: boolean }|null);
+
+            /** HMIStatus monitoredComponents */
+            monitoredComponents?: ({ [k: string]: apollo.monitor.IComponentStatus }|null);
+
+            /** HMIStatus dockerImage */
+            dockerImage?: (string|null);
+
+            /** HMIStatus utmZoneId */
+            utmZoneId?: (number|null);
+
+            /** HMIStatus passengerMsg */
+            passengerMsg?: (string|null);
+
+            /** HMIStatus otherComponents */
+            otherComponents?: ({ [k: string]: apollo.monitor.IComponentStatus }|null);
+
+            /** HMIStatus scenarioSet */
+            scenarioSet?: ({ [k: string]: apollo.dreamview.IScenarioSet }|null);
+
+            /** HMIStatus currentScenarioSetId */
+            currentScenarioSetId?: (string|null);
+
+            /** HMIStatus currentScenarioId */
+            currentScenarioId?: (string|null);
+
+            /** HMIStatus dynamicModels */
+            dynamicModels?: (string[]|null);
+
+            /** HMIStatus currentDynamicModel */
+            currentDynamicModel?: (string|null);
+
+            /** HMIStatus currentRecordId */
+            currentRecordId?: (string|null);
+
+            /** HMIStatus records */
+            records?: ({ [k: string]: number }|null);
+
+            /** HMIStatus currentVehicleType */
+            currentVehicleType?: (number|null);
+
+            /** HMIStatus currentCameraSensorChannel */
+            currentCameraSensorChannel?: (string|null);
+
+            /** HMIStatus currentPointCloudChannel */
+            currentPointCloudChannel?: (string|null);
+
+            /** HMIStatus operations */
+            operations?: (apollo.dreamview.HMIModeOperation[]|null);
+
+            /** HMIStatus currentOperation */
+            currentOperation?: (apollo.dreamview.HMIModeOperation|null);
+
+            /** HMIStatus currentLayout */
+            currentLayout?: (string|null);
+
+            /** HMIStatus currentRecordStatus */
+            currentRecordStatus?: (apollo.dreamview.IRecordStatus|null);
+
+            /** HMIStatus dataRecorderComponent */
+            dataRecorderComponent?: (apollo.monitor.IComponent|null);
+
+            /** HMIStatus expectedModules */
+            expectedModules?: (number|null);
+
+            /** HMIStatus modulesLock */
+            modulesLock?: ({ [k: string]: boolean }|null);
+
+            /** HMIStatus backendShutdown */
+            backendShutdown?: (boolean|null);
+
+            /** HMIStatus terminalComponent */
+            terminalComponent?: (apollo.monitor.IComponent|null);
+        }
+
+        /** Represents a HMIStatus. */
+        class HMIStatus implements IHMIStatus {
+
+            /**
+             * Constructs a new HMIStatus.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: apollo.dreamview.IHMIStatus);
+
+            /** HMIStatus header. */
+            public header?: (apollo.common.IHeader|null);
+
+            /** HMIStatus modes. */
+            public modes: string[];
+
+            /** HMIStatus currentMode. */
+            public currentMode: string;
+
+            /** HMIStatus maps. */
+            public maps: string[];
+
+            /** HMIStatus currentMap. */
+            public currentMap: string;
+
+            /** HMIStatus vehicles. */
+            public vehicles: string[];
+
+            /** HMIStatus currentVehicle. */
+            public currentVehicle: string;
+
+            /** HMIStatus modules. */
+            public modules: { [k: string]: boolean };
+
+            /** HMIStatus monitoredComponents. */
+            public monitoredComponents: { [k: string]: apollo.monitor.IComponentStatus };
+
+            /** HMIStatus dockerImage. */
+            public dockerImage: string;
+
+            /** HMIStatus utmZoneId. */
+            public utmZoneId: number;
+
+            /** HMIStatus passengerMsg. */
+            public passengerMsg: string;
+
+            /** HMIStatus otherComponents. */
+            public otherComponents: { [k: string]: apollo.monitor.IComponentStatus };
+
+            /** HMIStatus scenarioSet. */
+            public scenarioSet: { [k: string]: apollo.dreamview.IScenarioSet };
+
+            /** HMIStatus currentScenarioSetId. */
+            public currentScenarioSetId: string;
+
+            /** HMIStatus currentScenarioId. */
+            public currentScenarioId: string;
+
+            /** HMIStatus dynamicModels. */
+            public dynamicModels: string[];
+
+            /** HMIStatus currentDynamicModel. */
+            public currentDynamicModel: string;
+
+            /** HMIStatus currentRecordId. */
+            public currentRecordId: string;
+
+            /** HMIStatus records. */
+            public records: { [k: string]: number };
+
+            /** HMIStatus currentVehicleType. */
+            public currentVehicleType: number;
+
+            /** HMIStatus currentCameraSensorChannel. */
+            public currentCameraSensorChannel: string;
+
+            /** HMIStatus currentPointCloudChannel. */
+            public currentPointCloudChannel: string;
+
+            /** HMIStatus operations. */
+            public operations: apollo.dreamview.HMIModeOperation[];
+
+            /** HMIStatus currentOperation. */
+            public currentOperation: apollo.dreamview.HMIModeOperation;
+
+            /** HMIStatus currentLayout. */
+            public currentLayout: string;
+
+            /** HMIStatus currentRecordStatus. */
+            public currentRecordStatus?: (apollo.dreamview.IRecordStatus|null);
+
+            /** HMIStatus dataRecorderComponent. */
+            public dataRecorderComponent?: (apollo.monitor.IComponent|null);
+
+            /** HMIStatus expectedModules. */
+            public expectedModules: number;
+
+            /** HMIStatus modulesLock. */
+            public modulesLock: { [k: string]: boolean };
+
+            /** HMIStatus backendShutdown. */
+            public backendShutdown: boolean;
+
+            /** HMIStatus terminalComponent. */
+            public terminalComponent?: (apollo.monitor.IComponent|null);
+
+            /**
+             * Creates a new HMIStatus instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HMIStatus instance
+             */
+            public static create(properties?: apollo.dreamview.IHMIStatus): apollo.dreamview.HMIStatus;
+
+            /**
+             * Encodes the specified HMIStatus message. Does not implicitly {@link apollo.dreamview.HMIStatus.verify|verify} messages.
+             * @param message HMIStatus message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: apollo.dreamview.IHMIStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified HMIStatus message, length delimited. Does not implicitly {@link apollo.dreamview.HMIStatus.verify|verify} messages.
+             * @param message HMIStatus message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: apollo.dreamview.IHMIStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a HMIStatus message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns HMIStatus
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.HMIStatus;
+
+            /**
+             * Decodes a HMIStatus message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns HMIStatus
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.HMIStatus;
+
+            /**
+             * Verifies a HMIStatus message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a HMIStatus message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns HMIStatus
+             */
+            public static fromObject(object: { [k: string]: any }): apollo.dreamview.HMIStatus;
+
+            /**
+             * Creates a plain object from a HMIStatus message. Also converts values to other types if specified.
+             * @param message HMIStatus
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: apollo.dreamview.HMIStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this HMIStatus to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for HMIStatus
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         /** Properties of a PolygonPoint. */
         interface IPolygonPoint {
 
@@ -3372,2078 +7260,6 @@ export namespace apollo {
 
             /**
              * Gets the default type url for SimulationWorld
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a CameraUpdate. */
-        interface ICameraUpdate {
-
-            /** CameraUpdate localization */
-            localization?: (number[]|null);
-
-            /** CameraUpdate localization2cameraTf */
-            localization2cameraTf?: (number[]|null);
-
-            /** CameraUpdate image */
-            image?: (Uint8Array|null);
-
-            /** CameraUpdate imageAspectRatio */
-            imageAspectRatio?: (number|null);
-
-            /** CameraUpdate bbox2d */
-            bbox2d?: (apollo.perception.IBBox2D[]|null);
-
-            /** CameraUpdate obstaclesId */
-            obstaclesId?: (number[]|null);
-
-            /** CameraUpdate obstaclesSubType */
-            obstaclesSubType?: (apollo.dreamview.CameraUpdate.SubType[]|null);
-
-            /** CameraUpdate kImageScale */
-            kImageScale?: (number|null);
-        }
-
-        /** Represents a CameraUpdate. */
-        class CameraUpdate implements ICameraUpdate {
-
-            /**
-             * Constructs a new CameraUpdate.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.ICameraUpdate);
-
-            /** CameraUpdate localization. */
-            public localization: number[];
-
-            /** CameraUpdate localization2cameraTf. */
-            public localization2cameraTf: number[];
-
-            /** CameraUpdate image. */
-            public image: Uint8Array;
-
-            /** CameraUpdate imageAspectRatio. */
-            public imageAspectRatio: number;
-
-            /** CameraUpdate bbox2d. */
-            public bbox2d: apollo.perception.IBBox2D[];
-
-            /** CameraUpdate obstaclesId. */
-            public obstaclesId: number[];
-
-            /** CameraUpdate obstaclesSubType. */
-            public obstaclesSubType: apollo.dreamview.CameraUpdate.SubType[];
-
-            /** CameraUpdate kImageScale. */
-            public kImageScale: number;
-
-            /**
-             * Creates a new CameraUpdate instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CameraUpdate instance
-             */
-            public static create(properties?: apollo.dreamview.ICameraUpdate): apollo.dreamview.CameraUpdate;
-
-            /**
-             * Encodes the specified CameraUpdate message. Does not implicitly {@link apollo.dreamview.CameraUpdate.verify|verify} messages.
-             * @param message CameraUpdate message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.ICameraUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified CameraUpdate message, length delimited. Does not implicitly {@link apollo.dreamview.CameraUpdate.verify|verify} messages.
-             * @param message CameraUpdate message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.ICameraUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CameraUpdate message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CameraUpdate
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.CameraUpdate;
-
-            /**
-             * Decodes a CameraUpdate message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns CameraUpdate
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.CameraUpdate;
-
-            /**
-             * Verifies a CameraUpdate message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a CameraUpdate message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns CameraUpdate
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.CameraUpdate;
-
-            /**
-             * Creates a plain object from a CameraUpdate message. Also converts values to other types if specified.
-             * @param message CameraUpdate
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.CameraUpdate, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this CameraUpdate to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for CameraUpdate
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        namespace CameraUpdate {
-
-            /** SubType enum. */
-            enum SubType {
-                ST_UNKNOWN = 0,
-                ST_UNKNOWN_MOVABLE = 1,
-                ST_UNKNOWN_UNMOVABLE = 2,
-                ST_CAR = 3,
-                ST_VAN = 4,
-                ST_TRUCK = 5,
-                ST_BUS = 6,
-                ST_CYCLIST = 7,
-                ST_MOTORCYCLIST = 8,
-                ST_TRICYCLIST = 9,
-                ST_PEDESTRIAN = 10,
-                ST_TRAFFICCONE = 11
-            }
-        }
-
-        /** Properties of a WebsocketInfo. */
-        interface IWebsocketInfo {
-
-            /** WebsocketInfo websocketName */
-            websocketName?: (string|null);
-
-            /** WebsocketInfo websocketPipe */
-            websocketPipe?: (string|null);
-        }
-
-        /** Represents a WebsocketInfo. */
-        class WebsocketInfo implements IWebsocketInfo {
-
-            /**
-             * Constructs a new WebsocketInfo.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IWebsocketInfo);
-
-            /** WebsocketInfo websocketName. */
-            public websocketName: string;
-
-            /** WebsocketInfo websocketPipe. */
-            public websocketPipe: string;
-
-            /**
-             * Creates a new WebsocketInfo instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WebsocketInfo instance
-             */
-            public static create(properties?: apollo.dreamview.IWebsocketInfo): apollo.dreamview.WebsocketInfo;
-
-            /**
-             * Encodes the specified WebsocketInfo message. Does not implicitly {@link apollo.dreamview.WebsocketInfo.verify|verify} messages.
-             * @param message WebsocketInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IWebsocketInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified WebsocketInfo message, length delimited. Does not implicitly {@link apollo.dreamview.WebsocketInfo.verify|verify} messages.
-             * @param message WebsocketInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IWebsocketInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WebsocketInfo message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WebsocketInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.WebsocketInfo;
-
-            /**
-             * Decodes a WebsocketInfo message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns WebsocketInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.WebsocketInfo;
-
-            /**
-             * Verifies a WebsocketInfo message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a WebsocketInfo message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns WebsocketInfo
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.WebsocketInfo;
-
-            /**
-             * Creates a plain object from a WebsocketInfo message. Also converts values to other types if specified.
-             * @param message WebsocketInfo
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.WebsocketInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this WebsocketInfo to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for WebsocketInfo
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a DataHandlerInfo. */
-        interface IDataHandlerInfo {
-
-            /** DataHandlerInfo dataName */
-            dataName?: (string|null);
-
-            /** DataHandlerInfo protoPath */
-            protoPath?: (string|null);
-
-            /** DataHandlerInfo protoDesc */
-            protoDesc?: (Uint8Array|null);
-
-            /** DataHandlerInfo websocketInfo */
-            websocketInfo?: (apollo.dreamview.IWebsocketInfo|null);
-
-            /** DataHandlerInfo differentForChannels */
-            differentForChannels?: (boolean|null);
-
-            /** DataHandlerInfo channels */
-            channels?: (string[]|null);
-        }
-
-        /** Represents a DataHandlerInfo. */
-        class DataHandlerInfo implements IDataHandlerInfo {
-
-            /**
-             * Constructs a new DataHandlerInfo.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IDataHandlerInfo);
-
-            /** DataHandlerInfo dataName. */
-            public dataName: string;
-
-            /** DataHandlerInfo protoPath. */
-            public protoPath: string;
-
-            /** DataHandlerInfo protoDesc. */
-            public protoDesc: Uint8Array;
-
-            /** DataHandlerInfo websocketInfo. */
-            public websocketInfo?: (apollo.dreamview.IWebsocketInfo|null);
-
-            /** DataHandlerInfo differentForChannels. */
-            public differentForChannels: boolean;
-
-            /** DataHandlerInfo channels. */
-            public channels: string[];
-
-            /**
-             * Creates a new DataHandlerInfo instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DataHandlerInfo instance
-             */
-            public static create(properties?: apollo.dreamview.IDataHandlerInfo): apollo.dreamview.DataHandlerInfo;
-
-            /**
-             * Encodes the specified DataHandlerInfo message. Does not implicitly {@link apollo.dreamview.DataHandlerInfo.verify|verify} messages.
-             * @param message DataHandlerInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IDataHandlerInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified DataHandlerInfo message, length delimited. Does not implicitly {@link apollo.dreamview.DataHandlerInfo.verify|verify} messages.
-             * @param message DataHandlerInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IDataHandlerInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DataHandlerInfo message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DataHandlerInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.DataHandlerInfo;
-
-            /**
-             * Decodes a DataHandlerInfo message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns DataHandlerInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.DataHandlerInfo;
-
-            /**
-             * Verifies a DataHandlerInfo message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a DataHandlerInfo message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns DataHandlerInfo
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.DataHandlerInfo;
-
-            /**
-             * Creates a plain object from a DataHandlerInfo message. Also converts values to other types if specified.
-             * @param message DataHandlerInfo
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.DataHandlerInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this DataHandlerInfo to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for DataHandlerInfo
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a DataHandlerConf. */
-        interface IDataHandlerConf {
-
-            /** DataHandlerConf dataHandlerInfo */
-            dataHandlerInfo?: ({ [k: string]: apollo.dreamview.IDataHandlerInfo }|null);
-        }
-
-        /** Represents a DataHandlerConf. */
-        class DataHandlerConf implements IDataHandlerConf {
-
-            /**
-             * Constructs a new DataHandlerConf.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IDataHandlerConf);
-
-            /** DataHandlerConf dataHandlerInfo. */
-            public dataHandlerInfo: { [k: string]: apollo.dreamview.IDataHandlerInfo };
-
-            /**
-             * Creates a new DataHandlerConf instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DataHandlerConf instance
-             */
-            public static create(properties?: apollo.dreamview.IDataHandlerConf): apollo.dreamview.DataHandlerConf;
-
-            /**
-             * Encodes the specified DataHandlerConf message. Does not implicitly {@link apollo.dreamview.DataHandlerConf.verify|verify} messages.
-             * @param message DataHandlerConf message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IDataHandlerConf, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified DataHandlerConf message, length delimited. Does not implicitly {@link apollo.dreamview.DataHandlerConf.verify|verify} messages.
-             * @param message DataHandlerConf message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IDataHandlerConf, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DataHandlerConf message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DataHandlerConf
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.DataHandlerConf;
-
-            /**
-             * Decodes a DataHandlerConf message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns DataHandlerConf
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.DataHandlerConf;
-
-            /**
-             * Verifies a DataHandlerConf message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a DataHandlerConf message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns DataHandlerConf
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.DataHandlerConf;
-
-            /**
-             * Creates a plain object from a DataHandlerConf message. Also converts values to other types if specified.
-             * @param message DataHandlerConf
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.DataHandlerConf, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this DataHandlerConf to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for DataHandlerConf
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a StreamData. */
-        interface IStreamData {
-
-            /** StreamData type */
-            type?: (string|null);
-
-            /** StreamData action */
-            action?: (string|null);
-
-            /** StreamData dataName */
-            dataName?: (string|null);
-
-            /** StreamData channelName */
-            channelName?: (string|null);
-
-            /** StreamData data */
-            data?: (Uint8Array|null);
-        }
-
-        /** Represents a StreamData. */
-        class StreamData implements IStreamData {
-
-            /**
-             * Constructs a new StreamData.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IStreamData);
-
-            /** StreamData type. */
-            public type: string;
-
-            /** StreamData action. */
-            public action: string;
-
-            /** StreamData dataName. */
-            public dataName: string;
-
-            /** StreamData channelName. */
-            public channelName: string;
-
-            /** StreamData data. */
-            public data: Uint8Array;
-
-            /**
-             * Creates a new StreamData instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns StreamData instance
-             */
-            public static create(properties?: apollo.dreamview.IStreamData): apollo.dreamview.StreamData;
-
-            /**
-             * Encodes the specified StreamData message. Does not implicitly {@link apollo.dreamview.StreamData.verify|verify} messages.
-             * @param message StreamData message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IStreamData, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified StreamData message, length delimited. Does not implicitly {@link apollo.dreamview.StreamData.verify|verify} messages.
-             * @param message StreamData message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IStreamData, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a StreamData message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns StreamData
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.StreamData;
-
-            /**
-             * Decodes a StreamData message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns StreamData
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.StreamData;
-
-            /**
-             * Verifies a StreamData message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a StreamData message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns StreamData
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.StreamData;
-
-            /**
-             * Creates a plain object from a StreamData message. Also converts values to other types if specified.
-             * @param message StreamData
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.StreamData, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this StreamData to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for StreamData
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of an Obstacles. */
-        interface IObstacles {
-
-            /** Obstacles obstacle */
-            obstacle?: (apollo.dreamview.IObject[]|null);
-
-            /** Obstacles autoDrivingCar */
-            autoDrivingCar?: (apollo.dreamview.IObject|null);
-
-            /** Obstacles sensorMeasurements */
-            sensorMeasurements?: ({ [k: string]: apollo.dreamview.ISensorMeasurements }|null);
-        }
-
-        /** Represents an Obstacles. */
-        class Obstacles implements IObstacles {
-
-            /**
-             * Constructs a new Obstacles.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IObstacles);
-
-            /** Obstacles obstacle. */
-            public obstacle: apollo.dreamview.IObject[];
-
-            /** Obstacles autoDrivingCar. */
-            public autoDrivingCar?: (apollo.dreamview.IObject|null);
-
-            /** Obstacles sensorMeasurements. */
-            public sensorMeasurements: { [k: string]: apollo.dreamview.ISensorMeasurements };
-
-            /**
-             * Creates a new Obstacles instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Obstacles instance
-             */
-            public static create(properties?: apollo.dreamview.IObstacles): apollo.dreamview.Obstacles;
-
-            /**
-             * Encodes the specified Obstacles message. Does not implicitly {@link apollo.dreamview.Obstacles.verify|verify} messages.
-             * @param message Obstacles message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IObstacles, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Obstacles message, length delimited. Does not implicitly {@link apollo.dreamview.Obstacles.verify|verify} messages.
-             * @param message Obstacles message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IObstacles, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Obstacles message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Obstacles
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Obstacles;
-
-            /**
-             * Decodes an Obstacles message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Obstacles
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Obstacles;
-
-            /**
-             * Verifies an Obstacles message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates an Obstacles message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Obstacles
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Obstacles;
-
-            /**
-             * Creates a plain object from an Obstacles message. Also converts values to other types if specified.
-             * @param message Obstacles
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Obstacles, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Obstacles to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Obstacles
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of an Options. */
-        interface IOptions {
-
-            /** Options legendDisplay */
-            legendDisplay?: (boolean|null);
-
-            /** Options x */
-            x?: (apollo.dreamview.Options.IAxis|null);
-
-            /** Options y */
-            y?: (apollo.dreamview.Options.IAxis|null);
-
-            /** Options aspectRatio */
-            aspectRatio?: (number|null);
-
-            /** Options syncXyWindowSize */
-            syncXyWindowSize?: (boolean|null);
-        }
-
-        /** Represents an Options. */
-        class Options implements IOptions {
-
-            /**
-             * Constructs a new Options.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IOptions);
-
-            /** Options legendDisplay. */
-            public legendDisplay: boolean;
-
-            /** Options x. */
-            public x?: (apollo.dreamview.Options.IAxis|null);
-
-            /** Options y. */
-            public y?: (apollo.dreamview.Options.IAxis|null);
-
-            /** Options aspectRatio. */
-            public aspectRatio: number;
-
-            /** Options syncXyWindowSize. */
-            public syncXyWindowSize: boolean;
-
-            /**
-             * Creates a new Options instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Options instance
-             */
-            public static create(properties?: apollo.dreamview.IOptions): apollo.dreamview.Options;
-
-            /**
-             * Encodes the specified Options message. Does not implicitly {@link apollo.dreamview.Options.verify|verify} messages.
-             * @param message Options message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Options message, length delimited. Does not implicitly {@link apollo.dreamview.Options.verify|verify} messages.
-             * @param message Options message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Options message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Options
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Options;
-
-            /**
-             * Decodes an Options message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Options
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Options;
-
-            /**
-             * Verifies an Options message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates an Options message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Options
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Options;
-
-            /**
-             * Creates a plain object from an Options message. Also converts values to other types if specified.
-             * @param message Options
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Options, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Options to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Options
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        namespace Options {
-
-            /** Properties of an Axis. */
-            interface IAxis {
-
-                /** Axis min */
-                min?: (number|null);
-
-                /** Axis max */
-                max?: (number|null);
-
-                /** Axis labelString */
-                labelString?: (string|null);
-
-                /** Axis windowSize */
-                windowSize?: (number|null);
-
-                /** Axis stepSize */
-                stepSize?: (number|null);
-
-                /** Axis midValue */
-                midValue?: (number|null);
-            }
-
-            /** Represents an Axis. */
-            class Axis implements IAxis {
-
-                /**
-                 * Constructs a new Axis.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: apollo.dreamview.Options.IAxis);
-
-                /** Axis min. */
-                public min: number;
-
-                /** Axis max. */
-                public max: number;
-
-                /** Axis labelString. */
-                public labelString: string;
-
-                /** Axis windowSize. */
-                public windowSize: number;
-
-                /** Axis stepSize. */
-                public stepSize: number;
-
-                /** Axis midValue. */
-                public midValue: number;
-
-                /**
-                 * Creates a new Axis instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns Axis instance
-                 */
-                public static create(properties?: apollo.dreamview.Options.IAxis): apollo.dreamview.Options.Axis;
-
-                /**
-                 * Encodes the specified Axis message. Does not implicitly {@link apollo.dreamview.Options.Axis.verify|verify} messages.
-                 * @param message Axis message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: apollo.dreamview.Options.IAxis, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified Axis message, length delimited. Does not implicitly {@link apollo.dreamview.Options.Axis.verify|verify} messages.
-                 * @param message Axis message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: apollo.dreamview.Options.IAxis, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes an Axis message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns Axis
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Options.Axis;
-
-                /**
-                 * Decodes an Axis message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns Axis
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Options.Axis;
-
-                /**
-                 * Verifies an Axis message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates an Axis message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns Axis
-                 */
-                public static fromObject(object: { [k: string]: any }): apollo.dreamview.Options.Axis;
-
-                /**
-                 * Creates a plain object from an Axis message. Also converts values to other types if specified.
-                 * @param message Axis
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: apollo.dreamview.Options.Axis, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this Axis to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-
-                /**
-                 * Gets the default type url for Axis
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
-                 */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
-            }
-        }
-
-        /** Properties of a Line. */
-        interface ILine {
-
-            /** Line label */
-            label?: (string|null);
-
-            /** Line hideLabelInLegend */
-            hideLabelInLegend?: (boolean|null);
-
-            /** Line point */
-            point?: (apollo.common.IPoint2D[]|null);
-
-            /** Line properties */
-            properties?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a Line. */
-        class Line implements ILine {
-
-            /**
-             * Constructs a new Line.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.ILine);
-
-            /** Line label. */
-            public label: string;
-
-            /** Line hideLabelInLegend. */
-            public hideLabelInLegend: boolean;
-
-            /** Line point. */
-            public point: apollo.common.IPoint2D[];
-
-            /** Line properties. */
-            public properties: { [k: string]: string };
-
-            /**
-             * Creates a new Line instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Line instance
-             */
-            public static create(properties?: apollo.dreamview.ILine): apollo.dreamview.Line;
-
-            /**
-             * Encodes the specified Line message. Does not implicitly {@link apollo.dreamview.Line.verify|verify} messages.
-             * @param message Line message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.ILine, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Line message, length delimited. Does not implicitly {@link apollo.dreamview.Line.verify|verify} messages.
-             * @param message Line message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.ILine, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Line message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Line
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Line;
-
-            /**
-             * Decodes a Line message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Line
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Line;
-
-            /**
-             * Verifies a Line message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Line message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Line
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Line;
-
-            /**
-             * Creates a plain object from a Line message. Also converts values to other types if specified.
-             * @param message Line
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Line, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Line to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Line
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a Polygon. */
-        interface IPolygon {
-
-            /** Polygon label */
-            label?: (string|null);
-
-            /** Polygon hideLabelInLegend */
-            hideLabelInLegend?: (boolean|null);
-
-            /** Polygon point */
-            point?: (apollo.common.IPoint2D[]|null);
-
-            /** Polygon properties */
-            properties?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a Polygon. */
-        class Polygon implements IPolygon {
-
-            /**
-             * Constructs a new Polygon.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IPolygon);
-
-            /** Polygon label. */
-            public label: string;
-
-            /** Polygon hideLabelInLegend. */
-            public hideLabelInLegend: boolean;
-
-            /** Polygon point. */
-            public point: apollo.common.IPoint2D[];
-
-            /** Polygon properties. */
-            public properties: { [k: string]: string };
-
-            /**
-             * Creates a new Polygon instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Polygon instance
-             */
-            public static create(properties?: apollo.dreamview.IPolygon): apollo.dreamview.Polygon;
-
-            /**
-             * Encodes the specified Polygon message. Does not implicitly {@link apollo.dreamview.Polygon.verify|verify} messages.
-             * @param message Polygon message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IPolygon, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Polygon message, length delimited. Does not implicitly {@link apollo.dreamview.Polygon.verify|verify} messages.
-             * @param message Polygon message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IPolygon, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Polygon message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Polygon
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Polygon;
-
-            /**
-             * Decodes a Polygon message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Polygon
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Polygon;
-
-            /**
-             * Verifies a Polygon message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Polygon message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Polygon
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Polygon;
-
-            /**
-             * Creates a plain object from a Polygon message. Also converts values to other types if specified.
-             * @param message Polygon
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Polygon, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Polygon to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Polygon
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a Car. */
-        interface ICar {
-
-            /** Car label */
-            label?: (string|null);
-
-            /** Car hideLabelInLegend */
-            hideLabelInLegend?: (boolean|null);
-
-            /** Car x */
-            x?: (number|null);
-
-            /** Car y */
-            y?: (number|null);
-
-            /** Car heading */
-            heading?: (number|null);
-
-            /** Car color */
-            color?: (string|null);
-        }
-
-        /** Represents a Car. */
-        class Car implements ICar {
-
-            /**
-             * Constructs a new Car.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.ICar);
-
-            /** Car label. */
-            public label: string;
-
-            /** Car hideLabelInLegend. */
-            public hideLabelInLegend: boolean;
-
-            /** Car x. */
-            public x: number;
-
-            /** Car y. */
-            public y: number;
-
-            /** Car heading. */
-            public heading: number;
-
-            /** Car color. */
-            public color: string;
-
-            /**
-             * Creates a new Car instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Car instance
-             */
-            public static create(properties?: apollo.dreamview.ICar): apollo.dreamview.Car;
-
-            /**
-             * Encodes the specified Car message. Does not implicitly {@link apollo.dreamview.Car.verify|verify} messages.
-             * @param message Car message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.ICar, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Car message, length delimited. Does not implicitly {@link apollo.dreamview.Car.verify|verify} messages.
-             * @param message Car message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.ICar, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Car message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Car
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Car;
-
-            /**
-             * Decodes a Car message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Car
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Car;
-
-            /**
-             * Verifies a Car message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Car message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Car
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Car;
-
-            /**
-             * Creates a plain object from a Car message. Also converts values to other types if specified.
-             * @param message Car
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Car, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Car to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Car
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a Chart. */
-        interface IChart {
-
-            /** Chart title */
-            title?: (string|null);
-
-            /** Chart options */
-            options?: (apollo.dreamview.IOptions|null);
-
-            /** Chart line */
-            line?: (apollo.dreamview.ILine[]|null);
-
-            /** Chart polygon */
-            polygon?: (apollo.dreamview.IPolygon[]|null);
-
-            /** Chart car */
-            car?: (apollo.dreamview.ICar[]|null);
-        }
-
-        /** Represents a Chart. */
-        class Chart implements IChart {
-
-            /**
-             * Constructs a new Chart.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IChart);
-
-            /** Chart title. */
-            public title: string;
-
-            /** Chart options. */
-            public options?: (apollo.dreamview.IOptions|null);
-
-            /** Chart line. */
-            public line: apollo.dreamview.ILine[];
-
-            /** Chart polygon. */
-            public polygon: apollo.dreamview.IPolygon[];
-
-            /** Chart car. */
-            public car: apollo.dreamview.ICar[];
-
-            /**
-             * Creates a new Chart instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Chart instance
-             */
-            public static create(properties?: apollo.dreamview.IChart): apollo.dreamview.Chart;
-
-            /**
-             * Encodes the specified Chart message. Does not implicitly {@link apollo.dreamview.Chart.verify|verify} messages.
-             * @param message Chart message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IChart, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Chart message, length delimited. Does not implicitly {@link apollo.dreamview.Chart.verify|verify} messages.
-             * @param message Chart message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IChart, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Chart message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Chart
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.Chart;
-
-            /**
-             * Decodes a Chart message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Chart
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.Chart;
-
-            /**
-             * Verifies a Chart message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Chart message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Chart
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.Chart;
-
-            /**
-             * Creates a plain object from a Chart message. Also converts values to other types if specified.
-             * @param message Chart
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.Chart, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Chart to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Chart
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a ScenarioInfo. */
-        interface IScenarioInfo {
-
-            /** ScenarioInfo scenarioId */
-            scenarioId?: (string|null);
-
-            /** ScenarioInfo scenarioName */
-            scenarioName?: (string|null);
-
-            /** ScenarioInfo mapName */
-            mapName?: (string|null);
-
-            /** ScenarioInfo startPoint */
-            startPoint?: (apollo.common.IPoint2D|null);
-
-            /** ScenarioInfo endPoint */
-            endPoint?: (apollo.common.IPoint2D|null);
-        }
-
-        /** Represents a ScenarioInfo. */
-        class ScenarioInfo implements IScenarioInfo {
-
-            /**
-             * Constructs a new ScenarioInfo.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IScenarioInfo);
-
-            /** ScenarioInfo scenarioId. */
-            public scenarioId: string;
-
-            /** ScenarioInfo scenarioName. */
-            public scenarioName: string;
-
-            /** ScenarioInfo mapName. */
-            public mapName: string;
-
-            /** ScenarioInfo startPoint. */
-            public startPoint?: (apollo.common.IPoint2D|null);
-
-            /** ScenarioInfo endPoint. */
-            public endPoint?: (apollo.common.IPoint2D|null);
-
-            /**
-             * Creates a new ScenarioInfo instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ScenarioInfo instance
-             */
-            public static create(properties?: apollo.dreamview.IScenarioInfo): apollo.dreamview.ScenarioInfo;
-
-            /**
-             * Encodes the specified ScenarioInfo message. Does not implicitly {@link apollo.dreamview.ScenarioInfo.verify|verify} messages.
-             * @param message ScenarioInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IScenarioInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified ScenarioInfo message, length delimited. Does not implicitly {@link apollo.dreamview.ScenarioInfo.verify|verify} messages.
-             * @param message ScenarioInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IScenarioInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ScenarioInfo message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ScenarioInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ScenarioInfo;
-
-            /**
-             * Decodes a ScenarioInfo message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns ScenarioInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ScenarioInfo;
-
-            /**
-             * Verifies a ScenarioInfo message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a ScenarioInfo message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns ScenarioInfo
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ScenarioInfo;
-
-            /**
-             * Creates a plain object from a ScenarioInfo message. Also converts values to other types if specified.
-             * @param message ScenarioInfo
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.ScenarioInfo, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this ScenarioInfo to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for ScenarioInfo
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** Properties of a ScenarioSet. */
-        interface IScenarioSet {
-
-            /** ScenarioSet scenarioSetName */
-            scenarioSetName?: (string|null);
-
-            /** ScenarioSet scenarios */
-            scenarios?: (apollo.dreamview.IScenarioInfo[]|null);
-        }
-
-        /** Represents a ScenarioSet. */
-        class ScenarioSet implements IScenarioSet {
-
-            /**
-             * Constructs a new ScenarioSet.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IScenarioSet);
-
-            /** ScenarioSet scenarioSetName. */
-            public scenarioSetName: string;
-
-            /** ScenarioSet scenarios. */
-            public scenarios: apollo.dreamview.IScenarioInfo[];
-
-            /**
-             * Creates a new ScenarioSet instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ScenarioSet instance
-             */
-            public static create(properties?: apollo.dreamview.IScenarioSet): apollo.dreamview.ScenarioSet;
-
-            /**
-             * Encodes the specified ScenarioSet message. Does not implicitly {@link apollo.dreamview.ScenarioSet.verify|verify} messages.
-             * @param message ScenarioSet message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IScenarioSet, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified ScenarioSet message, length delimited. Does not implicitly {@link apollo.dreamview.ScenarioSet.verify|verify} messages.
-             * @param message ScenarioSet message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IScenarioSet, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ScenarioSet message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ScenarioSet
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.ScenarioSet;
-
-            /**
-             * Decodes a ScenarioSet message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns ScenarioSet
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.ScenarioSet;
-
-            /**
-             * Verifies a ScenarioSet message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a ScenarioSet message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns ScenarioSet
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.ScenarioSet;
-
-            /**
-             * Creates a plain object from a ScenarioSet message. Also converts values to other types if specified.
-             * @param message ScenarioSet
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.ScenarioSet, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this ScenarioSet to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for ScenarioSet
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** PlayRecordStatus enum. */
-        enum PlayRecordStatus {
-            RUNNING = 0,
-            PAUSED = 1,
-            CLOSED = 2
-        }
-
-        /** Properties of a RecordStatus. */
-        interface IRecordStatus {
-
-            /** RecordStatus currentRecordId */
-            currentRecordId?: (string|null);
-
-            /** RecordStatus playRecordStatus */
-            playRecordStatus?: (apollo.dreamview.PlayRecordStatus|null);
-
-            /** RecordStatus currTimeS */
-            currTimeS?: (number|null);
-        }
-
-        /** Represents a RecordStatus. */
-        class RecordStatus implements IRecordStatus {
-
-            /**
-             * Constructs a new RecordStatus.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IRecordStatus);
-
-            /** RecordStatus currentRecordId. */
-            public currentRecordId: string;
-
-            /** RecordStatus playRecordStatus. */
-            public playRecordStatus: apollo.dreamview.PlayRecordStatus;
-
-            /** RecordStatus currTimeS. */
-            public currTimeS: number;
-
-            /**
-             * Creates a new RecordStatus instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns RecordStatus instance
-             */
-            public static create(properties?: apollo.dreamview.IRecordStatus): apollo.dreamview.RecordStatus;
-
-            /**
-             * Encodes the specified RecordStatus message. Does not implicitly {@link apollo.dreamview.RecordStatus.verify|verify} messages.
-             * @param message RecordStatus message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IRecordStatus, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified RecordStatus message, length delimited. Does not implicitly {@link apollo.dreamview.RecordStatus.verify|verify} messages.
-             * @param message RecordStatus message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IRecordStatus, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a RecordStatus message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns RecordStatus
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.RecordStatus;
-
-            /**
-             * Decodes a RecordStatus message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns RecordStatus
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.RecordStatus;
-
-            /**
-             * Verifies a RecordStatus message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a RecordStatus message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns RecordStatus
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.RecordStatus;
-
-            /**
-             * Creates a plain object from a RecordStatus message. Also converts values to other types if specified.
-             * @param message RecordStatus
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.RecordStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this RecordStatus to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for RecordStatus
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        /** HMIModeOperation enum. */
-        enum HMIModeOperation {
-            None = 0,
-            SIM_DEBUG = 1,
-            Sim_Control = 2,
-            REAL_CAR_AUTO_DRIVING = 3,
-            TRACE = 4,
-            Scenario_Sim = 5,
-            Record = 6
-        }
-
-        /** Properties of a HMIStatus. */
-        interface IHMIStatus {
-
-            /** HMIStatus header */
-            header?: (apollo.common.IHeader|null);
-
-            /** HMIStatus modes */
-            modes?: (string[]|null);
-
-            /** HMIStatus currentMode */
-            currentMode?: (string|null);
-
-            /** HMIStatus maps */
-            maps?: (string[]|null);
-
-            /** HMIStatus currentMap */
-            currentMap?: (string|null);
-
-            /** HMIStatus vehicles */
-            vehicles?: (string[]|null);
-
-            /** HMIStatus currentVehicle */
-            currentVehicle?: (string|null);
-
-            /** HMIStatus modules */
-            modules?: ({ [k: string]: boolean }|null);
-
-            /** HMIStatus monitoredComponents */
-            monitoredComponents?: ({ [k: string]: apollo.monitor.IComponentStatus }|null);
-
-            /** HMIStatus dockerImage */
-            dockerImage?: (string|null);
-
-            /** HMIStatus utmZoneId */
-            utmZoneId?: (number|null);
-
-            /** HMIStatus passengerMsg */
-            passengerMsg?: (string|null);
-
-            /** HMIStatus otherComponents */
-            otherComponents?: ({ [k: string]: apollo.monitor.IComponentStatus }|null);
-
-            /** HMIStatus scenarioSet */
-            scenarioSet?: ({ [k: string]: apollo.dreamview.IScenarioSet }|null);
-
-            /** HMIStatus currentScenarioSetId */
-            currentScenarioSetId?: (string|null);
-
-            /** HMIStatus currentScenarioId */
-            currentScenarioId?: (string|null);
-
-            /** HMIStatus dynamicModels */
-            dynamicModels?: (string[]|null);
-
-            /** HMIStatus currentDynamicModel */
-            currentDynamicModel?: (string|null);
-
-            /** HMIStatus currentRecordId */
-            currentRecordId?: (string|null);
-
-            /** HMIStatus records */
-            records?: ({ [k: string]: number }|null);
-
-            /** HMIStatus currentVehicleType */
-            currentVehicleType?: (number|null);
-
-            /** HMIStatus currentCameraSensorChannel */
-            currentCameraSensorChannel?: (string|null);
-
-            /** HMIStatus currentPointCloudChannel */
-            currentPointCloudChannel?: (string|null);
-
-            /** HMIStatus operations */
-            operations?: (apollo.dreamview.HMIModeOperation[]|null);
-
-            /** HMIStatus currentOperation */
-            currentOperation?: (apollo.dreamview.HMIModeOperation|null);
-
-            /** HMIStatus currentLayout */
-            currentLayout?: (string|null);
-
-            /** HMIStatus currentRecordStatus */
-            currentRecordStatus?: (apollo.dreamview.IRecordStatus|null);
-
-            /** HMIStatus dataRecorderComponent */
-            dataRecorderComponent?: (apollo.monitor.IComponent|null);
-
-            /** HMIStatus expectedModules */
-            expectedModules?: (number|null);
-
-            /** HMIStatus modulesLock */
-            modulesLock?: ({ [k: string]: boolean }|null);
-
-            /** HMIStatus backendShutdown */
-            backendShutdown?: (boolean|null);
-        }
-
-        /** Represents a HMIStatus. */
-        class HMIStatus implements IHMIStatus {
-
-            /**
-             * Constructs a new HMIStatus.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: apollo.dreamview.IHMIStatus);
-
-            /** HMIStatus header. */
-            public header?: (apollo.common.IHeader|null);
-
-            /** HMIStatus modes. */
-            public modes: string[];
-
-            /** HMIStatus currentMode. */
-            public currentMode: string;
-
-            /** HMIStatus maps. */
-            public maps: string[];
-
-            /** HMIStatus currentMap. */
-            public currentMap: string;
-
-            /** HMIStatus vehicles. */
-            public vehicles: string[];
-
-            /** HMIStatus currentVehicle. */
-            public currentVehicle: string;
-
-            /** HMIStatus modules. */
-            public modules: { [k: string]: boolean };
-
-            /** HMIStatus monitoredComponents. */
-            public monitoredComponents: { [k: string]: apollo.monitor.IComponentStatus };
-
-            /** HMIStatus dockerImage. */
-            public dockerImage: string;
-
-            /** HMIStatus utmZoneId. */
-            public utmZoneId: number;
-
-            /** HMIStatus passengerMsg. */
-            public passengerMsg: string;
-
-            /** HMIStatus otherComponents. */
-            public otherComponents: { [k: string]: apollo.monitor.IComponentStatus };
-
-            /** HMIStatus scenarioSet. */
-            public scenarioSet: { [k: string]: apollo.dreamview.IScenarioSet };
-
-            /** HMIStatus currentScenarioSetId. */
-            public currentScenarioSetId: string;
-
-            /** HMIStatus currentScenarioId. */
-            public currentScenarioId: string;
-
-            /** HMIStatus dynamicModels. */
-            public dynamicModels: string[];
-
-            /** HMIStatus currentDynamicModel. */
-            public currentDynamicModel: string;
-
-            /** HMIStatus currentRecordId. */
-            public currentRecordId: string;
-
-            /** HMIStatus records. */
-            public records: { [k: string]: number };
-
-            /** HMIStatus currentVehicleType. */
-            public currentVehicleType: number;
-
-            /** HMIStatus currentCameraSensorChannel. */
-            public currentCameraSensorChannel: string;
-
-            /** HMIStatus currentPointCloudChannel. */
-            public currentPointCloudChannel: string;
-
-            /** HMIStatus operations. */
-            public operations: apollo.dreamview.HMIModeOperation[];
-
-            /** HMIStatus currentOperation. */
-            public currentOperation: apollo.dreamview.HMIModeOperation;
-
-            /** HMIStatus currentLayout. */
-            public currentLayout: string;
-
-            /** HMIStatus currentRecordStatus. */
-            public currentRecordStatus?: (apollo.dreamview.IRecordStatus|null);
-
-            /** HMIStatus dataRecorderComponent. */
-            public dataRecorderComponent?: (apollo.monitor.IComponent|null);
-
-            /** HMIStatus expectedModules. */
-            public expectedModules: number;
-
-            /** HMIStatus modulesLock. */
-            public modulesLock: { [k: string]: boolean };
-
-            /** HMIStatus backendShutdown. */
-            public backendShutdown: boolean;
-
-            /**
-             * Creates a new HMIStatus instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns HMIStatus instance
-             */
-            public static create(properties?: apollo.dreamview.IHMIStatus): apollo.dreamview.HMIStatus;
-
-            /**
-             * Encodes the specified HMIStatus message. Does not implicitly {@link apollo.dreamview.HMIStatus.verify|verify} messages.
-             * @param message HMIStatus message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: apollo.dreamview.IHMIStatus, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified HMIStatus message, length delimited. Does not implicitly {@link apollo.dreamview.HMIStatus.verify|verify} messages.
-             * @param message HMIStatus message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: apollo.dreamview.IHMIStatus, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a HMIStatus message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns HMIStatus
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): apollo.dreamview.HMIStatus;
-
-            /**
-             * Decodes a HMIStatus message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns HMIStatus
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): apollo.dreamview.HMIStatus;
-
-            /**
-             * Verifies a HMIStatus message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a HMIStatus message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns HMIStatus
-             */
-            public static fromObject(object: { [k: string]: any }): apollo.dreamview.HMIStatus;
-
-            /**
-             * Creates a plain object from a HMIStatus message. Also converts values to other types if specified.
-             * @param message HMIStatus
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: apollo.dreamview.HMIStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this HMIStatus to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for HMIStatus
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
              */
@@ -42275,6 +44091,9 @@ export namespace apollo {
 
             /** SystemStatus detectImmediately */
             detectImmediately?: (boolean|null);
+
+            /** SystemStatus terminalComponent */
+            terminalComponent?: (apollo.monitor.IComponent|null);
         }
 
         /** Represents a SystemStatus. */
@@ -42315,6 +44134,9 @@ export namespace apollo {
 
             /** SystemStatus detectImmediately. */
             public detectImmediately: boolean;
+
+            /** SystemStatus terminalComponent. */
+            public terminalComponent?: (apollo.monitor.IComponent|null);
 
             /**
              * Creates a new SystemStatus instance using the specified properties.

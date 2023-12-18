@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { IconIcAimingCircle, IconIcDextroversionHighlight, IconIcLeftTurnDefault } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
+import './index.less';
 
 type RotationInfoProps = {
     steeringPercentage?: number;
@@ -50,8 +51,8 @@ function RotationInfo(props: RotationInfoProps) {
             </div>
             <div className={classes['dashboard-rotation-info-wheel']}>
                 <IconIcLeftTurnDefault
+                    className={isLeftOn ? 'turn-signal' : ''}
                     style={{
-                        color: isLeftOn ? '#3288FA' : undefined,
                         fontSize: 16,
                     }}
                 />
@@ -77,8 +78,8 @@ function RotationInfo(props: RotationInfoProps) {
                     alt=''
                 />
                 <IconIcDextroversionHighlight
+                    className={isRightOn ? 'turn-signal' : ''}
                     style={{
-                        color: isRightOn ? '#3288FA' : undefined,
                         fontSize: 16,
                     }}
                 />

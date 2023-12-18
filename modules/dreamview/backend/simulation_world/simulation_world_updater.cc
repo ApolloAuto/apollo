@@ -22,7 +22,8 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
@@ -54,7 +55,7 @@ using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
-    WebSocketHandler *camera_ws, SimControlManager *sim_control_manager,
+    WebSocketHandler *camera_ws,
     WebSocketHandler *plugin_ws, const MapService *map_service,
     PerceptionCameraUpdater *perception_camera_updater,
     PluginManager *plugin_manager, bool routing_from_file)
@@ -64,7 +65,6 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       map_ws_(map_ws),
       camera_ws_(camera_ws),
       plugin_ws_(plugin_ws),
-      sim_control_manager_(sim_control_manager),
       perception_camera_updater_(perception_camera_updater),
       plugin_manager_(plugin_manager),
       command_id_(0) {
@@ -77,7 +77,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       [this](WebSocketHandler::Connection *conn) {
         Json response;
         response["type"] = "SimControlStatus";
-        response["enabled"] = sim_control_manager_->IsEnabled();
+        response["enabled"] = SimControlManager::Instance()->IsEnabled();
         websocket_->SendData(conn, response.dump());
       });
 
@@ -164,14 +164,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       "SetStartPoint",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto point = json["point"];
-        if (!sim_control_manager_->IsEnabled()) {
+        if (!SimControlManager::Instance()->IsEnabled()) {
           AWARN << "Set start point need start sim_control.";
         } else {
           if (!ContainsKey(point, "heading")) {
             AWARN << "Set start point need set heading.";
             return;
           }
-          sim_control_manager_->ReSetPoinstion(point["x"], point["y"],
+          SimControlManager::Instance()->ReSetPoinstion(point["x"], point["y"],
                                                point["heading"]);
 
           // Send a ActionCommand to clear the trajectory of planning.
@@ -420,7 +420,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
-        sim_control_manager_->Reset();
+        SimControlManager::Instance()->Reset();
       });
 
   websocket_->RegisterMessageHandler(
@@ -434,9 +434,9 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         auto enable = json.find("enable");
         if (enable != json.end() && enable->is_boolean()) {
           if (*enable) {
-            sim_control_manager_->Start();
+            SimControlManager::Instance()->Start();
           } else {
-            sim_control_manager_->Stop();
+            SimControlManager::Instance()->Stop();
           }
         }
       });

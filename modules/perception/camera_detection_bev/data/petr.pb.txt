@@ -1,0 +1,72 @@
+info {
+  name: "petrv1"
+  version: ""
+  dataset: "nuScenes"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: PaddlePaddle
+
+  proto_file {
+    file: "petr_inference.pdmodel"
+  }
+  weight_file {
+    file: "petr_inference.pdiparams"
+  }
+  inputs {
+    name: "images"
+    shape: 1
+    shape: 6
+    shape: 3
+    shape: 320
+    shape: 800
+  }
+  inputs {
+    name: "img2lidars"
+    shape: 1
+    shape: 6
+    shape: 4
+    shape: 4
+  }
+  outputs {
+    name: "_generated_var_4"
+    shape: 300
+    shape: 9
+  }
+  outputs {
+    name: "_generated_var_9"
+    shape: 300
+  }
+  outputs {
+    name: "_generated_var_14"
+    shape: 300
+  }
+  class_names: "car"
+  class_names: "truck"
+  class_names: "construction_vehicle"
+  class_names: "bus"
+  class_names: "trailer"
+  class_names: "barrier"
+  class_names: "motorcycle"
+  class_names: "bicycle"
+  class_names: "pedestrian"
+  class_names: "traffic_cone"
+}
+resize {
+  width: 800
+  height: 450
+}
+normalize {
+  mean: 103.530
+  mean: 116.280
+  mean: 123.675
+  std: 57.375
+  std: 57.120
+  std: 58.395
+}
+crop {
+  x: 0
+  y: 130
+  width: 800
+  height: 320
+}
+score_threshold: 0.5

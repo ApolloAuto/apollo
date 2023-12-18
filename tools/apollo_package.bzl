@@ -313,7 +313,7 @@ def apollo_package(enable_source=True):
         "name": "install_header_src",
         "src_dir": ["."],
         "dest": "include/%s" % package_name,
-        "filter": "*.h",
+        "filter": "*.h*",
         "type": "neo",
     }
 

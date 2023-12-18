@@ -4,5 +4,5 @@ import Icon  from '@ant-design/icons';
 import { IconProps } from '../type';
 import { default as Svg } from '../../svgs/ic_eit_full_screen_hover.svg';
 
-const IconIcEitFullScreenHover = (props: IconProps) => <Icon component={Svg} {...props}/>;
+const IconIcEitFullScreenHover = (props: IconProps) => <Icon component={Svg as any} {...props}/>;
 export default IconIcEitFullScreenHover;

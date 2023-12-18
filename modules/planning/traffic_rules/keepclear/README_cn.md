@@ -37,7 +37,7 @@ apollo::planning::KeepClear
 | 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
 | ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
 | `modules/planning/traffic_rules/keep_clear/conf/default_conf.pb.txt` | `apollo::planning::KeepClearConfig` |配置文件 |
-| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+| `modules/planning/planning_component/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
 
 | 配置项 | 说明 |
 | ----- | ----- |
@@ -48,7 +48,7 @@ apollo::planning::KeepClear
 
 #### 使用方式
 
-在 `modules/planning/planning_base/conf/traffic_rule_config.pb.txt` 增加 `KeepClear` 插件的配置
+在 `modules/planning/planning_component/conf/traffic_rule_config.pb.txt` 增加 `KeepClear` 插件的配置
 
 ```
 rule {

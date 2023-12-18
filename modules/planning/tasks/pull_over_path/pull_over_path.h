@@ -27,7 +27,7 @@
 #include <vector>
 #include "modules/planning/tasks/pull_over_path/proto/pull_over_path.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/common/path_generation.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_generation.h"
 
 namespace apollo {
 namespace planning {

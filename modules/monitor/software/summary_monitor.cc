@@ -66,20 +66,16 @@ void SummaryMonitor::RunOnce(const double current_time) {
     const auto& other_status = component.second.other_status();
     EscalateStatus(other_status.status(), other_status.message(), summary);
   }
-  // Escalate the summary status to the most severe one.
-  auto& data_record_component = *status->mutable_data_recorder_component();
-  auto* data_recorder_summary = data_record_component.mutable_summary();
 
-  const auto& data_recorder_process_status =
-      data_record_component.process_status();
-  EscalateStatus(data_recorder_process_status.status(),
-                 data_recorder_process_status.message(), data_recorder_summary);
-
-  const auto& data_recorder_resource_status =
-      data_record_component.resource_status();
-  EscalateStatus(data_recorder_resource_status.status(),
-                 data_recorder_resource_status.message(),
-                 data_recorder_summary);
+  // For global components
+  for (auto& component : *status->mutable_global_components()) {
+    auto* summary = component.second.mutable_summary();
+    const auto& process_status = component.second.process_status();
+    EscalateStatus(process_status.status(), process_status.message(), summary);
+    const auto& resource_status = component.second.resource_status();
+    EscalateStatus(resource_status.status(), resource_status.message(),
+                   summary);
+  }
 
   // Get fingerprint of current status.
   // Don't use DebugString() which has known bug on Map field. The string

@@ -9,6 +9,7 @@ function getEntry() {
     [...components].forEach((component) => {
         result[`components/${component}/index`] = [component];
     });
+    return result;
 }
 
 module.exports = getEntry;

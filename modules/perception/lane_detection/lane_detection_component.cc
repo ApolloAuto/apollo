@@ -428,6 +428,8 @@ int LaneDetectionComponent::InitSensorInfo() {
   // assume all camera have same image size
   base::BaseCameraModelPtr camera_model_ptr =
       sensor_manager->GetUndistortCameraModel(camera_names_[0]);
+  ACHECK(camera_model_ptr) << "Can't find " << camera_names_[0]
+                           << " in data/conf/sensor_meta.pb.txt";
   image_width_ = static_cast<int>(camera_model_ptr->get_width());
   image_height_ = static_cast<int>(camera_model_ptr->get_height());
 
@@ -496,6 +498,8 @@ int LaneDetectionComponent::InitCameraFrames() {
     base::BaseCameraModelPtr model;
     model = algorithm::SensorManager::Instance()->GetUndistortCameraModel(
         camera_name);
+    ACHECK(model) << "Can't find " << camera_name
+                  << " in data/conf/sensor_meta.pb.txt";
     auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
     Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
     intrinsic_map_[camera_name] = intrinsic;

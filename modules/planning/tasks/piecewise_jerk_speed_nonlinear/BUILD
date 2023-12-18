@@ -70,7 +70,7 @@ apollo_plugin(
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/planning/planning_base/proto:ipopt_return_status_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/piecewise_jerk_speed_nonlinear/proto:piecewise_jerk_speed_nonlinear_cc_proto",
         "@ipopt",
     ],

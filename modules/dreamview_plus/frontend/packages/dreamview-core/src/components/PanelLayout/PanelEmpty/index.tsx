@@ -7,6 +7,7 @@ import { update } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/act
 import { getPanelTypeByPanelId } from '@dreamview/dreamview-core/src/util/layout';
 import { useMenuStore, ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
+import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import useStyle from './useStyle';
 
 const spaceWidth = 12;
@@ -18,13 +19,14 @@ function PanelEmpty() {
     const { t } = useTranslation('panels');
     const { allPanel } = usePanelCatalogContext();
     const [, dispatch] = usePanelLayoutStore();
+    const [hmi] = usePickHmiStore();
     const [{ activeMenu }] = useMenuStore();
     const isMenuHide = activeMenu === ENUM_MENU_KEY.HIDDEN;
     const aotuWith = { width: isMenuHide ? `calc((100% - ${space4}) / 5)` : `calc((100% - ${space2}) / 3)` };
 
     const { classes, cx } = useStyle();
     const onAddPanel = (type: string) => {
-        dispatch(update(getPanelTypeByPanelId(type)));
+        dispatch(update({ mode: hmi.currentMode, layout: getPanelTypeByPanelId(type) }));
     };
     const flexFillElem = useMemo(
         () => new Array(4).fill(0).map((_, index: number) => <div style={aotuWith} key={`${index + 1}`} />),

@@ -35,6 +35,8 @@ using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
+const double kDoubleEpsilon = 1e-6;
+
 ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
@@ -442,6 +444,13 @@ bool ControlComponent::Proc() {
     return true;
   }
 
+  if (fabs(control_command.debug().simple_lon_debug().vehicle_pitch()) <
+      kDoubleEpsilon) {
+    injector_->vehicle_state()->Update(local_view_.localization(),
+                                       local_view_.chassis());
+    GetVehiclePitchAngle(&control_command);
+  }
+
   const auto end_time = Clock::Now();
   const double time_diff_ms = (end_time - start_time).ToSecond() * 1e3;
   ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
@@ -546,6 +555,13 @@ void ControlComponent::ResetAndProduceZeroControlCommand(
   latest_trajectory_.mutable_trajectory_point()->Clear();
   latest_trajectory_.mutable_path_point()->Clear();
   trajectory_reader_->ClearData();
+}
+
+void ControlComponent::GetVehiclePitchAngle(ControlCommand *control_command) {
+  double vehicle_pitch = injector_->vehicle_state()->pitch() * 180 / M_PI;
+  control_command->mutable_debug()
+      ->mutable_simple_lon_debug()
+      ->set_vehicle_pitch(vehicle_pitch + FLAGS_pitch_offset_deg);
 }
 
 }  // namespace control

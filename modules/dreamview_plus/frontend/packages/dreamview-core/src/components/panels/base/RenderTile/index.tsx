@@ -15,23 +15,23 @@ import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/Pane
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import ErrorBoundary from '@dreamview/dreamview-core/src/components/ErrorBoundery';
 import { MosaicPath, MosaicWindow, MosaicWindowContext } from 'react-mosaic-component';
-import { PanelInnerProvider } from '@dreamview/dreamview-core/src/store/PanelInnerStore';
 import { CustomizeEvent, useEventHandlersContext } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
 import useRegisterUpdateChanel from '@dreamview/dreamview-core/src/hooks/useRegisterUpdateChanel';
-import { createLocalStoragePersistor } from '@dreamview/dreamview-core/src/store/base/Persistor';
+import { FullScreenFnRef } from '@dreamview/dreamview-core/src/store/PanelInnerStore/type';
 import { PanelTileProvider } from '@dreamview/dreamview-core/src/store/PanelInnerStore/PanelTileStore';
-import errorImg from '@dreamview/dreamview-core/src/assets/ic_fail_to_load.png';
+import { hooksManager } from '@dreamview/dreamview-core/src/util/HooksManager';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { refreshPanel, usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
+import { usePanelInfoStore } from '@dreamview/dreamview-core/src/store/PanelInfoStore';
+import errorImg from '@dreamview/dreamview-core/src/assets/ic_fail_to_load.png';
 import useStyle from './style';
 import RenderToolbar from '../RenderToolbar';
 import { FullScreen } from '../FullScreen';
 import { SubscribeInfo } from '../../type/RenderToolBar';
-import { usePanelInfoStore } from '../../../../store/PanelInfoStore';
+
 import './index.less';
-import { hooksManager } from '../../../../util/HooksManager';
-import { FullScreenFnRef } from '../../../../store/PanelInnerStore/type';
+import { usePickHmiStore } from '../../../../store/HmiStore';
 
 export interface RenderTileProps {
     // panelId，panel实例化唯一Id
@@ -54,6 +54,7 @@ function Child(props: PropsWithChildren<ChildProps>) {
     const elem = useRef<HTMLDivElement>();
     const [dragging, setDraging] = useState(false);
     const [, dispatch] = usePanelLayoutStore();
+    const [hmi] = usePickHmiStore();
     const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
     const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
     const {
@@ -87,7 +88,7 @@ function Child(props: PropsWithChildren<ChildProps>) {
     }, []);
 
     const onRefresh = () => {
-        dispatch(refreshPanel({ path }));
+        dispatch(refreshPanel({ mode: hmi.currentMode, path }));
     };
 
     const errorComponent = (
@@ -132,13 +133,12 @@ function RenderTile(props: RenderTileProps) {
         exitFullScreen: async () => {},
     });
 
-    const { panelCatalog, panelComponents, panelToolBar } = usePanelCatalogContext();
+    const { panelCatalog, panelComponents } = usePanelCatalogContext();
 
     const PanelComponent = panelComponents.get(panelId);
 
     const panel = panelCatalog.get(panelId);
 
-    // const CustomRenderToolBar = panelToolBar.get(panelId);
     const CustomRenderToolBar = panel?.renderToolbar;
 
     const toolBar = useMemo(() => {
@@ -195,7 +195,7 @@ function RenderTile(props: RenderTileProps) {
                 fullScreenHookConfig?.afterEnterFullScreen();
             }
         }
-    }, [inFullScreen]);
+    }, [inFullScreen, panelId]);
 
     const exitFullScreen = useCallback(async () => {
         if (!inFullScreen) return;
@@ -225,14 +225,6 @@ function RenderTile(props: RenderTileProps) {
         fullScreenFnRef.current.exitFullScreen = exitFullScreen;
     }, [enterFullScreen, exitFullScreen]);
 
-    const [{ initialState, persistor }] = useState(() => ({
-        persistor: createLocalStoragePersistor(`dv-panel-inner-stoer-${panelId}`),
-        initialState: {
-            panelId,
-            state: {},
-        },
-    }));
-
     if (!PanelComponent) {
         return (
             <MosaicWindow<string> path={path} title='unknown'>
@@ -260,18 +252,16 @@ function RenderTile(props: RenderTileProps) {
                             exitFullScreen={exitFullScreen}
                             fullScreenFnObj={fullScreenFnRef.current}
                         >
-                            <PanelInnerProvider persistor={persistor} initialState={initialState}>
-                                <Child
-                                    path={path}
-                                    panel={panel}
-                                    panelId={panelId}
-                                    inFullScreen={inFullScreen}
-                                    updateChannel={updateChannel}
-                                >
-                                    <PanelComponent panelId={panelId} />
-                                    {toolBar}
-                                </Child>
-                            </PanelInnerProvider>
+                            <Child
+                                path={path}
+                                panel={panel}
+                                panelId={panelId}
+                                inFullScreen={inFullScreen}
+                                updateChannel={updateChannel}
+                            >
+                                <PanelComponent panelId={panelId} />
+                                {toolBar}
+                            </Child>
                         </PanelTileProvider>
                     </React.Suspense>
                 </ErrorBoundary>

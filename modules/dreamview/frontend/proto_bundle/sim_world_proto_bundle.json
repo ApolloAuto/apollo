@@ -962,12 +962,13 @@
             },
             "HMIModeOperation": {
               "values": {
-                "Record": 0,
+                "None": 0,
                 "SIM_DEBUG": 1,
                 "Sim_Control": 2,
                 "REAL_CAR_AUTO_DRIVING": 3,
                 "TRACE": 4,
-                "Scenario_Sim": 5
+                "Scenario_Sim": 5,
+                "Record": 6
               }
             },
             "HMIStatus": {
@@ -1105,6 +1106,25 @@
                 "dataRecorderComponent": {
                   "type": "apollo.monitor.Component",
                   "id": 29
+                },
+                "expectedModules": {
+                  "type": "uint32",
+                  "id": 30,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "modulesLock": {
+                  "keyType": "string",
+                  "type": "bool",
+                  "id": 31
+                },
+                "backendShutdown": {
+                  "type": "bool",
+                  "id": 32,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             }
@@ -12040,6 +12060,13 @@
                 "dataRecorderComponent": {
                   "type": "Component",
                   "id": 11
+                },
+                "detectImmediately": {
+                  "type": "bool",
+                  "id": 12,
+                  "options": {
+                    "default": false
+                  }
                 }
               },
               "reserved": [

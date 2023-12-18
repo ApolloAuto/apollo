@@ -19,7 +19,7 @@
 #pragma once
 
 #include "modules/planning/scenarios/pull_over/proto/pull_over.pb.h"
-#include "modules/planning/planning_base/scenario_base/scenario.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {

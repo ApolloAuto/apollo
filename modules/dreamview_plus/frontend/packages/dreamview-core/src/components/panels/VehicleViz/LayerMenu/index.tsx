@@ -1,18 +1,31 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { Checkbox, Radio } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
+import { useLocalStorage } from '@dreamview/dreamview-core/src/util/storageManager';
 import useStyle from '../useStyle';
-import { layerMenuParams, formatLayerParams, getCurrentLayerParams } from './params';
+import { layerMenuParams, formatLayerParams, getCurrentLayerParams, localLayerMenuParamsManager } from './params';
 import { usePanelContext } from '../../base/store/PanelStore';
 import { StreamDataNames } from '../../../../services/api/types';
 import useWebSocketServices from '../../../../services/hooks/useWebSocketServices';
+import ChannelSelect from '../../base/ChannelSelect';
 
 function LayerMenu(props: any) {
     const { classes, cx } = useStyle();
-    const { carviz, pointCloudFusionChannel } = props;
+    const {
+        carviz,
+        pointCloudFusionChannel,
+        handlePointCloudVisible,
+        pointcloudChannels,
+        updatePointcloudChannel,
+        curChannel,
+        setCurChannel,
+        handleReferenceLineVisible,
+        handleBoundaryLineVisible,
+        handleTrajectoryLineVisible,
+    } = props;
     const { t } = useTranslation('layerMenu');
     const panelContext = usePanelContext();
-    const { updateChannel, closeSubcription } = panelContext;
+    const { panelId } = panelContext;
 
     const { metadata } = useWebSocketServices();
 
@@ -25,8 +38,8 @@ function LayerMenu(props: any) {
                 )?.channels;
 
                 if (Array.isArray(pointCloudChannels)) {
-                    const hasCompensator = pointCloudChannels.some((item) => item.includes('compensator'));
-                    const hasFusion = pointCloudChannels.some((item) => item.includes('fusion'));
+                    const hasCompensator = pointCloudChannels.some((item) => item.channelName.includes('compensator'));
+                    const hasFusion = pointCloudChannels.some((item) => item.channelName.includes('fusion'));
                     return !(hasCompensator || hasFusion);
                 }
             }
@@ -36,19 +49,86 @@ function LayerMenu(props: any) {
     );
 
     const curLayerMenuParams = getCurrentLayerParams();
-    localStorage.setItem('layerMenuParams', JSON.stringify(curLayerMenuParams));
+    localLayerMenuParamsManager.set(curLayerMenuParams);
     carviz.option.updateLayerOption(formatLayerParams(curLayerMenuParams), 'vehicle');
 
     const [layerMenu, setLayerMenu] = useState(curLayerMenuParams);
     const [menu] = useState(Object.keys(layerMenu));
     const [currentMenu, setCurrentMenu] = useState(menu[0]);
     const [subMenu, setSubMenu] = useState(layerMenu[currentMenu]);
+    const pointCloudCheckedRef = useRef<boolean>();
 
     const resetLayerMenu = () => {
         setLayerMenu(() => layerMenuParams);
         carviz.option.updateLayerOption(formatLayerParams(layerMenuParams), 'vehicle');
-        localStorage.setItem('layerMenuParams', JSON.stringify(layerMenuParams));
+        localLayerMenuParamsManager.set(layerMenuParams);
     };
+
+    const localVizPointCloudChannel = useLocalStorage(`${panelId}-viz-pointcloud-channel`);
+    const onChange = (v: any) => {
+        setCurChannel(v);
+        updatePointcloudChannel(v);
+        localVizPointCloudChannel.set(v);
+    };
+
+    const pointCloudInfoBox = useMemo(() => {
+        const { currentVisible } = layerMenu[currentMenu].pointCloud || {};
+        pointCloudCheckedRef.current = currentVisible;
+        return (
+            <li className={classes['layer-menu-content-right-li']} key='pointCloud'>
+                <span className={classes['layer-menu-content-right-switch']}>
+                    <Checkbox
+                        checked={currentVisible}
+                        // disabled={checkBoxDisabled('pointCloud')}
+                        defaultChecked={currentVisible}
+                        onChange={(e) => {
+                            const checked = e.target.checked;
+                            pointCloudCheckedRef.current = checked;
+                            const newMenu = {
+                                ...layerMenu[currentMenu],
+                                pointCloud: {
+                                    ...layerMenu[currentMenu].pointCloud,
+                                    currentVisible: checked,
+                                },
+                            };
+
+                            const newLayerMenu = {
+                                ...layerMenu,
+                                [currentMenu]: newMenu,
+                            };
+                            setSubMenu(() => newMenu);
+                            setLayerMenu(() => newLayerMenu);
+                            carviz.option.updateLayerOption(formatLayerParams(newLayerMenu), 'vehicle');
+                            localLayerMenuParamsManager.set(newLayerMenu);
+                            // if (checked && !checkBoxDisabled('pointCloud') && pointCloudFusionChannel) {
+                            if (checked) {
+                                if (handlePointCloudVisible) {
+                                    handlePointCloudVisible(e.target.checked);
+                                }
+                            }
+
+                            if (!checked) {
+                                if (handlePointCloudVisible) {
+                                    handlePointCloudVisible(e.target.checked);
+                                }
+                            }
+                        }}
+                    />
+                </span>
+                <span className={classes['layer-menu-content-right-label']}>{t('pointCloud')}</span>
+            </li>
+        );
+    }, [
+        carviz.option,
+        checkBoxDisabled,
+        classes,
+        currentMenu,
+        handlePointCloudVisible,
+        layerMenu,
+        pointCloudFusionChannel,
+        t,
+    ]);
+
     return (
         <div className={classes['layer-menu-container']}>
             <div className={classes['layer-menu-header']}>
@@ -107,7 +187,7 @@ function LayerMenu(props: any) {
                                                     formatLayerParams(newLayerMenu),
                                                     'vehicle',
                                                 );
-                                                localStorage.setItem('layerMenuParams', JSON.stringify(newLayerMenu));
+                                                localLayerMenuParamsManager.set(newLayerMenu);
                                             }
                                         }}
                                     />
@@ -142,7 +222,7 @@ function LayerMenu(props: any) {
                                                     formatLayerParams(newLayerMenu),
                                                     'vehicle',
                                                 );
-                                                localStorage.setItem('layerMenuParams', JSON.stringify(newLayerMenu));
+                                                localLayerMenuParamsManager.set(newLayerMenu);
                                             }
                                         }}
                                     />
@@ -153,7 +233,20 @@ function LayerMenu(props: any) {
                         </>
                     )}
 
+                    {pointCloudInfoBox}
+                    <ChannelSelect
+                        disabled={!pointCloudCheckedRef.current}
+                        value={curChannel}
+                        options={pointcloudChannels}
+                        onChange={(v) => onChange(v)}
+                    />
+                    <div className={classes['layer-menu-horizontal-line']} />
+
                     {Object.keys(subMenu).map((key) => {
+                        if (key === 'pointCloud') {
+                            return null;
+                        }
+
                         const { currentVisible } = layerMenu[currentMenu][key] || {};
                         return (
                             key !== 'polygon' &&
@@ -173,7 +266,6 @@ function LayerMenu(props: any) {
                                                         currentVisible: checked,
                                                     },
                                                 };
-
                                                 const newLayerMenu = {
                                                     ...layerMenu,
                                                     [currentMenu]: newMenu,
@@ -184,21 +276,34 @@ function LayerMenu(props: any) {
                                                     formatLayerParams(newLayerMenu),
                                                     'vehicle',
                                                 );
-                                                localStorage.setItem('layerMenuParams', JSON.stringify(newLayerMenu));
+                                                localLayerMenuParamsManager.set(newLayerMenu);
+
                                                 if (
                                                     checked &&
                                                     key === 'pointCloud' &&
                                                     !checkBoxDisabled(key) &&
                                                     pointCloudFusionChannel
                                                 ) {
-                                                    updateChannel({
-                                                        name: StreamDataNames.POINT_CLOUD,
-                                                        needChannel: true,
-                                                        channel: pointCloudFusionChannel,
-                                                    });
+                                                    if (handlePointCloudVisible) {
+                                                        handlePointCloudVisible(e.target.checked);
+                                                    }
                                                 }
+
                                                 if (!checked && key === 'pointCloud') {
-                                                    closeSubcription(StreamDataNames.POINT_CLOUD);
+                                                    if (handlePointCloudVisible) {
+                                                        handlePointCloudVisible(e.target.checked);
+                                                    }
+                                                }
+                                                if (key === 'planningReferenceLine') {
+                                                    handleReferenceLineVisible(checked);
+                                                }
+
+                                                if (key === 'planningBoundaryLine') {
+                                                    handleBoundaryLineVisible(checked);
+                                                }
+
+                                                if (key === 'planningTrajectoryLine') {
+                                                    handleTrajectoryLineVisible(checked);
                                                 }
                                             }}
                                         />

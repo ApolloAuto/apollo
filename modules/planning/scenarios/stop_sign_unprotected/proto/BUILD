@@ -9,7 +9,7 @@ proto_library(
     name = "stop_sign_unprotected_proto",
     srcs = ["stop_sign_unprotected.proto"],
     deps = [
-        "//modules/planning/planning_base/scenario_base/proto:creep_stage_proto",
+        "//modules/planning/planning_interface_base/scenario_base/proto:creep_stage_proto",
     ],
 )
 

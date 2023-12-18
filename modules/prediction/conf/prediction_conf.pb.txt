@@ -27,20 +27,6 @@ evaluator_model_conf {
   model {
     evaluator_type: SEMANTIC_LSTM_EVALUATOR
     obstacle_type: PEDESTRIAN
-    backend: GPU
-    priority: 0
-    type: "SemanticLstmPedestrianTensorrt"
-  }
-  model {
-    evaluator_type: SEMANTIC_LSTM_EVALUATOR
-    obstacle_type: VEHICLE
-    backend: GPU
-    priority: 0
-    type: "SemanticLstmVehicleTensorrt"
-  }
-  model {
-    evaluator_type: SEMANTIC_LSTM_EVALUATOR
-    obstacle_type: PEDESTRIAN
     backend: CPU
     priority: 10
     type: "SemanticLstmPedestrianCpuTorch"

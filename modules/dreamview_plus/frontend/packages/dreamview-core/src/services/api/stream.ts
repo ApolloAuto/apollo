@@ -20,12 +20,12 @@ export class StreamApi {
         };
     }
 
-    subscribeToData<T>(name: string) {
-        return webSocketManager.subscribeToData<T>(name);
+    subscribeToData<T, P = any>(name: string) {
+        return webSocketManager.subscribeToData<T, P>(name);
     }
 
-    subscribeToDataWithChannel<T>(name: string, channel: string) {
-        return webSocketManager.subscribeToDataWithChannel<T>(name, channel);
+    subscribeToDataWithChannel<T, P = any>(name: string, channel: string) {
+        return webSocketManager.subscribeToDataWithChannel<T, P>(name, channel);
     }
 
     subscribeToDataWithChannelFuzzy<T>(name: string) {

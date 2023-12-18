@@ -7,6 +7,7 @@ export const personal = {
     document: 'Product Documentation',
     community: 'Apollo Developer Community',
     technicalSupport: 'Advice and Suggestion',
+    faq: 'FAQ',
     general: 'General',
     privacy: 'Privacy',
     about: 'About',

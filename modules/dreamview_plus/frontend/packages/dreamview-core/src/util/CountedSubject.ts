@@ -47,6 +47,9 @@ export default class CountedSubject<T> extends Subject<T> {
         const originalUnsubscribe = subscription.unsubscribe.bind(subscription);
         subscription.unsubscribe = () => {
             this.subscriptionCount -= 1;
+            if (this.subscriptionCount < 0) {
+                this.subscriptionCount = 0;
+            }
             logger.debug(
                 `Removed subscriber from ${this.name} ${
                     this.channel ? `with channel ${this.channel}` : 'with Upstream'

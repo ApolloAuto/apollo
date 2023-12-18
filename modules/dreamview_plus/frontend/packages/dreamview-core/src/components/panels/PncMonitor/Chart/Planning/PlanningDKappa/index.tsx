@@ -35,6 +35,7 @@ function DKappa() {
             initOptions({
                 dataset,
                 series,
+                scale: true,
                 xAxis: {
                     type: 'value',
                     name: 'Time (s)',

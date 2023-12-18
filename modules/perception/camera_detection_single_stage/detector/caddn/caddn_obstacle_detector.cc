@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/camera_detection_single_stage/detector/caddn/caddn_obstacle_detector.h"
 
+#include <map>
 #include <memory>
 
 #include "opencv2/opencv.hpp"
@@ -29,6 +30,12 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+const std::map<std::string, base::ObjectSubType> kKITTIName2SubTypeMap = {
+    {"Car", base::ObjectSubType::CAR},
+    {"Pedestrian", base::ObjectSubType::PEDESTRIAN},
+    {"Cyclist", base::ObjectSubType::CYCLIST},
+    {"MAX_OBJECT_TYPE", base::ObjectSubType::MAX_OBJECT_TYPE},
+};
 
 void CaddnObstacleDetector::InitImageSize(
     const caddn::ModelParam &model_param) {
@@ -51,6 +58,18 @@ void CaddnObstacleDetector::InitParam(const caddn::ModelParam &model_param) {
   score_threshold_ = model_param.score_threshold();
 }
 
+bool CaddnObstacleDetector::InitTypes(const caddn::ModelParam &model_param) {
+  for (const auto &class_name : model_param.info().class_names()) {
+    if (kKITTIName2SubTypeMap.find(class_name) != kKITTIName2SubTypeMap.end()) {
+      types_.push_back(kKITTIName2SubTypeMap.at(class_name));
+    } else {
+      AERROR << "Unsupported subtype type!" << class_name;
+      return false;
+    }
+  }
+  return true;
+}
+
 bool CaddnObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   options_ = options;
   std::string config_file =
@@ -62,16 +81,10 @@ bool CaddnObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
 
   InitImageSize(model_param_);
   InitParam(model_param_);
+  InitTypes(model_param_);
 
   const auto &model_info = model_param_.info();
   std::string model_path = GetModelPath(model_info.name());
-  std::string types_file =
-      GetModelFile(model_info.name(), model_info.types_file().file());
-  if (!LoadTypes(types_file, &types_)) {
-    AERROR << "Load types file failed!";
-    return false;
-  }
-
   if (!InitNetwork(model_param_.info(), model_path)) {
     AERROR << "Init network failed!";
     return false;
@@ -82,8 +95,7 @@ bool CaddnObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
 bool CaddnObstacleDetector::Preprocess(const base::Image8U *image,
                                        base::BlobPtr<float> input_blob) {
   cv::Mat img = cv::Mat(image->rows(), image->cols(), CV_8UC3);
-  memcpy(img.data, image->cpu_data(),
-         image->rows() * image->cols() * image->channels() * sizeof(uint8_t));
+  memcpy(img.data, image->cpu_data(), image->total() * sizeof(uint8_t));
 
   // resize
   cv::resize(img, img, cv::Size(width_, height_));
@@ -141,7 +153,7 @@ bool CaddnObstacleDetector::Detect(onboard::CameraFrame *frame) {
 
   float *input_lidar2cam_data = input_lidar2cam_blob->mutable_cpu_data();
   for (int i = 0; i < 16; ++i) {
-    input_lidar2cam_data[i] = input_lidar_data_[i];
+    input_lidar2cam_data[i] = lidar_to_cam_[i];
   }
 
   DataProvider::ImageOptions image_options;
@@ -167,12 +179,10 @@ bool CaddnObstacleDetector::Detect(onboard::CameraFrame *frame) {
   GetCaddnObjects(&frame->detected_objects, model_param_, types_,
                   out_detections, out_labels, out_scores);
 
-  RecoverCaddnBbox(frame->data_provider->src_width(),
-                   frame->data_provider->src_height(), 0,
-                   &frame->detected_objects);
-
   return true;
 }
+
+REGISTER_OBSTACLE_DETECTOR(CaddnObstacleDetector);
 
 }  // namespace camera
 }  // namespace perception

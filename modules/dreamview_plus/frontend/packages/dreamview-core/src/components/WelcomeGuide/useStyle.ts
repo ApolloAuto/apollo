@@ -89,7 +89,6 @@ export default function useStyle() {
         },
         'welcome-guide-content-tab-text': {
             width: '354px',
-            marginTop: '10px',
             marginLeft: '32px',
             position: 'relative',
         },

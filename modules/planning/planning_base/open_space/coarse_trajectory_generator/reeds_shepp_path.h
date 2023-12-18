@@ -30,10 +30,11 @@
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/node3d.h"
 
 namespace apollo {

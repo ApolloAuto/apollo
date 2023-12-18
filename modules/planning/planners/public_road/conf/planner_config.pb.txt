@@ -1,0 +1,48 @@
+scenario {
+    name: "EMERGENCY_PULL_OVER"
+    type: "EmergencyPullOverScenario"
+}
+scenario {
+    name: "EMERGENCY_STOP"
+    type: "EmergencyStopScenario"
+}
+scenario {
+    name: "VALET_PARKING"
+    type: "ValetParkingScenario"
+}
+scenario {
+    name: "BARE_INTERSECTION_UNPROTECTED"
+    type: "BareIntersectionUnprotectedScenario"
+}
+scenario {
+    name: "STOP_SIGN_UNPROTECTED"
+    type: "StopSignUnprotectedScenario"
+}
+scenario {
+    name: "YIELD_SIGN"
+    type: "YieldSignScenario"
+}
+scenario {
+    name: "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN"
+    type: "TrafficLightUnprotectedLeftTurnScenario"
+}
+scenario {
+    name: "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN"
+    type: "TrafficLightUnprotectedRightTurnScenario"
+}
+scenario {
+    name: "TRAFFIC_LIGHT_PROTECTED"
+    type: "TrafficLightProtectedScenario"
+}
+scenario {
+    name: "PULL_OVER"
+    type: "PullOverScenario"
+}
+scenario {
+    name: "PARK_AND_GO"
+    type: "ParkAndGoScenario"
+}
+scenario {
+    name: "LANE_FOLLOW"
+    type: "LaneFollowScenario"
+}

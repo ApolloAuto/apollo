@@ -81,4 +81,7 @@ tools/FlameGraph
 # jetbrain profiler
 .DS_Store
 
+# dv plugins
+modules/studio_connector
+
 #WORKSPACE

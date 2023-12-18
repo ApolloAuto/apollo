@@ -19,7 +19,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "modules/dreamview/proto/hmi_mode.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_mode.pb.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/common_msgs/monitor_msgs/system_status.pb.h"
 #include "modules/monitor/software/latency_monitor.h"

@@ -122,9 +122,9 @@ apollo::planning::LaneFollowMap
 #### 使用方式
 
 ##### 配置使用 LaneFollowMap
-在`modules/planning/planning_base/conf/planning_config.pb.txt`文件中修改`reference_line_config`的配置，配置使用`LaneFollowMap`。
+在`modules/planning/planning_component/conf/planning_config.pb.txt`文件中修改`reference_line_config`的配置，配置使用`LaneFollowMap`。
 ``` shell
-# modules/planning/planning_base/conf/planning_config.pb.txt
+# modules/planning/planning_component/conf/planning_config.pb.txt
 reference_line_config {
   pnc_map_class: "apollo::planning::LaneFollowMap"
 }

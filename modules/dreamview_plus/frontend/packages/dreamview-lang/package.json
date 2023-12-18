@@ -1,6 +1,6 @@
 {
   "name": "@dreamview/dreamview-lang",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.1",
   "description": "description.",
   "author": "adu-sim",
   "homepage": "",
@@ -12,9 +12,9 @@
     "test": "node ./__tests__/frontend.test.js"
   },
   "dependencies": {
-    "@dreamview/eslint-config-dreamview": "^1.0.0",
-    "@dreamview/log": "^1.0.0",
-    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@dreamview/eslint-config-dreamview": "1.0.1",
+    "@dreamview/log": "1.0.1",
+    "@dreamview/tslint-config-dreamview": "1.0.1",
     "@types/react-dom": "^18.2.4",
     "i18next": "^22.4.15",
     "i18next-browser-languagedetector": "^7.0.1",

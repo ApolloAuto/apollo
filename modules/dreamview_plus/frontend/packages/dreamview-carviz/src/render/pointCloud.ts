@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Logger from '@dreamview/log';
 import { pointCloudHeightColorMapping } from '../constant/common';
-import { disposeMesh } from '../utils/common';
+import { disposeMesh, getPointSize } from '../utils/common';
 
 const logger = Logger.getInstance(`PointCloud-${Date.now()}`);
 
@@ -16,30 +16,39 @@ export default class PointCloud {
 
     private adc;
 
-    private positionBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
-
-    private colorBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
-
-    private material = new THREE.PointsMaterial({
-        size: 0.25,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.7,
-    });
-
-    private geometry = new THREE.BufferGeometry();
+    private lastHeading;
 
     constructor(scene, adc, option) {
         this.scene = scene;
         this.adc = adc;
         this.option = option;
         this.pointCloudMesh = null;
-        this.geometry.setAttribute('position', this.positionBuffer);
-        this.geometry.setAttribute('color', this.colorBuffer);
+        this.lastHeading = 0;
+
+        this.initPointCloudMesh();
+    }
+
+    initPointCloudMesh() {
+        const positionBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
+        const colorBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', positionBuffer);
+        geometry.setAttribute('color', colorBuffer);
+        geometry.setDrawRange(0, 0);
+
+        const material = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.7,
+        });
+
+        const pointCloudMesh = new THREE.Points(geometry, material);
+        this.pointCloudMesh = pointCloudMesh;
+        this.scene.add(pointCloudMesh);
     }
 
     update(pointCloud) {
-        this.dispose();
         if (!this.option.layerOption.Perception.pointCloud || !pointCloud.num || pointCloud.num.length % 3 !== 0) {
             logger.warn('pointCloud length should be multiples of 3');
             return;
@@ -51,7 +60,11 @@ export default class PointCloud {
 
         const pointCloudSize = pointCloud.num.length / 3;
         const total = Math.min(pointCloudSize, MAX_POINTS);
-        this.geometry.setDrawRange(0, total);
+
+        this.pointCloudMesh.geometry.setDrawRange(0, total);
+        this.pointCloudMesh.material.setValues({
+            size: getPointSize(pointCloudSize),
+        });
 
         for (let i = 0; i < total; i += 1) {
             const index = i * 3;
@@ -63,17 +76,21 @@ export default class PointCloud {
 
             const color = pointCloudHeightColorMapping[colorKey];
 
-            this.positionBuffer.setXYZ(i, pointCloud.num[index], pointCloud.num[index + 1], z);
-            this.colorBuffer.setXYZ(i, color.r, color.g, color.b);
-        }
+            const positions = this.pointCloudMesh.geometry.attributes.position;
+            const colorsArray = this.pointCloudMesh.geometry.attributes.color;
 
-        this.positionBuffer.needsUpdate = true;
-        this.colorBuffer.needsUpdate = true;
-        const pointCloudMesh = new THREE.Points(this.geometry, this.material);
-        pointCloudMesh.position.set(x, y, 0);
-        pointCloudMesh.rotateZ(heading);
-        this.pointCloudMesh = pointCloudMesh;
-        this.scene.add(pointCloudMesh);
+            positions.setXYZ(i, pointCloud.num[index], pointCloud.num[index + 1], z);
+            colorsArray.setXYZ(i, color.r, color.g, color.b);
+        }
+        this.pointCloudMesh.position.set(x, y, 0);
+        this.pointCloudMesh.rotateZ(heading - this.lastHeading);
+        this.lastHeading = heading;
+        this.pointCloudMesh.geometry.attributes.position.needsUpdate = true;
+        this.pointCloudMesh.geometry.attributes.color.needsUpdate = true;
+
+        if (!this.scene.children.includes(this.pointCloudMesh)) {
+            this.scene.add(this.pointCloudMesh);
+        }
     }
 
     updateOffsetPosition() {
@@ -92,8 +109,12 @@ export default class PointCloud {
     }
 
     dispose() {
-        disposeMesh(this.pointCloudMesh);
+        // disposeMesh(this.pointCloudMesh);
+        // this.scene.remove(this.pointCloudMesh);
+        // this.pointCloudMesh = null;
+    }
+
+    disposeLastFrame() {
         this.scene.remove(this.pointCloudMesh);
-        this.pointCloudMesh = null;
     }
 }

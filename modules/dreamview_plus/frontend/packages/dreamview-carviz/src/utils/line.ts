@@ -20,6 +20,11 @@ export function drawDashedLineFromPoints(points, lineAttr) {
         transparent: true,
         opacity,
     });
+    material.depthTest = true;
+    material.transparent = true;
+    // material.precision = 'highp';
+    material.side = THREE.DoubleSide;
+    // material.blending = THREE.LessDepth;
     const mesh = new THREE.Line(geometry, material);
     mesh.computeLineDistances();
     mesh.position.z = zOffset;

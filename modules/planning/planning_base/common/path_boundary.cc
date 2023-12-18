@@ -18,10 +18,11 @@
  * @file
  **/
 
+#include "modules/planning/planning_base/common/path_boundary.h"
+
 #include <tuple>
 
 #include "cyber/common/log.h"
-#include "modules/planning/planning_base/common/path_boundary.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 namespace apollo {
 namespace planning {

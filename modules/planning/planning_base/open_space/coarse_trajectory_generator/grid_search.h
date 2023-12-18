@@ -29,7 +29,9 @@
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 

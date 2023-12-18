@@ -19,13 +19,15 @@
  **/
 
 #include "Eigen/Dense"
+
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

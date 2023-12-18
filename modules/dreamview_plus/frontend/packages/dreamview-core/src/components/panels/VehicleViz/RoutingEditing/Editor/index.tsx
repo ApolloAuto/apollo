@@ -63,7 +63,7 @@ export function Editor() {
 
     useEffect(() => {
         routingEditor.init();
-        routingEditor.view.changeViewType(ViewType.MAP);
+        routingEditor.view.changeViewType(ViewType.MAP, false);
         dispatch(initRoutingEditor({ routingEditor }));
     }, []);
 
@@ -117,7 +117,6 @@ export function Editor() {
                             subScribeCurrentRouteSubscription = routeManager.currentRouteManager.subScribeCurrentRoute(
                                 (currentRoute) => {
                                     const { routeOrigin, routePoint } = currentRoute;
-                                    console.log('currentRoute', currentRoute);
 
                                     if (routeOrigin === RouteOrigin.CREATING_ROUTE) {
                                         const routeInitialPoint = routePoint.routeInitialPoint;
@@ -157,9 +156,10 @@ export function Editor() {
                     })
                     .then((res) => {
                         if (!res.isLegal) {
-                            // if (checkPointType === PointType.INITIAL_POINT) {
-                            //     routingEditor.initiationMarker.undo();
-                            // }
+                            if (checkPointType === PointType.INITIAL_POINT) {
+                                routingEditor.initiationMarker.undo();
+                                message({ type: 'error', content: t('checkStartPointTooltip') });
+                            }
                             if (checkPointType === PointType.WAY_POINT) {
                                 routingEditor.pathwayMarker.undo();
                                 message({ type: 'error', content: t('checkPointTooltip') });

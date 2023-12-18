@@ -26,7 +26,13 @@
   ],
   "line": [
     {
-      "label": "roi_boundary",
+      "label": ".*roi_boundary",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "warm_path_box1",
+      "type": "box",
       "marker": "*-",
       "subplot": "xy"
     },

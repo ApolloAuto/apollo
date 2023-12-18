@@ -139,6 +139,33 @@ export class BaseMarker implements FunctionalClass {
         return planeIntersect;
     }
 
+    public computeRaycasterObject(x, y) {
+        const { camera, scene } = this.context;
+        const { x: nx, y: ny } = this.computeNormalizationPosition(x, y);
+        const raycasterTemp = new THREE.Raycaster();
+        raycasterTemp.setFromCamera(new THREE.Vector2(nx, ny), camera);
+
+        let ParkingSpaceModels = [];
+        scene.children.forEach((model) => {
+            if (model.name === "ParkingSpace") {
+                ParkingSpaceModels.push(model);
+            }
+        });
+
+        let selectedObject;
+        for (let index = 0; index < ParkingSpaceModels.length; index++) {
+            const element = ParkingSpaceModels[index];
+            let box3 = new THREE.Box3().setFromObject(element);
+            const point = new THREE.Vector3();
+            const isIntersecting = raycasterTemp.ray.intersectBox(box3, point);
+            if (isIntersecting) {
+                selectedObject = element;
+                break;
+            }
+        }
+        return selectedObject;
+    }
+
     public computeNormalizationPosition(x, y) {
         const { renderer } = this.context;
         const rect = renderer.domElement.getBoundingClientRect();

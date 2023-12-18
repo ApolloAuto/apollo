@@ -7,7 +7,6 @@ plugin_param {
 }
 enable_undistortion: false
 channel {
-  input_camera_channel_name: "/apollo/sensor/camera/front_12mm/image"
   output_obstacles_channel_name: "/perception/inner/Detection2"
 }
 gpu_id: 0

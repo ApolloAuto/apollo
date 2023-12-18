@@ -46,7 +46,7 @@ export default class Coordinates {
      */
     applyOffset(point, reverse = false) {
         if (this.offset === null) {
-            console.error('Offset is not set.');
+            // console.error('Offset is not set.');
             return null;
         }
         if (isNaN(this.offset?.x) || isNaN(this.offset?.y)) {

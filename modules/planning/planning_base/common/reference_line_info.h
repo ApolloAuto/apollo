@@ -40,10 +40,10 @@
 #include "modules/planning/planning_base/common/path_boundary.h"
 #include "modules/planning/planning_base/common/path_decision.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed/speed_data.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

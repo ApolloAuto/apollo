@@ -62,7 +62,7 @@ apollo_plugin(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/speed_decider/proto:speed_decider_cc_proto",
     ],
 )

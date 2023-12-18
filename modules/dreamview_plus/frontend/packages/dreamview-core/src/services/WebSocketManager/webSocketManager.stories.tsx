@@ -192,11 +192,11 @@ function WebSocketManagerStory() {
                             <>
                                 {item.channels.map((channel) => (
                                     <Button
-                                        key={channel}
-                                        type='default'
+                                        key={channel.channelName}
+                                        type={channel.channelName.includes('hmi') ? 'primary' : 'default'}
                                         onClick={() => {
                                             const subscription = streamApi
-                                                ?.subscribeToDataWithChannel(item.dataName, channel)
+                                                ?.subscribeToDataWithChannel(item.dataName, channel.channelName)
                                                 .subscribe((data) => {
                                                     logger.info(
                                                         `WebSocketManagerStory received data from ${item.dataName} ${channel}`,
@@ -207,7 +207,7 @@ function WebSocketManagerStory() {
                                         }}
                                     >
                                         {item.dataName}
-                                        {channel}
+                                        {channel.channelName}
                                     </Button>
                                 ))}
                             </>
@@ -237,15 +237,15 @@ function WebSocketManagerStory() {
                             <>
                                 {item.channels.map((channel) => (
                                     <Button
-                                        key={channel}
-                                        type='default'
+                                        key={channel.channelName}
+                                        type={channel.channelName.includes('hmi') ? 'primary' : 'default'}
                                         onClick={() => {
                                             registry.shift(item.dataName)?.unsubscribe();
                                         }}
                                     >
                                         disconnect
                                         {item.dataName}
-                                        {channel}
+                                        {channel.channelName}
                                     </Button>
                                 ))}
                             </>

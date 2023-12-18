@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/open_space_trajectory_provider/open_space_trajectory_optimizer.h"
 
+#include <iomanip>
 #include <utility>
 
 namespace apollo {

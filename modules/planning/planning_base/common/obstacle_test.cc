@@ -21,11 +21,13 @@
 #include "modules/planning/planning_base/common/obstacle.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -598,18 +600,18 @@ TEST(ObstacleMergeTest, add_decision_test) {
 TEST_F(ObstacleTest, GetObstacleTrajectoryPolygon) {
   Obstacle* obstacle = indexed_obstacles_.Find("88_0");
   EXPECT_TRUE(false) << obstacle->Id();
-  EXPECT_TRUE(false) << obstacle->Perception().position().x()
-                      << "  " << obstacle->Perception().position().y()
-                      << "  " << obstacle->Perception().theta()
-                      << "  " << sin(obstacle->Perception().theta());
+  EXPECT_TRUE(false) << obstacle->Perception().position().x() << "  "
+                     << obstacle->Perception().position().y() << "  "
+                     << obstacle->Perception().theta() << "  "
+                     << sin(obstacle->Perception().theta());
   for (int i = 0; i < obstacle->Trajectory().trajectory_point_size(); i++) {
     const auto& point = obstacle->Trajectory().trajectory_point(i);
-    EXPECT_TRUE(false) << point.path_point().x()
-                       << "  " << point.path_point().y()
-                       << "  " << point.path_point().theta()
-                       << "  " << sin(point.path_point().theta());
+    EXPECT_TRUE(false) << point.path_point().x() << "  "
+                       << point.path_point().y() << "  "
+                       << point.path_point().theta() << "  "
+                       << sin(point.path_point().theta());
     common::math::Polygon2d polygon =
-                              obstacle->GetObstacleTrajectoryPolygon(point);
+        obstacle->GetObstacleTrajectoryPolygon(point);
     const auto& corner_points = polygon.points();
     for (size_t j = 0; j < corner_points.size(); j++) {
       double x = corner_points[j].x();

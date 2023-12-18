@@ -39,6 +39,8 @@ struct PlayParam {
   std::set<std::string> files_to_play;
   std::set<std::string> channels_to_play;
   std::set<std::string> black_channels;
+  // for dreamview_plus play record;use record_id to check source
+  std::string record_id = "";
 };
 
 }  // namespace record

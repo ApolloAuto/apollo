@@ -32,13 +32,13 @@ export default function RoutingEditingFunctionalWay(props: RoutingEditingFunctio
     }, [wayPointCount]);
 
     return (
-        <div className={cx(wayDisable && classes['functional-initial-disable'], classes['functional-initial-con'])}>
+        <div className={cx({ [classes['functional-initial-disable']]: wayDisable }, classes['functional-initial-con'])}>
             <Popover
                 content={t('removeLastPoint')}
                 trigger='hover'
                 rootClassName={classes['functional-initial-popover']}
             >
-                <div className={wayDisable && cx(classes['functional-initial-every-icon-con'])}>
+                <div className={cx({ [classes['functional-initial-every-icon-con']]: wayDisable })}>
                     <div
                         className={cx(
                             'functional-initial-every-icon-disable',
@@ -55,7 +55,7 @@ export default function RoutingEditingFunctionalWay(props: RoutingEditingFunctio
                 trigger='hover'
                 rootClassName={classes['functional-initial-popover']}
             >
-                <div className={wayDisable && cx(classes['functional-initial-every-icon-con'])}>
+                <div className={cx({ [classes['functional-initial-every-icon-con']]: wayDisable })}>
                     <div
                         className={cx(
                             'functional-initial-every-icon-disable',

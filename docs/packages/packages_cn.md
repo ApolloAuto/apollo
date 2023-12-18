@@ -12,7 +12,7 @@
 | core | planning     | [old-routing-adpter](modules/external_command/old_routing_adapter/README_cn.md)                                                        |
 | core | planning     | [external-command-process](modules/external_command/process_component/README_cn.md)                                                    |
 | core | planning     | [routing](modules/routing/README_cn.md)                                                                                                |
-| core | planning     | [planning](modules/planning/planning_base/README_cn.md)                                                                                |
+| core | planning     | [planning-base](modules/planning/planning_base/README_cn.md)                                                                           |
 | core | planning     | [planning-scenario-pull-over](modules/planning/scenarios/pull_over/README_cn.md)                                                       |
 | core | planning     | [planning-scenario-emergency-stop](modules/planning/scenarios/emergency_stop/README_cn.md)                                             |
 | core | planning     | [planning-scenario-traffic-light-unprotected-right-turn](modules/planning/scenarios/traffic_light_unprotected_right_turn/README_cn.md) |
@@ -25,7 +25,12 @@
 | core | planning     | [planning-scenario-traffic-light-unprotected-left-turn](modules/planning/scenarios/traffic_light_unprotected_left_turn/README_cn.md)   |
 | core | planning     | [planning-scenario-valet-parking](modules/planning/scenarios/valet_parking/README_cn.md)                                               |
 | core | planning     | [planning-scenario-traffic-light-protected](modules/planning/scenarios/traffic_light_protected/README_cn.md)                           |
+| core | planning     | [planning](modules/planning/planning_component/README_cn.md)                                                                           |
 | core | planning     | [planning-lane-follow-map](modules/planning/pnc_map/lane_follow_map/README_cn.md)                                                      |
+| core | planning     | [planning-planner-navi](modules/planning/planners/navi/README_cn.md)                                                                   |
+| core | planning     | [planning-planner-lattice](modules/planning/planners/lattice/README_cn.md)                                                             |
+| core | planning     | [planning-planner-rtk](modules/planning/planners/rtk/README_cn.md)                                                                     |
+| core | planning     | [planning-planner-public-road](modules/planning/planners/public_road/README_cn.md)                                                     |
 | core | planning     | [planning-task-open-space-trajectory-provider](modules/planning/tasks/open_space_trajectory_provider/README_cn.md)                     |
 | core | planning     | [planning-task-rule-based-stop-decider](modules/planning/tasks/rule_based_stop_decider/README_cn.md)                                   |
 | core | planning     | [planning-task-piecewise-jerk-speed](modules/planning/tasks/piecewise_jerk_speed/README_cn.md)                                         |
@@ -101,6 +106,7 @@
 | core | drivers      | [drivers-smartereye](modules/drivers/smartereye/README.md)                                                                             |
 | core | drivers      | [drivers-image-decompress](modules/drivers/tools/image_decompress/README.md)                                                           |
 | core | drivers      | [drivers-gnss](modules/drivers/gnss/README.md)                                                                                         |
+| core | drivers      | [drivers-radar](modules/drivers/radar/README.md)                                                                                       |
 | core | localization | [localization](modules/localization/README_cn.md)                                                                                      |
 | core | dreamview    | [dreamview](modules/dreamview/README.md)                                                                                               |
 | core | dreamview    | [dreamview-plus](modules/dreamview_plus/README.md)                                                                                     |
@@ -117,3 +123,4 @@
 | core | calibration  | [calibration](modules/calibration/README.md)                                                                                           |
 | core | data         | [apollo-data](modules/data/README.md)                                                                                                  |
 | core | map          | [map](modules/map/README.md)                                                                                                           |
+

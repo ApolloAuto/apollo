@@ -20,17 +20,17 @@ config navigation mode
 """
 import sys
 import configparser
-from modules.dreamview.proto import hmi_config_pb2
+from modules.common_msgs.dreamview_msgs import hmi_config_pb2
 from modules.common_msgs.planning_msgs import planning_config_pb2
 from modules.tools.common import proto_utils
 
 DEFAULT_NAVI_CONFIG_FILE = "/apollo/modules/tools/navigation/config/default.ini"
 HMI_CONF_FILE = "/apollo/modules/dreamview/conf/hmi.conf"
-PLANNING_CONF_FILE = "/apollo/modules/planning/planning_base/conf/planning_config_navi.pb.txt"
+PLANNING_CONF_FILE = "/apollo/modules/planning/planning_component/conf/planning_config_navi.pb.txt"
 GLOBAL_FLAG_FILE = "/apollo/modules/common/data/global_flagfile.txt"
 LOCALIZATION_FLAG_FILE = "/apollo/modules/localization/conf/localization.conf"
-PLANNING_FLAG_FILE1 = "/apollo/modules/planning/planning_base/conf/planning.conf"
-PLANNING_FLAG_FILE2 = "/apollo/modules/planning/planning_base/conf/planning_navi.conf"
+PLANNING_FLAG_FILE1 = "/apollo/modules/planning/planning_component/conf/planning.conf"
+PLANNING_FLAG_FILE2 = "/apollo/modules/planning/planning_component/conf/planning_navi.conf"
 
 
 def set_hmi_conf(config):

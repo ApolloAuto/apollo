@@ -82,54 +82,54 @@ class PolygonScanCvter {
 
   /**
    * @brief Construct a new Polygon Scan Cvter object
-   * 
+   *
    */
   PolygonScanCvter() = default;
 
   /**
    * @brief Destroy the Polygon Scan Cvter object
-   * 
+   *
    */
   virtual ~PolygonScanCvter() = default;
 
   /**
    * @brief Return the polygon_
-   * 
-   * @return const Polygon& 
+   *
+   * @return const Polygon&
    */
   const Polygon& polygon() const { return polygon_; }
 
   /**
    * @brief Init of Polygon Scan Cvter object
-   * 
-   * @param polygon 
+   *
+   * @param polygon
    */
   void Init(const Polygon& polygon);
 
   /**
    * @brief Reset the Polygon Scan Cvter object
-   * 
+   *
    */
   void Reset();
 
   // HORIZONTAL = 0 for x, VERTICAL = 1 for y
   /**
    * @brief Get scan intervals
-   * 
-   * @param scan_loc 
-   * @param dir_major 
-   * @param scan_intervals 
+   *
+   * @param scan_loc
+   * @param dir_major
+   * @param scan_intervals
    */
   void ScanCvt(const T& scan_loc, DirectionMajor dir_major,
                std::vector<IntervalOut>* scan_intervals);
 
   /**
    * @brief Get scan intervals
-   * 
-   * @param scans_interval 
-   * @param dir_major 
-   * @param step 
-   * @param scans_intervals 
+   *
+   * @param scans_interval
+   * @param dir_major
+   * @param step
+   * @param scans_intervals
    */
   void ScansCvt(const IntervalIn& scans_interval,
                 const DirectionMajor dir_major, const T& step,
@@ -216,7 +216,7 @@ void PolygonScanCvter<T>::ScanCvt(const T& scan_loc, DirectionMajor dir_major,
     double k = ks[i];
     if (std::isfinite(k)) {
       if ((x >= low_x && x < high_x) || (x <= low_x && x > high_x)) {
-        if (x == low_x) {
+        if (std::fabs(x - low_x) < 1.0e-6) {
           nodes.push_back(low_y);
           if (is_singular[i]) {
             nodes.push_back(low_y);

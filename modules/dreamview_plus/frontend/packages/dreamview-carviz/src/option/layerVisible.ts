@@ -9,7 +9,7 @@ export const layerVisible: { [key: string]: ChildLayerVisible } = {
         pedestrian: true,
         bicycle: true,
         unknownMovable: true,
-        unknownUnMovable: true,
+        unknownUnmovable: true,
         unknown: true,
         cipv: true,
         obstacleVelocity: true,

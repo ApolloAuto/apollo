@@ -196,9 +196,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
       path_point_box.Shift(shift_vec);
       double iou_ratio =
           Polygon2d(ego_box_).ComputeIoU(Polygon2d(path_point_box));
-      AINFO << std::fixed << "get closetst point" << path_point_x << ","
-            << path_point_y << " distance" << distance << "iou" << iou_ratio
-            << "pt theta" << traj_point_moving_direction;
       closest_point.emplace(j, iou_ratio);
     }
   }
@@ -209,7 +206,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     auto fallback_tra_pair =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
     GenerateStopTrajectory(&fallback_tra_pair->first, -4.0);
-    fallback_tra_pair->second = canbus::Chassis::GEAR_DRIVE;
+    fallback_tra_pair->second = frame_->local_view().chassis->gear_location();
     const std::string msg =
         "Fail to find nearest trajectory point to follow stop to fallback "
         "replan";
@@ -710,6 +707,11 @@ void OpenSpaceTrajectoryPartition::GenerateStopTrajectory(
   static constexpr int stop_trajectory_length = 10;
   static constexpr double relative_stop_time = 0.1;
   trajectory_data->clear();
+  static constexpr double vEpsilon = 0.00001;
+  standstill_acceleration =
+      frame_->vehicle_state().linear_velocity() >= -vEpsilon
+          ? standstill_acceleration
+          : -1.0 * standstill_acceleration;
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(frame_->vehicle_state().x());

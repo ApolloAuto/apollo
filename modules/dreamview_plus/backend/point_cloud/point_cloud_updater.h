@@ -39,7 +39,7 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -92,7 +92,7 @@ class PointCloudUpdater : public UpdaterWithChannelsBase {
                    const std::string &channel_name = "",
                    nlohmann::json *subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name = "") override;
-  void OnTimer(const std::string& channel_name = "") override;
+  void OnTimer(const std::string& channel_name = "");
   void PublishMessage(const std::string& channel_name = "") override;
   void GetChannelMsg(std::vector<std::string> *channels) override;
   // The height of lidar w.r.t the ground.

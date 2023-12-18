@@ -1,3 +1,14 @@
 left_path_width: 2.0
 right_path_width: 2.0
 target_speed: 3.0
+point1_x: 750938.87
+point1_y: 2564015.21
+point2_x: 750936.63
+point2_y: 2563957.76
+point3_x: 750996.27
+point3_y: 2563954.90
+point4_x: 750993.98
+point4_y: 2564014.67
+end_pose_x: 750957.47
+end_pose_y: 2563975.60
+end_pose_heading: 3.14

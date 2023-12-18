@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/cyber.h"
-
 #include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
+
+#include <set>
+
+#include "cyber/cyber.h"
 #include "modules/dreamview_plus/backend/record_player/record_player_factory.h"
 
 namespace apollo {
@@ -65,9 +67,9 @@ void UpdaterWithChannelsBase::GetChannelMsgWithFilter(
     }
   }
   std::set<std::string> s(tmp_channels.begin(), tmp_channels.end());
-  channels->assign(s.begin(), s.end());
+  channels->assign(tmp_channels.begin(), tmp_channels.end());
   channels_.clear();
-  channels_ = {channels->begin(), channels->end()};
+  channels_.assign(s.begin(), s.end());
 }
 
 }  // namespace dreamview

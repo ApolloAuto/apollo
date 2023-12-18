@@ -24,7 +24,7 @@
 #include <string>
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/stage.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
 namespace apollo {

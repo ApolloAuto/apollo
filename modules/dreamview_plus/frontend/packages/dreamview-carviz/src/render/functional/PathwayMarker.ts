@@ -30,6 +30,8 @@ export default class PathwayMarker extends BaseMarker {
 
     private arrow: THREE.Mesh;
 
+    private selectedMesh: THREE.Mesh;
+
     constructor(protected context: IPathwayMarkerContext) {
         super(context);
         this.name = 'PathwayMarker';
@@ -80,6 +82,7 @@ export default class PathwayMarker extends BaseMarker {
         });
         this.positions = [];
         this.triggerCallback('reset');
+        this.selectParkingSpace(false);
         return this;
     }
 
@@ -144,6 +147,7 @@ export default class PathwayMarker extends BaseMarker {
 
         this.positions.push(this.currentMovePosition);
 
+        this.selectParkingSpace(true, event.clientX, event.clientY);
         this.triggerCallback('edit');
     };
 
@@ -187,6 +191,7 @@ export default class PathwayMarker extends BaseMarker {
         const position = this.positions.pop();
         position.instance.remove();
         this.triggerCallback('undo');
+        this.selectParkingSpace(false);
         return this.lastPosition;
     }
 
@@ -198,6 +203,27 @@ export default class PathwayMarker extends BaseMarker {
                 lastPosition: this.lastPosition,
             });
         }
+    }
+
+    selectParkingSpace(isSelecting: boolean, x?, y?) {
+        if (isSelecting) {
+            //first reset the crrent mesh color
+            if (this.selectedMesh) {
+                this.selectParkingSpace(false);
+            }
+            const parkspaceObject = this.computeRaycasterObject(x, y);
+            if (parkspaceObject) {
+                parkspaceObject.material.color.set(parkspaceObject.userData.selectedColor);
+                this.selectedMesh = parkspaceObject;
+            }
+        }
+        else {
+            if (this.selectedMesh) {
+                this.selectedMesh.material.color.set(this.selectedMesh.userData.color);
+            }
+        }
+        const {renderer, camera, scene } = this.context;
+        renderer.render(scene, camera);
     }
 
     // 返回最后一个点的坐标

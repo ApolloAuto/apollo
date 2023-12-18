@@ -22,6 +22,7 @@
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
 namespace {
 std::map<std::string, int> plugin_function_map = {
     {"UpdateScenarioSetToStatus", 0},
@@ -93,7 +94,6 @@ Status Dreamview::Init() {
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
 
@@ -101,7 +101,7 @@ Status Dreamview::Init() {
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), camera_ws_.get(),
-      sim_control_manager_.get(), plugin_ws_.get(), map_service_.get(),
+      plugin_ws_.get(), map_service_.get(),
       perception_camera_updater_.get(), plugin_manager_.get(),
       FLAGS_routing_from_file));
   point_cloud_updater_.reset(
@@ -148,7 +148,7 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  sim_control_manager_->Stop();
+  SimControlManager::Instance()->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();
@@ -169,7 +169,7 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       if (param_json.contains("x") && param_json.contains("y")) {
         const double x = param_json["x"];
         const double y = param_json["y"];
-        sim_control_manager_->Restart(x, y);
+        SimControlManager::Instance()->Restart(x, y);
         callback_res["result"] = true;
       }
     } break;
@@ -180,8 +180,9 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     }
     case 2: {
       // loadDynamicModels
-      if (sim_control_manager_->IsEnabled()) {
-        nlohmann::json load_res = sim_control_manager_->LoadDynamicModels();
+      if (SimControlManager::Instance()->IsEnabled()) {
+        nlohmann::json load_res =
+            SimControlManager::Instance()->LoadDynamicModels();
         callback_res["loaded_dynamic_models"] =
             load_res["loaded_dynamic_models"];
         callback_res["result"] = true;
@@ -193,9 +194,10 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     case 3: {
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->ChangeDynamicModel(
-            param_json["dynamic_model_name"]);
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] =
+            SimControlManager::Instance()->ChangeDynamicModel(
+                param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -205,9 +207,10 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     case 4: {
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->DeleteDynamicModel(
-            param_json["dynamic_model_name"]);
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] =
+            SimControlManager::Instance()->DeleteDynamicModel(
+                param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -217,8 +220,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     case 5: {
       // addDynamicModel
       if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->AddDynamicModel(
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] = SimControlManager::Instance()->AddDynamicModel(
             param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
@@ -229,7 +232,7 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     case 6: {
       // restart dynamic model
       map_service_->ReloadMap(true);
-      sim_control_manager_->Restart();
+      SimControlManager::Instance()->Restart();
       callback_res["result"] = true;
       break;
     }
@@ -249,10 +252,13 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
   switch (plugin_function_map[function_name]) {
     case 0: {
       // 解析结果
-      if (param_json.contains("scenario_set_id") &&
-          param_json.contains("scenario_set_name")) {
-        const std::string scenario_set_id = param_json["scenario_set_id"];
-        const std::string scenario_set_name = param_json["scenario_set_name"];
+      if (param_json.contains("data") &&
+          param_json["data"].contains("scenario_set_id") &&
+          param_json["data"].contains("scenario_set_name")) {
+        const std::string scenario_set_id =
+            param_json["data"]["scenario_set_id"];
+        const std::string scenario_set_name =
+            param_json["data"]["scenario_set_name"];
         if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
           callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
                                                          scenario_set_name);
@@ -263,8 +269,10 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
       callback_res = hmi_->UpdateRecordToStatus();
     } break;
     case 2: {
-      if (param_json.contains("dynamic_model_name")) {
-        const std::string dynamic_model_name = param_json["dynamic_model_name"];
+      if (param_json.contains("data") &&
+          param_json["data"].contains("dynamic_model_name")) {
+        const std::string dynamic_model_name =
+            param_json["data"]["dynamic_model_name"];
         if (!dynamic_model_name.empty()) {
           callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
         }

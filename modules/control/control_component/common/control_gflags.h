@@ -93,3 +93,5 @@ DECLARE_double(minimum_speed_protection);
 DECLARE_int32(action);
 
 DECLARE_bool(use_vehicle_epb);
+
+DECLARE_double(pitch_offset_deg);

@@ -48,11 +48,11 @@ modules/planning/traffic_rules/reference_line_end/
 
 | 文件路径                                            |  <div style="width: 300pt">说明</div> |
 | --------------------------------------------------- |  ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
+| `modules/planning/planning_component/conf/planning.conf` |  planning模块的flag配置文件           |
 
 #### 使用方式
 ##### 配置加载 ReferenceLineEnd 插件
-在 `modules/planning/planning_base/conf/traffic_rule_config.pb.txt` 文件中，配置参数中 `name` 表示 traffic rule 的名称，这个由用户自定义，配置 `type` 是 ReferenceLineEnd 的类名称，即 `ReferenceLineEnd`。
+在 `modules/planning/planning_component/conf/traffic_rule_config.pb.txt` 文件中，配置参数中 `name` 表示 traffic rule 的名称，这个由用户自定义，配置 `type` 是 ReferenceLineEnd 的类名称，即 `ReferenceLineEnd`。
 ```
 task {
   name: "REFERENCE_LINE_END"
@@ -65,5 +65,5 @@ task {
 
 ##### mainboard启动
 ```shell
-mainboard -d modules/planning/planning_base/dag/planning.dag
+mainboard -d modules/planning/planning_component/dag/planning.dag
 ```

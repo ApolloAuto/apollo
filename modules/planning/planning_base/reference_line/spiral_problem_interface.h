@@ -29,6 +29,7 @@
 #include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
+
 #include "modules/planning/planning_base/math/curve1d/quintic_spiral_path_with_derivation.h"
 
 namespace apollo {

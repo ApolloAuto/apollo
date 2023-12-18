@@ -24,10 +24,10 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/planning_base/task_base/common/path_generation.h"
-#include "modules/planning/planning_base/task_base/common/path_util/path_assessment_decider_util.h"
-#include "modules/planning/planning_base/task_base/common/path_util/path_bounds_decider_util.h"
-#include "modules/planning/planning_base/task_base/common/path_util/path_optimizer_util.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_generation.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_util/path_assessment_decider_util.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_util/path_bounds_decider_util.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_util/path_optimizer_util.h"
 
 namespace apollo {
 namespace planning {

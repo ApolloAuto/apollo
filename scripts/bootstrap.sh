@@ -17,7 +17,8 @@
 ###############################################################################
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DREAMVIEW_URL="http://localhost:8888"
+DREAMVIEW_URL="http://localhost:8899"
+DREAMVIEW_PLUS_URL="http://localhost:8888"
 
 cd "${DIR}/.."
 
@@ -63,9 +64,9 @@ function start_plus() {
   ./scripts/dreamview_plus.sh start
   if [ $? -eq 0 ]; then
     sleep 2 # wait for some time before starting to check
-    http_status="$(curl -o /dev/null -x '' -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
+    http_status="$(curl -o /dev/null -x '' -I -L -s -w '%{http_code}' ${DREAMVIEW_PLUS_URL})"
     if [ $http_status -eq 200 ]; then
-      echo "Dreamview Plus is running at" $DREAMVIEW_URL
+      echo "Dreamview Plus is running at" $DREAMVIEW_PLUS_URL
     else
       echo "Failed to start Dreamview Plus. Please check /apollo/nohup.out or /apollo/data/core for more information"
     fi

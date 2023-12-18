@@ -28,7 +28,7 @@
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 
 namespace apollo {
 namespace planning {

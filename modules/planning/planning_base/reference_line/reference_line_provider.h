@@ -31,9 +31,9 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/planning_msgs/navigation.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
 
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"

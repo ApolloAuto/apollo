@@ -23,6 +23,13 @@ import {
     HMIActionsOperationInfo,
     StartCycle,
     HDMapSwitchInfo,
+    OBJECT_STORE_TYPE,
+    IAddObjectStoreParams,
+    IDeleteObjectStoreParams,
+    IPutObjectStoreParams,
+    IGetObjectStoreParams,
+    IGetTuplesObjectStoreParams,
+    RoutePathInfo,
 } from './types';
 import { Metadata, SocketNameEnum } from '../WebSocketManager/type';
 
@@ -110,6 +117,16 @@ export class MainApi {
         });
     }
 
+    startPlayRTKRecorder() {
+        return this.request<'', undefined>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.StartPlayRtkRecorder,
+        });
+    }
+
     // 开始录制数据包
     startRecordPackets() {
         return this.requestWithoutRes<undefined>({
@@ -174,6 +191,40 @@ export class MainApi {
                 name: '',
                 info: {
                     action: HMIActions.StopRecord,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    startAutoDrive() {
+        return this.requestWithoutRes<{ action: HMIActions.StartAutoDrive }>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.StartAutoDrive,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    getInitData() {
+        return this.request<any, { currentMode: any; currentOperation: any }>({
+            data: {
+                name: '',
+                info: {},
+            },
+            type: MainApiTypes.GetInitData,
+        });
+    }
+
+    loadDynamic() {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.LOAD_DYNAMIC_MODELS,
                 },
             },
             type: MainApiTypes.HMIAction,
@@ -285,6 +336,19 @@ export class MainApi {
         });
     }
 
+    changeRTKRecord(record: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.ChangeRTKRecord,
+                    value: record,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
     deleteRecord(record: string) {
         return this.requestWithoutRes<HMIDataPayload>({
             data: {
@@ -350,6 +414,32 @@ export class MainApi {
         });
     }
 
+    deleteDynamicModel(dynamicName: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.DeleteDynamic,
+                    value: dynamicName,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    changeDynamicModel(dynamicName: string) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.ChangeDynamic,
+                    value: dynamicName,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
     loadRecords() {
         return this.requestWithoutRes<HMIDataPayload>({
             data: {
@@ -362,12 +452,37 @@ export class MainApi {
         });
     }
 
+    loadRecord(recordId: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.LoadRecord,
+                    value: recordId,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
     loadScenarios() {
         return this.requestWithoutRes<HMIDataPayload>({
             data: {
                 name: '',
                 info: {
                     action: HMIActions.LoadScenarios,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    loadRTKRecords() {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.LoadRTKRecords,
                 },
             },
             type: MainApiTypes.HMIAction,
@@ -503,6 +618,16 @@ export class MainApi {
                 info: '',
             },
             type: MainApiTypes.StopScenarioSimulation,
+        });
+    }
+
+    resetScenario() {
+        return this.requestWithoutRes<any>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.ResetScenarioSimulation,
         });
     }
 
@@ -655,6 +780,103 @@ export class MainApi {
                 },
             },
             type: MainApiTypes.GetMapElementsByIds,
+        });
+    }
+
+    addObjectStore<T>(type: OBJECT_STORE_TYPE, panelId: string, value: T) {
+        return this.request<IAddObjectStoreParams, T>({
+            data: {
+                name: '',
+                info: {
+                    key: `${type}_${panelId}`,
+                    value: JSON.stringify(value),
+                },
+            },
+            type: MainApiTypes.AddObjectStore,
+        });
+    }
+
+    putObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string; value: T }) {
+        return this.request<IPutObjectStoreParams, T>({
+            data: {
+                name: '',
+                info: {
+                    key: `${prop.type}_${prop.panelId}`,
+                    value: JSON.stringify(prop.value),
+                },
+            },
+            type: MainApiTypes.PutObjectStore,
+        });
+    }
+
+    deleteObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string }) {
+        return this.request<IDeleteObjectStoreParams, any>({
+            data: {
+                name: '',
+                info: {
+                    key: `${prop.type}_${prop.panelId}`,
+                },
+            },
+            type: MainApiTypes.DeleteObjectStore,
+        });
+    }
+
+    getObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string }) {
+        return this.request<IGetObjectStoreParams, string>({
+            data: {
+                name: '',
+                info: {
+                    key: `${prop.type}_${prop.panelId}`,
+                },
+            },
+            type: MainApiTypes.GetObjectStore,
+        }).then((r) => JSON.parse(r || '[]') as T);
+    }
+
+    getTuplesObjectStore<T>(prop: { type: OBJECT_STORE_TYPE }) {
+        return this.request<IGetTuplesObjectStoreParams, { key: string; value: string }[]>({
+            data: {
+                name: '',
+                info: {
+                    type: prop.type,
+                },
+            },
+            type: MainApiTypes.GetTuplesObjectStore,
+        }).then((r) => {
+            const val = r || [];
+            return val.map((item) => ({ key: item.key, value: JSON.parse(item.value) as T }));
+        });
+    }
+
+    startTerminal() {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: undefined,
+            },
+            type: MainApiTypes.StartTerminal,
+        });
+    }
+
+    stopAutoDrive() {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.DISENGAGE,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    getRoutePath() {
+        return this.request<'', RoutePathInfo>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.RequestRoutePath,
         });
     }
 }

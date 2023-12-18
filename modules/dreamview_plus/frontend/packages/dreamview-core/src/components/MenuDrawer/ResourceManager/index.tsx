@@ -10,6 +10,7 @@ import Recorders from './Recorders';
 import Scenarios from './Scenarios';
 import Vehicle from './Vehicle';
 import V2X from './V2X';
+import Dynamical from './Dynamical';
 import HDMap from './HDMap';
 
 const EnviormentResourcesItems = (t: TFunction) => [
@@ -37,6 +38,11 @@ const EnviormentResourcesItems = (t: TFunction) => [
         label: t('V2X'),
         key: ENUM_PROFILEMANAGER_TAB.V2X,
         children: <V2X />,
+    },
+    {
+        label: t('dynamical'),
+        key: ENUM_PROFILEMANAGER_TAB.Dynamical,
+        children: <Dynamical />,
     },
 ];
 

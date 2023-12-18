@@ -24,7 +24,7 @@
 #include <string>
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/base_stage_cruise.h"
+#include "modules/planning/planning_interface_base/scenario_base/base_stage_cruise.h"
 #include "modules/planning/scenarios/bare_intersection_unprotected/bare_intersection_unprotected_scenario.h"
 
 namespace apollo {

@@ -50,14 +50,14 @@ apollo::planning::RuleBasedStopDecider
 | 文件路径 | 类型/结构 | <div style="width: 300pt">说明</div> |
 | ---- | ---- | ---- |
 | `modules/planning/tasks/rule_based_stop_decider/conf/default_conf.pb.txt` | apollo::planning::RuleBasedStopDeciderConfig | RuleBasedStopDecider的默认配置文件 |
-| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+| `modules/planning/planning_component/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
 |`modules/common/data/vehicle_param.pb.txt`|`apollo::common::VehicleConfig`|车辆底盘配置文件|
 
 #### Flags
 
 | 文件路径                                            |  <div style="width: 300pt">说明</div> |
 | --------------------------------------------------- |  ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
+| `modules/planning/planning_component/conf/planning.conf` |  planning模块的flag配置文件           |
  
 #### 模块参数说明
   

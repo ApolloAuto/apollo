@@ -20,9 +20,9 @@
 #include <string>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/hmi/hmi_worker.h"
-#include "modules/dreamview_plus/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 #include "modules/dreamview_plus/backend/updater/updater_base.h"
 
 /**
@@ -45,7 +45,7 @@ class HMI : public UpdaterBase {
   void PublishMessage(const std::string &channel_name = "") override;
   void Stop();
   void StopStream(const std::string &channel_name = "") override;
-  void OnTimer(const std::string &channel_name = "") override;
+  void OnTimer(const std::string &channel_name = "");
   bool UpdateScenarioSetToStatus(const std::string &scenario_set_id,
                                  const std::string &scenario_set_name);
   bool UpdateDynamicModelToStatus(const std::string &dynamic_model_name);
@@ -54,9 +54,11 @@ class HMI : public UpdaterBase {
   bool UpdateVehicleToStatus();
   bool UpdateCameraChannelToStatus(const std::string &channel_name);
   bool UpdatePointChannelToStatus(const std::string &channel_name);
-  void GetCurrentScenarioEndPoint(double &x, double &y);
   bool StartSimObstacle();
   bool StopSimObstacle();
+  bool StartScenarioSimulation();
+  bool StopScenarioSimulation();
+  nlohmann::json GetCurrentScenarioExtremPoint();
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.
@@ -64,9 +66,10 @@ class HMI : public UpdaterBase {
   // void SendStatus(WebSocketHandler::Connection *conn = nullptr);
 
   void RegisterMessageHandlers();
+  void RegisterDBMessageHandlers();
 
-  std::unique_ptr<HMIWorker> hmi_worker_;
   apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
+  std::unique_ptr<HMIWorker> hmi_worker_;
 
   // No ownership.
   WebSocketHandler *websocket_;

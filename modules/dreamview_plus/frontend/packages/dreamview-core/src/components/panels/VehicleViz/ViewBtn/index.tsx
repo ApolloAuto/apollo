@@ -68,7 +68,7 @@ function ViewMenu(props: IViewMenuProps) {
 
     return (
         <>
-            <Popover trigger='hover' content={t('RuleIcon')}>
+            <Popover trigger='hover' placement='left' content={t('RuleIcon')}>
                 <div className={classes['view-menu-btn-item-only']} onClick={handleClick(MutexToolNameEnum.RULE)}>
                     <IconIcRanging
                         style={{
@@ -79,7 +79,7 @@ function ViewMenu(props: IViewMenuProps) {
                 </div>
             </Popover>
 
-            <Popover trigger='hover' content={t('CopyIcon')}>
+            <Popover trigger='hover' placement='left' content={t('CopyIcon')}>
                 <div className={classes['view-menu-btn-item-only']} onClick={handleClick(MutexToolNameEnum.COPY)}>
                     <IconIcCopy
                         style={{

@@ -31,7 +31,7 @@
 #include "modules/planning/planning_base/common/reference_line_info.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 #include "modules/planning/planning_base/reference_line/reference_point.h"
-#include "modules/planning/planning_base/scenario_base/stage.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {

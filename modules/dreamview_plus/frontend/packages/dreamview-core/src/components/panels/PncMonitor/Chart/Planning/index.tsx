@@ -13,6 +13,7 @@ import PlanningSpeedHeuristicGraph from './PlanningSpeedHeuristicGraph';
 import PlanningVTGraph from './PlanningVTGraph';
 import ScenarioHistory from './ScenarioHistory';
 import { IFilterList } from '../../useFilterList';
+import CustomChart from './CustomChart';
 
 const ComponentMap: Record<string, React.MemoExoticComponent<() => React.JSX.Element>> = {
     PlanningSpeed,
@@ -49,13 +50,18 @@ function Chart(props: Chart) {
                 </>
             )}
 
+            <CustomChart />
+
             {list.map(({ id: CompName }) => {
-                const Comp = ComponentMap[CompName];
+                const Comp: any = ComponentMap[CompName];
                 if (!Comp) {
                     return null;
                 }
+                if (!checkStatus[CompName]) {
+                    return null;
+                }
                 return (
-                    <div key={CompName} style={{ display: checkStatus[CompName] ? 'block' : 'none' }}>
+                    <div key={CompName}>
                         <Comp key={CompName} />
                         <Space />
                     </div>

@@ -29,7 +29,7 @@
 #include "cyber/cyber.h"
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 namespace apollo {
 namespace dreamview {
@@ -63,7 +63,7 @@ class ObstacleUpdater : public UpdaterWithChannelsBase {
                    const std::string& channel_name = "",
                    nlohmann::json* subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name) override;
-  void OnTimer(const std::string& channel_name = "") override;
+  void OnTimer(const std::string& channel_name = "");
   void PublishMessage(const std::string& channel_name = "") override;
   void GetChannelMsg(std::vector<std::string>* channels);
   void Stop();

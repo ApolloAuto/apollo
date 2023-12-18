@@ -74,16 +74,6 @@ base::ObjectSubType GetSubtype(int cls,
  * @param bbox  bbox result
  */
 void FillCaddnBbox3d(base::ObjectPtr obj, const float *bbox);
-/**
- * @brief Recover object bbox according to roi
- *
- * @param roi_w the roi width
- * @param roi_h roi height
- * @param offset_y the offset y
- * @param objects The objects container
- */
-void RecoverCaddnBbox(int roi_w, int roi_h, int offset_y,
-                      std::vector<base::ObjectPtr> *objects);
 
 }  // namespace camera
 }  // namespace perception

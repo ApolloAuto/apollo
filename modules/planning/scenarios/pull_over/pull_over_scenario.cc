@@ -71,6 +71,9 @@ bool PullOverScenario::IsTransferable(const Scenario* const other_scenario,
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
   reference_line.XYToSL(routing_end->pose(), &dest_sl);
+  if (!reference_line.IsOnLane(dest_sl)) {
+    return false;
+  }
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;

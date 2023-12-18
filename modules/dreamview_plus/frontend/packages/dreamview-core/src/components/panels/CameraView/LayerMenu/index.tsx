@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { Switch, Checkbox } from '@dreamview/dreamview-ui';
+import React, { useEffect, useState } from 'react';
+import { Checkbox } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
+import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
+import { useLocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import useStyle from '../useStyle';
 import { layerMenuParams } from './params';
 
 function LayerMenu(props: { setShowBoundingBox: any }) {
+    const panelContext = usePanelContext();
+    const { panelId } = panelContext;
     const setShowBoundingBox = props.setShowBoundingBox;
 
     const { classes, cx } = useStyle();
@@ -12,9 +16,21 @@ function LayerMenu(props: { setShowBoundingBox: any }) {
     const { t } = useTranslation('layerMenu');
 
     const [layerMenu, setLayerMenu] = useState(layerMenuParams);
-    const [menu] = useState(Object.keys(layerMenu));
+    const [menu] = useState(() => Object.keys(layerMenu));
     const [currentMenu, setCurrentMenu] = useState(menu[0]);
     const [subMenu, setSubMenu] = useState(layerMenu[currentMenu]);
+
+    const localLayerMenuManager = useLocalStorage(`${KEY_MANAGER.layerMenu}${panelId}`);
+    const localBoundingBoxManager = useLocalStorage(`${KEY_MANAGER.BBox}${panelId}`);
+
+    useEffect(() => {
+        const localLayerMenu = localLayerMenuManager.get();
+        if (localLayerMenu) {
+            setLayerMenu(localLayerMenu);
+            setCurrentMenu(menu[0]);
+            setSubMenu(localLayerMenu[menu[0]]);
+        }
+    }, []);
 
     return (
         <div className={classes['layer-menu-container']}>
@@ -47,10 +63,11 @@ function LayerMenu(props: { setShowBoundingBox: any }) {
                                 <span>
                                     <Checkbox
                                         checked={currentVisible}
-                                        defaultChecked={currentVisible}
+                                        defaultChecked={localBoundingBoxManager.get() === '1'}
                                         onChange={(e) => {
                                             const checked = e.target.checked;
                                             setShowBoundingBox(checked);
+                                            localBoundingBoxManager.set(checked ? 1 : 0);
                                             const newMenu = {
                                                 ...layerMenu[currentMenu],
                                                 [key]: {
@@ -65,6 +82,7 @@ function LayerMenu(props: { setShowBoundingBox: any }) {
                                             };
                                             setSubMenu(() => newMenu);
                                             setLayerMenu(() => newLayerMenu);
+                                            localLayerMenuManager.set(newLayerMenu);
                                         }}
                                     >
                                         {key}

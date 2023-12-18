@@ -26,7 +26,7 @@
 #include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/planning/tasks/path_time_heuristic/proto/path_time_heuristic.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/common/speed_optimizer.h"
+#include "modules/planning/planning_interface_base/task_base/common/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {

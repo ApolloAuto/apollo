@@ -24,21 +24,24 @@
 
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
-#include "modules/dreamview_plus/backend/handlers/image_handler.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/image_handler.h"
+#include "modules/dreamview/backend/common/handlers/proto_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
+#include "modules/dreamview_plus/backend/dv_plugin/dv_plugin_manager.h"
 #include "modules/dreamview_plus/backend/hmi/hmi.h"
-#include "modules/dreamview_plus/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 #include "modules/dreamview_plus/backend/map/map_updater.h"
 #include "modules/dreamview_plus/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview_plus/backend/obstacle_updater/obstacle_updater.h"
-#include "modules/dreamview_plus/backend/plugins/plugin_manager.h"
+#include "modules/dreamview/backend/common/plugins/plugin_manager.h"
 #include "modules/dreamview_plus/backend/point_cloud/point_cloud_updater.h"
-#include "modules/dreamview_plus/backend/sim_control_manager/sim_control_manager.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview_plus/backend/simulation_world/simulation_world_updater.h"
 #include "modules/dreamview_plus/backend/socket_manager/socket_manager.h"
 #include "modules/dreamview_plus/backend/updater/updater_manager.h"
+#include "modules/dreamview_plus/backend/channels_updater/channels_updater.h"
 #if WITH_TELEOP == 1
-#include "modules/dreamview_plus/backend/teleop/teleop.h"
+#include "modules/dreamview/backend/common/teleop/teleop.h"
 #endif
 
 /**
@@ -62,7 +65,7 @@ class Dreamview {
   bool PluginCallbackHMI(const std::string& function_name,
                          const nlohmann::json& param_json);
   nlohmann::json HMICallbackOtherService(const std::string& function_name,
-                                       const nlohmann::json& param_json);
+                                         const nlohmann::json& param_json);
   bool PointCloudCallback(const std::string& param_string);
 
   std::unique_ptr<cyber::Timer> exit_timer_;
@@ -78,7 +81,10 @@ class Dreamview {
   std::unique_ptr<WebSocketHandler> obstacle_ws_ = nullptr;
   std::unique_ptr<WebSocketHandler> hmi_ws_;
   std::unique_ptr<WebSocketHandler> socket_manager_ws_;
+  std::unique_ptr<WebSocketHandler> channels_info_ws_ = nullptr;
+  std::unique_ptr<DvPluginManager> dv_plugin_manager_ = nullptr;
   std::unique_ptr<ImageHandler> image_;
+  std::unique_ptr<ProtoHandler> proto_handler_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
@@ -88,6 +94,7 @@ class Dreamview {
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_ = nullptr;
   std::unique_ptr<UpdaterManager> updater_manager_ = nullptr;
   std::unique_ptr<ObstacleUpdater> obstacle_updater_ = nullptr;
+  std::unique_ptr<ChannelsUpdater> channels_info_updater_ = nullptr;
 #if WITH_TELEOP == 1
   std::unique_ptr<TeleopService> teleop_;
   std::unique_ptr<WebSocketHandler> teleop_ws_;

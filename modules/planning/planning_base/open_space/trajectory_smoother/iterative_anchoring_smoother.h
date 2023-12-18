@@ -24,8 +24,10 @@
 #include <vector>
 
 #include "Eigen/Eigen"
+
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"

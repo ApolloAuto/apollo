@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <cxxabi.h>
 
@@ -126,6 +127,13 @@ class PluginManager {
    */
   template <typename Base>
   bool CheckAndLoadPluginLibrary(const std::string& class_name);
+
+  /**
+   * @brief Get all derived class name by base class name
+   * @return all derived class name of base class name
+   */
+  template <typename Base>
+  std::vector<std::string> GetDerivedClassNameByBaseClass();
 
  private:
   apollo::cyber::class_loader::ClassLoaderManager class_loader_manager_;
@@ -245,6 +253,20 @@ bool PluginManager::CheckAndLoadPluginLibrary(const std::string& class_name) {
   }
   auto plugin_description = plugin_description_map_[plugin_name];
   return LoadLibrary(plugin_description->actual_library_path_);
+}
+
+template <typename Base>
+std::vector<std::string> PluginManager::GetDerivedClassNameByBaseClass() {
+  int status = 0;
+  std::string base_class_name =
+      abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
+  std::vector<std::string> derived_class_name;
+  for (const auto& iter : plugin_class_plugin_name_map_) {
+    if (iter.first.second == base_class_name) {
+      derived_class_name.push_back(iter.first.first);
+    }
+  }
+  return derived_class_name;
 }
 
 #define CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \

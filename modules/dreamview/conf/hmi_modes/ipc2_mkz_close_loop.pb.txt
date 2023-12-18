@@ -1,7 +1,7 @@
 cyber_modules {
   key: "Computer"
   value: {
-    dag_files: "/apollo/modules/planning/planning_base/dag/planning.dag"
+    dag_files: "/apollo/modules/planning/planning_component/dag/planning.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
     process_group: "compute_sched"
   }

@@ -1211,15 +1211,25 @@ def main():
     set_gcc_host_compiler_path(environ_cp)
     write_blank_line_to_bazelrc()
 
+    determined_gpu_platfrom = False
     if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        determined_gpu_platfrom = True
         setup_cuda_family_config(environ_cp)
         set_cuda_compute_capabilities(environ_cp)
         set_other_cuda_vars(environ_cp)
         set_other_build_cuda_config(environ_cp)
     if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        determined_gpu_platfrom = True
         setup_rocm_family_config(environ_cp)
         set_rocm_compute_capabilities(environ_cp)
         set_other_build_rocm_config(environ_cp)
+
+    if not determined_gpu_platfrom:
+        determined_gpu_platfrom = True
+        setup_cuda_family_config(environ_cp)
+        set_cuda_compute_capabilities(environ_cp)
+        set_other_cuda_vars(environ_cp)
+        set_other_build_cuda_config(environ_cp)
 
     write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
     if not _APOLLO_INSIDE_DOCKER and 'LD_LIBRARY_PATH' in environ_cp:

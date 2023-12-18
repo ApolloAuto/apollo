@@ -62,3 +62,18 @@ cc_library(
     include_prefix = "opencv2",
     strip_include_prefix = "include",
 )
+
+cc_library(
+    name = "calib3d",
+    includes = ["include"],
+    hdrs = glob(["include/**/*"]),
+    linkopts = [
+        "-lopencv_calib3d", 
+    ],
+    deps = [
+        ":core",
+        ":imgproc",
+    ],
+    include_prefix = "opencv2",
+    strip_include_prefix = "include",
+)

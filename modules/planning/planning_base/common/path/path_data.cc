@@ -24,11 +24,12 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -94,8 +95,8 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
 
-const std::vector<std::tuple<double, PathData::PathPointType, double>>
-    &PathData::path_point_decision_guide() const {
+const std::vector<std::tuple<double, PathData::PathPointType, double>> &
+PathData::path_point_decision_guide() const {
   return path_point_decision_guide_;
 }
 

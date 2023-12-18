@@ -40,6 +40,7 @@ function SpeedHeuristic() {
             initOptions({
                 dataset,
                 series,
+                scale: true,
                 graphic,
                 xAxis: {
                     type: 'value',
@@ -57,7 +58,7 @@ function SpeedHeuristic() {
     };
 
     useEffect(() => {
-        triggerUIUpdate(planningData.speedHeuristic.DpStSpeedOptimizer);
+        triggerUIUpdate(planningData.speedHeuristic.DP_ST_SPEED_OPTIMIZER);
     }, [planningData]);
 
     return <ChartBase title='Speed Heuristic' options={options} />;

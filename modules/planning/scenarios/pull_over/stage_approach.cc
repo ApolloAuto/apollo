@@ -27,7 +27,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/common.h"
 #include "modules/planning/scenarios/pull_over/context.h"
 #include "modules/planning/scenarios/pull_over/util.h"

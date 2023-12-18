@@ -56,7 +56,7 @@ apollo::planning::Crosswalk
 
 #### 使用方式
 
-在 `modules/planning/planning_base/conf/traffic_rule_config.pb.txt` 增加 `Crosswalk` 插件的配置
+在 `modules/planning/planning_component/conf/traffic_rule_config.pb.txt` 增加 `Crosswalk` 插件的配置
 
 ```
 rule {

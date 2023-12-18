@@ -22,7 +22,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/tasks/path_time_heuristic/gridded_path_time_graph.h"
 

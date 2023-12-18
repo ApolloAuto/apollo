@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PageLayoutStoreProvider } from '@dreamview/dreamview-core/src/store/PageLayoutStore';
-import { usePickHmiStore, CURRENT_MODE, changeMode } from '@dreamview/dreamview-core/src/store/HmiStore';
-import { usePanelLayoutStore, updateByMode } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
+import { usePickHmiStore, CURRENT_MODE } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { flushSync } from 'react-dom';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
+import { useLocalStorageState, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import Menu from '../Menu';
 import PanelLayout from '../PanelLayout';
 import MenuDrawer from '../MenuDrawer';
@@ -11,21 +11,21 @@ import usePageLayoutStyles from './style';
 import PerceptionGuide from '../Guide/PerceptionGuide';
 import WelcomeGuide from '../WelcomeGuide';
 import DefaultGuide from '../Guide/DefaultGuide';
-import useLocalStorage from '../../util/useLocalStorage';
 import PNCGuide from '../Guide/PNCGuide';
 import useComponentDisplay from '../../hooks/useComponentDisplay';
+import VehicleGuide from '../Guide/VehicleGuide';
 import BottomBar from '../BottomBar';
 
 function PageLayout() {
-    const [, dispatch] = usePickHmiStore();
+    const [hmi] = usePickHmiStore();
 
-    const { mainApi, isMainConnected } = useWebSocketServices();
-
-    const [, dispatchLayout] = usePanelLayoutStore();
+    const { isMainConnected } = useWebSocketServices();
 
     const { classes: c, cx, css } = usePageLayoutStyles();
 
-    const [localFirstUseGuideMode, setLocalFirstUseGuideMode] = useLocalStorage<string>('UserFirstUseGuideMode', null);
+    const [localFirstUseGuideMode, setLocalFirstUseGuideMode] = useLocalStorageState<string>(
+        KEY_MANAGER.UserFirstUseGuideMode,
+    );
 
     const [enterGuideState, setEnterGuideState] = useState({ currentMode: '' });
 
@@ -46,14 +46,6 @@ function PageLayout() {
 
     const clickEnterThisModeToGuide = useCallback(
         (useGuideMode: CURRENT_MODE) => {
-            if (isMainConnected) {
-                dispatch(
-                    changeMode(mainApi, useGuideMode, () => {
-                        dispatchLayout(updateByMode({ mode: useGuideMode }));
-                    }),
-                );
-            }
-
             if (useGuideMode === CURRENT_MODE.DEFAULT) {
                 setEnterGuideState({ currentMode: CURRENT_MODE.DEFAULT });
             }
@@ -62,6 +54,9 @@ function PageLayout() {
             }
             if (useGuideMode === CURRENT_MODE.PNC) {
                 setEnterGuideState({ currentMode: CURRENT_MODE.PNC });
+            }
+            if (useGuideMode === CURRENT_MODE.VEHICLE_TEST) {
+                setEnterGuideState({ currentMode: CURRENT_MODE.VEHICLE_TEST });
             }
         },
         [isMainConnected],
@@ -80,6 +75,9 @@ function PageLayout() {
                 <PerceptionGuide controlPerceptionGuideLastStep={controlPerceptionGuideLastStep} />
             )}
             {enterGuideState.currentMode === CURRENT_MODE.PNC && <PNCGuide />}
+            {enterGuideState.currentMode === CURRENT_MODE.VEHICLE_TEST && (
+                <VehicleGuide currentOperation={hmi.currentOperation} />
+            )}
             {localFirstUseGuideMode && (
                 <>
                     <div className={c['dv-layout-menu']}>

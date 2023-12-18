@@ -36,7 +36,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -220,8 +220,7 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
 
   common::SLPoint sl_point;
   XYToSL(traj_point.path_point().theta(),
-         {traj_point.path_point().x(), traj_point.path_point().y()},
-         &sl_point);
+         {traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;

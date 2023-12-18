@@ -13,7 +13,6 @@
     <depend type="binary" repo_name="control">control</depend>
     <depend type="binary" repo_name="common" lib_names="common">common</depend>
     <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
-    <depend repo_name="localization" lib_names="localization">localization</depend>
     <depend repo_name="eigen">3rd-eigen3</depend>
     <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
     <builder>bazel</builder>

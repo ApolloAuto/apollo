@@ -158,6 +158,8 @@ export default class Lane {
                 });
                 const centerLine = drawSegmentsFromPointsClone(points, this.centerLineBasicMaterialTemplate);
                 centerLine.name = `CentralLine-${id}`;
+                group.children.push(centerLine);
+                // group.add(centerLine);
                 this.scene.add(centerLine);
             });
             const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
@@ -166,7 +168,8 @@ export default class Lane {
                 const boundary = this.drawLaneMesh(rightLaneType, points);
                 boundary.name = `RightBoundary-${id}`;
                 boundary.position.z = zOffset.lane;
-                group.add(boundary);
+                group.children.push(boundary);
+                // group.add(boundary);
                 this.scene.add(boundary);
             });
 
@@ -176,7 +179,8 @@ export default class Lane {
                 const boundary = this.drawLaneMesh(leftLaneType, points);
                 boundary.name = `LeftBoundary-${id}`;
                 boundary.position.z = zOffset.lane;
-                group.add(boundary);
+                group.children.push(boundary);
+                // group.add(boundary);
                 this.scene.add(boundary);
             });
             this.laneGroupMap[id] = group;
@@ -233,8 +237,17 @@ export default class Lane {
         this.currentLaneIds = [];
         Object.keys(this.laneGroupMap).forEach((id) => {
             const group = this.laneGroupMap[id];
-            disposeGroup(group);
-            this.scene.remove(group);
+            while (group.children.length) {
+                const child = group.children[0];
+                group.remove(child);
+                if (child.material) {
+                    child.material.dispose();
+                }
+                if (child.geometry) {
+                    child.geometry.dispose();
+                }
+                this.scene.remove(child);
+            }
         });
         this.laneGroupMap = {};
     }

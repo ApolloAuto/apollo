@@ -10,6 +10,7 @@ export const bottomBar = {
     resetFailed: '清除失败',
 
     recordMsg: '请选择数据包',
+    routing: '发送路由',
 
     // recordModal
     record: '录制',
@@ -20,4 +21,13 @@ export const bottomBar = {
     save: '保存',
     nameEmpty: '请输入名称',
     nameHasWhitespace: '名称不能含有空格',
+    nameHasChinese: '名称只能由字母、数字、下划线组成',
+
+    Start: '开始',
+    Stop: '停止',
+    Running: '进行中',
+    Reset: '重置',
+    sendRouting: '发送路由',
+
+    StartAutoDraive: '自动驾驶',
 };

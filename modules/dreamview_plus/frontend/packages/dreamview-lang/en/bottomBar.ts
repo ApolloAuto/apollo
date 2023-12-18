@@ -10,6 +10,7 @@ export const bottomBar = {
     resetFailed: 'Clear Failed',
 
     recordMsg: 'Please select a data record',
+    routing: 'Routing',
 
     // recordModal
     record: 'record',
@@ -20,4 +21,13 @@ export const bottomBar = {
     save: 'Save',
     nameEmpty: 'please input the Record Name',
     nameHasWhitespace: 'The Record Name cannot contain spaces',
+    nameHasChinese: 'The RecordName can only be composed of letters, numbers, and underscores',
+
+    Start: 'START',
+    Stop: 'STOP',
+    Running: 'RUNNING',
+    Reset: 'RESET',
+    sendRouting: 'Routing',
+
+    StartAutoDraive: 'START',
 };

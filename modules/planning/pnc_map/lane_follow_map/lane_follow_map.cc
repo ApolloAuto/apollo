@@ -32,7 +32,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -525,6 +525,11 @@ bool LaneFollowMap::GetNearestPointFromRouting(
       // Use large epsilon to allow projection diff
       static constexpr double kEpsilon = 0.5;
       if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
+        continue;
+      }
+      double lane_heading = lane->Heading(s);
+      if (std::fabs(common::math::AngleDiff(lane_heading, state.heading())) >
+          M_PI_2) {
         continue;
       }
     }

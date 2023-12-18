@@ -14,6 +14,15 @@ export default function useStyle() {
             background: '#343C4D',
             borderRadius: '6px 6px 0px 0px',
             marginBottom: theme.tokens.margin.speace2,
+            position: 'relative',
+        },
+        'moniter-item-title-extra': {
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            right: '16px',
+            display: 'flex',
+            alignItems: 'center',
         },
         'moniter-item-chart-container': {
             width: '100%',
@@ -57,6 +66,10 @@ export default function useStyle() {
                     color: theme.tokens.font.reactive.mainActive,
                 },
             },
+        },
+        'refresh-ic': {
+            fontSize: theme.tokens.font.size.large,
+            marginLeft: theme.tokens.margin.speace,
         },
     }));
 

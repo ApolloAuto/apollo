@@ -42,8 +42,8 @@
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/indexed_queue.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
-#include "modules/planning/planning_base/task_base/common/decider.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planning_interface_base/task_base/common/decider.h"
 
 namespace apollo {
 namespace planning {
@@ -219,6 +219,11 @@ class OpenSpaceRoiDecider : public Decider {
                      const hdmap::ParkingSpaceInfoConstPtr &parking_spot,
                      std::shared_ptr<hdmap::Path> *nearby_path);
   bool AdjustPointsOrderToClockwise(std::vector<common::math::Vec2d> *polygon);
+
+  bool AddParkingSpaceBoundary(Frame *const frame,
+                               const hdmap::Path &nearby_path,
+                               std::vector<std::vector<common::math::Vec2d>>
+                                   *const roi_parking_boundary);
 
  private:
   // @brief parking_spot_id from routing

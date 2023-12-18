@@ -20,7 +20,7 @@
 
 #include "modules/planning/tasks/path_time_heuristic/st_graph_point.h"
 
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

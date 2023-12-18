@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/perception/camera_detection_bev/proto/camera_detection_bev.pb.h"
 
@@ -30,8 +31,11 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class CameraDetectionBevComponent final
-    : public cyber::Component<drivers::Image> {
+class CameraDetectionBevComponent final : public cyber::Component<> {
+ public:
+  using PerceptionObstacle = apollo::perception::PerceptionObstacle;
+  using PerceptionObstacles = apollo::perception::PerceptionObstacles;
+
  public:
   CameraDetectionBevComponent() : timestamp_offset_(0) {}
   /**
@@ -41,14 +45,6 @@ class CameraDetectionBevComponent final
    * @return false
    */
   bool Init() override;
-  /**
-   * @brief Process of camera detection 2d compoment
-   *
-   * @param msg image msg
-   * @return true
-   * @return false
-   */
-  bool Proc(const std::shared_ptr<drivers::Image>& msg) override;
 
  private:
   bool InitTransformWrapper(const CameraDetectionBEV& detection_param);
@@ -56,20 +52,28 @@ class CameraDetectionBevComponent final
   bool InitListeners(const CameraDetectionBEV& detection_param);
   bool InitDetector(const CameraDetectionBEV& detection_param);
 
+  bool OnReceiveImage(const std::shared_ptr<drivers::Image>& msg);
+
   void CameraToWorldCoor(const Eigen::Affine3d& camera2world,
                          std::vector<base::ObjectPtr>* objs);
+  int ConvertObjectToPb(const base::ObjectPtr& object_ptr,
+                        PerceptionObstacle* pb_msg);
+  int MakeProtobufMsg(double msg_timestamp, int seq_num,
+                      const std::vector<base::ObjectPtr>& objects,
+                      PerceptionObstacles* obstacles);
 
  private:
   int image_height_;
   int image_width_;
-  double timestamp_offset_;
+  uint32_t seq_num_ = 0;
+  double timestamp_offset_ = 0;
 
   std::shared_ptr<CameraFrame> frame_ptr_;
   std::shared_ptr<BaseObstacleDetector> detector_;
   std::shared_ptr<onboard::TransformWrapper> trans_wrapper_;
 
   std::vector<std::shared_ptr<cyber::Reader<drivers::Image>>> readers_;
-  std::shared_ptr<cyber::Writer<CameraFrame>> writer_;
+  std::shared_ptr<cyber::Writer<PerceptionObstacles>> writer_;
 };
 
 CYBER_REGISTER_COMPONENT(CameraDetectionBevComponent);

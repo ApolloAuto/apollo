@@ -24,7 +24,7 @@
 
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/stage.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 #include "modules/planning/scenarios/emergency_pull_over/emergency_pull_over_scenario.h"
 
 namespace apollo {

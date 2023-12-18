@@ -143,7 +143,7 @@ function Scenarios() {
         if (isMainConnected) {
             mainApi.loadScenarios();
         }
-    }, []);
+    }, [isMainConnected]);
 
     const { data, setOriginData, refreshList } = useDataSource<ScenarioSetRecord>({
         apiConnected: isPluginConnected,

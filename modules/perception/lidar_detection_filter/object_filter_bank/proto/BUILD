@@ -22,4 +22,9 @@ proto_library(
     srcs = ["roi_boundary_filter_config.proto"],
 )
 
+proto_library(
+    name = "strategy_filter_config_proto",
+    srcs = ["strategy_filter_config.proto"],
+)
+
 apollo_package()

@@ -6,15 +6,17 @@ import { useMenuStore, ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store
 import { UpdateMenuAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
 import useStyle from './useStyle';
 import CustomPopover from '../../../CustomPopover';
-import { usePickHmiStore } from '../../../../store/HmiStore';
+import { RECORDER_LOAD_STATUS, usePickHmiStore } from '../../../../store/HmiStore';
+import { Spinner } from '../Spinner';
 
 interface ISourceList1<T> {
     items: {
         label: string;
         id: string;
         content: T;
+        preLoad?: RECORDER_LOAD_STATUS;
     }[];
-    onChange: (v: T) => void;
+    onChange: (v: T, preLoad?: RECORDER_LOAD_STATUS) => void;
     activeId: string;
     type?: string;
 }
@@ -26,16 +28,62 @@ export function SourceList1<T>(props: ISourceList1<T>) {
     const [, dispatch] = useMenuStore();
     const [hmi] = usePickHmiStore();
 
-    const onClick = (item: T) => {
+    const onClick = (item: T, preLoad?: RECORDER_LOAD_STATUS) => {
         if (type === 'HDMap' && hmi.envResourcesHDMapDisable) {
             return;
         }
-        onChange(item);
+        onChange(item, preLoad);
     };
 
     const onChangeIntoResource = () => {
         dispatch(UpdateMenuAction(ENUM_MENU_KEY.PROFILE_MANAGEER));
     };
+
+    const renderRightByPreload = useCallback((preLoad: RECORDER_LOAD_STATUS) => {
+        switch (preLoad) {
+            case RECORDER_LOAD_STATUS.LOADING:
+                return (
+                    <div style={{ marginRight: '14px' }}>
+                        <Spinner />
+                    </div>
+                );
+            case RECORDER_LOAD_STATUS.LOADED:
+                return (
+                    <CustomPopover trigger='hover' content={t('use')}>
+                        <IconIcProfileAngerNormal
+                            className={cx(classes['source-list-operate'], 'source-list-operate-hover')}
+                        />
+                    </CustomPopover>
+                );
+            case RECORDER_LOAD_STATUS.NOT_LOAD:
+                return null;
+            default:
+                return (
+                    <CustomPopover trigger='hover' content={t('use')}>
+                        <IconIcProfileAngerNormal
+                            className={cx(classes['source-list-operate'], 'source-list-operate-hover')}
+                        />
+                    </CustomPopover>
+                );
+        }
+    }, []);
+
+    const renderFontColorByPreload = useCallback((preLoad: RECORDER_LOAD_STATUS) => {
+        // 灰色字体
+        const grayColorFont = {
+            color: '#4D505A',
+        };
+        switch (preLoad) {
+            case RECORDER_LOAD_STATUS.LOADING:
+                return grayColorFont;
+            case RECORDER_LOAD_STATUS.LOADED:
+                return {};
+            case RECORDER_LOAD_STATUS.NOT_LOAD:
+                return grayColorFont;
+            default:
+                return {};
+        }
+    }, []);
 
     return (
         <div className={classes['source-list-container']}>
@@ -48,21 +96,20 @@ export function SourceList1<T>(props: ISourceList1<T>) {
                                 'source-list-container-item-disbale': type === 'HDMap' && hmi.envResourcesHDMapDisable,
                             })}
                             key={item.id}
-                            onClick={onClick.bind(null, item.content)}
+                            style={renderFontColorByPreload(item.preLoad)}
+                            onClick={onClick.bind(null, item.content, item.preLoad)}
                         >
                             <span title={item.label} className={classes['source-list-name']}>
                                 {item.label}
                             </span>
+
+                            {/* {item.preLoad === RECORDER_LOAD_STATUS.LOADING && <Spinner />} */}
                             {activeId === item.id ? (
                                 <IconIcSucceed
                                     className={cx(classes['source-list-operate'], 'source-list-operate-hover')}
                                 />
                             ) : (
-                                <CustomPopover trigger='hover' content={t('use')}>
-                                    <IconIcProfileAngerNormal
-                                        className={cx(classes['source-list-operate'], 'source-list-operate-hover')}
-                                    />
-                                </CustomPopover>
+                                renderRightByPreload(item.preLoad)
                             )}
                         </div>
                     ))}
@@ -85,6 +132,8 @@ export function SourceList1<T>(props: ISourceList1<T>) {
 interface ISourceList2Item<T> {
     onChange: (v: ISourceList2Item<T>['item'], i: T) => void;
     activeId: string;
+    onExpand: (v: string) => void;
+    expandChildId: string;
     item: {
         label: string;
         id: string;
@@ -93,11 +142,11 @@ interface ISourceList2Item<T> {
 }
 
 function SourceList2Item<T>(props: ISourceList2Item<T>) {
-    const { item, onChange: propsOnChange, activeId } = props;
+    const { item, expandChildId, onChange: propsOnChange, activeId, onExpand } = props;
     const { classes, cx } = useStyle()({ height: (item.child?.length || 0) * 40 });
-    const [expand, setExpand] = useState<boolean>(false);
+    const expand = expandChildId === item.id;
     const onClick = () => {
-        setExpand((prev) => !prev);
+        onExpand(item.id);
     };
 
     const onChange = useCallback(
@@ -123,9 +172,11 @@ function SourceList2Item<T>(props: ISourceList2Item<T>) {
                 </span>
             </div>
             <div className={cx(classes['source-list-close'], { [classes['source-list-expand']]: expand })}>
-                <div>
-                    <SourceList1<T> activeId={activeId} onChange={onChange} items={item.child} />
-                </div>
+                {expand ? (
+                    <div>
+                        <SourceList1<T> activeId={activeId} onChange={onChange} items={item.child} />
+                    </div>
+                ) : null}
             </div>
         </>
     );
@@ -141,8 +192,13 @@ export function SourceList2<T>(props: ISourceList2<T>) {
     const { items, onChange, activeId } = props;
     const { classes } = useStyle()();
     const [, dispatch] = useMenuStore();
+    const [expandChildId, setExpandChildId] = useState<string>(null);
 
     const { t } = useTranslation('modeSettings');
+
+    const onExpand = useCallback((id: string) => {
+        setExpandChildId((prev: string) => (prev === id ? null : id));
+    }, []);
 
     const onChangeIntoResource = () => {
         dispatch(UpdateMenuAction(ENUM_MENU_KEY.PROFILE_MANAGEER));
@@ -152,7 +208,14 @@ export function SourceList2<T>(props: ISourceList2<T>) {
         <div className={classes['source-list-container']}>
             {items.length ? (
                 items.map((item) => (
-                    <SourceList2Item<T> activeId={activeId} onChange={onChange} item={item} key={item.id} />
+                    <SourceList2Item<T>
+                        onExpand={onExpand}
+                        expandChildId={expandChildId}
+                        activeId={activeId}
+                        onChange={onChange}
+                        item={item}
+                        key={item.id}
+                    />
                 ))
             ) : (
                 <div className={classes.empty}>

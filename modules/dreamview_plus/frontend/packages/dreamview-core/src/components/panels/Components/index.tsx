@@ -1,18 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { apollo } from '@dreamview/dreamview';
+import { useTranslation } from 'react-i18next';
 import Panel from '../base/Panel';
 import useStyle from './useStyle';
 import { ComponentListItem, ComponentListProps } from './ComponentList';
 import { StreamDataNames } from '../../../services/api/types';
 import { usePanelContext } from '../base/store/PanelStore';
+import EmptyPlaceHolder from '../base/EmptyPlaceHolder';
+import CustomScroll from '../../CustomScroll';
 
 type HMIStatus = apollo.dreamview.HMIStatus;
 
 function InnerComponents() {
     const panelContext = usePanelContext();
-    const { initSubscription, logger } = panelContext;
+    const { initSubscription, logger, setKeyDownHandlers } = panelContext;
     const { classes } = useStyle();
     const [hmi, setHmi] = useState<HMIStatus>();
+    const { t: tPanels } = useTranslation('panels');
 
     useEffect(() => {
         initSubscription({
@@ -40,18 +44,21 @@ function InnerComponents() {
             ));
     }, [hmi]);
 
-    return <div className={classes['panel-components']}>{componentItems}</div>;
+    return <CustomScroll className={classes['panel-components']}>{componentItems}</CustomScroll>;
 }
 
 InnerComponents.displayName = 'Components';
 
 function Components(props: any) {
+    const { t } = useTranslation('panels');
+
     const C = useMemo(
         () =>
             Panel({
                 PanelComponent: InnerComponents,
                 panelId: props.panelId,
                 subscribeInfo: [{ name: StreamDataNames.HMI_STATUS, needChannel: false }],
+                placeHolder: <EmptyPlaceHolder text={t('connectionError')} />,
             }),
         [],
     );

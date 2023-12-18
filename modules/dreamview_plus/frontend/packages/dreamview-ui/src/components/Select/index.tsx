@@ -1,11 +1,13 @@
 import React from 'react';
-import { Select as InternalSelect, SelectProps } from 'antd';
+import { Select as InternalSelect, SelectProps as AntdSelectProps } from 'antd';
 import './index.less';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
 import { IconIcArrowsDown } from '../../icons';
 import NoDataPlaceHolder from './NoData';
 
-export function Select(props: SelectProps) {
+export type SelectProps = AntdSelectProps;
+
+export function Select(props: AntdSelectProps) {
     const { prefixCls: customizePrefixCls, ...rest } = props;
     const prefixCls = getPrefixCls('select', customizePrefixCls);
 

@@ -31,7 +31,7 @@
 #include "modules/planning/planning_base/common/path/discretized_path.h"
 #include "modules/planning/planning_base/common/path_boundary.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 
 namespace apollo {
 namespace planning {

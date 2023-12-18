@@ -21,6 +21,7 @@
 #pragma once
 
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {

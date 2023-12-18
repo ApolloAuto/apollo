@@ -1,59 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { IconIcNotApplicable, IconIcOverUsable } from '@dreamview/dreamview-ui';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { usePickHmiStore, SIM_CONTROL_STATUS } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { usePanelInfoStore } from '@dreamview/dreamview-core/src/store/PanelInfoStore';
-import { usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
-import { MosaicNode, MosaicParent } from 'react-mosaic-component';
+import { useGetCurrentLayout } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { PanelType } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import { BusinessEventTypes, BusinessEventInfo } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
+import { message } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 import DumpBtn from '../Operate/Dump';
 import ResetBtn from '../Operate/Reset';
 import RecordBtn from '../Operate/Record';
-import { useKeyDownEvent } from '../util';
-
-function CountPanelAndCollectId(layout: MosaicNode<string>, panelname: string) {
-    const vehicleVisIds: Array<string> = [];
-    // panelId is like 'panelName!hash'
-    const hasChildren = (node: MosaicNode<string>) => typeof node !== 'string';
-    const isPanelMatch = (panelId: string) => panelId.match(panelname);
-    if (!layout) {
-        return {
-            panelVehicleVisCount: 0,
-            vehicleVisIds: [],
-        };
-    }
-
-    if (typeof layout === 'string') {
-        return {
-            panelVehicleVisCount: isPanelMatch(layout) ? 1 : 0,
-            vehicleVisIds: [layout],
-        };
-    }
-
-    let panelVehicleVisCount = 0;
-    function reduce(node: MosaicNode<string>) {
-        if (hasChildren(node)) {
-            reduce((node as MosaicParent<string>).first);
-            reduce((node as MosaicParent<string>).second);
-            return;
-        }
-        const isMatch = isPanelMatch(node as string);
-        if (isMatch) {
-            panelVehicleVisCount += 1;
-            vehicleVisIds.push(node as string);
-        }
-    }
-    reduce(layout);
-
-    return {
-        panelVehicleVisCount,
-        vehicleVisIds,
-    };
-}
+import { useKeyDownEvent, CountPanelAndCollectId } from '../util';
+import { DynamicEffectButtonMemo, DynamicEffectButtonStatus } from '../DynamicEffectButton';
 
 interface ScenarioBarProps {
     routingInfo: Record<string, BusinessEventInfo[BusinessEventTypes.SimControlRoute]['routeInfo']>;
@@ -62,12 +21,11 @@ interface ScenarioBarProps {
 function ScenarioBar(props: ScenarioBarProps) {
     const { routingInfo } = props;
     const [panelInfoState] = usePanelInfoStore();
-    const [{ layout }] = usePanelLayoutStore();
+    const layout = useGetCurrentLayout();
     const { t } = useTranslation('pncMonitor');
     const { mainApi, isMainConnected } = useWebSocketServices();
     const [hmi] = usePickHmiStore();
-
-    const isInScenarioControl = hmi.otherComponents?.ScenarioSimulation?.status === SIM_CONTROL_STATUS.OK;
+    const { t: tBottomBar } = useTranslation('bottomBar');
 
     const { panelVehicleVisCount, vehicleVisIds } = useMemo(
         () => CountPanelAndCollectId(layout, PanelType.VehicleViz),
@@ -110,11 +68,8 @@ function ScenarioBar(props: ScenarioBarProps) {
         if (!hmi.currentScenarioId) {
             return t('scenarioSimulationDisabled1');
         }
-        if (!hmi.moduleStatus?.get('Planning')) {
-            return t('scenarioSimulationDisabled2');
-        }
         return '';
-    }, [hmi.moduleStatus, hmi.currentScenarioId, t]);
+    }, [hmi.currentScenarioId, t]);
 
     const startScenario = useCallback(
         (fromScenario: boolean, end: BusinessEventInfo['RoutePoint'], waypoint: BusinessEventInfo['RoutePoint'][]) => {
@@ -137,6 +92,12 @@ function ScenarioBar(props: ScenarioBarProps) {
         if (!isMainConnected) {
             return;
         }
+        if (!hmi.modules?.get('Planning')) {
+            message({
+                type: 'warning',
+                content: t('scenarioSimulationDisabled2'),
+            });
+        }
         const info = getRouteInfo();
         if (info) {
             const waypoint = [...(info.wayPoint || [])];
@@ -152,7 +113,7 @@ function ScenarioBar(props: ScenarioBarProps) {
                 fromScenario: true,
             });
         }
-    }, [errormsg, isMainConnected, getRouteInfo, startCycle, startScenario, mainApi]);
+    }, [hmi.modules, errormsg, isMainConnected, getRouteInfo, startCycle, startScenario, mainApi, t]);
 
     const onEnd = useCallback(() => {
         if (errormsg) {
@@ -163,31 +124,71 @@ function ScenarioBar(props: ScenarioBarProps) {
         }
     }, [errormsg, isMainConnected, mainApi]);
 
-    const playIc = isInScenarioControl ? (
-        <IconIcOverUsable onClick={onEnd} className='ic-stop-btn' />
-    ) : (
-        <IconIcNotApplicable onClick={onStart} className='ic-play-btn' />
-    );
-
-    const popoverPlayIc = errormsg ? (
-        <Popover placement='topLeft' trigger='hover' content={errormsg}>
-            {playIc}
-        </Popover>
-    ) : (
-        playIc
-    );
+    const onReset = useCallback(() => {
+        if (errormsg) {
+            return;
+        }
+        if (isMainConnected) {
+            mainApi.resetScenario();
+        }
+    }, [errormsg, isMainConnected]);
 
     useKeyDownEvent(onStart, onEnd);
+
+    const buttonStatus = (() => {
+        if (errormsg) {
+            return DynamicEffectButtonStatus.DISABLE;
+        }
+        return hmi.otherComponents?.ScenarioSimulation?.status === SIM_CONTROL_STATUS.OK
+            ? DynamicEffectButtonStatus.STOP
+            : DynamicEffectButtonStatus.START;
+    })();
+
+    const behavior = {
+        [DynamicEffectButtonStatus.DISABLE]: {
+            disabledMsg: errormsg,
+            text: tBottomBar('Start'),
+        },
+        [DynamicEffectButtonStatus.START]: {
+            text: tBottomBar('Start'),
+            clickHandler: onStart,
+        },
+        [DynamicEffectButtonStatus.STOP]: {
+            text: tBottomBar('Stop'),
+            clickHandler: onEnd,
+        },
+    };
+
+    const resetBtnStatus = (() => {
+        if (errormsg) {
+            return DynamicEffectButtonStatus.DISABLE;
+        }
+        return DynamicEffectButtonStatus.STOP;
+    })();
 
     return (
         <div className={cx(classes['record-controlbar-container'], { [classes.disabled]: errormsg })}>
             <div id='guide-simulation-record' className='ic-play-container'>
-                {popoverPlayIc}
+                <DynamicEffectButtonMemo behavior={behavior} status={buttonStatus} />
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <DynamicEffectButtonMemo
+                    behavior={{
+                        [DynamicEffectButtonStatus.STOP]: {
+                            text: tBottomBar('Reset'),
+                            clickHandler: onReset,
+                        },
+                        [DynamicEffectButtonStatus.DISABLE]: {
+                            disabledMsg: errormsg,
+                            text: tBottomBar('Reset'),
+                        },
+                    }}
+                    status={resetBtnStatus}
+                />
             </div>
             <div className={classes['flex-center']}>
                 <RecordBtn />
-                <DumpBtn disabled />
-                <ResetBtn disabled />
+                <DumpBtn disabled={false} />
+                <ResetBtn disabled={false} />
             </div>
         </div>
     );

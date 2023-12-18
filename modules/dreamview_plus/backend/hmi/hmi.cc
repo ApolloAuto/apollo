@@ -18,17 +18,17 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "google/protobuf/util/json_util.h"
 
-#include "modules/dreamview_plus/proto/preprocess_table.pb.h"
+#include "modules/dreamview/proto/preprocess_table.pb.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview_plus/backend/point_cloud/point_cloud_updater.h"
 
 namespace apollo {
@@ -41,12 +41,13 @@ using Json = WebSocketHandler::Json;
 
 HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
          WebSocketHandler* hmi_websocket)
-    : hmi_worker_(new HMIWorker()),
-      monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
+    : monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
+      hmi_worker_(new HMIWorker(monitor_log_buffer_)),
       websocket_(websocket),
       map_service_(map_service),
       hmi_ws_(hmi_websocket) {
   if (websocket_) {
+    RegisterDBMessageHandlers();
     RegisterMessageHandlers();
   }
 }
@@ -77,24 +78,150 @@ void HMI::StopStream(const std::string& channel_name) {
   }
 }
 
-void HMI::RegisterMessageHandlers() {
-  // Broadcast HMIStatus to clients when status changed.
-  hmi_worker_->RegisterStatusUpdateHandler(
-      [this](const bool status_changed, HMIStatus* status) {
-        if (!status_changed) {
-          // Status doesn't change, skip broadcasting.
+void HMI::RegisterDBMessageHandlers() {
+  websocket_->RegisterMessageHandler(
+      "AddOrModifyObjectToDB",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR
+              << "Failed to add or modify object to DB: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
           return;
         }
-        // websocket_->BroadcastData(
-        //     JsonUtil::ProtoToTypedJson("HMIStatus", *status).dump());
-        if (status->current_map().empty()) {
-          monitor_log_buffer_.WARN("You haven't selected a map yet!");
+        response["data"]["requestId"] = request_id;
+        std::string key, value;
+        if (!JsonUtil::GetStringByPath(json, "data.info.key", &key)) {
+          AERROR << "Failed to add or modify object to DB: key not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss key";
+          websocket_->SendData(conn, response.dump());
+          return;
+        } else if (!JsonUtil::GetStringByPath(json, "data.info.value",
+                                              &value)) {
+          AERROR << "Failed to add or modify object to DB: value not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss value";
+          websocket_->SendData(conn, response.dump());
+          return;
         }
-        if (status->current_vehicle().empty()) {
-          monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
+        bool ret = hmi_worker_->AddOrModifyObjectToDB(key, value);
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to add or modify object to DB";
         }
+        websocket_->SendData(conn, response.dump());
       });
 
+  websocket_->RegisterMessageHandler(
+      "GetObjectFromDB",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to get object from DB: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        std::string key, value;
+        if (!JsonUtil::GetStringByPath(json, "data.info.key", &key)) {
+          AERROR << "Failed to get object from DB: key not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss key";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        std::string ret = hmi_worker_->GetObjectFromDB(key);
+        response["data"]["info"]["data"] = ret;
+        response["data"]["info"]["code"] = 0;
+        response["data"]["info"]["message"] = "Success";
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "DeleteObjectToDB",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to delete object to DB: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        std::string key, value;
+        if (!JsonUtil::GetStringByPath(json, "data.info.key", &key)) {
+          AERROR << "Failed to delete object to DB: key not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss key";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        bool ret = hmi_worker_->DeleteObjectToDB(key);
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Failed to delete object to DB";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "GetTuplesWithTypeFromDB",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR
+              << "Failed to get tuples with type from DB: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        std::string type;
+        if (!JsonUtil::GetStringByPath(json, "data.info.type", &type)) {
+          AERROR << "Failed to get tuples with type from DB: type not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss type";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        auto ret = hmi_worker_->GetTuplesWithTypeFromDB(type);
+        Json tuples = Json::array();
+        for (const auto& item : ret) {
+          Json tuple;
+          tuple["key"] = item.first;
+          tuple["value"] = item.second;
+          tuples.push_back(tuple);
+        }
+        response["data"]["info"]["data"] = tuples;
+        response["data"]["info"]["code"] = 0;
+        response["data"]["info"]["message"] = "Success";
+        websocket_->SendData(conn, response.dump());
+      });
+}
+
+void HMI::RegisterMessageHandlers() {
   // Send current status and vehicle param to newly joined client.
   // websocket_->RegisterConnectionReadyHandler(
   //     [this](WebSocketHandler::Connection* conn) {
@@ -207,55 +334,6 @@ void HMI::RegisterMessageHandlers() {
           AERROR << "Truncated SubmitDriveEvent request.";
           monitor_log_buffer_.WARN("Failed to submit a drive event.");
         }
-      });
-
-  // websocket_->RegisterMessageHandler(
-  //     "HMIStatus",
-  //     [this](const Json& json, WebSocketHandler::Connection* conn) {
-  //       SendStatus(conn);
-  //     });
-
-  websocket_->RegisterMessageHandler(
-      "SensorCalibrationPreprocess",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        // json should contain type and data.
-        std::string current_mode = hmi_worker_->GetStatus().current_mode();
-        std::string task_type;
-        if (current_mode == FLAGS_lidar_calibration_mode) {
-          task_type = "lidar_to_gnss";
-        } else if (current_mode == FLAGS_camera_calibration_mode) {
-          task_type = "camera_to_lidar";
-        } else {
-          AERROR << "Unsupported mode:" << current_mode;
-          return;
-        }
-
-        const auto iter = json.find("data");
-        if (iter == json.end()) {
-          AERROR << "The json has no such key: data";
-          return;
-        }
-        PreprocessTable preprocess_table;
-        if (!JsonStringToMessage(json["data"].dump(), &preprocess_table).ok()) {
-          AERROR
-              << "Failed to get user configuration: invalid preprocess table."
-              << json.dump();
-        }
-
-        // Gernerate user-specified configuration and run the preprocess script
-        std::string output_file =
-            absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
-                         task_type, "_user.config");
-        if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
-          AERROR << "Failed to generate user configuration file";
-        }
-        hmi_worker_->SensorCalibrationPreprocess(task_type);
-      });
-
-  websocket_->RegisterMessageHandler(
-      "VehicleCalibrationPreprocess",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        hmi_worker_->VehicleCalibrationPreprocess();
       });
 
   websocket_->RegisterMessageHandler(
@@ -394,7 +472,13 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        bool ret = hmi_worker_->StartDataRecorder();
+        bool ret;
+        if (hmi_worker_->GetStatus().current_operation() ==
+            HMIModeOperation::Waypoint_Follow) {
+          ret = hmi_worker_->StartRtkDataRecorder();
+        } else {
+          ret = hmi_worker_->StartDataRecorder();
+        }
         if (ret) {
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
@@ -421,7 +505,13 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        bool ret = hmi_worker_->StopDataRecorder();
+        bool ret;
+        if (hmi_worker_->GetStatus().current_operation() ==
+            HMIModeOperation::Waypoint_Follow) {
+          ret = hmi_worker_->StopRtkDataRecorder();
+        } else {
+          ret = hmi_worker_->StopDataRecorder();
+        }
         if (ret) {
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
@@ -430,6 +520,65 @@ void HMI::RegisterMessageHandlers() {
           response["data"]["info"]["message"] =
               "Failed to stop data recorder: failed to stop the cyber_recorder "
               "process";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "StartPlayRtkRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start data recorder: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        if (hmi_worker_->GetStatus().current_operation() !=
+            HMIModeOperation::Waypoint_Follow) {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "The current operation is not a Waypoint_ Follow";
+        }
+        Json result = hmi_worker_->StartPlayRtkRecorder();
+        response["data"]["info"]["code"] = result["isOk"] ? 0 : -1;
+        response["data"]["info"]["message"] =
+            result["isOk"] ? "Success" : result["error"];
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "StopPlayRtkRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start data recorder: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        if (hmi_worker_->GetStatus().current_operation() !=
+            HMIModeOperation::Waypoint_Follow) {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "The current operation is not a Waypoint_ Follow";
+        }
+        bool ret = hmi_worker_->StopPlayRtkRecorder();
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to stop play data recorder process";
         }
         websocket_->SendData(conn, response.dump());
       });
@@ -455,7 +604,13 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        bool ret = hmi_worker_->SaveDataRecorder(new_name);
+        bool ret;
+        if (hmi_worker_->GetStatus().current_operation() ==
+            HMIModeOperation::Waypoint_Follow) {
+          ret = hmi_worker_->SaveRtkDataRecorder(new_name);
+        } else {
+          ret = hmi_worker_->SaveDataRecorder(new_name);
+        }
         if (ret) {
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
@@ -481,13 +636,69 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        bool ret = hmi_worker_->DeleteDataRecorder();
+        bool ret;
+        if (hmi_worker_->GetStatus().current_operation() ==
+            HMIModeOperation::Waypoint_Follow) {
+          ret = hmi_worker_->DeleteRtkDataRecorder();
+        } else {
+          ret = hmi_worker_->DeleteDataRecorder();
+        }
         if (ret) {
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
         } else {
           response["data"]["info"]["code"] = -1;
           response["data"]["info"]["message"] = "Failed to delete the record";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  // To speed up the preloading process, fetching from hmi is relatively slow.
+  websocket_->RegisterMessageHandler(
+      "GetInitData",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to get current mode: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        std::string current_mode = hmi_worker_->GetStatus().current_mode();
+        auto current_operation = hmi_worker_->GetStatus().current_operation();
+        response["data"]["info"]["data"]["currentMode"] = current_mode;
+        response["data"]["info"]["data"]["currentOperation"] =
+            HMIModeOperation_Name(current_operation);
+        response["data"]["info"]["code"] = 0;
+        response["data"]["info"]["message"] = "Success";
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "StartTerminal",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start terminal: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool ret = hmi_worker_->StartTerminal();
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Failed to start terminal";
         }
         websocket_->SendData(conn, response.dump());
       });
@@ -553,13 +764,21 @@ bool HMI::UpdatePointChannelToStatus(const std::string& channel_name) {
   return true;
 }
 
-void HMI::GetCurrentScenarioEndPoint(double& x, double& y) {
-  hmi_worker_->GetCurrentScenarioEndPoint(x, y);
+Json HMI::GetCurrentScenarioExtremPoint() {
+  return hmi_worker_->GetCurrentScenarioExtremPoint();
 }
 
 bool HMI::StartSimObstacle() { return hmi_worker_->StartSimObstacle(); }
 
 bool HMI::StopSimObstacle() { return hmi_worker_->StopSimObstacle(); }
+
+bool HMI::StartScenarioSimulation() {
+  return hmi_worker_->StartScenarioSimulation();
+}
+
+bool HMI::StopScenarioSimulation() {
+  return hmi_worker_->StopScenarioSimulation();
+}
 
 }  // namespace dreamview
 }  // namespace apollo

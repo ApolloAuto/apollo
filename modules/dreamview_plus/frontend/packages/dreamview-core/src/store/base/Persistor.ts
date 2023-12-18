@@ -1,6 +1,6 @@
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
-import { getLocalStorageItem, setLocalStorageItem } from '@dreamview/dreamview-core/src/util/storage';
+import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 
 export type Persistor<S> =
     | {
@@ -71,15 +71,17 @@ export function createConfigurablePersistor<S>(
     throw new Error('Invalid Persistor: must have either load/save or loadSync/saveSync');
 }
 
+const dreamviewStorageManager = new LocalStorage(KEY_MANAGER.DV);
 export const localStoragePersistor: Persistor<any> = {
-    loadSync: () => getLocalStorageItem('dreamview'),
-    saveSync: (state) => setLocalStorageItem('dreamview', state),
+    loadSync: () => dreamviewStorageManager.get(),
+    saveSync: (state) => dreamviewStorageManager.set(state),
 };
 
 // 用于生成localStoragePersistor
 export function createLocalStoragePersistor<S>(key: string): Persistor<Partial<S>> {
+    const sotrageManager = new LocalStorage(key);
     return {
-        loadSync: () => getLocalStorageItem(key),
-        saveSync: (state) => setLocalStorageItem(key, state),
+        loadSync: () => sotrageManager.get(),
+        saveSync: (state) => sotrageManager.set(state),
     };
 }

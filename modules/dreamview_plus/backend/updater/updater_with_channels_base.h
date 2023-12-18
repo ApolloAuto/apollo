@@ -43,7 +43,9 @@ class UpdaterWithChannelsBase : public UpdaterBase {
    * @brief GetChannelMsg
    */
   virtual void GetChannelMsg(std::vector<std::string> *channels) = 0;
-  void GetChannelMsgWithFilter(std::vector<std::string> *channels, const std::string& filter_message_type, const std::string& filter_channel);
+  void GetChannelMsgWithFilter(std::vector<std::string>* channels,
+                               const std::string& filter_message_type,
+                               const std::string& filter_channel);
 
   std::vector<std::string> channels_;
 };

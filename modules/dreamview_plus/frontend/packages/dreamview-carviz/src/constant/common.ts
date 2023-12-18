@@ -50,7 +50,7 @@ export const zOffset = {
     parkingSpace: 0.04,
     checkpoint: 0.04,
     pullover: 0.12,
-    routing: 0.2,
+    routing: 0.6,
     prediction: 0.04,
 };
 

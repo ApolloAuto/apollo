@@ -1,13 +1,13 @@
 {
   "name": "@dreamview/eslint-config-dreamview",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Dreamview's ESLint config",
   "main": "index.js",
   "scripts": {},
   "license": "MIT",
   "dependencies": {
-    "@dreamview/log": "^1.0.0",
-    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@dreamview/log": "1.0.1",
+    "@dreamview/tslint-config-dreamview": "1.0.1",
     "@types/react-dom": "^18.2.4",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-prettier": "^4.2.1"

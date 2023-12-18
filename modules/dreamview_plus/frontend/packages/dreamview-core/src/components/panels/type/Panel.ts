@@ -18,4 +18,6 @@ export enum PanelType {
     DashBoard = 'dashBoard',
     PncMonitor = 'pncMonitor',
     Components = 'components',
+    Charts = 'charts',
+    TerminalWin = 'terminalWin',
 }

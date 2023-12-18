@@ -20,6 +20,7 @@
 #include "modules/planning/planning_base/common/open_space_info.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"

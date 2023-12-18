@@ -21,10 +21,10 @@
 
 #include "modules/perception/camera_detection_single_stage/detector/smoke/proto/model_param.pb.h"
 
-#include "modules/perception/common/interface/base_obstacle_detector.h"
 #include "modules/perception/common/base/blob.h"
 #include "modules/perception/common/base/image_8u.h"
 #include "modules/perception/common/base/object_types.h"
+#include "modules/perception/common/interface/base_obstacle_detector.h"
 #include "modules/perception/common/onboard/inner_component_messages/camera_detection_component_messages.h"
 
 namespace apollo {
@@ -58,6 +58,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   void InitImageOffset(const smoke::ModelParam &model_param);
   void InitImageSize(const smoke::ModelParam &model_param);
   void InitParam(const smoke::ModelParam &model_param);
+  void InitObstacleTypes();
 
   bool Preprocess(const base::Image8U *image,
                   std::shared_ptr<base::Blob<float>> input_blob);

@@ -6,6 +6,7 @@ export default function useStyle() {
             ...theme.tokens.typography.title,
             paddingLeft: '10px',
             position: 'relative',
+            cursor: 'pointer',
             marginBottom: theme.tokens.margin.speace,
             '&::after': {
                 position: 'absolute',
@@ -18,45 +19,25 @@ export default function useStyle() {
                 bottom: 0,
                 margin: 'auto 0',
             },
-        },
-        'mode-setting-title-expend': {
-            marginBottom: 0,
-        },
-        'mode-setting-collapse': {
-            border: 'none',
-            backgroundColor: 'transparent',
-            '&.dreamview-collapse > .dreamview-collapse-item:last-child > .dreamview-collapse-header': {
-                padding: 0,
-                position: 'relative',
-                color: theme.tokens.colors.fontColor2,
-                marginBottom: theme.tokens.margin.speace2,
-                border: 'none',
-            },
-            '& .rc-collapse-item': {
-                border: 'none',
-            },
-            '& .dreamview-collapse-content': {
-                backgroundColor: 'transparent',
-                padding: 0,
-            },
-            '& .dreamview-collapse-content > .dreamview-collapse-content-box': {
-                margin: 0,
-                paddingBlock: '0 !important',
-                padding: 0,
-            },
-            '& .dreamview-collapse-expand-icon': {
+            '& .anticon': {
                 position: 'absolute',
                 right: 0,
-                top: 0,
-                bottom: 0,
-                margin: 'auto 0',
-                paddingRight: '0px !important',
-                ...theme.util.flexCenterCenter,
-                '& svg': {
-                    transition: theme.tokens.transitions.easeInOut(),
-                    fontSize: '16px',
-                },
+                top: '4px',
+                transform: 'rotate(0)',
+                transition: theme.tokens.transitions.easeInOut(),
             },
+        },
+        'mode-setting-icon-active': {
+            '& .anticon': {
+                transform: 'rotate(180deg)',
+            },
+        },
+        'mode-setting-expend': {
+            transition: theme.tokens.transitions.easeInOut(),
+            height: 'auto',
+            overflow: 'hidden',
+            padding: '0 14px',
+            margin: '0 -14px',
         },
     }));
     return hoc();

@@ -17,7 +17,7 @@
 #pragma once
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/stage.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {

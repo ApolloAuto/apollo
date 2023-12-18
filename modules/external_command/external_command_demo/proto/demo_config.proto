@@ -11,4 +11,16 @@ message DemoConfig {
   optional double target_speed = 3 [default = 2.0];
   // Minimum distance error between location record. 
   optional double min_distance_error = 4 [default = 1.0];
+  // free space roi boundary
+  optional double point1_x = 5;
+  optional double point1_y = 6;
+  optional double point2_x = 7;
+  optional double point2_y = 8;
+  optional double point3_x = 9;
+  optional double point3_y = 10;
+  optional double point4_x = 11;
+  optional double point4_y = 12;
+  optional double end_pose_x = 13;
+  optional double end_pose_y = 14;
+  optional double end_pose_heading = 15 [default = 0.0];
 }

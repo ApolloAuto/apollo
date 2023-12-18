@@ -21,6 +21,7 @@
 #include "modules/planning/planning_base/math/curve1d/piecewise_quintic_spiral_path.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/planning_base/math/curve1d/quintic_spiral_path.h"
 
 namespace apollo {

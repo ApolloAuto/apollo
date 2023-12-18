@@ -118,7 +118,7 @@ bool LaneWayTool::GetVehicleLaneWayPoints(
   center_enu.set_y(localization->pose().position().y());
   common::math::Vec2d center_point(center_enu.x(), center_enu.y());
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  static constexpr double kNearbyLaneDistance = 10.0;
+  static constexpr double kNearbyLaneDistance = 20.0;
   if (hdmap_->GetLanes(center_enu, kNearbyLaneDistance, &lanes) < 0) {
     AERROR << "get lanes failed" << center_enu.DebugString();
     return false;
@@ -128,6 +128,9 @@ bool LaneWayTool::GetVehicleLaneWayPoints(
     if (!lane->GetProjection(center_point, &s, &l)) {
       AERROR << "get projection failed";
       return false;
+    }
+    if (s < 0.0 || s > lane->total_length()) {
+      continue;
     }
     lane_way_points->emplace_back();
     auto &lane_way_point = lane_way_points->back();

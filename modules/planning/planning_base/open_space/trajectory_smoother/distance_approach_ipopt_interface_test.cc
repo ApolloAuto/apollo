@@ -20,6 +20,7 @@
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 
 namespace apollo {

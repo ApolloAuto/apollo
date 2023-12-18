@@ -24,7 +24,7 @@
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/dreamview_plus/proto/simulation_world.pb.h"
+#include "modules/common_msgs/dreamview_msgs/simulation_world.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/time/clock.h"
@@ -34,7 +34,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
 namespace dreamview {
@@ -471,14 +471,10 @@ void SimulationWorldService::UpdateLatencies() {
 }
 
 void SimulationWorldService::GetWireFormatString(
-    double radius, std::string *sim_world,
-    std::string *sim_world_with_planning_data) {
+    double radius, std::string *sim_world_with_planning_data) {
   PopulateMapInfo(radius);
 
   world_.SerializeToString(sim_world_with_planning_data);
-
-  world_.clear_planning_data();
-  world_.SerializeToString(sim_world);
 }
 
 Json SimulationWorldService::GetUpdateAsJson(double radius) const {

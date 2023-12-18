@@ -65,7 +65,7 @@ modules/planning/tasks/open_space_roi_decider/
 
 | 文件路径                                            |  <div style="width: 300pt">说明</div> |
 | --------------------------------------------------- |  ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
+| `modules/planning/planning_component/conf/planning.conf` |  planning模块的flag配置文件           |
 
 #### 使用方式
 ##### 配置加载 OpenSpaceRoiDecider Task 插件
@@ -78,8 +78,8 @@ task {
 ```
 ##### 配置 OpenSpaceRoiDecider 参数
 在`modules/planning/tasks/open_space_roi_decider/conf/default_conf.pb.txt`中，对`OpenSpaceRoiDecider`插件的参数进行配置。
-在`modules/planning/planning_base/conf/planning.conf`中，对作用在`OpenSpaceRoiDecider`插件的gflag参数进行配置。
+在`modules/planning/planning_component/conf/planning.conf`中，对作用在`OpenSpaceRoiDecider`插件的gflag参数进行配置。
 ##### 启动planning
 ```shell
-mainboard -d modules/planning/planning_base/dag/planning.dag
+mainboard -d modules/planning/planning_component/dag/planning.dag
 ```

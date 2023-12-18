@@ -8,6 +8,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const detectPort = require('detect-port');
+const { GenerateSW } = require('workbox-webpack-plugin');
 
 const { htmlPath, webPublicPath } = require('./path.js');
 
@@ -40,12 +41,18 @@ const devServerConfig = async (params) => {
             static: {
                 directory: params.outputPath,
             },
+            proxy: {
+                '/proto': {
+                    target: 'http://localhost:8888',
+                    pathRewrite: { '^/proto': '/proto' },
+                    changeOrigin: true,
+                },
+            },
             hot: true,
             open: true,
             port: PORT,
             allowedHosts: 'all',
         },
-
         plugins: [new CleanWebpackPlugin()],
     };
 };
@@ -98,6 +105,11 @@ const mainConfig = (params) => (env, argv) => {
             isProd &&
                 new MiniCssExtractPlugin({
                     filename: isProd ? '[name].[contenthash].css' : '[name].css',
+                }),
+            isProd &&
+                new GenerateSW({
+                    clientsClaim: true,
+                    skipWaiting: true,
                 }),
         ].filter(Boolean),
     };

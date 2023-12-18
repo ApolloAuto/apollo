@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 import { Subscription } from 'rxjs';
-import { updateStatus, usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
+import {
+    updateStatus,
+    usePickHmiStore,
+    updateCurrentMode,
+    updateCurrentOperate,
+    changeDynamic,
+} from '@dreamview/dreamview-core/src/store/HmiStore';
 import { ChangeCertStatusAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
 import { ENUM_CERT_STATUS } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { Emptyable, noop } from './util/similarFunctions';
@@ -8,6 +14,7 @@ import useWebSocketServices from './services/hooks/useWebSocketServices';
 import { StreamDataNames } from './services/api/types';
 import { useUserInfoStore } from './store/UserInfoStore';
 import { initUserInfo } from './store/UserInfoStore/actions';
+import useComponentDisplay from './hooks/useComponentDisplay';
 import { menuStoreUtils, useMenuStore } from './store/MenuStore';
 
 function useInitUserMixInfo() {
@@ -73,20 +80,40 @@ function useInitHmiStatus() {
     }, [metadata]);
 }
 
-function useInitRecord() {
+function useInitAppData() {
     const { isMainConnected, mainApi } = useWebSocketServices();
+    const [, dispatch] = usePickHmiStore();
 
     useEffect(() => {
         if (isMainConnected) {
             mainApi.loadRecords();
             mainApi.loadScenarios();
+            mainApi.loadRTKRecords();
+            mainApi.getInitData().then((r) => {
+                dispatch(updateCurrentMode(r.currentMode));
+                dispatch(updateCurrentOperate(r.currentOperation));
+            });
         }
     }, [isMainConnected]);
+}
+
+function useInitDynamic() {
+    const [, dispatch] = usePickHmiStore();
+    const { mainApi } = useWebSocketServices();
+    const [{ isDynamicalModelsShow }] = useComponentDisplay();
+    useEffect(() => {
+        if (isDynamicalModelsShow) {
+            mainApi?.loadDynamic();
+            // 这里需要默认选中Simulation Perfect Control
+            dispatch(changeDynamic(mainApi, 'Simulation Perfect Control'));
+        }
+    }, [isDynamicalModelsShow, mainApi]);
 }
 
 export default function InitAppData() {
     useInitHmiStatus();
     useInitUserMixInfo();
-    useInitRecord();
+    useInitAppData();
+    useInitDynamic();
     return <></>;
 }

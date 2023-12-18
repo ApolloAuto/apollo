@@ -25,8 +25,10 @@
 
 #include "Eigen/Dense"
 #include "osqp/osqp.h"
+
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {

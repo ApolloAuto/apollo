@@ -17,6 +17,8 @@
 
 namespace apollo {
 namespace dreamview {
+using RLock = boost::shared_lock<boost::shared_mutex>;
+using WLock = boost::unique_lock<boost::shared_mutex>;
 
 RecordPlayerFactory::RecordPlayerFactory() {
   // unified init cyber for all player related node.
@@ -44,6 +46,14 @@ void RecordPlayerFactory::UnregisterRecordPlayer(
   }
   iter->second = nullptr;
   s_record_player_map_.erase(record_name);
+  {
+    WLock wlock(mutex_);
+    auto vec_iter =
+        std::find(loaded_record_.begin(), loaded_record_.end(), record_name);
+    if (vec_iter != loaded_record_.end()) {
+      loaded_record_.erase(vec_iter);
+    }
+  }
   return;
 }
 
@@ -69,11 +79,16 @@ bool RecordPlayerFactory::RegisterRecordPlayer(
   // play_param.delay_time_s = 0;
   // preload time and delay time is no used when nohup player process
   play_param.preload_time_s = 1;
+  play_param.record_id = record_name;
   play_param.files_to_play.insert(record_file_path);
   const std::string node_name = "record_player_factory_" + record_name;
   s_record_player_map_[record_name] = std::unique_ptr<Player>(
       new Player(play_param, apollo::cyber::CreateNode(node_name), true));
   s_record_player_map_[record_name]->Init();
+  {
+    WLock wlock(mutex_);
+    loaded_record_.push_back(record_name);
+  }
   return true;
 }
 
@@ -97,5 +112,57 @@ Player* RecordPlayerFactory::GetRecordPlayer(const std::string& record_name) {
   }
   return iter->second.get();
 }
+
+int RecordPlayerFactory::GetLoadedRecordNum() {
+  {
+    RLock rlock(mutex_);
+    return loaded_record_.size();
+  }
+}
+
+bool RecordPlayerFactory::EnableContinuePreload() {
+  return GetLoadedRecordNum() < PRELOAD_RECORD_NUM;
+}
+
+bool RecordPlayerFactory::EnableContinueLoad() {
+  return GetLoadedRecordNum() < LOADED_RECORD_NUM;
+}
+
+void RecordPlayerFactory::IncreaseRecordPriority(
+    const std::string& record_name) {
+  WLock wlock(mutex_);
+  auto iter =
+      std::find(loaded_record_.begin(), loaded_record_.end(), record_name);
+  if (iter == loaded_record_.end()) {
+    AERROR << "Current record is not loaded,invalid operation!";
+    return;
+  }
+  loaded_record_.erase(iter);
+  loaded_record_.push_back(record_name);
+  return;
+}
+
+bool RecordPlayerFactory::RemoveLRURecord(std::string* remove_record_id) {
+  if (EnableContinueLoad()) {
+    AERROR << "No need to remove record.";
+    return false;
+  }
+  {
+    RLock rlock(mutex_);
+    auto iter = loaded_record_.begin();
+    *remove_record_id = *loaded_record_.begin();
+    while (iter != loaded_record_.end()) {
+      // Can not remove selected record
+      if (*iter != current_record_) {
+        *remove_record_id = *iter;
+        break;
+      }
+      iter++;
+    }
+  }
+  UnregisterRecordPlayer(*remove_record_id);
+  return true;
+}
+
 }  // namespace dreamview
 }  // namespace apollo

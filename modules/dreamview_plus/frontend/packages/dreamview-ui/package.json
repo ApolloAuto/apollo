@@ -1,10 +1,10 @@
 {
   "name": "@dreamview/dreamview-ui",
-  "version": "1.0.2-alpha.0",
+  "version": "1.0.5",
   "description": "Visualization of the Apollo simulator.",
   "author": "adu-sim",
   "homepage": "",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "license": "Apache-2.0",
   "directories": {
     "test": "__tests__"
@@ -21,16 +21,16 @@
     "gen:component": "bash scripts/gen_component.sh",
     "gen:icons:svg": "node scripts/gen_icon_with_svg.js",
     "gen:icons:mdx": "node scripts/gen_icon_mdx.js",
-    "gen:icons": "yarn gen:icons:svg && yarn gen:icons:mdx"
+    "gen:icons": "yarn gen:icons:svg && yarn gen:icons:mdx",
+    "build": "webpack --mode production --progress --config config/webpack.config.js --stats-error-details --stats-children"
   },
   "dependencies": {
-    "@dreamview/eslint-config-dreamview": "^1.0.0",
-    "@dreamview/log": "^1.0.0",
-    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@dreamview/log": "1.0.1",
     "@types/react-dom": "^18.2.4",
-    "antd": "^5.5.1",
+    "antd": "5.5.1",
     "lodash": "^4.17.21",
     "postcss-loader": "^7.3.0",
+    "rc-tabs": "12.12.1",
     "rc-util": "^5.32.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -44,9 +44,9 @@
     "@ant-design/icons": "^5.1.2",
     "@babel/preset-env": "^7.21.5",
     "@babel/preset-react": "^7.18.6",
-    "@babel/preset-typescript": "^7.21.5",
-    "@dreamview/eslint-config-dreamview": "^1.0.0",
-    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@babel/preset-typescript": "^7.23.3",
+    "@dreamview/eslint-config-dreamview": "1.0.1",
+    "@dreamview/tslint-config-dreamview": "1.0.1",
     "@jest/globals": "^29.5.0",
     "@storybook/addon-essentials": "^7.0.12",
     "@storybook/addon-interactions": "^7.0.12",
@@ -77,6 +77,7 @@
     "less-loader": "^11.1.0",
     "mini-css-extract-plugin": "^2.7.5",
     "mkdirp": "^3.0.1",
+    "node-polyfill-webpack-plugin": "^2.0.1",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^7.3.0",
     "postcss-normalize": "^10.0.1",

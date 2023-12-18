@@ -1,8 +1,7 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 import React, { useEffect, useMemo, useState } from 'react';
 import { IconIcClassificationNotes } from '@dreamview/dreamview-ui';
-
-const colors = ['#3288FA', '#1FCC4D', '#FF8D26', '#44D7B6', '#FFEC3D', '#B37FEB', '#F75660'];
+import { defaultColor } from '../ChartBase/util';
 
 function useStyle() {
     const hoc = useMakeStyle((theme) => ({
@@ -51,7 +50,7 @@ function useStyle() {
 }
 
 interface LegendProps {
-    legends: string[];
+    legends: Array<{ name: string; color: string }>;
     onClick: (key: string) => void;
 }
 
@@ -62,11 +61,11 @@ function Legend(props: LegendProps) {
 
     useEffect(() => {
         const result: Record<string, boolean> = {};
-        legends.forEach((key) => {
-            if (key in selected) {
-                result[key] = selected[key];
+        legends.forEach(({ name }) => {
+            if (name in selected) {
+                result[name] = selected[name];
             } else {
-                result[key] = true;
+                result[name] = true;
             }
         });
         setSelected(result);
@@ -90,13 +89,16 @@ function Legend(props: LegendProps) {
                 {legends.map((item, index) => (
                     <div
                         className={cx(classes['legend-item'], {
-                            [classes['legend-unactive']]: !selected[item],
+                            [classes['legend-unactive']]: !selected[item.name],
                         })}
-                        onClick={() => onClick(item)}
-                        key={item}
+                        onClick={() => onClick(item.name)}
+                        key={`${item.name}_${index + 1}`}
                     >
-                        <IconIcClassificationNotes className={classes} style={{ color: colors[index] }} />
-                        {item}
+                        <IconIcClassificationNotes
+                            className={classes}
+                            style={{ color: item.color || defaultColor[index] }}
+                        />
+                        {item.name}
                     </div>
                 ))}
             </div>

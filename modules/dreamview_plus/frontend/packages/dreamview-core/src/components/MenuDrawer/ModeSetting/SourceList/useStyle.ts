@@ -74,7 +74,6 @@ export default function useStyle() {
         'source-list-close': {
             height: 0,
             overflowY: 'hidden',
-            margin: '0 -14px',
             transition: theme.tokens.transitions.easeInOut(),
             '& > div': {
                 margin: '0 14px',

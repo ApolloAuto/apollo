@@ -9,6 +9,7 @@ type UseComponentDisplay = [
         isBottomBarShow: boolean;
         isBottomBarHidden: boolean;
         isScenarioHistoryShow: boolean;
+        isDynamicalModelsShow: boolean;
     },
     { bottomBarHeight: number; bottomBarHeightString: string; menuDrawerWidthString: string },
 ];
@@ -28,10 +29,15 @@ export default function useComponentDisplay(): UseComponentDisplay {
                 HMIModeOperation.PLAY_RECORDER,
                 HMIModeOperation.SIM_CONTROL,
                 HMIModeOperation.SCENARIO,
+                HMIModeOperation.AUTO_DRIVE,
+                HMIModeOperation.WAYPOINT_FOLLOW,
             ].some((item) => item === hmi.currentOperation),
             // PnCmonitor scenario history
             isScenarioHistoryShow: [HMIModeOperation.SIM_CONTROL, HMIModeOperation.SCENARIO].some(
                 (item) => item === hmi.currentOperation,
+            ),
+            isDynamicalModelsShow: [HMIModeOperation.SIM_CONTROL, HMIModeOperation.SCENARIO].includes(
+                hmi.currentOperation,
             ),
         };
 

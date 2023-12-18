@@ -2,7 +2,17 @@
  * 定义与 WebSocketManager 元数据、连接状态、socket 名称、消息操作和有效负载字段相关的类型和接口。
  */
 
-import { StreamDataNames } from '../api/types';
+import { TaskInternal } from '@dreamview/dreamview-core/src/worker/type';
+import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
+
+/**
+ * channel
+ */
+export interface Channel {
+    channelName: string;
+    msgType: string;
+    protoPath: string;
+}
 
 /**
  * 元数据项，包含数据名称、proto 文件路径、proto 描述、请求名称和 WebSocket 信息。
@@ -11,15 +21,13 @@ export type MetadataItem = {
     /** 数据名称 */
     dataName: StreamDataNames;
     /** 数据频道 */
-    channels: string[];
+    channels: Channel[];
     /** 是否存在不同的频道 */
     differentForChannels: boolean;
     /** proto 文件路径 */
     protoPath: string;
     /** proto 描述 */
-    protoDesc: string;
-    /** 请求名称 */
-    requestName: string;
+    msgType: string;
     /** WebSocket 信息 */
     websocketInfo: {
         /** WebSocket 名称 */
@@ -81,11 +89,20 @@ export enum RequestMessageActionEnum {
 export enum ResponseMessageActionEnum {
     /** 元数据消息类型 */
     METADATA_MESSAGE_TYPE = 'metadata',
+    /** 元数据增量更新消息类型 */
+    METADATA_JOIN_TYPE = 'join',
+    /** 元数据局部清理消息类型 */
+    METADATA_LEAVE_TYPE = 'leave',
     /** 响应消息类型 */
     RESPONSE_MESSAGE_TYPE = 'response',
     /** 流消息类型 */
     STREAM_MESSAGE_TYPE = 'stream',
 }
+
+/**
+ * 元数据操作类型，包含元数据消息类型、元数据增量更新消息类型和元数据局部清理消息类型。
+ */
+export type MetaActionType = 'join' | 'leave';
 
 /**
  * 有效负载字段类型，包含字段名称、源、信息、目标、源类型、目标类型和请求 ID。
@@ -211,7 +228,13 @@ export type WorkerMessageType =
     // WebSocket打开 (SOCKET_OPEN):
     | 'SOCKET_OPEN'
     // WebSocket已关闭 (SOCKET_CLOSED):
-    | 'SOCKET_CLOSED';
+    | 'SOCKET_CLOSED'
+    // SOCKET_METADATA 更新元数据 (SOCKET_METADATA):
+    | 'SOCKET_METADATA'
+    // 接受首次反序列化的数据 (SOCKET_STREAM_MESSAGE):
+    | 'SOCKET_STREAM_MESSAGE'
+    // 二次反序列化的数据 (SOCKET_STREAM_MESSAGE_DATA):
+    | 'SOCKET_STREAM_MESSAGE_DATA';
 
 type INIT_SOCKET_Payload = { name: StreamDataNames; url: string };
 type DESTROY_SOCKET_Payload = undefined;
@@ -221,6 +244,9 @@ type SOCKET_MESSAGE_Payload = unknown;
 type SOCKET_ERROR_Payload = undefined;
 type SOCKET_OPEN_Payload = undefined;
 type SOCKET_CLOSED_Payload = undefined;
+type SOCKET_METADATA_Payload = MetadataItem[];
+type SOCKET_STREAM_MESSAGE_Payload = TaskInternal<StreamMessage>;
+type SOCKET_STREAM_MESSAGE_DATA_Payload = TaskInternal<StreamMessage>;
 
 export type WorkerMessagePayloads = {
     INIT_SOCKET: INIT_SOCKET_Payload;
@@ -231,6 +257,9 @@ export type WorkerMessagePayloads = {
     SOCKET_ERROR: SOCKET_ERROR_Payload;
     SOCKET_OPEN: SOCKET_OPEN_Payload;
     SOCKET_CLOSED: SOCKET_CLOSED_Payload;
+    SOCKET_METADATA: SOCKET_METADATA_Payload;
+    SOCKET_STREAM_MESSAGE: SOCKET_STREAM_MESSAGE_Payload;
+    SOCKET_STREAM_MESSAGE_DATA: SOCKET_STREAM_MESSAGE_DATA_Payload;
 };
 export interface WorkerMessage<T extends WorkerMessageType> {
     type: T;

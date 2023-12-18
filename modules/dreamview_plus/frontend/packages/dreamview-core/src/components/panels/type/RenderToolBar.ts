@@ -4,7 +4,7 @@ import { IPanelMetaInfo } from './Panel';
 export type SubscribeInfo = {
     name?: string;
     channel?: string;
-    needChannel: boolean;
+    needChannel?: boolean;
 };
 
 export interface RenderToolbarProps {

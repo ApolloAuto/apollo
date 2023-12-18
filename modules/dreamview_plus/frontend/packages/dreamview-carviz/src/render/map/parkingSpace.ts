@@ -51,6 +51,9 @@ export default class ParkingSpace {
                 opacity: 1,
                 matrixAutoUpdate: true,
             });
+            mesh.name = "ParkingSpace";
+            mesh.userData = {color: colorMapping.YELLOW,
+                        selectedColor: 'rgb(247, 86, 96)'};
             this.meshs[id] = mesh;
             this.scene.add(mesh);
 

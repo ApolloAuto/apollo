@@ -140,6 +140,7 @@ function _usage() {
     ${BLUE}build_fe${NO_COLOR}: compile frontend JS code for Dreamview. Requires all node_modules pre-installed.
     ${BLUE}build_teleop${NO_COLOR}: run build with teleop enabled.
     ${BLUE}build_prof [module]${NO_COLOR}: build with perf profiling support. Not implemented yet.
+    ${BLUE}install_dv_plugins ${NO_COLOR}: install Dreamview plugins package.
     ${BLUE}doc${NO_COLOR}: generate doxygen document
     ${BLUE}release${NO_COLOR}: build Apollo binary releases
     ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
@@ -271,6 +272,9 @@ function main() {
       ;;
     release)
       env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_release.sh" "$@"
+      ;;
+    install_dv_plugins)
+      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/install_dv_plugins.sh"
       ;;
     doc)
       env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"

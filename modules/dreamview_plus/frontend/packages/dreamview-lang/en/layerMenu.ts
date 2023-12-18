@@ -44,7 +44,9 @@ export const layerMenu = {
 
     planning: 'Planning',
     planningCar: 'Planning Car',
-    planningTrajectory: 'Planning Trajectory',
+    planningTrajectoryLine: 'Planning Trajectory Line',
+    planningReferenceLine: 'Planning Reference Line',
+    planningBoundaryLine: 'Planinng Boundary Line',
 
     map: 'Map',
     crosswalk: 'Crosswalk',

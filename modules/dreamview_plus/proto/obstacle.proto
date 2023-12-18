@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-import "modules/dreamview_plus/proto/simulation_world.proto";
+import "modules/common_msgs/dreamview_msgs/simulation_world.proto";
 
 message Obstacles {
     repeated Object obstacle = 1;

@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import Logger from '@dreamview/log';
-import { IconIcPlay, IconIcStopPlaying } from '@dreamview/dreamview-ui';
+import { IconIcPlay, IconIcStopPlaying, IconIcSissue } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
+import { BusinessEventTypes, BusinessEventInfo } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
 import useStyle from './useStyle';
-import { PlayRecordStatus, useKeyDownEvent } from '../util';
+import { PlayRecordStatus, useKeyDownEvent, useSendRouting } from '../util';
 import Progress from './Progress';
 import DumpBtn from '../Operate/Dump';
 import ResetBtn from '../Operate/Reset';
@@ -20,14 +21,20 @@ function formatTs(v: number) {
     return Math.floor(Math.round(v * 100)) / 100;
 }
 
+interface PlayerControlBarProps {
+    routingInfo: Record<string, BusinessEventInfo[BusinessEventTypes.SimControlRoute]['routeInfo']>;
+}
 // 播放进度条组件
-function PlayerControlBar() {
+function PlayerControlBar(props: PlayerControlBarProps) {
     const { isMainConnected, mainApi } = useWebSocketServices();
     const { t } = useTranslation('bottomBar');
     const [hmi] = useHmiStore();
+
+    const routingManager = useSendRouting(props.routingInfo, false);
+
     const recordInfo = useMemo(
         () => ({
-            totalTimeS: formatTs(hmi?.records[hmi?.currentRecordStatus?.currentRecordId]),
+            totalTimeS: formatTs(hmi?.records[hmi?.currentRecordStatus?.currentRecordId]?.totalTimeS || 0),
             currTimeS: formatTs(hmi?.currentRecordStatus?.currTimeS || 0),
             playRecordStatus: hmi?.currentRecordStatus?.playRecordStatus || PlayRecordStatus.CLOSED,
             disabled: !hmi.currentRecordStatus?.currentRecordId,
@@ -74,6 +81,7 @@ function PlayerControlBar() {
 
     // 开始播放record
     const onStart = useCallback(() => {
+        if (!isMainConnected) return;
         if (recordInfo.disabled) {
             return;
         }
@@ -88,7 +96,7 @@ function PlayerControlBar() {
         if (recordInfo.playRecordStatus === PlayRecordStatus.PAUSED) {
             mainApi.ctrRecorderAction('continue', recordInfo.currTimeS);
         }
-    }, [mainApi, recordInfo.disabled, recordInfo.playRecordStatus, recordInfo.currTimeS]);
+    }, [mainApi, isMainConnected, recordInfo.disabled, recordInfo.playRecordStatus, recordInfo.currTimeS]);
 
     const playIc = isInPlaying ? (
         <IconIcPlay disabled={recordInfo.disabled} onClick={onEnd} className='ic-play-btn' />
@@ -104,11 +112,34 @@ function PlayerControlBar() {
         playIc
     );
 
+    const popoverRoutingIc =
+        recordInfo.disabled || routingManager.routingInfo.errorMessage ? (
+            <Popover
+                placement='topLeft'
+                trigger='hover'
+                content={recordInfo.disabled ? t('recordMsg') : routingManager.routingInfo.errorMessage}
+            >
+                <IconIcSissue className='ic-routing-btn' />
+            </Popover>
+        ) : (
+            <Popover placement='topLeft' trigger='hover' content={t('routing')}>
+                <IconIcSissue onClick={routingManager.send} className='ic-routing-btn' />
+            </Popover>
+        );
+
     useKeyDownEvent(onStart, onEnd);
 
     return (
         <div className={cx(classes['player-controlbar-container'], { [classes.disabled]: recordInfo.disabled })}>
-            {popoverPlayIc}
+            <span
+                className={cx({
+                    [classes.disabled]: routingManager.routingInfo.errorMessage,
+                })}
+                id='guide-simulation-record'
+            >
+                {popoverRoutingIc}
+            </span>
+            <span id='guide-simulation-record'>{popoverPlayIc}</span>
             <span className='player-progress-text'>
                 {recordInfo.currTimeS}
                 &nbsp;/&nbsp;

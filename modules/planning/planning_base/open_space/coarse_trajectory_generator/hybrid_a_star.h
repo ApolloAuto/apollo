@@ -38,7 +38,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/grid_search.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/node3d.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/reeds_shepp_path.h"

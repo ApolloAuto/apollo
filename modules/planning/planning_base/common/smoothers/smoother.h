@@ -22,6 +22,7 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/frame.h"
 

@@ -25,6 +25,7 @@
 #include <random>
 
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"

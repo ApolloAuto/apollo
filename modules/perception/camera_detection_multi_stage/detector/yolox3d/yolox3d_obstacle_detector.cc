@@ -163,9 +163,10 @@ void Yolox3DObstacleDetector::Yolo3DInference(const base::Image8U *image,
   cv::Rect object_roi(left_x, left_y, width, height);
   cv::Mat cropped_obj = img_(object_roi);
 
-  // resize croped image to 224*224
-  cropped_obj =
-      resizeKeepAspectRatioYolox(cropped_obj, cv::Size(224, 224), {0, 0, 0});
+  // resize croped image to 224*224, no padding
+  // cropped_obj =
+  //     resizeKeepAspectRatioYolox(cropped_obj, cv::Size(224, 224), {0, 0, 0});
+  cv::resize(cropped_obj, cropped_obj, cv::Size(224, 224));
 
   // normallize channel value from 0～255 to 0~1 and change it to float type
   cropped_obj.convertTo(cropped_obj, CV_32F, 1.0f / 255.0);

@@ -24,17 +24,16 @@
 
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
-#include "modules/dreamview/backend/handlers/image_handler.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/image_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
-#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
-#include "modules/dreamview/backend/plugins/plugin_manager.h"
+#include "modules/dreamview/backend/common/plugins/plugin_manager.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
-#include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #if WITH_TELEOP == 1
-#include "modules/dreamview/backend/teleop/teleop.h"
+#include "modules/dreamview/backend/common/teleop/teleop.h"
 #endif
 
 /**
@@ -64,7 +63,6 @@ class Dreamview {
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
   std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
-  std::unique_ptr<SimControlManager> sim_control_manager_;
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<WebSocketHandler> websocket_;
   std::unique_ptr<WebSocketHandler> map_ws_;

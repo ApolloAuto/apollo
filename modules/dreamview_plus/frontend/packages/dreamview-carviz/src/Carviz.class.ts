@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import noop from 'lodash/noop';
+import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import View from './render/view';
 import Map from './render/map';
 import Adc from './render/adc';
@@ -21,6 +22,7 @@ import InitiationMarker from './render/functional/InitiationMarker';
 import PathwayMarker from './render/functional/PathwayMarker';
 import CopyMarker from './render/functional/CopyMarker';
 import RulerMarker from './render/functional/RulerMarker';
+import Follow from './render/follow';
 
 enum PREVDATA_STATUS {
     EXIT = 'EXIT',
@@ -78,7 +80,7 @@ export class Carviz {
 
     public rulerMarker: RulerMarker;
 
-    private initialized;
+    public initialized;
 
     public coordinates;
 
@@ -87,6 +89,10 @@ export class Carviz {
     private prevDataStatus: Record<string, PREVDATA_STATUS> = {};
 
     public raycaster: THREE.Raycaster = new THREE.Raycaster();
+
+    public follow: Follow;
+
+    private viewLocalStorage;
 
     constructor(id) {
         this.canvasId = id;
@@ -122,6 +128,17 @@ export class Carviz {
         });
     }
 
+    resetScence() {
+        if (this.scene) {
+            this.scene = null;
+        }
+        this.scene = new THREE.Scene();
+        const light = new THREE.DirectionalLight(0xffeedd, 2.0);
+        light.position.set(0, 0, 10);
+        this.scene.add(light);
+        this.initModule();
+    }
+
     initThree() {
         this.scene = new THREE.Scene();
 
@@ -130,7 +147,7 @@ export class Carviz {
             antialias: true,
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.width, this.height);
         this.renderer.setClearColor(0x0f1014);
         this.canvasDom.appendChild(this.renderer.domElement);
 
@@ -142,7 +159,7 @@ export class Carviz {
         );
         this.camera.up.set(0, 0, 1);
 
-        const light = new THREE.DirectionalLight(0xffeedd);
+        const light = new THREE.DirectionalLight(0xffeedd, 2.0);
         light.position.set(0, 0, 10);
         this.scene.add(light);
 
@@ -204,6 +221,7 @@ export class Carviz {
         this.prediction = new Prediction(this.scene, this.option, this.coordinates);
         this.planning = new Planning(this.scene, this.option, this.coordinates);
         this.gps = new Gps(this.scene, this.adc, this.option, this.coordinates);
+        this.follow = new Follow(this.scene, this.coordinates);
 
         const context = {
             scene: this.scene,
@@ -278,7 +296,7 @@ export class Carviz {
                 2,
             )}`;
         } catch (error) {
-            console.error('Error handling mouse move event:', error);
+            // console.error('Error handling mouse move event:', error);
         }
     };
 
@@ -329,6 +347,15 @@ export class Carviz {
 
         this.ifDispose(
             datas,
+            'vehicleParam',
+            () => {
+                this.adc.updateVehicleParam(datas.vehicleParam);
+            },
+            noop,
+        );
+
+        this.ifDispose(
+            datas,
             'planningData',
             () => {
                 this.adc.update(datas.planningData.initPoint?.pathPoint, 'planningAdc');
@@ -349,10 +376,25 @@ export class Carviz {
 
         this.ifDispose(
             datas,
+            'mainStop',
+            () => {
+                this.decision.updateMainDecision(datas.mainStop);
+            },
+            () => {
+                this.decision.disposeMainDecisionMeshs();
+            },
+        );
+
+        this.ifDispose(
+            datas,
             'object',
             () => {
                 this.decision.updateObstacleDecision(datas.object);
-                this.obstacles.update(datas.object, datas.sensorMeasurements, datas.autoDrivingCar);
+                this.obstacles.update(
+                    datas.object,
+                    datas.sensorMeasurements,
+                    datas.autoDrivingCar || datas.CopyAutoDrivingCar || {},
+                );
                 this.prediction.update(datas.object);
             },
             () => {
@@ -388,7 +430,20 @@ export class Carviz {
             },
             noop,
         );
+
+        this.ifDispose(
+            datas,
+            'followPlanningData',
+            () => {
+                this.follow.update(datas.followPlanningData, datas.autoDrivingCar);
+            },
+            noop,
+        );
     }
+
+    updataCoordinates = (data) => {
+        this.adc.updateOffset(data, 'adc');
+    };
 
     removeAll() {
         this.map.dispose();
@@ -399,6 +454,7 @@ export class Carviz {
         this.prediction.dispose();
         this.planning.dispose();
         this.gps.dispose();
+        this.follow.dispose();
     }
 
     // 取消激活所有功能

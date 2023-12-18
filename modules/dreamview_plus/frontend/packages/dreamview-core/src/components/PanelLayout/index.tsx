@@ -1,19 +1,29 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-import React, { useCallback, useEffect, memo } from 'react';
+import React, { useCallback } from 'react';
 import { Mosaic, MosaicPath, MosaicNode } from 'react-mosaic-component';
 import 'react-mosaic-component/react-mosaic-component.css';
 import { update } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
+import {
+    useGetCurrentLayout,
+    usePanelLayoutStore,
+    useMosaicId,
+} from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
+import RenderTile from '@dreamview/dreamview-core/src/components/panels/base/RenderTile';
+import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import useStyle from './style';
-import { usePanelLayoutStore, useMosaicId } from '../../store/PanelLayoutStore';
-import RenderTile from '../panels/base/RenderTile';
 import PanelEmpty from './PanelEmpty';
 
+/**
+ * Panel layout component.
+ */
 function DreamviewWindow() {
     const mosaicId = useMosaicId();
-    const [{ layout }, dispatch] = usePanelLayoutStore();
+    const [hmi] = usePickHmiStore();
+    const [, dispatch] = usePanelLayoutStore();
+    const layout = useGetCurrentLayout();
 
     const onMosaicChange = (newNode: MosaicNode<string>) => {
-        dispatch(update(newNode));
+        dispatch(update({ mode: hmi.currentMode, layout: newNode }));
     };
 
     const renderTile = useCallback(
@@ -36,7 +46,7 @@ const DreamviewWindowMemo = React.memo(DreamviewWindow);
 
 function PanelLayout() {
     const { classes } = useStyle();
-    const [{ layout }] = usePanelLayoutStore();
+    const layout = useGetCurrentLayout();
     return <div className={classes['layout-root']}>{layout ? <DreamviewWindowMemo /> : <PanelEmpty />}</div>;
 }
 

@@ -16,6 +16,7 @@ import { PNCMonitorContext } from './PNCMonitorContext';
 import usePlanningData, { initData as initPlanningData } from './usePlanningData';
 import useControlData, { initData as initControlData } from './useControlData';
 import useLatencyData, { initData as initLatenctData } from './useLatencyData';
+import { useCreateViewBoxPosInfo, viewBoxPosInfoContext } from './Chart/ChartBase';
 
 interface FilterProps {
     filterList: IFilterList;
@@ -50,11 +51,10 @@ function Filter(props: FilterProps) {
     );
 }
 const MemoFilter = React.memo(Filter);
-
 function PncMonitorInner() {
     const { mainApi, isMainConnected } = useWebSocketServices();
     const consumerFuncs = useRef<any>([]);
-    const { initSubscription } = usePanelContext();
+    const { initSubscription, setKeyDownHandlers } = usePanelContext();
 
     const { classes } = useStyle();
     const [activeTab, setActiveTab] = useState<ENUM_PNCMONITOR_TAB>(ENUM_PNCMONITOR_TAB.PLANNING);
@@ -79,8 +79,9 @@ function PncMonitorInner() {
     }));
 
     const { onSimData: onPlanningData } = usePlanningData();
-    const { onSimData: onControlData } = useControlData();
-    const { onSimData: onLatencyData } = useLatencyData();
+    const { onSimData: onControlData, onRefresh: onClearControlView } = useControlData();
+    const { onSimData: onLatencyData, onRefresh: onClearLatencyView } = useLatencyData();
+    const { onRef, contextValue } = useCreateViewBoxPosInfo();
 
     useEffect(() => {
         initSubscription({
@@ -110,43 +111,50 @@ function PncMonitorInner() {
             planningData,
             controlData,
             latencyData,
+            onClearLatencyView,
+            onClearControlView,
         }),
-        [planningData, controlData, latencyData],
+        [planningData, controlData, latencyData, onClearControlView, onClearLatencyView],
     );
 
     const items = [
         {
             key: ENUM_PNCMONITOR_TAB.PLANNING,
             label: 'Planning',
+            forceRender: false,
             children: <Planning list={planning.filterList} checkStatus={planning.checkedStatus} />,
         },
         {
             key: ENUM_PNCMONITOR_TAB.CONTROL,
+            forceRender: false,
             label: 'Control',
             children: <Control list={control.filterList} checkStatus={control.checkedStatus} />,
         },
         {
             key: ENUM_PNCMONITOR_TAB.LATENCY,
+            forceRender: false,
             label: 'Latency',
             children: <Latency />,
         },
     ];
 
     return (
-        <CustomScroll className={classes['pnc-container']}>
-            <PNCMonitorContext.Provider value={PNCMonitorContextValue}>
-                <Tabs
-                    destroyInactiveTabPane
-                    onChange={onTabChange}
-                    activeKey={activeTab}
-                    rootClassName={classes.tabs}
-                    items={items}
-                />
-                {activeTab !== ENUM_PNCMONITOR_TAB.LATENCY && (
-                    <MemoFilter onToggle={onToggle} filterList={filterList} checkStatus={checkStatus} />
-                )}
-            </PNCMonitorContext.Provider>
-        </CustomScroll>
+        <viewBoxPosInfoContext.Provider value={contextValue}>
+            <CustomScroll ref={onRef} className={classes['pnc-container']}>
+                <PNCMonitorContext.Provider value={PNCMonitorContextValue}>
+                    <Tabs
+                        destroyInactiveTabPane
+                        onChange={onTabChange}
+                        activeKey={activeTab}
+                        rootClassName={classes.tabs}
+                        items={items}
+                    />
+                    {activeTab !== ENUM_PNCMONITOR_TAB.LATENCY && (
+                        <MemoFilter onToggle={onToggle} filterList={filterList} checkStatus={checkStatus} />
+                    )}
+                </PNCMonitorContext.Provider>
+            </CustomScroll>
+        </viewBoxPosInfoContext.Provider>
     );
 }
 

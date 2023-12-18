@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/traffic_light_base/base_stage_traffic_light_cruise.h"
+#include "modules/planning/planning_interface_base/scenario_base/traffic_light_base/base_stage_traffic_light_cruise.h"
 
 namespace apollo {
 namespace planning {

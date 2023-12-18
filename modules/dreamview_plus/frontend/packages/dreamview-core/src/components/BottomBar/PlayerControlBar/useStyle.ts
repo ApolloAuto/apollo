@@ -7,6 +7,9 @@ export default function useStyle() {
             '& .progress-pointer': {
                 display: 'none',
             },
+            '& .ic-routing-btn': {
+                cursor: 'not-allowed',
+            },
         },
         'player-controlbar-container': {
             height: '100%',
@@ -22,6 +25,11 @@ export default function useStyle() {
             '& .ic-play-btn': {
                 cursor: 'pointer',
                 fontSize: '24px !important',
+                marginRight: '6px',
+            },
+            '& .ic-routing-btn': {
+                cursor: 'pointer',
+                fontSize: '18px !important',
                 marginRight: '6px',
             },
             '& .player-progress': {

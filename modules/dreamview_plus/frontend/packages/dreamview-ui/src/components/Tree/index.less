@@ -1,0 +1,36 @@
+.dreamview-tree {
+    background-color: transparent;
+    height: 100%;
+    .dreamview-tree-list {
+        .dreamview-tree-treenode {
+
+            &.dreamview-tree-treenode-selected {
+                background-color: #3288FA;
+            }
+            .dreamview-tree-switcher {
+                display: none;
+            }
+            .dreamview-tree-node-content-wrapper {
+                height: 22px;
+                line-height: 22px;
+                min-height: 22px;
+                cursor: pointer;
+                &:hover {
+                    background-color: transparent;
+                }
+
+                .dreamview-tree-title {
+                    font-family: PingFangSC-Medium;
+                    font-size: 14px;
+                    color: #A6B5CC;
+                    line-height: 22px;
+                    height: 22px;
+                }
+
+                &.dreamview-tree-node-selected {
+                    background-color: #3288FA;
+                }
+            }
+        }
+    }
+}

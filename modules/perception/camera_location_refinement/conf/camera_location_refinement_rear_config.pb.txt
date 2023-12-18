@@ -1,5 +1,4 @@
 camera_name: "front_12mm"
-timestamp_offset: 0.0
 postprocessor_param {
   plugin_param {
     name: "LocationRefinerPostprocessor"
@@ -14,7 +13,5 @@ calibration_service_param {
   }
 }
 channel {
-  input_camera_channel_name: "/perception/inner/location_estimation2"
   output_obstacles_channel_name: "/perception/inner/location_refinement2"
 }
-lane_calibration_working_sensor_name: "front_12mm"

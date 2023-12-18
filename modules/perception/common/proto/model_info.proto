@@ -47,6 +47,8 @@ message ModelInfo {
   // input and output
   repeated ModelBlob inputs = 40;
   repeated ModelBlob outputs = 41;
+  // class names
+  repeated string class_names = 42;
 }
 
 // model files

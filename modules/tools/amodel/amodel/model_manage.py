@@ -47,7 +47,8 @@ FRAMEWORK_ABBREVIATION = {
   "Caffe": "caffe",
   "PaddlePaddle": "paddle",
   "PyTorch": "torch",
-  "TensorFlow": "tf"}
+  "TensorFlow": "tf",
+  "Onnx": "onnx"}
 
 
 def _jion_meta_file(meta_path):

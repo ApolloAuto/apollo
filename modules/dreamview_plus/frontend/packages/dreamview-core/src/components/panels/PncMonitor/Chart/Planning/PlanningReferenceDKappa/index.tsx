@@ -34,6 +34,7 @@ function DKappa() {
         setOptions(
             initOptions({
                 dataset,
+                scale: true,
                 series,
                 xAxis: {
                     type: 'value',

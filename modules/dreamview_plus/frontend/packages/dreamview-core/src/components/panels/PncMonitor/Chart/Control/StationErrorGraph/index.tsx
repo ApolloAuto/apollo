@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function StationErrorGraph() {
     const [options, setOptions] = useState<any>(null);
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         if (!graph?.length) {
@@ -46,6 +46,13 @@ function StationErrorGraph() {
         triggerUIUpdate(controlData.stationError);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Station Error' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['stationError'])}
+            labelRotateBoundary={550}
+            title='Station Error'
+            options={options}
+        />
+    );
 }
 export default React.memo(StationErrorGraph);

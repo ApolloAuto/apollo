@@ -41,6 +41,7 @@ void GetObjects(const base::BlobPtr<float> &box3ds,
                 const base::BlobPtr<float> &scores,
                 const std::vector<base::ObjectSubType> &types,
                 float score_threshold, std::vector<base::ObjectPtr> *objects);
+
 /**
  * @brief Fill the 3d bbox to object
  *
@@ -48,6 +49,7 @@ void GetObjects(const base::BlobPtr<float> &box3ds,
  * @param obj
  */
 void FillBBox3d(const float *bbox, base::ObjectPtr obj);
+
 /**
  * @brief Get the Subtype
  *

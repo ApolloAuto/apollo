@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+
 #include "modules/planning/planning_base/math/polynomial_xd.h"
 #include "modules/planning/planning_base/math/smoothing_spline/spline_2d_seg.h"
 

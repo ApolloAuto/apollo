@@ -22,6 +22,7 @@
 #include <string>
 
 #include "modules/common_msgs/map_msgs/map_lane.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/time/clock.h"
@@ -30,8 +31,8 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/planning_base/common/feature_output.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/math_util.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

@@ -56,4 +56,8 @@ message LonBasedPidControllerConf{
   optional double stop_gain_acceleration = 35;
 
   optional bool use_vehicle_epb = 36 [default = false];
+
+  optional double full_stop_path_remain_gain = 37;
+
+  optional int32 use_opposite_slope_compensation = 38 [default = 1];
 }

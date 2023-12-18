@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function SpeedGraph() {
     const [options, setOptions] = useState<any>();
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         const { dataset, series } = Object.entries(graph).reduce(
@@ -50,6 +50,13 @@ function SpeedGraph() {
         triggerUIUpdate(controlData.speed);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Speed' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['speed'])}
+            labelRotateBoundary={550}
+            title='Speed'
+            options={options}
+        />
+    );
 }
 export default React.memo(SpeedGraph);

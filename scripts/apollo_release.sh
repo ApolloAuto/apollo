@@ -283,27 +283,27 @@ function run_install() {
       -- ${install_opts} ${INSTALL_OPTIONS} ${PREFIX_DIR}
   else
 
-    for target in ${INSTALL_TARGETS[*]}; do
-      bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-    done
+    # for target in ${INSTALL_TARGETS[*]}; do
+    #   bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
+    #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    # done
 
-    for target in ${INSTALL_TARGETS[*]}; do
-      bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-    done
+    # for target in ${INSTALL_TARGETS[*]}; do
+    #   bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
+    #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    # done
 
-    CMDLINE_OPTIONS="--config=cpu "
+    # CMDLINE_OPTIONS="--config=cpu "
 
-    for target in ${CPU_INSTALL_TARGETS[*]}; do
-      bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-    done
+    # for target in ${CPU_INSTALL_TARGETS[*]}; do
+    #   bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
+    #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    # done
 
-    for target in ${CPU_INSTALL_TARGETS[*]}; do
-      bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-    done
+    # for target in ${CPU_INSTALL_TARGETS[*]}; do
+    #   bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
+    #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    # done
 
     bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install \
       -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"

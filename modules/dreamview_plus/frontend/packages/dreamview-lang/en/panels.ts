@@ -60,6 +60,7 @@ export const panels = {
     // panel components
     componentsTitle: 'Components',
     componentsDescription: 'Panel to display the status of common components',
+    connectionError: 'Please connect hardware device first',
 
     // operate
     pressTips: 'Long press and drag the mouse to move the panel',
@@ -80,4 +81,20 @@ export const panels = {
     panelErrorMsg1: 'Component error, try',
     panelErrorMsg2: 'refresh',
     panelErrorMsg3: 'it',
+
+    // panel Charts
+    chartsTitle: 'Charts',
+    chartsDescription: 'Observe changes of data in the channel over time',
+    newChart: 'Add Chart',
+
+    terminalWinTitle: 'Terminal',
+
+    // panel keyName
+    play: 'Play/Run',
+    stop: 'Stop',
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
+    shortCut: 'Shortcut Key Description',
+
+    exitFullScreen: 'exit full screen',
 };

@@ -22,15 +22,16 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-void GetCaddnObjects(
-    std::vector<base::ObjectPtr> *objects, const caddn::ModelParam &model_param,
-    const std::vector<base::ObjectSubType> &types,
-    const base::BlobPtr<float> &boxes, const base::BlobPtr<float> &labels,
-    const base::BlobPtr<float> &scores) {
+void GetCaddnObjects(std::vector<base::ObjectPtr> *objects,
+                     const caddn::ModelParam &model_param,
+                     const std::vector<base::ObjectSubType> &types,
+                     const base::BlobPtr<float> &boxes,
+                     const base::BlobPtr<float> &labels,
+                     const base::BlobPtr<float> &scores) {
   objects->clear();
-  const float* boxes_data = boxes->cpu_data();
-  const float* labels_data = labels->cpu_data();
-  const float* scores_data = scores->cpu_data();
+  const float *boxes_data = boxes->cpu_data();
+  const float *labels_data = labels->cpu_data();
+  const float *scores_data = scores->cpu_data();
 
   int len_pred = 7;
   for (int i = 0; i < labels->num(); ++i) {
@@ -53,6 +54,8 @@ void GetCaddnObjects(
     obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
     obj->confidence = score;
 
+    // todo(zero): Need to be converted to camera coordinates and
+    // converted to KITTI coordinates
     Eigen::Matrix<float, 3, 4> velo_to_cam;
     velo_to_cam << 0.00753374, -0.9999714, -0.0006166, -0.00406977, 0.01480249,
         0.00072807, -0.9998902, -0.07631618, 0.9998621, 0.00752379, 0.01480755,
@@ -72,8 +75,9 @@ void GetCaddnObjects(
 }
 
 void Bbox3dLidar2Camera(const Eigen::Matrix<float, 3, 4> &V2C,
-    const Eigen::Matrix<float, 3, 3> &R, const float *bbox_lidar,
-    std::vector<float> *bbox_camera) {
+                        const Eigen::Matrix<float, 3, 3> &R,
+                        const float *bbox_lidar,
+                        std::vector<float> *bbox_camera) {
   float x = *(bbox_lidar + 0);
   float y = *(bbox_lidar + 1);
   float z = *(bbox_lidar + 2);
@@ -93,8 +97,8 @@ void Bbox3dLidar2Camera(const Eigen::Matrix<float, 3, 4> &V2C,
                       final_result.data() + final_result.size());
 }
 
-base::ObjectSubType GetSubtype(
-    int cls, const std::vector<base::ObjectSubType> &types) {
+base::ObjectSubType GetSubtype(int cls,
+                               const std::vector<base::ObjectSubType> &types) {
   if (cls < 0 || cls >= static_cast<int>(types.size())) {
     return base::ObjectSubType::UNKNOWN;
   }
@@ -112,26 +116,6 @@ void FillCaddnBbox3d(base::ObjectPtr obj, const float *bbox) {
   obj->camera_supplement.local_center[1] = bbox[1];
   obj->camera_supplement.local_center[2] = bbox[2];
 }
-
-void RecoverCaddnBbox(
-    int roi_w, int roi_h, int offset_y, std::vector<base::ObjectPtr> *objects) {
-  for (auto &obj : *objects) {
-    float xmin = obj->camera_supplement.box.xmin;
-    float ymin = obj->camera_supplement.box.ymin;
-    float xmax = obj->camera_supplement.box.xmax;
-    float ymax = obj->camera_supplement.box.ymax;
-    float x = xmin * static_cast<float>(roi_w);
-    float w = (xmax - xmin) * static_cast<float>(roi_w);
-    float y = ymin * static_cast<float>(roi_h) + static_cast<float>(offset_y);
-    float h = (ymax - ymin) * static_cast<float>(roi_h);
-    base::RectF rect_det(x, y, w, h);
-    base::RectF rect_img(0, 0, static_cast<float>(roi_w),
-                         static_cast<float>(roi_h + offset_y));
-    base::RectF rect = rect_det & rect_img;
-    obj->camera_supplement.box = rect;
-  }
-}
-
 
 }  // namespace camera
 }  // namespace perception

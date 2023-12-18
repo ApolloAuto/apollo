@@ -29,3 +29,4 @@ export * from './table';
 export * from './carviz';
 export * from './pncMonitor';
 export * from './routeEditing';
+export * from './chartEditing';

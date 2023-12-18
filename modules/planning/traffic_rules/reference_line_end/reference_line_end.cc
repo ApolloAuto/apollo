@@ -24,7 +24,7 @@
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

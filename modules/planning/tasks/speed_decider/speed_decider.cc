@@ -30,8 +30,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
-#include "modules/planning/planning_base/task_base/utils/st_gap_estimator.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planning_interface_base/task_base/utils/st_gap_estimator.h"
 
 namespace apollo {
 namespace planning {

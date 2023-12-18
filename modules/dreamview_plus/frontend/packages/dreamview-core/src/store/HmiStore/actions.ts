@@ -1,7 +1,15 @@
 import Logger from '@dreamview/log';
 import { message } from '@dreamview/dreamview-ui';
 import { TFunction } from 'i18next';
-import { ACTIONS, ChangeModeAction, ChangeOperateAction, ChangeRecorderAction } from './actionTypes';
+import {
+    ACTIONS,
+    ChangeModeAction,
+    ChangeOperateAction,
+    ChangeDynamicAction,
+    ChangeRecorderAction,
+    ChangeRTKRecorderAction,
+    CURRENT_MODE,
+} from './actionTypes';
 import * as TYPES from './actionTypes';
 import { MainApi } from '../../services/api';
 import { AsyncAction } from '../base/Middleware';
@@ -17,16 +25,12 @@ export const updateStatus = (val: TYPES.SIM_WORLD_STATUS): TYPES.UpdateStatusAct
 export const changeMode = (
     mainApi: MainApi,
     payload: TYPES.ChangeModePayload,
-    callback?: (mode: string) => void,
+    callback?: (mode: CURRENT_MODE) => void,
 ): AsyncAction<TYPES.IInitState, ChangeModeAction> => {
     noop();
     return async (dispatch, state) => {
         logger.debug('changeMode', { state, payload });
         await mainApi.changeSetupMode(payload);
-        dispatch({
-            type: ACTIONS.CHANGE_MODE,
-            payload,
-        });
         if (callback) {
             callback(payload);
         }
@@ -57,10 +61,37 @@ export const changeRecorder = (
     return async (dispatch, state) => {
         logger.debug('changeRecorder', { state, payload });
         await mainApi.changeRecord(payload);
+        await mainApi.resetSimWorld();
         dispatch({
             type: ACTIONS.CHANGE_RECORDER,
             payload,
         });
+    };
+};
+
+export const changeRTKRecord = (
+    mainApi: MainApi,
+    payload: TYPES.ChangeRTKRecorderPayload,
+): AsyncAction<TYPES.IInitState, ChangeRTKRecorderAction> => {
+    noop();
+    return async (dispatch, state) => {
+        logger.debug('changeRTKRecorder', { state, payload });
+        await mainApi.changeRTKRecord(payload);
+        dispatch({
+            type: ACTIONS.CHANGE_RTK_RECORDER,
+            payload,
+        });
+    };
+};
+
+export const changeDynamic = (
+    mainApi: MainApi,
+    payload: TYPES.ChangeDynamicPayload,
+): AsyncAction<TYPES.IInitState, ChangeDynamicAction> => {
+    noop();
+    return async (dispatch, state) => {
+        logger.debug('changeDynamic', { state, payload });
+        await mainApi.changeDynamicModel(payload);
     };
 };
 
@@ -124,11 +155,22 @@ export const changeVehicle = (
     };
 };
 
+export const updateCurrentMode: any = (mode: TYPES.ChangeModePayload) => ({
+    type: ACTIONS.CHANGE_MODE,
+    payload: mode,
+});
+
+export const updateCurrentOperate: any = (mode: TYPES.ChangeOperatePayload) => ({
+    type: ACTIONS.CHANGE_OPERATE,
+    payload: mode,
+});
+
 export type CombineAction =
     | AsyncAction<TYPES.IInitState, TYPES.ChangeScenariosAction>
     | AsyncAction<TYPES.IInitState, TYPES.ChangeVehicleAction>
     | AsyncAction<TYPES.IInitState, TYPES.ChangeMapAction>
     | AsyncAction<TYPES.IInitState, ChangeRecorderAction>
+    | AsyncAction<TYPES.IInitState, ChangeRTKRecorderAction>
     | AsyncAction<TYPES.IInitState, ChangeOperateAction>
     | AsyncAction<TYPES.IInitState, ChangeModeAction>
     | TYPES.ToggleModuleAction

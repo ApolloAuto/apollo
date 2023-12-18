@@ -90,6 +90,8 @@ enum class ObjectSubType {
   SMALLMOT = 12,
   BIGMOT = 13,
   NONMOT = 14,
+  // Attention(lordon): matrix dimensions in type_change_cost file need to be
+  // the same
   MAX_OBJECT_TYPE = 15,
 };
 
@@ -161,7 +163,7 @@ const std::map<ObjectSemanticType, std::string> kObjectSemanticType2NameMap = {
     {ObjectSemanticType::NOISE, "NOISE"},
     {ObjectSemanticType::WALL, "WALL"},
     {ObjectSemanticType::MAX_OBJECT_SEMANTIC_LABEL,
-        "MAX_OBJECT_SEMANTIC_LABEL"}};
+     "MAX_OBJECT_SEMANTIC_LABEL"}};
 
 const std::map<std::string, ObjectSemanticType> kName2ObjectSemanticTypeMap = {
     {"UNKNOWN", ObjectSemanticType::UNKNOWN},
@@ -174,7 +176,7 @@ const std::map<std::string, ObjectSemanticType> kName2ObjectSemanticTypeMap = {
     {"NOISE", ObjectSemanticType::NOISE},
     {"WALL", ObjectSemanticType::WALL},
     {"MAX_OBJECT_SEMANTIC_LABEL",
-        ObjectSemanticType::MAX_OBJECT_SEMANTIC_LABEL}};
+     ObjectSemanticType::MAX_OBJECT_SEMANTIC_LABEL}};
 
 /**
  * VisualObjectType mapping

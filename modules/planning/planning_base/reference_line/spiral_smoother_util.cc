@@ -19,10 +19,11 @@
  **/
 
 #include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/spiral_reference_line_smoother.h"
 
 DEFINE_string(input_file, "", "input file with format x,y per line");
@@ -98,9 +99,10 @@ class SpiralSmootherUtil {
                   [&start_point](Eigen::Vector2d& p) { p = p - start_point; });
 
     ReferenceLineSmootherConfig config;
-    ACHECK(cyber::common::GetProtoFromFile(
-        "modules/planning/planning_base/conf/spiral_smoother_config.pb.txt",
-        &config));
+    ACHECK(
+        cyber::common::GetProtoFromFile("modules/planning/planning_component/"
+                                        "conf/spiral_smoother_config.pb.txt",
+                                        &config));
 
     std::vector<double> opt_theta;
     std::vector<double> opt_kappa;

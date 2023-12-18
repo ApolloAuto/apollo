@@ -32,7 +32,9 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/tasks/open_space_trajectory_provider/proto/open_space_trajectory_provider.pb.h"
+
 #include "modules/common/math/vec2d.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_problem.h"

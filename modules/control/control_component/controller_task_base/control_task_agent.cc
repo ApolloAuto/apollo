@@ -43,7 +43,7 @@ Status ControlTaskAgent::Init(std::shared_ptr<DependencyInjector> injector,
     auto controller = PluginManager::Instance()->CreateInstance<ControlTask>(
         "apollo::control::" + control_pipeline.controller(i).type());
     if (!controller->Init(injector_).ok()) {
-      AERROR << "Can not init controller" << controller->Name();
+      AERROR << "Can not init controller " << controller->Name();
       return Status(
           ErrorCode::CONTROL_INIT_ERROR,
           "Failed to init Controller:" + control_pipeline.controller(i).name());

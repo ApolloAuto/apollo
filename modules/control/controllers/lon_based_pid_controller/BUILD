@@ -37,7 +37,6 @@ apollo_plugin(
         "//modules/control/controllers/lon_based_pid_controller/proto:lon_based_pid_controller_conf_cc_proto",
         "//modules/control/control_component/proto:mrac_conf_cc_proto",
         "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
-        "//modules/localization/common:localization_gflags",
         "@com_google_absl//:absl",
     ],
 )

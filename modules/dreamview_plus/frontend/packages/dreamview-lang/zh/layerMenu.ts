@@ -44,7 +44,9 @@ export const layerMenu = {
 
     Planning: '规划',
     planningCar: '规划小车',
-    planningTrajectory: '规划轨迹',
+    planningTrajectoryLine: '规划轨迹',
+    planningReferenceLine: '参考线',
+    planningBoundaryLine: '道路边界线',
 
     Map: '地图',
     crosswalk: '人行道',

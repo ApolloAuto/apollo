@@ -8,14 +8,15 @@ interface IRoutingEditingFunctionalItemProps {
     checkedItem: FunctionalNameEnum;
     onClick?: () => void;
     children?: React.ReactNode;
+    disable?: boolean;
 }
 function RoutingEditingFunctionalItem(
-    { functionalName, checkedItem, onClick }: IRoutingEditingFunctionalItemProps,
+    { functionalName, checkedItem, onClick, disable }: IRoutingEditingFunctionalItemProps,
     ref: React.Ref<HTMLDivElement>,
 ) {
     const checked = useMemo(() => checkedItem === functionalName, [functionalName, checkedItem]);
 
-    const { classes, cx } = useStyle();
+    const { classes, cx } = useStyle({});
 
     const icon = useMemo(() => {
         switch (functionalName) {
@@ -57,6 +58,7 @@ function RoutingEditingFunctionalItem(
             className={cx(classes['routing-editing-functional__item'], {
                 [classes['routing-editing-functional__item--active']]: checked,
                 [classes['hover-color-change']]: !checked,
+                [classes['routing-editing-functional__item--disable']]: disable,
             })}
             onClick={onClick}
         >

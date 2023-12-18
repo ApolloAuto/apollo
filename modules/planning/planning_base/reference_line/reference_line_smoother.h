@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/planning/planning_base/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 
 namespace apollo {

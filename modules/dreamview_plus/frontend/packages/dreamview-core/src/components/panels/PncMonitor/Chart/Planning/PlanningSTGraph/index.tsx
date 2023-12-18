@@ -7,13 +7,13 @@ function ChartByDataset() {
     const { planningData } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
-        const dataset = Object.entries(graph.QpSplineStSpeedOptimizer || {})
+        const dataset = Object.entries(graph || {})
             .filter(([key]) => key !== 'obstaclesBoundary')
             .map(([id, value]: any) => ({
                 id,
                 source: [['x', 'y'], ...(value || [])],
             }));
-        const series = Object.entries(graph.QpSplineStSpeedOptimizer || {})
+        const series = Object.entries(graph || {})
             .filter(([key]) => key !== 'obstaclesBoundary')
             .map(([id]: any) => ({
                 datasetId: id,
@@ -26,22 +26,21 @@ function ChartByDataset() {
                     y: 'y',
                 },
             }));
-        const graphic = Object.entries(graph.QpSplineStSpeedOptimizer?.obstaclesBoundary || {}).map(
-            ([, points]: any) => ({
-                type: 'polygon',
-                style: {
-                    fill: 'transparent', // 设置多边形颜色
-                    stroke: 'red',
-                },
-                shape: {
-                    points,
-                },
-            }),
-        );
+        const graphic = Object.entries(graph?.obstaclesBoundary || {}).map(([, points]: any) => ({
+            type: 'polygon',
+            style: {
+                fill: 'transparent', // 设置多边形颜色
+                stroke: 'red',
+            },
+            shape: {
+                points,
+            },
+        }));
         setOptions(
             initOptions({
                 dataset,
                 series,
+                scale: true,
                 graphic,
                 xAxis: {
                     type: 'value',
@@ -59,7 +58,7 @@ function ChartByDataset() {
     };
 
     useEffect(() => {
-        triggerUIUpdate(planningData.st);
+        triggerUIUpdate(planningData.st.PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER);
     }, [planningData]);
 
     return <ChartBase title='Planning S-T Graph' options={options} />;

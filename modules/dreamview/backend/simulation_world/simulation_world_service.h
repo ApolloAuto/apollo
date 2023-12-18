@@ -55,11 +55,11 @@
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
+#include "modules/common_msgs/dreamview_msgs/simulation_world.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 
 /**
  * @namespace apollo::dreamview

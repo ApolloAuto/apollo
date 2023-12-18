@@ -21,8 +21,9 @@
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/planning_base/common/ego_info.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

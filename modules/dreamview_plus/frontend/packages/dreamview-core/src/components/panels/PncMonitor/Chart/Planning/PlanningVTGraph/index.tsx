@@ -40,6 +40,7 @@ function PlanningVTGraph() {
             initOptions({
                 dataset,
                 graphic,
+                scale: true,
                 series,
                 xAxis: {
                     type: 'value',
@@ -57,7 +58,7 @@ function PlanningVTGraph() {
     };
 
     useEffect(() => {
-        triggerUIUpdate(planningData.vt);
+        triggerUIUpdate(planningData.vt.PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER);
     }, [planningData]);
 
     return <ChartBase title='Planning V-T Graph' options={options} />;

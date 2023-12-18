@@ -64,3 +64,6 @@ point2box_max_num: 5
 quantize: 0.2
 filter_by_points: true
 min_points_threshold: 3
+diff_class_nms: true
+diff_class_iou: 0.25
+nms_strategy: false

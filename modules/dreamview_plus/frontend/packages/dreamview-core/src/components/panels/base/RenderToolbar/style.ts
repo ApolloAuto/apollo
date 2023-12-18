@@ -92,6 +92,40 @@ export default function useStyle() {
                 display: 'none',
             },
         },
+        'panel-desc-item': {
+            lineHeight: '76px',
+
+            display: 'flex',
+            justifyContent: 'center',
+            '&:not(:last-of-type)': {
+                borderBottom: '1px solid #383B45',
+            },
+        },
+        'panel-desc-item-left': {
+            width: '170px',
+        },
+        'panel-desc-item-right': {
+            width: '584px',
+            height: '22px',
+            color: '#808B9D',
+            fontWeight: 400,
+            fontFamily: 'PingFangSC-Regular',
+        },
+        'btn-item': {
+            display: 'inline-block',
+            cursor: 'pointer',
+            textAlign: 'center',
+            minWidth: '32px',
+            height: '32px',
+            lineHeight: '32px',
+            background: '#343C4D',
+            borderRadius: '6px',
+            marginTop: '12px',
+            fontSize: '16px',
+            color: '#96A5C1',
+            padding: '0 6px 0 6px',
+            marginRight: '6px',
+        },
     }));
     return hoc();
 }

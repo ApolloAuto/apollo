@@ -61,6 +61,7 @@ export const panels = {
     // panel components
     componentsTitle: '监控组件',
     componentsDescription: '用于展示常用组件状态的面板',
+    connectionError: '请先连接硬件设备',
 
     // operate
     pressTips: '长按并拖拽鼠标移动面板',
@@ -81,4 +82,20 @@ export const panels = {
     panelErrorMsg1: '组件出错了,尝试',
     panelErrorMsg2: '刷新',
     panelErrorMsg3: '一下吧',
+
+    // panel Charts
+    chartsTitle: '图表',
+    chartsDescription: '观测channel中数据随时间的变化情况',
+    newChart: '新建图表',
+
+    terminalWinTitle: '终端',
+
+    // panel keyName
+    play: '播放/运行',
+    stop: '停止',
+    zoomIn: '放大',
+    zoomOut: '缩小',
+    shortCut: '快捷键描述',
+
+    exitFullScreen: '退出全屏',
 };

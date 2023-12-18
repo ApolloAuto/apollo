@@ -1,11 +1,8 @@
-camera_name: "front_12mm"
-timestamp_offset: 0.0
 plugin_param {
   name: "MultiCueTransformer"
   config_path: "perception/camera_location_estimation/data"
   config_file: "config.pb.txt"
 }
 channel {
-  input_camera_channel_name: "/perception/inner/Detection2"
   output_obstacles_channel_name: "/perception/inner/location_estimation2"
 }

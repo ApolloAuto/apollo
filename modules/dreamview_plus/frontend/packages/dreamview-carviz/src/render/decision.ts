@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import loadshIsNumber from 'lodash/isNumber';
 import { disposeGroup, disposeMesh, drawImge, drawShapeFromPoints } from '../utils/common';
 import { drawDashedLineFromPoints } from '../utils/line';
 import {
@@ -76,6 +77,18 @@ export default class Decision {
             const dec = decision[i];
             const { stopReason, changeLaneType } = dec;
             const group = new THREE.Group();
+            let curPosition = position;
+            let curHeading = heading;
+            if (loadshIsNumber(dec.positionX) && loadshIsNumber(dec.positionY)) {
+                curPosition = this.coordinates.applyOffset({
+                    x: dec.positionX,
+                    y: dec.positionY,
+                    z: 0.2,
+                });
+            }
+            if (loadshIsNumber(dec.heading)) {
+                curHeading = dec.heading;
+            }
             if (stopReason) {
                 if (this.mainStopReasonMeshMapping[stopReason]) {
                     const mesh = this.mainStopReasonMeshMapping[stopReason].clone();
@@ -102,8 +115,9 @@ export default class Decision {
                     group.add(mesh);
                 }
             }
-            group.position.set(position.x, position.y, position.z);
-            group.rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
+            group.position.set(curPosition.x, curPosition.y, curPosition.z);
+
+            group.rotation.set(Math.PI / 2, curHeading - Math.PI / 2, 0);
             this.mainDecisionGroups.push(group);
             this.scene.add(group);
         }
@@ -164,11 +178,12 @@ export default class Decision {
                             matrixAutoUpdate: true,
                         });
                         line.computeLineDistances();
-                        line.rotation.set(-Math.PI / 2, heading - Math.PI / 2, 0);
+                        line.rotation.set(Math.PI / -2, 0, Math.PI / 2 - decision.heading);
+                        line.position.set(0, 1.5, 0);
                         group.add(line);
                     }
                     group.rotation.set(Math.PI / 2, heading - Math.PI / 2, 0);
-                    group.position.set(position.x, position.y, 0);
+                    group.position.set(position.x, position.y, 0.2);
                     this.obstacleDecisionGroupsAndMeshs.push(group);
                     this.scene.add(group);
                 } else if (type === 'NUDGE') {

@@ -80,7 +80,8 @@ void MapUpdater::StartStream(const double &time_interval_ms,
   // json to message
   map_element_ids_.Clear();
   nlohmann::json element_ids_json;
-  if (!JsonUtil::GetJsonByPath(*subscribe_param, {"mapElementIds"}, &element_ids_json)) {
+  if (!JsonUtil::GetJsonByPath(*subscribe_param, {"mapElementIds"},
+                               &element_ids_json)) {
     AERROR << "ElementIds param is wrong type.";
     return;
   }

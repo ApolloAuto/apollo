@@ -21,31 +21,32 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-void Resize(cv::Mat *img, int width, int height) {
-  cv::resize(*img, *img, cv::Size(width, height));
+void Resize(cv::Mat *img, cv::Mat *img_n, int width, int height) {
+  cv::resize(*img, *img_n, cv::Size(width, height));
 }
 
-void Crop(cv::Mat *img, int x, int y, int width, int height) {
+void Crop(cv::Mat *img, cv::Mat *img_n, int x, int y, int width, int height) {
   cv::Rect roi(x, y, width, height);
-  *img = (*img)(roi);
+  *img_n = (*img)(roi);
 }
 
 void Normalize(const std::vector<float> &mean, const std::vector<float> &std,
-               float scale, cv::Mat *im) {
+               float scale, cv::Mat *img) {
   ACHECK(std.size() == 3);
   for (const auto std_value : std) {
     ACHECK(std_value != 0.0);
   }
-  ACHECK(scale != 0.0);
-  im->convertTo(*im, CV_32FC3, scale);
-  for (int h = 0; h < im->rows; h++) {
-    for (int w = 0; w < im->cols; w++) {
-      im->at<cv::Vec3f>(h, w)[0] =
-          (im->at<cv::Vec3f>(h, w)[0] - mean[0]) / std[0];
-      im->at<cv::Vec3f>(h, w)[1] =
-          (im->at<cv::Vec3f>(h, w)[1] - mean[1]) / std[1];
-      im->at<cv::Vec3f>(h, w)[2] =
-          (im->at<cv::Vec3f>(h, w)[2] - mean[2]) / std[2];
+  if (scale) {
+    (*img).convertTo(*img, CV_32FC3, scale);
+  }
+  for (int h = 0; h < img->rows; ++h) {
+    for (int w = 0; w < img->cols; ++w) {
+      img->at<cv::Vec3f>(h, w)[0] =
+          (img->at<cv::Vec3f>(h, w)[0] - mean[0]) / std[0];
+      img->at<cv::Vec3f>(h, w)[1] =
+          (img->at<cv::Vec3f>(h, w)[1] - mean[1]) / std[1];
+      img->at<cv::Vec3f>(h, w)[2] =
+          (img->at<cv::Vec3f>(h, w)[2] - mean[2]) / std[2];
     }
   }
 }

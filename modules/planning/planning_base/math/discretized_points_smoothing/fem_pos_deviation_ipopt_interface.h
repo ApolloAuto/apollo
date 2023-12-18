@@ -22,7 +22,6 @@
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpIpoptCalculatedQuantities.hpp>
 #include <coin/IpIpoptData.hpp>

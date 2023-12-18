@@ -166,6 +166,22 @@ void ProtobufFactory::GetDescriptorString(const std::string& type,
   return GetDescriptorString(desc, desc_str);
 }
 
+void ProtobufFactory::GetProtoPath(const std::string& type,
+                                   std::string& location) {
+  auto desc = DescriptorPool::generated_pool()->FindMessageTypeByName(type);
+  if (desc != nullptr) {
+    location = (desc->file())->name();
+    return;
+  }
+
+  desc = pool_->FindMessageTypeByName(type);
+  if (desc == nullptr) {
+    return;
+  }
+  location = (desc->file())->name();
+  return;
+}
+
 // Internal method
 google::protobuf::Message* ProtobufFactory::GenerateMessageByType(
     const std::string& type) const {

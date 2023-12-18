@@ -4,6 +4,7 @@ import ChartBase, {
     interpolateValueByCurrentTime,
 } from '@dreamview/dreamview-core/src/components/panels/PncMonitor/Chart/ChartBase';
 import { hmiUtils } from '@dreamview/dreamview-core/src/store/HmiStore';
+import lodashLast from 'lodash/last';
 
 const MAX_HISTORY_POINTS = 80;
 
@@ -41,6 +42,12 @@ export const initData = (): any => ({
     pose: {},
     currentTargetPoint: [],
 });
+function pushIfChange(arr: any, item: any) {
+    const lastTarget: any = lodashLast(arr) || [];
+    if (item[0] !== lastTarget[0] && item[1] !== lastTarget[1]) {
+        arr.push(item);
+    }
+}
 const init = initData();
 export default function useControlData() {
     const data = useRef<any>(init);
@@ -116,20 +123,24 @@ export default function useControlData() {
         const hasNewData = graph.target.length === 0 || currentTimestamp !== graph.target[graph.target.length - 1].t;
         if (hasNewData) {
             // set planned data
-            graph.plan = (trajectory || []).map((point: any) => [point[xFieldName], point[yFieldName]]);
+
+            graph.plan = (trajectory || []).reduce((result: any, point: any) => {
+                pushIfChange(result, [point[xFieldName], point[yFieldName]]);
+                return result;
+            }, []);
 
             // add target value
-            graph.target.push([
+            pushIfChange(graph.target, [
                 interpolateValueByCurrentTime(trajectory, currentTimestamp, xFieldName),
                 interpolateValueByCurrentTime(trajectory, currentTimestamp, yFieldName),
             ]);
 
             // add real value
-            graph.real.push([adc[xFieldName], adc[yFieldName]]);
+            pushIfChange(graph.real, [adc[xFieldName], adc[yFieldName]]);
 
             // add auto-mode indicator
             const isCompleteAuto = adc.disengageType === 'DISENGAGE_NONE';
-            graph.autoModeZone.push([adc[xFieldName], isCompleteAuto ? adc[yFieldName] : undefined]);
+            pushIfChange(graph.autoModeZone, [adc[xFieldName], isCompleteAuto ? adc[yFieldName] : undefined]);
         }
     }
     function updateCar(vehicleParam: any) {
@@ -182,7 +193,7 @@ export default function useControlData() {
     function setCurrentTargetPoint(trajectoryPoint: any) {
         data.current.currentTargetPoint = [];
         if (trajectoryPoint && trajectoryPoint.pathPoint) {
-            data.current.currentTargetPoint.push([trajectoryPoint.pathPoint.x, trajectoryPoint.pathPoint.y]);
+            pushIfChange(data.current.currentTargetPoint, [trajectoryPoint.pathPoint.x, trajectoryPoint.pathPoint.y]);
         }
     }
 
@@ -241,8 +252,16 @@ export default function useControlData() {
         return { ...data.current };
     }, []);
 
+    const refresh = useCallback((chartNames: string[]) => {
+        const newData = initData();
+        chartNames.forEach((chartName) => {
+            data.current[chartName] = newData[chartName];
+        });
+    }, []);
+
     return {
         data,
         onSimData,
+        onRefresh: refresh,
     };
 }

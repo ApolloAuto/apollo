@@ -23,7 +23,7 @@
 #include <utility>
 
 #include "modules/common/math/math_utils.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

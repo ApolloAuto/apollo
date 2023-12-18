@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
+
 #include "modules/planning/planning_base/common/indexed_list.h"
 #include "modules/planning/planning_base/common/obstacle.h"
 

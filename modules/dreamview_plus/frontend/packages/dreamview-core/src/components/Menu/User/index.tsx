@@ -6,6 +6,7 @@ import {
     IconIcProductDocumentation,
     IconIcApolloDeveloperCommunity,
     IconIcSuggest,
+    IconIcFaq,
 } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import packageJson from '@dreamview/dreamview-core/package.json';
@@ -75,6 +76,13 @@ function User(props: UserProps) {
                 },
             ],
             menusProfile: [
+                {
+                    icon: <IconIcFaq />,
+                    text: t('faq'),
+                    onClick: () => {
+                        window.open('https://apollo.baidu.com/community/article/1223');
+                    },
+                },
                 {
                     icon: <IconIcHelpHover />,
                     text: t('guide'),

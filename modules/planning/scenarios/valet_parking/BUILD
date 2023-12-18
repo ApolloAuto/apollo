@@ -27,7 +27,7 @@ apollo_plugin(
     deps = [
         "//cyber",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/scenarios/valet_parking/proto:valet_parking_cc_proto",
     ],
 )

@@ -112,7 +112,7 @@ const InternalButton: React.ForwardRefRenderFunction<HTMLButtonElement | HTMLAnc
     const [innerLoading, setLoading] = useState(loadingOrDelay.loading);
 
     useEffect(() => {
-        let delayTimer: NodeJS.Timer | null = null;
+        let delayTimer: any = null;
         if (loadingOrDelay.delay > 0) {
             delayTimer = setTimeout(() => {
                 delayTimer = null;

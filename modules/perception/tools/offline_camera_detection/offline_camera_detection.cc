@@ -81,6 +81,8 @@ bool TestDetection() {
   base::BaseCameraModelPtr model =
       algorithm::SensorManager::Instance()->GetUndistortCameraModel(
           camera_name);
+  ACHECK(model) << "Can't find " << camera_name
+                << " in data/conf/sensor_meta.pb.txt";
   auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
   init_options.intrinsic = pinhole->get_intrinsic_params();
   camera_frame.camera_k_matrix = pinhole->get_intrinsic_params();

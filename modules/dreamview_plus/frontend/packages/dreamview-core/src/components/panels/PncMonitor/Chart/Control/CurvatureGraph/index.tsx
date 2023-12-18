@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function CurvatureGraph() {
     const [options, setOptions] = useState<any>();
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         const { dataset, series } = Object.entries(graph).reduce(
@@ -50,6 +50,13 @@ function CurvatureGraph() {
         triggerUIUpdate(controlData.curvature);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Curvature' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['curvature'])}
+            labelRotateBoundary={550}
+            title='Curvature'
+            options={options}
+        />
+    );
 }
 export default React.memo(CurvatureGraph);

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { apollo } from '@dreamview/dreamview';
+import { useTranslation } from 'react-i18next';
 import { millisecondsToTime } from '../../../util/misc';
 import useStyle from './useStyle';
 import { StreamDataNames } from '../../../services/api/types';
@@ -16,11 +17,12 @@ interface IModuleDelayMsg {
 
 function InternalModuleDelay() {
     const panelContext = usePanelContext();
-    const { initSubscription, logger, data: subcribedData } = panelContext;
+    const { initSubscription, logger, data: subcribedData, setKeyDownHandlers } = panelContext;
     const { classes, cx } = useStyle();
 
     const [delay, setDelay] = useState<Record<string, number>>({});
     const [data, setData] = useState<ISimulationWorld>();
+    const { t: tPanels } = useTranslation('panels');
 
     useEffect(() => {
         initSubscription({

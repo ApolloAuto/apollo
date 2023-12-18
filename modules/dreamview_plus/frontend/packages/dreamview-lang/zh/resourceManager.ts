@@ -50,6 +50,16 @@ export const profileManagerV2X = {
     titleOperate: '操作',
 };
 
+export const profileManagerDynamical = {
+    titleName: '名称',
+    titleType: '类型',
+    titleState: '下载状态',
+    titleOperate: '操作',
+    refresh: '刷新',
+    reset: '重置',
+    upload: '上传',
+};
+
 export const profileManagerOperate = {
     cancel: '取消下载',
     download: '下载',
@@ -76,4 +86,5 @@ export const profileManager = {
     HDMap: '高精地图',
     vehicle: '车辆',
     V2X: 'V2X',
+    dynamical: '动力学模型',
 };

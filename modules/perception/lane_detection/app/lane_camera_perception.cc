@@ -83,6 +83,8 @@ void LaneCameraPerception::InitLane(
         lane_detector_plugin_param.config_path();
     model = algorithm::SensorManager::Instance()->GetUndistortCameraModel(
         lane_detector_param.camera_name());
+    ACHECK(model) << "Can't find " << lane_detector_param.camera_name()
+                  << " in data/conf/sensor_meta.pb.txt";
     auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
     name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
         lane_detector_param.camera_name(), pinhole->get_intrinsic_params()));

@@ -41,6 +41,8 @@
 #include "modules/perception/common/util.h"
 #include "modules/perception/lidar_detection/detector/center_point_detection/params.h"
 
+#include "cyber/profiler/profiler.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -91,8 +93,63 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
         z_min_range_,
         static_cast<float>(model_param_.preprocess().ground_removal_height()));
   }
-
+  nms_strategy_ = model_param_.nms_strategy();
+  diff_class_iou_ = model_param_.diff_class_iou();
+  diff_class_nms_ = model_param_.diff_class_nms();
+  if (diff_class_nms_) {
+    nms_strategy_table_ = {
+      {base::ObjectType::BICYCLE, {base::ObjectType::PEDESTRIAN,
+       base::ObjectType::UNKNOWN}},
+      {base::ObjectType::PEDESTRIAN, {base::ObjectType::UNKNOWN}},
+      {base::ObjectType::VEHICLE, {base::ObjectType::BICYCLE,
+       base::ObjectType::PEDESTRIAN, base::ObjectType::UNKNOWN}}
+    };
+  }
   return true;
+}
+
+float get_3Dbox_iou_len(float center1, float len1, float center2, float len2) {
+    float x11 = center1 - len1 / 2;
+    float x12 = center2 - len2 / 2;
+    float x21 = center1 + len1 / 2;
+    float x22 = center2 + len2 / 2;
+    if (std::min(x22, x21) - std::max(x12, x11) < 0) {
+        return 0;
+    }
+    return std::min(x22, x21) - std::max(x12, x11);
+}
+
+float get_3dbox_iou(base::ObjectPtr obj1, base::ObjectPtr obj2,
+                    int index1, int index2) {
+    auto center1 = obj1->center;
+    auto center2 = obj2->center;
+    auto size1 = obj1->size;
+    auto size2 = obj2->size;
+    float x_len = get_3Dbox_iou_len(center1(0), size1(0), center2(0), size2(0));
+    float y_len = get_3Dbox_iou_len(center1(1), size1(1), center2(1), size2(1));
+    float z_len = get_3Dbox_iou_len(center1(2), size1(2), center2(2), size2(2));
+    float v1 = size1(0) * size1(1) * size1(2);
+    float v2 = size2(0) * size2(1) * size2(2);
+    float vo = x_len * y_len * z_len;
+    ADEBUG << "center point IOU: (" << index1 << ", " << index2
+           << ") v1:" << v1 << " v2:" << v2 << " vo:" << vo;
+    return vo / (v1 + v2 - vo);
+}
+
+bool nms_by_strategy(std::shared_ptr<base::Object> obj1,
+            std::shared_ptr<base::Object> obj2,
+            std::map<base::ObjectType, std::vector<base::ObjectType>> table) {
+    if (obj1.get()->type == obj2.get()->type) {
+        return obj1.get()->confidence > obj2.get()->confidence;
+    }
+    std::vector<base::ObjectType> obj_type_array = table[obj1.get()->type];
+    if (std::find(obj_type_array.begin(), obj_type_array.end(),
+                  obj2->type) != obj_type_array.end()) {
+        return true;
+    } else {
+        return false;
+    }
+    return true;
 }
 
 bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
@@ -266,6 +323,26 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
 
   FilterForegroundPoints(&frame->segmented_objects);
 
+  std::stringstream sstr;
+  sstr << "[CenterPointDetection BeforeNMS] "
+       << std::to_string(frame->timestamp)
+       << " objs: " << frame->segmented_objects.size() << std::endl;
+  for (auto obj : frame->segmented_objects) {
+      sstr << "id = " << obj->id << ": " << obj->center(0) << ", "
+           << obj->center(1) << ", " << obj->center(2) << ", "
+           << obj->size(0) << ", " << obj->size(1) << ", "
+           << obj->size(2) << ", " << obj->theta << ", "
+           << static_cast<int>(obj->type) << std::endl;
+  }
+  ADEBUG << sstr.str();
+
+  PERF_BLOCK("class_nms")
+  if (diff_class_nms_) {
+      FilterObjectsbyClassNMS(&frame->segmented_objects);
+  }
+  PERF_BLOCK_END
+  nms_time_ = timer.toc(true);
+
   SetPointsInROI(&frame->segmented_objects);
 
   postprocess_time_ = timer.toc(true);
@@ -277,7 +354,22 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
         << "shuffle: " << shuffle_time_ << "\t"
         << "cloud_to_array: " << cloud_to_array_time_ << "\t"
         << "inference: " << inference_time_ << "\t"
-        << "postprocess: " << postprocess_time_ << "\t";
+        << "postprocess: " << postprocess_time_ << "\t"
+        << "nms: " << nms_time_ << "\t";
+
+  std::stringstream ssstr;
+  ssstr << "[CenterPointDetection AfterNMS] "
+        << std::to_string(frame->timestamp)
+        << " objs: " << frame->segmented_objects.size() << std::endl;
+  for (auto obj : frame->segmented_objects) {
+      ssstr << "id = " << obj->id << ": " << obj->center(0) << ", "
+            << obj->center(1) << ", " << obj->center(2) << ", "
+            << obj->size(0) << ", " << obj->size(1) << ", "
+            << obj->size(2) << ", " << obj->theta << ", "
+            << static_cast<int>(obj->type) << std::endl;
+  }
+  ADEBUG << ssstr.str();
+
   return true;
 }
 
@@ -542,6 +634,7 @@ void CenterPointDetection::GetObjects(
   std::vector<float> box_rectangular(num_objects * 4);
   GetBoxCorner(num_objects, detections, box_corner, box_rectangular);
   GetBoxIndices(num_objects, detections, box_corner, box_rectangular, objects);
+  AINFO << "[CenterPoint] we get " << num_objects << " objs";
 }
 
 // for nuscenes model
@@ -649,6 +742,54 @@ void CenterPointDetection::FilterForegroundPoints(
     mask.RemoveIndices(ind);
   }
   mask.GetValidIndices(&lidar_frame_ref_->secondary_indices);
+}
+
+void CenterPointDetection::FilterObjectsbyClassNMS(
+    std::vector<std::shared_ptr<base::Object>> *objects) {
+    std::vector<bool> delete_array(objects->size(), false);
+    // different class nms
+    for (size_t i = 0; i < objects->size(); i++) {
+        auto &obj_i = objects->at(i);
+        if (!obj_i) {
+            continue;
+        }
+        for (size_t j = i + 1; j < objects->size(); j++) {
+            auto &obj_j = objects->at(j);
+            if (!obj_j) {
+                continue;
+            }
+            if (get_3dbox_iou(obj_i, obj_j, i, j) <= diff_class_iou_) {
+                continue;
+            }
+            // should NMS
+            if (nms_strategy_) {
+                if (nms_by_strategy(obj_i, obj_j, nms_strategy_table_)) {
+                    delete_array[j] = true;
+                } else {
+                    delete_array[i] = true;
+                }
+            } else {
+                // reserve by score
+                if (objects->at(i)->confidence > objects->at(j)->confidence) {
+                    delete_array[j] = true;
+                } else {
+                    delete_array[i] = true;
+                }
+                // size_t index = (objects->at(i)->confidence
+                // >= objects->at(j)->confidence ? i : j);
+                // delete_array[index] = true;
+            }
+        }
+    }
+    size_t valid_num = 0;
+    for (size_t i = 0; i < objects->size(); i++) {
+        auto &object = objects->at(i);
+        if (!delete_array[i]) {
+            objects->at(valid_num) = object;
+            valid_num++;
+        }
+    }
+    objects->resize(valid_num);
 }
 
 void CenterPointDetection::SetPointsInROI(

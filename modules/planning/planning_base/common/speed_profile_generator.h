@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+
 #include "modules/planning/planning_base/common/ego_info.h"
 #include "modules/planning/planning_base/common/reference_line_info.h"
 #include "modules/planning/planning_base/common/speed/speed_data.h"

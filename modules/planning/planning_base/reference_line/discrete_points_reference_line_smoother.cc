@@ -21,7 +21,7 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/discrete_points_math.h"
 #include "modules/planning/planning_base/math/discretized_points_smoothing/cos_theta_smoother.h"
 #include "modules/planning/planning_base/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"

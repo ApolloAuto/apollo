@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from 'react';
-import { Observable, filter, fromEvent } from 'rxjs';
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Observable, Subscription, filter, fromEvent } from 'rxjs';
 import { FunctionalKey } from '../../../../store/EventHandlersStore';
 
 export type KeyHandlers = {
     keys: string[];
     functionalKey?: FunctionalKey;
     handler: (event: KeyboardEvent) => void | boolean | undefined;
+    discriptor?: React.ReactNode;
+    isGloable?: boolean;
 };
 
 type KeyListenerProps = {
@@ -15,49 +19,54 @@ type KeyListenerProps = {
     keyUpHandlers?: KeyHandlers[];
 };
 
-function getMultiPressedKey(observableEvent: Observable<Event>) {
-    return (cb: (event: Event) => void, keys: string[], functionalKey?: FunctionalKey) => {
-        let isPressedKeys = new Array<boolean>(keys.length).fill(false);
-        keys.forEach((key, index) => {
-            observableEvent
-                .pipe(
-                    filter((event) => {
-                        if (event instanceof KeyboardEvent) {
-                            const lowerKey = key.toLowerCase();
-                            const eventKey = event.key?.toLowerCase();
-
-                            const clearerTimer = setTimeout(() => {
-                                isPressedKeys[index] = false;
-                                clearTimeout(clearerTimer);
-                            }, 200);
-
-                            if (functionalKey) {
-                                return event[functionalKey] && eventKey === lowerKey;
-                            }
-
-                            return eventKey === lowerKey;
-                        }
-
-                        return false;
-                    }),
-                )
-                .subscribe((event) => {
-                    isPressedKeys[index] = true;
-                    if (isPressedKeys.reduce((prev, cur) => prev && cur, true)) {
-                        cb(event);
-                        isPressedKeys = isPressedKeys.fill(false);
-                    } else {
-                        event.preventDefault();
-                    }
-                });
-        });
-    };
-}
-
 export default function KeyListener(props: KeyListenerProps) {
     const { active = false, keyDownHandlers, keyUpHandlers } = props;
     const elementRef = useRef<HTMLDivElement>();
     const activeRef = useRef<boolean>(active);
+    const subscriptionsRef = useRef<Subscription[]>([]);
+
+    const getMultiPressedKey = useCallback(
+        (observableEvent: Observable<Event>) =>
+            (cb: (event: Event) => void, keys: string[], functionalKey?: FunctionalKey) => {
+                let isPressedKeys = new Array<boolean>(keys.length).fill(false);
+                keys.forEach((key, index) => {
+                    subscriptionsRef.current.push(
+                        observableEvent
+                            .pipe(
+                                filter((event) => {
+                                    if (event instanceof KeyboardEvent) {
+                                        const lowerKey = key.toLowerCase();
+                                        const eventKey = event.key?.toLowerCase();
+
+                                        const clearerTimer = setTimeout(() => {
+                                            isPressedKeys[index] = false;
+                                            clearTimeout(clearerTimer);
+                                        }, 200);
+
+                                        if (functionalKey) {
+                                            return event[functionalKey] && eventKey === lowerKey;
+                                        }
+
+                                        return eventKey === lowerKey;
+                                    }
+
+                                    return false;
+                                }),
+                            )
+                            .subscribe((event) => {
+                                isPressedKeys[index] = true;
+                                if (isPressedKeys.reduce((prev, cur) => prev && cur, true)) {
+                                    cb(event);
+                                    isPressedKeys = isPressedKeys.fill(false);
+                                } else {
+                                    event.preventDefault();
+                                }
+                            }),
+                    );
+                });
+            },
+        [],
+    );
 
     useEffect(() => {
         activeRef.current = active;
@@ -82,24 +91,15 @@ export default function KeyListener(props: KeyListenerProps) {
             }
         }
 
-        if (keyUpHandlers) {
-            const len = keyUpHandlers.length;
-            for (let i = 0; i < len; i += 1) {
-                const keyUpEvent = fromEvent(document, 'keyup');
-                const setKeyUp = getMultiPressedKey(keyUpEvent);
-                const keyUpHandler = keyUpHandlers[i];
-                setKeyUp(
-                    (event) => {
-                        if (activeRef.current) {
-                            keyUpHandler?.handler(event as KeyboardEvent);
-                        }
-                    },
-                    keyUpHandler?.keys,
-                    keyUpHandler?.functionalKey,
-                );
+        return () => {
+            // 想要清空keyDownEventRef.current注册的所有回调
+            for (const sp of subscriptionsRef.current) {
+                sp.unsubscribe();
             }
-        }
-    }, [keyDownHandlers, keyUpHandlers]);
+
+            subscriptionsRef.current = [];
+        };
+    }, [keyDownHandlers]);
 
     return (
         <div

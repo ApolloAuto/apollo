@@ -16,6 +16,7 @@ Filter foreground and background objects based on obejcts attributes, lane lines
     │   ├── object_filter_bank.h
     │   ├── background_filter    // filter algorithm based on lane
     │   └── roi_boundary_filter  // filter algorithm based on roi boundary
+    │   └── strategy_filter      // merge strategy based on expand-big include small
     ├── interface       // definition of BaseObjectFilter
     ├── proto           // definition of data structure
     ├── lidar_detection_filter_component.cc // component inference

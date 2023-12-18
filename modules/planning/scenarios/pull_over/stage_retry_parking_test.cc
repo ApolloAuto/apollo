@@ -17,7 +17,7 @@
 #include "modules/planning/scenarios/pull_over/stage_retry_parking.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/planning_base/scenario_base/proto/scenario_pipeline.pb.h"
+#include "modules/planning/planning_interface_base/scenario_base/proto/scenario_pipeline.pb.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/pull_over/context.h"

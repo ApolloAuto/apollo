@@ -36,11 +36,13 @@ apollo_cc_library(
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/common/proto:perception_config_schema_cc_proto",
         "//modules/perception/lidar_detection_filter/object_filter_bank/proto:background_filter_config_cc_proto",
+        "//modules/perception/lidar_detection_filter/object_filter_bank/proto:strategy_filter_config_cc_proto",
         "//modules/perception/lidar_detection_filter/object_filter_bank/proto:filter_bank_config_cc_proto",
         "//modules/perception/lidar_detection_filter/object_filter_bank/proto:roi_boundary_filter_config_cc_proto",
         "//modules/perception/lidar_detection_filter/proto:lidar_detection_filter_component_config_cc_proto",
         "@com_google_googletest//:gtest",
         "@eigen",
+        "@local_config_pcl//:pcl",
     ],
 )
 

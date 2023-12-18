@@ -36,6 +36,7 @@ function Theta() {
             initOptions({
                 dataset,
                 series,
+                scale: true,
                 xAxis: {
                     type: 'value',
                     name: 'S (m)',

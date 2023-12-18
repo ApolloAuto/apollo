@@ -109,6 +109,8 @@ class HDMapUtil {
   // Reload maps from the file specified by global flags.
   static bool ReloadMaps();
 
+  static bool ReloadBaseMap();
+
  private:
   HDMapUtil() = delete;
 

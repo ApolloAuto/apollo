@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Checkbox, Radio } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useStyle from '../../VehicleViz/useStyle';
-import { formatLayerParams, getCurrentLayerParams } from './params';
+import { localPointCloudManager, formatLayerParams, getCurrentLayerParams } from './params';
 import ChannelSelect from '../../base/ChannelSelect';
 
 export default function LayerMenu(props: any) {
@@ -20,7 +20,8 @@ export default function LayerMenu(props: any) {
     const { t } = useTranslation('layerMenu');
 
     const curLayerMenuParams = getCurrentLayerParams();
-    localStorage.setItem('pointCloudLayerMenuParams', JSON.stringify(curLayerMenuParams));
+
+    localPointCloudManager.set(curLayerMenuParams);
     carviz.option.updateLayerOption(formatLayerParams(curLayerMenuParams), 'pointCloud');
 
     const [layerMenu, setLayerMenu] = useState(curLayerMenuParams);
@@ -86,7 +87,7 @@ export default function LayerMenu(props: any) {
                                         setSubMenu(() => newMenu);
                                         setLayerMenu(() => newLayerMenu);
                                         carviz.option.updateLayerOption(formatLayerParams(newLayerMenu), 'vehicle');
-                                        localStorage.setItem('pointCloudLayerMenuParams', JSON.stringify(newLayerMenu));
+                                        localPointCloudManager.set(newLayerMenu);
                                     }
                                 }}
                             />
@@ -118,7 +119,7 @@ export default function LayerMenu(props: any) {
                                         setSubMenu(() => newMenu);
                                         setLayerMenu(() => newLayerMenu);
                                         carviz.option.updateLayerOption(formatLayerParams(newLayerMenu), 'vehicle');
-                                        localStorage.setItem('pointCloudLayerMenuParams', JSON.stringify(newLayerMenu));
+                                        localPointCloudManager.set(newLayerMenu);
                                     }
                                 }}
                             />

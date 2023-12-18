@@ -9,7 +9,7 @@ export function Template(props: CollapseProps) {
   it can be found as a welcome guest in many households across the world.
 `;
 
-    const items: CollapseProps['items'] = [
+    const items = [
         {
             key: '1',
             label: 'This is panel header 1',
@@ -27,5 +27,5 @@ export function Template(props: CollapseProps) {
         },
     ];
 
-    return <Collapse defaultActiveKey={['1']} items={items} />;
+    return <Collapse defaultActiveKey={['1']}/>;
 }

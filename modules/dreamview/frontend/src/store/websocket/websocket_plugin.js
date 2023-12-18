@@ -42,11 +42,13 @@ export default class PluginWebSocketEndpoint {
       this.initialize();
     };
     this.worker.addEventListener('message', (event) => {
-      if (event.data.type === 'PluginMsg') {
+      if (event.data.type === 'PluginResponse') {
         const message = event.data;
+        const businessData =  message.data?.info || {};
+
         switch (message.data.name) {
           case 'StudioConnectorCertStatus':
-            const status = JSON.parse(message.data.info ?? '{}').code;
+            const status = businessData.code;
             if (status === 0) {
               this.getScenarioSetList();
               this.getDynamicsModelList();
@@ -57,98 +59,98 @@ export default class PluginWebSocketEndpoint {
           // Get Scenario Set Info Success
           case 'GetScenarioSetListSuccess':
             STORE.studioConnector.updateRemoteScenarioSetList(
-              JSON.parse(message.data.info).data ?? {},
+              businessData.data ?? {},
             );
             break;
           // Get Scenario Set Info Failed
           case 'GetScenarioSetListFail':
             STORE.studioConnector.updateRemoteScenarioSetList(
-              JSON.parse(message.data.info).data ?? {},
+              businessData.data ?? {},
             );
             break;
           case 'DownloadScenarioSet':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info)?.data?.resource_id,
+              businessData?.data?.resource_id,
               'downloaded',
-              JSON.parse(message.data.info)?.data?.status,
+              businessData?.data?.status,
             );
             // this.getScenarioSetList();
             break;
           case 'DownloadScenarioSetFail':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info)?.data?.resource_id,
+              businessData?.data?.resource_id,
               'fail',
-              JSON.parse(message.data.info)?.data?.error_msg,
+              businessData?.data?.error_msg,
             );
             break;
           case 'GetDynamicModelListSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelList(
-              JSON.parse(message.data.info).data ?? {}
+              businessData.data ?? {}
             );
             break;
           case 'GetDynamicModelListFail':
             STORE.studioConnector.updateRemoteDynamicsModelList(
-              JSON.parse(message.data.info).data ?? {}
+              businessData.data ?? {}
             );
             break;
           case 'DownloadDynamicModelSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info)?.data?.dynamic_model_name,
-              JSON.parse(message.data.info)?.data?.status,
+              businessData?.data?.dynamic_model_name,
+              businessData?.data?.status,
             );
             // this.getDynamicsModelList();
             break;
           case 'DownloadDynamicModelFail':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info)?.data?.dynamic_model_name,
+              businessData?.data?.dynamic_model_name,
               'fail',
-              JSON.parse(message.data.info)?.data?.error_msg,
+              businessData?.data?.error_msg,
             );
             break;
           case 'GetRecordsList':
             STORE.studioConnector.updateRemoteRecordsList(
-              JSON.parse(message.data.info)?.data ?? {}
+              businessData?.data ?? {}
             );
             break;
           case 'GetRecordsListSuccess':
             STORE.studioConnector.updateRemoteRecordsList(
-              JSON.parse(message.data.info)?.data ?? {}
+              businessData?.data ?? {}
             );
             break;
           case 'GetRecordListFail':
             STORE.studioConnector.updateRemoteRecordsList(
-              JSON.parse(message.data.info)?.data ?? {},
+              businessData?.data ?? {},
             );
             break;
           // 下载record成功
           case 'UpdateRecordToStatus':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info)?.data?.resource_id,
-              JSON.parse(message.data.info)?.data?.status,
+              businessData?.data?.resource_id,
+              businessData?.data?.status,
             );
             break;
           case 'DownloadRecordFail':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info)?.data?.record_id,
+              businessData?.data?.record_id,
               'fail',
-              JSON.parse(message.data.info)?.data?.error_msg,
+              businessData?.data?.error_msg,
             );
             break;
           case 'GetVehicleInfoSuccess':
             STORE.studioConnector.updateVehicleInfo(
-              JSON.parse(message.data.info).data ?? {},
+              businessData.data ?? {},
               2,
             );
             break;
           case 'GetVehicleInfoFail':
             STORE.studioConnector.updateVehicleInfo(
-              JSON.parse(message.data.info).data ?? {},
+              businessData.data ?? {},
               3,
             );
             break;
           case 'RefreshVehicleConfigSuccess':
             STORE.studioConnector.refreshVehicleConfig(
-              JSON.parse(message.data.info).data ?? {},
+              businessData.data ?? {},
               2,
             );
         }
@@ -316,7 +318,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'RefreshVehicleConfigSuccess':
@@ -350,7 +352,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'ResetVehicleConfigSuccess':
@@ -384,7 +386,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'UploadConfigSuccess':
@@ -416,7 +418,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'GetV2xInfoSuccess':
@@ -448,7 +450,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'RefreshV2xConfSuccess':
@@ -480,7 +482,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'ResetV2xConfSuccess':
@@ -512,7 +514,7 @@ export default class PluginWebSocketEndpoint {
     );
     return new Promise((resolve, reject) => {
       this.worker.addEventListener('message', (event) => {
-        if (event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginResponse') {
           const message = event.data;
           switch (message.data.name) {
             case 'UploadV2xSuccess':

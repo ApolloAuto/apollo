@@ -5,15 +5,15 @@ package(default_visibility = ["//visibility:public"])
 
 apollo_cc_library(
     name = "cyber_binary",
-    srcs = ["binary.cc",],
-    hdrs = ["binary.h",],
+    srcs = ["binary.cc"],
+    hdrs = ["binary.h"],
 )
 
 apollo_cc_library(
     name = "cyber_state",
-    srcs = ["state.cc",],
-    hdrs = ["state.h",], 
-    deps = ["//cyber/common:cyber_common",],
+    srcs = ["state.cc"],
+    hdrs = ["state.h"],
+    deps = ["//cyber/common:cyber_common"],
 )
 
 apollo_cc_library(
@@ -37,6 +37,7 @@ apollo_cc_library(
         "//cyber/class_loader:cyber_class_loader",
         "//cyber/common:cyber_common",
         "//cyber/component:cyber_component",
+        "//cyber/context:cyber_context",
         "//cyber/croutine:cyber_croutine",
         "//cyber/data:cyber_data",
         "//cyber/event:cyber_event",

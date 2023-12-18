@@ -3,7 +3,7 @@ lost_age: 3
 reserve_age: 5
 weight_same_camera {
     appearance: 0.45
-    motion: 0.4
+    motion: 1.0
     shape: 0.15
     overlap: 0.05
 }
@@ -13,13 +13,13 @@ weight_diff_camera {
     overlap: 0.35
 }
 type_change_cost_file: "type_change_cost"
-border: 20
+border: 5
 target_thresh: 0.6
 correct_type: false
 image_displacement: 50
 abnormal_movement: 0.4
 min_init_height_ratio:17
-target_combine_iou_threshold: 0.6
+target_combine_iou_threshold: 0.3
 target_param {
     velocity_threshold: 100000
     velocity_output_delay: 0

@@ -9,27 +9,33 @@ import {
 } from 'react-mosaic-component';
 import { useResizeDetector } from 'react-resize-detector';
 import { OnResizeCallback } from 'react-resize-detector/build/types/types';
-import shortUUID from 'short-uuid';
-import { Observable, Subscription, combineLatest, of, withLatestFrom, zip } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { isEmpty } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { FullScreenHookConfig, InitSubscriptionMap, PanelContext, PanelMetaData } from './store/PanelStore';
-import { usePanelCatalogContext } from '../../../store/PanelCatalogStore';
-import { genereatePanelId } from '../../../util/layout';
-import { noop } from '../../../util/similarFunctions';
-import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
-import { PanelRoot } from './PanelRoot';
-import useUpdateChannel from '../../../hooks/useUpdateChannel';
-import EmptyPlaceHolder from './EmptyPlaceHolder';
-import CountedSubject from '../../../util/CountedSubject';
-import { SubscribeInfo } from '../type/RenderToolBar';
-import useNotifyInitialChanel from '../../../hooks/useNotifyInitialChanel';
-import useGetUpdateChannel from '../../../hooks/useGetUpdateChannel';
-import { usePanelInfoStore } from '../../../store/PanelInfoStore';
-import { addSelectedPanelId, deleteSelectedPanelId } from '../../../store/PanelInfoStore/actions';
+import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
+import { genereatePanelId } from '@dreamview/dreamview-core/src/util/layout';
+import { noop } from '@dreamview/dreamview-core/src/util/similarFunctions';
+import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
+import useUpdateChannel from '@dreamview/dreamview-core/src/hooks/useUpdateChannel';
+import CountedSubject from '@dreamview/dreamview-core/src/util/CountedSubject';
+import useNotifyInitialChanel from '@dreamview/dreamview-core/src/hooks/useNotifyInitialChanel';
+import useGetUpdateChannel from '@dreamview/dreamview-core/src/hooks/useGetUpdateChannel';
+import { usePanelInfoStore } from '@dreamview/dreamview-core/src/store/PanelInfoStore';
+import {
+    addGloableKeyHandler,
+    addKeyHandler,
+    addSelectedPanelId,
+    removeKeyHandler,
+} from '@dreamview/dreamview-core/src/store/PanelInfoStore/actions';
+import { hooksManager } from '@dreamview/dreamview-core/src/util/HooksManager';
+import { usePanelTileContext } from '@dreamview/dreamview-core/src/store/PanelInnerStore/PanelTileStore';
+import useKeyDownAddHandler from '@dreamview/dreamview-core/src/hooks/useKeyDownAddHandler';
+import useRegKeyDownAddHandler from '@dreamview/dreamview-core/src/hooks/useRegKeyDownAddHandler';
 import KeyListener, { KeyHandlers } from './KeyListener';
-import { hooksManager } from '../../../util/HooksManager';
-import { usePanelTileContext } from '../../../store/PanelInnerStore/PanelTileStore';
+import { SubscribeInfo } from '../type/RenderToolBar';
+import EmptyPlaceHolder from './EmptyPlaceHolder';
+import { PanelRoot } from './PanelRoot';
+import { FullScreenHookConfig, InitSubscriptionMap, PanelContext, PanelMetaData } from './store/PanelStore';
 
 export type PanelProps = {
     PanelComponent: React.ComponentType & { displayName: string };
@@ -39,8 +45,12 @@ export type PanelProps = {
     panelMetaData?: PanelMetaData;
 };
 
+const defaultConsumer = noop;
+
 export default function Panel(panelProps: PanelProps) {
     const { PanelComponent, panelId, placeHolder, subscribeInfo, panelMetaData } = panelProps;
+
+    const logger = Logger.getInstance(`Panel-${panelId}`);
     function PanelWrapper(props: any) {
         const { isMainConnected, streamApi, metadata } = useWebSocketServices();
         const { panelCatalog } = usePanelCatalogContext();
@@ -52,7 +62,7 @@ export default function Panel(panelProps: PanelProps) {
         const { enterFullScreen, exitFullScreen, fullScreenFnObj } = usePanelTileContext();
         const [hasSubscribed, setHasSubscribed] = useState(false);
         const [hasData, setHasData] = useState(false);
-        const [combinedData, setCombinedData] = useState<Record<string, any>>({});
+        const [combinedData] = useState<Record<string, any>>({});
         const connectedSubjectsRef = useRef<
             {
                 name: string;
@@ -66,36 +76,148 @@ export default function Panel(panelProps: PanelProps) {
             }[]
         >([]);
 
+        // 声明式初始化订阅数据
         const initSubscriptionMapRef = useRef<InitSubscriptionMap>();
         const resizeCallBackRef = useRef<OnResizeCallback>();
         const resizeCallBackArrRef = useRef<OnResizeCallback[]>([]);
         const [keyDownHandlers, _setKeyDownHandlers] = useState<KeyHandlers[]>([
             {
                 keys: ['escape'],
-                handler: (e) => {
+                handler: () => {
                     if (fullScreenFnObj && fullScreenFnObj?.exitFullScreen) {
                         fullScreenFnObj?.exitFullScreen();
                     }
                 },
             },
         ]);
+
+        useEffect(() => {
+            panelInfoDispatch(
+                addKeyHandler({
+                    panelId,
+                    keyHandlers: [
+                        {
+                            keys: ['escape'],
+                            handler: () => {
+                                if (fullScreenFnObj && fullScreenFnObj?.exitFullScreen) {
+                                    fullScreenFnObj?.exitFullScreen();
+                                }
+                            },
+                            discriptor: t('exitFullScreen'),
+                        },
+                        {
+                            keys: ['p'],
+                            functionalKey: 'ctrlKey',
+                            handler: (e) => {},
+                            discriptor: t('play'),
+                            isGloable: true,
+                        },
+                        {
+                            keys: ['s'],
+                            functionalKey: 'ctrlKey',
+                            handler: (e) => {},
+                            discriptor: t('stop'),
+                            isGloable: true,
+                        },
+                    ],
+                }),
+            );
+
+            return () => {
+                panelInfoDispatch(
+                    removeKeyHandler({
+                        panelId,
+                        keyHandlers: [
+                            {
+                                keys: ['escape'],
+                                handler: () => {
+                                    if (fullScreenFnObj && fullScreenFnObj?.exitFullScreen) {
+                                        fullScreenFnObj?.exitFullScreen();
+                                    }
+                                },
+                                discriptor: t('exitFullScreen'),
+                            },
+                            {
+                                keys: ['p'],
+                                functionalKey: 'ctrlKey',
+                                handler: (e) => {},
+                                discriptor: t('play'),
+                                isGloable: true,
+                            },
+                            {
+                                keys: ['s'],
+                                functionalKey: 'ctrlKey',
+                                handler: (e) => {},
+                                discriptor: t('stop'),
+                                isGloable: true,
+                            },
+                        ],
+                    }),
+                );
+            };
+        }, [t]);
+
         const [keyUpHandlers, _setKeyUpHandlers] = useState<KeyHandlers[]>([]);
         const updateChannel = useGetUpdateChannel(panelId);
 
-        const panel = useMemo(() => panelCatalog.get(panelId), [panelId, panelCatalog]);
-        const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
+        const setKeyDownHandlers = useCallback((handlers: KeyHandlers[]) => {
+            _setKeyDownHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
+            // save
 
-        const initSubscription = useMemo(
-            () => (val: InitSubscriptionMap) => {
-                initSubscriptionMapRef.current = val;
+            // eslint-disable-next-line no-restricted-syntax
+            for (const handler of handlers) {
+                if (handler?.isGloable) {
+                    panelInfoDispatch(addGloableKeyHandler([handler]));
+                } else {
+                    panelInfoDispatch(addKeyHandler({ panelId, keyHandlers: [handler] }));
+                }
+            }
+        }, []);
+
+        const removeKeyDownHandlers = useCallback(
+            (handlers: KeyHandlers[]) => {
+                const targets2Delte = handlers.map((handler) => (handler?.functionalKey ?? '') + handler.keys.join());
+                const curHandlers = keyDownHandlers.filter((handler) => {
+                    const key = (handler?.functionalKey ?? '') + handler.keys.join();
+                    return !targets2Delte.includes(key);
+                });
+                _setKeyDownHandlers(curHandlers);
+
+                panelInfoDispatch(
+                    removeKeyHandler({
+                        panelId,
+                        keyHandlers: handlers,
+                    }),
+                );
             },
-            [],
+            [keyDownHandlers],
         );
 
-        const logger = useMemo(() => Logger.getInstance(panelId), [panelId]);
+        const setKeyUpHandlers = useCallback((handlers: KeyHandlers[]) => {
+            _setKeyUpHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
+        }, []);
 
+        const keyAddHandler = useCallback(
+            (handlers: KeyHandlers[]) => {
+                setKeyDownHandlers(handlers);
+            },
+            [setKeyDownHandlers],
+        );
+        useRegKeyDownAddHandler(`keydown-add:${panelId}`);
+        useKeyDownAddHandler(panelId, keyAddHandler);
+
+        const panel = useMemo(() => panelCatalog.get(panelId), [panelCatalog]);
+        const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
+
+        // 初始化订阅相关数据的消费者
+        const initSubscription = useCallback((val: InitSubscriptionMap) => {
+            initSubscriptionMapRef.current = val;
+        }, []);
+
+        const panelWidthRef = useRef(-1);
         const { ref: panelRootRef } = useResizeDetector({
             onResize: (width: number, height: number) => {
+                panelWidthRef.current = width;
                 if (resizeCallBackRef.current) {
                     resizeCallBackRef.current(width, height);
                 }
@@ -112,6 +234,9 @@ export default function Panel(panelProps: PanelProps) {
         const onPanelResize = useCallback((onResize: OnResizeCallback) => {
             resizeCallBackRef.current = onResize;
             resizeCallBackArrRef.current.push(onResize);
+            if (panelWidthRef.current !== -1) {
+                onResize(panelWidthRef.current);
+            }
         }, []);
 
         const splitPanel = useCallback(
@@ -140,17 +265,14 @@ export default function Panel(panelProps: PanelProps) {
                     panelId,
                 });
             },
-            [panelId],
+            [],
         );
 
-        const onPanleClick: React.MouseEventHandler<HTMLDivElement> = useCallback(
-            (event) => {
-                if (!isSelected) {
-                    panelInfoDispatch(addSelectedPanelId(panelId));
-                }
-            },
-            [isSelected, panelInfoDispatch],
-        );
+        const onPanleClick: React.MouseEventHandler<HTMLDivElement> = useCallback(() => {
+            if (!isSelected) {
+                panelInfoDispatch(addSelectedPanelId(panelId));
+            }
+        }, [isSelected, panelInfoDispatch]);
 
         const checkDataEmpty = useCallback(
             (val: unknown) => {
@@ -161,30 +283,26 @@ export default function Panel(panelProps: PanelProps) {
             [hasData],
         );
 
-        const handleSubscribe = useCallback(
-            (newChannelInfo: SubscribeInfo) => {
-                let newConnectedSubj: CountedSubject<unknown>;
-                if (newChannelInfo?.needChannel) {
-                    if (newChannelInfo?.name && newChannelInfo?.channel) {
-                        if (newChannelInfo?.channel === 'default') {
-                            newConnectedSubj = streamApi.subscribeToDataWithChannelFuzzy(newChannelInfo?.name);
-                        } else {
-                            newConnectedSubj = streamApi.subscribeToDataWithChannel(
-                                newChannelInfo?.name,
-                                newChannelInfo?.channel,
-                            );
-                        }
+        function subscribeHandler<T>(newChannelInfo: SubscribeInfo) {
+            let newConnectedSubj: CountedSubject<T>;
+            if (newChannelInfo?.needChannel) {
+                if (newChannelInfo?.name && newChannelInfo?.channel) {
+                    if (newChannelInfo?.channel === 'default') {
+                        newConnectedSubj = streamApi.subscribeToDataWithChannelFuzzy(newChannelInfo?.name);
+                    } else {
+                        newConnectedSubj = streamApi.subscribeToDataWithChannel(
+                            newChannelInfo?.name,
+                            newChannelInfo?.channel,
+                        );
                     }
-                } else {
-                    newConnectedSubj = streamApi.subscribeToData(newChannelInfo?.name);
                 }
+            } else {
+                newConnectedSubj = streamApi.subscribeToData(newChannelInfo?.name);
+            }
 
-                return newConnectedSubj;
-            },
-            [streamApi],
-        );
-
-        const defaultConsumer = useCallback((data: unknown) => {}, []);
+            return newConnectedSubj;
+        }
+        const handleSubscribe = useCallback(subscribeHandler, [streamApi]);
 
         const addChannel = useCallback(
             (newChannelInfo: SubscribeInfo) => {
@@ -193,6 +311,9 @@ export default function Panel(panelProps: PanelProps) {
                     const targetSubjectIndex = curSubjects.findIndex(
                         (curSubject) => curSubject.name === newChannelInfo.name,
                     );
+                    subscriptionsRef.current.forEach((subscription) => {
+                        subscription.subscription.unsubscribe();
+                    });
 
                     if (targetSubjectIndex === -1) {
                         // 不存在 => 新增订阅
@@ -283,14 +404,6 @@ export default function Panel(panelProps: PanelProps) {
             [isMainConnected],
         );
 
-        const setKeyDownHandlers = useCallback((handlers: KeyHandlers[]) => {
-            _setKeyDownHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
-        }, []);
-
-        const setKeyUpHandlers = useCallback((handlers: KeyHandlers[]) => {
-            _setKeyUpHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
-        }, []);
-
         const registerFullScreenHooks = useCallback((hookConfig: FullScreenHookConfig) => {
             hooksManager.addHook(panelId, hookConfig);
         }, []);
@@ -304,7 +417,17 @@ export default function Panel(panelProps: PanelProps) {
 
         const NoDataPlaceHolder = useMemo(() => {
             if (placeHolder) {
-                return placeHolder;
+                return (
+                    <div
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            display: !isPlaceHolderDisplay ? 'none' : 'flex',
+                        }}
+                    >
+                        {placeHolder}
+                    </div>
+                );
             }
             return (
                 <EmptyPlaceHolder
@@ -362,6 +485,7 @@ export default function Panel(panelProps: PanelProps) {
             }
 
             return () => {
+                connectedSubjectsRef.current = [];
                 subscriptionsRef.current.forEach((subscription) => {
                     subscription.subscription.unsubscribe();
                 });
@@ -395,11 +519,12 @@ export default function Panel(panelProps: PanelProps) {
                 updateChannel,
                 closeSubcription,
                 setKeyDownHandlers,
+                removeKeyDownHandlers,
                 setKeyUpHandlers,
                 registerFullScreenHooks,
+                subscribeToData: handleSubscribe,
             }),
             [
-                logger,
                 updateChannel,
                 initSubscription,
                 _panelMetaData,
@@ -413,6 +538,7 @@ export default function Panel(panelProps: PanelProps) {
                 addChannel,
                 closeSubcription,
                 setKeyDownHandlers,
+                removeKeyDownHandlers,
                 setKeyUpHandlers,
                 registerFullScreenHooks,
             ],

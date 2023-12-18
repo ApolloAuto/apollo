@@ -61,7 +61,7 @@ apollo_plugin(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:common_util",
         "//modules/common_msgs/planning_msgs:decision_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/path_decider/proto:path_decider_cc_proto",
     ],
 )

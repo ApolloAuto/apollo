@@ -12,7 +12,17 @@
   ],
   "line": [
     {
-      "label": "free_space_roi",
+      "label": "roi_parking_boundary",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": ".*parking_polygon",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "adc_corners",
       "marker": "*-",
       "subplot": "xy"
     },

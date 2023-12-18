@@ -8,6 +8,7 @@ export default function useStyle() {
             rowGap: '8px',
             height: '100%',
             width: '100%',
+            minWidth: '380px',
             padding: '16px',
         },
         error: {

@@ -12,6 +12,7 @@ import argparse
 import collections
 import filecmp
 import itertools
+import hashlib
 import os
 import re
 import json
@@ -59,6 +60,9 @@ list_only = False
 # N.B. On linux, dynamic libraries may have their version number as a suffix
 # (e.g. my_lib.so.x.y.z).
 dylib_match = re.compile(r"(.*\.so)(\.\d+)*$")
+
+workspace = os.getenv("PWD", "/apollo_workspace").split("/.cache/")[0]
+lib_cache_prefix = os.path.join(workspace, "dev", "install", "apollo")
 
 meta = []
 export_library_dict = {}
@@ -269,18 +273,61 @@ def may_be_binary(dst_full):
             return False
     return True
 
+def create_cache(src):
+    global lib_cache_prefix
+
+    cache = os.path.join(lib_cache_prefix, src)
+    if not os.path.exists(cache):
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, "w+") as f:
+            sha1 = hashlib.sha1()
+            with open(src, "rb") as t:
+                data = t.read()
+                sha1.update(data)
+            f.write(sha1.hexdigest())
+
+def cachecmp(src, cache):
+    with open(cache, "r+") as f:
+        old_sha1 = f.read()
+        new_sha1 = hashlib.sha1()
+        with open(src, "rb") as t:
+            data = t.read()
+            new_sha1.update(data)
+            new_sha1_text = new_sha1.hexdigest()
+        if old_sha1 == new_sha1_text:
+            return True
+        f.seek(0)
+        f.truncate(0)
+        f.write(new_sha1_text)
+        return False
 
 def needs_install(src, dst):
+    global lib_cache_prefix
+    co_dev = os.getenv("CO_DEV", 0)
+
+    if co_dev:
+        # always return true in co_dev
+        return True
+
+    if os.path.basename(dst) == "cyberfile.xml":
+        # data file -> installation needed.
+        return True
     # Get canonical destination.
     dst_full = os.path.join(prefix, dst)
 
     # Check if destination exists.
     if not os.path.exists(dst_full):
         # Destination doesn't exist -> installation needed.
+        create_cache(src)  
+        return True
+    
+    cache = os.path.join(lib_cache_prefix, src)
+    if not os.path.exists(cache):
+        create_cache(src)
         return True
 
     # Check if files are different.
-    if filecmp.cmp(src, dst_full, shallow=False):
+    if cachecmp(src, cache):
         # Files are the same -> no installation needed.
         return False
 
@@ -305,8 +352,8 @@ def copy_or_link(src, dst):
         shutil.copy2(src, dst)
 
 
-def install(src, dst, action_type=None,
-    package_path=None, shared_library_export=None, target_name=None):
+def install(src, dst, action_type=None, package_path=None,
+        shared_library_export=None, target_name=None):
     global subdirs
     global meta
 
@@ -414,17 +461,17 @@ def install(src, dst, action_type=None,
 
     dst_full = os.path.join(prefix, dst)
     # Install file, if not up to date.
-    # if needs_install(src, dst):
-    print("-- Installing: {}".format(dst_full))
-    if os.path.exists(dst_full):
-        os.remove(dst_full)
-    copy_or_link(src, dst_full)
-    # else:
-    #     # TODO(eric.cousineau): Unclear how RPath-patched file can be deemed
-    #     # "up-to-date" by comparison?
-    #     print("-- Up-to-date: {}".format(dst_full))
-    #     # No need to check patching.
-    #     return
+    if needs_install(src, dst):
+        print("-- Installing: {}".format(dst_full))
+        if os.path.exists(dst_full):
+            os.remove(dst_full)
+        copy_or_link(src, dst_full)
+    else:
+        # TODO(eric.cousineau): Unclear how RPath-patched file can be deemed
+        # "up-to-date" by comparison?
+        print("-- Up-to-date: {}".format(dst_full))
+        # No need to check patching.
+        return
     basename = os.path.basename(dst)
     if re.match(dylib_match, basename):  # It is a library.
         #TODO(lanyongshun): interim method
@@ -477,12 +524,29 @@ def create_package_meta(prefix):
         os.makedirs(package_index_path, exist_ok=True)
 
         package_install_files = []
+        files_dst = set()
         for install_file in packages[package_path]:
             package_install_files.append(install_file)
+            files_dst.add(install_file.split(":")[-1])
         package_install_files.append(
             "src_path:{}".format(package_path))
-        with open(os.path.join(package_index_path, "meta.txt"), "w+") as f:
-            f.write("\n".join(package_install_files))
+        if os.path.exists(os.path.join(package_index_path, "meta.txt")):
+            with open(os.path.join(package_index_path, "meta.txt"), "r+") as f:
+                # delete redundant files
+                contents = f.read().split("\n")
+                contents = contents[: len(contents)-1]
+                for i in contents:
+                    file_name = i.split(":")[-1]
+                    file_full_name = os.path.join(prefix, file_name)
+                    if file_name not in files_dst and \
+                            os.path.exists(file_full_name):
+                        os.remove(file_full_name)
+                f.seek(0)
+                f.truncate(0)
+                f.write("\n".join(package_install_files))
+        else:
+            with open(os.path.join(package_index_path, "meta.txt"), "w+") as f:
+                f.write("\n".join(package_install_files))
 
         so_files = []
         for i in package_install_files:
@@ -506,8 +570,9 @@ def create_package_meta(prefix):
 
                 ld_result = subprocess.check_output(
                     ldd_query, shell=True).decode("utf-8").split("\n")
-                
-                if "not found" in ld_result:
+
+                ld_result_str = "".join(ld_result)
+                if "not found" in ld_result_str:
                     print("[WARNNING] missing dynamic library in ld, try refreash ld cache")
                     update_sh = os.path.join(prefix, "update_dylib.sh")
                     ld_cache = os.path.join(prefix, "ld.cache") 
@@ -538,7 +603,7 @@ def create_package_meta(prefix):
                     elf_query, shell=True).decode("utf-8").split("\n")
                 needed_so = list(filter(None, needed_so))
                 for i in needed_so:
-                    if shared_obj_dict[i] is None:
+                    if i not in shared_obj_dict:
                         continue
                     if i.startswith("lib") and i.endswith(".so"):
                         ld_path.append(shared_obj_dict[i])
@@ -548,6 +613,7 @@ def create_package_meta(prefix):
                     if i.startswith("/opt/apollo/neo/lib") and not i.startswith("/opt/apollo/neo/lib/3rd-"):
                         i = "/".join(i.split("/")[0: len(i.split("/"))-1])
                         link_paths.append('"-L{}"'.format(i))
+                        link_paths.append('"-Wl,-rpath,{}"'.format(i))
 
                 link_opts = []
                 for so_lib in needed_so:
@@ -636,18 +702,19 @@ def install_plugin_description(name, src, dst):
         else:
             libraries_to_fix_rpath[basename] = [dst_full]
 
-def fix_rpaths_and_strip():
+def fix_rpaths_and_strip(compatible=False):
     # Add binary executables to list of files to be fixed up:
     find_binary_executables()
     # Only fix files that are installed now.
-    fix_items = [] 
+    lib_fix_items = [] 
+    bin_fix_items = []
     for k in libraries_to_fix_rpath:
-        fix_items += libraries_to_fix_rpath[k]
+        lib_fix_items += libraries_to_fix_rpath[k]
 
     for i in range(len(binaries_to_fix_rpath)):
-        fix_items += binaries_to_fix_rpath[i][1] 
+        bin_fix_items += binaries_to_fix_rpath[i][1] 
 
-    for dst_full in fix_items:
+    for dst_full in lib_fix_items:
         if os.path.islink(dst_full):
             # Skip files that are links. However, they need to be in the
             # dictionary to fixup other library and executable paths.
@@ -664,7 +731,26 @@ def fix_rpaths_and_strip():
         # skip py runfiles fix rpath
         if dst_full.startswith(py_bin_path) and ".runfiles" in dst_full:
             continue
-        linux_fix_rpaths(dst_full)
+        linux_fix_rpaths(dst_full, binary=False, compatible=compatible)
+
+    for dst_full in bin_fix_items:
+        if os.path.islink(dst_full):
+            # Skip files that are links. However, they need to be in the
+            # dictionary to fixup other library and executable paths.
+            continue
+        # Enable write permissions to allow modification.
+        os.chmod(dst_full, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+                | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        # Strip before running `patchelf`. Trying to strip after patching
+        # the files is likely going to create the following error:
+        # 'Not enough room for program headers, try linking with -N'
+        # if strip:
+        #     check_call([strip_tool, dst_full])
+        py_bin_path = os.path.join(prefix, "bin")
+        # skip py runfiles fix rpath
+        if dst_full.startswith(py_bin_path) and ".runfiles" in dst_full:
+            continue
+        linux_fix_rpaths(dst_full, binary=True, compatible=compatible)
 
 
 def linux_fix_rpaths_old(dst_full):
@@ -744,46 +830,93 @@ def linux_fix_rpaths_old(dst_full):
     )
 
 def resolve_install_rpath(path, rpath, prefix):
-  """resolve install rpath
-  """
-  if not rpath.startswith('$ORIGIN'):
-    return rpath
-  if not prefix:
-    return rpath
+    """resolve install rpath
+    """
+    lib_prefix = "/opt/apollo/neo/lib"
+    bin_prefix = "/opt/apollo/neo/bin"
+    if not rpath.startswith('$ORIGIN'):
+        return rpath
+    if not prefix:
+        return rpath
 
-  patt = re.compile(r'(.*)/_solib_.*?/(.*)')
-  m = patt.match(rpath)
-  if not m:
-    return rpath
+    patt = re.compile(r'(.*)/_solib_.*?/(.*)')
+    m = patt.match(rpath)
+    if not m:
+        return rpath
 
-  # m.group(1)
+    # m.group(1)
+    if prefix == lib_prefix:
+        decoded_path = m.group(2).replace('_C', ':').replace(
+            '_U', '_').replace('_S', '/').replace('_D', '.')
+        if decoded_path.startswith('_@'):
+            # external libs
+            subpath = decoded_path.split('__')[1]
+            ext_rpath = re.compile(r'^_lib/').sub(m.group(1) + '/', subpath)
+            if os.path.exists(ext_rpath.replace('$ORIGIN', os.path.dirname(path))):
+                # apollo packages
+                return ext_rpath
+            # external packages
+            return None
+        else:
+            # package internal lib
+            return decoded_path.split(':')[0].replace('_//', m.group(1) + '/')
+    else:
+        decoded_path = m.group(2).replace('_C', ':').replace(
+            '_U', '_').replace('_S', '/').replace('_D', '.')
+        if decoded_path.startswith('_@'):
+            # external libs
+            subpath = decoded_path.split('__')[1]
+            ext_rpath = re.compile(r'^_lib/').sub(m.group(1) + '/', subpath)
+            if '$ORIGIN' in ext_rpath:
+                # apollo packages
+                suffix = ext_rpath.split("../")[-1]
+                return "$ORIGIN/../lib/{}".format(suffix)
+            # external packages
+            return None
+        else:
+            # package internal lib
+            raw_decode_path = decoded_path.split(':')[0].replace('_//', m.group(1) + '/')
+            suffix = raw_decode_path.split("../")[-1]
+            return "$ORIGIN/../lib/{}".format(suffix)
+            
 
-  decoded_path = m.group(2).replace('_C', ':').replace(
-      '_U', '_').replace('_S', '/').replace('_D', '.')
-  # external libs
-  if decoded_path.startswith('_@'):
-    subpath = decoded_path.split('__')[1]
-    ext_rpath = re.compile(r'^_lib/').sub(m.group(1) + '/', subpath)
-    if os.path.exists(ext_rpath.replace('$ORIGIN', os.path.dirname(path))):
-      # apollo packages
-      return ext_rpath
-    # external packages
-    return None
+        return decoded_path.split(':')[0].replace('_//', m.group(1) + '/') 
 
-  return decoded_path.split(':')[0].replace('_//', m.group(1) + '/')
-
-def linux_fix_rpaths(path):
+def linux_fix_rpaths(path, binary=False, compatible=False):
     """fix rpath
     """
     old_rpath = check_output(
         ['patchelf', '--print-rpath', path])
     old_rpath_list = old_rpath.decode('utf-8').strip().split(':')
-
-    prefix = '/opt/apollo/neo/lib'
-    new_rpath_list = filter(
+    if binary:
+        prefix = "/opt/apollo/neo/bin"
+    else:
+        prefix = '/opt/apollo/neo/lib'
+    new_rpath_list = list(filter(
         lambda x: x is not None and x != '',
-        map(lambda x: resolve_install_rpath(path, x, prefix), old_rpath_list))
+        map(lambda x: resolve_install_rpath(path, x, prefix), old_rpath_list)))
     new_rpath = ':'.join(new_rpath_list)
+    compatible_rpath_list = []
+    if compatible:
+        for i in new_rpath_list:
+            # indirect dependence
+            if i.startswith("/opt/apollo/neo/lib"):
+                compatible_rpath_list.append(
+                    os.path.abspath(i).replace("/opt/apollo/neo/lib", "/apollo/bazel-bin"))
+            # direct dependence
+            elif i.startswith("$ORIGIN"):
+                # binary
+                if "../lib/" in i:
+                    suffix = i.split("../lib/")[-1]
+                # library
+                else:
+                    suffix = i.split("../")[-1]
+                compatible_rpath_list.append(os.path.join("/apollo/bazel-bin", suffix))
+
+        compatible_rpath_list = list(set(compatible_rpath_list))
+
+    if len(compatible_rpath_list) > 0:
+        new_rpath = "{}:{}".format(new_rpath, ":".join(compatible_rpath_list))
 
     check_call(['patchelf', '--force-rpath', '--set-rpath', new_rpath, path])
 
@@ -834,6 +967,8 @@ def main(args):
     #                     help='dev package with headers.')
     parser.add_argument('--legacy', action='store_true', default=False,
                         help='legacy way to release output.')
+    parser.add_argument('--compatible-with-src', action='store_true', default=False,
+                        help='output are compatible with the src env.')
     args = parser.parse_args(args)
 
     color = args.color
@@ -846,6 +981,7 @@ def main(args):
     pre_clean = args.pre_clean
     install_lib = args.install_lib
     fix_rpath = args.fix_rpath
+    compatible = args.compatible_with_src
 
     # dbg = args.dbg
     # gpu = args.gpu
@@ -894,7 +1030,7 @@ def main(args):
 
     # Libraries paths may need to be updated in libraries and executables.
     if fix_rpath:
-        fix_rpaths_and_strip()
+        fix_rpaths_and_strip(compatible)
 
     create_package_meta(prefix)
 

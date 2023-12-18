@@ -53,8 +53,8 @@ export default function useStyle() {
                 background: theme.tokens.colors.background1,
             },
             '.dreamview-tabs-tab': {
-                padding: '5px 0',
-                width: '106px',
+                padding: '5px 16px',
+                minWidth: '106px',
                 justifyContent: 'center',
                 margin: '0 !important',
             },
@@ -77,6 +77,7 @@ export function useCurrentResourceStyle() {
     const hoc = useMakeStyle((theme) => ({
         'current-resource-item': {
             height: '40px',
+            fontSize: theme.tokens.font.size.regular,
             lineHeight: '40px',
             margin: '0 -14px',
             borderRadius: '8px',
@@ -103,6 +104,7 @@ export function useCurrentResourceStyle() {
             textAlign: 'center',
             color: theme.tokens.colors.fontColor3,
             marginBottom: '20px',
+            fontSize: theme.tokens.font.size.regular,
             img: {
                 display: 'block',
                 margin: '0 auto',

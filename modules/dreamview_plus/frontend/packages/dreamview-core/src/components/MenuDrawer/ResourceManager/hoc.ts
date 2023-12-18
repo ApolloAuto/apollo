@@ -70,6 +70,7 @@ export function useScrollHeight() {
             const windowHeight = document.documentElement.clientHeight;
             setScrollHeight(windowHeight - 250 - bottomBarHeight);
         }, 200);
+        resizeHandler();
         window.addEventListener('resize', resizeHandler);
         return () => {
             window.removeEventListener('resize', resizeHandler);

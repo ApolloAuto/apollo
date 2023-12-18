@@ -1,6 +1,6 @@
 import { produce, enableMapSet } from 'immer';
 import { CombineAction } from './actions';
-import { ACTIONS, IInitState, CURRENT_MODE } from './actionTypes';
+import { ACTIONS, IInitState, CURRENT_MODE, ENUM_DATARECORD_PROCESS_STATUS } from './actionTypes';
 import { reducerHander } from './reducerHandler';
 
 // 使用 Immer 时涉及到了 Map 或 Set 数据结构， 需要开启 MapSet 插件。
@@ -10,19 +10,22 @@ export const reducer = (state: IInitState, action: CombineAction) =>
     produce(state, (draftState: IInitState) => {
         switch (action.type) {
             case ACTIONS.UPDATE_STATUS:
-                reducerHander.updateStatus(state, draftState, action.payload);
+                reducerHander.updateStatusSimp(state, draftState, action.payload);
                 break;
             case ACTIONS.TOGGLE_MODULE:
                 reducerHander.toggleModule(draftState, action.payload);
                 break;
             case ACTIONS.CHANGE_MODE:
-                reducerHander.changeMode(action.payload);
+                reducerHander.updateCurrentMode(draftState, action.payload);
                 break;
             case ACTIONS.CHANGE_OPERATE:
-                reducerHander.changeOperate(action.payload);
+                reducerHander.changeOperate(draftState, action.payload);
                 break;
             case ACTIONS.CHANGE_RECORDER:
                 reducerHander.changeRecorder(action.payload);
+                break;
+            case ACTIONS.CHANGE_RTK_RECORDER:
+                reducerHander.changeRTKRecorder(action.payload);
                 break;
             case ACTIONS.CHANGE_SCENARIOS:
                 reducerHander.changeScenarios(action.payload);
@@ -42,6 +45,7 @@ export const reducer = (state: IInitState, action: CombineAction) =>
 export const initState: IInitState = {
     prevStatus: {},
     modes: [],
+    dynamicModels: [],
     currentMode: CURRENT_MODE.NONE,
     // such as:['Lincoln2017MKZ LGSVL', 'Mkz Example'],
     vehicles: [],
@@ -50,18 +54,18 @@ export const initState: IInitState = {
     dockerImage: '',
     maps: [],
     currentMap: '',
-    moduleStatus: new Map(),
+    modules: new Map(),
     modulesLock: new Map(),
-    componentStatus: new Map(),
 
-    isVehicleCalibrationMode: false,
-    isSensorCalibrationMode: false,
     //  数据包名称1: RECORDER_DOWNLOAD_STATUS.DOWNLOADEND
     records: {},
+    rtkRecords: [],
     currentRecordId: '',
+    currentRtkRecordId: '',
     currentScenarioSetId: '',
     currentScenarioName: '',
     currentScenarioId: '',
+    currentDynamicModel: '',
     scenarioSet: {},
     otherComponents: {},
 
@@ -69,12 +73,47 @@ export const initState: IInitState = {
     operations: [],
     currentOperation: undefined,
 
-    dataRecorderComponent: {
-        processStatus: {
-            status: undefined,
+    globalComponents: {
+        DataRecorder: {
+            processStatus: {
+                message: '',
+                status: undefined,
+            },
+            resourceStatus: {
+                message: '',
+                status: undefined,
+            },
         },
-        resourceStatus: {
-            status: undefined,
+        RTKPlayer: {
+            processStatus: {
+                message: '',
+                status: undefined,
+            },
+            summary: {
+                message: '',
+                status: undefined,
+            },
+        },
+        RTKRecorder: {
+            processStatus: {
+                message: '',
+                status: undefined,
+            },
+            summary: {
+                message: '',
+                status: undefined,
+            },
+        },
+    },
+
+    Terminal: {
+        processStatus: {
+            message: '',
+            status: ENUM_DATARECORD_PROCESS_STATUS.FATAL,
+        },
+        summary: {
+            message: '',
+            status: ENUM_DATARECORD_PROCESS_STATUS.FATAL,
         },
     },
 

@@ -1,0 +1,78 @@
+<package format="2">
+  <name>planning</name>
+  <version>local</version>
+  <description>
+    Compared with previous versions, Apollo 7.0 adds a  new dead end scenario, adds the "three-point turn",  increases vehicle driving in and out ability, and expands the operation boundary of the urban road network. The "three-point turn" function is based on the open space planner framework and includes the following parts: scene conversion of dead ends, construction of open space ROI, and "three-point turn" trajectory planning.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/planning/planning_component</src_path>
+
+  <depend type="binary" repo_name="planning-base">planning-base</depend>
+  <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+  <depend type="binary" repo_name="planning-planner-public-road">planning-planner-public-road</depend>
+  
+  <depend repo_name="planning-lane-follow-map" type="binary">planning-lane-follow-map</depend>
+
+  <depend repo_name="planning-scenario-bare-intersection-unprotected" type="binary">planning-scenario-bare-intersection-unprotected</depend>
+  <depend repo_name="planning-scenario-emergency-pull-over" type="binary">planning-scenario-emergency-pull-over</depend>
+  <depend repo_name="planning-scenario-emergency-stop" type="binary">planning-scenario-emergency-stop</depend>
+  <depend repo_name="planning-scenario-lane-follow" type="binary">planning-scenario-lane-follow</depend>
+  <depend repo_name="planning-scenario-park-and-go" type="binary">planning-scenario-park-and-go</depend>
+  <depend repo_name="planning-scenario-pull-over" type="binary">planning-scenario-pull-over</depend>
+  <depend repo_name="planning-scenario-stop-sign-unprotected" type="binary">planning-scenario-stop-sign-unprotected</depend>
+  <depend repo_name="planning-scenario-traffic-light-protected" type="binary">planning-scenario-traffic-light-protected</depend>
+  <depend repo_name="planning-scenario-traffic-light-unprotected-left-turn" type="binary">planning-scenario-traffic-light-unprotected-left-turn</depend>
+  <depend repo_name="planning-scenario-traffic-light-unprotected-right-turn" type="binary">planning-scenario-traffic-light-unprotected-right-turn</depend>
+  <depend repo_name="planning-scenario-valet-parking" type="binary">planning-scenario-valet-parking</depend>
+  <depend repo_name="planning-scenario-yield-sign" type="binary">planning-scenario-yield-sign</depend>
+
+  <depend repo_name="planning-task-fallback-path" type="binary">planning-task-fallback-path</depend>
+  <depend repo_name="planning-task-fast-stop-trajectory-fallback" type="binary">planning-task-fast-stop-trajectory-fallback</depend>
+  <depend repo_name="planning-task-lane-borrow-path" type="binary">planning-task-lane-borrow-path</depend>
+  <depend repo_name="planning-task-lane-change-path" type="binary">planning-task-lane-change-path</depend>
+  <depend repo_name="planning-task-lane-follow-path" type="binary">planning-task-lane-follow-path</depend>
+  <depend repo_name="planning-task-open-space-fallback-decider" type="binary">planning-task-open-space-fallback-decider</depend>
+  <depend repo_name="planning-task-open-space-pre-stop-decider" type="binary">planning-task-open-space-pre-stop-decider</depend>
+  <depend repo_name="planning-task-open-space-roi-decider" type="binary">planning-task-open-space-roi-decider</depend>
+  <depend repo_name="planning-task-open-space-trajectory-partition" type="binary">planning-task-open-space-trajectory-partition</depend>
+  <depend repo_name="planning-task-open-space-trajectory-provider" type="binary">planning-task-open-space-trajectory-provider</depend>
+  <depend repo_name="planning-task-path-decider" type="binary">planning-task-path-decider</depend>
+  <depend repo_name="planning-task-path-reference-decider" type="binary">planning-task-path-reference-decider</depend>
+  <depend repo_name="planning-task-path-time-heuristic" type="binary">planning-task-path-time-heuristic</depend>
+  <depend repo_name="planning-task-piecewise-jerk-speed" type="binary">planning-task-piecewise-jerk-speed</depend>
+  <depend repo_name="planning-task-piecewise-jerk-speed-nonlinear" type="binary">planning-task-piecewise-jerk-speed-nonlinear</depend>
+  <depend repo_name="planning-task-pull-over-path" type="binary">planning-task-pull-over-path</depend>
+  <depend repo_name="planning-task-reuse-path" type="binary">planning-task-reuse-path</depend>
+  <depend repo_name="planning-task-rss-decider" type="binary">planning-task-rss-decider</depend>
+  <depend repo_name="planning-task-rule-based-stop-decider" type="binary">planning-task-rule-based-stop-decider</depend>
+  <depend repo_name="planning-task-speed-bounds-decider" type="binary">planning-task-speed-bounds-decider</depend>
+  <depend repo_name="planning-task-speed-decider" type="binary">planning-task-speed-decider</depend>
+  <depend repo_name="planning-task-st-bounds-decider" type="binary">planning-task-st-bounds-decider</depend>
+
+  <depend repo_name="planning-traffic-rules-backside-vehicle" type="binary">planning-traffic-rules-backside-vehicle</depend>
+  <depend repo_name="planning-traffic-rules-crosswalk" type="binary">planning-traffic-rules-crosswalk</depend>
+  <depend repo_name="planning-traffic-rules-destination" type="binary">planning-traffic-rules-destination</depend>
+  <depend repo_name="planning-traffic-rules-keepclear" type="binary">planning-traffic-rules-keepclear</depend>
+  <depend repo_name="planning-traffic-rules-reference-line-end" type="binary">planning-traffic-rules-reference-line-end</depend>
+  <depend repo_name="planning-traffic-rules-rerouting" type="binary">planning-traffic-rules-rerouting</depend>
+  <depend repo_name="planning-traffic-rules-stop-sign" type="binary">planning-traffic-rules-stop-sign</depend>
+  <depend repo_name="planning-traffic-rules-traffic-light" type="binary">planning-traffic-rules-traffic-light</depend>
+  <depend repo_name="planning-traffic-rules-yield-sign" type="binary">planning-traffic-rules-yield-sign</depend>
+
+  <!-- external_command -->
+  <depend repo_name="external-command-action" type="binary">external-command-action</depend>
+  <depend repo_name="external-command-demo" type="binary">external-command-demo</depend>
+  <depend repo_name="external-command-lane-follow" type="binary">external-command-lane-follow</depend>
+  <depend repo_name="external-command-process" type="binary">external-command-process</depend>
+  <depend repo_name="external-command-processor-base" type="binary">external-command-processor-base</depend>
+  <depend repo_name="external-command-valet-parking" type="binary">external-command-valet-parking</depend>
+  <depend repo_name="old-routing-adpter" type="binary">old-routing-adpter</depend>
+  <depend repo_name="routing" type="binary">routing</depend>
+</package>

@@ -10,7 +10,7 @@
 | core | planning     | @subpage md_modules_2external\_\_command_2old\_\_routing\_\_adapter_2README\_\_cn "old-routing-adpter"                                                            |
 | core | planning     | @subpage md_modules_2external\_\_command_2process\_\_component_2README\_\_cn "external-command-process"                                                           |
 | core | planning     | @subpage md_modules_2routing_2README\_\_cn "routing"                                                                                                              |
-| core | planning     | @subpage md_modules_2planning_2planning\_\_base_2README\_\_cn "planning"                                                                                          |
+| core | planning     | @subpage md_modules_2planning_2planning\_\_base_2README\_\_cn "planning-base"                                                                                     |
 | core | planning     | @subpage md_modules_2planning_2scenarios_2pull\_\_over_2README\_\_cn "planning-scenario-pull-over"                                                                |
 | core | planning     | @subpage md_modules_2planning_2scenarios_2emergency\_\_stop_2README\_\_cn "planning-scenario-emergency-stop"                                                      |
 | core | planning     | @subpage md_modules_2planning_2scenarios_2traffic\_\_light\_\_unprotected\_\_right\_\_turn_2README\_\_cn "planning-scenario-traffic-light-unprotected-right-turn" |
@@ -23,7 +23,12 @@
 | core | planning     | @subpage md_modules_2planning_2scenarios_2traffic\_\_light\_\_unprotected\_\_left\_\_turn_2README\_\_cn "planning-scenario-traffic-light-unprotected-left-turn"   |
 | core | planning     | @subpage md_modules_2planning_2scenarios_2valet\_\_parking_2README\_\_cn "planning-scenario-valet-parking"                                                        |
 | core | planning     | @subpage md_modules_2planning_2scenarios_2traffic\_\_light\_\_protected_2README\_\_cn "planning-scenario-traffic-light-protected"                                 |
+| core | planning     | @subpage md_modules_2planning_2planning\_\_component_2README\_\_cn "planning"                                                                                     |
 | core | planning     | @subpage md_modules_2planning_2pnc\_\_map_2lane\_\_follow\_\_map_2README\_\_cn "planning-lane-follow-map"                                                         |
+| core | planning     | @subpage md_modules_2planning_2planners_2navi_2README\_\_cn "planning-planner-navi"                                                                               |
+| core | planning     | @subpage md_modules_2planning_2planners_2lattice_2README\_\_cn "planning-planner-lattice"                                                                         |
+| core | planning     | @subpage md_modules_2planning_2planners_2rtk_2README\_\_cn "planning-planner-rtk"                                                                                 |
+| core | planning     | @subpage md_modules_2planning_2planners_2public\_\_road_2README\_\_cn "planning-planner-public-road"                                                              |
 | core | planning     | @subpage md_modules_2planning_2tasks_2open\_\_space\_\_trajectory\_\_provider_2README\_\_cn "planning-task-open-space-trajectory-provider"                        |
 | core | planning     | @subpage md_modules_2planning_2tasks_2rule\_\_based\_\_stop\_\_decider_2README\_\_cn "planning-task-rule-based-stop-decider"                                      |
 | core | planning     | @subpage md_modules_2planning_2tasks_2piecewise\_\_jerk\_\_speed_2README\_\_cn "planning-task-piecewise-jerk-speed"                                               |
@@ -99,6 +104,7 @@
 | core | drivers      | @subpage md_modules_2drivers_2smartereye_2README "drivers-smartereye"                                                                                             |
 | core | drivers      | @subpage md_modules_2drivers_2tools_2image\_\_decompress_2README "drivers-image-decompress"                                                                       |
 | core | drivers      | @subpage md_modules_2drivers_2gnss_2README "drivers-gnss"                                                                                                         |
+| core | drivers      | @subpage md_modules_2drivers_2radar_2README "drivers-radar"                                                                                                       |
 | core | localization | @subpage md_modules_2localization_2README\_\_cn "localization"                                                                                                    |
 | core | dreamview    | @subpage md_modules_2dreamview_2README "dreamview"                                                                                                                |
 | core | dreamview    | @subpage md_modules_2dreamview\_\_plus_2README "dreamview-plus"                                                                                                   |
@@ -115,3 +121,4 @@
 | core | calibration  | @subpage md_modules_2calibration_2README "calibration"                                                                                                            |
 | core | data         | @subpage md_modules_2data_2README "apollo-data"                                                                                                                   |
 | core | map          | @subpage md_modules_2map_2README "map"                                                                                                                            |
+

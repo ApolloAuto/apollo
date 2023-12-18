@@ -17,7 +17,7 @@
 #include "modules/planning/scenarios/stop_sign_unprotected/stage_pre_stop.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/planning_base/scenario_base/proto/scenario_pipeline.pb.h"
+#include "modules/planning/planning_interface_base/scenario_base/proto/scenario_pipeline.pb.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/stop_sign_unprotected/context.h"

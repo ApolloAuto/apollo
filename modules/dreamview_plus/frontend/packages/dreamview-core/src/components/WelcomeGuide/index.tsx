@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, Button } from '@dreamview/dreamview-ui';
 import welcomeGuideTabsImageDefault from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_default.png';
 import welcomeGuideTabsImagePerception from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_perception.png';
+import welcomeGuideTabsImageVehicle from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_vehicle.jpg';
 import welcomeGuideDecorateEle from '@dreamview/dreamview-core/src/assets/welcome_guide_decorate_ele.png';
 import welcomeGuideTabsImagePNC from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_pnc.png';
+import { usePickHmiStore, CURRENT_MODE, changeMode } from '@dreamview/dreamview-core/src/store/HmiStore';
+import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
+import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 import { useUserInfoStore } from '../../store/UserInfoStore';
-import { CURRENT_MODE } from '../../store/HmiStore';
 import showViewLoginModal from './showViewLoginModal';
 import BackgroundEffect from './BackgroundEffect';
+import { StreamDataNames } from '../../services/api/types';
 
 type WelcomeGuideTabsContentProps = {
     contentImageUrl: string;
     clickEnterThisMode: () => void;
+    currentMode: CURRENT_MODE;
 };
 
 function WelcomeGuideTabsContent(props: WelcomeGuideTabsContentProps) {
-    const { contentImageUrl, clickEnterThisMode } = props;
+    const { contentImageUrl, clickEnterThisMode, currentMode } = props;
+    const { t } = useTranslation('guide');
     const { classes } = useStyle();
 
     return (
@@ -26,25 +32,22 @@ function WelcomeGuideTabsContent(props: WelcomeGuideTabsContentProps) {
                 style={{ backgroundImage: `url(${contentImageUrl})` }}
             />
             <div className={classes['welcome-guide-content-tab-text']}>
-                <div className={classes['welcome-guide-content-tab-text-desc']}>
-                    The default mode follows the old version of Dreamview layout and is applicable to all scenarios
-                    where debugging begins.
-                </div>
+                <div className={classes['welcome-guide-content-tab-text-desc']}>{t(`${currentMode}Desc`)}</div>
                 <div className={classes['welcome-guide-content-tab-text-modules-panel']}>
-                    Modules:
+                    {`${t('modules')}:`}
                     <div className={classes['welcome-guide-content-tab-text-modules-panel-desc']}>
-                        Include all modules
+                        {t(`${currentMode}Modules`)}
                     </div>
                 </div>
                 <div className={classes['welcome-guide-content-tab-text-modules-panel']}>
-                    Panel：
+                    {`${t('panel')}:`}
                     <div className={classes['welcome-guide-content-tab-text-modules-panel-desc']}>
-                        Vehicle Visualization、Vehicle Dashboard、Module delay、Console
+                        {t(`${currentMode}Panel`)}
                     </div>
                 </div>
                 <div className={classes['enter-this-mode']}>
                     <Button className={classes['enter-this-mode-btn']} onClick={() => clickEnterThisMode()}>
-                        Enter this mode
+                        {t('enterThisMode')}
                     </Button>
                 </div>
             </div>
@@ -60,7 +63,13 @@ type WelcomeGuideProps = {
 function WelcomeGuide(props: WelcomeGuideProps) {
     const { clickEnterThisModeToGuide, setLocalFirstUseGuideMode } = props;
 
-    const { classes, theme } = useStyle();
+    const [hmi, dispatch] = usePickHmiStore();
+
+    const { classes } = useStyle();
+
+    const { t } = useTranslation('guide');
+
+    const { mainApi, streamApi } = useWebSocketServices();
 
     const [userMixInfo] = useUserInfoStore();
 
@@ -75,8 +84,14 @@ function WelcomeGuide(props: WelcomeGuideProps) {
     };
 
     const clickEnterThisMode = () => {
+        dispatch(changeMode(mainApi, activeWelcomeGuideItemKey as CURRENT_MODE));
         setLocalFirstUseGuideMode(activeWelcomeGuideItemKey);
-        clickEnterThisModeToGuide(activeWelcomeGuideItemKey);
+        const subscription = streamApi?.subscribeToData(StreamDataNames.HMI_STATUS).subscribe((data: any) => {
+            if (data?.currentMode === activeWelcomeGuideItemKey) {
+                clickEnterThisModeToGuide(activeWelcomeGuideItemKey);
+                subscription.unsubscribe();
+            }
+        });
     };
 
     const WelcomeGuideTabsItem = [
@@ -87,6 +102,7 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                 <WelcomeGuideTabsContent
                     contentImageUrl={welcomeGuideTabsImageDefault}
                     clickEnterThisMode={clickEnterThisMode}
+                    currentMode={CURRENT_MODE.DEFAULT}
                 />
             ),
         },
@@ -97,6 +113,7 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                 <WelcomeGuideTabsContent
                     contentImageUrl={welcomeGuideTabsImagePerception}
                     clickEnterThisMode={clickEnterThisMode}
+                    currentMode={CURRENT_MODE.PERCEPTION}
                 />
             ),
         },
@@ -107,6 +124,18 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                 <WelcomeGuideTabsContent
                     contentImageUrl={welcomeGuideTabsImagePNC}
                     clickEnterThisMode={clickEnterThisMode}
+                    currentMode={CURRENT_MODE.PNC}
+                />
+            ),
+        },
+        {
+            key: CURRENT_MODE.VEHICLE_TEST,
+            label: 'Vehicle Test Mode',
+            children: (
+                <WelcomeGuideTabsContent
+                    contentImageUrl={welcomeGuideTabsImageVehicle}
+                    clickEnterThisMode={clickEnterThisMode}
+                    currentMode={CURRENT_MODE.VEHICLE_TEST}
                 />
             ),
         },
@@ -122,7 +151,7 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                             className={classes['welcome-guide-head-text-name']}
                             style={{ backgroundImage: `url(${welcomeGuideDecorateEle})` }}
                         >
-                            <span>Welcome</span>
+                            <span>{t('welcome')}</span>
                             <span>{userMixInfo.isLogin ? '~ ' : ', '}</span>
                             <span>
                                 {userMixInfo.isLogin ? (
@@ -132,15 +161,12 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                                         className={classes['welcome-guide-head-text-name-no-login']}
                                         onClick={clickViewLoginSteps}
                                     >
-                                        View login steps
+                                        {t('viewLoginSteps')}
                                     </span>
                                 )}
                             </span>
                         </div>
-                        <div className={classes['welcome-guide-head-text-desc']}>
-                            We provide you with the following visualization template. Choose one as the default
-                            interface to open.
-                        </div>
+                        <div className={classes['welcome-guide-head-text-desc']}>{t('modeSelectDesc')}</div>
                     </div>
                     <div className={classes['welcome-guide-head-logo']} />
                 </div>

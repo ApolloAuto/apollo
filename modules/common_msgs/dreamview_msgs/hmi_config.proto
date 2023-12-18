@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+enum HMIAction {
+  // Simple HMI action without any parameter.
+  NONE = 0;
+  SETUP_MODE = 1;       // Setup current mode.
+  RESET_MODE = 2;       // Reset current mode.
+  ENTER_AUTO_MODE = 3;  // Enter into auto driving mode.
+  DISENGAGE = 4;        // Disengage from auto driving mode.
+
+  // HMI action with a value string parameter.
+  CHANGE_MODE = 5;     // value = mode_name
+  CHANGE_MAP = 6;      // value = map_name
+  CHANGE_VEHICLE = 7;  // value = vehicle_name
+  START_MODULE = 8;    // value = module_name
+  STOP_MODULE = 9;     // value = module_name
+  CHANGE_SCENARIO = 10;     // value = scenario_id
+  CHANGE_SCENARIO_SET = 11;      // value = scenario_set_id
+  LOAD_SCENARIOS = 12; // 加载全部scenarios
+  DELETE_SCENARIO_SET = 13; // value = scenario_set_id
+  LOAD_DYNAMIC_MODELS = 14; // 加载全部动力学模型
+  CHANGE_DYNAMIC_MODEL = 15; // 切换动力学模型 value = dynamic_model_name
+  DELETE_DYNAMIC_MODEL = 16; // 删除动力学模型 value = dynamic_model_name
+  CHANGE_RECORD = 17; //value = record_id
+  DELETE_RECORD = 18; //value = record_id
+  LOAD_RECORDS = 19;     // Load all records
+  STOP_RECORD = 20; //value = module_name
+  CHANGE_OPERATION = 21; //value = operation_name
+  DELETE_VEHICLE_CONF = 22; // Delete the parameters of a vehicle.
+  DELETE_V2X_CONF = 23; // Delete the parameters of a v2x.
+  DELETE_MAP = 24; // Delete map that value = map_name
+  LOAD_RTK_RECORDS = 25; // Load all rtk records
+  CHANGE_RTK_RECORD = 26; // change rtk records
+  LOAD_RECORD = 27;     // Load record
+}
+
+message HMIConfig {
+  map<string, string> modes = 1;     // {mode_name: mode_path}
+  map<string, string> maps = 2;      // {map_name: map_path}
+  map<string, string> vehicles = 3;  // {vehicle_name: vehicle_path}
+}
+
+message VehicleData {
+  // Upon switching vehicle, we need to copy source data to the dest path to
+  // make it in effect.
+  message DataFile {
+    // Source path is a path relative to the vehicle data directory.
+    optional string source_path = 1;
+    // Dest path is where the data file could become in effect.
+    optional string dest_path = 2;
+  }
+  repeated DataFile data_files = 1;
+}
+

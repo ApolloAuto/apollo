@@ -64,8 +64,8 @@ task {
 ```
 ##### 配置 LaneFollowPath 参数
 在`modules/planning/tasks/lane_follow_path/conf/default_conf.pb.txt`中，对`LaneFollowPath`插件的参数进行配置。
-在`modules/planning/planning_base/conf/planning.conf`中，对作用在`LaneFollowPath`插件的gflag参数进行配置
+在`modules/planning/planning_component/conf/planning.conf`中，对作用在`LaneFollowPath`插件的gflag参数进行配置
 ##### 启动planning
 ```shell
-mainboard -d modules/planning/planning_base/dag/planning.dag
+mainboard -d modules/planning/planning_component/dag/planning.dag
 ```

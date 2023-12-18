@@ -17,7 +17,7 @@
 #include "modules/planning/scenarios/traffic_light_unprotected_left_turn/stage_creep.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/planning_base/scenario_base/proto/scenario_pipeline.pb.h"
+#include "modules/planning/planning_interface_base/scenario_base/proto/scenario_pipeline.pb.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/traffic_light_unprotected_left_turn/context.h"

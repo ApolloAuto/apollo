@@ -58,27 +58,11 @@ USER_SPECIFIED_MAPS=
 MAP_VOLUMES_CONF=
 OTHER_VOLUMES_CONF=
 
-# Install python tools
-source docker/setup_host/host_env.sh
-DEFAULT_PYTHON_TOOLS=(
-  amodel~=0.1.0
-)
-
-# Model
-MODEL_REPOSITORY="https://apollo-pkg-beta.cdn.bcebos.com/perception_model"
-DEFAULT_INSTALL_MODEL=(
-  "${MODEL_REPOSITORY}/tl_detection_caffe.zip"
-  "${MODEL_REPOSITORY}/horizontal_caffe.zip"
-  "${MODEL_REPOSITORY}/quadrate_caffe.zip"
-  "${MODEL_REPOSITORY}/vertical_caffe.zip"
-  "${MODEL_REPOSITORY}/darkSCNN_caffe.zip"
-  "${MODEL_REPOSITORY}/cnnseg128_caffe.zip"
-  "${MODEL_REPOSITORY}/3d-r4-half_caffe.zip"
-)
 CROSS_PLATFORM_FLAG=0
 
 # Map
 DEFAULT_MAPS=(
+  sunnyvale
   sunnyvale_big_loop
   sunnyvale_loop
   sunnyvale_with_two_offices
@@ -314,6 +298,7 @@ function setup_devices_and_mount_local_volumes() {
   local volumes="-v $APOLLO_ROOT_DIR:/apollo"
 
   [ ! -z "${CO_DEV_PATH}" ] && volumes="-v ${PWD}/${CO_DEV_PATH}:/apollo_workspace ${volumes}"
+  [ ! -z "${CO_DEV_PATH}" ] && volumes="-e CO_DEV=1 ${volumes}"
 
   [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
   volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"
@@ -325,10 +310,6 @@ function setup_devices_and_mount_local_volumes() {
   local apollo_tools="${APOLLO_ROOT_DIR}/../apollo-tools"
   if [ -d "${apollo_tools}" ]; then
     volumes="${volumes} -v ${apollo_tools}:/tools"
-  fi
-  # Mount PYTHON_INSTALL_PATH to apollo docker
-  if [ -d "${PYTHON_INSTALL_PATH}" ]; then
-    volumes="${volumes} -v ${PYTHON_INSTALL_PATH}:${PYTHON_INSTALL_PATH}"
   fi
 
   local os_release="$(lsb_release -rs)"
@@ -442,31 +423,6 @@ function mount_other_volumes() {
   OTHER_VOLUMES_CONF="${volume_conf}"
 }
 
-function install_python_tools() {
-  export PYTHONUSERBASE=${PYTHON_INSTALL_PATH}
-
-  for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
-    info "Install python tool ${tool} ..."
-    # Use /usr/bin/pip3 because native python is used in the container.
-    /usr/bin/pip3 install --user "${tool}"
-    if [ $? -ne 0 ]; then
-      error "Failed to install ${tool}"
-      exit 1
-    fi
-  done
-}
-
-function install_perception_models() {
-  if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
-    for model_url in ${DEFAULT_INSTALL_MODEL[@]}; do
-      info "Install model ${model_url} ..."
-      amodel install "${model_url}" -s
-    done
-  else
-    warning "Skip the model installation, if you need to run the perception module, you can manually install."
-  fi
-}
-
 function main() {
   check_host_environment
   check_target_arch
@@ -506,17 +462,9 @@ function main() {
   mount_map_volumes
   mount_other_volumes
 
-  if ! [ -x "$(command -v pip3)" ]; then
-    warning "Skip install perception models!!! " \
-      "Need pip3 to install Apollo model management tool!" \
-      "Try \"sudo apt install python3-pip\" "
-  else
-    info "Installing python tools ..."
-    # install_python_tools
-
-    info "Installing perception models ..."
-    install_perception_models
-  fi
+  warning "Starting in 9.0 we do not automatically download models!" \
+    "If you want to run the perception module, download the model manually" \
+    "reference https://github.com/ApolloAuto/apollo/discussions/15212"
 
   info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
@@ -541,8 +489,6 @@ function main() {
     -e DOCKER_GRP="${group}" \
     -e DOCKER_GRP_ID="${gid}" \
     -e DOCKER_IMG="${DEV_IMAGE}" \
-    -e PYTHON_INSTALL_PATH="${PYTHON_INSTALL_PATH}" \
-    -e PYTHON_VERSION="${PYTHON_VERSION}" \
     -e USE_GPU_HOST="${USE_GPU_HOST}" \
     -e NVIDIA_VISIBLE_DEVICES=all \
     -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \

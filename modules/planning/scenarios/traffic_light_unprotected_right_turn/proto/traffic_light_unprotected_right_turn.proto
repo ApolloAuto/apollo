@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/planning_base/scenario_base/proto/creep_stage.proto";
+import "modules/planning/planning_interface_base/scenario_base/proto/creep_stage.proto";
 
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
   // Switch to "TrafficLightUnprotectedRightTurnScenario" when ego-vehicle is

@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/planning/planning_base/common/frame.h"
 
 namespace apollo {
@@ -95,6 +96,9 @@ class OpenSpaceRoiUtil {
                                      const double& origin_heading,
                                      OpenSpaceInfo* open_space_info);
   static bool IsPolygonClockwise(const std::vector<Vec2d>& polygon);
+  static bool AdjustPointsOrderToClockwise(std::vector<Vec2d>* polygon);
+  static bool UpdateParkingPointsOrder(const apollo::hdmap::Path& nearby_path,
+                                       std::vector<Vec2d>* points);
 };
 
 }  // namespace planning

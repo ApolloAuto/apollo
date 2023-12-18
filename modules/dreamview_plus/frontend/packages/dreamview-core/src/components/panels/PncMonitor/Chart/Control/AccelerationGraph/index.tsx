@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function AccelerationGraph() {
     const [options, setOptions] = useState<any>();
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         const { dataset, series } = Object.entries(graph).reduce(
@@ -52,6 +52,13 @@ function AccelerationGraph() {
         triggerUIUpdate(controlData.acceleration);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Acceleration' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['acceleration'])}
+            labelRotateBoundary={550}
+            title='Acceleration'
+            options={options}
+        />
+    );
 }
 export default React.memo(AccelerationGraph);

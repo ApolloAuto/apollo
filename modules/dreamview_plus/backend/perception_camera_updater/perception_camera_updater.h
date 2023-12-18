@@ -29,12 +29,12 @@
 #include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/common_msgs/transform_msgs/transform.pb.h"
-#include "modules/dreamview_plus/proto/camera_update.pb.h"
+#include "modules/dreamview/proto/camera_update.pb.h"
 #include "modules/dreamview_plus/proto/data_handler.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 #include "modules/transform/buffer.h"
 
@@ -83,7 +83,7 @@ class PerceptionCameraUpdater : public UpdaterWithChannelsBase {
                    const std::string &channel_name = "",
                    nlohmann::json *subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name = "") override;
-  void OnTimer(const std::string& channel_name = "") override;
+  void OnTimer(const std::string& channel_name = "");
   void PublishMessage(const std::string& channel_name = "") override;
 
 

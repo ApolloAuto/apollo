@@ -3,7 +3,12 @@ import { Input, Modal } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 import showModal, { WithModalComponentProps } from '@dreamview/dreamview-core/src/util/modal';
-import { usePickHmiStore, ENUM_DATARECORD_PRECESS_STATUS } from '@dreamview/dreamview-core/src/store/HmiStore';
+import {
+    usePickHmiStore,
+    ENUM_DATARECORD_PROCESS_STATUS,
+    ENUM_RTKRECORD_PROCESS_STATUS,
+    HMIModeOperation,
+} from '@dreamview/dreamview-core/src/store/HmiStore';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import dayjs from 'dayjs';
 import useStyle from './useStyle';
@@ -91,9 +96,10 @@ interface ConfirmModalProps {
     onConfirmSave: (name: string) => Promise<any>;
     onCancelSave: () => void;
     defaultName: string;
+    currentOperation: HMIModeOperation;
 }
 function ConfirmModal(props: WithModalComponentProps<ConfirmModalProps>) {
-    const { destroy, defaultName, onConfirmSave, onCancelSave } = props;
+    const { destroy, defaultName, onConfirmSave, onCancelSave, currentOperation } = props;
     const { t } = useTranslation('bottomBar');
     const [name, setName] = useState(() => defaultName.replace(/\s/g, ''));
     const isLoad = useRef(true);
@@ -107,6 +113,11 @@ function ConfirmModal(props: WithModalComponentProps<ConfirmModalProps>) {
 
         if (/\s/.test(name)) {
             setError(t('nameHasWhitespace'));
+            return false;
+        }
+
+        if (/[^0-9A-z_]/.test(name)) {
+            setError(t('nameHasChinese'));
             return false;
         }
 
@@ -177,7 +188,12 @@ function RecordBtn() {
     const { classes, cx } = useStyle();
     const { t } = useTranslation('bottomBar');
 
-    const isInRecord = hmi.dataRecorderComponent?.processStatus?.status === ENUM_DATARECORD_PRECESS_STATUS.OK;
+    const isInRecord = (() => {
+        if (hmi.currentOperation === HMIModeOperation.WAYPOINT_FOLLOW) {
+            return hmi.globalComponents?.RTKRecorder?.processStatus?.status === ENUM_RTKRECORD_PROCESS_STATUS.OK;
+        }
+        return hmi.globalComponents?.DataRecorder?.processStatus?.status === ENUM_DATARECORD_PROCESS_STATUS.OK;
+    })();
 
     const [, onStartRecord] = usePending(
         useCallback(() => {
@@ -214,14 +230,14 @@ function RecordBtn() {
                         defaultName: [dayjs().format('YYYYMMDDHHmm'), hmi.currentVehicle, hmi.currentMap]
                             .filter(Boolean)
                             .join('_'),
+                        currentOperation: hmi.currentOperation,
                     });
                 });
             }
             return Promise.reject();
-        }, [isMainConnected, hmi.currentVehicle, hmi.currentMap]),
+        }, [isMainConnected, hmi.currentVehicle, hmi.currentMap, hmi.currentOperation]),
     );
 
-    // const { isMainConnected, mainApi } = useWebSocketServices();
     // 重置record
     const onRecord = () => {
         if (isInRecord) {

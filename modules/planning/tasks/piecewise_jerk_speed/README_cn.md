@@ -98,7 +98,7 @@ apollo::planning::PiecewiseJerkSpeedOptimizer
 
 | 文件路径                                            |  <div style="width: 300pt">说明</div> |
 | --------------------------------------------------- |  ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
+| `modules/planning/planning_component/conf/planning.conf` |  planning模块的flag配置文件           |
 
 #### 模块参数说明
   

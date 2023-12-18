@@ -28,13 +28,26 @@ def process_markdown(filename: str):
                       r'(\)|\]|"|\')')
     with open(filename, 'r', encoding='utf-8') as fin:
         content = fin.read()
+        # if not re.compile(r'^#\s+.*').match(content):
+        #     # add title
+        #     title = os.path.basename(filename).replace('.md', '')
+        #     content = f'# {title}\n\n' + content
         if '[TOC]' not in content:
             # add table of content
-            content = re.sub(r'^(#[^#].*|.*\n=+)', '\\1\n\n[TOC]\n', content)
+            # content = re.sub(r'^(#[^#].*|.*\n=+)', '\\1\n\n[TOC]\n', content)
+            content = '[TOC]\n\n' + content
 
         result = re.sub(patt,
                         lambda x: resolve_markdown_linkpath(filename, x, None),
                         content)
+        result = result + (
+            '\n\n'
+            '## 文档意见反馈\n\n'
+            '如果您在使用文档的过程中，'
+            '遇到任何问题，请到我们在【开发者社区】建立的 '
+            '[反馈意见收集问答页面]'
+            '(https://studio.apollo.auto/community/article/163)，'
+            '反馈相关的问题。我们会根据反馈意见对文档进行迭代优化。')
         print(result, end='')
 
 

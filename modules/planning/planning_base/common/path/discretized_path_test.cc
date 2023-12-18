@@ -17,6 +17,7 @@
 #include "modules/planning/planning_base/common/path/discretized_path.h"
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/util/point_factory.h"
 

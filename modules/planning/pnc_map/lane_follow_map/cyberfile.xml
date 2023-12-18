@@ -10,7 +10,7 @@
     <license>Apache License 2.0</license>
     <author>Apollo</author>
     <depend>bazel-extend-tools</depend>
-    <depend type="binary" repo_name="planning">planning</depend>
+    <depend type="binary" repo_name="planning-base">planning-base</depend>
     
     <builder>bazel</builder>
   </package>

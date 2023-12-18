@@ -1,5 +1,5 @@
 info {
-  name: "yolox3d"
+  name: "yolox3d_onnx"
   version: "2023-10-18"
   dataset: "L4"
   task_type: Detection3D
@@ -46,7 +46,7 @@ nms_param {
 }
 info_3d{
   info {
-    name: "yolox3d"
+    name: "yolox3d_onnx"
     version: "2023-06-27"
     dataset: "L4"
     task_type: Detection3D

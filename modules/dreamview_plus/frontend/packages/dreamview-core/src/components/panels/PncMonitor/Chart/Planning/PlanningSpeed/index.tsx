@@ -37,7 +37,7 @@ function Speed() {
             initOptions({
                 dataset,
                 series,
-                // scale: true,
+                scale: true,
                 xAxis: {
                     type: 'value',
                     name: 'time (s)',

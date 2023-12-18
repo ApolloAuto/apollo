@@ -10,15 +10,15 @@ function DemoChannelSelect(props: RenderToolbarProps) {
     const { panelId, updateChannel } = props;
     const { metadata, isMainConnected } = useWebSocketServices();
     const [curVal, setCurVal] = useState(undefined);
-    const curMeta = useMemo(() => metadata.find((meata) => meata.dataName === props.name), [metadata, isMainConnected]);
+    const curMeta = useMemo(() => metadata.find((meta) => meta.dataName === props.name), [metadata, isMainConnected]);
     const channels = useMemo(() => {
         if (!curMeta) {
             return [];
         }
 
         return curMeta.channels.map((channel) => ({
-            label: channel,
-            value: channel,
+            label: channel.channelName,
+            value: channel.channelName,
         }));
     }, [curMeta]);
     const notifyInitialChannel = useRegisterNotifyInitialChanel(panelId);

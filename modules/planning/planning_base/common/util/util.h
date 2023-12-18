@@ -25,9 +25,9 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/planning_base/common/reference_line_info.h"
-
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 
 namespace apollo {

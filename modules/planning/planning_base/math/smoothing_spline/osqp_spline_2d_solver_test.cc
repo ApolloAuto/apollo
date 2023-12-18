@@ -22,6 +22,7 @@
 #include <chrono>
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/planning_base/math/curve_math.h"
 
 namespace apollo {

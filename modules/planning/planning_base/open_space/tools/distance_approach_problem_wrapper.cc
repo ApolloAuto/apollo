@@ -17,8 +17,11 @@
 /**
  * @file
  **/
+
+#include <future>
+
 #include "cyber/common/file.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
@@ -430,7 +433,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double ipopt_total = 0.0;
 
   std::string flag_file_path =
-      "/apollo/modules/planning/planning_base/conf/planning.conf";
+      "/apollo/modules/planning/planning_component/conf/planning.conf";
   google::SetCommandLineOption("flagfile", flag_file_path.c_str());
 
   HybridAStartResult hybrid_astar_result;

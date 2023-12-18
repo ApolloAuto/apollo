@@ -1,17 +1,25 @@
 import { BehaviorSubject, filter, finalize, from, map, Observable, Subject, tap } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import Logger from '@dreamview/log';
 import { isEqual, isNil } from 'lodash';
+import WorkerPoolManager from '@dreamview/dreamview-core/src/worker/WorkerPoolManager';
 import { HandleMessageType } from '@dreamview/dreamview-core/src/services/models/response-message.model';
 import { RequestDataType } from '@dreamview/dreamview-core/src/services/models/request-message.model';
 import CountedSubject from '@dreamview/dreamview-core/src/util/CountedSubject';
 import MultiKeyMap from '@dreamview/dreamview-core/src/util/MultiKeyMap';
 import { Emptyable, Nullable } from '@dreamview/dreamview-core/src/util/similarFunctions';
 import { genereateRequestId } from '@dreamview/dreamview-core/src/util/genereateRequestId';
+import MessageQueue from '@dreamview/dreamview-core/src/util/MessageQueue';
+import ChildWsWorkerClass from '@dreamview/dreamview-core/src/worker/child-ws.worker-class';
+import { WorkerFactory } from '@dreamview/dreamview-core/src/worker/WorkerFactory';
+import DecoderWorkerClass from '@dreamview/dreamview-core/src/worker/decoder.worker-class';
+import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
 import { WebSocketConnection } from './websocket-connect.service';
-import { config } from './constant';
+import { config, requestIdleCallbackTimeout } from './constant';
 import {
     ConnectionStatusEnum,
     isMessageType,
+    MetaActionType,
     MetadataItem,
     RequestMessage,
     RequestMessageActionEnum,
@@ -19,25 +27,36 @@ import {
     ResponseMessage,
     ResponseMessageActionEnum,
     SocketNameEnum,
+    StreamMessage,
     StreamMessageData,
     SubscribePayload,
 } from './type';
 import { PluginManager } from './plugins/PluginManager';
 import { WebSocketPlugin } from './plugins/type';
 import MapMessageHandlerPlugin from './plugins/MapMessageHandlerPlugin';
-import ChildWsService from './child-ws.service';
-import { StreamDataNames } from '../api/types';
+import { indexedDBStorage } from '../../util/indexedDB/IndexedDBStorage';
+import { ProtoLoader } from '../../util/ProtoLoader';
 
 const logger = Logger.getInstance('WebSocketManager');
 
 const dataFrequencyMs = 100;
-
+interface IArrayItem {
+    dataName: StreamDataNames;
+    protoPath: string;
+    channelName?: string;
+}
 export class WebSocketManager {
+    private childWsManagerQueue = new MessageQueue<string>({
+        name: 'WebSocketManager',
+    });
+
     private readonly mainConnection: WebSocketConnection;
 
     private readonly pluginConnection: WebSocketConnection;
 
-    private activeWorkers: { [key: string]: ChildWsService } = {};
+    private readonly protoLoader = new ProtoLoader();
+
+    private activeWorkers: { [key: string]: ChildWsWorkerClass } = {};
 
     private pluginManager = new PluginManager();
 
@@ -58,6 +77,11 @@ export class WebSocketManager {
         };
     } = {};
 
+    private workerPoolManager = new WorkerPoolManager<StreamMessage>({
+        name: 'decoderWorkerPool',
+        workerFactory: new WorkerFactory<StreamMessage>(() => new DecoderWorkerClass()),
+    });
+
     constructor(mainUrl: string = config.mainUrl, pluginUrl: string = config.pluginUrl) {
         this.registerPlugin([new MapMessageHandlerPlugin()]);
         this.mainConnection = new WebSocketConnection(mainUrl);
@@ -68,6 +92,104 @@ export class WebSocketManager {
         this.pluginConnection.receivedMessages$.subscribe((msg) =>
             this.handleMessage(<HandleMessageType>msg, SocketNameEnum.PLUGIN),
         );
+
+        this.loadInitProtoFiles();
+
+        this.metadataSubject.pipe(debounceTime(200)).subscribe(() => {
+            this.consumeChildWsManagerQueue();
+            // console.log("metadata: ", this.metadata);
+            const protoList: {
+                level0: IArrayItem[];
+                level1: IArrayItem[];
+                level2: IArrayItem[];
+            } = {
+                level0: [],
+                level1: [],
+                level2: [],
+            };
+
+            const protoFiles: string[] = [];
+
+            this.metadata.forEach((item) => {
+                if (!item.differentForChannels) {
+                    protoList.level0.push({ dataName: item.dataName, protoPath: item.protoPath });
+                    protoFiles.push(`${item.protoPath}`);
+                } else if (item.protoPath) {
+                    protoList.level1.push({ dataName: item.dataName, protoPath: item.protoPath });
+                    protoFiles.push(`${item.protoPath}`);
+                } else {
+                    item.channels.forEach((channel) => {
+                        protoList.level2.push({
+                            dataName: item.dataName,
+                            protoPath: channel.protoPath,
+                            channelName: channel.channelName,
+                        });
+                        protoFiles.push(`${item.protoPath}`);
+                    });
+                }
+            });
+            // console.log("protodata list: ", protoList);
+
+            protoFiles.forEach((file) => {
+                this.protoLoader.loadProto(file).catch((error) => {
+                    logger.error(error);
+                });
+            });
+
+            if (this.metadata.length > 0) {
+                protoList.level0.forEach((item) => {
+                    this.protoLoader
+                        .loadAndCacheProto(item.protoPath, {
+                            dataName: item.dataName,
+                        })
+                        .catch((error) => {
+                            logger.error(error);
+                        });
+                });
+
+                protoList.level1.forEach((item) => {
+                    this.protoLoader
+                        .loadAndCacheProto(item.protoPath, {
+                            dataName: item.dataName,
+                        })
+                        .catch((error) => {
+                            logger.error(error);
+                        });
+                });
+                protoList.level2.forEach((item) => {
+                    this.protoLoader
+                        .loadAndCacheProto(item.protoPath, {
+                            dataName: item.dataName,
+                            channelName: item.channelName,
+                        })
+                        .catch((error) => {
+                            logger.error(error);
+                        });
+                });
+            }
+        });
+
+        if (process.env.NODE_ENV === 'development') {
+            setInterval(() => {
+                this.workerPoolManager.visualize();
+            }, 1000);
+        }
+    }
+
+    loadInitProtoFiles() {
+        const initProtoFiles: string[] = [
+            'modules/common_msgs/basic_msgs/error_code.proto',
+            'modules/common_msgs/basic_msgs/header.proto',
+            'modules/common_msgs/dreamview_msgs/hmi_status.proto',
+            'modules/common_msgs/basic_msgs/geometry.proto',
+            'modules/common_msgs/map_msgs/map_id.proto',
+        ];
+
+        initProtoFiles.forEach((file) => {
+            this.protoLoader.loadProto(file).catch((error) => {
+                logger.error(error);
+            });
+        });
     }
 
     public registerPlugin(plugins: WebSocketPlugin[]): void {
@@ -98,16 +220,72 @@ export class WebSocketManager {
             const metadata = Object.values(msg.data.info.data.dataHandlerInfo);
             this.setMetadata(metadata);
             this.mainConnection.connectionStatus$.next(ConnectionStatusEnum.METADATA);
+        } else if (msg.action === ResponseMessageActionEnum.METADATA_JOIN_TYPE) {
+            const sourceDataForJoin = Object.values(msg.data.info.data.dataHandlerInfo);
+            const metadata = this.updateMetadataChannels(this.metadata, 'join', sourceDataForJoin);
+            this.setMetadata(metadata);
+        } else if (msg.action === ResponseMessageActionEnum.METADATA_LEAVE_TYPE) {
+            const sourceDataForLeave = Object.values(msg.data.info.data.dataHandlerInfo);
+            const metadata = this.updateMetadataChannels(this.metadata, 'leave', sourceDataForLeave);
+            this.setMetadata(metadata);
         } else if (msg.action === ResponseMessageActionEnum.RESPONSE_MESSAGE_TYPE) {
             if (msg && this.responseResolvers[msg.data.requestId]) {
                 if (msg.data.info.code === 0) {
                     this.responseResolvers[msg.data.requestId].resolver(msg);
+                } else {
+                    this.responseResolvers[msg.data.requestId].reject(msg);
                 }
                 if (this.responseResolvers[msg.data.requestId].shouldDelete) {
                     delete this.responseResolvers[msg.data.requestId];
                 }
             }
         }
+    }
+
+    /**
+     * Updates or adds channels in a target MetadataItem array based on a specified action type
+     * ('join' or 'leave') and source data. New MetadataItem objects are created
+     * for new dataNames in case of 'join' action.
+     * @param targetArray Target MetadataItem array to update
+     * @param actionType Action type ('join' or 'leave')
+     * @param sourceArray Source MetadataItem array
+     */
+    updateMetadataChannels(
+        targetArray: MetadataItem[],
+        actionType: MetaActionType,
+        sourceArray: MetadataItem[],
+    ): MetadataItem[] {
+        const targetMap = new Map<string, MetadataItem>(targetArray.map((item) => [item.dataName, item]));
+
+        sourceArray.forEach((sourceItem) => {
+            const { dataName, channels } = sourceItem;
+            let targetItem = targetMap.get(dataName);
+
+            if (!targetItem) {
+                targetItem = { dataName, channels: [] } as MetadataItem;
+                targetMap.set(dataName, targetItem);
+            } else {
+                // 创建 targetItem 的浅副本
+                targetItem = { ...targetItem };
+            }
+
+            if (actionType === 'join') {
+                channels.forEach((newChannel) => {
+                    if (!targetItem.channels.some((ch) => ch.channelName === newChannel.channelName)) {
+                        targetItem.channels = [...targetItem.channels, newChannel];
+                    }
+                });
+            } else if (actionType === 'leave') {
+                targetItem.channels = targetItem.channels.filter(
+                    (ch) => !channels.some((channelToRemove) => ch.channelName === channelToRemove.channelName),
+                );
+            }
+
+            // 更新 targetMap 中的 targetItem
+            targetMap.set(dataName, targetItem);
+        });
+
+        return Array.from(targetMap.values());
     }
 
     connectMain(retries = 3, retryInterval = 1000) {
@@ -149,21 +327,32 @@ export class WebSocketManager {
         if (!isEqual(this.metadata, metadata)) {
             this.metadata = metadata;
             this.metadataSubject.next(metadata);
+            indexedDBStorage
+                .getStoreManager('DreamviewPlus')
+                .then(
+                    (storeManager) => storeManager.setItem('metadata', metadata),
+                    (error) => logger.error(error),
+                )
+                .then(() => logger.debug('metadata is saved to indexedDB'));
         } else {
             logger.debug('Metadata is not changed');
         }
     }
 
     get metadata$(): Observable<MetadataItem[]> {
-        return this.metadataSubject.asObservable();
+        return this.metadataSubject.asObservable().pipe(debounceTime(100));
     }
 
     private connectChildSocket(name: string): void {
         const metadata = this.metadata.find((m) => m.dataName === name);
-        if (!metadata) return;
+
+        if (!metadata) {
+            logger.error(`Cannot find metadata for ${name}`);
+            return;
+        }
 
         if (!this.activeWorkers[name]) {
-            this.activeWorkers[name] = new ChildWsService(
+            this.activeWorkers[name] = new ChildWsWorkerClass(
                 name as StreamDataNames,
                 `${config.baseURL}/${metadata.websocketInfo.websocketName}`,
             ).connect();
@@ -171,12 +360,23 @@ export class WebSocketManager {
 
         this.activeWorkers[name].socketMessage$.subscribe((message) => {
             if (isMessageType(message, 'SOCKET_MESSAGE')) {
-                const endTimestamp = performance.now();
-                const startTimestamp = message.payload?.performance?.startTimestamp;
-                if (startTimestamp) {
-                    logger.debug(`Message from ${name} took ${endTimestamp - startTimestamp}ms to transfer`);
-                }
-                this.dataSubjects.getByExactKey({ name })?.next(message.payload);
+                const { data } = message.payload as StreamMessage;
+                this.workerPoolManager
+                    .dispatchTask({
+                        type: 'SOCKET_STREAM_MESSAGE',
+                        payload: <StreamMessage>message.payload,
+                        transferList: [data.buffer],
+                    })
+                    .then(
+                        (response) => {
+                            if (response.success) {
+                                this.dataSubjects.getByExactKey({ name })?.next(response.result);
+                            }
+                        },
+                        (error) => {
+                            logger.error(error);
+                        },
+                    );
             }
         });
     }
@@ -195,8 +395,15 @@ export class WebSocketManager {
             return;
         }
 
+        const metadata = this.metadata.find((m) => m.dataName === name);
+
+        if (!metadata) {
+            logger.error(`Cannot find metadata for ${name}`);
+            return;
+        }
+
         const info: SubscribePayload = {
-            websocketName: name,
+            websocketName: metadata.websocketInfo.websocketName,
             ...(isNil(channel) ? {} : { channelName: channel }),
             ...(isNil(option?.param) ? {} : { param: option.param }),
             dataFrequencyMs: option?.dataFrequencyMs ?? dataFrequencyMs,
@@ -223,8 +430,35 @@ export class WebSocketManager {
      */
     private initChildSocket(name: string): void {
         if (this.activeWorkers[name] === undefined) {
-            this.connectChildSocket(name);
+            this.childWsManagerQueue.enqueue(name);
         }
+        this.consumeChildWsManagerQueue();
+    }
+
+    private consumeChildWsManagerQueue() {
+        // 用requestIdleCallback排队执行的函数
+        const idleConsume = (deadline: IdleDeadline) => {
+            let maxIterations = this.childWsManagerQueue.size;
+
+            // 仅当浏览器空闲时，才开始处理队列中的消息
+            while (deadline.timeRemaining() > 0 && !this.childWsManagerQueue.isEmpty() && maxIterations > 0) {
+                const name = this.childWsManagerQueue.dequeue();
+                // 检查 metadata 是否存在
+                const metadata = this.metadata.find((m) => m.dataName === name);
+
+                // 如果 metadata 存在且 worker 未激活，则进行连接
+                if (metadata && this.activeWorkers[name] === undefined) {
+                    logger.debug(`Connecting to ${name}`);
+                    this.connectChildSocket(name);
+                }
+
+                // 处理完后，将 name 放回队列末尾
+                this.childWsManagerQueue.enqueue(name);
+                maxIterations -= 1;
+            }
+        };
+
+        requestIdleCallback(idleConsume, { timeout: requestIdleCallbackTimeout });
     }
 
     /**
@@ -262,12 +496,18 @@ export class WebSocketManager {
                 const isCompleted = subject$.completed;
                 if (isCompleted) return;
                 if (subscribersCount === 0) {
-                    this.sendSubscriptionMessage(RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE, name, null, option);
-
-                    this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
-                    // 不再主动关闭socket，可以复用。
-                    // this.activeSockets[name].complete();
-                    // delete this.activeSockets[name];
+                    setTimeout(() => {
+                        const delaySubscribersCount = subject$.count;
+                        if (delaySubscribersCount === 0) {
+                            this.sendSubscriptionMessage(
+                                RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
+                                name,
+                                null,
+                                option,
+                            );
+                            this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
+                        }
+                    }, 5000);
                 }
             }),
         );
@@ -296,23 +536,6 @@ export class WebSocketManager {
 
         if (this.dataSubjects.getByExactKey({ name, channel }) === undefined) {
             this.sendSubscriptionMessage(RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE, name, channel, option);
-            // this.mainConnection.sendMessage({
-            //     action: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-            //     type: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-            //     data: {
-            //         name: 'subscribe',
-            //         source: 'dreamview',
-            //         info: {
-            //             websocketName: name,
-            //             channelName: channel,
-            //             param: option.param,
-            //             dataFrequencyMs: option.dataFrequencyMs || dataFrequencyMs,
-            //         },
-            //         sourceType: 'websocktSubscribe',
-            //         targetType: 'module',
-            //         requestId: 'dreamview',
-            //     },
-            // } as RequestStreamMessage);
             this.dataSubjects.set({ name, channel }, new CountedSubject(name, channel));
         }
 
@@ -329,36 +552,27 @@ export class WebSocketManager {
                 const isCompleted = downstream.completed;
                 if (isCompleted) return;
                 if (subscribersCount === 0) {
-                    this.sendSubscriptionMessage(
-                        RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                        name,
-                        channel,
-                        option,
-                    );
-                    // this.mainConnection.sendMessage({
-                    //     action: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                    //     type: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                    //     data: {
-                    //         name: 'unsubscribe',
-                    //         source: 'dreamview',
-                    //         info: {
-                    //             websocketName: name,
-                    //             channelName: channel,
-                    //         },
-                    //         sourceType: 'websocktSubscribe',
-                    //         targetType: 'module',
-                    //         requestId: 'unsubscribe',
-                    //     },
-                    // } as RequestStreamMessage);
+                    setTimeout(() => {
+                        const delaySubscribersCount = downstream.count;
+                        if (delaySubscribersCount === 0) {
+                            this.sendSubscriptionMessage(
+                                RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
+                                name,
+                                channel,
+                                option,
+                            );
 
-                    this.dataSubjects.deleteByExactKey({ name, channel }, (countedSubject) =>
-                        countedSubject.complete(),
-                    );
+                            this.dataSubjects.deleteByExactKey({ name, channel }, (countedSubject) =>
+                                countedSubject.complete(),
+                            );
+                        }
+                    }, 5000);
                 }
 
                 // 如果没有下游订阅者，就取消上游数据源的订阅
                 if (this.dataSubjects.countIf((subject) => subject.name === name) === 1) {
-                    this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
+                    // fixme: 暂时不删除这个主题
+                    // this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
                     // this.activeSockets[name]?.complete();
                     // delete this.activeSockets[name];
                 }
@@ -448,13 +662,9 @@ export class WebSocketManager {
     }
 
     public sendMessage<T>(request: RequestMessage<T>, socket: SocketNameEnum = SocketNameEnum.MAIN): void {
-        if (socket === SocketNameEnum.MAIN) {
-            this.mainConnection.sendMessage({ ...request });
-        }
+        const connection = socket === SocketNameEnum.MAIN ? this.mainConnection : this.pluginConnection;
 
-        if (socket === SocketNameEnum.PLUGIN) {
-            this.pluginConnection.sendMessage({ ...request });
-        }
+        connection.sendMessage({ ...request });
     }
 }
 

@@ -50,6 +50,6 @@ Modal.confirm = (props: ModalFuncProps) => {
         icon: <IcModalConfirmWarning />,
         autoFocusButton: null,
         ...props,
-        className: 'dreamview-modal-confirm',
+        className: `${props.className || ''} dreamview-modal-confirm`,
     });
 };

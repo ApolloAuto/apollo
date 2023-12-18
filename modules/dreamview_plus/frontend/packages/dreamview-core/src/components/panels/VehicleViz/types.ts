@@ -7,3 +7,8 @@ export enum ViewType {
     // 2D视角
     TOP_DOWN = 'TopDown',
 }
+
+export enum VizCurMode {
+    DEFAULT = 'Default',
+    FOLLOW = 'Follow',
+}

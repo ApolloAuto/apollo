@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "modules/planning/scenarios/traffic_light_unprotected_left_turn/proto/traffic_light_unprotected_left_turn.pb.h"
-#include "modules/planning/planning_base/scenario_base/scenario.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {

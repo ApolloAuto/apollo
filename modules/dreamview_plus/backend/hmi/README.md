@@ -7,7 +7,7 @@ HMIWorker.
 
 ## HMI Config
 
-See modules/dreamview/proto/hmi_config.proto. It defines all supported modes,
+See modules/common_msgs/dreamview_msgs/hmi_config.proto. It defines all supported modes,
 modules, hardware and tools.
 
 ## HMI Worker

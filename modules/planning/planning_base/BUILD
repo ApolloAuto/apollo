@@ -13,32 +13,10 @@ PLANNING_FOPENMP = [
     "-fopenmp",
 ]
 
-apollo_component(
-    name = "libplanning_component.so",
-    srcs = ["planning_component.cc"],
-    hdrs = ["planning_component.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:util_tool",
-        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
-        "//modules/common_msgs/localization_msgs:localization_cc_proto",
-        "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
-        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
-        "//modules/common_msgs/storytelling_msgs:story_cc_proto",
-    ],
-)
-
 apollo_cc_library(
     name = "apollo_planning_planning_base",
     srcs = [
-        "common/config_util.cc",
+        "common/util/config_util.cc",
         "common/ego_info.cc",
         "common/feature_output.cc",
         "common/frame.cc",
@@ -54,7 +32,6 @@ apollo_cc_library(
         "common/path_boundary.cc",
         "common/path_decision.cc",
         "common/planning_context.cc",
-        "common/planning_gflags.cc",
         "common/reference_line_info.cc",
         "common/smoothers/smoother.cc",
         "common/speed/speed_data.cc",
@@ -77,23 +54,16 @@ apollo_cc_library(
         "common/util/math_util.cc",
         "common/util/print_debug_info.cc",
         "common/util/util.cc",
-        "constraint_checker/collision_checker.cc",
-        "constraint_checker/constraint_checker.cc",
-        "constraint_checker/constraint_checker1d.cc",
-        "lattice/behavior/feasible_region.cc",
-        "lattice/behavior/path_time_graph.cc",
-        "lattice/behavior/prediction_querier.cc",
-        "lattice/trajectory_generation/backup_trajectory_generator.cc",
-        "lattice/trajectory_generation/end_condition_sampler.cc",
-        "lattice/trajectory_generation/lateral_osqp_optimizer.cc",
-        "lattice/trajectory_generation/lateral_qp_optimizer.cc",
-        "lattice/trajectory_generation/lattice_trajectory1d.cc",
-        "lattice/trajectory_generation/piecewise_braking_trajectory_generator.cc",
-        "lattice/trajectory_generation/trajectory1d_generator.cc",
-        "lattice/trajectory_generation/trajectory_combiner.cc",
-        "lattice/trajectory_generation/trajectory_evaluator.cc",
+        "math/constraint_checker/constraint_checker.cc",
+        "math/constraint_checker/constraint_checker1d.cc",
+        "gflags/planning_gflags.cc",
         "learning_based/img_feature_renderer/birdview_img_feature_renderer.cc",
         "learning_based/model_inference/trajectory_imitation_libtorch_inference.cc",
+        "learning_based/tuning/autotuning_mlp_net_model.cc",
+        "learning_based/tuning/autotuning_raw_feature_generator.cc",
+        "learning_based/tuning/speed_model/autotuning_speed_feature_builder.cc",
+        "learning_based/tuning/speed_model/autotuning_speed_mlp_model.cc",
+        "learning_based/pipeline/evaluator.cc",
         "math/curve1d/cubic_polynomial_curve1d.cc",
         "math/curve1d/piecewise_quintic_spiral_path.cc",
         "math/curve1d/quartic_polynomial_curve1d.cc",
@@ -124,13 +94,6 @@ apollo_cc_library(
         "math/smoothing_spline/spline_2d_kernel.cc",
         "math/smoothing_spline/spline_2d_seg.cc",
         "math/smoothing_spline/spline_seg_kernel.cc",
-        "navi/decider/navi_obstacle_decider.cc",
-        "navi/decider/navi_path_decider.cc",
-        "navi/decider/navi_speed_decider.cc",
-        "navi/decider/navi_speed_ts_graph.cc",
-        "navi/decider/navi_task.cc",
-        "navi_planning.cc",
-        "on_lane_planning.cc",
         "open_space/coarse_trajectory_generator/grid_search.cc",
         "open_space/coarse_trajectory_generator/hybrid_a_star.cc",
         "open_space/coarse_trajectory_generator/node3d.cc",
@@ -149,15 +112,6 @@ apollo_cc_library(
         "open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.cc",
         "open_space/trajectory_smoother/iterative_anchoring_smoother.cc",
         "open_space/utils/open_space_roi_util.cc",
-        "pipeline/evaluator.cc",
-        "planner/lattice/lattice_planner.cc",
-        "planner/navi/navi_planner.cc",
-        "planner/navi_planner_dispatcher.cc",
-        "planner/on_lane_planner_dispatcher.cc",
-        "planner/planner_dispatcher.cc",
-        "planner/public_road/public_road_planner.cc",
-        "planner/rtk/rtk_replay_planner.cc",
-        "planning_base.cc",
         "reference_line/discrete_points_reference_line_smoother.cc",
         "reference_line/qp_spline_reference_line_smoother.cc",
         "reference_line/reference_line.cc",
@@ -165,34 +119,9 @@ apollo_cc_library(
         "reference_line/reference_point.cc",
         "reference_line/spiral_problem_interface.cc",
         "reference_line/spiral_reference_line_smoother.cc",
-        "scenario_base/base_stage_creep.cc",
-        "scenario_base/base_stage_cruise.cc",
-        "scenario_base/process_result.cc",
-        "scenario_base/scenario.cc",
-        "scenario_base/scenario_manager.cc",
-        "scenario_base/stage.cc",
-        "scenario_base/traffic_light_base/base_stage_traffic_light_creep.cc",
-        "scenario_base/traffic_light_base/base_stage_traffic_light_cruise.cc",
-        "task_base/common/decider.cc",
-        "task_base/common/lane_change_util/lane_change_util.cc",
-        "task_base/common/path_generation.cc",
-        "task_base/common/path_util/path_assessment_decider_util.cc",
-        "task_base/common/path_util/path_bounds_decider_util.cc",
-        "task_base/common/path_util/path_optimizer_util.cc",
-        "task_base/common/speed_optimizer.cc",
-        "task_base/common/trajectory_optimizer.cc",
-        "task_base/task.cc",
-        "task_base/trajectory_fallback_task.cc",
-        "task_base/utils/st_gap_estimator.cc",
-        "traffic_rules_base/traffic_decider.cc",
-        "traffic_rules_base/traffic_rule.cc",
-        "tuning/autotuning_mlp_net_model.cc",
-        "tuning/autotuning_raw_feature_generator.cc",
-        "tuning/speed_model/autotuning_speed_feature_builder.cc",
-        "tuning/speed_model/autotuning_speed_mlp_model.cc",
     ],
     hdrs = [
-        "common/config_util.h",
+        "common/util/config_util.h",
         "common/dependency_injector.h",
         "common/ego_info.h",
         "common/feature_output.h",
@@ -212,7 +141,6 @@ apollo_cc_library(
         "common/path_boundary.h",
         "common/path_decision.h",
         "common/planning_context.h",
-        "common/planning_gflags.h",
         "common/reference_line_info.h",
         "common/smoothers/smoother.h",
         "common/speed/speed_data.h",
@@ -235,24 +163,20 @@ apollo_cc_library(
         "common/util/math_util.h",
         "common/util/print_debug_info.h",
         "common/util/util.h",
-        "constraint_checker/collision_checker.h",
-        "constraint_checker/constraint_checker.h",
-        "constraint_checker/constraint_checker1d.h",
-        "lattice/behavior/feasible_region.h",
-        "lattice/behavior/path_time_graph.h",
-        "lattice/behavior/prediction_querier.h",
-        "lattice/trajectory_generation/backup_trajectory_generator.h",
-        "lattice/trajectory_generation/end_condition_sampler.h",
-        "lattice/trajectory_generation/lateral_osqp_optimizer.h",
-        "lattice/trajectory_generation/lateral_qp_optimizer.h",
-        "lattice/trajectory_generation/lattice_trajectory1d.h",
-        "lattice/trajectory_generation/piecewise_braking_trajectory_generator.h",
-        "lattice/trajectory_generation/trajectory1d_generator.h",
-        "lattice/trajectory_generation/trajectory_combiner.h",
-        "lattice/trajectory_generation/trajectory_evaluator.h",
+        "common/util/evaluator_logger.h",
+        "math/constraint_checker/constraint_checker.h",
+        "math/constraint_checker/constraint_checker1d.h",
+        "gflags/planning_gflags.h",
         "learning_based/img_feature_renderer/birdview_img_feature_renderer.h",
         "learning_based/model_inference/model_inference.h",
         "learning_based/model_inference/trajectory_imitation_libtorch_inference.h",
+        "learning_based/tuning/autotuning_base_model.h",
+        "learning_based/tuning/autotuning_feature_builder.h",
+        "learning_based/tuning/autotuning_mlp_net_model.h",
+        "learning_based/tuning/autotuning_raw_feature_generator.h",
+        "learning_based/tuning/speed_model/autotuning_speed_feature_builder.h",
+        "learning_based/tuning/speed_model/autotuning_speed_mlp_model.h",
+        "learning_based/pipeline/evaluator.h",
         "math/curve1d/cubic_polynomial_curve1d.h",
         "math/curve1d/curve1d.h",
         "math/curve1d/piecewise_quintic_spiral_path.h",
@@ -287,13 +211,6 @@ apollo_cc_library(
         "math/smoothing_spline/spline_2d_seg.h",
         "math/smoothing_spline/spline_2d_solver.h",
         "math/smoothing_spline/spline_seg_kernel.h",
-        "navi/decider/navi_obstacle_decider.h",
-        "navi/decider/navi_path_decider.h",
-        "navi/decider/navi_speed_decider.h",
-        "navi/decider/navi_speed_ts_graph.h",
-        "navi/decider/navi_task.h",
-        "navi_planning.h",
-        "on_lane_planning.h",
         "open_space/coarse_trajectory_generator/grid_search.h",
         "open_space/coarse_trajectory_generator/hybrid_a_star.h",
         "open_space/coarse_trajectory_generator/node3d.h",
@@ -313,17 +230,6 @@ apollo_cc_library(
         "open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h",
         "open_space/trajectory_smoother/iterative_anchoring_smoother.h",
         "open_space/utils/open_space_roi_util.h",
-        "pipeline/evaluator.h",
-        "pipeline/evaluator_logger.h",
-        "planner/lattice/lattice_planner.h",
-        "planner/navi/navi_planner.h",
-        "planner/navi_planner_dispatcher.h",
-        "planner/on_lane_planner_dispatcher.h",
-        "planner/planner.h",
-        "planner/planner_dispatcher.h",
-        "planner/public_road/public_road_planner.h",
-        "planner/rtk/rtk_replay_planner.h",
-        "planning_base.h",
         "reference_line/discrete_points_reference_line_smoother.h",
         "reference_line/qp_spline_reference_line_smoother.h",
         "reference_line/reference_line.h",
@@ -332,33 +238,6 @@ apollo_cc_library(
         "reference_line/reference_point.h",
         "reference_line/spiral_problem_interface.h",
         "reference_line/spiral_reference_line_smoother.h",
-        "scenario_base/base_stage_creep.h",
-        "scenario_base/base_stage_cruise.h",
-        "scenario_base/process_result.h",
-        "scenario_base/scenario.h",
-        "scenario_base/scenario_manager.h",
-        "scenario_base/stage.h",
-        "scenario_base/traffic_light_base/base_stage_traffic_light_creep.h",
-        "scenario_base/traffic_light_base/base_stage_traffic_light_cruise.h",
-        "task_base/common/decider.h",
-        "task_base/common/lane_change_util/lane_change_util.h",
-        "task_base/common/path_generation.h",
-        "task_base/common/path_util/path_assessment_decider_util.h",
-        "task_base/common/path_util/path_bounds_decider_util.h",
-        "task_base/common/path_util/path_optimizer_util.h",
-        "task_base/common/speed_optimizer.h",
-        "task_base/common/trajectory_optimizer.h",
-        "task_base/task.h",
-        "task_base/trajectory_fallback_task.h",
-        "task_base/utils/st_gap_estimator.h",
-        "traffic_rules_base/traffic_decider.h",
-        "traffic_rules_base/traffic_rule.h",
-        "tuning/autotuning_base_model.h",
-        "tuning/autotuning_feature_builder.h",
-        "tuning/autotuning_mlp_net_model.h",
-        "tuning/autotuning_raw_feature_generator.h",
-        "tuning/speed_model/autotuning_speed_feature_builder.h",
-        "tuning/speed_model/autotuning_speed_mlp_model.h",
     ],
     copts = [
         "-fopenmp",
@@ -408,7 +287,6 @@ apollo_cc_library(
         "//modules/planning/planning_base/proto:auto_tuning_raw_feature_cc_proto",
         "//modules/planning/planning_base/proto:lattice_structure_cc_proto",
         "//modules/planning/planning_base/proto:learning_data_cc_proto",
-        "//modules/planning/planning_base/proto:navi_task_config_cc_proto",
         "//modules/planning/planning_base/proto:piecewise_jerk_path_config_cc_proto",
         "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
@@ -419,9 +297,6 @@ apollo_cc_library(
         "//modules/planning/planning_base/proto/math:cos_theta_smoother_config_cc_proto",
         "//modules/planning/planning_base/proto/math:fem_pos_deviation_smoother_config_cc_proto",
         "//modules/planning/planning_base/proto/math:qp_problem_cc_proto",
-        "//modules/planning/planning_base/scenario_base/proto:creep_stage_cc_proto",
-        "//modules/planning/planning_base/scenario_base/proto:scenario_pipeline_cc_proto",
-        "//modules/planning/planning_base/traffic_rules_base/proto:traffic_rules_cc_proto",
         "//modules/prediction:apollo_prediction_network",
         "@adolc",
         "@boost",
@@ -460,21 +335,6 @@ filegroup(
     ]),
 )
 
-filegroup(
-    name = "planning_conf",
-    srcs = glob([
-        "conf/**",
-    ]),
-)
-
-filegroup(
-    name = "runtime_data",
-    srcs = glob([
-        "dag/*.dag",
-        "launch/*.launch",
-    ]) + [":planning_conf"],
-)
-
 apollo_cc_test(
     name = "distance_approach_ipopt_interface_test",
     size = "small",
@@ -489,41 +349,10 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
-    name = "navi_planner_test",
-    size = "small",
-    srcs = ["planner/navi/navi_planner_test.cc"],
-    data = ["//modules/planning/planning_base:planning_testdata"],
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "//modules/common/util:common_util",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "rtk_replay_planner_test",
-    size = "small",
-    srcs = ["planner/rtk/rtk_replay_planner_test.cc"],
-    data = ["//modules/planning/planning_base:planning_testdata"],
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "//modules/common/util:common_util",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
     name = "spiral_reference_line_smoother_test",
     size = "small",
     srcs = ["reference_line/spiral_reference_line_smoother_test.cc"],
     data = [
-        "//modules/planning/planning_base:planning_conf",
     ],
     deps = [
         ":apollo_planning_planning_base",
@@ -536,7 +365,6 @@ apollo_cc_test(
     size = "small",
     srcs = ["reference_line/qp_spline_reference_line_smoother_test.cc"],
     data = [
-        "//modules/planning/planning_base:planning_conf",
         "//modules/planning/planning_base:planning_testdata",
     ],
     deps = [
@@ -549,7 +377,7 @@ apollo_cc_test(
 apollo_cc_test(
     name = "autotuning_speed_feature_builder_test",
     size = "small",
-    srcs = ["tuning/speed_model/autotuning_speed_feature_builder_test.cc"],
+    srcs = ["learning_based/tuning/speed_model/autotuning_speed_feature_builder_test.cc"],
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
@@ -559,7 +387,7 @@ apollo_cc_test(
 apollo_cc_test(
     name = "autotuning_speed_mlp_model_test",
     size = "small",
-    srcs = ["tuning/speed_model/autotuning_speed_mlp_model_test.cc"],
+    srcs = ["learning_based/tuning/speed_model/autotuning_speed_mlp_model_test.cc"],
     tags = ["exclude"],
     deps = [
         ":apollo_planning_planning_base",
@@ -570,7 +398,7 @@ apollo_cc_test(
 apollo_cc_test(
     name = "autotuning_raw_feature_generator_test",
     size = "small",
-    srcs = ["tuning/autotuning_raw_feature_generator_test.cc"],
+    srcs = ["learning_based/tuning/autotuning_raw_feature_generator_test.cc"],
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
@@ -580,7 +408,7 @@ apollo_cc_test(
 apollo_cc_test(
     name = "autotuning_mlp_net_model_test",
     size = "small",
-    srcs = ["tuning/autotuning_mlp_net_model_test.cc"],
+    srcs = ["learning_based/tuning/autotuning_mlp_net_model_test.cc"],
     tags = ["exclude"],
     deps = [
         ":apollo_planning_planning_base",
@@ -593,7 +421,6 @@ apollo_cc_test(
     size = "small",
     srcs = ["reference_line/discrete_points_reference_line_smoother_test.cc"],
     data = [
-        "//modules/planning/planning_base:planning_conf",
         "//modules/planning/planning_base:planning_testdata",
     ],
     deps = [
@@ -618,42 +445,6 @@ apollo_cc_binary(
     deps = [
         ":apollo_planning_planning_base",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
-    ],
-)
-
-apollo_cc_test(
-    name = "public_road_planner_test",
-    size = "small",
-    srcs = ["planner/public_road/public_road_planner_test.cc"],
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "on_lane_planner_dispatcher_test",
-    size = "small",
-    srcs = ["planner/on_lane_planner_dispatcher_test.cc"],
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "navi_planner_dispatcher_test",
-    size = "small",
-    srcs = ["planner/navi_planner_dispatcher_test.cc"],
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -880,23 +671,6 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
-    name = "navi_decider_test",
-    size = "small",
-    srcs = [
-        "navi/decider/navi_obstacle_decider_test.cc",
-        "navi/decider/navi_path_decider_test.cc",
-        "navi/decider/navi_speed_decider_test.cc",
-        "navi/decider/navi_speed_ts_graph_test.cc",
-    ],
-    data = ["//modules/planning/planning_base:planning_testdata"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "//modules/common/util:common_util",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
     name = "spline_2d_kernel_test",
     size = "small",
     srcs = ["math/smoothing_spline/spline_2d_kernel_test.cc"],
@@ -1083,7 +857,7 @@ apollo_cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
     srcs = ["open_space/tools/hybrid_a_star_wrapper.cc"],
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
     ],
@@ -1094,7 +868,7 @@ apollo_cc_binary(
     srcs = ["open_space/tools/distance_approach_problem_wrapper.cc"],
     copts = ["-fopenmp"],
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
     ],
@@ -1107,7 +881,7 @@ apollo_cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "//cyber",
@@ -1120,7 +894,7 @@ apollo_cc_binary(
 
 apollo_cc_binary(
     name = "evaluate_trajectory",
-    srcs = ["pipeline/evaluate_trajectory.cc"],
+    srcs = ["learning_based/pipeline/evaluate_trajectory.cc"],
     copts = PLANNING_COPTS,
     deps = [
         ":apollo_planning_planning_base",
@@ -1129,7 +903,7 @@ apollo_cc_binary(
 
 apollo_cc_binary(
     name = "record_to_learning_data",
-    srcs = ["pipeline/record_to_learning_data.cc"],
+    srcs = ["learning_based/pipeline/record_to_learning_data.cc"],
     copts = PLANNING_COPTS,
     deps = [
         ":apollo_planning_planning_base",

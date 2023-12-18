@@ -25,7 +25,6 @@
 
 #include <adolc/adolc.h>
 #include <adolc/adolc_sparse.h>
-
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
 
@@ -33,6 +32,7 @@
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 
 // #define tag_f 1

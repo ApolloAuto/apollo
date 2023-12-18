@@ -4,5 +4,5 @@ import Icon  from '@ant-design/icons';
 import { IconProps } from '../type';
 import { default as Svg } from '../../svgs/ic_profile_hover.svg';
 
-const IconIcProfileHover = (props: IconProps) => <Icon component={Svg} {...props}/>;
+const IconIcProfileHover = (props: IconProps) => <Icon component={Svg as any} {...props}/>;
 export default IconIcProfileHover;

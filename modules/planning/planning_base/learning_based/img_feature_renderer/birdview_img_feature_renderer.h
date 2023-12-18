@@ -26,8 +26,10 @@
 #include <vector>
 
 #include "opencv2/opencv.hpp"
+
 #include "modules/planning/planning_base/proto/learning_data.pb.h"
 #include "modules/planning/planning_base/proto/planning_semantic_map_config.pb.h"
+
 #include "cyber/common/macros.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 

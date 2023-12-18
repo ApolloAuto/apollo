@@ -73,7 +73,7 @@ apollo_plugin(
     deps = [
         "//modules/common/status",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/open_space_trajectory_partition/proto:open_space_trajectory_partition_cc_proto",
     ],
 )

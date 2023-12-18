@@ -21,6 +21,7 @@
 #include "modules/planning/planning_base/common/indexed_list.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/util/util.h"
 
 namespace apollo {

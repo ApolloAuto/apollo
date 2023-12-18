@@ -21,7 +21,7 @@
 #include "cyber/common/file.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
 std::map<std::string, int> plugin_function_map = {
     {"UpdateScenarioSetToStatus", 0},
@@ -98,8 +98,11 @@ Status Dreamview::Init() {
   hmi_ws_.reset(new WebSocketHandler("HMI"));
   sim_world_ws_.reset(new WebSocketHandler("SimWorld"));
   obstacle_ws_.reset(new WebSocketHandler("Obstacle"));
+  // auto registered when dreamview start to publish specified channels info
+  channels_info_ws_.reset(new WebSocketHandler("ChannelsInfo"));
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
+  proto_handler_.reset(new ProtoHandler());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get(), hmi_ws_.get()));
@@ -111,8 +114,10 @@ Status Dreamview::Init() {
   point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   map_updater_.reset(new MapUpdater(map_ws_.get(), map_service_.get()));
   obstacle_updater_.reset(new ObstacleUpdater(obstacle_ws_.get()));
+  channels_info_updater_.reset(new ChannelsUpdater(channels_info_ws_.get()));
   updater_manager_.reset(new UpdaterManager());
   RegisterUpdaters();
+  dv_plugin_manager_.reset(new DvPluginManager(server_.get()));
   socket_manager_.reset(
       new SocketManager(websocket_.get(), updater_manager_.get()));
   server_->addWebSocketHandler("/websocket", *websocket_);
@@ -124,7 +129,10 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/hmi", *hmi_ws_);
   server_->addWebSocketHandler("/socketmanager", *socket_manager_ws_);
   server_->addWebSocketHandler("/obstacle", *obstacle_ws_);
+  server_->addWebSocketHandler("/channelsinfo", *channels_info_ws_);
   server_->addHandler("/image", *image_);
+  server_->addHandler("/proto", *proto_handler_);
+  dv_plugin_manager_->Init();
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
   teleop_.reset(new TeleopService(teleop_ws_.get()));
@@ -143,6 +151,7 @@ Status Dreamview::Start() {
                                 const nlohmann::json& param_json) -> bool {
     return PluginCallbackHMI(function_name, param_json);
   });
+  dv_plugin_manager_->Start();
   // sim_world_updater_->StartStream(100);
   // perception_camera_updater_->Start();
   // ([this](const std::string& param_string) -> bool {
@@ -267,11 +276,12 @@ bool Dreamview::PointCloudCallback(const std::string& param_string) {
 void Dreamview::RegisterUpdaters() {
   updater_manager_->RegisterUpdater("simworld", sim_world_updater_.get());
   updater_manager_->RegisterUpdater("hmistatus", hmi_.get());
-  updater_manager_->RegisterUpdater
-  ("camera", perception_camera_updater_.get());
+  updater_manager_->RegisterUpdater("camera", perception_camera_updater_.get());
   updater_manager_->RegisterUpdater("pointcloud", point_cloud_updater_.get());
   updater_manager_->RegisterUpdater("map", map_updater_.get());
   updater_manager_->RegisterUpdater("obstacle", obstacle_updater_.get());
+  updater_manager_->RegisterUpdater("channelsinfo",
+                                    channels_info_updater_.get());
 }
 
 }  // namespace dreamview

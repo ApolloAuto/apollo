@@ -6,6 +6,10 @@ import vehicleVizIllustratorImg from '@dreamview/dreamview-core/src/assets/vehic
 import cameraViewIllustratorImg from '@dreamview/dreamview-core/src/assets/camera_view_hover_illustrator.png';
 import pointCloudIllustratorImg from '@dreamview/dreamview-core/src/assets/pointcloud_hover_illustrator.png';
 import dashBoardIllustratorImg from '@dreamview/dreamview-core/src/assets/dashboard_hover_illustrator.png';
+import chartIllustratorImg from '@dreamview/dreamview-core/src/assets/image_Charts.png';
+import componentsIllustratorImg from '@dreamview/dreamview-core/src/assets/Components.png';
+import terminalIllustratorImg from '@dreamview/dreamview-core/src/assets/terminal_Illustrator.png';
+import customChartIllustratorImg from '@dreamview/dreamview-core/src/assets/panel_chart.png';
 import { IPanelMetaInfo, PanelType } from './type/Panel';
 import ChannelSelectFactory from './base/ChannelSelect/ChannelSelectFactory';
 import { StreamDataNames } from '../../services/api/types';
@@ -89,7 +93,7 @@ export const getAllPanels = (t: TFunction | ((str: string) => string)): IPanelMe
     {
         title: t('pncMonitorTitle'),
         type: PanelType.PncMonitor,
-        thumbnail: dashBoardIllustratorImg,
+        thumbnail: chartIllustratorImg,
         description: t('pncMonitorDescription'),
         renderToolbar: ChannelSelectFactory({
             helpContent: <PanelHelp description={t('pncMonitorDescription')} />,
@@ -99,8 +103,22 @@ export const getAllPanels = (t: TFunction | ((str: string) => string)): IPanelMe
     {
         title: t('componentsTitle'),
         type: PanelType.Components,
-        // thumbnail: dashBoardIllustratorImg,
+        thumbnail: componentsIllustratorImg,
         description: t('componentsDescription'),
         module: () => import('@dreamview/dreamview-core/src/components/panels/Components'),
+    },
+    {
+        title: t('terminalWinTitle'),
+        type: PanelType.TerminalWin,
+        thumbnail: terminalIllustratorImg,
+        description: t('terminalWinDescription'),
+        module: () => import('@dreamview/dreamview-core/src/components/panels/Terminal'),
+    },
+    {
+        title: t('chartsTitle'),
+        type: PanelType.Charts,
+        thumbnail: customChartIllustratorImg,
+        description: t('chartsDescription'),
+        module: () => import('@dreamview/dreamview-core/src/components/panels/Charts'),
     },
 ];

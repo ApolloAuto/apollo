@@ -15,7 +15,6 @@ enum ObjectType {
     VIRTUAL = 6,
     CIPV = 7,
 }
-
 function getSensorType(key) {
     if (key.search('radar') !== -1) {
         return 'RadarSensor';
@@ -28,7 +27,6 @@ function getSensorType(key) {
     }
     return null;
 }
-
 export default class Obstacles {
     private obstacleMeshs;
 
@@ -54,7 +52,10 @@ export default class Obstacles {
 
     private coordinates;
 
+    private memo;
+
     constructor(scene, view, text, option, coordinates) {
+        this.memo = new Map();
         this.scene = scene;
         this.view = view;
         this.text = text;
@@ -67,27 +68,97 @@ export default class Obstacles {
         this.iconMeshs = [];
         this.iconMeshTemplate = null;
         this.solidFaceCubeMeshTemplate = null;
-
         this.drawIconMeshTemplate();
         this.drawCubeTemplate();
     }
 
+    getMemo(id, sceneName, init) {
+        const scene = this.memo.get(sceneName);
+        if (!scene) {
+            this.memo.set(sceneName, new Map());
+        }
+        const memo = this.memo.get(sceneName).get(id);
+        if (memo) {
+            return memo;
+        }
+        const val = init();
+        val.memoName = `${sceneName}_${id}`;
+        this.memo.get(sceneName).set(id, val);
+        return this.memo.get(sceneName).get(id);
+    }
+
+    getObstacleHeadingMemo(id, init) {
+        return this.getMemo(id, 'obstacleheadingMemo', init);
+    }
+
+    getSpeedHeadingMemo(id, init) {
+        return this.getMemo(id, 'speedheadingMemo', init);
+    }
+
+    getTrafficConeMemo(id, init) {
+        return this.getMemo(id, 'trafficConeMemo', init);
+    }
+
+    getBottomFaceMemo(id, init) {
+        return this.getMemo(id, 'bottomFaceMemo', init);
+    }
+
+    getTopFaceMemo(id, init) {
+        return this.getMemo(id, 'topFaceMemo', init);
+    }
+
+    getSolidTopFaceMemo(id, init) {
+        return this.getMemo(id, 'solidFaceMemo', init);
+    }
+
+    getDashTopFaceMemo(id, init) {
+        return this.getMemo(id, 'dashTopFaceMemo', init);
+    }
+
+    getStaticColorMaterial(id, init) {
+        return this.getMemo(id, 'staticColorMateria', init);
+    }
+
+    getStaticDashMaterial(id, init) {
+        return this.getMemo(id, 'staticDashMateria', init);
+    }
+
+    getV2xCubeMemo(id, init) {
+        return this.getMemo(id, 'V2xCubeMemo', init);
+    }
+
+    getCubeMemo(id, init) {
+        return this.getMemo(id, 'cubeMemo', init);
+    }
+
+    getIconMemo(id, init) {
+        return this.getMemo(id, 'iconMemo', init);
+    }
+
+    getSegmentMesh(id, init) {
+        return this.getMemo(id, 'segmentMeshMemo', init);
+    }
+
+    getSegmentDashMesh(id, init) {
+        return this.getMemo(id, 'segmentDashMeshMemo', init);
+    }
+
     drawObstacleHeading(obstacle) {
-        const { height, positionX, positionY, heading } = obstacle;
+        const { height, positionX, positionY, heading, id } = obstacle;
         const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
         const color = 0xffffff;
-        const arrowMesh = drawArrow(color);
-        arrowMesh.rotateZ(heading);
+        const arrowMesh = this.getObstacleHeadingMemo(id, () => drawArrow(color));
+        arrowMesh.rotation.z = heading;
         arrowMesh.position.set(position.x, position.y, (height || DEFAULT_HEIGHT) / 2);
         return arrowMesh;
     }
 
     drawSpeedHeading(obstacle) {
-        const { height, positionX, positionY, type, speedHeading, speed } = obstacle;
+        const { height, positionX, positionY, type, speedHeading, speed, id } = obstacle;
         const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
-        const color = obstacleColorMapping[ObjectType[type]] || obstacleColorMapping.DEFAULT;
-        const arrowMesh = drawArrow(color);
-        arrowMesh.rotateZ(speedHeading);
+        const color = obstacleColorMapping[type] || obstacleColorMapping.DEFAULT;
+        const arrowMesh = this.getSpeedHeadingMemo(id, () => drawArrow(color));
+        arrowMesh.rotation.z = speedHeading;
         const scale = 1 + Math.log2(speed);
         arrowMesh.scale.set(scale, scale, scale);
         arrowMesh.position.set(position.x, position.y, (height || DEFAULT_HEIGHT) / 2);
@@ -95,16 +166,19 @@ export default class Obstacles {
     }
 
     drawTrafficCone(obstacle) {
-        const { positionX, positionY, positionZ } = obstacle;
+        const { positionX, positionY, positionZ, id } = obstacle;
         const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
-        const geometry = new THREE.CylinderGeometry(0.1, 0.25, 0.914, 32);
-        const material = new THREE.MeshBasicMaterial({
-            color: obstacleColorMapping.TRAFFICCONE,
-            transparent: true,
-            opacity: 0.64,
+        const mesh = this.getTrafficConeMemo(id, () => {
+            const geometry = new THREE.CylinderGeometry(0.1, 0.25, 0.914, 32);
+            const material = new THREE.MeshBasicMaterial({
+                color: obstacleColorMapping.TRAFFICCONE,
+                transparent: true,
+                opacity: 0.64,
+            });
+            return new THREE.Mesh(geometry, material);
         });
-        const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.set(Math.PI / 2, 0, 0);
+        // todo z的值时否要改成 0.914 / 2
         mesh.position.set(position.x, position.y, positionZ);
         return mesh;
     }
@@ -122,11 +196,11 @@ export default class Obstacles {
         const { obstacleHeading, obstacleDistanceAndSpeed } = this.option.layerOption.Perception;
         for (let i = 0; i < obstacles.length; i += 1) {
             const obstacle = obstacles[i];
-            const { positionX, positionY, yieldedobstacle, type } = obstacle;
+            const { positionX, positionY, yieldedobstacle, type, id } = obstacle;
             if (!positionX || !positionY) {
                 continue;
             }
-            if (!this.option.layerOption.Perception[camelCase(ObjectType[type])]) {
+            if (!this.option.layerOption.Perception[camelCase(type)]) {
                 continue;
             }
 
@@ -154,11 +228,15 @@ export default class Obstacles {
                     this.scene.add(speedHeadingArrow);
                 }
             }
-
             if (yieldedobstacle) {
-                const icon = this.iconMeshTemplate.clone();
-                let position = new THREE.Vector3(positionX, positionY, (obstacle.height || DEFAULT_HEIGHT) + 0.5);
-                position = this.coordinates.applyOffset(position);
+                const icon = this.getIconMemo(id, () => {
+                    return this.iconMeshTemplate.clone();
+                });
+                const position = this.coordinates.applyOffset({
+                    x: positionX,
+                    y: positionY,
+                    z: (obstacle.height || DEFAULT_HEIGHT) + 0.5,
+                });
                 icon.position.set(position.x, position.y, position.z);
                 this.scene.add(icon);
                 this.iconMeshs.push(icon);
@@ -244,25 +322,35 @@ export default class Obstacles {
     }
 
     drawObstaclePolygon(obstacle) {
-        const { polygonPoint, height, confidence, source, type } = obstacle;
+        const { polygonPoint, height, confidence, source, type, id } = obstacle;
         const bottomPoints = this.coordinates.applyOffsetToArray(polygonPoint);
-        const color = obstacleColorMapping[ObjectType[type]] || obstacleColorMapping.DEFAULT;
-        const material = new THREE.LineBasicMaterial({
-            color,
+        const color = obstacleColorMapping[type] || obstacleColorMapping.DEFAULT;
+        const material = this.getStaticColorMaterial(color, () => {
+            return new THREE.LineBasicMaterial({
+                color,
+            });
         });
-        const dashMaterial = new THREE.LineDashedMaterial({ color });
+        const dashMaterial = this.getStaticDashMaterial(color, () => {
+            return new THREE.LineDashedMaterial({ color });
+        });
         const isV2x = source === 'v2x';
 
         const group = new THREE.Group();
         // 绘制底面
-        const bottomGeometry = new THREE.BufferGeometry().setFromPoints(bottomPoints);
-        const bottomFace = new THREE.LineLoop(bottomGeometry, material);
+        const bottomFace = this.getBottomFaceMemo(id, () => {
+            const bottomGeometry = new THREE.BufferGeometry();
+            return new THREE.LineLoop(bottomGeometry, material);
+        });
+        bottomFace.geometry.setFromPoints(bottomPoints);
         group.add(bottomFace);
         if (isV2x) {
             // 绘制顶面
             const topPoints = bottomPoints.map((item) => new THREE.Vector3(item.x, item.y, item.z + height));
-            const topGeometry = new THREE.BufferGeometry().setFromPoints(topPoints);
-            const topFace = new THREE.LineLoop(topGeometry, material);
+            const topFace = this.getTopFaceMemo(id, () => {
+                const topGeometry = new THREE.BufferGeometry();
+                return new THREE.LineLoop(topGeometry, material);
+            });
+            topFace.geometry.setFromPoints(topPoints);
             group.add(topFace);
             // 绘制底面和顶面的连接线
             for (let i = 0; i < topPoints.length; i += 1) {
@@ -275,25 +363,37 @@ export default class Obstacles {
             const solidTopPoints = bottomPoints.map(
                 (item) => new THREE.Vector3(item.x, item.y, item.z + confidence * height),
             );
-            const solidTopGeometry = new THREE.BufferGeometry().setFromPoints(solidTopPoints);
-            const solidTopFace = new THREE.LineLoop(solidTopGeometry, material);
+            const solidTopFace = this.getSolidTopFaceMemo(id, () => {
+                const solidTopGeometry = new THREE.BufferGeometry();
+                return new THREE.LineLoop(solidTopGeometry, material);
+            });
+            solidTopFace.geometry.setFromPoints(solidTopPoints);
             group.add(solidTopFace);
             // 绘制底面和实部顶面的连接线
             for (let i = 0; i < solidTopPoints.length; i += 1) {
-                const geometry = new THREE.BufferGeometry().setFromPoints([solidTopPoints[i], bottomPoints[i]]);
-                const segmentMesh = new THREE.LineSegments(geometry, material);
+                const segmentMesh = this.getSegmentMesh(`${id}_${i}`, () => {
+                    const geometry = new THREE.BufferGeometry();
+                    return new THREE.LineSegments(geometry, material);
+                });
+                segmentMesh.geometry.setFromPoints([solidTopPoints[i], bottomPoints[i]]);
                 group.add(segmentMesh);
             }
             if (confidence < 1) {
                 // 绘制虚部的顶面
                 const dashTopPoints = bottomPoints.map((item) => new THREE.Vector3(item.x, item.y, item.z + height));
-                const dashTopGeometry = new THREE.BufferGeometry().setFromPoints(dashTopPoints);
-                const dashTopFace = new THREE.LineLoop(dashTopGeometry, dashMaterial);
+                const dashTopFace = this.getDashTopFaceMemo(id, () => {
+                    const dashTopGeometry = new THREE.BufferGeometry();
+                    return new THREE.LineLoop(dashTopGeometry, dashMaterial);
+                });
+                dashTopFace.geometry.setFromPoints(dashTopPoints);
                 group.add(dashTopFace);
                 // 绘制虚部顶部和实部顶面的虚线
                 for (let i = 0; i < solidTopPoints.length; i += 1) {
-                    const geometry = new THREE.BufferGeometry().setFromPoints([dashTopPoints[i], solidTopPoints[i]]);
-                    const segmentMesh = new THREE.LineSegments(geometry, dashMaterial);
+                    const segmentMesh = this.getSegmentDashMesh(`${id}_${i}`, () => {
+                        const geometry = new THREE.BufferGeometry();
+                        return new THREE.LineSegments(geometry, dashMaterial);
+                    });
+                    segmentMesh.geometry.setFromPoints([dashTopPoints[i], solidTopPoints[i]]);
                     group.add(segmentMesh);
                 }
             }
@@ -320,9 +420,11 @@ export default class Obstacles {
     }
 
     drawV2xCube(obstacle) {
-        const { length, width, height, positionX, positionY, type, heading } = obstacle;
-        const color = obstacleColorMapping[ObjectType[type]] || obstacleColorMapping.DEFAULT;
-        const v2XCubeMesh = this.solidFaceCubeMeshTemplate.clone();
+        const { length, width, height, positionX, positionY, type, heading, id } = obstacle;
+        const color = obstacleColorMapping[type] || obstacleColorMapping.DEFAULT;
+        const v2XCubeMesh = this.getV2xCubeMemo(id, () => {
+            return this.solidFaceCubeMeshTemplate.clone();
+        });
         const position = this.coordinates.applyOffset({
             x: positionX,
             y: positionY,
@@ -338,14 +440,20 @@ export default class Obstacles {
 
     drawCube(obstacle) {
         const group = new THREE.Group();
-        const { length, width, height, positionX, positionY, type, heading, confidence = 0.5 } = obstacle;
-        const color = obstacleColorMapping[ObjectType[type]] || obstacleColorMapping.DEFAULT;
+        const { length, width, height, positionX, positionY, type, heading, confidence = 0.5, id } = obstacle;
+        const color = obstacleColorMapping[type] || obstacleColorMapping.DEFAULT;
         const position = this.coordinates.applyOffset({
             x: positionX,
             y: positionY,
         });
         if (confidence > 0) {
-            const solidBox = drawBox(length, width, height * confidence, color);
+            const solidBox = this.getCubeMemo(`${id}_solidbox`, () => {
+                const geometry = new THREE.BoxGeometry(length, width, height * confidence);
+                const material = new THREE.MeshBasicMaterial({ color });
+                const box = new THREE.BoxHelper(new THREE.Mesh(geometry, material));
+                return box;
+            });
+            solidBox.material.color.set(color);
             solidBox.position.z = ((height || DEFAULT_HEIGHT) / 2) * confidence;
             group.add(solidBox);
         }
@@ -366,7 +474,7 @@ export default class Obstacles {
         const isBirdView = this.view.viewType === 'Overhead' || this.view.viewType === 'Map';
         const isV2x = source === 'v2x';
         const textMeshs = [];
-        const { positionX: adcX, positionY: adcY, heading: adcHeading } = autoDrivingCar;
+        const { positionX: adcX, positionY: adcY, heading: adcHeading } = autoDrivingCar ?? {};
         const adcPosition = new THREE.Vector3(adcX, adcY, 0);
         const obstaclePosition = new THREE.Vector3(positionX, positionY, (height || DEFAULT_HEIGHT) / 2);
         const initPosition = this.coordinates.applyOffset({

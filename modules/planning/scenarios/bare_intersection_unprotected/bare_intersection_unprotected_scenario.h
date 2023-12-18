@@ -27,7 +27,7 @@
 #include "modules/planning/scenarios/bare_intersection_unprotected/proto/bare_intersection_unprotected_scenario.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/factory.h"
-#include "modules/planning/planning_base/scenario_base/scenario.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {

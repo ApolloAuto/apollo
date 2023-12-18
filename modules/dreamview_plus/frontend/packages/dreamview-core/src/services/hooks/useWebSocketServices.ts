@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     useWebSocketManager,
     useMainApi,
@@ -6,8 +6,8 @@ import {
     useStreamApi,
     useMetadata,
 } from '@dreamview/dreamview-core/src/store/WebSocketManagerStore';
+import { CustomEventTypes } from '@dreamview/dreamview-core/src/store/EventHandlersStore/eventType';
 import { useEventHandlersContext } from '../../store/EventHandlersStore';
-import { CustomEventTypes } from '../../store/EventHandlersStore/eventType';
 import { MetadataItem } from '../WebSocketManager/type';
 import { MainApi, PluginApi, StreamApi } from '../api';
 import { Nullable } from '../../util/similarFunctions';
@@ -41,21 +41,6 @@ export default function useWebSocketServices(): useWebSocketServicesReturnType {
 
     const [isPluginConnected, setPluginConnected] = useState(false);
 
-    const mainApi = useMemo(() => {
-        if (!isMainConnected) return null;
-        return mainApiIns;
-    }, [isMainConnected]);
-
-    const streamApi = useMemo(() => {
-        if (!isMainConnected) return null;
-        return streamApiIns;
-    }, [isMainConnected]);
-
-    const pluginApi = useMemo(() => {
-        if (!isPluginConnected) return null;
-        return pluginApiIns;
-    }, [isPluginConnected]);
-
     useEffect(() => {
         customizeSubs.getCustomizeEvent(CustomEventTypes.MainConnectedEvent).subscribe(() => {
             setMainConnected(webSocketManager.isMainConnected());
@@ -72,5 +57,13 @@ export default function useWebSocketServices(): useWebSocketServicesReturnType {
         };
     }, [customizeSubs, webSocketManager]);
 
-    return { isMainConnected, isPluginConnected, metadata, mainApi, streamApi, pluginApi, setMetaData };
+    return {
+        isMainConnected,
+        isPluginConnected,
+        metadata,
+        mainApi: mainApiIns,
+        streamApi: streamApiIns,
+        pluginApi: pluginApiIns,
+        setMetaData,
+    };
 }

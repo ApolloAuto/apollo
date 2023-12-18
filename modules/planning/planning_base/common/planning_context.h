@@ -21,6 +21,7 @@
 #pragma once
 
 #include "modules/planning/planning_base/proto/planning_status.pb.h"
+
 #include "cyber/common/macros.h"
 
 /**

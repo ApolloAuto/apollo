@@ -32,6 +32,8 @@ export default class InitiationMarker extends BaseMarker {
 
     private arrow: THREE.Mesh;
 
+    private selectedMesh: THREE.Mesh;
+
     constructor(protected context: IInitiationMarkerContext) {
         super(context);
         this.name = 'InitiationMarker';
@@ -84,6 +86,7 @@ export default class InitiationMarker extends BaseMarker {
         });
         this.positions = [];
         this.triggerCallback('reset');
+        this.selectParkingSpace(false);
         return this;
     }
 
@@ -129,6 +132,7 @@ export default class InitiationMarker extends BaseMarker {
                     .render(),
             };
         }
+        this.selectParkingSpace(true, event.clientX, event.clientY);
     };
 
     private handleMouseMove = async (event: MouseEvent, mouseDownInfo: IMouseDownInfo) => {
@@ -141,7 +145,6 @@ export default class InitiationMarker extends BaseMarker {
         const angle = Math.atan2(deltaY, deltaX);
 
         this.handleMouseMoveDragging(mouseDownInfo.event, angle.toFixed(2));
-
         this.currentMovePosition?.instance.updateDirection(angle).render();
     };
 
@@ -187,6 +190,7 @@ export default class InitiationMarker extends BaseMarker {
         position.instance.remove();
         const lastPosition = this.positions[this.positions.length - 1];
         this.triggerCallback('undo');
+        this.selectParkingSpace(false);
         if (lastPosition) {
             lastPosition?.instance.addToScene().render();
 
@@ -207,6 +211,24 @@ export default class InitiationMarker extends BaseMarker {
         if (typeof this.createInitiationMarkerCallback === 'function') {
             this.createInitiationMarkerCallback(operation, this.initiationMarkerPosition);
         }
+    }
+
+    selectParkingSpace(isSelecting: boolean, x?, y?) {
+        if (isSelecting) {
+            // first reset the crrent mesh color
+            if (this.selectedMesh) {
+                this.selectParkingSpace(false);
+            }
+            const parkspaceObject = this.computeRaycasterObject(x, y);
+            if (parkspaceObject) {
+                parkspaceObject.material.color.set(parkspaceObject.userData.selectedColor);
+                this.selectedMesh = parkspaceObject;
+            }
+        } else {
+            this.selectedMesh?.material?.color?.set(this.selectedMesh.userData.color);
+        }
+        const { renderer, camera, scene } = this.context;
+        renderer.render(scene, camera);
     }
 
     // 返回坐标个数

@@ -79,8 +79,9 @@ bool PointCloudPreprocessor::Preprocess(
         }
       }
       Eigen::Vector3d vec3d_lidar(pt.x(), pt.y(), pt.z());
-      Eigen::Vector3d vec3d_novatel =
-          options.sensor2novatel_extrinsics * vec3d_lidar;
+      // Eigen::Vector3d vec3d_novatel =
+      //     options.sensor2novatel_extrinsics * vec3d_lidar;
+      Eigen::Vector3d vec3d_novatel = vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
           vec3d_novatel[0] > box_backward_x_ &&
           vec3d_novatel[1] < box_forward_y_ &&
@@ -129,8 +130,9 @@ bool PointCloudPreprocessor::Preprocess(
         }
       }
       Eigen::Vector3d vec3d_lidar(pt.x, pt.y, pt.z);
-      Eigen::Vector3d vec3d_novatel =
-          options.sensor2novatel_extrinsics * vec3d_lidar;
+      // Eigen::Vector3d vec3d_novatel =
+      //     options.sensor2novatel_extrinsics * vec3d_lidar;
+      Eigen::Vector3d vec3d_novatel = vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
           vec3d_novatel[0] > box_backward_x_ &&
           vec3d_novatel[1] < box_forward_y_ &&

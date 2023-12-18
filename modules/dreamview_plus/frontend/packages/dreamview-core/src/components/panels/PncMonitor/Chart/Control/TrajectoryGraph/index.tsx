@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '../../ChartBase';
 
 function TrajectoryGraph() {
     const [options, setOptions] = useState<any>();
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const getMaxAndMin = (values: any, prevX: { max: number; min: number }, prevy: { max: number; min: number }) => {
         if (!values?.length) {
@@ -88,9 +88,9 @@ function TrajectoryGraph() {
                 graphic,
                 grid: {
                     containLabel: false,
-                    left: 95,
+                    left: 70,
                     top: 35,
-                    bottom: 95,
+                    bottom: 70,
                     right: 35,
                 },
                 xAxis: {
@@ -124,6 +124,13 @@ function TrajectoryGraph() {
         triggerUIUpdate(controlData.trajectory, controlData.polygon);
     }, [controlData]);
 
-    return <ChartBase autoHeight title='TrajectoryGraph' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['trajectory', 'polygon'])}
+            autoHeight
+            title='TrajectoryGraph'
+            options={options}
+        />
+    );
 }
 export default React.memo(TrajectoryGraph);

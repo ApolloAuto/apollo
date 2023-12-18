@@ -18,6 +18,9 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
@@ -39,11 +42,20 @@ class RecordPlayerFactory {
   void Reset();
   void GetAllRecords(std::vector<std::string>* records);
   void SetCurrentRecord(const std::string& record_name);
+  void IncreaseRecordPriority(const std::string& record_name);
+  bool RemoveLRURecord(std::string* remove_record_id);
   std::string GetCurrentRecord();
+  int GetLoadedRecordNum();
+  bool EnableContinuePreload();
+  bool EnableContinueLoad();
 
  private:
   std::unordered_map<std::string, std::unique_ptr<Player>> s_record_player_map_;
   std::string current_record_;
+  std::vector<std::string> loaded_record_;
+  mutable boost::shared_mutex mutex_;
+  static const int32_t PRELOAD_RECORD_NUM = 3;
+  static const int32_t LOADED_RECORD_NUM = 15;
 
   DECLARE_SINGLETON(RecordPlayerFactory);
 };

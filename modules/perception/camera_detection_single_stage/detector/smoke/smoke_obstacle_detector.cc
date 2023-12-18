@@ -28,7 +28,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-
 void SmokeObstacleDetector::InitImageOffset(
     const smoke::ModelParam &model_param) {
   // offset
@@ -39,6 +38,16 @@ void SmokeObstacleDetector::InitImageOffset(
   AINFO << "image_width=" << image_width << ", "
         << "image_height=" << image_height << ", "
         << "offset_y=" << offset_y_ << ", ";
+}
+
+void SmokeObstacleDetector::InitObstacleTypes() {
+  types_.push_back(base::ObjectSubType::CAR);
+  types_.push_back(base::ObjectSubType::CYCLIST);
+  types_.push_back(base::ObjectSubType::PEDESTRIAN);
+  types_.push_back(base::ObjectSubType::VAN);
+  types_.push_back(base::ObjectSubType::TRUCK);
+  types_.push_back(base::ObjectSubType::BUS);
+  types_.push_back(base::ObjectSubType::TRAFFICCONE);
 }
 
 void SmokeObstacleDetector::InitImageSize(
@@ -81,6 +90,7 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   InitImageOffset(model_param_);
   InitImageSize(model_param_);
   InitParam(model_param_);
+  InitObstacleTypes();
 
   const auto &model_info = model_param_.info();
   std::string model_path = GetModelPath(model_info.name());

@@ -1,0 +1,55 @@
+task : NAVI_PATH_DECIDER
+task : NAVI_SPEED_DECIDER
+navi_path_decider_config {
+min_path_length: 5
+min_look_forward_time: 2
+max_keep_lane_distance: 0.4
+max_keep_lane_shift_y: 0.15
+min_keep_lane_offset: 0.20
+keep_lane_shift_compensation: 0.01
+move_dest_lane_config_talbe {
+    lateral_shift {
+    max_speed: 34
+    max_move_dest_lane_shift_y: 0.45
+    }
+}
+move_dest_lane_compensation: 0.35
+max_kappa_threshold: 0.0
+kappa_move_dest_lane_compensation: 0.0
+start_plan_point_from: 0
+}
+
+navi_speed_decider_config {
+preferred_accel: 1.5
+preferred_decel: 1.5
+preferred_jerk: 2.0
+max_accel: 4.0
+max_decel: 5.0
+obstacle_buffer: 1.0
+safe_distance_base: 10.0
+safe_distance_ratio: 1.0
+following_accel_ratio: 0.5
+soft_centric_accel_limit: 1.0
+hard_centric_accel_limit: 1.5
+hard_speed_limit: 40.0
+hard_accel_limit: 8.0
+enable_safe_path: false
+enable_planning_start_point: true
+enable_accel_auto_compensation: false
+kappa_preview: 80.0
+kappa_threshold: 0.02
+}
+
+navi_obstacle_decider_config {
+min_nudge_distance: 0.2
+max_nudge_distance: 1.1
+max_allow_nudge_speed: 16.667
+safe_distance: 0.2
+nudge_allow_tolerance : 0.05
+cycles_number : 3
+judge_dis_coeff : 2.0
+basis_dis_value : 30.0
+lateral_velocity_value : 0.5
+speed_decider_detect_range : 0.35
+max_keep_nudge_cycles : 110
+}

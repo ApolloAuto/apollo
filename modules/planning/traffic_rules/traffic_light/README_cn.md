@@ -53,7 +53,7 @@ apollo::planning::TrafficLight
 
   ##### 配置加载 TrafficLight 插件
 
-  在 `modules/planning/planning_base/conf/traffic_rule_config.pb.txt` 增加`TrafficLight`插件的配置，配置参数中`name` 表示rule的名称，这个由用户自定义，表达清楚是哪个rule即可，`type` 是rule的类名称，即`TrafficLight`。
+  在 `modules/planning/planning_component/conf/traffic_rule_config.pb.txt` 增加`TrafficLight`插件的配置，配置参数中`name` 表示rule的名称，这个由用户自定义，表达清楚是哪个rule即可，`type` 是rule的类名称，即`TrafficLight`。
 
   ```
     rule {

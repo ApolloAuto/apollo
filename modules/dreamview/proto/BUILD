@@ -13,11 +13,6 @@ proto_library(
 )
 
 proto_library(
-    name = "hmi_config_proto",
-    srcs = ["hmi_config.proto"],
-)
-
-proto_library(
     name = "point_cloud_proto",
     srcs = ["point_cloud.proto"],
 )
@@ -30,28 +25,6 @@ proto_library(
 proto_library(
     name = "data_collection_table_proto",
     srcs = ["data_collection_table.proto"],
-)
-
-proto_library(
-    name = "hmi_mode_proto",
-    srcs = ["hmi_mode.proto"],
-    deps = [
-        "//modules/common_msgs/dreamview_msgs:hmi_status_proto"
-    ],
-)
-
-proto_library(
-    name = "simulation_world_proto",
-    srcs = ["simulation_world.proto"],
-    deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_proto",
-        "//modules/common_msgs/monitor_msgs:monitor_log_proto",
-        "//modules/common_msgs/basic_msgs:pnc_point_proto",
-        "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
-        "//modules/common_msgs/planning_msgs:planning_internal_proto",
-        "//modules/common_msgs/prediction_msgs:feature_proto",
-        "//modules/common_msgs/routing_msgs:routing_geometry_proto",
-    ],
 )
 
 proto_library(

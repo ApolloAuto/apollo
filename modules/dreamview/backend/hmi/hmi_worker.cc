@@ -32,28 +32,12 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/fuel_monitor/data_collection_monitor.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_gflags.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
-#include "modules/dreamview/backend/fuel_monitor/preprocess_monitor.h"
-#include "modules/dreamview/backend/hmi/vehicle_manager.h"
-
-DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
-              "HMI modes config path.");
-
-DEFINE_string(recorder_config_path,
-              "/apollo/modules/dreamview/conf/recorder_config.pb.txt",
-              "Recorder config path.");
-
-DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
-
-DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
-
-DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
-              "Key to store hmi_status.current_mode in KV DB.");
-
-DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
-              "Default HMI Mode when there is no cache.");
+#include "modules/dreamview/backend/common/fuel_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_gflags.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/fuel_monitor/preprocess_monitor.h"
+#include "modules/dreamview/backend/common/vehicle_manager/vehicle_manager.h"
+#include "modules/dreamview/backend/common/util/hmi_util.h"
 
 namespace apollo {
 namespace dreamview {
@@ -75,53 +59,12 @@ using apollo::external_command::CommandStatus;
 using apollo::localization::LocalizationEstimate;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
-using google::protobuf::Map;
 using google::protobuf::util::JsonStringToMessage;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
 using Json = nlohmann::json;
 
 constexpr char kNavigationModeName[] = "Navigation";
-
-// Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(std::string_view origin) {
-  std::vector<std::string> parts = absl::StrSplit(origin, '_');
-  for (auto &part : parts) {
-    if (!part.empty()) {
-      // Upper case the first char.
-      part[0] = static_cast<char>(toupper(part[0]));
-    }
-  }
-
-  return absl::StrJoin(parts, " ");
-}
-
-// List subdirs and return a dict of {subdir_title: subdir_path}.
-Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
-  Map<std::string, std::string> result;
-  const auto subdirs = cyber::common::ListSubPaths(dir);
-  for (const auto &subdir : subdirs) {
-    const auto subdir_title = TitleCase(subdir);
-    const auto subdir_path = absl::StrCat(dir, "/", subdir);
-    result.insert({subdir_title, subdir_path});
-  }
-  return result;
-}
-
-// List files by pattern and return a dict of {file_title: file_path}.
-Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
-                                              std::string_view extension) {
-  Map<std::string, std::string> result;
-  const std::string pattern = absl::StrCat(dir, "/*", extension);
-  for (const std::string &file_path : cyber::common::Glob(pattern)) {
-    // Remove the extension and convert to title case as the file title.
-    const std::string filename = cyber::common::GetFileName(file_path);
-    const std::string file_title =
-        TitleCase(filename.substr(0, filename.length() - extension.length()));
-    result.insert({file_title, file_path});
-  }
-  return result;
-}
 
 template <class FlagType, class ValueType>
 void SetGlobalFlag(std::string_view flag_name, const ValueType &value,
@@ -149,7 +92,8 @@ void System(std::string_view cmd) {
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node> &node)
-    : config_(LoadConfig()), node_(node) {
+    : config_(util::HMIUtil::LoadConfig(FLAGS_dv_hmi_modes_config_path)),
+      node_(node) {
   InitStatus();
 }
 
@@ -173,20 +117,6 @@ void HMIWorker::Stop() {
   }
 }
 
-HMIConfig HMIWorker::LoadConfig() {
-  HMIConfig config;
-  // Get available modes, maps and vehicles by listing data directory.
-  *config.mutable_modes() =
-      ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
-
-  *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
-  *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
-  AINFO << "Loaded HMI config: " << config.DebugString();
-  return config;
-}
-
 bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
                                        const std::string &current_vehicle_path,
                                        HMIMode *self_defined_mode) {
@@ -202,59 +132,8 @@ bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
                                          self_defined_mode))
       << "Unable to parse vehicle self defined HMIMode from file "
       << vehicle_mode_config_path;
-  TranslateCyberModules(self_defined_mode);
+  util::HMIUtil::TranslateCyberModules(self_defined_mode);
   return true;
-}
-
-void HMIWorker::TranslateCyberModules(HMIMode* mode){
-    // Translate cyber_modules to regular modules.
-  for (const auto &iter : mode->cyber_modules()) {
-    const std::string &module_name = iter.first;
-    const CyberModule &cyber_module = iter.second;
-    // Each cyber module should have at least one dag file.
-    ACHECK(!cyber_module.dag_files().empty())
-        << "None dag file is provided for " << module_name;
-
-    Module &module = LookupOrInsert(mode->mutable_modules(), module_name, {});
-    module.set_required_for_safety(cyber_module.required_for_safety());
-
-    // Construct start_command:
-    //     nohup mainboard -p <process_group> -d <dag> ... &
-    module.set_start_command("nohup mainboard");
-    const auto &process_group = cyber_module.process_group();
-    if (!process_group.empty()) {
-      absl::StrAppend(module.mutable_start_command(), " -p ", process_group);
-    }
-    for (const std::string &dag : cyber_module.dag_files()) {
-      absl::StrAppend(module.mutable_start_command(), " -d ", dag);
-    }
-    absl::StrAppend(module.mutable_start_command(), " &");
-
-    // Construct stop_command: pkill -f '<dag[0]>'
-    const std::string &first_dag = cyber_module.dag_files(0);
-    module.set_stop_command(absl::StrCat("pkill -f \"", first_dag, "\""));
-    // Construct process_monitor_config.
-    module.mutable_process_monitor_config()->add_command_keywords("mainboard");
-    module.mutable_process_monitor_config()->add_command_keywords(first_dag);
-  }
-  mode->clear_cyber_modules();
-}
-
-
-HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
-  HMIMode mode;
-  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
-      << "Unable to parse HMIMode from file " << mode_config_path;
-  
-  TranslateCyberModules(&mode);
-  // For global recording.
-  ACHECK(cyber::common::GetProtoFromFile(
-      FLAGS_recorder_config_path, mode.mutable_data_recorder_component()))
-      << "Unable to parse Recorder config from file "
-      << FLAGS_recorder_config_path;
-
-  AINFO << "Loaded HMI mode: " << mode.DebugString();
-  return mode;
 }
 
 void HMIWorker::InitStatus() {
@@ -691,7 +570,7 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
   } else {
     // modules may have been modified the last time selected a vehicle
     // need to be recovery by load mode
-    current_mode_ = LoadMode(mode_config_path);
+    current_mode_ = util::HMIUtil::LoadMode(mode_config_path);
   }
   {
     WLock wlock(status_mutex_);
@@ -709,12 +588,13 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
   }
 }
 
-void HMIWorker::MergeToCurrentMode(HMIMode* mode){
-    current_mode_.clear_modules();
-    current_mode_.clear_cyber_modules();
-    current_mode_.clear_monitored_components();
-    current_mode_.mutable_modules()->swap(*(mode->mutable_modules()));
-    current_mode_.mutable_monitored_components()->swap(*(mode->mutable_monitored_components()));
+void HMIWorker::MergeToCurrentMode(HMIMode *mode) {
+  current_mode_.clear_modules();
+  current_mode_.clear_cyber_modules();
+  current_mode_.clear_monitored_components();
+  current_mode_.mutable_modules()->swap(*(mode->mutable_modules()));
+  current_mode_.mutable_monitored_components()->swap(
+      *(mode->mutable_monitored_components()));
 }
 
 void HMIWorker::ChangeMode(const std::string &mode_name) {
@@ -735,10 +615,11 @@ void HMIWorker::ChangeMode(const std::string &mode_name) {
   {
     WLock wlock(status_mutex_);
     status_.set_current_mode(mode_name);
-    current_mode_ = LoadMode(config_.modes().at(mode_name));
+    current_mode_ = util::HMIUtil::LoadMode(config_.modes().at(mode_name));
     // for vehicle self-defined module
     HMIMode vehicle_defined_mode;
-    const std::string *vehicle_dir = FindOrNull(config_.vehicles(), status_.current_vehicle());
+    const std::string *vehicle_dir =
+        FindOrNull(config_.vehicles(), status_.current_vehicle());
     if (vehicle_dir != nullptr &&
         LoadVehicleDefinedMode(config_.modes().at(mode_name), *vehicle_dir,
                                &vehicle_defined_mode)) {
@@ -1254,7 +1135,7 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
     }
     // replay engine use xx_xx like:apollo_map
     // dv need Apollo Map
-    scenario_info->set_map_name(TitleCase(map_name));
+    scenario_info->set_map_name(util::HMIUtil::TitleCase(map_name));
     auto start_point = scenario_info->mutable_start_point();
     start_point->set_x(scenario_start_point.x());
     start_point->set_y(scenario_start_point.y());
@@ -1496,7 +1377,7 @@ bool HMIWorker::LoadRecords() {
     return false;
   }
   struct dirent *file;
-  std::map<std::string, std::int32_t> new_records;
+  std::map<std::string, LoadRecordInfo> new_records;
   while ((file = readdir(directory)) != nullptr) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -1508,7 +1389,9 @@ bool HMIWorker::LoadRecords() {
     const int index = record_id.rfind(".record");
     if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
-      new_records[local_record_resource] = 1;
+      // compatible records with dv and dv_plus
+      new_records[local_record_resource] = {};
+      new_records[local_record_resource].set_download_status(1);
     }
   }
   closedir(directory);
@@ -1562,7 +1445,7 @@ void HMIWorker::DeleteRecord(const std::string &record_id) {
 }
 bool HMIWorker::ReloadVehicles() {
   AINFO << "load config";
-  HMIConfig config = LoadConfig();
+  HMIConfig config = util::HMIUtil::LoadConfig(FLAGS_dv_hmi_modes_config_path);
   std::string msg;
   AINFO << "serialize new config";
   config.SerializeToString(&msg);

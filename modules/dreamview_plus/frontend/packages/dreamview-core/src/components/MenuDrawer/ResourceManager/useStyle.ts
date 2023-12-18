@@ -9,15 +9,12 @@ export default function useStyle() {
             position: 'relative',
         },
         'profile-manager-tab': {
-            '& .dreamview-tabs-tab': {
-                padding: '17px 4px',
-            },
             '&.dreamview-tabs .dreamview-tabs-tab': {
                 fontSize: theme.tokens.font.size.large,
                 padding: '0 4px',
                 height: '56px',
                 lineHeight: '56px',
-                width: '80px',
+                minWidth: '80px',
                 justifyContent: 'center',
             },
             '&.dreamview-tabs .dreamview-tabs-nav .dreamview-tabs-nav-list': {
@@ -49,10 +46,10 @@ export default function useStyle() {
 export function useTableHover() {
     return useMakeStyle((theme, prop) => ({
         'table-active': {
-            [`&  tr:nth-of-type(${prop.activeIndex}):hover td`]: {
+            [`&  tr:nth-of-type(${prop.activeIndex + 1}):hover td`]: {
                 background: theme.tokens.colors.brand3,
             },
-            [`&  tr:nth-of-type(${prop.activeIndex}) td`]: {
+            [`&  tr:nth-of-type(${prop.activeIndex + 1}) td`]: {
                 background: theme.tokens.colors.brand3,
                 color: theme.tokens.colors.fontColor1,
                 '& .download-active': {

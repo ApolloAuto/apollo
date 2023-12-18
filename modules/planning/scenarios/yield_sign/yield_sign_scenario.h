@@ -30,7 +30,7 @@
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/factory.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/planning_base/scenario_base/scenario.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {

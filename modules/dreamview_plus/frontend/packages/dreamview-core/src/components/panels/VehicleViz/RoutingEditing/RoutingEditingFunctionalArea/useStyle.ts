@@ -1,7 +1,7 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 
-export default function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
+export default function useStyle(areaProps: any) {
+    const hoc = useMakeStyle((theme, props) => ({
         'routing-editing-function-area': {
             width: 32,
             position: 'absolute',
@@ -57,6 +57,13 @@ export default function useStyle() {
                 background: 'rgba(40, 43, 54) !important',
             },
         },
+
+        'routing-editing-functional__item--disable': {
+            cursor: 'not-allowed',
+            '&:hover': {
+                cursor: 'not-allowed',
+            },
+        },
     }));
-    return hoc();
+    return hoc(areaProps);
 }

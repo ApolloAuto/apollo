@@ -37,6 +37,6 @@ cc_library(
     deps = [
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
-        "@local_config_rocm//:rocm::hip",
+        "@local_config_rocm//rocm:hip",
     ],
 )

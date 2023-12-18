@@ -27,7 +27,7 @@
 #include <vector>
 #include "modules/planning/tasks/lane_change_path/proto/lane_change_path.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/common/path_generation.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_generation.h"
 
 namespace apollo {
 namespace planning {

@@ -88,7 +88,6 @@ proto_library(
     name = "planning_config_proto",
     srcs = ["planning_config.proto"],
     deps = [
-        ":navi_task_config_proto",
         ":plugin_declare_info_proto",
     ],
 )
@@ -96,11 +95,6 @@ proto_library(
 proto_library(
     name = "plugin_declare_info_proto",
     srcs = [":plugin_declare_info.proto"],
-)
-
-proto_library(
-    name = "navi_task_config_proto",
-    srcs = ["navi_task_config.proto"],
 )
 
 proto_library(

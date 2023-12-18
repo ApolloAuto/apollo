@@ -26,7 +26,9 @@
 #include <vector>
 
 #include "gtest/gtest_prod.h"
+
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"

@@ -81,6 +81,7 @@ export default class Text3D {
                     mesh = charMesh;
                     this.charWidths[idx] = Number.isFinite(charWidth) ? charWidth : 0.2;
                 }
+                mesh.memoName = true;
                 this.charMeshes[idx].push(mesh);
             }
 

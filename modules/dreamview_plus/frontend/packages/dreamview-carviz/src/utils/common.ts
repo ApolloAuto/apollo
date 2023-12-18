@@ -20,6 +20,9 @@ export const getObjectLengthAndWidth = (object) => {
 };
 
 export const disposeMesh = (mesh) => {
+    if (mesh?.memoName) {
+        return;
+    }
     mesh?.geometry?.dispose();
     mesh?.material?.dispose();
 };
@@ -124,7 +127,10 @@ export const drawThickBandFromPoints = (points, thickAttr) => {
         lineWidth,
         opacity,
     });
-    return new THREE.Mesh(line, material);
+    material.depthTest = true;
+    material.transparent = true;
+    material.side = THREE.DoubleSide;
+    return new THREE.Mesh(line.geometry, material);
 };
 
 export const drawShapeFromPoints = (points, color) => {
@@ -153,4 +159,18 @@ export function areVerticesValid(vertices) {
         }
     }
     return true;
+}
+
+export function compareLineSame(oldLine, newLine) {
+    return oldLine.every((item, index) => {
+        return item.x === newLine[index].x && item.y === newLine[index].y && item.z === newLine[index].z;
+    });
+}
+
+// 根据点云数量修改点云绘制点的大小
+export function getPointSize(pointCount: number) {
+    if (pointCount < 3000) {
+        return 1;
+    }
+    return 0.05;
 }

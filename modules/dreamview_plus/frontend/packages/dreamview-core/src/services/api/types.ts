@@ -5,11 +5,13 @@ import { apollo } from '@dreamview/dreamview';
  */
 export enum MainApiTypes {
     StartRecordPackets = 'StartDataRecorder',
+    GetInitData = 'GetInitData',
     StopRecordPackets = 'StopDataRecorder',
     SaveRecordPackets = 'SaveDataRecorder',
     DeleteRecordPackets = 'DeleteDataRecorder',
     ResetRecordProgress = 'ResetRecordProgress',
     StartPlayRecorder = 'StartPlayRecorder',
+    StartPlayRtkRecorder = 'StartPlayRtkRecorder',
     PlayRecorderAction = 'PlayRecorderAction',
     HMIAction = 'HMIAction',
     Dump = 'Dump',
@@ -19,6 +21,7 @@ export enum MainApiTypes {
     GetDefaultRoutings = 'GetDefaultRoutings',
     SendScenarioSimulationRequest = 'SendScenarioSimulationRequest',
     StopScenarioSimulation = 'StopScenarioSimulation',
+    ResetScenarioSimulation = 'ResetScenarioSimulation',
     DeleteDefaultRouting = 'DeleteDefaultRouting',
     SaveDefaultRouting = 'SaveDefaultRouting',
     GetStartPoint = 'GetStartPoint',
@@ -31,6 +34,13 @@ export enum MainApiTypes {
     SendParkingRoutingRequest = 'SendParkingRoutingRequest',
     GetMapElementIds = 'GetMapElementIds',
     GetMapElementsByIds = 'GetMapElementsByIds',
+    AddObjectStore = 'AddOrModifyObjectToDB',
+    DeleteObjectStore = 'DeleteObjectToDB',
+    PutObjectStore = 'AddOrModifyObjectToDB',
+    GetObjectStore = 'GetObjectFromDB',
+    GetTuplesObjectStore = 'GetTuplesWithTypeFromDB',
+    StartTerminal = 'StartTerminal',
+    RequestRoutePath = 'RequestRoutePath',
 }
 
 /**
@@ -50,6 +60,7 @@ export enum StreamDataNames {
     POINT_CLOUD = 'pointcloud',
     Map = 'map',
     Obstacle = 'obstacle',
+    Cyber = 'cyber',
 }
 
 /**
@@ -81,24 +92,32 @@ export enum PluginApiNames {
  */
 export enum HMIActions {
     StopRecord = 'STOP_RECORD',
+    StartAutoDrive = 'ENTER_AUTO_MODE',
+    LOAD_DYNAMIC_MODELS = 'LOAD_DYNAMIC_MODELS',
     ChangeScenariosSet = 'CHANGE_SCENARIO_SET',
     ChangeScenarios = 'CHANGE_SCENARIO',
     ChangeMode = 'CHANGE_MODE',
     ChangeMap = 'CHANGE_MAP',
     ChangeVehicle = 'CHANGE_VEHICLE',
+    ChangeDynamic = 'CHANGE_DYNAMIC_MODEL',
     LoadRecords = 'LOAD_RECORDS',
+    LoadRecord = 'LOAD_RECORD',
     LoadScenarios = 'LOAD_SCENARIOS',
+    LoadRTKRecords = 'LOAD_RTK_RECORDS',
     ChangeRecord = 'CHANGE_RECORD',
+    ChangeRTKRecord = 'CHANGE_RTK_RECORD',
     DeleteRecord = 'DELETE_RECORD',
     DeleteHDMap = 'DELETE_MAP',
     DeleteVehicle = 'DELETE_VEHICLE_CONF',
     DeleteV2X = 'DELETE_V2X_CONF',
     DeleteScenarios = 'DELETE_SCENARIO_SET',
+    DeleteDynamic = 'DELETE_DYNAMIC_MODEL',
     ChangeOperation = 'CHANGE_OPERATION',
     StartModule = 'START_MODULE',
     StopModule = 'STOP_MODULE',
     SetupMode = 'SETUP_MODE',
     ResetMode = 'RESET_MODE',
+    DISENGAGE = 'DISENGAGE',
 }
 
 /**
@@ -157,6 +176,7 @@ export type DynamicModelRecord = {
     [name: string]: {
         name: string;
         status: ENUM_DOWNLOAD_STATUS;
+        percentage: number;
     };
 };
 
@@ -282,7 +302,7 @@ export type SendDefaultCycleRoutingRequestInfo = {
     cycleNumber: number;
 };
 
-export type SendParkingRoutingRequestInfo = {};
+export type SendParkingRoutingRequestInfo = any;
 
 export type GetMapElementIdsInfo = {
     point?: {
@@ -307,3 +327,42 @@ export type HMIActionsOperationInfo = {
 export type HDMapSwitchInfo = {
     isOk: boolean;
 };
+
+export enum OBJECT_STORE_TYPE {
+    CHART = 'chart',
+}
+export interface IAddObjectStoreParams {
+    key: string;
+    value: any;
+}
+
+export interface IPutObjectStoreParams {
+    key: string;
+    value: any;
+}
+
+export interface IDeleteObjectStoreParams {
+    key: string;
+}
+
+export interface IGetObjectStoreParams {
+    key: string;
+}
+
+export interface IGetTuplesObjectStoreParams {
+    type: OBJECT_STORE_TYPE;
+}
+
+export interface RoutePathInfoPoint {
+    x: number;
+    y: number;
+    z: number;
+}
+
+export interface RoutePathInfoItem {
+    point: RoutePathInfoPoint[];
+}
+export interface RoutePathInfo {
+    routingTime: number;
+    routePath: RoutePathInfoItem[];
+}

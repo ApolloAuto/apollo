@@ -590,16 +590,17 @@ Status LatController::ComputeControlCommand(
 
   // Check if the steer is locked and hence the previous steer angle should be
   // executed
-  if ((std::abs(vehicle_state->linear_velocity()) <
-           lat_based_lqr_controller_conf_.lock_steer_speed() ||
-       previous_lon_debug->path_remain() <= 0) &&
-      (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
-       vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
-      chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
-    ADEBUG << "Into lock steer, path_remain is "
-          << previous_lon_debug->path_remain() << "linear_velocity is "
-          << vehicle_state->linear_velocity();
-    steer_angle = pre_steer_angle_;
+  if (injector_->vehicle_state()->gear() != canbus::Chassis::GEAR_REVERSE) {
+    if ((std::abs(vehicle_state->linear_velocity()) <
+             lat_based_lqr_controller_conf_.lock_steer_speed() ||
+         previous_lon_debug->path_remain() <= 0) &&
+        vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE &&
+        chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+      ADEBUG << "Into lock steer, path_remain is "
+             << previous_lon_debug->path_remain() << "linear_velocity is "
+             << vehicle_state->linear_velocity();
+      steer_angle = pre_steer_angle_;
+    }
   }
 
   // Set the steer commands

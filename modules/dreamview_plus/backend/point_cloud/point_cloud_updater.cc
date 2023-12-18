@@ -23,13 +23,13 @@
 #include "pcl/filters/voxel_grid.h"
 #include "yaml-cpp/yaml.h"
 
-#include "modules/dreamview_plus/proto/point_cloud.pb.h"
+#include "modules/dreamview/proto/point_cloud.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace apollo {
 namespace dreamview {
 

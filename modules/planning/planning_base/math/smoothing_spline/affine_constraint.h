@@ -21,6 +21,7 @@
 #pragma once
 
 #include "Eigen/Core"
+
 #include "modules/planning/planning_base/math/polynomial_xd.h"
 
 namespace apollo {

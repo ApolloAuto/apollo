@@ -23,7 +23,9 @@
 #include <limits>
 
 #include "absl/strings/str_cat.h"
+
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -34,8 +36,8 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/planning_base/common/feature_output.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/util.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 
 namespace apollo {

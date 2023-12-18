@@ -246,7 +246,7 @@ class RtkPlayer(object):
                 "trajectory start point: [%s], gear is [%s]" % (self.start, self.data['gear'][self.start]))
 
             self.end = self.next_gear_switch_time(self.start, len(self.data))
-            self.logger.debug("len of data: ", len(self.data))
+            self.logger.debug("len of data: %d", len(self.data))
             self.logger.debug("trajectory end point: [%s], gear is [%s]" %
                               (self.end, self.data['gear'][self.end]))
 
@@ -335,13 +335,18 @@ def main():
     parser = argparse.ArgumentParser(
         description='Generate Planning Trajectory from Data File')
     parser.add_argument(
+        '-f',
+        '--file',
+        help=' files name ',
+        default='garage')
+    parser.add_argument(
         '-s',
         '--speedmulti',
         help='Speed multiplier in percentage (Default is 100) ',
         type=float,
         default='100')
     parser.add_argument(
-        '-c', '--complete', help='Generate complete path (t/F)', default='F')
+        '-c', '--complete', help='Generate complete path (t/F)', default='t')
     parser.add_argument(
         '-r',
         '--replan',
@@ -356,7 +361,8 @@ def main():
         use_stdout=True,
         log_level=logging.DEBUG)
 
-    record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
+    # record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
+    record_file = os.path.join(APOLLO_ROOT, 'data/log/' + args['file'] + '.csv')
 
     player = RtkPlayer(record_file, node, args['speedmulti'],
                        args['complete'].lower(), args['replan'].lower())

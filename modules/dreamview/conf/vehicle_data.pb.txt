@@ -148,7 +148,7 @@ data_files {
 }
 data_files {
   source_path: "planning_conf"
-  dest_path: "/apollo/modules/planning/planning_base/conf"
+  dest_path: "/apollo/modules/planning/planning_component/conf"
 }
 data_files {
   source_path: "localization_conf"
@@ -229,4 +229,8 @@ data_files {
 data_files {
   source_path: "v2x_conf"
   dest_path: "/apollo/modules/v2x/conf"
+}
+data_files {
+  source_path: "sensor_meta.pb.txt"
+  dest_path: "/apollo/modules/perception/data/conf/sensor_meta.pb.txt"
 }

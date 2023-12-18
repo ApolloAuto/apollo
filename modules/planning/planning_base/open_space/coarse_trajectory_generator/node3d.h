@@ -24,9 +24,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "modules/common/math/box2d.h"
-#include "modules/planning/planning_base/constraint_checker/collision_checker.h"
 
 namespace apollo {
 namespace planning {

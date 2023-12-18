@@ -13,11 +13,11 @@ export default class Routing {
     private coordinates;
 
     constructor(scene, option, coordinates) {
-        this.routePathMeshs = [];
         this.scene = scene;
         this.option = option;
-        this.coordinates = coordinates;
+        this.routePathMeshs = [];
         this.lastRoutingTime = -1;
+        this.coordinates = coordinates;
     }
 
     update(routingTime, routePath) {
@@ -43,6 +43,7 @@ export default class Routing {
                     opacity: 0.6,
                     lineWidth: 0.2,
                 });
+                pathMesh.renderOrder = 0;
                 if (pathMesh) {
                     pathMesh.position.z = zOffset.routing;
                     this.scene.add(pathMesh);

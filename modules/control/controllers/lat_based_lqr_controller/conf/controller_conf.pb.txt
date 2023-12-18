@@ -1,31 +1,31 @@
 ts: 0.01
 preview_window: 0
-cf: 126050
-cr: 126050
-mass_fl: 100
-mass_fr: 100
-mass_rl: 100
-mass_rr: 100
+cf: 155494.663
+cr: 155494.663
+mass_fl: 520
+mass_fr: 520
+mass_rl: 520
+mass_rr: 520
 eps: 0.01
-matrix_q: 6.0
-matrix_q: 1.0
-matrix_q: 3.0
+matrix_q: 0.05
 matrix_q: 0.0
-reverse_matrix_q: 5.0
-reverse_matrix_q: 1.0
-reverse_matrix_q: 2.0
+matrix_q: 1.0
+matrix_q: 0.0
+reverse_matrix_q: 0.05
 reverse_matrix_q: 0.0
-cutoff_freq: 5
+reverse_matrix_q: 1.0
+reverse_matrix_q: 0.0
+cutoff_freq: 10
 mean_filter_window_size: 10
-max_iteration: 300
-max_lateral_acceleration: 4.0
-enable_reverse_leadlag_compensation: false
+max_iteration: 150
+max_lateral_acceleration: 5.0
+enable_reverse_leadlag_compensation: true
 enable_steer_mrac_control: false
 enable_look_ahead_back_control: true
-lookahead_station: 0.5
-lookback_station: 1.05
-lookahead_station_high_speed: 0.0
-lookback_station_high_speed: 0.0
+lookahead_station: 1.4224
+lookback_station: 2.8448
+lookahead_station_high_speed: 1.4224
+lookback_station_high_speed: 2.8448
 switch_speed: 2.0
 switch_speed_window: 0.0
 query_relative_time: 0.8
@@ -41,54 +41,46 @@ reverse_feedforward_ratio: 1.4
 reverse_use_dynamic_model: false
 lat_err_gain_scheduler {
   scheduler {
-    speed: 2.0
+    speed: 4.0
     ratio: 1.0
   }
   scheduler {
-    speed: 2.5
-    ratio: 0.8
-  }
-  scheduler {
-    speed: 3.0
+    speed: 8.0
     ratio: 0.6
   }
   scheduler {
-    speed: 3.5
-    ratio: 0.3
+    speed: 12.0
+    ratio: 0.2
   }
   scheduler {
-    speed: 4.0
+    speed: 20.0
     ratio: 0.1
   }
   scheduler {
-    speed: 4.5
-    ratio: 0.08
+    speed: 25.0
+    ratio: 0.05
   }
 }
 heading_err_gain_scheduler {
   scheduler {
-    speed: 2.0
+    speed: 4.0
     ratio: 1.0
   }
   scheduler {
-    speed: 2.5
-    ratio: 0.8
-  }
-  scheduler {
-    speed: 3.0
+    speed: 8.0
     ratio: 0.6
   }
   scheduler {
-    speed: 3.5
+    speed: 12.0
+    ratio: 0.4
+  }
+  scheduler {
+    speed: 20.0
     ratio: 0.2
   }
   scheduler {
-    speed: 4.0
+    speed: 25.0
     ratio: 0.1
-  }
-  scheduler {
-    speed: 4.5
-    ratio: 0.008
   }
 }
 reverse_leadlag_conf {
@@ -99,13 +91,14 @@ reverse_leadlag_conf {
 }
 steer_mrac_conf {
   mrac_model_order: 1
-  reference_time_constant: 0.01
+  reference_time_constant: 0.09
   reference_natural_frequency: 10
   reference_damping_ratio: 0.9
-  adaption_state_gain: 1.0
-  adaption_desired_gain: 1.0
-  adaption_nonlinear_gain: 1.0
+  adaption_state_gain: 0.0001
+  adaption_desired_gain: 0.0001
+  adaption_nonlinear_gain: 0.0001
   adaption_matrix_p: 1.0
   mrac_saturation_level: 1.0
-  anti_windup_compensation_gain: 0.0
+  anti_windup_compensation_gain: 0.0001
+  clamping_time_constant: 0.08
 }

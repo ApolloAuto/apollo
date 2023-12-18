@@ -1,5 +1,6 @@
 import { lowerFirst } from 'lodash';
 import * as THREE from 'three';
+import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import { cameraParams } from '../constant/common';
 
 export default class View {
@@ -17,9 +18,11 @@ export default class View {
 
     private controls;
 
-    public viewType = 'Default';
+    public viewType;
 
     private adc;
+
+    private viewLocalStorage = new LocalStorage(KEY_MANAGER.CurrentSwitchView);
 
     public constructor(camera, controls, adc) {
         this.defaultViewDistance = 22.5;
@@ -30,6 +33,7 @@ export default class View {
         this.viewAngle = 0.8;
         this.controls = controls;
         this.adc = adc;
+        this.viewType = this.viewLocalStorage.get('Default');
     }
 
     public setDefaultViewDistance(distance) {
@@ -52,8 +56,11 @@ export default class View {
         this.viewAngle = angle;
     }
 
-    public setViewType(type) {
+    public setViewType(type, force = true) {
         this.viewType = type;
+        if (force) {
+            this.viewLocalStorage.set(type);
+        }
     }
 
     public setView() {
@@ -117,8 +124,8 @@ export default class View {
         this.setView();
     }
 
-    public changeViewType(type) {
-        this.setViewType(type);
+    public changeViewType(type, force = true) {
+        this.setViewType(type, force);
         this.setView();
     }
 }

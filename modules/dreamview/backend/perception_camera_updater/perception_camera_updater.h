@@ -32,7 +32,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/transform/buffer.h"
 
 namespace apollo {

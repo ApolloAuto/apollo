@@ -4,5 +4,5 @@ import Icon  from '@ant-design/icons';
 import { IconProps } from '../type';
 import { default as Svg } from '../../svgs/ic_ranging.svg';
 
-const IconIcRanging = (props: IconProps) => <Icon component={Svg} {...props}/>;
+const IconIcRanging = (props: IconProps) => <Icon component={Svg as any} {...props}/>;
 export default IconIcRanging;

@@ -162,6 +162,7 @@ apollo_cc_library(
         "interface/base_lidar_detector.h",
         "object_builder/object_builder.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         ":anchor_mask_cuda",
         ":feature_generator_cuda",

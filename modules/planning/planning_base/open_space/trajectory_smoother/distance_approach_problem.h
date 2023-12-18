@@ -29,7 +29,7 @@
 
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h"

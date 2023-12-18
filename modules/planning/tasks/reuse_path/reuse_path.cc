@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/planning_base/task_base/common/path_generation.h"
+#include "modules/planning/planning_interface_base/task_base/common/path_generation.h"
 
 namespace apollo {
 namespace planning {

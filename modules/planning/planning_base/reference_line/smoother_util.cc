@@ -19,13 +19,14 @@
  **/
 
 #include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/future.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 #include "modules/planning/planning_base/reference_line/reference_line_smoother.h"

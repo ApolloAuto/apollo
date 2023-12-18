@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function Latency() {
     const [options, setOptions] = useState<any>();
-    const { latencyData } = usePNCMonitorContext();
+    const { latencyData, onClearLatencyView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         const { dataset, series } = Object.entries(graph).reduce(
@@ -52,6 +52,6 @@ function Latency() {
         triggerUIUpdate(latencyData);
     }, [latencyData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Latency' options={options} />;
+    return <ChartBase onRefresh={onClearLatencyView} labelRotateBoundary={550} title='Latency' options={options} />;
 }
 export default React.memo(Latency);

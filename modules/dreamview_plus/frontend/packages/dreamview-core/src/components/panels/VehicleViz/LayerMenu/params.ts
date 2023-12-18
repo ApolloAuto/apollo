@@ -1,3 +1,5 @@
+import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
+
 export interface subMenuParams {
     [key: string]: {
         defaultVisible: boolean;
@@ -37,7 +39,7 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
         unknownStationary: {
             defaultVisible: true,
             currentVisible: true,
-            vizKey: 'unknownUnMovable',
+            vizKey: 'unknownUnmovable',
         },
         pedestrian: {
             defaultVisible: true,
@@ -157,10 +159,20 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
             currentVisible: false,
             vizKey: 'planningCar',
         },
-        planningTrajectory: {
+        planningTrajectoryLine: {
             defaultVisible: true,
             currentVisible: true,
-            vizKey: 'planningTrajectory',
+            vizKey: 'planningTrajectoryLine',
+        },
+        planningReferenceLine: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'PlanningReferenceLine',
+        },
+        planningBoundaryLine: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'PlanningBoundaryLine',
         },
         // 'RSS Info': {
         //     defaultVisible: false,
@@ -267,13 +279,10 @@ export const formatLayerParams = (params: { [key: string]: subMenuParams }) => {
     return result;
 };
 
+export const localLayerMenuParamsManager = new LocalStorage(KEY_MANAGER.layerMenuParams);
+
 export const getCurrentLayerParams = () => {
-    const localStorageLayerMenuParams = localStorage.getItem('layerMenuParams');
-    let curLayerMenuParams = null;
-    if (localStorageLayerMenuParams) {
-        curLayerMenuParams = JSON.parse(localStorageLayerMenuParams);
-    } else {
-        curLayerMenuParams = layerMenuParams;
-    }
-    return curLayerMenuParams;
+    const localStorageLayerMenuParams = localLayerMenuParamsManager.get();
+
+    return localStorageLayerMenuParams || layerMenuParams;
 };

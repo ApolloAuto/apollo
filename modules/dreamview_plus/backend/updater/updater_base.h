@@ -58,11 +58,6 @@ class UpdaterBase {
   virtual void StopStream(const std::string& channel_name = "") = 0;
 
   /**
-   * @brief Timer setting.
-   */
-  virtual void OnTimer(const std::string& channel_name = "") = 0;
-
-  /**
    * @brief Publish Message to dreamview frontend.
    */
   virtual void PublishMessage(const std::string& channel_name = "") = 0;

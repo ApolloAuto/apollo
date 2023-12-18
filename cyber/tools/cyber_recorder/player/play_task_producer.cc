@@ -213,7 +213,7 @@ void PlayTaskProducer::WriteRecordProgress(const double& curr_time_s,
   record_info.set_total_time_s(total_time_s);
   record_info.set_curr_time_s(curr_time_s);
   record_info.set_progress(curr_time_s / total_time_s);
-  record_info.set_record_name(*(play_param_.files_to_play.cbegin()));
+  record_info.set_record_name(play_param_.record_id);
   std::string content;
   record_info.SerializeToString(&content);
   auto raw_msg = std::make_shared<message::RawMessage>(content);

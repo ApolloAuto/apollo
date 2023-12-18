@@ -82,6 +82,9 @@ class ProtobufFactory {
   // Get Serialized descriptors of messages with the given type.
   void GetDescriptorString(const std::string& type, std::string* desc_str);
 
+  // Get the storage location of proto.
+  void GetProtoPath(const std::string& type, std::string& location);
+
   // Given a type name, constructs the default (prototype) Message of that type.
   // Returns nullptr if no such message exists.
   google::protobuf::Message* GenerateMessageByType(

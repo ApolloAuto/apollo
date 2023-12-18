@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState, useLayoutEffect } from 're
 import type { apollo } from '@dreamview/dreamview';
 import { IconIcCoverageHover, Popover } from '@dreamview/dreamview-ui';
 import { isEmpty } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { useLocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import useStyle from './useStyle';
 import { usePanelContext } from '../base/store/PanelStore';
 import { ObstacleTypeColorMap } from './utils';
@@ -29,9 +31,10 @@ enum SubType {
 
 function InternalCameraView() {
     const panelContext = usePanelContext();
-    const { logger, panelId, data: subcribedData, onPanelResize, initSubscription } = panelContext;
+    const { logger, panelId, onPanelResize, initSubscription } = panelContext;
+    const localBoundingBoxManager = useLocalStorage(`${KEY_MANAGER.BBox}${panelId}`);
 
-    const [showBoundingBox, setShowBoundingBox] = useState(false);
+    const [showBoundingBox, setShowBoundingBox] = useState(() => localBoundingBoxManager.get());
 
     const [viewPortSize, setViewPortSize] = useState(null);
     const [data, setData] = useState<ICameraUpdate>();

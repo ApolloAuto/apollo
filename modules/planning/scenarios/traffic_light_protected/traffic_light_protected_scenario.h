@@ -28,7 +28,7 @@
 // #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/planning/scenarios/traffic_light_protected/proto/traffic_light_protected.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/scenario_base/scenario.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 #include "modules/planning/scenarios/traffic_light_protected/context.h"
 
 namespace apollo {

@@ -41,7 +41,7 @@ void GetObjects(const base::BlobPtr<float> &box3ds,
   const auto label_ptr = labels->cpu_data();
   const auto score_ptr = scores->cpu_data();
 
-  int feature_size = box3ds->shape(2);
+  int feature_size = box3ds->shape(1);
   objects->clear();
   for (int i = 0; i < scores->count(); ++i) {
     float score = score_ptr[i];
@@ -49,7 +49,8 @@ void GetObjects(const base::BlobPtr<float> &box3ds,
       continue;
     }
 
-    base::ObjectPtr obj = std::make_shared<base::Object>();
+    base::ObjectPtr obj;
+    obj.reset(new base::Object());
 
     obj->sub_type = GetSubtype(label_ptr[i], types);
     obj->type = base::kSubType2TypeMap.at(obj->sub_type);
@@ -76,11 +77,8 @@ void FillBBox3d(const float *bbox, base::ObjectPtr obj) {
   obj->size[1] = bbox[3];
   obj->size[2] = bbox[5];
 
+  // yaw
   obj->theta = bbox[6];
-
-  obj->direction[0] = cosf(bbox[6]);
-  obj->direction[1] = sinf(bbox[6]);
-  obj->direction[2] = 0;
 
   obj->center(0) = static_cast<double>(obj->camera_supplement.local_center[0]);
   obj->center(1) = static_cast<double>(obj->camera_supplement.local_center[1]);

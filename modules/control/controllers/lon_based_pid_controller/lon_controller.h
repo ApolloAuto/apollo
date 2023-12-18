@@ -175,6 +175,8 @@ class LonController : public ControlTask {
 
   double standstill_narmal_acceleration_ = 0.0;
   double stop_gain_acceleration_ = 0.0;
+  double max_path_remain_when_stopped_ = 0.0;
+  bool parking_release_ = false;
 };
 
 // 1.2 当前类声明为插件

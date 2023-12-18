@@ -4,5 +4,5 @@ import Icon  from '@ant-design/icons';
 import { IconProps } from '../type';
 import { default as Svg } from '../../svgs/ic_product_documentation.svg';
 
-const IconIcProductDocumentation = (props: IconProps) => <Icon component={Svg} {...props}/>;
+const IconIcProductDocumentation = (props: IconProps) => <Icon component={Svg as any} {...props}/>;
 export default IconIcProductDocumentation;

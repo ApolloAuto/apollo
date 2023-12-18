@@ -130,6 +130,9 @@ class CenterPointDetection : public BaseLidarDetector {
   void SetPointsInROI(
     std::vector<std::shared_ptr<base::Object>> *objects);
 
+  void FilterObjectsbyClassNMS(
+    std::vector<std::shared_ptr<base::Object>> *objects);
+
   // reference pointer of lidar frame
   LidarFrame *lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
@@ -156,6 +159,14 @@ class CenterPointDetection : public BaseLidarDetector {
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
   double postprocess_time_ = 0.0;
+  double nms_time_ = 0.0;
+
+  // diff class nms params
+  bool diff_class_nms_ = false;
+  float diff_class_iou_ = 0.0;
+  // true: use nms strategy, false: use nms by object score
+  bool nms_strategy_ = false;
+  std::map<base::ObjectType, std::vector<base::ObjectType>> nms_strategy_table_;
 
   // centerpoint param
   centerpoint::ModelParam model_param_;

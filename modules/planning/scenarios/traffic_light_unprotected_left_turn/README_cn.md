@@ -65,4 +65,4 @@ apollo::planning::TrafficLightUnprotectedLeftTurnScenario
 | ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
 | `modules/planning/scenarios/traffic_light_unprotected_left_turn/conf/scenario_conf.pb.txt` |`apollo::planning::ScenarioTrafficLightUnprotectedLeftTurnConfig`| 场景的配置文件   |
 | `modules/planning/scenarios/traffic_light_unprotected_left_turn/conf/pipeline.pb.txt`      | `apollo::planning::ScenarioPipeline` |场景的流水线文件 |
-| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+| `modules/planning/planning_component/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |

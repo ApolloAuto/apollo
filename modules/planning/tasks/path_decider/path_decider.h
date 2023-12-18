@@ -25,7 +25,7 @@
 
 #include "modules/planning/tasks/path_decider/proto/path_decider.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 
 namespace apollo {
 namespace planning {

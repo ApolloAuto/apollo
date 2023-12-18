@@ -19,3 +19,5 @@ export const config = {
     mainUrl: `${baseURL}/websocket`,
     pluginUrl: `${baseURL}/plugin`,
 };
+
+export const requestIdleCallbackTimeout = 2000;

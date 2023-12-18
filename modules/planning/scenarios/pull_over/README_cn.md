@@ -120,13 +120,13 @@ apollo::planning::PullOverScenario
 
 | 文件路径                                            |  <div style="width: 300pt">说明</div> |
 | --------------------------------------------------- |  ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
+| `modules/planning/planning_component/conf/planning.conf` |  planning模块的flag配置文件           |
 
 #### 使用方式
 ##### 配置加载 PullOverScenario 插件
-- 在`modules/planning/planning_base/conf/planning_config.pb.txt`文件中增加`standard_planning_config`的配置，配置使用当前场景插件。
+- 在`modules/planning/planning_component/conf/planning_config.pb.txt`文件中增加`standard_planning_config`的配置，配置使用当前场景插件。
   ``` shell
-  # modules/planning/planning_base/conf/planning_config.pb.txt
+  # modules/planning/planning_component/conf/planning_config.pb.txt
 
   standard_planning_config {
     planner_type: ......

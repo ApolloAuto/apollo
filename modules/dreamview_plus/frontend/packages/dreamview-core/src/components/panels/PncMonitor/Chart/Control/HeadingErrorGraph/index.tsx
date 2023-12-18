@@ -5,7 +5,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 function HeadingErrorGraph() {
     const [options, setOptions] = useState<any>();
 
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         if (!graph?.length) {
@@ -47,6 +47,13 @@ function HeadingErrorGraph() {
         triggerUIUpdate(controlData.headingError);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Heading Error' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['headingError'])}
+            labelRotateBoundary={550}
+            title='Heading Error'
+            options={options}
+        />
+    );
 }
 export default React.memo(HeadingErrorGraph);

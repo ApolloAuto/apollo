@@ -32,9 +32,9 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/planning_base/common/ego_info.h"
 #include "modules/planning/planning_base/common/frame.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
-#include "modules/planning/planning_base/constraint_checker/constraint_checker.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planning_base/math/constraint_checker/constraint_checker.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 
 namespace apollo {

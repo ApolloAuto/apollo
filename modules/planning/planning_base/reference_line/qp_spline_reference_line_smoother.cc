@@ -27,7 +27,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/curve_math.h"
 #include "modules/planning/planning_base/math/smoothing_spline/osqp_spline_2d_solver.h"
 

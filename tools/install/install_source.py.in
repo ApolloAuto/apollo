@@ -13,7 +13,6 @@ import shutil
 import stat
 import sys
 from subprocess import check_output, check_call, Popen, PIPE
-from multiprocessing import Process, Queue
 import xml.etree.ElementTree as ET
 
 prefix = None
@@ -185,34 +184,25 @@ def install_src(src, dst, file_filter, action_type=None):
 
 def install_src_file():
     global src_install_dirs_dict
-    queue = Queue()
+
     for file_filter in src_install_dirs_dict:
         common_prefix = os.path.commonprefix([src_dir for src_dir in src_install_dirs_dict[file_filter]])
         if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
-            print("\033[31m[ERROR]\033[0m can not calculate common prefix: {}".format(common_prefix), file=sys.stderr)
-            exit(-1)
+            print("\033[31m[INFO]\033[0m can not calculate common prefix: {}, install all".format(common_prefix), file=sys.stderr)
+            for i in src_install_dirs_dict[file_filter]:
+                dst_full = src_install_dirs_dict[file_filter][i]["dst"]
+                if not os.path.exists(dst_full):
+                    os.makedirs(dst_full)
+                shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                    .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))   
+        else:  
 
-        pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
-        src_hash_cmd = "find {} -name \"*\" -type f -print0 | sort -z | xargs -0 cat | sha1sum".format(
-            is_relative_link(os.path.join(pwd, common_prefix)))
-        src_process = Process(target=process_cmd, args=(src_hash_cmd, queue, ))
-        src_process.start()
-
-        des_hash_cmd = "find {} -name \"*\" -type f -print0 2>&1 | sort -z | xargs -0 cat 2>&1 | sha1sum".format(
-            src_install_dirs_dict[file_filter][common_prefix]["dst"])
-
-        des_process = Process(target=process_cmd, args=(des_hash_cmd, queue, ))
-        des_process.start()
-
-        src_process.join()
-        des_process.join()
-
-        if queue.get() != queue.get():
+            pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
             dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
             if not os.path.exists(dst_full):
                 os.makedirs(dst_full)
-            shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
-                .format(is_relative_link(os.path.join(pwd, common_prefix)), file_filter, dst_full))
+            shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
 
 
 def main(args):

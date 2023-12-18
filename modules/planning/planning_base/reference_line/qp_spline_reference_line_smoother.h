@@ -25,6 +25,7 @@
 
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/planning/planning_base/proto/reference_line_smoother_config.pb.h"
+
 #include "modules/planning/planning_base/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 #include "modules/planning/planning_base/reference_line/reference_line_smoother.h"

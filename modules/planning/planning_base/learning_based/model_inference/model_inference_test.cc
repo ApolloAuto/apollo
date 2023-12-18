@@ -24,7 +24,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "modules/planning/planning_base/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
 
@@ -58,7 +58,7 @@ TEST_F(ModelInferenceTest, trajectory_imitation_libtorch_inference) {
       "/apollo/modules/planning/planning_base/testdata/model_inference_test/"
       "learning_data_sunnyvale_with_two_offices.bin";
   FLAGS_planning_birdview_img_feature_renderer_config_file =
-      "/apollo/modules/planning/planning_base/conf/"
+      "/apollo/modules/planning/planning_component/conf/"
       "planning_semantic_map_config.pb.txt";
 
   LearningModelInferenceTaskConfig config;

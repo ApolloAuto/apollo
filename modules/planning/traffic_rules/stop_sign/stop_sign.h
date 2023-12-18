@@ -26,7 +26,7 @@
 
 #include "modules/planning/traffic_rules/stop_sign/proto/stop_sign.pb.h"
 
-#include "modules/planning/planning_base/traffic_rules_base/traffic_rule.h"
+#include "modules/planning/planning_interface_base/traffic_rules_base/traffic_rule.h"
 
 namespace apollo {
 namespace planning {

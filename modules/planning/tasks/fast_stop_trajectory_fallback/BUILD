@@ -17,7 +17,7 @@ apollo_plugin(
     description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
     ],
 )
 

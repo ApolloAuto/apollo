@@ -41,19 +41,25 @@ export default {
     '.mosaic-tile': {
         margin: '0.5px',
     },
+    '.mosaic-split': {
+        zIndex: 2,
+        backgroundClip: 'content-box !important',
+    },
     '.mosaic-split.-row': {
-        marginLeft: '-1px',
-        width: '2px',
+        padding: '0 4px',
+        width: '10px',
+        marginLeft: '-4px',
     },
     '.mosaic-split.-column': {
-        marginTop: '-2px',
-        height: '2px',
+        padding: '4px 0',
+        height: '10px',
+        marginTop: '-4px',
     },
     '.mosaic-split:hover': {
         backgroundColor: 'rgba(41,125,236,1)',
     },
     '.mosaic-window .mosaic-window-body, .mosaic-preview .mosaic-window-body': {
-        background: '#0F1014',
+        backgroundColor: '#0F1014',
     },
     // /* 指定滚动条的宽度和颜色 */
     // '::-webkit-scrollbar': {

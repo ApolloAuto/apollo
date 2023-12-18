@@ -54,6 +54,16 @@ export const profileManagerV2X = {
     upload: 'upload',
 };
 
+export const profileManagerDynamical = {
+    titleName: 'Name',
+    titleType: 'Type',
+    titleState: 'State',
+    titleOperate: 'Operation',
+    refresh: 'refresh',
+    reset: 'reset',
+    upload: 'upload',
+};
+
 export const profileManagerOperate = {
     cancel: 'canel download',
     download: 'download',
@@ -79,4 +89,5 @@ export const profileManager = {
     HDMap: 'HDMap',
     vehicle: 'Vehicle',
     V2X: 'V2X',
+    dynamical: 'Dynamical Model',
 };

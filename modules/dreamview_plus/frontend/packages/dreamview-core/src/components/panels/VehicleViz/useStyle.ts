@@ -87,7 +87,7 @@ export default function useStyle() {
         },
         'layer-menu-content-right-li': {
             '&:nth-of-type(2n + 1)': {
-                width: '150px',
+                minWidth: '150px',
             },
             '&:nth-of-type(2n + 2)': {
                 width: '216px',

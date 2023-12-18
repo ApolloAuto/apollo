@@ -11,7 +11,7 @@ export const personal = {
     about: '关于我们',
     language: '语言',
     technicalSupport: '意见与建议',
-
+    faq: '常见问题',
     confirm: '确认',
     close: '关闭',
     generalConfirm: '发送匿名使用数据以帮助我们改进Dreamview',

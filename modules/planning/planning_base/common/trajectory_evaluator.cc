@@ -20,10 +20,11 @@
 #include <limits>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/file.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/planning_base/pipeline/evaluator_logger.h"
+#include "modules/planning/planning_base/common/util/evaluator_logger.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

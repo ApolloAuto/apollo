@@ -25,7 +25,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/util/perf_util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

@@ -2,41 +2,6 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/planning_base/proto/plugin_declare_info.proto";
-import "modules/planning/planning_base/proto/navi_task_config.proto";
-
-message PlannerPublicRoadConfig {
-  repeated PluginDeclareInfo scenario = 1;
-}
-
-message PlannerNaviConfig {
-  repeated NaviTaskType task = 1;
-  optional NaviPathDeciderConfig navi_path_decider_config = 2;
-  optional NaviSpeedDeciderConfig navi_speed_decider_config = 3;
-  optional NaviObstacleDeciderConfig navi_obstacle_decider_config = 4;
-}
-
-enum PlannerType {
-  RTK = 0;
-  PUBLIC_ROAD = 1;  // public road planner
-  NAVI = 2;         // navigation planner
-  LATTICE = 3;      // lattice planner
-}
-
-message RtkPlanningConfig {
-  optional PlannerType planner_type = 1;
-}
-
-message StandardPlanningConfig {
-  repeated PlannerType planner_type = 1;  // supported planners
-  optional PlannerPublicRoadConfig planner_public_road_config = 2;
-}
-
-message NavigationPlanningConfig {
-  repeated PlannerType planner_type = 1;  // supported planners
-  optional PlannerNaviConfig planner_navi_config = 4;
-}
-
 message TopicConfig {
   optional string chassis_topic = 1;
   optional string hmi_status_topic = 2;
@@ -71,9 +36,5 @@ message PlanningConfig {
   optional TopicConfig topic_config = 1;
   optional PlanningLearningMode learning_mode = 2;
   optional ReferenceLineConfig reference_line_config = 3;
-  oneof planning_config {
-    RtkPlanningConfig rtk_planning_config = 4;
-    StandardPlanningConfig standard_planning_config = 5;
-    NavigationPlanningConfig navigation_planning_config = 6;
-  }
+  optional string planner = 4;
 }

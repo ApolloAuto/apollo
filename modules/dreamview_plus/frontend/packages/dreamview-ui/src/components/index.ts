@@ -14,6 +14,8 @@ export { CheckboxGroup } from './Checkbox';
 export { Checkbox } from './Checkbox/checkBox';
 export { Radio } from './Radio';
 export { Form } from './Form';
+export { ColorPicker } from './ColorPicker';
 export { InputNumber } from './InputNumber';
 export { message } from './Message';
 export { SwitchLoading } from './Switch/switch-loading';
+export { Tree } from './Tree';

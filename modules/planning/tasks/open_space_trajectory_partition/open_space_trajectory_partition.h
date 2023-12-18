@@ -33,7 +33,7 @@
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/planning_base/task_base/common/trajectory_optimizer.h"
+#include "modules/planning/planning_interface_base/task_base/common/trajectory_optimizer.h"
 
 namespace apollo {
 namespace planning {

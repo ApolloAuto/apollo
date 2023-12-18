@@ -20,8 +20,9 @@
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_problem.h"
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

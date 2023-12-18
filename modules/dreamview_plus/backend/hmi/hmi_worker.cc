@@ -16,13 +16,16 @@
 
 #include "modules/dreamview_plus/backend/hmi/hmi_worker.h"
 
+#include <cstdio>
+#include <utility>
+
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 
 #include "cyber/proto/dag_conf.pb.h"
 #include "cyber/proto/record.pb.h"
-#include "modules/dreamview_plus/proto/scenario.pb.h"
+#include "modules/dreamview/proto/scenario.pb.h"
 #include "cyber/record/file/record_file_reader.h"
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -31,30 +34,14 @@
 #include "modules/common/util/future.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
-#include "modules/dreamview_plus/backend/common/dreamview_gflags.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/data_collection_monitor.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/fuel_monitor_gflags.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/fuel_monitor_manager.h"
-#include "modules/dreamview_plus/backend/fuel_monitor/preprocess_monitor.h"
-#include "modules/dreamview_plus/backend/hmi/vehicle_manager.h"
-#include "modules/dreamview_plus/backend/sim_control_manager/sim_control_manager.h"
-
-DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview_plus/conf/hmi_modes",
-              "HMI modes config path.");
-
-DEFINE_string(recorder_config_path,
-              "/apollo/modules/dreamview_plus/conf/recorder_config.pb.txt",
-              "Recorder config path.");
-
-DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
-
-DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
-
-DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
-              "Key to store hmi_status.current_mode in KV DB.");
-
-DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
-              "Default HMI Mode when there is no cache.");
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/fuel_monitor/data_collection_monitor.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_gflags.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/fuel_monitor/preprocess_monitor.h"
+#include "modules/dreamview/backend/common/vehicle_manager/vehicle_manager.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
+#include "modules/dreamview/backend/common/util/hmi_util.h"
 
 DEFINE_string(cyber_recorder_play_command, "cyber_recorder play -p 1 -f ",
               "Cyber recorder play command");
@@ -79,7 +66,6 @@ using apollo::external_command::CommandStatus;
 using apollo::localization::LocalizationEstimate;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
-using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
 using Json = nlohmann::json;
@@ -87,50 +73,10 @@ using Json = nlohmann::json;
 constexpr char kNavigationModeName[] = "Navigation";
 // operations based on sim control is enabled, note that it is
 // consistent with the field name in hmistatus
-const std::vector<std::string> OperationBasedOnSimControl = {
-    "Scenario_Sim",
-    "Sim_Control",
+const std::vector<HMIModeOperation> OperationBasedOnSimControl = {
+    HMIModeOperation::Scenario_Sim,
+    HMIModeOperation::Sim_Control,
 };
-
-// Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(std::string_view origin) {
-  std::vector<std::string> parts = absl::StrSplit(origin, '_');
-  for (auto &part : parts) {
-    if (!part.empty()) {
-      // Upper case the first char.
-      part[0] = static_cast<char>(toupper(part[0]));
-    }
-  }
-
-  return absl::StrJoin(parts, " ");
-}
-
-// List subdirs and return a dict of {subdir_title: subdir_path}.
-Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
-  Map<std::string, std::string> result;
-  const auto subdirs = cyber::common::ListSubPaths(dir);
-  for (const auto &subdir : subdirs) {
-    const auto subdir_title = TitleCase(subdir);
-    const auto subdir_path = absl::StrCat(dir, "/", subdir);
-    result.insert({subdir_title, subdir_path});
-  }
-  return result;
-}
-
-// List files by pattern and return a dict of {file_title: file_path}.
-Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
-                                              std::string_view extension) {
-  Map<std::string, std::string> result;
-  const std::string pattern = absl::StrCat(dir, "/*", extension);
-  for (const std::string &file_path : cyber::common::Glob(pattern)) {
-    // Remove the extension and convert to title case as the file title.
-    const std::string filename = cyber::common::GetFileName(file_path);
-    const std::string file_title =
-        TitleCase(filename.substr(0, filename.length() - extension.length()));
-    result.insert({file_title, file_path});
-  }
-  return result;
-}
 
 template <class FlagType, class ValueType>
 void SetGlobalFlag(std::string_view flag_name, const ValueType &value,
@@ -157,8 +103,12 @@ void System(std::string_view cmd) {
 
 }  // namespace
 
-HMIWorker::HMIWorker(const std::shared_ptr<Node> &node)
-    : config_(LoadConfig()), node_(node) {
+HMIWorker::HMIWorker(
+    const std::shared_ptr<Node> &node,
+    const apollo::common::monitor::MonitorLogBuffer& monitor_log_buffer)
+    : config_(util::HMIUtil::LoadConfig(FLAGS_dv_plus_hmi_modes_config_path)),
+      node_(node),
+      monitor_log_buffer_(monitor_log_buffer) {
   InitStatus();
   time_interval_ms_ = 3000;
   overtime_time_ = 3;
@@ -182,23 +132,10 @@ void HMIWorker::Start(DvCallback callback_api) {
 
 void HMIWorker::Stop() {
   stop_ = true;
+  std::system(FLAGS_terminal_stop_cmd.data());
   if (thread_future_.valid()) {
     thread_future_.get();
   }
-}
-
-HMIConfig HMIWorker::LoadConfig() {
-  HMIConfig config;
-  // Get available modes, maps and vehicles by listing data directory.
-  *config.mutable_modes() =
-      ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
-
-  *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
-  *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
-  AINFO << "Loaded HMI config: " << config.DebugString();
-  return config;
 }
 
 bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
@@ -215,58 +152,8 @@ bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
                                          self_defined_mode))
       << "Unable to parse vehicle self defined HMIMode from file "
       << vehicle_mode_config_path;
-  TranslateCyberModules(self_defined_mode);
+  util::HMIUtil::TranslateCyberModules(self_defined_mode);
   return true;
-}
-
-void HMIWorker::TranslateCyberModules(HMIMode *mode) {
-  // Translate cyber_modules to regular modules.
-  for (const auto &iter : mode->cyber_modules()) {
-    const std::string &module_name = iter.first;
-    const CyberModule &cyber_module = iter.second;
-    // Each cyber module should have at least one dag file.
-    ACHECK(!cyber_module.dag_files().empty())
-        << "None dag file is provided for " << module_name;
-
-    Module &module = LookupOrInsert(mode->mutable_modules(), module_name, {});
-    module.set_required_for_safety(cyber_module.required_for_safety());
-
-    // Construct start_command:
-    //     nohup mainboard -p <process_group> -d <dag> ... &
-    module.set_start_command("nohup mainboard");
-    const auto &process_group = cyber_module.process_group();
-    if (!process_group.empty()) {
-      absl::StrAppend(module.mutable_start_command(), " -p ", process_group);
-    }
-    for (const std::string &dag : cyber_module.dag_files()) {
-      absl::StrAppend(module.mutable_start_command(), " -d ", dag);
-    }
-    absl::StrAppend(module.mutable_start_command(), " &");
-
-    // Construct stop_command: pkill -f '<dag[0]>'
-    const std::string &first_dag = cyber_module.dag_files(0);
-    module.set_stop_command(absl::StrCat("pkill -f \"", first_dag, "\""));
-    // Construct process_monitor_config.
-    module.mutable_process_monitor_config()->add_command_keywords("mainboard");
-    module.mutable_process_monitor_config()->add_command_keywords(first_dag);
-  }
-  mode->clear_cyber_modules();
-}
-
-HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
-  HMIMode mode;
-  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
-      << "Unable to parse HMIMode from file " << mode_config_path;
-
-  TranslateCyberModules(&mode);
-  // For global recording.
-  ACHECK(cyber::common::GetProtoFromFile(
-      FLAGS_recorder_config_path, mode.mutable_data_recorder_component()))
-      << "Unable to parse Recorder config from file "
-      << FLAGS_recorder_config_path;
-
-  AINFO << "Loaded HMI mode: " << mode.DebugString();
-  return mode;
 }
 
 void HMIWorker::InitStatus() {
@@ -351,7 +238,7 @@ void HMIWorker::InitReadersAndWriters() {
         // Update modules running status from realtime SystemStatus.
         if (is_realtime_msg) {
           for (auto &iter : *status_.mutable_modules()) {
-            bool previous_second = iter.second; 
+            bool previous_second = iter.second;
             auto *status = FindOrNull(system_status->hmi_modules(), iter.first);
             iter.second =
                 status != nullptr && status->status() == ComponentStatus::OK;
@@ -359,7 +246,8 @@ void HMIWorker::InitReadersAndWriters() {
               LockModule(iter.first, false);
             }
           }
-          // system_status is true, indicating that the monitor immediately detected the module startup status
+          // system_status is true, indicating that the monitor immediately
+          // detected the module startup status
           if (system_status->detect_immediately()) {
             status_.set_expected_modules(status_.expected_modules() - 1);
           }
@@ -381,15 +269,15 @@ void HMIWorker::InitReadersAndWriters() {
               FindOrNull(system_status->other_components(), iter.first);
           if (status != nullptr) {
             iter.second.CopyFrom(*status);
-          } else {
+          } else if (iter.first != "ScenarioSimulation") {
             iter.second.set_status(ComponentStatus::UNKNOWN);
             iter.second.set_message("Status not reported by Monitor.");
           }
         }
-
-        // Update data recorder status.
-        status_.mutable_data_recorder_component()->CopyFrom(
-            system_status->data_recorder_component());
+        // For global components.
+        for (auto &iter : *system_status->mutable_global_components()) {
+          (*status_.mutable_global_components())[iter.first] = iter.second;
+        }
 
         // Check if the status is changed.
         const size_t new_fingerprint =
@@ -404,9 +292,12 @@ void HMIWorker::InitReadersAndWriters() {
       FLAGS_record_info_topic,
       [this](const std::shared_ptr<RecordInfo> &record_info) {
         WLock wlock(status_mutex_);
-        status_.mutable_current_record_status()
-            ->set_curr_time_s(record_info.get()->curr_time_s());
-        status_changed_ = true;
+        if (record_info->record_name() ==
+            status_.current_record_status().current_record_id()) {
+          status_.mutable_current_record_status()->set_curr_time_s(
+              record_info.get()->curr_time_s());
+          status_changed_ = true;
+        }
       });
 
   localization_reader_ =
@@ -449,6 +340,9 @@ bool HMIWorker::Trigger(const HMIAction action) {
       break;
     case HMIAction::LOAD_RECORDS:
       LoadRecords();
+      break;
+    case HMIAction::LOAD_RTK_RECORDS:
+      LoadRtkRecords();
       break;
     case HMIAction::STOP_RECORD:
       StopRecordPlay();
@@ -502,6 +396,9 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string &value) {
     case HMIAction::CHANGE_RECORD:
       ChangeRecord(value);
       break;
+    case HMIAction::CHANGE_RTK_RECORD:
+      ChangeRtkRecord(value);
+      break;
     case HMIAction::CHANGE_OPERATION:
       ChangeOperation(value);
       break;
@@ -512,6 +409,9 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string &value) {
       break;
     case HMIAction::DELETE_MAP:
       DeleteMap(value);
+      break;
+    case HMIAction::LOAD_RECORD:
+      LoadRecordAndChangeStatus(value);
       break;
     default:
       AERROR << "HMIAction not implemented, yet!";
@@ -730,7 +630,7 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
   } else {
     // modules may have been modified the last time selected a vehicle
     // need to be recovery by load mode
-    current_mode_ = LoadMode(mode_config_path);
+    current_mode_ = util::HMIUtil::LoadMode(mode_config_path);
   }
   {
     WLock wlock(status_mutex_);
@@ -775,7 +675,7 @@ void HMIWorker::ChangeMode(const std::string &mode_name) {
   {
     WLock wlock(status_mutex_);
     status_.set_current_mode(mode_name);
-    current_mode_ = LoadMode(config_.modes().at(mode_name));
+    current_mode_ = util::HMIUtil::LoadMode(config_.modes().at(mode_name));
     // for vehicle self-defined module
     HMIMode vehicle_defined_mode;
     const std::string *vehicle_dir =
@@ -1043,29 +943,31 @@ bool HMIWorker::StopModuleByCommand(const std::string &stop_command) const {
 // }
 
 void HMIWorker::ChangeScenario(const std::string &scenario_info) {
-  size_t split_pos=scenario_info.find(",");
+  size_t split_pos = scenario_info.find(",");
   if (split_pos == scenario_info.npos) {
-    AERROR<<"Scenario info should contains scenario_set id and scenario id;use , to connect it.";
+    AERROR << "Scenario info should contains scenario_set id and"
+              " scenario id;use, to connect it.";
   }
-  const std::string scenario_set_id=scenario_info.substr(0,split_pos);
-  const std::string scenario_id=scenario_info.substr(split_pos+1);
+  const std::string scenario_set_id = scenario_info.substr(0, split_pos);
+  const std::string scenario_id = scenario_info.substr(split_pos + 1);
   std::string scenario_map = "";
   std::string current_map = "";
   double scenario_start_x;
   double scenario_start_y;
   {
     RLock rlock(status_mutex_);
-    if(scenario_set_id.empty()||scenario_id.empty()){
+    if (scenario_set_id.empty() || scenario_id.empty()) {
       AERROR << "Cannot change to empty scenario set or empty scenario!";
       return;
     }
-    if ((status_.current_scenario_set_id() == scenario_set_id)&&(status_.current_scenario_id() == scenario_id)) {
+    if ((status_.current_scenario_set_id() == scenario_set_id) &&
+        (status_.current_scenario_id() == scenario_id)) {
       // Skip if scenario doesn't actually change.
       return;
     }
     if (status_.current_operation() != HMIModeOperation::Scenario_Sim) {
-      AERROR << "Failed to change scenario for change scenario is only allowed "
-                "under scenario sim operation.";
+      AERROR << "Failed to change scenario for change scenario "
+                "is only allowed under scenario sim operation.";
       return;
     }
     auto &scenario_set = status_.scenario_set();
@@ -1094,13 +996,18 @@ void HMIWorker::ChangeScenario(const std::string &scenario_info) {
       return;
     }
   }
-  // todo(@lijin):check stop status,directly think pkill successfully.
-  StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
+
+  // Used to stop the vehicle when selecting the control-driven dynamics model.
+  SimControlManager::Instance()->Reset();
+
+  if (!StopScenarioSimulation()) {
+    AWARN << "Failed to stop Scenario simulation";
+  }
   if (current_map != scenario_map) {
-    if(!SelectAndReloadMap(scenario_map)){
-      AERROR<<"Failed to reload scenario related map";
+    if (!SelectAndReloadMap(scenario_map)) {
+      AERROR << "Failed to reload scenario related map";
       return;
-    };
+    }
   }
   SimControlManager::Instance()->Restart(scenario_start_x, scenario_start_y);
 
@@ -1231,37 +1138,39 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
     const std::string file_path = scenario_set_directory_path + file_name;
     SimTicket new_sim_ticket;
     if (!cyber::common::GetProtoFromJsonFile(file_path, &new_sim_ticket)) {
-      AERROR << "Cannot parse this scenario:" << file_path;
+      monitor_log_buffer_.WARN("Cannot parse this scenario:" + file_path);
       return false;
     }
     if (!new_sim_ticket.has_scenario()) {
-      AERROR << "Cannot get scenario.";
+      monitor_log_buffer_.WARN("Cannot get scenario from " + file_path);
       return false;
     }
     if (!new_sim_ticket.description_en_tokens_size()) {
-      AERROR << "Cannot get scenario name.";
+      monitor_log_buffer_.WARN("Cannot get scenario name from " + file_path);
       return false;
     }
     if (!new_sim_ticket.scenario().has_map_dir()) {
-      AERROR << "Cannot get scenario map dir.";
+      monitor_log_buffer_.WARN("Cannot get scenario map dir from " + file_path);
       return false;
     }
     if (!new_sim_ticket.scenario().has_start()) {
-      AERROR << "Cannot get scenario start_point.";
+      monitor_log_buffer_.WARN("Cannot get scenario start_point from " +
+                               file_path);
       return false;
     }
     auto &scenario_start_point = new_sim_ticket.scenario().start();
     if (!scenario_start_point.has_x() || !scenario_start_point.has_y()) {
-      AERROR << "Scenario start_point is invalid!";
+      monitor_log_buffer_.WARN("Scenario start_point is invalid!");
       return false;
     }
     if (!new_sim_ticket.scenario().has_end()) {
-      AERROR << "Cannot get scenario end_point.";
+      monitor_log_buffer_.WARN("Cannot get scenario end point from " +
+                               file_path);
       return false;
     }
     auto &scenario_end_point = new_sim_ticket.scenario().end();
     if (!scenario_end_point.has_x() || !scenario_end_point.has_y()) {
-      AERROR << "Scenario end_point is invalid!";
+      monitor_log_buffer_.WARN("Scenario end_point is invalid!");
       return false;
     }
     std::string scenario_name = new_sim_ticket.description_en_tokens(0);
@@ -1277,17 +1186,17 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
     const std::string map_dir = new_sim_ticket.scenario().map_dir();
     size_t idx = map_dir.find_last_of('/');
     if (idx == map_dir.npos) {
-      AERROR << "Cannot get scenario map name.";
+      monitor_log_buffer_.WARN("Cannot get scenario map name.");
       return false;
     }
     const std::string map_name = map_dir.substr(idx + 1);
     if (map_name.empty()) {
-      AERROR << "Cannot get scenario map name.";
+      monitor_log_buffer_.WARN("Cannot get scenario map name.");
       return false;
     }
     // replay engine use xx_xx like:apollo_map
     // dv need Apollo Map
-    scenario_info->set_map_name(TitleCase(map_name));
+    scenario_info->set_map_name(util::HMIUtil::TitleCase(map_name));
     auto start_point = scenario_info->mutable_start_point();
     start_point->set_x(scenario_start_point.x());
     start_point->set_y(scenario_start_point.y());
@@ -1330,18 +1239,20 @@ bool HMIWorker::LoadScenarios() {
                                              &user_ads_group_info)) {
       AERROR << "Unable to parse UserAdsGroup from file "
              << scenario_set_json_path;
-      return false;
+      continue;
     }
     if (!user_ads_group_info.has_name()) {
-      AERROR << "Failed to get ads group name!";
-      return false;
+      AERROR << "Failed to get ads group name from file "
+             << scenario_set_json_path;
+      continue;
     }
     const std::string scenario_set_name = user_ads_group_info.name();
     ScenarioSet new_scenario_set;
     if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
                            &new_scenario_set)) {
-      AERROR << "Failed to update scenario_set!";
-      return false;
+      AERROR << "Failed to update scenario_set from file "
+             << scenario_set_json_path;
+      continue;
     }
     scenario_sets[scenario_set_id] = new_scenario_set;
   }
@@ -1498,6 +1409,10 @@ bool HMIWorker::handlePlayRecordProcess(const std::string &action_type) {
                 "or process is not exists!";
       return false;
     }
+    if (!RecordIsLoaded(record_id)) {
+      AERROR << "Failed to pause record for record has not been loaded!";
+      return false;
+    }
   }
   if (action_type.compare("continue") == 0) {
     expected_play_record_status = PlayRecordStatus::RUNNING;
@@ -1526,6 +1441,7 @@ bool HMIWorker::handlePlayRecordProcess(const std::string &action_type) {
         expected_play_record_status);
     status_changed_ = true;
   }
+  record_player_factory->IncreaseRecordPriority(record_id);
   return true;
 }
 
@@ -1537,6 +1453,10 @@ bool HMIWorker::RePlayRecord() {
     record_id = record_status.current_record_id();
     if (record_status.current_record_id().empty()) {
       AERROR << "Failed to play record for record has not been selected!";
+      return false;
+    }
+    if (!RecordIsLoaded(record_id)) {
+      AERROR << "Failed to play record for record has not been loaded!";
       return false;
     }
     if (record_status.play_record_status() == PlayRecordStatus::RUNNING) {
@@ -1573,6 +1493,7 @@ bool HMIWorker::RePlayRecord() {
     record_status->set_play_record_status(play_record_status);
     status_changed_ = true;
   }
+  record_player_factory->IncreaseRecordPriority(record_id);
   return play_record_res;
 }
 
@@ -1590,7 +1511,12 @@ bool HMIWorker::ResetRecordProgress(const double &progress) {
                 "selected!";
       return false;
     }
-    total_time_s = status_.records().at(record_id);
+    if (!RecordIsLoaded(record_id)) {
+      AERROR << "Failed to reset record progress for record has not been "
+                "loaded!";
+      return false;
+    }
+    total_time_s = status_.records().at(record_id).total_time_s();
   }
   AERROR << "total :  " << total_time_s;
   if (progress > total_time_s) {
@@ -1623,6 +1549,7 @@ bool HMIWorker::ResetRecordProgress(const double &progress) {
     record_status->set_curr_time_s(progress);
     status_changed_ = true;
   }
+  record_player_factory->IncreaseRecordPriority(record_id);
   return true;
 }
 
@@ -1634,6 +1561,10 @@ void HMIWorker::StopRecordPlay(const std::string &record_id) {
   }
   if (!record_id.empty()) {
     curr_record_id = record_id;
+  }
+  if (!RecordIsLoaded(curr_record_id)) {
+    AERROR << "Failed to stop record player under unloaded status!";
+    return;
   }
   auto *record_player_factory = RecordPlayerFactory::Instance();
   auto player_ptr = record_player_factory->GetRecordPlayer(curr_record_id);
@@ -1650,13 +1581,28 @@ void HMIWorker::StopRecordPlay(const std::string &record_id) {
   }
   status_changed_ = true;
 }
+
+bool HMIWorker::RecordIsLoaded(const std::string &record_id) {
+  {
+    RLock rlock(status_mutex_);
+    auto iter = status_.records().find(record_id);
+    return iter != status_.records().end() &&
+           (iter->second.load_record_status() == LoadRecordStatus::LOADED);
+  }
+}
+
 void HMIWorker::ChangeRecord(const std::string &record_id) {
   std::string last_record_id;
   {
     RLock rlock(status_mutex_);
     auto status_records = status_.mutable_records();
-    if (status_records->find(record_id) == status_records->end()) {
+    auto iter = status_records->find(record_id);
+    if (iter == status_records->end()) {
       AERROR << "Cannot change to unknown record!";
+      return;
+    }
+    if (!RecordIsLoaded(record_id)) {
+      AERROR << "Cannot change to unloaded record, load this record before!";
       return;
     }
     last_record_id = status_.current_record_status().current_record_id();
@@ -1670,12 +1616,54 @@ void HMIWorker::ChangeRecord(const std::string &record_id) {
   status_.mutable_current_record_status()->set_current_record_id(record_id);
   auto *record_player_factory = RecordPlayerFactory::Instance();
   record_player_factory->SetCurrentRecord(record_id);
+  record_player_factory->IncreaseRecordPriority(record_id);
   status_changed_ = true;
   return;
 }
+
+void HMIWorker::ClearInvalidResourceUnderChangeOperation(
+    const HMIModeOperation operation) {
+  ClearInvalidRecordStatus(operation);
+  HMIModeOperation old_operation;
+  {
+    RLock rlock(status_mutex_);
+    old_operation = status_.current_operation();
+  }
+    // dynamic model resource clear and sim control manager start/stop
+    // sim control status changed when operation change
+    auto sim_control_manager = SimControlManager::Instance();
+    auto iter = std::find(OperationBasedOnSimControl.begin(),
+                          OperationBasedOnSimControl.end(), operation);
+    if (iter != OperationBasedOnSimControl.end()) {
+      sim_control_manager->Start();
+      if (operation == HMIModeOperation::Scenario_Sim && !StartSimObstacle()) {
+        AERROR << "Failed to start sim obstacle";
+      }
+    } else {
+      sim_control_manager->Stop();
+      // clear DynamicModel related info
+      {
+        WLock wlock(status_mutex_);
+        status_.set_current_dynamic_model("");
+        status_.clear_dynamic_models();
+        status_changed_ = true;
+      }
+    }
+    if (old_operation == HMIModeOperation::Record) {
+      // change from record need to clear record info.
+      ClearRecordInfo();
+    }
+    if (old_operation == HMIModeOperation::Scenario_Sim) {
+      // change from record need to clear record info.
+      ClearScenarioInfo();
+    }
+    if (old_operation == HMIModeOperation::Waypoint_Follow) {
+      // clear selected rtk record
+      ClearRtkRecordInfo();
+    }
+}
+
 void HMIWorker::ChangeOperation(const std::string &operation_str) {
-  ClearRecordInfo();
-  ClearScenarioInfo();
   HMIModeOperation operation;
   if (!HMIModeOperation_Parse(operation_str, &operation)) {
     AERROR << "Invalid HMI operation string: " << operation_str;
@@ -1699,25 +1687,17 @@ void HMIWorker::ChangeOperation(const std::string &operation_str) {
       return;
     }
   }
+  ClearInvalidResourceUnderChangeOperation(operation);
   {
     WLock wlock(status_mutex_);
     status_.set_current_operation(operation);
     status_changed_ = true;
   }
-  // sim control status changed when operation change
-  auto sim_control_manager = SimControlManager::Instance();
-  auto iter = std::find(OperationBasedOnSimControl.begin(),
-                        OperationBasedOnSimControl.end(), operation_str);
-  if (iter != OperationBasedOnSimControl.end()) {
-    sim_control_manager->Start();
-  } else {
-    sim_control_manager->Stop();
-  }
   return;
 }
 
 bool HMIWorker::ReadRecordInfo(const std::string &file,
-                               double *total_time_s) const {
+                                double *total_time_s) const {
   cyber::record::RecordFileReader file_reader;
   if (!file_reader.Open(file)) {
     AERROR << "open record file error. file: " << file;
@@ -1750,7 +1730,7 @@ bool HMIWorker::UpdateMapToStatus(const std::string &map_tar_name) {
     AERROR << "Failed to find maps!";
     return false;
   }
-  map_name_prefix = TitleCase(map_name_prefix);
+  map_name_prefix = util::HMIUtil::TitleCase(map_name_prefix);
   {
     WLock wlock(status_mutex_);
     auto iter = status_.maps().begin();
@@ -1765,7 +1745,86 @@ bool HMIWorker::UpdateMapToStatus(const std::string &map_tar_name) {
     status_.add_maps(map_name_prefix);
     status_changed_ = true;
   }
+  return true;
+}
 
+bool HMIWorker::LoadRecordAndChangeStatus(const std::string &record_name) {
+    std::string record_file_path;
+    {
+      RLock rlock(status_mutex_);
+      auto &status_records = status_.records();
+      auto iter = status_records.find(record_name);
+      if (iter == status_records.end()) {
+        AERROR << "Cannot load unknown record!";
+        return false;
+      }
+      if (RecordIsLoaded(record_name)) {
+        AERROR << "Cannot load already loaded record.";
+        return false;
+      }
+      if (iter->second.record_file_path().empty()) {
+        AERROR << "Cannot load record without record file path!";
+        return false;
+      }
+      record_file_path = iter->second.record_file_path();
+    }
+    {
+      WLock wlock(status_mutex_);
+      auto status_records = status_.mutable_records();
+      (*status_records)[record_name].set_load_record_status(
+          LoadRecordStatus::LOADING);
+    }
+    double total_time_s;
+    if (LoadRecord(record_name, record_file_path, &total_time_s)) {
+      {
+        WLock wlock(status_mutex_);
+        auto status_records = status_.mutable_records();
+        (*status_records)[record_name].set_load_record_status(
+            LoadRecordStatus::LOADED);
+        (*status_records)[record_name].set_total_time_s(total_time_s);
+      }
+      RecordPlayerFactory::Instance()->IncreaseRecordPriority(record_name);
+    } else {
+      {
+        WLock wlock(status_mutex_);
+        auto status_records = status_.mutable_records();
+        (*status_records)[record_name].set_load_record_status(
+            LoadRecordStatus::NOT_LOAD);
+      }
+    }
+    return true;
+}
+
+bool HMIWorker::LoadRecord(const std::string &record_name,
+                           const std::string &record_file_path,
+                           double *total_time_s) {
+  if (RecordIsLoaded(record_name)) {
+    AERROR << "Record is loaded,no need to load";
+    return false;
+  }
+  // check if record player factory can continue load
+  auto record_player_factory = RecordPlayerFactory::Instance();
+  if (!record_player_factory->EnableContinueLoad()) {
+    // can not load record,need to remove lru record
+    std::string remove_record_id;
+    if (record_player_factory->RemoveLRURecord(&remove_record_id)) {
+      // remove successfully, change removed record status
+      {
+        WLock wlock(status_mutex_);
+        auto status_records = status_.mutable_records();
+        (*status_records)[remove_record_id].set_load_record_status(
+            LoadRecordStatus::NOT_LOAD);
+        (*status_records)[remove_record_id].clear_total_time_s();
+      }
+    }
+  }
+  if (!ReadRecordInfo(record_file_path, total_time_s)) {
+    return false;
+  }
+  if (!record_player_factory->RegisterRecordPlayer(record_name,
+                                                   record_file_path)) {
+    return false;
+  }
   return true;
 }
 
@@ -1783,7 +1842,7 @@ bool HMIWorker::LoadRecords() {
     return false;
   }
   struct dirent *file;
-  std::map<std::string, double> new_records;
+  google::protobuf::Map<std::string, LoadRecordInfo> new_records;
   while ((file = readdir(directory)) != nullptr) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -1797,17 +1856,27 @@ bool HMIWorker::LoadRecords() {
       const std::string local_record_resource = record_id.substr(0, index);
       const std::string record_file_path = directory_path + "/" + record_id;
       double total_time_s;
-      if (record_player_factory->GetRecordPlayer(local_record_resource)) {
+      // Already loaded, no need to change status
+      if (RecordIsLoaded(local_record_resource)) {
         continue;
       }
-      if (!ReadRecordInfo(record_file_path, &total_time_s)) {
+      // already reach max preload num,no load only get basic info
+      if (!record_player_factory->EnableContinuePreload()) {
+        new_records[local_record_resource].set_load_record_status(
+            LoadRecordStatus::NOT_LOAD);
+        new_records[local_record_resource].set_record_file_path(
+            record_file_path);
         continue;
       }
-      if (!record_player_factory->RegisterRecordPlayer(local_record_resource,
-                                                       record_file_path)) {
+      // failed to load record，continue
+      if (!LoadRecord(local_record_resource, record_file_path, &total_time_s)) {
         continue;
       }
-      new_records[local_record_resource] = total_time_s;
+      // Successfully load record, change hmi status
+      new_records[local_record_resource].set_total_time_s(total_time_s);
+      new_records[local_record_resource].set_load_record_status(
+          LoadRecordStatus::LOADED);
+      new_records[local_record_resource].set_record_file_path(record_file_path);
     }
   }
   closedir(directory);
@@ -1823,7 +1892,7 @@ bool HMIWorker::LoadRecords() {
 }
 
 void HMIWorker::DeleteMap(const std::string &map_name) {
-  std::string title_map_name = TitleCase(map_name);
+  std::string title_map_name = util::HMIUtil::TitleCase(map_name);
   if (map_name.empty()) {
     return;
   }
@@ -1923,7 +1992,8 @@ void HMIWorker::DeleteRecord(const std::string &record_id) {
 }
 
 bool HMIWorker::ReloadVehicles() {
-  HMIConfig config = LoadConfig();
+  HMIConfig config =
+      util::HMIUtil::LoadConfig(FLAGS_dv_plus_hmi_modes_config_path);
   std::string msg;
   config.SerializeToString(&msg);
 
@@ -1971,7 +2041,8 @@ void HMIWorker::DeleteVehicleConfig(const std::string &vehicle_name) {
   if (vehicle_name.empty()) {
     return;
   }
-  const std::string *vehicle_dir = FindOrNull(config_.vehicles(), vehicle_name);
+  const std::string *vehicle_dir =
+      FindOrNull(config_.vehicles(), vehicle_name);
   if (vehicle_dir == nullptr) {
     AERROR << "Unknow vehicle name" << vehicle_name;
     return;
@@ -1998,7 +2069,7 @@ void HMIWorker::DeleteV2xConfig(const std::string &vehicle_name) {
     return;
   }
   const std::string *vehicle_dir =
-      FindOrNull(config_.vehicles(), TitleCase(vehicle_name));
+      FindOrNull(config_.vehicles(), util::HMIUtil::TitleCase(vehicle_name));
   if (vehicle_dir == nullptr) {
     AERROR << "Unknow vehicle name " << vehicle_name;
     return;
@@ -2051,10 +2122,11 @@ bool HMIWorker::StopDataRecorder() {
 
 bool HMIWorker::SaveDataRecorder(const std::string &new_name) {
   std::string save_cmd = "/apollo/scripts/record_bag.py --default_name " +
-                         FLAGS_data_record_default_name + " --rename " +
-                         new_name;
+                          FLAGS_data_record_default_name + " --rename " +
+                          new_name;
   int ret = std::system(save_cmd.data());
   if (ret == 0) {
+    LoadRecords();
     return true;
   } else {
     AERROR << "Failed to save the record, a file with the same name exists";
@@ -2075,7 +2147,8 @@ bool HMIWorker::DeleteDataRecorder() {
   }
 }
 
-void HMIWorker::GetCurrentScenarioEndPoint(double &x, double &y) {
+Json HMIWorker::GetCurrentScenarioExtremPoint() {
+  Json extrem_point;
   {
     RLock rlock(status_mutex_);
     std::string scenario_id = status_.current_scenario_id();
@@ -2083,51 +2156,39 @@ void HMIWorker::GetCurrentScenarioEndPoint(double &x, double &y) {
     auto &scenario_set = status_.scenario_set();
     if (scenario_set.find(scenario_set_id) == scenario_set.end()) {
       AERROR << "Failed to find scenario set!";
-      return;
+      return extrem_point;
     }
     for (auto &scenario : scenario_set.at(scenario_set_id).scenarios()) {
       if (scenario.scenario_id() == scenario_id) {
-        x = scenario.end_point().x();
-        y = scenario.end_point().y();
+        extrem_point["start"]["x"] = scenario.start_point().x();
+        extrem_point["start"]["y"] = scenario.start_point().y();
+        extrem_point["start"]["z"] = 0;
+        extrem_point["end"]["x"] = scenario.end_point().x();
+        extrem_point["end"]["y"] = scenario.end_point().y();
+        extrem_point["end"]["z"] = 0;
         break;
       }
     }
   }
+  return extrem_point;
 }
 
 bool HMIWorker::StartSimObstacle() {
-  std::string cur_scenario_id;
-  {
-    RLock rlock(status_mutex_);
-    cur_scenario_id = status_.current_scenario_id();
-  }
-
-  const std::string absolute_path =
-      cyber::common::GetEnv("HOME") + FLAGS_sim_obstacle_path;
+  const std::string absolute_path = FLAGS_sim_obstacle_path;
   if (!cyber::common::PathExists(absolute_path)) {
-    AERROR << "Failed to find sim obstacle";
-    return false;
-  }
-  std::string scenario_set_id;
-  {
-    RLock rlock(status_mutex_);
-    scenario_set_id = status_.current_scenario_set_id();
-  }
-  std::string scenario_set_path;
-  GetScenarioSetPath(scenario_set_id, &scenario_set_path);
-  const std::string scenario_path =
-      scenario_set_path + "/scenarios/" + cur_scenario_id + ".json";
-  if (!cyber::common::PathExists(scenario_path)) {
-    AERROR << "Failed to find scenario!";
+    AERROR << "Failed to find sim obstacle from file: " + absolute_path;
+    monitor_log_buffer_.ERROR("Failed to find sim obstacle from file: " +
+                              absolute_path);
     return false;
   }
   // Start sim obstacle
-  const std::string start_command = "nohup " + absolute_path + " " +
-                                    scenario_path + " " + "false" +
-                                    FLAGS_gflag_command_arg + " &";
+  const std::string start_command = "nohup " + absolute_path + " " + "true" +
+                                    " " + "false" + FLAGS_gflag_command_arg +
+                                    " &";
   int ret = std::system(start_command.data());
   if (ret != 0) {
     AERROR << "Failed to start sim obstacle";
+    monitor_log_buffer_.ERROR("Failed to start sim obstacle !");
     return false;
   }
   return true;
@@ -2157,6 +2218,26 @@ void HMIWorker::ClearRecordInfo() {
   return;
 }
 
+void HMIWorker::ClearRtkRecordInfo() {
+  std::string last_rtk_record_id;
+  {
+    RLock rlock(status_mutex_);
+    if (status_.current_operation() != HMIModeOperation::Waypoint_Follow) {
+      return;
+    }
+    last_rtk_record_id = status_.current_rtk_record_id();
+  }
+  if (!last_rtk_record_id.empty()) {
+    StopPlayRtkRecorder();
+  }
+  {
+    WLock wlock(status_mutex_);
+    status_.set_current_rtk_record_id("");
+    status_changed_ = true;
+  }
+  return;
+}
+
 void HMIWorker::AddExpectedModules(const HMIAction& action) {
   WLock wlock(status_mutex_);
   int expected_modules = 1;
@@ -2168,13 +2249,15 @@ void HMIWorker::AddExpectedModules(const HMIAction& action) {
 }
 
 void HMIWorker::OnTimer(const double& overtime_time) {
-  auto delay_sec = monitor_reader_->GetDelaySec();
-  if (delay_sec < 0 || delay_sec > overtime_time) {
-    AERROR << "Running time error: monitor is not turned on!";
-    {
-      WLock wlock(status_mutex_);
-      for (auto& iter : *status_.mutable_modules_lock()) {
-        iter.second = false;
+  if (monitor_reader_ != nullptr) {
+    auto delay_sec = monitor_reader_->GetDelaySec();
+    if (delay_sec < 0 || delay_sec > overtime_time) {
+      AERROR << "Running time error: monitor is not turned on!";
+      {
+        WLock wlock(status_mutex_);
+        for (auto& iter : *status_.mutable_modules_lock()) {
+          iter.second = false;
+        }
       }
     }
   }
@@ -2186,7 +2269,6 @@ void HMIWorker::LockModule(const std::string& module, const bool& lock_flag) {
 }
 
 void HMIWorker::ClearScenarioInfo() {
-  std::string last_record_id;
   {
     RLock rlock(status_mutex_);
     if (status_.current_operation() != HMIModeOperation::Scenario_Sim) {
@@ -2196,10 +2278,246 @@ void HMIWorker::ClearScenarioInfo() {
   StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
   {
     WLock wlock(status_mutex_);
-    status_.clear_current_scenario_set_id();
-    status_.clear_current_scenario_id();
+    status_.set_current_scenario_set_id("");
+    status_.set_current_scenario_id("");
     status_changed_ = true;
   }
+}
+
+bool HMIWorker::AddOrModifyObjectToDB(const std::string& key,
+                                      const std::string& value) {
+  return KVDB::Put(key, value);
+}
+
+bool HMIWorker::DeleteObjectToDB(const std::string& key) {
+  return KVDB::Delete(key);
+}
+
+std::string HMIWorker::GetObjectFromDB(const std::string& key) {
+  return KVDB::Get(key).value_or("");
+}
+
+std::vector<std::pair<std::string, std::string>>
+HMIWorker::GetTuplesWithTypeFromDB(const std::string& type) {
+  return KVDB::GetWithStart(type);
+}
+
+bool HMIWorker::StartTerminal() {
+  return std::system(FLAGS_terminal_start_cmd.data()) == 0;
+}
+
+void HMIWorker::GetRtkRecordPath(std::string *record_path) {
+  CHECK_NOTNULL(record_path);
+  *record_path = FLAGS_resource_rtk_record_path;
+}
+
+bool HMIWorker::LoadRtkRecords() {
+  {
+    WLock wLock(status_mutex_);
+    status_.clear_rtk_records();
+  }
+  std::string directory_path;
+  GetRtkRecordPath(&directory_path);
+  if (!cyber::common::PathExists(directory_path)) {
+    AERROR << "Failed to find rtk records!";
+    return false;
+  }
+  DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
+    AERROR << "Cannot open rtk record directory" << directory_path;
+    return false;
+  }
+  struct dirent *file;
+  std::map<std::string, double> new_records;
+  while ((file = readdir(directory)) != nullptr) {
+    if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
+      continue;
+    }
+    if (file->d_type == DT_DIR) {
+      continue;
+    }
+    const std::string record_id = file->d_name;
+    const int index = record_id.rfind(".csv");
+    if (index != -1 && record_id[0] != '.') {
+      const std::string local_record_resource = record_id.substr(0, index);
+      {
+        WLock wLock(status_mutex_);
+        status_.add_rtk_records(local_record_resource);
+      }
+    }
+  }
+  closedir(directory);
+  {
+    WLock wlock(status_mutex_);
+    status_changed_ = true;
+  }
+  return true;
+}
+
+bool HMIWorker::StartRtkDataRecorder() {
+  std::string start_cmd = "nohup /apollo/scripts/rtk_recorder.sh start &";
+  int ret = std::system(start_cmd.data());
+  if (ret == 0) {
+    return true;
+  } else {
+    AERROR << "Failed to start the rtk_recorder process";
+    return false;
+  }
+}
+
+bool HMIWorker::StopRtkDataRecorder() {
+  std::string stop_cmd = "/apollo/scripts/rtk_recorder.sh stop";
+  int ret = std::system(stop_cmd.data());
+  if (ret == 9) {
+    return true;
+  } else {
+    AERROR << "Failed to stop the rtk_recorder process";
+    return false;
+  }
+}
+
+Json HMIWorker::StartPlayRtkRecorder() {
+  Json result;
+  if (!ChangeDrivingMode(Chassis::COMPLETE_AUTO_DRIVE)) {
+    AERROR << "Failed to play rtk: Failed to enter auto drive.";
+    result["error"] = "Failed to enter auto drive";
+    result["isOk"] = false;
+    return result;
+  }
+  std::string record_id;
+  {
+    RLock rlock(status_mutex_);
+    record_id = status_.current_rtk_record_id();
+  }
+  std::string start_cmd =
+      "nohup /apollo/scripts/rtk_player.sh start " + record_id + " &";
+  int ret = std::system(start_cmd.data());
+  if (ret == 0) {
+    AINFO << "Start the rtk_recorder process Successful.";
+    result["isOk"] = true;
+  } else {
+    AERROR << "Failed to play rtk: Failed to start the rtk_recorder process.";
+    result["error"] = "Failed to start the rtk_recorder process";
+    result["isOk"] = false;
+  }
+  return result;
+}
+
+bool HMIWorker::StopPlayRtkRecorder() {
+  std::string stop_cmd = "/apollo/scripts/rtk_player.sh stop";
+  int ret = std::system(stop_cmd.data());
+  if (ret == 9) {
+    return true;
+  } else {
+    AERROR << "Failed to stop the rtk_recorder process";
+    return false;
+  }
+}
+
+bool HMIWorker::SaveRtkDataRecorder(const std::string &new_name) {
+  std::string new_rtk_record_file =
+      FLAGS_default_rtk_record_path + new_name + ".csv";
+  if (cyber::common::PathExists(new_rtk_record_file)) {
+    AERROR << "Failed to save the ret record, a file with the same name exists";
+    return false;
+  }
+  if (std::rename(FLAGS_default_rtk_record_file.data(),
+                  new_rtk_record_file.data()) == 0) {
+    UpdateRtkRecordToStatus(new_name);
+    return true;
+  } else {
+    AERROR << "Failed to save the ret record, save command execution failed";
+    return false;
+  }
+}
+
+bool HMIWorker::DeleteRtkDataRecorder() {
+  if (!cyber::common::PathExists(FLAGS_default_rtk_record_file)) {
+    AERROR << "Failed to delete the ret record, file not exist";
+    return false;
+  }
+  if (std::remove(FLAGS_default_rtk_record_file.data()) == 0) {
+      return true;
+    } else {
+      AERROR << "Failed to delete the record, delete command execution failed";
+      return false;
+    }
+  }
+
+void HMIWorker::ChangeRtkRecord(const std::string &record_id) {
+  if (!StopPlayRtkRecorder()) {
+    AWARN << "Warning to change rtk record: Failed to stop the rtk_recorder "
+             "process.";
+  }
+  std::string last_record_id;
+  {
+    RLock rlock(status_mutex_);
+    last_record_id = status_.current_rtk_record_id();
+  }
+  if (last_record_id == record_id) {
+    AERROR << "Failed to change rtk record: rtk record is same!";
+    return;
+  }
+  WLock wlock(status_mutex_);
+  status_.set_current_rtk_record_id(record_id);
+  status_changed_ = true;
+  return;
+}
+
+void HMIWorker::UpdateRtkRecordToStatus(const std::string &new_name) {
+  WLock wlock(status_mutex_);
+  status_.add_rtk_records(new_name);
+  status_changed_ = true;
+}
+
+void HMIWorker::ClearInvalidRecordStatus(const HMIModeOperation &operation) {
+  HMIModeOperation last_operation;
+  {
+    RLock rlock(status_mutex_);
+    last_operation = status_.current_operation();
+  }
+  if (operation == last_operation) {
+    return;
+  } else if (last_operation == HMIModeOperation::Waypoint_Follow) {
+    StopRtkDataRecorder();
+    DeleteRtkDataRecorder();
+  } else if (operation == HMIModeOperation::Waypoint_Follow) {
+    StopDataRecorder();
+    DeleteDataRecorder();
+  }
+}
+
+bool HMIWorker::StartScenarioSimulation() {
+  WLock wlock(status_mutex_);
+  if (status_.other_components().find("ScenarioSimulation") !=
+      status_.other_components().end()) {
+    (*status_.mutable_other_components())["ScenarioSimulation"].set_status(
+        apollo::monitor::ComponentStatus_Status::ComponentStatus_Status_OK);
+    (*status_.mutable_other_components())["ScenarioSimulation"].set_message(
+        "OK");
+    return true;
+  }
+  apollo::monitor::ComponentStatus obstacle_status;
+  obstacle_status.set_status(
+      apollo::monitor::ComponentStatus_Status::ComponentStatus_Status_OK);
+  obstacle_status.set_message("OK");
+  (*status_.mutable_other_components())["ScenarioSimulation"] = obstacle_status;
+  return true;
+}
+
+bool HMIWorker::StopScenarioSimulation() {
+  WLock wlock(status_mutex_);
+  if (status_.other_components().find("ScenarioSimulation") ==
+      status_.other_components().end()) {
+    AERROR
+        << "Failed to stop scenario sumulation: sim obstacle status not find";
+    return false;
+  }
+  (*status_.mutable_other_components())["ScenarioSimulation"].set_status(
+      apollo::monitor::ComponentStatus_Status::ComponentStatus_Status_FATAL);
+  (*status_.mutable_other_components())["ScenarioSimulation"].set_message(
+      "FATAL");
+  return true;
 }
 
 }  // namespace dreamview

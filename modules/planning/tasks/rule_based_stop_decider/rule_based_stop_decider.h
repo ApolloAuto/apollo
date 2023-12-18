@@ -22,7 +22,7 @@
 #include "modules/planning/tasks/rule_based_stop_decider/proto/rule_based_stop_decider.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/dependency_injector.h"
-#include "modules/planning/planning_base/task_base/common/decider.h"
+#include "modules/planning/planning_interface_base/task_base/common/decider.h"
 
 namespace apollo {
 namespace planning {

@@ -1,8 +1,16 @@
 import * as THREE from 'three';
 import { union } from 'lodash';
+import { MeshLine, MeshLineMaterial } from 'three.meshline';
 import { planningParams } from '../constant/params';
-import { disposeMesh, drawThickBandFromPoints } from '../utils/common';
-import { drawDashedLineFromPoints } from '../utils/line';
+import {
+    disposeMesh,
+    disposeGroup,
+    drawThickBandFromPoints,
+    compareLineSame,
+    drawCircle,
+    drawArrow,
+} from '../utils/common';
+import { drawDashedLineFromPoints, drawSegmentsFromPoints } from '../utils/line';
 import { zOffset } from '../constant/common';
 
 const DEFAULT_WIDTH = planningParams.defaults.width;
@@ -36,26 +44,89 @@ function normalizePlanningTrajectory(trajectory) {
     return result;
 }
 
+function drawPullOverBox({ lengthFront, lengthBack, widthLeft, widthRight }) {
+    const pullOverStatus = new THREE.Group();
+    const color = 0x006aff;
+    const polygon = drawSegmentsFromPoints(
+        [
+            new THREE.Vector3(lengthFront, -widthLeft, 0),
+            new THREE.Vector3(lengthFront, widthRight, 0),
+            new THREE.Vector3(-lengthBack, widthRight, 0),
+            new THREE.Vector3(-lengthBack, -widthLeft, 0),
+            new THREE.Vector3(lengthFront, -widthLeft, 0),
+        ],
+        {
+            color,
+            linewidth: 2,
+            zOffset: 0,
+        },
+    );
+    pullOverStatus.add(polygon);
+
+    const material = new THREE.MeshBasicMaterial({
+        color,
+        transparent: false,
+        opacity: 0.5,
+    });
+    const circle = drawCircle(0.2, material);
+    pullOverStatus.add(circle);
+
+    const heading = drawArrow(color, 1.5, 0.5, 0.5);
+    heading.position.z = 0;
+    heading.material.linewidth = 2;
+    // heading.rotation.set(0, 0, -Math.PI / 2);
+    pullOverStatus.add(heading);
+
+    return pullOverStatus;
+}
+
 export default class Planning {
     private scene;
 
     private paths;
 
+    private pathsGeometry;
+
+    private pathsMeshLine;
+
     private option;
+
+    private oldOptions;
 
     private coordinates;
 
+    private pullOverBox;
+
+    private lastPullOver;
+
+    private dashLineNames;
+
     constructor(scene, option, coordinates) {
+        this.paths = {};
         this.scene = scene;
         this.option = option;
+        this.oldOptions = {};
         this.coordinates = coordinates;
-        this.paths = {};
+        this.pathsGeometry = {};
+        this.pathsMeshLine = {};
+        this.pullOverBox = null;
+        this.lastPullOver = {};
+        this.dashLineNames = [
+            'planning_path_boundary_1_regular/self',
+            'planning_path_boundary_2_regular/self',
+            'planning_path_boundary_1_fallback/self',
+            'planning_path_boundary_2_fallback/self',
+        ];
     }
 
     update(planningTrajectory, planningData, autoDrivingCar) {
         if (!this.coordinates.isInitialized()) {
             return;
         }
+
+        // update draw pullOver
+        this.updatePullOver(planningData);
+
         let width = null;
         if (!autoDrivingCar?.width) {
             console.warn(
@@ -66,71 +137,93 @@ export default class Planning {
             width = autoDrivingCar.width;
         }
 
-        const newPaths = {
-            trajectory: [],
-        };
-        if (planningTrajectory) {
+        const newPaths: any = {};
+
+        if (planningTrajectory && planningTrajectory.length) {
             newPaths.trajectory = planningTrajectory.map((point) => ({ x: point.positionX, y: point.positionY }));
         }
         if (planningData && planningData.path) {
-            planningData.path.forEach((path) => {
-                newPaths[path.name] = path.pathPoint;
+            planningData.path?.forEach((path) => {
+                if (path.pathPoint?.length) {
+                    newPaths[path.name] = path.pathPoint;
+                }
             });
         }
 
         const allPaths = union(Object.keys(this.paths), Object.keys(newPaths));
-        // console.log('planning', allPaths);
-        // const allPaths = ['trajectory'];
-        // const allPaths = ['Planning PathData'];
-        // const allPaths = ['planning_reference_line'];
-        allPaths.forEach((name) => {
-            const oldPath = this.paths[name];
-            if (name === 'trajectory' && !this.option.layerOption.Planning.planningTrajectory) {
-                disposeMesh(oldPath);
-                this.scene.remove(oldPath);
-                delete this.paths[name];
-                return;
-            }
-            if (oldPath) {
-                disposeMesh(oldPath);
-                this.scene.remove(oldPath);
-                delete this.paths[name];
-            }
 
+        allPaths.forEach((name) => {
             let property = planningParams.pathProperties[name];
+
             if (!property) {
-                // console.warn(`No path properties found for [${name}]. Use default properties instead.`);
                 property = planningParams.pathProperties.default;
             }
 
             if (newPaths[name]) {
                 let points = normalizePlanningTrajectory(newPaths[name]);
+
                 points = this.coordinates.applyOffsetToArray(points);
+
                 if (points.length === 0) {
                     return;
                 }
-                if (property.style === 'dash') {
-                    this.paths[name] = drawDashedLineFromPoints(points, {
-                        color: property.color,
-                        linewidth: width * property.width,
-                        dashSize: 1,
-                        gapSize: 1,
-                        zOffset: property.zOffset,
-                        opacity: property.opacity,
-                        matrixAutoUpdate: true,
-                    });
-                } else {
-                    const line = drawThickBandFromPoints(points, {
-                        color: property.color,
-                        opacity: property.opacity,
-                        lineWidth: width * property.width,
-                    });
-                    if (line) {
-                        line.position.z = property.zOffset;
-                        this.paths[name] = line;
+
+                if (!this.paths[name] || this.dashLineNames.includes(name)) {
+                    if (property.style === 'dash') {
+                        // dashed lines Redraw, clear old dashed lines before drawing
+                        const mesh = this.paths[name];
+                        disposeMesh(mesh);
+                        this.scene.remove(mesh);
+                        this.paths[name] = drawDashedLineFromPoints(points, {
+                            color: property.color,
+                            linewidth: width * property.width,
+                            dashSize: 1,
+                            gapSize: 1,
+                            zOffset: property.zOffset,
+                            opacity: property.opacity,
+                            matrixAutoUpdate: true,
+                        });
+                        this.paths[name].position.z = property.zOffset;
+                        this.paths[name].renderOrder = property.renderOrder;
+                    } else {
+                        const planningGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                        const planningMeshLine = new MeshLine();
+                        planningMeshLine.setGeometry(planningGeometry);
+                        const material = new MeshLineMaterial({
+                            color: property.color,
+                            opacity: property.opacity,
+                            lineWidth: width * property.width,
+                        });
+                        material.depthTest = true;
+                        material.transparent = true;
+                        material.side = THREE.DoubleSide;
+
+                        this.pathsGeometry[name] = planningGeometry;
+                        this.pathsMeshLine[name] = planningMeshLine;
+                        this.paths[name] = new THREE.Mesh(planningMeshLine, material);
+                        this.paths[name].position.z = property.zOffset;
+                        this.paths[name].renderOrder = property.renderOrder;
                     }
+                    this.scene.add(this.paths[name]);
+                } else {
+                    if (property.style === 'dash') {
+                        // Abandon updating points and redraw
+                        // this.paths[name].geometry.setFromPoints(points);
+                    } else {
+                        // update geometry
+                        this.pathsGeometry[name].setFromPoints(points);
+                        // update MeshLine
+                        this.pathsMeshLine[name].setGeometry(this.pathsGeometry[name]);
+                    }
+                    this.paths[name].geometry.attributes.position.needsUpdate = true;
+                    this.paths[name].position.z = property.zOffset;
+                    this.paths[name].renderOrder = property.renderOrder;
                 }
-                this.scene.add(this.paths[name]);
+            } else {
+                const mesh = this.paths[name];
+                disposeMesh(mesh);
+                this.scene.remove(mesh);
+                delete this.paths[name];
             }
         });
     }
@@ -142,5 +235,52 @@ export default class Planning {
             this.scene.remove(mesh);
         });
         this.paths = {};
+
+        if (this.pullOverBox) {
+            disposeGroup(this.pullOverBox);
+            this.scene.remove(this.pullOverBox);
+            this.pullOverBox = null;
+        }
+        this.lastPullOver = {};
+    }
+
+    updatePullOver(planningData) {
+        if (!planningData || !planningData.pullOver) {
+            if (this.pullOverBox && this.pullOverBox.visible) {
+                this.pullOverBox.visible = false;
+            }
+            return;
+        }
+        const pullOverData = planningData.pullOver;
+        const isNewDimension =
+            pullOverData.lengthFront !== this.lastPullOver.lengthFront ||
+            pullOverData.lengthBack !== this.lastPullOver.lengthBack ||
+            pullOverData.widthLeft !== this.lastPullOver.widthLeft ||
+            pullOverData.widthRight !== this.lastPullOver.widthRight;
+
+        if (!this.pullOverBox) {
+            this.pullOverBox = drawPullOverBox(pullOverData);
+            this.scene.add(this.pullOverBox);
+        }
+        else {
+             if (isNewDimension) {
+                disposeGroup(this.pullOverBox);
+                this.scene.remove(this.pullOverBox);
+                // redraw
+                this.pullOverBox = drawPullOverBox(pullOverData);
+                this.scene.add(this.pullOverBox);
+             }
+             this.pullOverBox.visible = true;
+        }
+        this.lastPullOver = pullOverData;
+
+        // Set position and theta
+        const position = this.coordinates.applyOffset({
+            x: pullOverData.position.x,
+            y: pullOverData.position.y,
+            z: 0.3,
+        });
+        this.pullOverBox.position.set(position.x, position.y, position.z);
+        this.pullOverBox.rotation.set(0, 0, pullOverData.theta);
     }
 }

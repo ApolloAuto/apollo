@@ -12,6 +12,7 @@ export enum ENUM_PROFILEMANAGER_TAB {
     HDMap = 'HDMap',
     Vehicle = 'Vehicle',
     V2X = 'V2X',
+    Dynamical = 'Dynamical Model',
 }
 
 export function ProfileManagerProvider(props: PropsWithChildren) {

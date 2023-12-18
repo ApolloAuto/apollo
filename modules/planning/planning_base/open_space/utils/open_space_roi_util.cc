@@ -302,5 +302,43 @@ bool OpenSpaceRoiUtil::IsPolygonClockwise(const std::vector<Vec2d> &polygon) {
     return false;
   }
 }
+
+bool OpenSpaceRoiUtil::AdjustPointsOrderToClockwise(
+    std::vector<Vec2d> *polygon) {
+  if (!IsPolygonClockwise(*polygon)) {
+    // counter clockwise reverse it
+    ADEBUG << "point is anticlockwise,reverse";
+    std::reverse(polygon->begin(), polygon->end());
+    return true;
+  } else {
+    return false;
+  }
+}
+// make points order as left top ,right top, right bottom, left bottom
+bool OpenSpaceRoiUtil::UpdateParkingPointsOrder(
+    const apollo::hdmap::Path &nearby_path, std::vector<Vec2d> *points) {
+  AdjustPointsOrderToClockwise(points);
+  double min_dist = std::numeric_limits<double>::max();
+  size_t min_index = 0;
+  for (size_t i = 0; i < points->size(); i++) {
+    double s, l;
+    nearby_path.GetProjection(points->at(i), &s, &l);
+    ADEBUG << std::fixed << points->at(i).x() << "," << points->at(i).y()
+           << "sl" << s << "," << l;
+    if (std::fabs(s) + std::fabs(l) < min_dist) {
+      min_dist = std::fabs(s) + std::fabs(l);
+      min_index = i;
+    }
+    std::vector<Vec2d> tmp_points(*points);
+    for (size_t i = 0; i < points->size(); i++) {
+      tmp_points[i] = points->at((i + min_index) % points->size());
+    }
+    for (size_t i = 0; i < points->size(); i++) {
+      points->at(i) = tmp_points[i];
+    }
+  }
+  return true;
+}
+
 }  // namespace planning
 }  // namespace apollo

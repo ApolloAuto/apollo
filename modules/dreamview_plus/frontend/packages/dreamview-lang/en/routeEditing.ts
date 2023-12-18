@@ -26,12 +26,14 @@ export const routeEditing = {
     createCommonRouteSuccess: 'common routing created successfully！',
 
     initialPoint: 'Initial Point',
+    initialPointDis: 'Inial Point is only available for simulation',
     wayPoint: 'Way Point',
     loopRouting: 'Loop Routing',
     commonRouting: 'Common Routing',
     routingEditing: 'Routing Editing',
 
     checkPointTooltip: 'Point should be on the road that can be driven',
+    checkStartPointTooltip: 'Point should be on the road that can be driven',
 
     modalConfirmNo: 'No',
     modalConfirmYes: 'Yes',

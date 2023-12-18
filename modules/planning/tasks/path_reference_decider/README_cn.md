@@ -80,7 +80,7 @@ apollo::planning::PathReferenceDecider
 | 文件路径 | 类型/结构 | <div style="width: 300pt">说明</div> |
 | ---- | ---- | ---- |
 | `modules/planning/tasks/path_reference_decider/conf/default_conf.pb.txt` | apollo::planning::PathReferenceDeciderConfig | PathReferenceDecider 的配置文件 |
-| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+| `modules/planning/planning_component/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
 
 #### 使用方式
 ##### 配置加载 PathReferenceDecider Task 插件
@@ -93,8 +93,8 @@ task {
 
 ##### 配置 PathReferenceDecider 参数
 在`modules/planning/tasks/path_reference_decider/conf/default_conf.pb.txt`中，对`PathReferenceDecider`插件的参数进行配置。
-在`modules/planning/planning_base/conf/planning.conf`中，对作用在`PathReferenceDecider`插件的gflag参数进行配置
+在`modules/planning/planning_component/conf/planning.conf`中，对作用在`PathReferenceDecider`插件的gflag参数进行配置
 ##### 启动planning
 ```shell
-mainboard -d modules/planning/planning_base/dag/planning.dag
+mainboard -d modules/planning/planning_component/dag/planning.dag
 ```

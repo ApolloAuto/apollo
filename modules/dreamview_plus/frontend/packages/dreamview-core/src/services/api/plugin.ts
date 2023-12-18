@@ -249,7 +249,7 @@ export class PluginApi {
 
     // 动力学模型列表（一期无）
     downloadDynamicModel(name: string) {
-        return this.requestStream<string, Partial<DynamicModel>>({
+        return this.requestStream<string, DynamicModel>({
             data: {
                 info: name,
                 name: PluginApiNames.DownloadDynamicModel,

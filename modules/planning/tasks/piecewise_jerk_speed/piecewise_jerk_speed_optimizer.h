@@ -26,7 +26,7 @@
 #include <vector>
 #include "modules/planning/tasks/piecewise_jerk_speed/proto/piecewise_jerk_speed.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/planning/planning_base/task_base/common/speed_optimizer.h"
+#include "modules/planning/planning_interface_base/task_base/common/speed_optimizer.h"
 
 namespace apollo {
 namespace planning {

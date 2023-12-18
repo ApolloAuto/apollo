@@ -7,7 +7,7 @@ proto_library(
     name = "yield_sign_proto",
     srcs = ["yield_sign.proto"],
     deps = [
-        "//modules/planning/planning_base/scenario_base/proto:creep_stage_proto",
+        "//modules/planning/planning_interface_base/scenario_base/proto:creep_stage_proto",
     ],
 )
 

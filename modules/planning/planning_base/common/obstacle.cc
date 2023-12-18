@@ -21,16 +21,16 @@
 #include "modules/planning/planning_base/common/obstacle.h"
 
 #include <algorithm>
-#include <utility>
 #include <iomanip>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed/st_boundary.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -772,8 +772,8 @@ void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear) {
 // ouput: obstacle polygon
 common::math::Polygon2d Obstacle::GetObstacleTrajectoryPolygon(
     const common::TrajectoryPoint& point) const {
-  double delta_heading = point.path_point().theta()
-                         - perception_obstacle_.theta();
+  double delta_heading =
+      point.path_point().theta() - perception_obstacle_.theta();
   double cos_delta_heading = cos(delta_heading);
   double sin_delta_heading = sin(delta_heading);
   std::vector<common::math::Vec2d> polygon_point;
@@ -782,10 +782,10 @@ common::math::Polygon2d Obstacle::GetObstacleTrajectoryPolygon(
   for (auto& iter : perception_polygon_.points()) {
     double relative_x = iter.x() - perception_obstacle_.position().x();
     double relative_y = iter.y() - perception_obstacle_.position().y();
-    double x = relative_x * cos_delta_heading
-              - relative_y * sin_delta_heading + point.path_point().x();
-    double y = relative_x * sin_delta_heading
-              + relative_y * cos_delta_heading + point.path_point().y();
+    double x = relative_x * cos_delta_heading - relative_y * sin_delta_heading +
+               point.path_point().x();
+    double y = relative_x * sin_delta_heading + relative_y * cos_delta_heading +
+               point.path_point().y();
     polygon_point.emplace_back(x, y);
   }
 

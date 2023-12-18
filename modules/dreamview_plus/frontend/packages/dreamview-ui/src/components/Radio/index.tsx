@@ -10,6 +10,8 @@ export function Radio(props: RadioProps) {
     return <InternalRadio prefixCls={prefixCls} {...rest} />;
 }
 
+Radio.Group = InternalRadio.Group;
+
 // Radio.propTypes = {
 //     /**
 //      * Is this the principal call to action on the page?

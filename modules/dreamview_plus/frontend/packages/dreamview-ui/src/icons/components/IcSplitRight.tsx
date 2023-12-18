@@ -4,5 +4,5 @@ import Icon  from '@ant-design/icons';
 import { IconProps } from '../type';
 import { default as Svg } from '../../svgs/ic_split_right.svg';
 
-const IconIcSplitRight = (props: IconProps) => <Icon component={Svg} {...props}/>;
+const IconIcSplitRight = (props: IconProps) => <Icon component={Svg as any} {...props}/>;
 export default IconIcSplitRight;

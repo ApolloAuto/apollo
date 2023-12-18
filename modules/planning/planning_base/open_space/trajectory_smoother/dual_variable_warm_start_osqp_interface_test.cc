@@ -23,8 +23,9 @@
 #include <coin/IpSolveStatistics.hpp>
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
 namespace apollo {

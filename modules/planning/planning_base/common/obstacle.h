@@ -31,6 +31,7 @@
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
 #include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/planning_base/common/indexed_list.h"

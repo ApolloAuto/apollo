@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/rss_decider/rss_decider.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
+    <title>ic_over</title>
+    <g id="ic_over" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="16" height="16"/>
+        <circle id="椭圆形备份" stroke="#FFFFFF" cx="8" cy="8" r="7.5"/>
+        <rect id="矩形" fill="#FFFFFF" x="5.0639153" y="5.0639153" width="5.87216941" height="5.87216941" rx="1"/>
+    </g>
+</svg>

@@ -44,8 +44,14 @@ export default function useLatencyData() {
         }
         return { ...data.current };
     }, []);
+
+    const refresh = useCallback(() => {
+        data.current = {};
+    }, []);
+
     return {
         data,
         onSimData,
+        onRefresh: refresh,
     };
 }

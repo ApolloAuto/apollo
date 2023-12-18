@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/planning_base/common/util/print_debug_info.h"
+
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "modules/planning/planning_base/common/planning_gflags.h"
-#include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 namespace apollo {
 namespace planning {
 

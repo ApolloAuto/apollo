@@ -9,7 +9,6 @@ import {
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import { genereatePanelId } from '@dreamview/dreamview-core/src/util/layout';
 import {
-    IconIcBottomRailDeleteHover,
     IconIcFullscreen,
     IconIcSplitDown,
     IconIcSplitRight,
@@ -25,8 +24,9 @@ import { useTranslation } from 'react-i18next';
 import useStyle from './style';
 import './index.less';
 import { usePanelInfoStore } from '../../../../store/PanelInfoStore';
-import { addSelectedPanelId, deleteSelectedPanelId } from '../../../../store/PanelInfoStore/actions';
+import { addSelectedPanelId } from '../../../../store/PanelInfoStore/actions';
 import { usePanelTileContext } from '../../../../store/PanelInnerStore/PanelTileStore';
+import { SubHeader } from '../PanelHelpContent';
 
 type SubscribeInfo = {
     name?: string;
@@ -48,7 +48,7 @@ export interface RenderToolbarProps {
 function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
     const { t } = useTranslation('panels');
     const { classes, cx } = useStyle();
-    const { path, panel, panelId, inFullScreen, helpContent, updateChannel, name } = props;
+    const { path, panel, panelId, inFullScreen, helpContent } = props;
     const {
         mosaicWindowActions: { connectDragSource: mosaicConnectDragSource },
     } = useContext(MosaicWindowContext);
@@ -57,6 +57,12 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
     const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
+    const keyHandlers = useMemo(() => {
+        const panelKeyHandlers = panelInfoState.keyHandlerMap.get(panelId) ?? [];
+        const gloableKeyHandlers =
+            panelInfoState.globalKeyhandlers.size === 0 ? [] : Array.from(panelInfoState.globalKeyhandlers.values());
+        return [...gloableKeyHandlers, ...panelKeyHandlers];
+    }, [panelInfoState]);
 
     const connectDragSource = (el: any) => {
         if (path.length > 0) {
@@ -128,14 +134,49 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
         </div>
     );
 
-    const onToolbarClick: React.MouseEventHandler<HTMLDivElement> = useCallback(
-        (event) => {
-            if (!isSelected) {
-                panelInfoDispatch(addSelectedPanelId(panelId));
+    const onToolbarClick: React.MouseEventHandler<HTMLDivElement> = useCallback(() => {
+        if (!isSelected) {
+            panelInfoDispatch(addSelectedPanelId(panelId));
+        }
+    }, [isSelected, panelInfoDispatch]);
+    const KeyDescriptor = useMemo(() => {
+        const handlersDesc = keyHandlers?.map((handler) => {
+            let functionalKey;
+            if (handler.functionalKey) {
+                functionalKey = <span className={classes['btn-item']}>{handler.functionalKey}</span>;
             }
-        },
-        [isSelected, panelInfoDispatch],
-    );
+
+            let keys;
+            if (handler.keys) {
+                keys = (
+                    <>
+                        {handler.keys.map((key, index) => (
+                            <span key={key} className={classes['btn-item']}>
+                                {key}
+                            </span>
+                        ))}
+                    </>
+                );
+            }
+
+            return (
+                <div className={classes['panel-desc-item']} key={handler.keys.join('')}>
+                    <div className={classes['panel-desc-item-left']}>
+                        {functionalKey}
+                        {keys}
+                    </div>
+                    <div className={classes['panel-desc-item-right']}>{handler.discriptor}</div>
+                </div>
+            );
+        });
+
+        return (
+            <>
+                <SubHeader>{t('shortCut')}</SubHeader>
+                {handlersDesc}
+            </>
+        );
+    }, [classes, keyHandlers, t]);
 
     return (
         <div onClick={onToolbarClick} className={classes['mosaic-custom-toolbar-root']} ref={connectDragSource as any}>
@@ -184,13 +225,10 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
                 onCancel={handleCancel}
                 className='dreamview-modal-panel-help'
             >
-                {helpContent ?? (
-                    <>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                    </>
-                )}
+                <div style={{ width: '100%', height: '100%' }}>
+                    {helpContent}
+                    {KeyDescriptor}
+                </div>
             </Modal>
         </div>
     );

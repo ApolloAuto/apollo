@@ -26,7 +26,7 @@
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
 
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/planning_base/reference_line/spiral_problem_interface.h"
 

@@ -24,9 +24,10 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
+
 #include "cyber/common/macros.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 
 namespace apollo {

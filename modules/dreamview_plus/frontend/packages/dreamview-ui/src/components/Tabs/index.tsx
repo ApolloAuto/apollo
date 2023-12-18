@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Tabs as InternalTabs, TabsProps } from 'antd';
 import './index.less';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';

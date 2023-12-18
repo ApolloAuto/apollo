@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "Eigen/Core"
+
 #include "modules/planning/planning_base/math/smoothing_spline/spline_1d.h"
 
 namespace apollo {

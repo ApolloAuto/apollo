@@ -21,6 +21,7 @@
 #include "modules/planning/planning_base/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/planning_base/math/curve1d/cubic_polynomial_curve1d.h"
 #include "modules/planning/planning_base/math/curve1d/quintic_polynomial_curve1d.h"
 

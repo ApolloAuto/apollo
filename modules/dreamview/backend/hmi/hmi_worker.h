@@ -39,8 +39,8 @@
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
 #include "modules/common_msgs/simulation_msgs/scenario.pb.h"
-#include "modules/dreamview/proto/hmi_config.pb.h"
-#include "modules/dreamview/proto/hmi_mode.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_config.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_mode.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
@@ -110,9 +110,6 @@ class HMIWorker {
                           std::string* scenario_set_path);
   void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
   void UpdatePointCloudChannelToStatus(const std::string& channel_name);
-  // Load HMIConfig and HMIMode.
-  static HMIConfig LoadConfig();
-  static HMIMode LoadMode(const std::string& mode_config_path);
 
  private:
   void InitReadersAndWriters();
@@ -157,12 +154,6 @@ class HMIWorker {
   void StopRecordPlay();
 
   void ResetComponentStatusTimer();
-
-  /**
-   * @brief transfer the mode's cyber modules to modules.
-   * @param mode: the mode to be transfered.
-   */
-  static void TranslateCyberModules(HMIMode* mode);
 
   /**
    * @brief load the mode which is self defined by vehicles.

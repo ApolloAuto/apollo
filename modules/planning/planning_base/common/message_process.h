@@ -38,6 +38,7 @@
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/planning/planning_base/proto/learning_data.pb.h"
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
+
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/planning_base/common/dependency_injector.h"
 

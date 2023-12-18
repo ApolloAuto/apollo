@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { apollo } from '@dreamview/dreamview';
 import { IconIcErrorMessage, IconIcRegularMessage } from '@dreamview/dreamview-ui';
 import { timestampMsToTimeString } from '@dreamview/dreamview-core/src/util/misc';
+import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 import { usePanelContext } from '../base/store/PanelStore';
 import { StreamDataNames } from '../../../services/api/types';
@@ -57,10 +58,11 @@ function MonitorItem(props: IMonitorItem) {
 const MonitorItemMemo = React.memo(MonitorItem);
 function InternalConsole() {
     const panelContext = usePanelContext();
-    const { data: subcribedData, initSubscription } = panelContext;
+    const { data: subcribedData, initSubscription, setKeyDownHandlers } = panelContext;
 
     const [list, setList] = useState<IMonitorItem[]>([]);
     const [data, setData] = useState<ISimulationWorld>();
+    const { t: tPanels } = useTranslation('panels');
 
     // 向list前端插入数据，最多保留29条
     const insertList = (item: IMonitorItem) => {

@@ -50,6 +50,8 @@ export { default as IconIcCloudProfileBlue } from './components/IcCloudProfileBl
 
 export { default as IconIcCommonRoutin } from './components/IcCommonRoutin';
 
+export { default as IconIcCompile } from './components/IcCompile';
+
 export { default as IconIcCopy } from './components/IcCopy';
 
 export { default as IconIcCoverage } from './components/IcCoverage';
@@ -77,6 +79,8 @@ export { default as IconIcEitFullScreen } from './components/IcEitFullScreen';
 export { default as IconIcEitFullScreenHover } from './components/IcEitFullScreenHover';
 
 export { default as IconIcErrorMessage } from './components/IcErrorMessage';
+
+export { default as IconIcFaq } from './components/IcFaq';
 
 export { default as IconIcFullscreen } from './components/IcFullscreen';
 
@@ -111,6 +115,10 @@ export { default as IconIcMoveClick } from './components/IcMoveClick';
 export { default as IconIcMoveHover } from './components/IcMoveHover';
 
 export { default as IconIcNotExpanded } from './components/IcNotExpanded';
+
+export { default as IconIcNotVisual } from './components/IcNotVisual';
+
+export { default as IconIcOver } from './components/IcOver';
 
 export { default as IconIcOverUsable } from './components/IcOverUsable';
 
@@ -168,9 +176,15 @@ export { default as IconIcSettingHover } from './components/IcSettingHover';
 
 export { default as IconIcSettingNormal } from './components/IcSettingNormal';
 
+export { default as IconIcSissue } from './components/IcSissue';
+
 export { default as IconIcSplitDown } from './components/IcSplitDown';
 
 export { default as IconIcSplitRight } from './components/IcSplitRight';
+
+export { default as IconIcStart } from './components/IcStart';
+
+export { default as IconIcStartForbidden } from './components/IcStartForbidden';
 
 export { default as IconIcStopPlaying } from './components/IcStopPlaying';
 
@@ -191,6 +205,8 @@ export { default as IconIcUseRetry } from './components/IcUseRetry';
 export { default as IconIcV2X } from './components/IcV2X';
 
 export { default as IconIcVehicle } from './components/IcVehicle';
+
+export { default as IconIcVisual } from './components/IcVisual';
 
 export { default as IconIcWarningMessage } from './components/IcWarningMessage';
 

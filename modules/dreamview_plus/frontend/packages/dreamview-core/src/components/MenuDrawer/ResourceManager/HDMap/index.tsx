@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { ENUM_DOWNLOAD_STATUS, HDMapSet } from '@dreamview/dreamview-core/src/services/api/types';
+import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
+import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { useTableHover } from '../useStyle';
 import Table from '../Table';
 import RenderDownLoadStatus from '../RenderDownLoadStatus';
 import RenderName from '../RenderName';
 import RenderOperation from '../RenderOperation';
-import useWebSocketServices from '../../../../services/hooks/useWebSocketServices';
-import { useHmiStore } from '../../../../store/HmiStore';
 import { useDataSource, useScrollHeight } from '../hoc';
 import { ENUM_PROFILEMANAGER_TAB } from '../provider';
 import Background from '../Background';
@@ -139,8 +139,8 @@ const format = (v: any) =>
 
 function HDMap() {
     const { isPluginConnected, pluginApi } = useWebSocketServices();
-    const [hmi] = useHmiStore();
-    const currentRecordId = hmi?.currentRecordStatus?.currentRecordId;
+    const [hmi] = usePickHmiStore();
+    const currentRecordId = hmi?.currentRecordId;
     const { t } = useTranslation('profileManagerHDMap');
     const scrollHeight = useScrollHeight();
 

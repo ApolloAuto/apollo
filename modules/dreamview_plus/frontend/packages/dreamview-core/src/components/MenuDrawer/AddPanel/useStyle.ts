@@ -4,6 +4,7 @@ export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'add-panel-content': {
             marginTop: '6px',
+            height: 'calc(100% - 6px - 78px)',
         },
         'add-panel-item': {
             padding: '0 16px 0 24px',

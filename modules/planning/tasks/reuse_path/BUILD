@@ -60,7 +60,7 @@ apollo_plugin(
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/reuse_path/proto:reuse_path_cc_proto",
     ],
 )

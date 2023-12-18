@@ -1,0 +1,3 @@
+<library path="modules/planning/planners/public_road/liblattice_planner.so">
+    <class type="apollo::planning::LatticePlanner" base_class="apollo::planning::Planner"></class>
+</library>

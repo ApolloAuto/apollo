@@ -10,6 +10,22 @@ export default function useStyle() {
             height: '78px',
             ...theme.tokens.typography.title1,
         },
+        'menu-drawer-title-ic-container': {
+            display: 'flex',
+        },
+        'menu-drawer-title-ic': {
+            fontSize: theme.tokens.font.size.large,
+            cursor: 'pointer',
+            padding: '10px',
+            marginRight: '-10px',
+            ...theme.util.func.textReactive(
+                theme.tokens.font.reactive.mainHover,
+                theme.tokens.font.reactive.mainActive,
+            ),
+            '& .anticon': {
+                display: 'block',
+            },
+        },
         'menu-drawer-title-icclose': {
             fontSize: theme.tokens.font.size.large,
             cursor: 'pointer',

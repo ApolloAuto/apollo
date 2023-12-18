@@ -6,7 +6,13 @@ import sys
 import os
 import pathlib
 import subprocess
+import jinja2
+from urllib.parse import quote
+from urllib.parse import unquote
 from xml.etree import ElementTree as ET
+# from jinja2 import Environment, PackageLoader, select_autoescape
+# env = Environment(loader=PackageLoader("doxygen"),
+#                   autoescape=select_autoescape())
 
 CATEGORIES = (
     ('core', 'cyber', 'cyber'),
@@ -41,6 +47,22 @@ CATEGORIES = (
 )
 
 
+def remove_prefix(text, prefix):
+    """remove_prefix
+    """
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
+
+def remove_suffix(text, suffix):
+    """remove_suffix
+    """
+    if text.endswith(suffix):
+        return text[:-len(suffix)]
+    return text
+
+
 def doxylink_encode(path):
     """doxylink_encode
     """
@@ -49,6 +71,8 @@ def doxylink_encode(path):
         ('_', '\\_\\_'),
         ('.', '_8'),
         ('/', '_2'),
+        ('+', '_09'),
+        (' ', '_01'),
     )
     result = path
     for rule in rules:
@@ -65,11 +89,14 @@ def doxylink_encode_unescape(path):
         ('_', '__'),
         ('.', '_8'),
         ('/', '_2'),
+        ('+', '_09'),
+        (' ', '_01'),
     )
     result = path
     for rule in rules:
         result = result.replace(*rule)
 
+    result = quote(result).replace('%', '_x')
     return result
 
 
@@ -100,6 +127,12 @@ class Package():
         """version
         """
         return self.cyberfile.findtext('version')
+
+    @property
+    def depends(self):
+        """depends
+        """
+        return [x.text for x in self.cyberfile.findall('depend')]
 
     @property
     def readme_cn_path(self):
@@ -165,7 +198,8 @@ def generate_packages_cn_md():
     ]
     for repo, category, path in categories:
         for pkg in find_packages(path):
-            output.append(f'|{repo}|{category}|{pkg.readme_md_link()}|')
+            if pkg.readme_path.exists():
+                output.append(f'|{repo}|{category}|{pkg.readme_md_link()}|')
 
     prettier_output = subprocess.check_output(
         ['prettier', '--parser=markdown'],
@@ -186,7 +220,9 @@ def generate_packages_core_cn_md():
     ]
     for repo, category, path in categories:
         for pkg in find_packages(path):
-            output.append(f'|{repo}|{category}|{pkg.readme_md_doxylink()}|')
+            if pkg.readme_path.exists():
+                output.append(
+                    f'|{repo}|{category}|{pkg.readme_md_doxylink()}|')
 
     prettier_output = subprocess.check_output(
         ['prettier', '--parser=markdown'],
@@ -359,6 +395,202 @@ def generate_treeview_html():
                 print(
                     f'<tab type="user" visible="yes" title="{pkg.name}" intro="" url="{pkg.readme_md_doxylink_ref()}" />'
                 )
+
+
+def generate_dir_html(dirpath, prefix='', indent_level=0):
+    """generate_dir_html
+    """
+    dir_title = dirpath.split('/')[-1]
+    indent = '    ' * indent_level
+    # print(indent + dirpath)
+    print(
+        f'{indent}<tab type="usergroup" visible="yes" title="{dir_title}" intro="" url="">'
+    )
+    for name in os.listdir(dirpath):
+        if name.startswith('.'):
+            continue
+        if os.path.isdir(os.path.join(dirpath, name)):
+            generate_dir_html(os.path.join(dirpath, name), prefix,
+                              indent_level + 1)
+        elif os.path.isfile(os.path.join(dirpath,
+                                         name)) and name.endswith('.md'):
+            filepath = os.path.join(dirpath, name)
+            sub_indent = '    ' * (indent_level + 1)
+            title = remove_suffix(name, '.md')
+            # print(sub_indent + os.path.join(dirpath, name))
+            print(
+                f'{sub_indent}<tab type="user" visible="yes" title="{title}" intro="" url="@ref md_{doxylink_encode_unescape(filepath)}" />'
+            )
+    # for root, dirs, files in os.walk(dirpath):
+    #     print('root', root)
+    #     print('dirs', dirs)
+    #     print('files', files)
+    #     for filename in files:
+    #         if filename.endswith('.md'):
+    #             filepath = os.path.join(root, filename)
+    #             sub_indent = '    ' * (indent_level + 1)
+    #             title = remove_suffix(filename, '.md')
+    #             print(sub_indent + os.path.join(root, filename))
+    #             # print(
+    #             #     f'{sub_indent}<tab type="user" visible="yes" title="{title}" intro="" url="@ref md_{doxylink_encode_unescape(filepath)}" />'
+    #             # )
+    #     print(2)
+    #     for dirname in dirs:
+    #         generate_dir_html(os.path.join(root, dirname), prefix,
+    #                           indent_level + 1)
+
+    print(f'{indent}</tab>')
+
+
+def generate_treeview_html2():
+    """generate_treeview_html2
+    """
+    dirs1 = (
+        'docs/发版说明',
+        'docs/安装指南',
+        'docs/应用实践',
+    )
+    for dirent in dirs1:
+        generate_dir_html(dirent)
+    dirs4 = ('docs/框架设计', )
+    dirs2 = ('docs/工具使用', )
+    for dirent in dirs2:
+        generate_dir_html(dirent, 'docs')
+    # 源代码文档
+
+
+def scan_dir(dirpath, indent_level=0):
+    """scan_dir
+    """
+    print(f'{indent_level}\t{dirpath}/')
+    for name in os.listdir(dirpath):
+        if name.startswith('.'):
+            continue
+        if os.path.isdir(os.path.join(dirpath, name)):
+            scan_dir(os.path.join(dirpath, name), indent_level + 1)
+        elif os.path.isfile(os.path.join(dirpath,
+                                         name)) and name.endswith('.md'):
+            filepath = os.path.join(dirpath, name)
+            print(f'{indent_level + 1}\t{filepath}')
+
+
+def scan_docs_dir():
+    """scan_docs_dir
+    """
+    dirs1 = (
+        'docs/发版说明',
+        'docs/安装指南',
+        'docs/应用实践',
+        'docs/框架设计',
+        'docs/工具使用',
+    )
+    for dirent in dirs1:
+        scan_dir(dirent)
+
+
+def generate_treeview_html3():
+    """generate_treeview_html3
+    """
+    with open('./docs.structure.txt', 'r') as fin:
+        docs_structure = list(
+            map(lambda x: x.split('\t'),
+                fin.read().splitlines()))
+    output = []
+    stack = []
+    last_level = 0
+    for (level, name) in docs_structure:
+        level = int(level)
+        if level < last_level:
+            for _ in range(last_level - level):
+                stack.pop()
+                indent = '    ' * len(stack)
+                output.append(f'{indent}</tab>')
+        if name.endswith('/'):
+            title = name.split('/')[-2]
+            indent = '    ' * int(level)
+            # print(f'{indent}{name}')
+            output.append(
+                f'{indent}<tab type="usergroup" visible="yes" title="{title}" intro="" url="">'
+            )
+            stack.append(name)
+        elif name.endswith('.md'):
+            title = remove_suffix(name.split('/')[-1], '.md')
+            indent = '    ' * int(level)
+            # print(f'{indent}{name}')
+            output.append(
+                f'{indent}<tab type="user" visible="yes" title="{title}" intro="" url="@ref md_{doxylink_encode_unescape(name)}" />'
+            )
+            upper_dir = name.split('/')[-2]
+            if upper_dir == '核心模块':
+                for line in generate_treeview_modules_html():
+                    output.append(line)
+        last_level = level
+
+    while len(stack) > 0:
+        stack.pop()
+        indent = '    ' * len(stack)
+        output.append(f'{indent}</tab>')
+
+    # print('\n'.join(output))
+    with open('./docs/DoxygenLayout.xml.tpl', 'r') as fin:
+        template = jinja2.Template(fin.read())
+        print(template.render(docs_structure_html='\n'.join(output)))
+    return output
+
+
+def generate_treeview_modules_html():
+    """generate_treeview_modules_html
+    """
+    output = []
+    pkg_map = {}
+
+    categories = CATEGORIES
+    for repo, category, path in categories:
+        for pkg in find_packages(path):
+            if pkg.readme_path.exists():
+                pkg_map[pkg.name] = pkg
+
+    modules = (
+        'collection/planning',
+        'collection/control',
+        'collection/canbus',
+        'collection/perception',
+        'collection/prediction',
+        'collection/localization',
+    )
+    for module_path in modules:
+        indent = '    ' * 2
+        module = module_path.split('/')[-1]
+        output.append(
+            f'{indent}<tab type="usergroup" visible="yes" title="{module}" intro="" url="">'
+        )
+        module_pkg = Package(f'{module_path}')
+        output.append(
+            f'{indent}    <tab type="user" visible="yes" title="概述" intro="" url="{module_pkg.readme_md_doxylink_ref()}" />'
+        )
+        for dep in module_pkg.depends:
+            if dep in pkg_map:
+                pkg = pkg_map[dep]
+                output.append(
+                    f'{indent}    <tab type="user" visible="yes" title="{pkg.name}" intro="" url="{pkg.readme_md_doxylink_ref()}" />'
+                )
+        output.append(f'{indent}</tab>')
+
+    output.append(
+        f'{indent}<tab type="usergroup" visible="yes" title="软件包文档" intro="" url="@ref md_docs_2packages_2packages__cn">'
+    )
+    output.append(
+        f'{indent}    <tab type="usergroup" visible="yes" title="Apollo Core" intro="" url="@ref md_docs_2packages_2packages__core__cn">'
+    )
+    for pkg in pkg_map.values():
+        if pkg.readme_path.exists():
+            output.append(
+                f'{indent}        <tab type="user" visible="yes" title="{pkg.name}" intro="" url="{pkg.readme_md_doxylink_ref()}" />'
+            )
+    output.append(f'{indent}    </tab>')
+    output.append(f'{indent}</tab>')
+
+    return output
 
 
 def main():

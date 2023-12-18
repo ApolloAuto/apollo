@@ -32,16 +32,17 @@
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_config.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_mode.pb.h"
 #include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/external_command_msgs/action_command.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/monitor_msgs/system_status.pb.h"
-#include "modules/dreamview_plus/proto/hmi_config.pb.h"
-#include "modules/dreamview_plus/proto/hmi_mode.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/dreamview_plus/backend/record_player/record_player_factory.h"
 
 /**
@@ -56,8 +57,12 @@ class HMIWorker {
  public:
   using DvCallback = std::function<nlohmann::json(
       const std::string& function_name, const nlohmann::json& param_json)>;
-  HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
-  explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
+  explicit HMIWorker(
+      apollo::common::monitor::MonitorLogBuffer monitor_log_buffer)
+      : HMIWorker(cyber::CreateNode("HMI"), monitor_log_buffer) {}
+  HMIWorker(
+      const std::shared_ptr<apollo::cyber::Node>& node,
+      const apollo::common::monitor::MonitorLogBuffer& monitor_log_buffer);
   void Start(DvCallback callback_api);
   void Stop();
 
@@ -105,7 +110,13 @@ class HMIWorker {
   //                     const std::string& record_status);
   bool UpdateMapToStatus(const std::string& map_name);
   bool LoadRecords();
+  bool LoadRecordAndChangeStatus(const std::string& record_name);
+  bool LoadRecord(const std::string& record_name,
+                  const std::string& record_file_path, double* total_time_s);
+  bool RecordIsLoaded(const std::string& record_id);
   bool RePlayRecord();
+  bool LoadRtkRecords();
+  void UpdateRtkRecordToStatus(const std::string &new_name);
   /**
    * @brief control the nohup play record process by action_type
    * @param action_type The action to control the nohup play record process
@@ -130,10 +141,12 @@ class HMIWorker {
    * @param x is the x-coordinate of the end point
    * @param y is the y-coordinate of the end point
    */
-  void GetCurrentScenarioEndPoint(double& x, double& y);
+  nlohmann::json GetCurrentScenarioExtremPoint();
 
   bool StartSimObstacle();
   bool StopSimObstacle();
+  bool StartScenarioSimulation();
+  bool StopScenarioSimulation();
 
   // Start / Stop Data Recorder
   bool StartDataRecorder();
@@ -141,10 +154,24 @@ class HMIWorker {
   bool SaveDataRecorder(const std::string& new_name);
   bool DeleteDataRecorder();
 
-  // Load HMIConfig and HMIMode.
-  static HMIConfig LoadConfig();
-  static HMIMode LoadMode(const std::string& mode_config_path);
+  // Start / Stop rtk Data Recorder
+  bool StartRtkDataRecorder();
+  bool StopRtkDataRecorder();
+  bool DeleteRtkDataRecorder();
+  bool SaveRtkDataRecorder(const std::string &new_name);
+  bool StopPlayRtkRecorder();
+  nlohmann::json StartPlayRtkRecorder();
+
   void ChangeMapVal(const std::string& map_name);
+
+  // kv database update interface
+  bool AddOrModifyObjectToDB(const std::string& key, const std::string& value);
+  bool DeleteObjectToDB(const std::string& key);
+  std::string GetObjectFromDB(const std::string& key);
+  std::vector<std::pair<std::string, std::string>> GetTuplesWithTypeFromDB(
+      const std::string& type);
+
+  bool StartTerminal();
 
  private:
   void InitReadersAndWriters();
@@ -161,12 +188,24 @@ class HMIWorker {
   bool SelectAndReloadMap(const std::string& map_name);
   void ChangeVehicle(const std::string& vehicle_name);
   void ChangeRecord(const std::string& record_id);
+  void ChangeRtkRecord(const std::string& record_id);
   void ChangeOperation(const std::string& operation_str);
   void ChangeDynamicModel(const std::string& dynamic_model_name);
   void ChangeScenario(const std::string& scenario_info);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
   void ClearRecordInfo();
   void ClearScenarioInfo();
+  void ClearRtkRecordInfo();
+  void ClearInvalidRecordStatus(const HMIModeOperation& operation);
+  /**
+   * @brief clear invalid selected resource under different operations.
+   * operation is strong associated with resources,for some resources are only
+   * used under special operation.when change operations should clear invalid
+   * selected resources.
+   * @param operation: the operation to be changed
+   */
+  void ClearInvalidResourceUnderChangeOperation(
+      const HMIModeOperation operation);
 
   bool LoadScenarios();
 
@@ -181,6 +220,7 @@ class HMIWorker {
   void DeleteV2xConfig(const std::string& vehicle_name);
   void GetScenarioResourcePath(std::string* scenario_resource_path);
   void GetRecordPath(std::string* record_path);
+  void GetRtkRecordPath(std::string* record_path);
 
   // Start / stop a module.
   void StartModule(const std::string& module);
@@ -195,12 +235,6 @@ class HMIWorker {
   bool ReadRecordInfo(const std::string& file, double* total_time_s) const;
   // Periodically check whether the monitor is turned on.
   void OnTimer(const double &overtime_time);
-
-  /**
-   * @brief transfer the mode's cyber modules to modules.
-   * @param mode: the mode to be transfered.
-   */
-  static void TranslateCyberModules(HMIMode* mode);
 
   /**
    * @brief load the mode which is self defined by vehicles.
@@ -266,6 +300,7 @@ class HMIWorker {
       drive_event_writer_;
   DvCallback callback_api_;
   std::unique_ptr<cyber::Timer> monitor_timer_;
+  apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
 };
 
 }  // namespace dreamview

@@ -124,3 +124,5 @@ DEFINE_double(minimum_speed_protection, 0.1, "minimum speed protection.");
 DEFINE_int32(action, 1, "START = 1; RESET = 2; VIN_REQ = 3");
 
 DEFINE_bool(use_vehicle_epb, false, "enable epb brake for vehicle.");
+
+DEFINE_double(pitch_offset_deg, 0.0, "vehicle pitch offset when in horizon.");

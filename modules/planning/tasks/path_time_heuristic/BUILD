@@ -90,7 +90,7 @@ apollo_plugin(
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_internal_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
         "//modules/planning/tasks/path_time_heuristic/proto:path_time_heuristic_cc_proto",
         "//modules/planning/tasks/speed_bounds_decider:st_boundary_mapper",

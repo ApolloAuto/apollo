@@ -21,6 +21,7 @@
 #include "modules/planning/planning_base/reference_line/spiral_reference_line_smoother.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/planning/planning_base/proto/reference_line_smoother_config.pb.h"
 
 namespace apollo {

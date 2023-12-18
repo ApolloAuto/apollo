@@ -18,6 +18,7 @@ export const initData: any = () => ({
     theta: {},
     st: {},
     speedHeuristic: {},
+    customChart: [] as any,
     speed: {},
     referenceTheta: {},
     referenceKappa: {},
@@ -26,6 +27,7 @@ export const initData: any = () => ({
     DKappa: {},
     acceleration: {},
     scenarioHistory: [] as any,
+    vehicle: {},
 });
 
 export default function usePlanningData() {
@@ -209,23 +211,39 @@ export default function usePlanningData() {
         }
     }
 
+    function updateCustomChart(chart: any, vehicle: any) {
+        data.current.customChart = chart;
+        data.current.vehicle = vehicle;
+    }
+
     const onSimData = useCallback((simdata: any) => {
         const planningData = simdata.planningData;
         const newPlanningTime = simdata?.latency?.planning?.timestampSec;
         if (planningData && planningTimeSec.current !== newPlanningTime) {
+            if (planningData.chart) {
+                updateCustomChart(planningData.chart, simdata.vehicleParam);
+            } else {
+                data.current.customChart = [];
+            }
+
             if (planningData?.path) {
                 updateReferenceTheta(planningData.path);
                 updateReferenceKappaGraph(planningData.path);
                 updateReferenceDKappa(planningData.path);
+            } else {
+                data.current.referenceTheta = {};
+                data.current.referenceKappa = {};
+                data.current.referenceDKappa = {};
             }
 
             if (planningData?.stGraph) {
                 updateSTGraph(planningData.stGraph);
+                updateVTGraph(planningData.stGraph);
                 updateSpeedHeuristicGraph(planningData.stGraph);
-            }
-
-            if (planningData?.stSpeedGraph) {
-                updateVTGraph(planningData.stSpeedGraph);
+            } else {
+                data.current.st = {};
+                data.current.vt = {};
+                data.current.speedHeuristic = {};
             }
 
             if (simdata?.planningTrajectory) {
@@ -233,10 +251,17 @@ export default function usePlanningData() {
                 updateKappaGraph(simdata.planningTrajectory);
                 updateDkappaGraph(simdata.planningTrajectory);
                 updateAcceleration(simdata.planningTrajectory);
+            } else {
+                data.current.theta.Trajectory = [];
+                data.current.kappa.Trajectory = [];
+                data.current.DKappa.Trajectory = [];
+                data.current.acceleration.VehicleSpeed = [];
             }
 
             if (planningData?.speedPlan) {
                 updateSpeed(planningData?.speedPlan, simdata?.planningTrajectory);
+            } else {
+                data.current.speed = {};
             }
 
             if (planningData.scenario) {
@@ -244,6 +269,9 @@ export default function usePlanningData() {
             }
 
             updatePlanningTime(newPlanningTime);
+        }
+        if (!planningData) {
+            data.current = initData();
         }
         return { ...data.current };
     }, []);

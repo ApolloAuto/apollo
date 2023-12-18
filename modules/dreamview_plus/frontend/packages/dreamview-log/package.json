@@ -1,6 +1,6 @@
 {
     "name": "@dreamview/log",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "> TODO: description",
     "author": "wangkang12 <wangkang12@baidu.com>",
     "homepage": "",
@@ -30,8 +30,8 @@
         "rxjs": "^7.8.1"
     },
     "devDependencies": {
-        "@dreamview/eslint-config-dreamview": "^1.0.0",
-        "@dreamview/tslint-config-dreamview": "^1.0.0",
+        "@dreamview/eslint-config-dreamview": "1.0.1",
+        "@dreamview/tslint-config-dreamview": "1.0.1",
         "jest": "^29.5.0",
         "ts-jest": "^29.1.0"
     }

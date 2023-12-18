@@ -1,3 +1,5 @@
+import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
+
 export interface subMenuParams {
     [key: string]: {
         defaultVisible: boolean;
@@ -37,7 +39,7 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
         unknownStationary: {
             defaultVisible: true,
             currentVisible: true,
-            vizKey: 'unknownUnMovable',
+            vizKey: 'unknownUnmovable',
         },
         pedestrian: {
             defaultVisible: true,
@@ -267,13 +269,10 @@ export const formatLayerParams = (params: { [key: string]: subMenuParams }) => {
     return result;
 };
 
+export const localPointCloudManager = new LocalStorage(KEY_MANAGER.PointCloudLayerMenu);
+
 export const getCurrentLayerParams = () => {
-    const localStorageLayerMenuParams = localStorage.getItem('pointCloudLayerMenuParams');
-    let curLayerMenuParams = null;
-    if (localStorageLayerMenuParams) {
-        curLayerMenuParams = JSON.parse(localStorageLayerMenuParams);
-    } else {
-        curLayerMenuParams = layerMenuParams;
-    }
-    return curLayerMenuParams;
+    const localStorageLayerMenuParams = localPointCloudManager.get();
+
+    return localStorageLayerMenuParams || layerMenuParams;
 };

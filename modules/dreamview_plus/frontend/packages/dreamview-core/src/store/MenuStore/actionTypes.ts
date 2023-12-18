@@ -30,6 +30,7 @@ export enum ENUM_ENVIORMENT_MANAGER_TAB_KEY {
 export enum ENUM_ADS_MANAGER_TAB_KEY {
     VEHICLE = 'VEHICLE',
     V2X = 'V2X',
+    DYNAMIC = 'DYNAMIC',
 }
 
 export type UpdateMenuPayload = ENUM_MENU_KEY;

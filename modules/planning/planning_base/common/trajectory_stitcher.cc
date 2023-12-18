@@ -30,7 +30,7 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_model/vehicle_model.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -199,9 +199,11 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
     auto lon_diff = time_matched_point.path_point().s() - frenet_sd.first;
     auto lat_diff = frenet_sd.second;
-    double time_diff = time_matched_point.relative_time() -
-            prev_trajectory->TrajectoryPointAt(
-              static_cast<uint32_t>(position_matched_index)).relative_time();
+    double time_diff =
+        time_matched_point.relative_time() -
+        prev_trajectory
+            ->TrajectoryPointAt(static_cast<uint32_t>(position_matched_index))
+            .relative_time();
 
     ADEBUG << "Control lateral diff: " << lat_diff
            << ", longitudinal diff: " << lon_diff

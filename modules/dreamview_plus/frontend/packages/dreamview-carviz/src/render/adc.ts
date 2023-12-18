@@ -84,9 +84,11 @@ export default class Adc {
         if (!this[name] || !pos || !isNumber(pos.positionX) || !isNumber(pos.positionY)) {
             return;
         }
+
         if (!this.coordinates.isInitialized()) {
             this.coordinates.initialize(pos.positionX, pos.positionY);
         }
+
         if (this[name] && pos) {
             const { positionX, positionY, heading } = pos;
             const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
@@ -108,6 +110,36 @@ export default class Adc {
         }
     }
 
+    public updateOffset(pos, name) {
+        if (!this[name] || !pos || !isNumber(pos.positionX) || !isNumber(pos.positionY)) {
+            return;
+        }
+
+        if (!this.coordinates.isInitialized()) {
+            this.coordinates.initialize(pos.positionX, pos.positionY);
+        }
+
+        if (this[name] && pos) {
+            const { positionX, positionY, heading } = pos;
+            const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
+            if (!position) {
+                return;
+            }
+
+            this[name].rotation.y = heading;
+            this[name].position.set(position.x, position.y, 0);
+            if (name === 'adc') {
+                this.adc.visible = false;
+            }
+            if (name === 'shadowAdc') {
+                this.shadowAdc.visible = false;
+            }
+            if (name === 'planningAdc') {
+                this.planningAdc.visible = false;
+            }
+        }
+    }
+
     updateVehicleParam(params) {
         this.vehicleParam = params;
         this.resizeCarSize(
@@ -118,8 +150,8 @@ export default class Adc {
     }
 
     resizeCarSize(x, y, z) {
-        this.shadowAdc?.scale(x, y, z);
-        this.adc?.scale(x, y, z);
-        this.planningAdc?.scale(x, y, z);
+        this.shadowAdc?.scale?.set(x, y, z);
+        this.adc?.scale?.set(x, y, z);
+        this.planningAdc?.scale?.set(x, y, z);
     }
 }

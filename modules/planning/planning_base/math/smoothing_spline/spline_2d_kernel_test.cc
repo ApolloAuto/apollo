@@ -20,6 +20,7 @@
 #include "modules/planning/planning_base/math/smoothing_spline/spline_2d_kernel.h"
 
 #include "gtest/gtest.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {

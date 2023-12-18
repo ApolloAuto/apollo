@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+
 #include "cyber/common/macros.h"
 
 namespace apollo {

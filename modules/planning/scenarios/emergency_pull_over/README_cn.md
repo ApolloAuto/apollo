@@ -102,13 +102,13 @@ apollo::planning::EmergencyPullOverScenario
 | `modules/planning/scenarios/emergency_pull_over/conf/scenario_conf.pb.txt`| `apollo::planning::ScenarioEmergencyPullOverConfig` | 场景的配置文件   |
 | `modules/planning/scenarios/emergency_pull_over/conf/pipeline.pb.txt`     | `apollo::planning::ScenarioPipeline` | 场景的流水线文件 |
 | `modules/planning/scenarios/emergency_pull_over/conf/emergency_pull_over_approach/pull_over_path.pb.txt`                 | `apollo::planning::PullOverPathConfig`              | Task配置文件               |
-| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+| `modules/planning/planning_component/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
 
 #### 使用方式
 ##### 配置加载 EmergencyPullOverScenario 插件
-- 在`modules/planning/planning_base/conf/planning_config.pb.txt`文件中增加`standard_planning_config`的配置，配置使用当前场景插件。
+- 在`modules/planning/planning_component/conf/planning_config.pb.txt`文件中增加`standard_planning_config`的配置，配置使用当前场景插件。
   ``` shell
-  # modules/planning/planning_base/conf/planning_config.pb.txt
+  # modules/planning/planning_component/conf/planning_config.pb.txt
 
   standard_planning_config {
     planner_type: ......

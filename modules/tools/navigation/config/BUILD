@@ -18,7 +18,7 @@ apollo_py_binary(
     srcs = ["navi_config.py"],
     data = ["default.ini"],
     deps = [
-        "//modules/dreamview/proto:hmi_config_py_pb2",
+        "//modules/common_msgs/dreamview_msgs:hmi_config_py_pb2",
         "//modules/planning/planning_base/proto:planning_config_py_pb2",
         "//modules/tools/common:proto_utils",
     ],

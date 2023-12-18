@@ -3,13 +3,13 @@
     "description": "Visualization of the Apollo simulator.",
     "version": "0.0.0",
     "main": "app.js",
-    "private": true,
     "author": "adu-sim",
     "license": "Apache-2.0",
+    "private": "true",
     "scripts": {
         "clean": "rimraf packages/platforms/web/.web_build",
         "clean:dep": "lerna clean --yes && rimraf node_modules",
-        "web:build": "yarn patch-package && lerna run build --scope=@dreamview/web --stream",
+        "web:build": "yarn patch-package && lerna run build --scope=@dreamview/web --stream && lerna run deploy --scope=@dreamview/web --stream",
         "web:serve": "yarn patch-package && lerna run serve --scope=@dreamview/web --stream",
         "web:dev": "yarn run dreamview:mock & yarn run web:serve",
         "lint:css": "stylelint 'packages/**/*.{css,less,scss}' --fix --custom-syntax postcss-less",
@@ -18,6 +18,7 @@
         "version:update": "lerna version --no-private --no-commit-hooks --no-git-tag-version --no-push",
         "dreamview:doc:build": "storybook build",
         "dreamview:doc": "yarn patch-package && storybook dev -p 6006",
+        "dreamview:doc:debug": "yarn patch-package && storybook dev -p 6006 --debug-webpack",
         "dreamview:mock": "lerna run start --scope=@dreamview/dreamview-mock --stream"
     },
     "devDependencies": {

@@ -16,6 +16,7 @@
 
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
@@ -23,7 +24,7 @@
 #include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace {
 
@@ -39,7 +40,8 @@ class PadTerminal {
   PadTerminal() : node_(CreateNode("planning_pad_terminal")) {}
   void init() {
     const std::string planning_config_file =
-        "/apollo/modules/planning/planning_base/conf/planning_config.pb.txt";
+        "/apollo/modules/planning/planning_component/conf/"
+        "planning_config.pb.txt";
     PlanningConfig planning_config;
     ACHECK(GetProtoFromFile(planning_config_file, &planning_config))
         << "failed to load planning config file " << planning_config_file;

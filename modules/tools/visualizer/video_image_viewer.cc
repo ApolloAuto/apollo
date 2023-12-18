@@ -64,8 +64,8 @@ void VideoImgViewer::initializeGL() {
   }
 
   video_image_shader_prog_ = RenderableObject::CreateShaderProgram(
-      tr(":/shaders/video_image_plane.vert"),
-      tr(":/shaders/video_image_plane.frag"));
+      tr("/apollo/modules/tools/visualizer/shaders/video_image_plane.vert"),
+      tr("/apollo/modules/tools/visualizer/shaders/video_image_plane.frag"));
   if (video_image_shader_prog_ == nullptr) {
     return;
   }

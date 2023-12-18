@@ -35,10 +35,10 @@
 #include "modules/planning/planning_base/common/dependency_injector.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/planning_base/task_base/common/decider.h"
+#include "modules/planning/planning_interface_base/task_base/common/decider.h"
 
 namespace apollo {
 namespace planning {

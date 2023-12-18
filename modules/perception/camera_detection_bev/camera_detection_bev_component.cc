@@ -19,6 +19,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
 #include "modules/perception/common/base/camera.h"
 
@@ -27,7 +28,7 @@ namespace perception {
 namespace camera {
 
 bool CameraDetectionBevComponent::InitDetector(
-    const CameraDetectionBEV& detection_param) {
+    const CameraDetectionBEV &detection_param) {
   ObstacleDetectorInitOptions init_options;
   // Init conf file
   auto plugin_param = detection_param.plugin_param();
@@ -40,7 +41,9 @@ bool CameraDetectionBevComponent::InitDetector(
   base::BaseCameraModelPtr model =
       algorithm::SensorManager::Instance()->GetUndistortCameraModel(
           camera_name);
-  auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
+  ACHECK(model) << "Can't find " << camera_name
+                << " in data/conf/sensor_meta.pb.txt";
+  auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
   init_options.intrinsic = pinhole->get_intrinsic_params();
   init_options.image_height = model->get_height();
   init_options.image_width = model->get_width();
@@ -55,7 +58,7 @@ bool CameraDetectionBevComponent::InitDetector(
 }
 
 bool CameraDetectionBevComponent::InitCameraFrame(
-    const CameraDetectionBEV& detection_param) {
+    const CameraDetectionBEV &detection_param) {
   DataProvider::InitOptions init_options;
   init_options.image_height = image_height_;
   init_options.image_width = image_width_;
@@ -66,7 +69,7 @@ bool CameraDetectionBevComponent::InitCameraFrame(
         << " camera_name: " << init_options.sensor_name;
 
   frame_ptr_ = std::make_shared<CameraFrame>();
-  int num = detection_param.channel().input_camera_channel_name().size();
+  int num = 6;
   frame_ptr_->data_provider.resize(num);
   for (int i = 0; i < num; ++i) {
     frame_ptr_->data_provider[i] = std::make_shared<DataProvider>();
@@ -76,17 +79,25 @@ bool CameraDetectionBevComponent::InitCameraFrame(
 }
 
 bool CameraDetectionBevComponent::InitListeners(
-    const CameraDetectionBEV& detection_param) {
-  for (const auto& channel :
+    const CameraDetectionBEV &detection_param) {
+  for (const auto &channel :
        detection_param.channel().input_camera_channel_name()) {
-    auto reader = node_->CreateReader<drivers::Image>(channel);
+    std::shared_ptr<cyber::Reader<drivers::Image>> reader;
+    if (channel == "/apollo/sensor/camera/CAM_BACK/image") {
+      reader = node_->CreateReader<drivers::Image>(
+          channel, [&](const std::shared_ptr<drivers::Image> &msg) {
+            OnReceiveImage(msg);
+          });
+    } else {
+      reader = node_->CreateReader<drivers::Image>(channel);
+    }
     readers_.emplace_back(reader);
   }
   return true;
 }
 
 bool CameraDetectionBevComponent::InitTransformWrapper(
-    const CameraDetectionBEV& detection_param) {
+    const CameraDetectionBEV &detection_param) {
   trans_wrapper_.reset(new onboard::TransformWrapper());
   // tf_camera_frame_id
   trans_wrapper_->Init(detection_param.frame_id());
@@ -100,19 +111,20 @@ bool CameraDetectionBevComponent::Init() {
     return false;
   }
 
+  // todo(zero): need init image_height_\image_width_
+  InitDetector(detection_param);
   InitCameraFrame(detection_param);
   InitListeners(detection_param);
-  InitDetector(detection_param);
   InitTransformWrapper(detection_param);
 
-  writer_ = node_->CreateWriter<CameraFrame>(
+  writer_ = node_->CreateWriter<PerceptionObstacles>(
       detection_param.channel().output_obstacles_channel_name());
   return true;
 }
 
 void CameraDetectionBevComponent::CameraToWorldCoor(
-    const Eigen::Affine3d& camera2world, std::vector<base::ObjectPtr>* objs) {
-  for (auto& obj : *objs) {
+    const Eigen::Affine3d &camera2world, std::vector<base::ObjectPtr> *objs) {
+  for (auto &obj : *objs) {
     Eigen::Vector3d local_center =
         obj->camera_supplement.local_center.cast<double>();
     obj->center = camera2world * local_center;
@@ -122,16 +134,76 @@ void CameraDetectionBevComponent::CameraToWorldCoor(
   }
 }
 
-bool CameraDetectionBevComponent::Proc(
-    const std::shared_ptr<drivers::Image>& msg) {
+int CameraDetectionBevComponent::ConvertObjectToPb(
+    const base::ObjectPtr &object_ptr, PerceptionObstacle *pb_msg) {
+  if (!object_ptr || !pb_msg) {
+    return cyber::FAIL;
+  }
+  pb_msg->set_id(object_ptr->track_id);
+
+  apollo::common::Point3D *obj_center = pb_msg->mutable_position();
+  obj_center->set_x(object_ptr->center(0));
+  obj_center->set_y(object_ptr->center(1));
+  obj_center->set_z(object_ptr->center(2));
+
+  pb_msg->set_length(object_ptr->size(0));
+  pb_msg->set_width(object_ptr->size(1));
+  pb_msg->set_height(object_ptr->size(2));
+
+  pb_msg->set_theta(object_ptr->theta);
+
+  // for camera results, set object's center as anchor point
+  pb_msg->set_type(static_cast<PerceptionObstacle::Type>(object_ptr->type));
+  pb_msg->set_sub_type(
+      static_cast<PerceptionObstacle::SubType>(object_ptr->sub_type));
+  pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
+
+  pb_msg->set_height_above_ground(object_ptr->size(2));
+
+  return cyber::SUCC;
+}
+
+int CameraDetectionBevComponent::MakeProtobufMsg(
+    double msg_timestamp, int seq_num,
+    const std::vector<base::ObjectPtr> &objects,
+    PerceptionObstacles *obstacles) {
+  double publish_time = apollo::cyber::Clock::NowInSeconds();
+  auto header = obstacles->mutable_header();
+  header->set_timestamp_sec(publish_time);
+  header->set_module_name("perception_camera");
+  header->set_sequence_num(seq_num);
+  // in nanosecond
+  // PnC would use lidar timestamp to predict
+  header->set_lidar_timestamp(static_cast<uint64_t>(msg_timestamp * 1e9));
+  header->set_camera_timestamp(static_cast<uint64_t>(msg_timestamp * 1e9));
+
+  // write out obstacles in world coordinates
+  int count = 0;
+  for (const auto &obj : objects) {
+    obj->track_id = count++;
+    PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+    if (ConvertObjectToPb(obj, obstacle) != cyber::SUCC) {
+      AERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
+      return cyber::FAIL;
+    }
+  }
+
+  return cyber::SUCC;
+}
+
+bool CameraDetectionBevComponent::OnReceiveImage(
+    const std::shared_ptr<drivers::Image> &msg) {
   const double msg_timestamp = msg->measurement_time() + timestamp_offset_;
 
   for (size_t i = 0; i < readers_.size(); ++i) {
     readers_[i]->Observe();
-    const auto& camera_msg = readers_[i]->GetLatestObserved();
+    const auto &camera_msg = readers_[i]->GetLatestObserved();
+    if (camera_msg == nullptr) {
+      return false;
+    }
     frame_ptr_->data_provider[i]->FillImageData(
         image_height_, image_width_,
-        reinterpret_cast<const uint8_t*>(camera_msg->data().data()),
+        reinterpret_cast<const uint8_t *>(camera_msg->data().data()),
         camera_msg->encoding());
   }
 
@@ -153,8 +225,16 @@ bool CameraDetectionBevComponent::Proc(
 
   CameraToWorldCoor(lidar2world_trans, &frame_ptr_->detected_objects);
 
+  std::shared_ptr<PerceptionObstacles> out_message(new (std::nothrow)
+                                                       PerceptionObstacles);
+  if (MakeProtobufMsg(msg_timestamp, seq_num_, frame_ptr_->detected_objects,
+                      out_message.get()) != cyber::SUCC) {
+    AERROR << "MakeProtobufMsg failed ts: " << msg_timestamp;
+    return false;
+  }
+  seq_num_++;
   // Send msg
-  writer_->Write(frame_ptr_);
+  writer_->Write(out_message);
 
   return true;
 }

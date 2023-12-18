@@ -30,7 +30,6 @@
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
 
@@ -38,12 +37,13 @@
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/planning_base/proto/planner_open_space_config.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/distance_approach_interface.h"
 
 #define tag_f 1

@@ -8,6 +8,8 @@ import {
 import PlayerControlBar from './PlayerControlBar';
 import SimControlBar from './SimControlBar';
 import ScenarioBar from './ScenarioBar';
+import WayFollowBar from './WayFollowBar';
+import AutoDriveBar from './AutoDriveBar';
 
 export default function BottomBar() {
     const [hmi] = usePickHmiStore();
@@ -33,15 +35,23 @@ export default function BottomBar() {
     }, []);
 
     if (hmi.currentOperation === HMIModeOperation.PLAY_RECORDER) {
-        return <PlayerControlBar />;
+        return <PlayerControlBar routingInfo={routingInfo} />;
     }
 
     if (hmi.currentOperation === HMIModeOperation.SIM_CONTROL) {
         return <SimControlBar routingInfo={routingInfo} />;
     }
 
+    if (hmi.currentOperation === HMIModeOperation.AUTO_DRIVE) {
+        return <AutoDriveBar routingInfo={routingInfo} />;
+    }
+
     if (hmi.currentOperation === HMIModeOperation.SCENARIO) {
         return <ScenarioBar routingInfo={routingInfo} />;
+    }
+
+    if (hmi.currentOperation === HMIModeOperation.WAYPOINT_FOLLOW) {
+        return <WayFollowBar />;
     }
 
     return null;

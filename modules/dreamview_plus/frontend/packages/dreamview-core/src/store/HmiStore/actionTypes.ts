@@ -15,6 +15,8 @@ export const enum ACTIONS {
     CHANGE_MODE = 'CHANGE_MODE',
     CHANGE_OPERATE = 'CHANGE_OPERATE',
     CHANGE_RECORDER = 'CHANGE_RECORDER',
+    CHANGE_RTK_RECORDER = 'CHANGE_RTK_RECORDER',
+    CHANGE_DYNAMIC = 'CHANGE_DYNAMIC',
     CHANGE_SCENARIOS = 'CHANGE_SCENARIOS',
     CHANGE_MAP = 'CHANGE_MAP',
     CHANGE_VEHICLE = 'CHANGE_VEHICLE',
@@ -58,6 +60,20 @@ export enum RECORDER_DOWNLOAD_STATUS {
     DOWNLOADEND,
 }
 
+// 数据包预加载
+export enum RECORDER_LOAD_STATUS {
+    // 下载中
+    NOT_LOAD = 'NOT_LOAD',
+    LOADING = 'LOADING',
+    LOADED = 'LOADED',
+}
+
+export interface IRecordSInfo {
+    loadRecordStatus: RECORDER_LOAD_STATUS;
+    totalTimeS: number;
+    recordFilePath: string;
+}
+
 // 车辆类型
 export enum VEHICLE_TYPE {
     '未设置',
@@ -70,10 +86,16 @@ export enum VEHICLE_TYPE {
     'DKIT_CHALLENGE',
 }
 
-export enum ENUM_DATARECORD_PRECESS_STATUS {
+export enum ENUM_DATARECORD_PROCESS_STATUS {
     FATAL = 'FATAL',
     OK = 'OK',
 }
+
+export enum ENUM_RTKRECORD_PROCESS_STATUS {
+    FATAL = 'FATAL',
+    OK = 'OK',
+}
+
 export enum ENUM_DATARECORD_RESOURCE_STATUS {
     OK = 'UNKNOWN',
     ERROR = 'ERROR',
@@ -95,6 +117,7 @@ export enum CURRENT_MODE {
     DEFAULT = 'Default',
     PERCEPTION = 'Perception',
     PNC = 'Pnc',
+    VEHICLE_TEST = 'Vehicle Test',
 }
 
 export enum PREPROCESS_STATUS {
@@ -105,13 +128,11 @@ export enum PREPROCESS_STATUS {
 
 export enum HMIModeOperation {
     PLAY_RECORDER = 'Record',
-    SIM_DEBUG = 'SIM_DEBUG',
-    // SIM_CONTROL = 'SIM_CONTROL',
-    // SCENARIO = 'SCENARIO',
+    // SIM_DEBUG = 'SIM_DEBUG',
     SIM_CONTROL = 'Sim_Control',
     SCENARIO = 'Scenario_Sim',
-    REAL_CAR_AUTO_DRIVING = 'REAL_CAR_AUTO_DRIVING',
-    TRACE = 'TRACE',
+    AUTO_DRIVE = 'Auto_Drive',
+    WAYPOINT_FOLLOW = 'Waypoint_Follow',
 }
 
 export interface SIM_WORLD_STATUS {
@@ -134,16 +155,18 @@ export interface SIM_WORLD_STATUS {
     modulesLock: Record<string, boolean>;
     monitoredComponents: Record<string, COMPONENTS>;
     passengerMsg: string;
-    records: Record<any, any>;
+    records: Record<string, IRecordSInfo>;
     scenarioSet: Record<string, IScenarioSet>;
     vehicles: string[];
     backendShutdown: boolean;
-    dataRecorderComponent: {
-        processStatus: {
-            status: ENUM_DATARECORD_PRECESS_STATUS;
-        };
-        resourceStatus: {
-            status: ENUM_DATARECORD_RESOURCE_STATUS;
+    globalComponents: {
+        DataRecorder: {
+            processStatus: {
+                status: ENUM_DATARECORD_PROCESS_STATUS;
+            };
+            resourceStatus: {
+                status: ENUM_DATARECORD_RESOURCE_STATUS;
+            };
         };
     };
     otherComponents: Record<
@@ -159,9 +182,11 @@ export type IInitState = {
     prevStatus: any;
     modes: string[];
     currentMode: CURRENT_MODE;
+    dynamicModels: string[];
     vehicles: string[];
     currentVehicle: string;
     dockerImage: string;
+    currentDynamicModel: string;
     otherComponents: Record<
         string,
         {
@@ -172,33 +197,66 @@ export type IInitState = {
 
     maps: string[];
     currentMap: string;
-    moduleStatus: Map<string, boolean>;
+    modules: Map<string, boolean>;
     modulesLock: Map<string, boolean>;
-    componentStatus: Map<string, COMPONENTS>;
 
-    isVehicleCalibrationMode: boolean;
-    isSensorCalibrationMode: boolean;
-    records: Record<string, RECORDER_DOWNLOAD_STATUS>;
+    records: Record<string, IRecordSInfo>;
+    rtkRecords: string[];
     currentRecordId: string;
+    currentRtkRecordId: string;
     currentScenarioSetId: string;
     currentScenarioId: string;
     currentScenarioName: string;
     scenarioSet: SIM_WORLD_STATUS['scenarioSet'];
     currentRecordStatus: apollo.dreamview.IRecordStatus;
     operations: apollo.dreamview.HMIModeOperation[];
-    currentOperation: string;
+    currentOperation: HMIModeOperation;
 
-    dataRecorderComponent: {
-        processStatus: {
-            status: ENUM_DATARECORD_PRECESS_STATUS;
+    globalComponents: {
+        DataRecorder: {
+            processStatus: {
+                message: string;
+                status: ENUM_DATARECORD_PROCESS_STATUS;
+            };
+            resourceStatus: {
+                message: string;
+                status: ENUM_DATARECORD_RESOURCE_STATUS;
+            };
         };
-        resourceStatus: {
-            status: ENUM_DATARECORD_RESOURCE_STATUS;
+        RTKPlayer?: {
+            processStatus?: {
+                message: string;
+                status: ENUM_RTKRECORD_PROCESS_STATUS;
+            };
+            summary?: {
+                message: string;
+                status: ENUM_RTKRECORD_PROCESS_STATUS;
+            };
+        };
+        RTKRecorder?: {
+            processStatus?: {
+                message: string;
+                status: ENUM_RTKRECORD_PROCESS_STATUS;
+            };
+            summary?: {
+                message: string;
+                status: ENUM_RTKRECORD_PROCESS_STATUS;
+            };
         };
     };
-
     envResourcesHDMapDisable: boolean;
     backendShutdown: boolean;
+
+    Terminal?: {
+        processStatus: {
+            message: string;
+            status: ENUM_DATARECORD_PROCESS_STATUS;
+        };
+        summary: {
+            message: string;
+            status: ENUM_DATARECORD_PROCESS_STATUS;
+        };
+    };
 };
 
 export type UpdateStatusAction = PayloadAction<ACTIONS.UPDATE_STATUS, SIM_WORLD_STATUS>;
@@ -209,7 +267,7 @@ export interface ToggleModulePayload {
 
 export type ToggleModuleAction = PayloadAction<ACTIONS.TOGGLE_MODULE, ToggleModulePayload>;
 
-export type ChangeModePayload = string;
+export type ChangeModePayload = CURRENT_MODE;
 
 export type ChangeModeAction = PayloadAction<ACTIONS.CHANGE_MODE, ChangeModePayload>;
 
@@ -219,7 +277,15 @@ export type ChangeOperateAction = PayloadAction<ACTIONS.CHANGE_OPERATE, ChangeOp
 
 export type ChangeRecorderPayload = string;
 
+export type ChangeRTKRecorderPayload = string;
+
+export type ChangeDynamicPayload = string;
+
 export type ChangeRecorderAction = PayloadAction<ACTIONS.CHANGE_RECORDER, ChangeRecorderPayload>;
+
+export type ChangeRTKRecorderAction = PayloadAction<ACTIONS.CHANGE_RTK_RECORDER, ChangeRTKRecorderPayload>;
+
+export type ChangeDynamicAction = PayloadAction<ACTIONS.CHANGE_RECORDER, ChangeDynamicPayload>;
 
 export interface ChangeScenariosPayload {
     scenariosSetId: string;

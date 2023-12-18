@@ -21,9 +21,10 @@
 #include "modules/planning/planning_base/common/ego_info.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/planning_base/common/frame.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 
 namespace apollo {

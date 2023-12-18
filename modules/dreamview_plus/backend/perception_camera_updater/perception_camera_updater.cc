@@ -24,7 +24,7 @@
 
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
-#include "modules/dreamview_plus/proto/camera_update.pb.h"
+#include "modules/dreamview/proto/camera_update.pb.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -85,7 +85,7 @@ void PerceptionCameraUpdater::StartStream(const double &time_interval_ms,
   }
   if (time_interval_ms > 0) {
     CameraChannelUpdater *updater = GetCameraChannelUpdater(channel_name);
-    updater->enabled_=true;
+    updater->enabled_ = true;
     updater->timer_.reset(new cyber::Timer(
         time_interval_ms,
         [channel_name, this]() { this->OnTimer(channel_name); }, false));
@@ -131,11 +131,11 @@ void PerceptionCameraUpdater::StopStream(const std::string &channel_name) {
     updater->image_buffer_.clear();
     updater->current_image_timestamp_ = 0.0;
     updater->camera_update_.Clear();
-    updater->enabled_=false;
+    updater->enabled_ = false;
   }
 }
 
-void PerceptionCameraUpdater::OnTimer(const std::string& channel_name) {
+void PerceptionCameraUpdater::OnTimer(const std::string &channel_name) {
   PublishMessage(channel_name);
 }
 
@@ -358,7 +358,8 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update,
     std::lock(updater->image_mutex_, updater->localization_mutex_,
               updater->obstacle_mutex_);
     std::lock_guard<std::mutex> lock1(updater->image_mutex_, std::adopt_lock);
-    std::lock_guard<std::mutex> lock2(updater->localization_mutex_, std::adopt_lock);
+    std::lock_guard<std::mutex> lock2(updater->localization_mutex_,
+                                      std::adopt_lock);
     std::lock_guard<std::mutex> lock3(updater->obstacle_mutex_,
                                       std::adopt_lock);
     *(updater->camera_update_).mutable_localization() = {localization.begin(),
@@ -382,7 +383,7 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update,
 }
 void PerceptionCameraUpdater::GetChannelMsg(
     std::vector<std::string> *channels) {
-  GetChannelMsgWithFilter(channels,"drivers.Image","");
+  GetChannelMsgWithFilter(channels, "drivers.Image", "");
 }
 
 std::shared_ptr<cyber::Reader<apollo::perception::PerceptionObstacles>>

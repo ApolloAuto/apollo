@@ -86,6 +86,10 @@ DECLARE_string(dynamic_model_root_path);
 
 DECLARE_string(dynamic_model_library_path);
 
+DECLARE_string(dynamic_model_package_library_path);
+
+DECLARE_string(apollo_package_meta_info_path_prefix);
+
 DECLARE_string(sim_obstacle_stop_command);
 
 DECLARE_string(sim_obstacle_path);
@@ -95,6 +99,8 @@ DECLARE_string(gflag_command_arg);
 DECLARE_string(sim_perfect_control);
 
 DECLARE_string(resource_record_path);
+
+DECLARE_string(resource_rtk_record_path);
 
 DECLARE_string(cyber_recorder_stop_command);
 
@@ -107,7 +113,36 @@ DECLARE_string(lane_follow_command_topic);
 DECLARE_string(valet_parking_command_topic);
 
 DECLARE_string(action_command_topic);
+DECLARE_string(data_handler_config_path);
 
 DECLARE_string(data_recorder_command_keyword);
 
 DECLARE_string(data_record_default_name);
+
+DECLARE_double(threshold_for_destination_check);
+
+DECLARE_string(dv_hmi_modes_config_path);
+
+DECLARE_string(dv_plus_hmi_modes_config_path);
+
+DECLARE_string(maps_data_path);
+
+DECLARE_string(global_components_config_path);
+
+DECLARE_string(terminal_start_cmd);
+
+DECLARE_string(terminal_stop_cmd);
+
+DECLARE_string(cyber_channels_key);
+
+DECLARE_string(vehicle_data_config_filename);
+
+DECLARE_double(status_publish_interval);
+
+DECLARE_string(current_mode_db_key);
+
+DECLARE_string(default_hmi_mode);
+
+DECLARE_string(default_rtk_record_file);
+
+DECLARE_string(default_rtk_record_path);

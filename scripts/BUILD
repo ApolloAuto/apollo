@@ -7,9 +7,7 @@ package(
 filegroup(
     name = "apollo_base",
     srcs = glob([
-        "*.sh",
-        "*.py",
-        "*.txt",
+        "*",
     ]),
 )
 

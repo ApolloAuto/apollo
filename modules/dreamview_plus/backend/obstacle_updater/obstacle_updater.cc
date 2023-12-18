@@ -65,6 +65,7 @@ void ObstacleUpdater::StartStream(const double& time_interval_ms,
                                   nlohmann::json* subscribe_param) {
   if (channel_name.empty()) {
     AERROR << "Failed to subscribe channel for channel is empty";
+    return;
   }
   if (time_interval_ms > 0) {
     ObstacleChannelUpdater* channel_updater =
@@ -100,7 +101,7 @@ void ObstacleUpdater::StopStream(const std::string& channel_name) {
   }
 }
 
-void ObstacleUpdater::Stop() { 
+void ObstacleUpdater::Stop() {
   if (enabled_) {
     obstacle_channel_updater_map_.clear();
   }
@@ -128,7 +129,7 @@ void ObstacleUpdater::PublishMessage(const std::string& channel_name) {
 
 void ObstacleUpdater::GetChannelMsg(std::vector<std::string>* channels) {
   enabled_ = true;
-  GetChannelMsgWithFilter(channels,"perception.PerceptionObstacles","");
+  GetChannelMsgWithFilter(channels, "perception.PerceptionObstacles", "");
 }
 
 void ObstacleUpdater::OnObstacles(
@@ -139,7 +140,8 @@ void ObstacleUpdater::OnObstacles(
   }
   {
     std::lock_guard<std::mutex> lck(updater_publish_mutex_);
-    ObstacleChannelUpdater* channel_updater = GetObstacleChannelUpdater(channel);
+    ObstacleChannelUpdater* channel_updater =
+        GetObstacleChannelUpdater(channel);
     channel_updater->obstacles_.clear();
     for (auto& obstacle : obstacles->perception_obstacle()) {
       channel_updater->obstacles_.push_back(obstacle);
@@ -160,7 +162,7 @@ void ObstacleUpdater::GetObjects(std::string* to_send,
     std::lock_guard<std::mutex> lck(updater_publish_mutex_);
     ObstacleChannelUpdater* channel_updater =
         GetObstacleChannelUpdater(channel_name);
-      
+
     if (channel_updater->obstacles_.empty()) {
       return;
     }

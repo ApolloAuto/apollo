@@ -32,7 +32,7 @@ apollo_plugin(
         "//cyber",
         "//modules/common/util:util_tool",
         "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/scenarios/emergency_pull_over/proto:emergency_pull_over_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",

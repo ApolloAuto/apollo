@@ -25,12 +25,14 @@ export const routeEditing = {
     createCommonRouteSuccess: '常用路由创建成功',
 
     initialPoint: '初始位置',
+    initialPointDis: '重定位功能仅仿真下可用',
     wayPoint: '轨迹点',
     loopRouting: '循环路由',
     commonRouting: '常用路由',
     routingEditing: '路由编辑',
 
     checkPointTooltip: '轨迹点应位于可行驶道路上',
+    checkStartPointTooltip: '起始点应位于可行驶道路上',
 
     modalConfirmNo: '否',
     modalConfirmYes: '是',

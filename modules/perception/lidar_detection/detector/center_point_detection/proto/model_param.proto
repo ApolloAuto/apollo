@@ -14,4 +14,7 @@ message ModelParam {
   optional float quantize = 6;
   optional bool filter_by_points = 7;
   optional int32 min_points_threshold = 8;
+  optional bool diff_class_nms = 9 [default = true];
+  optional float diff_class_iou = 10 [default = 0.25];
+  optional bool nms_strategy = 11 [default = true];
 }

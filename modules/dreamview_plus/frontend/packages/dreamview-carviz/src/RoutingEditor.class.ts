@@ -29,17 +29,6 @@ export class RoutingEditor extends Carviz {
 
     initModule() {
         super.initModule();
-        const context = {
-            scene: this.scene,
-            renderer: this.renderer,
-            camera: this.camera,
-            coordinates: this.coordinates,
-            CSS2DRenderer: this.CSS2DRenderer,
-        };
-        this.initiationMarker = new InitiationMarker(context);
-        this.pathwayMarker = new PathwayMarker(context);
-        this.copyMarker = new CopyMarker(context);
-        this.rulerMarker = new RulerMarker(context);
     }
 
     // 当摄像机位置或视角改变时，调用该回调

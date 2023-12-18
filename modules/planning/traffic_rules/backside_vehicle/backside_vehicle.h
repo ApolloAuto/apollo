@@ -26,7 +26,7 @@
 #include "modules/planning/traffic_rules/backside_vehicle/proto/backside_vehicle.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
-#include "modules/planning/planning_base/traffic_rules_base/traffic_rule.h"
+#include "modules/planning/planning_interface_base/traffic_rules_base/traffic_rule.h"
 
 namespace apollo {
 namespace planning {

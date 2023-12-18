@@ -37,10 +37,10 @@
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/hmi/hmi.h"
-#include "modules/dreamview_plus/backend/map/map_service.h"
-#include "modules/dreamview_plus/backend/plugins/plugin_manager.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
+#include "modules/dreamview/backend/common/plugins/plugin_manager.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/dreamview_plus/backend/simulation_world/simulation_world_service.h"
 #include "modules/dreamview_plus/backend/socket_manager/socket_manager.h"
@@ -95,7 +95,7 @@ class SimulationWorldUpdater : public UpdaterBase {
    * @brief The callback function to get updates from SimulationWorldService,
    * and update simulation_world_json_.
    */
-  void OnTimer(const std::string &channel_name = "") override;
+  void OnTimer(const std::string &channel_name = "");
 
   /**
    * @brief The function to construct a LaneFollowCommand from the given json,
@@ -210,8 +210,8 @@ class SimulationWorldUpdater : public UpdaterBase {
   bool CheckCycleRouting(const nlohmann::json &json, nlohmann::json &result);
 
   void RegisterMessageHandlers();
+  void RegisterRoutingMessageHandlers();
 
-  bool enable_pnc_monitor_;
   SimulationWorldService sim_world_service_;
   const MapService *map_service_ = nullptr;
   WebSocketHandler *websocket_ = nullptr;
@@ -233,7 +233,6 @@ class SimulationWorldUpdater : public UpdaterBase {
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.
-  std::string simulation_world_;
   std::string simulation_world_with_planning_data_;
 
   // Received relative map data in wire format.

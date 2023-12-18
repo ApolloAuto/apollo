@@ -27,8 +27,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool BaseObstacleDetector::InitNetwork(const common::ModelInfo &model_info,
-                                       const std::string &model_root) {
+bool BaseObstacleDetector::InitNetwork(const common::ModelInfo& model_info,
+                                       const std::string& model_root) {
   // Network files
   std::string proto_file = cyber::common::GetAbsolutePath(
       model_root, model_info.proto_file().file());
@@ -42,15 +42,27 @@ bool BaseObstacleDetector::InitNetwork(const common::ModelInfo &model_info,
       inference::GetBlobNames(model_info.outputs());
 
   // Network type
-  const auto &framework = model_info.framework();
-  net_.reset(inference::CreateInferenceByName(framework, proto_file,
-                                              weight_file, output_names,
-                                              input_names, model_root));
+  const auto& framework = model_info.framework();
+  std::string plugin_name = model_info.infer_plugin();
+  static const std::string class_namespace = "apollo::perception::inference::";
+  if (model_info.has_infer_plugin() && !plugin_name.empty()) {
+    plugin_name = class_namespace + plugin_name;
+    net_ = apollo::cyber::plugin_manager::PluginManager::Instance()
+               ->CreateInstance<inference::Inference>(plugin_name);
+    net_->set_model_info(proto_file, input_names, output_names);
+    AINFO << "net load plugin success: " << plugin_name;
+  } else {
+    net_.reset(inference::CreateInferenceByName(framework, proto_file,
+                                                weight_file, output_names,
+                                                input_names, model_root));
+  }
+
   ACHECK(net_ != nullptr);
   net_->set_gpu_id(gpu_id_);
 
   std::map<std::string, std::vector<int>> shape_map;
   inference::AddShape(&shape_map, model_info.inputs());
+  inference::AddShape(&shape_map, model_info.outputs());
 
   if (!net_->Init(shape_map)) {
     AERROR << model_info.name() << "init failed!";

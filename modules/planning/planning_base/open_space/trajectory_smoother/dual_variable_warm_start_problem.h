@@ -22,7 +22,9 @@
 #include <algorithm>
 
 #include "Eigen/Dense"
+
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+
 #include "modules/planning/planning_base/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 #include "modules/planning/planning_base/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"

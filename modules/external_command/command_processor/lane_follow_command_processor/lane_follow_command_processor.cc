@@ -42,6 +42,7 @@ bool LaneFollowCommandProcessor::Convert(
   auto lane_way_tool = GetLaneWayTool();
   if (!command->is_start_pose_set()) {
     if (lane_way_tool->IsParkandgoScenario()) {
+      AINFO << "adc is outside road, in park and go scenario";
       if (!SetStartPose(&lane_way_points)) {
         return false;
       }

@@ -29,7 +29,8 @@ namespace camera {
  * @param width The width of the image.
  * @param height The height of the image.
  */
-void Resize(cv::Mat *img, int width, int height);
+void Resize(cv::Mat *img, cv::Mat *img_n, int width, int height);
+
 /**
  * @brief Image crop function
  *
@@ -39,7 +40,8 @@ void Resize(cv::Mat *img, int width, int height);
  * @param width The width of the crop image.
  * @param height The height of the crop image.
  */
-void Crop(cv::Mat *img, int x, int y, int width, int height);
+void Crop(cv::Mat *img, cv::Mat *img_n, int x, int y, int width, int height);
+
 /**
  * @brief Image normalize function
  *
@@ -49,7 +51,7 @@ void Crop(cv::Mat *img, int x, int y, int width, int height);
  * @param im The image to be normalized.
  */
 void Normalize(const std::vector<float> &mean, const std::vector<float> &std,
-               float scale, cv::Mat *im);
+               float scale, cv::Mat *img);
 
 }  // namespace camera
 }  // namespace perception

@@ -17,6 +17,7 @@
 #include "modules/planning/planning_base/common/st_graph_data.h"
 
 #include "gmock/gmock.h"
+
 #include "cyber/common/log.h"
 #include "modules/planning/planning_base/common/speed/st_boundary.h"
 

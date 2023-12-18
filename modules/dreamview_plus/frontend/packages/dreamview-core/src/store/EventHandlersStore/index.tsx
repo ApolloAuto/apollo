@@ -147,7 +147,6 @@ export function EventHandlersProvider({ children }: ProviderProps): React.ReactE
         }
     }, []);
     const getCustomizeEvent = (eventName: string): CustomizeEvent => customizeEventMapRef.current.get(eventName);
-
     const keyDownEvent = useMemo(() => fromEvent(document, 'keydown'), []);
     const keyUpEvent = useMemo(() => fromEvent(document, 'keyup'), []);
     const clickEvent = useMemo(() => fromEvent(document, 'click'), []);

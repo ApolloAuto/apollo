@@ -35,7 +35,7 @@ apollo_plugin(
         "//modules/common/util:common_util",
         "//modules/common/util:util_tool",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/scenarios/stop_sign_unprotected/proto:stop_sign_unprotected_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",

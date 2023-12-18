@@ -27,7 +27,7 @@ Usage:
 
     3. record channels exclude lidar and image channels
     > python data_record.py --small
-    
+
     4. stop record
     > python data_record.py --stop
 """
@@ -81,7 +81,9 @@ class ArgManager(object):
                                  'but include compensator channel')
         self.parser.add_argument('--small', default=False, action="store_true",
                                  help='record channels exclude lidar and image channels')
-        self.parser.add_argument('-d', '--dest_dir', default=default_record_dir, 
+        self.parser.add_argument('--foreground', default=False, action="store_true",
+                                 help='run cyber_recorder record as a foreground process')
+        self.parser.add_argument('-d', '--dest_dir', default=default_record_dir,
                                  help='target record dirname')
         self._args = None
 
@@ -106,7 +108,6 @@ class Recorder(object):
         if Recorder.is_running():
             print('Another data recorder is running, skip.')
             return
-        
         has_record_task = False
         if self.args.all:
             self.record_task('all', record_args_dict['all'])
@@ -117,7 +118,6 @@ class Recorder(object):
         if self.args.small:
             self.record_task('small', record_args_dict['small'])
             has_record_task = True
-
         # default: record all
         if not has_record_task:
             self.record_task('all', record_args_dict['all'])
@@ -136,12 +136,12 @@ class Recorder(object):
         print('Recording to {}'.format(task_dir))
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
-        
         log_file = f'{APOLLO_ENV_ROOT}/data/log/apollo_record_{mode}.out'
-        cmd = '''
-            cd "{task_dir}"
-            nohup cyber_recorder record {record_args} >{log_file} 2>&1 &
-        '''.format(task_dir=task_dir, record_args=record_args, log_file=log_file)
+        cmd = '''cd "{task_dir}"
+                 nohup cyber_recorder record {record_args} >{log_file} 2>&1'''.format(
+                task_dir=task_dir, record_args=record_args, log_file=log_file)
+        if not self.args.foreground:
+            cmd += " &"
         shell_cmd(cmd)
 
     @staticmethod

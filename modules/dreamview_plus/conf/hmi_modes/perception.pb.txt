@@ -1,23 +1,11 @@
-cyber_modules {
+modules {
   key: "Perception"
   value: {
-    dag_files: "/apollo/modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag"
-    dag_files: "/apollo/modules/prediction/dag/prediction_navi.dag"
-    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag"
-    dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_front.dag"
-    dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_front.dag"
-    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_front.dag"
-    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_rear.dag"
-    dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_rear.dag"
-    dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_rear.dag"
-    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_rear.dag"
-    dag_files: "/apollo/modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag"
-    dag_files: "/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag"
-    dag_files: "/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag"
-    dag_files: "/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag"
-    dag_files: "/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag"
-    dag_files: "/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag"
-    dag_files: "/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_all.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_all.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_all.launch"
+    }
   }
 }
 cyber_modules {
@@ -32,58 +20,65 @@ cyber_modules {
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
   }
 }
-cyber_modules {
+modules {
   key: "TrafficLight"
   value: {
-    dag_files: "/apollo/modules/perception/traffic_light_region_proposal/dag/traffic_light_region_proposal.dag"
-    dag_files: "/apollo/modules/perception/traffic_light_detection/dag/traffic_light_detection.dag"
-    dag_files: "/apollo/modules/perception/traffic_light_recognition/dag/traffic_light_recognition.dag"
-    dag_files: "/apollo/modules/perception/traffic_light_tracking/dag/traffic_light_tracking.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_trafficlight.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_trafficlight.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_trafficlight.launch"
+    }
   }
 }
-cyber_modules {
+modules {
   key: "Lane"
   value: {
-    dag_files: "/apollo/modules/perception/lane_detection/dag/lane_detection.dag"
-    dag_files: "/apollo/modules/perception/motion_service/dag/motion_service.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_lane.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_lane.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_lane.launch"
+    }
   }
 }
-cyber_modules {
+modules {
   key: "CameraMultiStage"
   value: {
-    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag"
-    dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation.dag"
-    dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement.dag"
-    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking.dag"
-    dag_files: "/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_camera_multi_stage.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_camera_multi_stage.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_camera_multi_stage.launch"
+    }
   }
 }
-cyber_modules {
+modules {
   key: "CameraSingleStage"
   value: {
-    dag_files: "/apollo/modules/perception/camera_detection_single_stage/dag/camera_detection_single_stage.dag"
-    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking.dag"
-    dag_files: "/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_camera_single_stage.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_camera_single_stage.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_camera_single_stage.launch"
+    }
   }
 }
-cyber_modules {
+modules {
   key: "Lidar"
   value: {
-    dag_files: "/apollo/modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag"
-    dag_files: "/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag"
-    dag_files: "/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag"
-    dag_files: "/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag"
-    dag_files: "/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag"
-    dag_files: "/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag"
-    dag_files: "/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_lidar.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_lidar.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_lidar.launch"
+    }
   }
 }
 
-cyber_modules {
+modules {
   key: "Radar"
   value: {
-    dag_files: "/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag"
-    dag_files: "/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag"
+    start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_radar.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_radar.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/perception/launch/perception_radar.launch"
+    }
   }
 }
 operations: Record

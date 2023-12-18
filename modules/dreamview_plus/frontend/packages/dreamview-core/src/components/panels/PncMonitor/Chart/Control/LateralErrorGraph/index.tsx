@@ -4,7 +4,7 @@ import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components
 
 function LateralErrorGraph() {
     const [options, setOptions] = useState<any>();
-    const { controlData } = usePNCMonitorContext();
+    const { controlData, onClearControlView } = usePNCMonitorContext();
 
     const triggerUIUpdate = (graph: any) => {
         if (!graph?.length) {
@@ -46,6 +46,13 @@ function LateralErrorGraph() {
         triggerUIUpdate(controlData.lateralError);
     }, [controlData]);
 
-    return <ChartBase labelRotateBoundary={550} title='Lateral Error' options={options} />;
+    return (
+        <ChartBase
+            onRefresh={() => onClearControlView(['lateralError'])}
+            labelRotateBoundary={550}
+            title='Lateral Error'
+            options={options}
+        />
+    );
 }
 export default React.memo(LateralErrorGraph);

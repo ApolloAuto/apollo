@@ -29,6 +29,9 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+// Lane image valid size
+static const int kMaxValidSize = 3000;
+
 std::vector<base::LaneLinePositionType> spatialLUT(
     {base::LaneLinePositionType::UNKNOWN,
      base::LaneLinePositionType::FOURTH_LEFT,
@@ -88,6 +91,10 @@ bool DarkSCNNLanePostprocessor::Init(
   input_offset_y_ = lane_postprocessor_param_.input_offset_y();
   lane_map_width_ = lane_postprocessor_param_.resize_width();
   lane_map_height_ = lane_postprocessor_param_.resize_height();
+  DCHECK_LT(lane_map_width_, kMaxValidSize);
+  DCHECK_GT(lane_map_width_, 0);
+  DCHECK_LT(lane_map_height_, kMaxValidSize);
+  DCHECK_GT(lane_map_height_, 0);
 
   roi_height_ = lane_postprocessor_param_.roi_height();
   roi_start_ = lane_postprocessor_param_.roi_start();
