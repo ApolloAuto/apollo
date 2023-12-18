@@ -334,7 +334,7 @@ def apollo_component(**kwargs):
     if not kwargs["name"].startswith("lib") or not kwargs["name"].endswith(".so"):
         fail("name must start with 'lib' and end with '.so'")
     if "alwayslink" in kwargs:
-        fail("'apollo_component' macro has not 'alwayslink' attrbute")
+        fail("'apollo_component' macro has not 'alwayslink' attribute")
 
     internal_lib_name = "{}_lib".format(kwargs["name"][3: len(kwargs["name"])-3])
 
