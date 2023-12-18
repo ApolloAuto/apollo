@@ -70,7 +70,8 @@ void GetInParallelLane(const TopoNode* node,
 }
 
 // for new navigator
-void AddBlackMapFromRoad(const RoutingRequest& request, const TopoGraph* graph,
+void AddBlackMapFromRoad(const routing::RoutingRequest& request,
+                         const TopoGraph* graph,
                          TopoRangeManager* const range_manager) {
   for (const auto& road_id : request.blacklisted_road()) {
     std::unordered_set<const TopoNode*> road_nodes_set;
@@ -82,7 +83,8 @@ void AddBlackMapFromRoad(const RoutingRequest& request, const TopoGraph* graph,
 }
 
 // for new navigator
-void AddBlackMapFromLane(const RoutingRequest& request, const TopoGraph* graph,
+void AddBlackMapFromLane(const routing::RoutingRequest& request,
+                         const TopoGraph* graph,
                          TopoRangeManager* const range_manager) {
   for (const auto& lane : request.blacklisted_lane()) {
     const auto* node = graph->GetNode(lane.id());
@@ -117,7 +119,7 @@ void AddBlackMapFromInParallel(const TopoNode* node, double cut_ratio,
 }  // namespace
 
 void BlackListRangeGenerator::GenerateBlackMapFromRequest(
-    const RoutingRequest& request, const TopoGraph* graph,
+    const routing::RoutingRequest& request, const TopoGraph* graph,
     TopoRangeManager* const range_manager) const {
   AddBlackMapFromLane(request, graph, range_manager);
   AddBlackMapFromRoad(request, graph, range_manager);
@@ -132,11 +134,12 @@ void BlackListRangeGenerator::AddBlackMapFromTerminal(
 
   static constexpr double kEpsilon = 1e-2;
   const double start_s_adjusted =
-      (start_s > start_length && start_s - start_length <= kEpsilon) ?
-          start_length : start_s;
+      (start_s > start_length && start_s - start_length <= kEpsilon)
+          ? start_length
+          : start_s;
   const double end_s_adjusted =
-      (end_s > end_length && end_s - end_length <= kEpsilon) ?
-          end_length : end_s;
+      (end_s > end_length && end_s - end_length <= kEpsilon) ? end_length
+                                                             : end_s;
 
   if (start_s_adjusted < 0.0 || start_s_adjusted > start_length) {
     AERROR << "Illegal start_s: " << start_s << ", length: " << start_length;

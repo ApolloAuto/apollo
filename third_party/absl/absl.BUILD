@@ -8,8 +8,9 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "absl",
     srcs = glob(["lib/*.so*"]),
-    hdrs = glob(["include/*.h"]),
+    hdrs = glob(["include/**/*"]),
     includes = [
         "include",
     ],
+    strip_include_prefix = "include",
 )

@@ -1,0 +1,5 @@
+<library path="modules/planning/scenarios/traffic_light_protected/libtraffic_light_protected_scenario.so">
+    <class type="apollo::planning::TrafficLightProtectedScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::TrafficLightProtectedStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::TrafficLightProtectedStageIntersectionCruise" base_class="apollo::planning::Stage"></class>
+</library>

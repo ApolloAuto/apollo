@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <title>dreamview core</title>
+<!--        由于本地无法使用api、暂时注释掉pwa注册-->
+<!--        <link rel="manifest" href="/manifest.json">-->
+        <script>
+            var CONSOLE_START_TIME = (new Date).getTime();
+            var FRAMEWORK_LOADED_TIME = -1;
+            var G_CONSOLE_ENDPOINT = '';
+            var G_STARTUP_MODULE = 'apollo_sim/startup';
+            var G_APP_NAME = 'home';
+            var G_API_PREFIX = '<?php if(YII_ENV_TYPE !== 3):?>/api/apollo<?php endif?>';
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+</html>

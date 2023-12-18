@@ -1,0 +1,36 @@
+rule {
+  name: "BACKSIDE_VEHICLE"
+  type: "BacksideVehicle"
+}
+rule {
+  name: "CROSSWALK"
+  type: "Crosswalk"
+}
+rule {
+  name: "DESTINATION"
+  type: "Destination"
+}
+rule {
+  name: "KEEP_CLEAR"
+  type: "KeepClear"
+}
+rule {
+  name: "REFERENCE_LINE_END"
+  type: "ReferenceLineEnd"
+}
+rule {
+  name: "REROUTING"
+  type: "Rerouting"
+}
+rule {
+  name: "STOP_SIGN"
+  type: "StopSign"
+}
+rule {
+  name: "TRAFFIC_LIGHT"
+  type: "TrafficLight"
+}
+rule {
+  name: "YIELD_SIGN"
+  type: "YieldSign"
+}

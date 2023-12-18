@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.radar4d;
+
+message FusedClassifierConfig {
+  optional double temporal_window = 1 [default = 20.0];
+  optional bool enable_temporal_fusion = 2 [default = true];
+  optional string one_shot_fusion_method = 3
+      [default = "CCRFOneShotTypeFusion"];
+  optional string sequence_fusion_method = 4
+      [default = "CCRFSequenceTypeFusion"];
+  optional bool use_tracked_objects = 5 [default = true];
+}

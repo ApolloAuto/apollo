@@ -1,0 +1,3 @@
+<library path="modules/perception/lidar_detection_filter/object_filter_bank/strategy_filter/libstrategy_filter.so">
+    <class type="apollo::perception::lidar::StrategyFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>

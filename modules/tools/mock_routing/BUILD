@@ -1,9 +1,10 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "mock_routing_request",
     srcs = ["mock_routing_request.py"],
     deps = [
@@ -13,10 +14,11 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/mock_routing",
-    targets = [
-        ":mock_routing_request",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/mock_routing",
+#     targets = [
+#         ":mock_routing_request",
+#     ]
+# )
+apollo_package()

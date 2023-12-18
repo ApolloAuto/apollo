@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message FusionComponentConfig {
+  optional perception.PluginParam fusion_param = 1;
+  optional bool object_in_roi_check = 2;
+  optional double radius_for_roi_object_check = 3;
+
+  optional string output_obstacles_channel_name = 4
+      [default = "/perception/vehicle/obstacles"];
+  optional string output_viz_fused_content_channel_name = 5
+      [default = "/perception/inner/visualization/FusedObjects"];
+}

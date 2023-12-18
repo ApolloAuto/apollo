@@ -399,6 +399,13 @@ def _find_libs(repository_ctx, check_cuda_libs_script, cuda_config):
             version = None,
             static = False,
         ),
+        "nvidia_ml": _check_cuda_lib_params(
+            "nvidia-ml",
+            cpu_value,
+            cuda_config.config["cuda_library_dir"] + stub_dir,
+            version = None,
+            static = False,
+        ),
         "cudart": _check_cuda_lib_params(
             "cudart",
             cpu_value,
@@ -638,6 +645,7 @@ def _create_dummy_repository(repository_ctx):
         "cuda:BUILD",
         {
             "%{cuda_driver_lib}": lib_name("cuda", cpu_value),
+            "%{nvidia_ml_lib}": lib_name("nvidia-ml", cpu_value),
             "%{cudart_static_lib}": lib_name(
                 "cudart_static",
                 cpu_value,
@@ -950,6 +958,7 @@ def _create_local_cuda_repository(repository_ctx):
         tpl_paths["cuda:BUILD"],
         {
             "%{cuda_driver_lib}": _basename(repository_ctx, cuda_libs["cuda"]),
+            "%{nvidia_ml_lib}": _basename(repository_ctx, cuda_libs["nvidia_ml"]),
             "%{cudart_static_lib}": _basename(repository_ctx, cuda_libs["cudart_static"]),
             "%{cudart_static_linkopt}": _cudart_static_linkopt(cuda_config.cpu_value),
             "%{cudart_lib}": _basename(repository_ctx, cuda_libs["cudart"]),
@@ -1160,9 +1169,10 @@ def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
 
 def _cuda_autoconf_impl(repository_ctx):
     """Implementation of the cuda_autoconf repository rule."""
-    if not enable_cuda(repository_ctx):
-        _create_dummy_repository(repository_ctx)
-    elif get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
+    # always retrun valid cuda lib for cpu compile
+    # if not enable_cuda(repository_ctx):
+    #     _create_dummy_repository(repository_ctx)
+    if get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
         has_cuda_version = get_host_environ(repository_ctx, _TF_CUDA_VERSION) != None
         has_cudnn_version = get_host_environ(repository_ctx, _TF_CUDNN_VERSION) != None
         if not has_cuda_version or not has_cudnn_version:

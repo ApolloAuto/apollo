@@ -66,7 +66,7 @@ Status VehicleStateProvider::Update(
     vehicle_state_.set_steering_percentage(chassis.steering_percentage());
   }
 
-  static constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 0.1;
   if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
   } else {
@@ -156,37 +156,23 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
   return true;
 }
 
-double VehicleStateProvider::x() const {
-  return vehicle_state_.x();
-}
+double VehicleStateProvider::x() const { return vehicle_state_.x(); }
 
-double VehicleStateProvider::y() const {
-  return vehicle_state_.y();
-}
+double VehicleStateProvider::y() const { return vehicle_state_.y(); }
 
-double VehicleStateProvider::z() const {
-  return vehicle_state_.z();
-}
+double VehicleStateProvider::z() const { return vehicle_state_.z(); }
 
-double VehicleStateProvider::roll() const {
-  return vehicle_state_.roll();
-}
+double VehicleStateProvider::roll() const { return vehicle_state_.roll(); }
 
-double VehicleStateProvider::pitch() const {
-  return vehicle_state_.pitch();
-}
+double VehicleStateProvider::pitch() const { return vehicle_state_.pitch(); }
 
-double VehicleStateProvider::yaw() const {
-  return vehicle_state_.yaw();
-}
+double VehicleStateProvider::yaw() const { return vehicle_state_.yaw(); }
 
 double VehicleStateProvider::heading() const {
   return vehicle_state_.heading();
 }
 
-double VehicleStateProvider::kappa() const {
-  return vehicle_state_.kappa();
-}
+double VehicleStateProvider::kappa() const { return vehicle_state_.kappa(); }
 
 double VehicleStateProvider::linear_velocity() const {
   return vehicle_state_.linear_velocity();
@@ -200,9 +186,7 @@ double VehicleStateProvider::linear_acceleration() const {
   return vehicle_state_.linear_acceleration();
 }
 
-double VehicleStateProvider::gear() const {
-  return vehicle_state_.gear();
-}
+double VehicleStateProvider::gear() const { return vehicle_state_.gear(); }
 
 double VehicleStateProvider::steering_percentage() const {
   return vehicle_state_.steering_percentage();

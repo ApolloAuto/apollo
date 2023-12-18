@@ -23,36 +23,33 @@
 #include <memory>
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/common/speed_profile_generator.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_point.h"
-#include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/scenarios/stage.h"
-#include "modules/planning/tasks/task.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/reference_line_info.h"
+#include "modules/planning/planning_base/common/speed_profile_generator.h"
+#include "modules/planning/planning_base/reference_line/reference_line.h"
+#include "modules/planning/planning_base/reference_line/reference_point.h"
+#include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace lane_follow {
 
 class LaneFollowScenario : public Scenario {
  public:
-  LaneFollowScenario(const ScenarioConfig& config,
-                     const ScenarioContext* context,
-                     const std::shared_ptr<DependencyInjector>& injector)
-      : Scenario(config, context, injector) {}
+  /**
+   * @brief Get the scenario context.
+   */
+  ScenarioContext* GetContext() override { return nullptr; }
 
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config,
-      const std::shared_ptr<DependencyInjector>& injector) override;
+  bool IsTransferable(const Scenario* other_scenario,
+                      const Frame& frame) override;
 };
 
-}  // namespace lane_follow
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::LaneFollowScenario,
+                                     Scenario)
+
 }  // namespace planning
 }  // namespace apollo

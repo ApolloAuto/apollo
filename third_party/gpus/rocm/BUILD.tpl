@@ -22,10 +22,10 @@ config_setting(
 
 cc_library(
     name = "rocm_headers",
-    hdrs = [
+    hdrs = glob([
         "rocm/rocm_config.h",
         %{rocm_headers}
-    ],
+    ]),
     includes = [
         ".",
         "rocm/include",
@@ -35,8 +35,8 @@ cc_library(
 
 cc_library(
     name = "hip",
-    srcs = ["rocm/lib/%{hip_lib}"],
-    data = ["rocm/lib/%{hip_lib}"],
+    srcs = glob(["rocm/lib/%{hip_lib}"]),
+    data = glob(["rocm/lib/%{hip_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -47,8 +47,8 @@ cc_library(
 
 cc_library(
     name = "miopen",
-    srcs = ["rocm/lib/%{miopen_lib}"],
-    data = ["rocm/lib/%{miopen_lib}"],
+    srcs = glob(["rocm/lib/%{miopen_lib}"]),
+    data = glob(["rocm/lib/%{miopen_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -62,8 +62,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_lib",
-    srcs = ["rocm/lib/%{migraphx_lib}"],
-    data = ["rocm/lib/%{migraphx_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -74,8 +74,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_c_lib",
-    srcs = ["rocm/lib/%{migraphx_c_lib}"],
-    data = ["rocm/lib/%{migraphx_c_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_c_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_c_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -86,8 +86,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_tf_lib",
-    srcs = ["rocm/lib/%{migraphx_tf_lib}"],
-    data = ["rocm/lib/%{migraphx_tf_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_tf_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_tf_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -98,8 +98,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_device_lib",
-    srcs = ["rocm/lib/%{migraphx_device_lib}"],
-    data = ["rocm/lib/%{migraphx_device_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_device_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_device_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -110,8 +110,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_gpu_lib",
-    srcs = ["rocm/lib/%{migraphx_gpu_lib}"],
-    data = ["rocm/lib/%{migraphx_gpu_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_gpu_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_gpu_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -122,8 +122,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_ref_lib",
-    srcs = ["rocm/lib/%{migraphx_ref_lib}"],
-    data = ["rocm/lib/%{migraphx_ref_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_ref_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_ref_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -134,8 +134,8 @@ cc_library(
 
 cc_library(
     name = "migraphx_lib_onnx",
-    srcs = ["rocm/lib/%{migraphx_onnx_lib}"],
-    data = ["rocm/lib/%{migraphx_onnx_lib}"],
+    srcs = glob(["rocm/lib/%{migraphx_onnx_lib}"]),
+    data = glob(["rocm/lib/%{migraphx_onnx_lib}"]),
     includes = [
         ".",
         "rocm/include",
@@ -173,14 +173,14 @@ cc_library(
 
 cc_library(
     name = "hipblas",
-    srcs = ["rocm/lib/%{hipblas_lib}"],
-    data = ["rocm/lib/%{hipblas_lib}"],
+    srcs = glob(["rocm/lib/%{hipblas_lib}"]),
+    data = glob(["rocm/lib/%{hipblas_lib}"]),
 )
 
 cc_library(
     name = "rocblas",
-    srcs = ["rocm/lib/%{rocblas_lib}"],
-    data = ["rocm/lib/%{rocblas_lib}"],
+    srcs = glob(["rocm/lib/%{rocblas_lib}"]),
+    data = glob(["rocm/lib/%{rocblas_lib}"]),
 )
 
 cc_library(

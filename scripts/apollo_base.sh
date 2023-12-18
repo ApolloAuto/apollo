@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 
@@ -49,6 +48,43 @@ function set_lib_path() {
   pathprepend /apollo/modules/teleop/common/scripts
 }
 
+function site_restore() {
+  [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE"
+  echo "" > "${TOP_DIR}/tools/package/rules_cc.patch"
+  [[ -e "${TOP_DIR}/tools/proto/proto.bzl.tpl" ]] && rm -f "${TOP_DIR}/tools/proto/proto.bzl" && cp "${TOP_DIR}/tools/proto/proto.bzl.tpl" "${TOP_DIR}/tools/proto/proto.bzl"
+  if which buildtool > /dev/null 2>&1; then
+    sudo apt remove -y apollo-neo-buildtool
+  fi
+  # switch back to standalone mode to increase building speed
+  sed -i 's/build --spawn_strategy=sandboxed/build --spawn_strategy=standalone/' "${TOP_DIR}/tools/bazel.rc"
+  # recover ld cache
+  sudo bash -c "echo '/opt/apollo/sysroot/lib' > /etc/ld.so.conf.d/apollo.conf"
+  sudo bash -c "echo '/usr/local/fast-rtps/lib' >> /etc/ld.so.conf.d/apollo.conf"
+  sudo bash -c "echo '/opt/apollo/absl/lib' >> /etc/ld.so.conf.d/apollo.conf"
+  sudo bash -c "echo '/opt/apollo/pkgs/adv_plat/lib' >> /etc/ld.so.conf.d/apollo.conf"
+  return 0
+}
+
+function env_prepare() {
+  set +e
+  mkdir -p /opt/apollo/neo/src
+  dpkg -l apollo-neo-buildtool > /dev/null 2>&1
+  [[ $? -ne 0 ]] && set -e && sudo apt-get install -y ca-certificates curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings &&
+    curl -fsSL https://apollo-pkg-beta.cdn.bcebos.com/neo/beta/key/deb.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/apolloauto.gpg &&
+    sudo chmod a+r /etc/apt/keyrings/apolloauto.gpg && echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/apolloauto.gpg] https://apollo-pkg-beta.cdn.bcebos.com/apollo/core" \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") "main" | sudo tee /etc/apt/sources.list.d/apolloauto.list &&
+    sudo apt-get update && sudo apt-get install -y apollo-neo-buildtool apollo-neo-env-manager-dev &&
+    sudo touch /.installed && sudo sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
+  source /opt/apollo/neo/setup.sh
+  # currently, only sandboxed available in package managerment env
+  if cat "${TOP_DIR}/tools/bazel.rc" | grep standalone; then
+    sed -i 's/build --spawn_strategy=standalone/build --spawn_strategy=sandboxed/' "${TOP_DIR}/tools/bazel.rc"
+    rm -rf "${TOP_DIR}/.cache"
+  fi
+  return 0
+}
+
 function create_data_dir() {
   local DATA_DIR="${APOLLO_ROOT_DIR}/data"
   mkdir -p "${DATA_DIR}/log"
@@ -72,11 +108,14 @@ function setup_device_for_aarch64() {
   fi
 
   if [[ -x "$(command -v ip)" ]]; then
-    if ! ip link show type can | grep "${socket_can_dev}" &>/dev/null; then
+    if ! ip link show type can | grep "${socket_can_dev}" &> /dev/null; then
       warning "No SocketCAN device named ${socket_can_dev}."
     else
-      sudo ip link set can0 type can bitrate 500000
-      sudo ip link set can0 up
+      sudo modprobe can
+      sudo modprobe can_raw
+      sudo modprobe mttcan
+      sudo ip link set "${socket_can_dev}" type can bitrate 500000 sjw 4 berr-reporting on loopback off
+      sudo ip link set up "${socket_can_dev}"
     fi
   else
     warning "ip command not found."
@@ -130,13 +169,13 @@ function setup_device() {
 
 function decide_task_dir() {
   # Try to find largest NVMe drive.
-  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 \
-    | awk '{print substr($0, index($0, $6))}')"
+  DISK="$(df | grep "^/dev/nvme" | sort -nr -k 4 |
+    awk '{print substr($0, index($0, $6))}')"
 
   # Try to find largest external drive.
   if [ -z "${DISK}" ]; then
-    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 \
-      | awk '{print substr($0, index($0, $6))}')"
+    DISK="$(df | grep "/media/${DOCKER_USER}" | sort -nr -k 4 |
+      awk '{print substr($0, index($0, $6))}')"
   fi
 
   if [ -z "${DISK}" ]; then
@@ -387,35 +426,35 @@ function _chk_n_set_gpu_arg() {
     return 0
   fi
 
-  if (( $use_cpu == 1 )) && (( $use_gpu == 1 )); then
+  if (($use_cpu == 1)) && (($use_gpu == 1)); then
     error "${RED}Mixed use of '--config=cpu' and '--config=gpu' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_cpu == 1 )) && (( $use_nvidia == 1 )); then
+  if (($use_cpu == 1)) && (($use_nvidia == 1)); then
     error "${RED}Mixed use of '--config=cpu' and '--config=nvidia' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_cpu == 1 )) && (( $use_amd == 1 )); then
+  if (($use_cpu == 1)) && (($use_amd == 1)); then
     error "${RED}Mixed use of '--config=cpu' and '--config=amd' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_nvidia == 1 )) && (( $use_amd == 1 )); then
+  if (($use_nvidia == 1)) && (($use_amd == 1)); then
     error "${RED}Mixed use of '--config=amd' and '--config=nvidia':" \
       "please specify only one GPU target. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_nvidia == 1 )) && (( $use_amd == -1 )) && [ "$GPU_PLATFORM" == "AMD" ]; then
+  if (($use_nvidia == 1)) && (($use_amd == -1)) && [ "$GPU_PLATFORM" == "AMD" ]; then
     error "${RED}Cross-compilation for NVIDIA GPU target is not supported on AMD GPU device':" \
-      "please specify AMD or skip its specification to compile for AMD GPU target."\
+      "please specify AMD or skip its specification to compile for AMD GPU target." \
       "To compile for NVIDIA GPU target NVIDIA GPU device should be installed. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_amd == 1 )) && (( $use_nvidia == -1 )) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+  if (($use_amd == 1)) && (($use_nvidia == -1)) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
     error "${RED}Cross-compilation for AMD GPU target is not supported on NVIDIA GPU device':" \
-      "please specify NVIDIA or skip its specification to compile for NVIDIA GPU target."\
+      "please specify NVIDIA or skip its specification to compile for NVIDIA GPU target." \
       "To compile for AMD GPU target AMD GPU device should be installed. Exiting...${NO_COLOR}"
     exit 1
   fi
@@ -433,7 +472,7 @@ function parse_cmdline_arguments() {
     local opt="${!pos}"
     local optarg
     local known_bazel_opt=0
-    if (( ${bazel} == 1 )); then
+    if ((${bazel} == 1)); then
       ((++bazel))
     fi
     case "${opt}" in
@@ -468,10 +507,10 @@ function parse_cmdline_arguments() {
         known_options="${known_options} ${opt} ${optarg}"
         ;;
       *)
-        if (( ${bazel} == 0 )); then
+        if ((${bazel} == 0)); then
           remained_args="${remained_args} ${opt}"
-        elif (( ${bazel} == 2 )); then
-          if (( ${known_bazel_opt} == 0 )); then
+        elif ((${bazel} == 2)); then
+          if ((${known_bazel_opt} == 0)); then
             known_options="${known_options} ${bazel_option}"
           fi
           bazel=0
@@ -479,7 +518,7 @@ function parse_cmdline_arguments() {
         ;;
     esac
   done
-  if (( ${bazel} == 1 )); then
+  if ((${bazel} == 1)); then
     warning "Bazel option is not specified. Skipping..."
   fi
   # Strip leading whitespaces
@@ -505,7 +544,8 @@ function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then
     warning "ESD CAN library supplied by ESD Electronics doesn't exist."
     warning "If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md"
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
+    # DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS}"
   fi
 }
 
@@ -513,9 +553,9 @@ function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   elif [ "$GPU_PLATFORM" == "AMD" ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/inference/tensorrt/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/common/inference/tensorrt/..."
   elif [ "$GPU_PLATFORM" == "NVIDIA" ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/inference/migraphx/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/common/inference/migraphx/..."
   fi
 }
 
@@ -529,7 +569,7 @@ function _determine_localization_disabled() {
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} \
-        except //modules/planning/open_space/trajectory_smoother:planning_block"
+        except //modules/planning/planning_base:planning_block"
   fi
 }
 
@@ -690,9 +730,9 @@ function run_bazel() {
     info "${TAB}GPU arch:      ${spaces}${GREEN}${GPU_PLATFORM}${NO_COLOR}"
     info "${TAB}CROSSTOOL_VERBOSE: ${GREEN}${CROSSTOOL_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for verbose]"
     if [ "$GPU_PLATFORM" == "AMD" ]; then
-        info "${TAB}HIPCC_VERBOSE: ${spaces}${GREEN}${HIPCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for cmd, 2 for env, 4 for args, 3,5,6,7 for combinations of 1,2,4]"
+      info "${TAB}HIPCC_VERBOSE: ${spaces}${GREEN}${HIPCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for cmd, 2 for env, 4 for args, 3,5,6,7 for combinations of 1,2,4]"
     elif [ "$GPU_PLATFORM" == "NVIDIA" ]; then
-        info "${TAB}NVCC_VERBOSE:  ${spaces}${GREEN}${NVCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for verbose]"
+      info "${TAB}NVCC_VERBOSE:  ${spaces}${GREEN}${NVCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for verbose]"
     fi
   else
     info "${TAB}CPU arch:      ${spaces}${GREEN}${ARCH}${NO_COLOR}"

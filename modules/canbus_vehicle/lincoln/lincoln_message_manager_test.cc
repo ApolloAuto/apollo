@@ -54,24 +54,21 @@ class LincolnMessageManagerTest : public ::testing::Test {
 
 TEST_F(LincolnMessageManagerTest, Accel6b) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Accel6b::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Accel6b::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Accel6b *>(pd)->ID, Accel6b::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Brake60) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Brake60::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Brake60::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brake60 *>(pd)->ID, Brake60::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Brake61) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Brake61::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Brake61::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brake61 *>(pd)->ID, Brake61::ID);
 }
@@ -94,56 +91,49 @@ TEST_F(LincolnMessageManagerTest, Fuellevel72) {
 
 TEST_F(LincolnMessageManagerTest, Gear66) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gear66::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gear66::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gear66 *>(pd)->ID, Gear66::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Gear67) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gear67::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gear67::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gear67 *>(pd)->ID, Gear67::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Gps6d) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gps6d::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gps6d::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6d *>(pd)->ID, Gps6d::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Gps6e) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gps6e::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gps6e::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6e *>(pd)->ID, Gps6e::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Gps6f) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gps6f::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gps6f::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6f *>(pd)->ID, Gps6f::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Gyro6c) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Gyro6c::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Gyro6c::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gyro6c *>(pd)->ID, Gyro6c::ID);
 }
 
 TEST_F(LincolnMessageManagerTest, Misc69) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Misc69::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Misc69::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Misc69 *>(pd)->ID, Misc69::ID);
 }
@@ -206,8 +196,7 @@ TEST_F(LincolnMessageManagerTest, Turnsignal68) {
 
 TEST_F(LincolnMessageManagerTest, Version7f) {
   LincolnMessageManager manager;
-  ProtocolData<Lincoln> *pd =
-      manager.GetMutableProtocolDataById(Version7f::ID);
+  ProtocolData<Lincoln> *pd = manager.GetMutableProtocolDataById(Version7f::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Version7f *>(pd)->ID, Version7f::ID);
 }

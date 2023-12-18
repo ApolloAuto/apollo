@@ -1,0 +1,12 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "modules/external_command/process_component/libexternal_command_process_component.so"
+    components {
+      class_name : "ExternalCommandProcessComponent"
+      config {
+        name : "external_command_process"
+        config_file_path : "/apollo/modules/external_command/process_component/conf/config.pb.txt"
+        flag_file_path: "/apollo/modules/common/data/global_flagfile.txt"
+      }
+    }
+}

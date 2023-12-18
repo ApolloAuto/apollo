@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/path_time_heuristic/libpath_time_heuristic_optimizer.so">
+    <class type="apollo::planning::PathTimeHeuristicOptimizer" base_class="apollo::planning::Task"></class>
+</library>

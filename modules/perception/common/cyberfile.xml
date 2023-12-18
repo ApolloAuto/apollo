@@ -1,0 +1,56 @@
+<package format="2">
+  <name>perception-common</name>
+  <version>local</version>
+  <description>
+    The perception module incorporates the capability of using multiple cameras, radars (front and rear) and
+    LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list.
+    The obstacle sub-module detects, classifies and tracks obstacles.
+    This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
+    For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane
+    relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/common</src_path>
+
+  <depend repo_name="libtorch_gpu" lib_names="libtorch_gpu">3rd-libtorch-gpu</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map</depend>
+  <depend type="binary" repo_name="transform" lib_names="transform">transform</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend repo_name="perception-data-conf" type="binary">perception-data-conf</depend>
+  <depend repo_name="perception-data-flag" type="binary">perception-data-flag</depend>
+  <depend repo_name="perception-data-params" type="binary">perception-data-params</depend>
+  <depend repo_name="opencv" lib_names="core,highgui,imgproc,imgcodecs">3rd-opencv</depend>
+  <depend lib_names="glog" repo_name="com_github_google_glog">3rd-glog</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend repo_name="npp">3rd-npp</depend>
+
+  <depend expose="False">3rd-pcl</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False" version_gte="1.0.0.2">3rd-paddleinference</depend>
+  <depend expose="False">3rd-tensorrt</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend>3rd-mkl</depend>
+
+  <depend expose="False">3rd-gpus</depend>
+
+  <depend>libtinyxml2-dev</depend>
+  <depend>libleveldb-dev</depend>
+  <depend>libnuma-dev</depend>
+  <depend>3rd-magma</depend>
+
+</package>

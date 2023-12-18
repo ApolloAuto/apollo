@@ -97,12 +97,13 @@ bool BridgeProtoDiserializedBuf<T>::Diserialized(std::shared_ptr<T> proto) {
 template <typename T>
 void BridgeProtoDiserializedBuf<T>::UpdateStatus(uint32_t frame_index) {
   size_t status_size = status_list_.size();
-  if (status_size == 0) {
+  uint32_t status_index = frame_index / INT_BITS;
+  if (status_size == 0 ||
+    static_cast<std::size_t>(status_index) >= status_size) {
     is_ready_diser = false;
     return;
   }
 
-  uint32_t status_index = frame_index / INT_BITS;
   status_list_[status_index] |= (1 << (frame_index % INT_BITS));
   for (size_t i = 0; i < status_size; i++) {
     if (i == status_size - 1) {
@@ -151,7 +152,12 @@ bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
   }
 
   if (!proto_buf_) {
-    proto_buf_ = new char[total_size_];
+    try {
+      proto_buf_ = new char[total_size_];
+    } catch (const std::bad_alloc& e) {
+      AERROR << "Memory allocation failed: " << e.what();
+      return false;
+    }
   }
   return true;
 }

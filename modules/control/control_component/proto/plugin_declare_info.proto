@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.control;
+
+// Plugin Information.
+message PluginDeclareInfo {
+  // The alias name of the plugin.
+  required string name = 1;
+  // The class type of the plugin.
+  required string type = 2;
+}

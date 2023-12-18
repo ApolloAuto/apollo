@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_base/proto/plugin_declare_info.proto";
+
+message StagePipeline {
+    // The alias name of the stage.
+    required string name = 1;
+    // The class type of the stage.
+    required string type = 2;
+    // If the stage is disabled, it will be skipped.
+    optional bool enabled = 3;
+    // The contained task list of the stage pipeline.
+    repeated PluginDeclareInfo task = 4;
+    // Task executed when path or speed planning failed.
+    optional PluginDeclareInfo fallback_task = 5;
+}
+
+message ScenarioPipeline {
+    // The contained stage list of the scenarion pipeline.
+    repeated StagePipeline stage = 1;
+}

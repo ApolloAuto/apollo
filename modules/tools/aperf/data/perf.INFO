@@ -1,0 +1,326 @@
+Log file created at: 2023/10/30 16:22:29
+Running on machine: in-dev-docker
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I1030 16:22:29.477173 12116 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.477175 12116 frame.cc:53] 2,cloud_preprocessor,7629514,3628204071235884,3628204078865398
+I1030 16:22:29.477177 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7794856,3628204071122005,3628204078916861
+I1030 16:22:29.483443 12126 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.483443 12126 frame.cc:53] 2,map_manager,1614639,3628204078928647,3628204080543286
+I1030 16:22:29.483445 12126 frame.cc:53] 2,roi_filter,4609543,3628204080544270,3628204085153813
+I1030 16:22:29.483446 12126 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6257627,3628204078928185,3628204085185812
+I1030 16:22:29.496217 12119 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.496219 12119 frame.cc:53] 2,ground_detector,9299585,3628204088633133,3628204097932718
+I1030 16:22:29.496222 12119 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),12765741,3628204085195448,3628204097961189
+I1030 16:22:29.713418 12124 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.713421 12124 frame.cc:53] 2,cloud_preprocessor,11021895,3628204304071845,3628204315093740
+I1030 16:22:29.713425 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),11215564,3628204303945772,3628204315161336
+I1030 16:22:29.723543 12117 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.723546 12117 frame.cc:53] 2,map_manager,2351349,3628204315175669,3628204317527018
+I1030 16:22:29.723549 12117 frame.cc:53] 2,roi_filter,7724573,3628204317528853,3628204325253426
+I1030 16:22:29.723551 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10112069,3628204315174773,3628204325286842
+I1030 16:22:29.731801 12111 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.731804 12111 frame.cc:53] 2,cloud_preprocessor,9005167,3628204324499207,3628204333504374
+I1030 16:22:29.731807 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),9131592,3628204324412679,3628204333544271
+I1030 16:22:29.739522 12124 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.739526 12124 frame.cc:53] 2,map_manager,2045716,3628204333549038,3628204335594754
+I1030 16:22:29.739528 12124 frame.cc:53] 2,roi_filter,5630554,3628204335595743,3628204341226297
+I1030 16:22:29.739531 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),7717308,3628204333548424,3628204341265732
+I1030 16:22:29.741237 12111 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.741240 12111 frame.cc:53] 2,cloud_preprocessor,8491623,3628204334464559,3628204342956182
+I1030 16:22:29.741242 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),8618432,3628204334362093,3628204342980525
+I1030 16:22:29.741997 12117 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.741998 12117 frame.cc:53] 2,ground_detector,13584318,3628204330086423,3628204343670741
+I1030 16:22:29.742002 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),18429122,3628204325310063,3628204343739185
+I1030 16:22:29.746615 12126 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.746616 12126 frame.cc:53] 2,map_manager,1559954,3628204342986341,3628204344546295
+I1030 16:22:29.746618 12126 frame.cc:53] 2,roi_filter,3782685,3628204344547254,3628204348329939
+I1030 16:22:29.746619 12126 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),5372722,3628204342985886,3628204348358608
+I1030 16:22:29.757233 12117 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.757236 12117 frame.cc:53] 2,ground_detector,13710049,3628204345231589,3628204358941638
+I1030 16:22:29.757238 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),15223532,3628204343752514,3628204358976046
+I1030 16:22:29.768115 12117 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.768116 12117 frame.cc:53] 2,ground_detector,9667400,3628204360146123,3628204369813523
+I1030 16:22:29.768118 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10867088,3628204358991595,3628204369858683
+I1030 16:22:29.796962 12111 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.796964 12111 frame.cc:53] 2,cloud_preprocessor,7932663,3628204390692424,3628204398625087
+I1030 16:22:29.796967 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),8113293,3628204390592172,3628204398705465
+I1030 16:22:29.803387 12122 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.803390 12122 frame.cc:53] 2,map_manager,1614154,3628204398712944,3628204400327098
+I1030 16:22:29.803390 12122 frame.cc:53] 2,roi_filter,4769550,3628204400327992,3628204405097542
+I1030 16:22:29.803391 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6418343,3628204398712319,3628204405130662
+I1030 16:22:29.814000 12120 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.814002 12120 frame.cc:53] 2,ground_detector,9599555,3628204406100834,3628204415700389
+I1030 16:22:29.814004 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10603245,3628204405140726,3628204415743971
+I1030 16:22:29.900856 12111 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.900861 12111 frame.cc:53] 2,cloud_preprocessor,5347461,3628204497186971,3628204502534432
+I1030 16:22:29.900864 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),5510812,3628204497088428,3628204502599240
+I1030 16:22:29.906904 12124 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.906908 12124 frame.cc:53] 2,map_manager,2357271,3628204502591652,3628204504948923
+I1030 16:22:29.906908 12124 frame.cc:53] 2,roi_filter,3652628,3628204504951292,3628204508603920
+I1030 16:22:29.906910 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6056505,3628204502591047,3628204508647552
+I1030 16:22:29.919072 12121 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.919075 12121 frame.cc:53] 2,cloud_preprocessor,9243335,3628204511503208,3628204520746543
+I1030 16:22:29.919077 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),9436793,3628204511378661,3628204520815454
+I1030 16:22:29.920486 12120 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.920490 12120 frame.cc:53] 2,ground_detector,11716563,3628204510406700,3628204522123263
+I1030 16:22:29.920492 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),13578840,3628204508650531,3628204522229371
+I1030 16:22:29.926857 12117 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.926859 12117 frame.cc:53] 2,map_manager,2285860,3628204520805816,3628204523091676
+I1030 16:22:29.926862 12117 frame.cc:53] 2,roi_filter,5457114,3628204523092817,3628204528549931
+I1030 16:22:29.926862 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),7794846,3628204520805117,3628204528599963
+I1030 16:22:29.930325 12121 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.930327 12121 frame.cc:53] 2,cloud_preprocessor,9230303,3628204522802291,3628204532032594
+I1030 16:22:29.930330 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),9384234,3628204522684391,3628204532068625
+I1030 16:22:29.938855 12116 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.938858 12116 frame.cc:53] 2,map_manager,2923719,3628204532081511,3628204535005230
+I1030 16:22:29.938859 12116 frame.cc:53] 2,roi_filter,5549639,3628204535008133,3628204540557772
+I1030 16:22:29.938861 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),8517862,3628204532080980,3628204540598842
+I1030 16:22:29.941100 12124 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.941102 12124 frame.cc:53] 2,ground_detector,12550808,3628204530254810,3628204542805618
+I1030 16:22:29.941103 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),14249576,3628204528594237,3628204542843813
+I1030 16:22:29.943236 12121 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:29.943238 12121 frame.cc:53] 2,cloud_preprocessor,8956390,3628204535997501,3628204544953891
+I1030 16:22:29.943240 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),9127911,3628204535851684,3628204544979595
+I1030 16:22:29.950527 12120 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:29.950528 12120 frame.cc:53] 2,map_manager,1752854,3628204544983566,3628204546736420
+I1030 16:22:29.950531 12120 frame.cc:53] 2,roi_filter,5502776,3628204546737189,3628204552239965
+I1030 16:22:29.950532 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),7287646,3628204544983078,3628204552270724
+I1030 16:22:29.952984 12124 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.952986 12124 frame.cc:53] 2,ground_detector,10762053,3628204543922408,3628204554684461
+I1030 16:22:29.952988 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),11874825,3628204542853351,3628204554728176
+I1030 16:22:29.964829 12124 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:29.964831 12124 frame.cc:53] 2,ground_detector,10508544,3628204556024041,3628204566532585
+I1030 16:22:29.964833 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),11836086,3628204554737037,3628204566573123
+I1030 16:22:30.039211 12118 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.039213 12118 frame.cc:53] 2,cloud_preprocessor,7902081,3628204633008034,3628204640910115
+I1030 16:22:30.039216 12118 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),8045978,3628204632907667,3628204640953645
+I1030 16:22:30.045837 12115 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.045838 12115 frame.cc:53] 2,map_manager,1641685,3628204640953757,3628204642595442
+I1030 16:22:30.045840 12115 frame.cc:53] 2,roi_filter,4952429,3628204642596325,3628204647548754
+I1030 16:22:30.045841 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6627265,3628204640953003,3628204647580268
+I1030 16:22:30.056655 12120 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.056658 12120 frame.cc:53] 2,ground_detector,9825460,3628204648525603,3628204658351063
+I1030 16:22:30.056659 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10818272,3628204647580828,3628204658399100
+I1030 16:22:30.135607 12126 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.135608 12126 frame.cc:53] 2,cloud_preprocessor,5986994,3628204731331384,3628204737318378
+I1030 16:22:30.135610 12126 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),6099416,3628204731249751,3628204737349167
+I1030 16:22:30.140627 12121 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.140630 12121 frame.cc:53] 2,map_manager,1837459,3628204737354519,3628204739191978
+I1030 16:22:30.140630 12121 frame.cc:53] 2,roi_filter,3148711,3628204739192645,3628204742341356
+I1030 16:22:30.140632 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),5016973,3628204737354000,3628204742370973
+I1030 16:22:30.151005 12115 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.151005 12115 frame.cc:53] 2,ground_detector,9149189,3628204743517030,3628204752666219
+I1030 16:22:30.151007 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10371233,3628204742376618,3628204752747851
+I1030 16:22:30.236289 12115 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.236290 12115 frame.cc:53] 2,cloud_preprocessor,6137117,3628204831867280,3628204838004397
+I1030 16:22:30.236292 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),6249489,3628204831783408,3628204838032897
+I1030 16:22:30.242825 12115 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.242826 12115 frame.cc:53] 2,map_manager,1900318,3628204838048964,3628204839949282
+I1030 16:22:30.242828 12115 frame.cc:53] 2,roi_filter,4580579,3628204839950306,3628204844530885
+I1030 16:22:30.242830 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6520257,3628204838048510,3628204844568767
+I1030 16:22:30.253089 12118 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.253091 12118 frame.cc:53] 2,ground_detector,8945559,3628204845810500,3628204854756059
+I1030 16:22:30.253093 12118 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10267672,3628204844565432,3628204854833104
+I1030 16:22:30.343946 12113 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.343948 12113 frame.cc:53] 2,cloud_preprocessor,10383564,3628204935264568,3628204945648132
+I1030 16:22:30.343952 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),10532718,3628204935156054,3628204945688772
+I1030 16:22:30.352944 12113 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.352948 12113 frame.cc:53] 2,map_manager,2131779,3628204945711270,3628204947843049
+I1030 16:22:30.352952 12113 frame.cc:53] 2,roi_filter,6799389,3628204947844060,3628204954643449
+I1030 16:22:30.352953 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),8977003,3628204945710828,3628204954687831
+I1030 16:22:30.363759 12121 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.363761 12121 frame.cc:53] 2,ground_detector,9653526,3628204955800456,3628204965453982
+I1030 16:22:30.363763 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10817591,3628204954684337,3628204965501928
+I1030 16:22:30.829968 12114 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.829969 12114 frame.cc:53] 2,cloud_preprocessor,7702228,3628205423976182,3628205431678410
+I1030 16:22:30.829972 12114 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7855623,3628205423855571,3628205431711194
+I1030 16:22:30.834618 12117 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.834619 12117 frame.cc:53] 2,map_manager,1495734,3628205431710415,3628205433206149
+I1030 16:22:30.834621 12117 frame.cc:53] 2,roi_filter,3125405,3628205433206864,3628205436332269
+I1030 16:22:30.834622 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4651806,3628205431710046,3628205436361852
+I1030 16:22:30.840260 12114 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.840262 12114 frame.cc:53] 2,cloud_preprocessor,7759032,3628205434207027,3628205441966059
+I1030 16:22:30.840265 12114 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7873329,3628205434130051,3628205442003380
+I1030 16:22:30.845757 12112 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.845757 12112 frame.cc:53] 2,ground_detector,9997632,3628205437444396,3628205447442028
+I1030 16:22:30.845759 12112 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),11131470,3628205436367865,3628205447499335
+I1030 16:22:30.846964 12123 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.846966 12123 frame.cc:53] 2,map_manager,1652634,3628205442008284,3628205443660918
+I1030 16:22:30.846967 12123 frame.cc:53] 2,roi_filter,5022250,3628205443661802,3628205448684052
+I1030 16:22:30.846969 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6700112,3628205442007698,3628205448707810
+I1030 16:22:30.858012 12118 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.858014 12118 frame.cc:53] 2,ground_detector,10019380,3628205449690648,3628205459710028
+I1030 16:22:30.858016 12118 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),11044351,3628205448711216,3628205459755567
+I1030 16:22:30.939255 12115 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:30.939257 12115 frame.cc:53] 2,cloud_preprocessor,4275122,3628205536693258,3628205540968380
+I1030 16:22:30.939260 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),4402460,3628205536596458,3628205540998918
+I1030 16:22:30.944869 12124 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:30.944872 12124 frame.cc:53] 2,map_manager,1492713,3628205541001365,3628205542494078
+I1030 16:22:30.944875 12124 frame.cc:53] 2,roi_filter,4068474,3628205542494959,3628205546563433
+I1030 16:22:30.944878 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),5610409,3628205541000803,3628205546611212
+I1030 16:22:30.956318 12123 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:30.956321 12123 frame.cc:53] 2,ground_detector,10222615,3628205547787851,3628205558010466
+I1030 16:22:30.956323 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),11457753,3628205546603561,3628205558061314
+I1030 16:22:31.042968 12123 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.042968 12123 frame.cc:53] 2,cloud_preprocessor,7534061,3628205637138377,3628205644672438
+I1030 16:22:31.042970 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7663496,3628205637046931,3628205644710427
+I1030 16:22:31.048974 12121 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.048976 12121 frame.cc:53] 2,map_manager,1558043,3628205644710471,3628205646268514
+I1030 16:22:31.048978 12121 frame.cc:53] 2,roi_filter,4406766,3628205646269841,3628205650676607
+I1030 16:22:31.048980 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),6007707,3628205644710152,3628205650717859
+I1030 16:22:31.064095 12112 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.064098 12112 frame.cc:53] 2,ground_detector,13753378,3628205652005715,3628205665759093
+I1030 16:22:31.064101 12112 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),15123663,3628205650714354,3628205665838017
+I1030 16:22:31.143616 12113 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.143618 12113 frame.cc:53] 2,cloud_preprocessor,4923009,3628205740408418,3628205745331427
+I1030 16:22:31.143620 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),5030410,3628205740329799,3628205745360209
+I1030 16:22:31.149175 12114 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.149176 12114 frame.cc:53] 2,map_manager,1638145,3628205745366537,3628205747004682
+I1030 16:22:31.149178 12114 frame.cc:53] 2,roi_filter,3878813,3628205747005600,3628205750884413
+I1030 16:22:31.149180 12114 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),5552415,3628205745366102,3628205750918517
+I1030 16:22:31.161262 12124 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.161264 12124 frame.cc:53] 2,ground_detector,10934950,3628205751991282,3628205762926232
+I1030 16:22:31.161267 12124 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),12086512,3628205750917963,3628205763004475
+I1030 16:22:31.241387 12117 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.241389 12117 frame.cc:53] 2,cloud_preprocessor,6580059,3628205836513269,3628205843093328
+I1030 16:22:31.241391 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),6702496,3628205836427696,3628205843130192
+I1030 16:22:31.246217 12120 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.246218 12120 frame.cc:53] 2,map_manager,1505660,3628205843129084,3628205844634744
+I1030 16:22:31.246219 12120 frame.cc:53] 2,roi_filter,3294577,3628205844635844,3628205847930421
+I1030 16:22:31.246222 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4831300,3628205843128733,3628205847960033
+I1030 16:22:31.257081 12115 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.257081 12115 frame.cc:53] 2,ground_detector,9837964,3628205848940636,3628205858778600
+I1030 16:22:31.257084 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10859683,3628205847963777,3628205858823460
+I1030 16:22:31.339920 12122 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.339921 12122 frame.cc:53] 2,cloud_preprocessor,6124361,3628205935508526,3628205941632887
+I1030 16:22:31.339923 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),6243141,3628205935420255,3628205941663396
+I1030 16:22:31.344733 12113 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.344735 12113 frame.cc:53] 2,map_manager,1546859,3628205941665142,3628205943212001
+I1030 16:22:31.344736 12113 frame.cc:53] 2,roi_filter,3237747,3628205943213185,3628205946450932
+I1030 16:22:31.344738 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4812355,3628205941664733,3628205946477088
+I1030 16:22:31.355247 12117 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.355249 12117 frame.cc:53] 2,ground_detector,9559382,3628205947395425,3628205956954807
+I1030 16:22:31.355250 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10511522,3628205946479085,3628205956990607
+I1030 16:22:31.380983 12122 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.380985 12122 frame.cc:53] 2,filter_bank,27408,3628205982681231,3628205982708639
+I1030 16:22:31.380986 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),46627,3628205982680550,3628205982727177
+I1030 16:22:31.381312 12123 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.381314 12123 frame.cc:53] 2,multi_target_tracker,260054,3628205982757306,3628205983017360
+I1030 16:22:31.381315 12123 frame.cc:53] 2,fusion_classifier,14829,3628205983018094,3628205983032923
+I1030 16:22:31.381316 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),314859,3628205982740935,3628205983055794
+I1030 16:22:31.439267 12125 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.439270 12125 frame.cc:53] 2,cloud_preprocessor,7726434,3628206033251333,3628206040977767
+I1030 16:22:31.439273 12125 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7849802,3628206033160736,3628206041010538
+I1030 16:22:31.439949 12119 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.439950 12119 frame.cc:53] 2,lidar_detector,59001100,3628205982672627,3628206041673727
+I1030 16:22:31.439952 12119 frame.cc:53] 2,object_builder,232,3628206041674871,3628206041675103
+I1030 16:22:31.439953 12119 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),59020633,3628205982672328,3628206041692961
+I1030 16:22:31.440006 12111 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.440008 12111 frame.cc:53] 2,filter_bank,25099,3628206041701649,3628206041726748
+I1030 16:22:31.440011 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),48233,3628206041701157,3628206041749390
+I1030 16:22:31.440348 12117 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.440351 12117 frame.cc:53] 2,multi_target_tracker,287271,3628206041767957,3628206042055228
+I1030 16:22:31.440352 12117 frame.cc:53] 2,fusion_classifier,14386,3628206042056000,3628206042070386
+I1030 16:22:31.440353 12117 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),337129,3628206041755009,3628206042092138
+I1030 16:22:31.444097 12120 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.444097 12120 frame.cc:53] 2,map_manager,1431500,3628206041011859,3628206042443359
+I1030 16:22:31.444099 12120 frame.cc:53] 2,roi_filter,3373016,3628206042443999,3628206045817015
+I1030 16:22:31.444100 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4828138,3628206041011509,3628206045839647
+I1030 16:22:31.454756 12115 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.454756 12115 frame.cc:53] 2,ground_detector,9654507,3628206046800327,3628206056454834
+I1030 16:22:31.454758 12115 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10655870,3628206045842766,3628206056498636
+I1030 16:22:31.512111 12118 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.512113 12118 frame.cc:53] 2,lidar_detector,57323995,3628206056507264,3628206113831259
+I1030 16:22:31.512115 12118 frame.cc:53] 2,object_builder,214,3628206113832724,3628206113832938
+I1030 16:22:31.512116 12118 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),57348385,3628206056506828,3628206113855213
+I1030 16:22:31.512192 12126 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.512195 12126 frame.cc:53] 2,filter_bank,28524,3628206113865883,3628206113894407
+I1030 16:22:31.512197 12126 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),70999,3628206113865392,3628206113936391
+I1030 16:22:31.512471 12113 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.512475 12113 frame.cc:53] 2,multi_target_tracker,189787,3628206113965259,3628206114155046
+I1030 16:22:31.512476 12113 frame.cc:53] 2,fusion_classifier,17865,3628206114155827,3628206114173692
+I1030 16:22:31.512478 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),266878,3628206113947274,3628206114214152
+I1030 16:22:31.557886 12121 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.557888 12121 frame.cc:53] 2,cloud_preprocessor,4129955,3628206155470611,3628206159600566
+I1030 16:22:31.557889 12121 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),4277045,3628206155352478,3628206159629523
+I1030 16:22:31.562741 12113 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.562741 12113 frame.cc:53] 2,map_manager,1736662,3628206159638112,3628206161374774
+I1030 16:22:31.562743 12113 frame.cc:53] 2,roi_filter,3081076,3628206161375760,3628206164456836
+I1030 16:22:31.562744 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4846395,3628206159637496,3628206164483891
+I1030 16:22:31.573385 12125 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.573386 12125 frame.cc:53] 2,ground_detector,9575494,3628206165529618,3628206175105112
+I1030 16:22:31.573388 12125 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),10639556,3628206164488426,3628206175127982
+I1030 16:22:31.626931 12111 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.626933 12111 frame.cc:53] 2,lidar_detector,53510388,3628206175137781,3628206228648169
+I1030 16:22:31.626936 12111 frame.cc:53] 2,object_builder,203,3628206228649724,3628206228649927
+I1030 16:22:31.626938 12111 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),53537520,3628206175137275,3628206228674795
+I1030 16:22:31.627013 12123 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.627019 12123 frame.cc:53] 2,filter_bank,30046,3628206228690866,3628206228720912
+I1030 16:22:31.627022 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),66495,3628206228690235,3628206228756730
+I1030 16:22:31.627290 12116 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.627292 12116 frame.cc:53] 2,multi_target_tracker,201800,3628206228775385,3628206228977185
+I1030 16:22:31.627295 12116 frame.cc:53] 2,fusion_classifier,19325,3628206228977753,3628206228997078
+I1030 16:22:31.627295 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),272560,3628206228761275,3628206229033835
+I1030 16:22:31.635792 12125 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.635793 12125 frame.cc:53] 2,cloud_preprocessor,7189961,3628206230320079,3628206237510040
+I1030 16:22:31.635795 12125 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),7292540,3628206230243105,3628206237535645
+I1030 16:22:31.640231 12122 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.640233 12122 frame.cc:53] 2,map_manager,1418337,3628206237542216,3628206238960553
+I1030 16:22:31.640234 12122 frame.cc:53] 2,roi_filter,2991221,3628206238961293,3628206241952514
+I1030 16:22:31.640236 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4433362,3628206237541821,3628206241975183
+I1030 16:22:31.650239 12122 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.650241 12122 frame.cc:53] 2,ground_detector,9158743,3628206242805886,3628206251964629
+I1030 16:22:31.650243 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),9993252,3628206241988917,3628206251982169
+I1030 16:22:31.704640 12123 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.704643 12123 frame.cc:53] 2,lidar_detector,54372238,3628206251989064,3628206306361302
+I1030 16:22:31.704643 12123 frame.cc:53] 2,object_builder,225,3628206306362504,3628206306362729
+I1030 16:22:31.704644 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),54395839,3628206251988600,3628206306384439
+I1030 16:22:31.704695 12123 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.704696 12123 frame.cc:53] 2,filter_bank,18104,3628206306399230,3628206306417334
+I1030 16:22:31.704697 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),39835,3628206306398845,3628206306438680
+I1030 16:22:31.705008 12123 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.705009 12123 frame.cc:53] 2,multi_target_tracker,237678,3628206306455070,3628206306692748
+I1030 16:22:31.705010 12123 frame.cc:53] 2,fusion_classifier,22984,3628206306693371,3628206306716355
+I1030 16:22:31.705013 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),302321,3628206306448406,3628206306750727
+I1030 16:22:31.739092 12120 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.739094 12120 frame.cc:53] 2,cloud_preprocessor,5593262,3628206335219972,3628206340813234
+I1030 16:22:31.739095 12120 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),5696961,3628206335138962,3628206340835923
+I1030 16:22:31.743455 12113 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.743456 12113 frame.cc:53] 2,map_manager,1398274,3628206340843328,3628206342241602
+I1030 16:22:31.743458 12113 frame.cc:53] 2,roi_filter,2934204,3628206342242503,3628206345176707
+I1030 16:22:31.743459 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4355618,3628206340842991,3628206345198609
+I1030 16:22:31.753248 12113 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.753249 12113 frame.cc:53] 2,ground_detector,8860097,3628206346105299,3628206354965396
+I1030 16:22:31.753250 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),9779728,3628206345211893,3628206354991621
+I1030 16:22:31.805317 12116 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.805320 12116 frame.cc:53] 2,lidar_detector,52031565,3628206354993889,3628206407025454
+I1030 16:22:31.805321 12116 frame.cc:53] 2,object_builder,267,3628206407027062,3628206407027329
+I1030 16:22:31.805322 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),52067586,3628206354993425,3628206407061011
+I1030 16:22:31.805397 12123 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.805397 12123 frame.cc:53] 2,filter_bank,25195,3628206407069908,3628206407095103
+I1030 16:22:31.805399 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),69977,3628206407069516,3628206407139493
+I1030 16:22:31.805675 12114 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.805677 12114 frame.cc:53] 2,multi_target_tracker,214371,3628206407149225,3628206407363596
+I1030 16:22:31.805680 12114 frame.cc:53] 2,fusion_classifier,20225,3628206407364148,3628206407384373
+I1030 16:22:31.805682 12114 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),283516,3628206407133805,3628206407417321
+I1030 16:22:31.833178 12125 frame.cc:51] Frame : PointCloudPreprocess
+I1030 16:22:31.833180 12125 frame.cc:53] 2,cloud_preprocessor,3972728,3628206430923356,3628206434896084
+I1030 16:22:31.833181 12125 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudPreprocessComponent::Proc(const std::shared_ptr<apollo::drivers::PointCloud>&),4082363,3628206430839149,3628206434921512
+I1030 16:22:31.837393 12122 frame.cc:51] Frame : PointCloudMapROI
+I1030 16:22:31.837394 12122 frame.cc:53] 2,map_manager,1361372,3628206434924760,3628206436286132
+I1030 16:22:31.837395 12122 frame.cc:53] 2,roi_filter,2822513,3628206436287063,3628206439109576
+I1030 16:22:31.837396 12122 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudMapROIComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),4212063,3628206434924373,3628206439136436
+I1030 16:22:31.847285 12116 frame.cc:51] Frame : PointCloudGroundDetect
+I1030 16:22:31.847286 12116 frame.cc:53] 2,ground_detector,9055155,3628206439955006,3628206449010161
+I1030 16:22:31.847288 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::PointCloudGroundDetectComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),9887178,3628206439140849,3628206449028027
+I1030 16:22:31.899067 12116 frame.cc:51] Frame : LidarDetection
+I1030 16:22:31.899068 12116 frame.cc:53] 2,lidar_detector,51744246,3628206449043432,3628206500787678
+I1030 16:22:31.899070 12116 frame.cc:53] 2,object_builder,180,3628206500789479,3628206500789659
+I1030 16:22:31.899071 12116 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),51767709,3628206449042960,3628206500810669
+I1030 16:22:31.899121 12123 frame.cc:51] Frame : LidarDetectionFilter
+I1030 16:22:31.899123 12123 frame.cc:53] 2,filter_bank,20852,3628206500818272,3628206500839124
+I1030 16:22:31.899125 12123 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarDetectionFilterComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),47198,3628206500817761,3628206500864959
+I1030 16:22:31.899366 12113 frame.cc:51] Frame : LidarTracking
+I1030 16:22:31.899369 12113 frame.cc:53] 2,multi_target_tracker,180872,3628206500881697,3628206501062569
+I1030 16:22:31.899369 12113 frame.cc:53] 2,fusion_classifier,17651,3628206501063028,3628206501080679
+I1030 16:22:31.899370 12113 frame.cc:53] 1,virtual bool apollo::perception::lidar::LidarTrackingComponent::Proc(const std::shared_ptr<apollo::perception::onboard::LidarFrameMessage>&),240466,3628206500869380,3628206501109846

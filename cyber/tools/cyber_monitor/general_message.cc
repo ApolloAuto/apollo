@@ -16,8 +16,11 @@
 
 #include "cyber/tools/cyber_monitor/general_message.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <numeric>
+#include <utility>
+#include <string>
 #include <sstream>
 #include <vector>
 

@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.perception.radar4d;
+
+message PreprocessorConfig {
+  optional double rcs_offset = 1;
+}

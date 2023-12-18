@@ -13,6 +13,7 @@ import { ScenarioCertificateInvalid, ScenarioNoCertificate }
   from './ScenarioNoCertificate';
 import RemoteResourseItem from './RemoteResourseItem';
 import VehicleListItem from './VehicleListItem';
+import V2xList from './V2xList';
 
 const RadioGroup = Radio.Group;
 
@@ -41,6 +42,10 @@ export default class DataProfile extends React.Component {
         {
           title: 'Vehicle Profiles',
           key: 'vehicleProfiles',
+        },
+        {
+          title: 'v2x Profiles',
+          key: 'v2xProfiles',
         },
       ],
     };
@@ -131,6 +136,9 @@ export default class DataProfile extends React.Component {
     return (<div className='local-record-list'>
       {Object.keys(toJS(records)).map((item) => {
         // record下载状态
+        /**
+         * @param recordStatus {downloadStatus: number}
+         */
         const recordStatus = records[item];
         return (
           <LocalRecordItem
@@ -138,7 +146,7 @@ export default class DataProfile extends React.Component {
             item={item}
             updateRecordList={this.updateRecordList}
             // 0 下载中 1 下载完成
-            recordStatus={recordStatus}
+            recordStatus={recordStatus?.downloadStatus}
             currentRecordId={currentRecordId}
             changeRecord={this.onRecordChange}
           />
@@ -176,6 +184,9 @@ export default class DataProfile extends React.Component {
     </div>);
   };
 
+  // 渲染v2x tab
+  renderV2xProfilesList = () => <V2xList />;
+
   render() {
 
     const { store } = this.props;
@@ -191,6 +202,7 @@ export default class DataProfile extends React.Component {
       remoteDynamicModelListFiltered,
       remoteRecordListFiltered,
     } = store.studioConnector;
+
 
     const remoteResourceLength = remoteScenarioSetList.length
       + remoteDynamicModelList.length
@@ -283,9 +295,6 @@ export default class DataProfile extends React.Component {
                     className={currentKey === tab.key ? 'active' : ''}
                     onClick={() => {
                       this.setState({ currentKey: tab.key });
-                      if (tab.key === 'recordProfiles') {
-                        WS.checkWsConnection().loadLocalRecords();
-                      }
                     }}
                   >{tab.title}</span>
                 );
@@ -316,6 +325,7 @@ export default class DataProfile extends React.Component {
             {currentKey === 'dynamicModel' && this.renderDynamicModelList()}
             {currentKey === 'recordProfiles' && this.renderRecordProfilesList()}
             {currentKey === 'vehicleProfiles' && this.renderVehicleProfilesList()}
+            {currentKey === 'v2xProfiles' && this.renderV2xProfilesList()}
           </div>
         </div>
       </div>

@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message LidarOutputComponentConfig {
+  optional string output_channel_name = 1;
+  optional bool save_benchmark_frame = 2 [default = false];
+  optional string benchmark_frame_output_dir = 3 [default = ""];
+}

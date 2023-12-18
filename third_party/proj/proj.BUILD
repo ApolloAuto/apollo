@@ -9,6 +9,7 @@ cc_library(
     includes = [
         ".",
     ],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lproj",

@@ -168,5 +168,13 @@ bool HDMapUtil::ReloadMaps() {
   return base_map_ != nullptr && sim_map_ != nullptr;
 }
 
+bool HDMapUtil::ReloadBaseMap() {
+  {
+    std::lock_guard<std::mutex> lock(base_map_mutex_);
+    base_map_ = CreateMap(BaseMapFile());
+  }
+  return base_map_ != nullptr;
+}
+
 }  // namespace hdmap
 }  // namespace apollo

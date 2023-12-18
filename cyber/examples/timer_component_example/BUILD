@@ -1,26 +1,16 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 
 package(default_visibility = ["//visibility:public"])
 
-
-cc_binary(
+apollo_component(
     name = "libtimer_component_example.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":timer_component_example_lib"],
-)
-
-cc_library(
-    name = "timer_component_example_lib",
     srcs = ["timer_component_example.cc"],
     hdrs = ["timer_component_example.h"],
     deps = [
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",
     ],
-    alwayslink = True,
     visibility = ["//visibility:private"],
 )
 
@@ -32,14 +22,5 @@ filegroup(
     ],
 )
 
-install(
-    name = "install",
-    data = [
-        ":conf",
-    ],
-    targets = [
-        ":libtimer_component_example.so",
-    ],
-)
-
+apollo_package()
 cpplint()

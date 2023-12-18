@@ -29,10 +29,12 @@ DEFINE_string(static_file_dir, "/apollo/modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");
 
-DEFINE_string(server_ports, "8888",
-              "Comma-separated list of ports to listen on. If the port is SSL, "
-              "a letter s must be appended, for example, 80,443s will open "
-              "port 80 and port 443.");
+DEFINE_string(
+    server_ports, "8899",
+    "Comma-separated list of ports to listen on. If the port is SSL, "
+    "a letter s must be appended, for example, 80,443s will open "
+    "port 80 and port 443.Dreamview always use 8899 and Dreamview Plus"
+    " always use 8888.");
 
 DEFINE_bool(routing_from_file, false,
             "Whether Dreamview reads initial routing response from file.");
@@ -135,11 +137,19 @@ DEFINE_string(dynamic_model_library_path,
               "/.apollo/resources/dynamic_models/library/",
               "Dynamic Model libs placement");
 
+DEFINE_string(dynamic_model_package_library_path,
+              "/opt/apollo/neo/lib/modules/dynamic_model/",
+              "Dynamic Model package lib path");
+
+DEFINE_string(apollo_package_meta_info_path_prefix,
+              "/opt/apollo/neo/share/packages/",
+              "apollo package meta info path prefix");
+
 DEFINE_string(sim_obstacle_stop_command, "pkill -9 -f \"sim_obstacle\" ",
               "Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,
-              "/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle",
+              "/opt/apollo/neo/bin/sim_obstacle",
               "sim obstacle binary placement.");
 
 DEFINE_string(gflag_command_arg,
@@ -152,8 +162,76 @@ DEFINE_string(sim_perfect_control, "Simulation Perfect Control",
 DEFINE_string(resource_record_path, "/.apollo/resources/records/",
               "Records placement");
 
+DEFINE_string(resource_rtk_record_path, "/apollo/data/log",
+              "Waypoint Follow Records placement");
+
 DEFINE_string(cyber_recorder_stop_command, "pkill -9 cyber_recorder",
               "stop play recorder");
 
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
               "Vehicles config path.");
+
+DEFINE_bool(
+    vehicle_changed_use_copy_mode, true,
+    "change vehicle use copy mode if set to true, else use symlink mode");
+
+DEFINE_string(lane_follow_command_topic, "/apollo/external_command/lane_follow",
+              "Lane follow command topic name.");
+
+DEFINE_string(valet_parking_command_topic,
+              "/apollo/external_command/valet_parking",
+              "Valet parking command topic name.");
+
+DEFINE_string(action_command_topic, "/apollo/external_command/action",
+              "Action command topic name.");
+DEFINE_string(data_handler_config_path, "",
+              "Data handler config path.");
+
+DEFINE_string(data_recorder_command_keyword, "cyber_recorder record",
+              "Data recorder command keyword.");
+
+DEFINE_string(data_record_default_name, "default_record_name",
+              "Data record default name");
+
+DEFINE_double(threshold_for_destination_check, 1.0,
+              "meters, which is 100 feet.  This threshold is used to check if"
+              "the vehicle reaches the destination");
+DEFINE_string(dv_hmi_modes_config_path,
+              "/apollo/modules/dreamview/conf/hmi_modes",
+              "Dreamview HMI modes config path.");
+DEFINE_string(dv_plus_hmi_modes_config_path,
+              "/apollo/modules/dreamview_plus/conf/hmi_modes",
+              "Dreamview Plus HMI modes config path.");
+DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
+DEFINE_string(global_components_config_path,
+              "/apollo/modules/dreamview/conf/global_components_config.pb.txt",
+              "Global components config path.");
+
+DEFINE_string(
+    terminal_start_cmd,
+    "nohup /apollo/modules/dreamview_plus/backend/third_party_lib/cyber_shell "
+    "&",
+    "Terminal start cmd");
+
+DEFINE_string(terminal_stop_cmd, "pkill -9 -f \"cyber_shell\" ",
+              "Terminal start cmd");
+
+DEFINE_string(cyber_channels_key, "apollo.dreamview.Cyber",
+              "Cyber channels key");
+DEFINE_string(vehicle_data_config_filename,
+              "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
+              "Vehicle data config file.");
+            
+DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
+
+DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
+              "Key to store hmi_status.current_mode in KV DB.");
+
+DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
+              "Default HMI Mode when there is no cache.");
+
+DEFINE_string(default_rtk_record_file, "/apollo/data/log/garage.csv",
+              "Default rtk record file.");
+
+DEFINE_string(default_rtk_record_path, "/apollo/data/log/",
+              "Default rtk record path.");

@@ -1,0 +1,107 @@
+vertical_model {
+  info {
+    name: "vertical_caffe"
+    version: "2021-01-15"
+    dataset: "KITTI"
+    task_type: CustomTask
+    sensor_type: Camera
+    framework: TensorRT
+
+    proto_file {
+      file: "deploy.prototxt"
+    }
+    weight_file {
+      file: "baidu_iter_250000.caffemodel"
+    }
+    inputs {
+      name: "data_org"
+      shape: 1
+      shape: 96
+      shape: 32
+      shape: 3
+    }
+    outputs {
+      name: "prob"
+    }
+  }
+  classify_threshold: 0.5
+  classify_resize_width: 32
+  classify_resize_height: 96
+  mean_r: 69.06
+  mean_g: 66.58
+  mean_b: 66.56
+  is_bgr: true
+  scale: 0.01
+}
+
+quadrate_model {
+  info {
+    name: "quadrate_caffe"
+    version: "2021-01-15"
+    dataset: "KITTI"
+    task_type: CustomTask
+    sensor_type: Camera
+    framework: TensorRT
+
+    proto_file {
+      file: "deploy.prototxt"
+    }
+    weight_file {
+      file: "baidu_iter_200000.caffemodel"
+    }
+    inputs {
+      name: "data_org"
+      shape: 1
+      shape: 64
+      shape: 64
+      shape: 3
+    }
+    outputs {
+      name: "prob"
+    }
+  }
+  classify_threshold: 0.5
+  classify_resize_width: 64
+  classify_resize_height: 64
+  mean_r: 69.06
+  mean_g: 66.58
+  mean_b: 66.56
+  is_bgr: true
+  scale: 0.01
+}
+
+horizontal_model {
+  info {
+    name: "horizontal_caffe"
+    version: "2021-01-15"
+    dataset: "KITTI"
+    task_type: CustomTask
+    sensor_type: Camera
+    framework: TensorRT
+
+    proto_file {
+      file: "deploy.prototxt"
+    }
+    weight_file {
+      file: "baidu_iter_200000.caffemodel"
+    }
+    inputs {
+      name: "data_org"
+      shape: 1
+      shape: 32
+      shape: 96
+      shape: 3
+    }
+    outputs {
+      name: "prob"
+    }
+  }
+  classify_threshold: 0.5
+  classify_resize_width: 96
+  classify_resize_height: 32
+  mean_r: 69.06
+  mean_g: 66.58
+  mean_b: 66.56
+  is_bgr: true
+  scale: 0.01
+}

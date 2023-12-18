@@ -1,31 +1,40 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "canbus_component_lib",
-    srcs = ["canbus_component.cc"],
-    hdrs = ["canbus_component.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
+apollo_cc_library(
+    name = "apollo_canbus",
+    srcs = [
+        "common/canbus_gflags.cc",
+        "vehicle/abstract_vehicle_factory.cc",
+    ],
+    hdrs = [
+        "common/canbus_gflags.h",
+        "vehicle/abstract_vehicle_factory.h",
+        "vehicle/vehicle_controller.h",
+    ],
     deps = [
         "//cyber",
-        "//modules/canbus/common:canbus_gflags",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/status",
-        "//modules/drivers/canbus:sensor_canbus_lib",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/common_msgs/external_command_msgs:chassis_command_cc_proto",
         "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "canbus_test",
     size = "small",
     srcs = ["canbus_test.cc"],
@@ -36,58 +45,20 @@ cc_test(
     ],
 )
 
-cc_binary(
+apollo_component(
     name = "libcanbus_component.so",
-    linkshared = True,
-    linkstatic = True,
+    srcs = ["canbus_component.cc"],
+    hdrs = ["canbus_component.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        ":canbus_component_lib",
-    ],
-)
-
-install(
-    name = "testdata",
-    data_dest = "canbus/addition_data",
-    data = [
-        ":test_data",
-    ],
-)
-
-install(
-    name = "install",
-    library_dest = "canbus/lib",
-    data_dest = "canbus",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus.BUILD",
-    ],
-    targets = [
-        ":libcanbus_component.so",
-    ],
-    deps = [
-        ":pb_canbus",
-        ":pb_hdrs",
-        ":testdata",
-        "//modules/canbus/common:install",
-        "//modules/canbus/tools:install",
-    ],
-)
-
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus/include",
-    data = [
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
-    ],
-)
-
-install_files(
-    name = "pb_canbus",
-    dest = "canbus",
-    files = [
-        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        ":apollo_canbus",
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/monitor_log",
+        "//modules/common/status",
+        "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -107,26 +78,5 @@ filegroup(
     srcs = glob(["testdata/**"]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_canbus_src",
-        ":install_canbus_hdrs"
-    ],
-)
-
-install_src_files(
-    name = "install_canbus_src",
-    src_dir = ["."],
-    dest = "canbus/src",
-    filter = "*",
-)
-
-install_src_files(
-    name = "install_canbus_hdrs",
-    src_dir = ["."],
-    dest = "canbus/include",
-    filter = "*.h",
-)
-
+apollo_package()
 cpplint()

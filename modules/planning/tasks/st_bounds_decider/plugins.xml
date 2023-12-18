@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/st_bounds_decider/libst_bounds_decider.so">
+    <class type="apollo::planning::STBoundsDecider" base_class="apollo::planning::Task"></class>
+</library>

@@ -1,4 +1,5 @@
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,4 +26,4 @@ install_src_files(
     filter = "*",
     deps = ["//third_party/camera_library/smartereye:headers", ":lib_placeholder"]
 )
-
+# apollo_package()

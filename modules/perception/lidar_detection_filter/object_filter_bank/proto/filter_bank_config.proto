@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message FilterBankConfig {
+  repeated PluginParam plugins = 1;
+}

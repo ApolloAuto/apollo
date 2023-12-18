@@ -28,6 +28,13 @@ DEFINE_string(localization_config_file,
 
 // features
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
+
+DEFINE_bool(enable_gps_imu_compensate, false,
+                "enable compensate of GPU/IMU timestamp");
+
+DEFINE_int32(gps_imu_compensate_ns_tolerance, 10000000,
+                "tolerance of GPU/IMU timestamp compensator");
+
 DEFINE_bool(enable_watchdog, true, "enable watchdog");
 
 DEFINE_double(gps_time_delay_tolerance, 1.0,

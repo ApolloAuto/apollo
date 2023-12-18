@@ -1,129 +1,109 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "ch_vehicle_factory",
-    srcs = ["ch_vehicle_factory.cc"],
-    hdrs = ["ch_vehicle_factory.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_ch",
+    srcs = [
+        "ch_controller.cc",
+        "ch_message_manager.cc",
+        "ch_vehicle_factory.cc",
+        "protocol/brake_command_111.cc",
+        "protocol/brake_status__511.cc",
+        "protocol/ecu_status_1_515.cc",
+        "protocol/ecu_status_2_516.cc",
+        "protocol/ecu_status_3_517.cc",
+        "protocol/ecu_status_4_518.cc",
+        "protocol/gear_command_114.cc",
+        "protocol/gear_status_514.cc",
+        "protocol/steer_command_112.cc",
+        "protocol/steer_status__512.cc",
+        "protocol/throttle_command_110.cc",
+        "protocol/throttle_status__510.cc",
+        "protocol/turnsignal_command_113.cc",
+        "protocol/turnsignal_status__513.cc",
+        "protocol/vehicle_mode_command_116.cc",
+        "protocol/vin_resp1_51b.cc",
+        "protocol/vin_resp2_51c.cc",
+        "protocol/vin_resp3_51d.cc",
+        "protocol/wheelspeed_report_51e.cc",
+    ],
+    hdrs = [
+        "ch_controller.h",
+        "ch_message_manager.h",
+        "ch_vehicle_factory.h",
+        "protocol/brake_command_111.h",
+        "protocol/brake_status__511.h",
+        "protocol/ecu_status_1_515.h",
+        "protocol/ecu_status_2_516.h",
+        "protocol/ecu_status_3_517.h",
+        "protocol/ecu_status_4_518.h",
+        "protocol/gear_command_114.h",
+        "protocol/gear_status_514.h",
+        "protocol/steer_command_112.h",
+        "protocol/steer_status__512.h",
+        "protocol/throttle_command_110.h",
+        "protocol/throttle_status__510.h",
+        "protocol/turnsignal_command_113.h",
+        "protocol/turnsignal_status__513.h",
+        "protocol/vehicle_mode_command_116.h",
+        "protocol/vin_resp1_51b.h",
+        "protocol/vin_resp2_51c.h",
+        "protocol/vin_resp3_51d.h",
+        "protocol/wheelspeed_report_51e.h",
+    ],
     deps = [
-        ":ch_controller",
-        ":ch_message_manager",
-        "//modules/canbus/common:canbus_gflags",
+        "//modules/canbus:apollo_canbus",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
+        "//modules/canbus_vehicle/ch/proto:ch_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
-    ],
-)
-
-cc_binary(
-    name = "libch_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":ch_vehicle_factory"],
-)
-
-cc_library(
-    name = "ch_message_manager",
-    srcs = ["ch_message_manager.cc"],
-    hdrs = ["ch_message_manager.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        "//modules/canbus_vehicle/ch/proto:ch_cc_proto",
-        "//modules/canbus_vehicle/ch/protocol:canbus_ch_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_library(
-    name = "ch_controller",
-    srcs = ["ch_controller.cc"],
-    hdrs = ["ch_controller.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        ":ch_message_manager",
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus_vehicle/ch/protocol:canbus_ch_protocol",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
     ],
 )
 
-cc_test(
+apollo_component(
+    name = "libch_vehicle_factory_lib.so",
+    deps = [":apollo_canbus_vehicle_ch"],
+)
+
+apollo_cc_test(
     name = "ch_controller_test",
     size = "small",
     srcs = ["ch_controller_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        ":ch_controller",
+        ":apollo_canbus_vehicle_ch",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "ch_message_manager_test",
     size = "small",
     srcs = ["ch_message_manager_test.cc"],
     deps = [
-        ":ch_message_manager",
+        ":apollo_canbus_vehicle_ch",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "ch_vehicle_factory_test",
     size = "small",
     srcs = ["ch_vehicle_factory_test.cc"],
     data = ["//modules/canbus:test_data"],
     linkstatic = True,
     deps = [
-        ":ch_vehicle_factory",
+        ":apollo_canbus_vehicle_ch",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-ch/lib",
-    data_dest = "canbus-vehicle-ch",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-ch.BUILD",
-    ],
-    targets = [
-        ":libch_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_ch",
-        ":pb_hdrs",
-    ],
-)
-
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-ch/include",
-    data = [
-        "//modules/canbus_vehicle/ch/proto:ch_cc_proto",
-    ],
-)
-
-install_files(
-    name = "pb_ch",
-    dest = "canbus-vehicle-ch",
-    files = [
-        "//modules/canbus_vehicle/ch/proto:ch_py_pb2",
     ],
 )
 
@@ -134,26 +114,127 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
+apollo_cc_test(
+    name = "brake_status__511_test",
+    size = "small",
+    srcs = ["protocol/brake_status__511_test.cc"],
     deps = [
-        ":install_ch_src",
-        ":install_ch_hdrs"
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
-install_src_files(
-    name = "install_ch_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-ch/src",
-    filter = "*",
+apollo_cc_test(
+    name = "ecu_status_1_515_test",
+    size = "small",
+    srcs = ["protocol/ecu_status_1_515_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
-install_src_files(
-    name = "install_ch_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-ch/include",
-    filter = "*.h",
+apollo_cc_test(
+    name = "ecu_status_2_516_test",
+    size = "small",
+    srcs = ["protocol/ecu_status_2_516_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
+
+apollo_cc_test(
+    name = "ecu_status_3_517_test",
+    size = "small",
+    srcs = ["protocol/ecu_status_3_517_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "gear_command_114_test",
+    size = "small",
+    srcs = ["protocol/gear_command_114_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "gear_status_514_test",
+    size = "small",
+    srcs = ["protocol/gear_status_514_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "steer_command_112_test",
+    size = "small",
+    srcs = ["protocol/steer_command_112_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "steer_status__512_test",
+    size = "small",
+    srcs = ["protocol/steer_status__512_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "throttle_command_110_test",
+    size = "small",
+    srcs = ["protocol/throttle_command_110_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "throttle_status__510_test",
+    size = "small",
+    srcs = ["protocol/throttle_status__510_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "turnsignal_command_113_test",
+    size = "small",
+    srcs = ["protocol/turnsignal_command_113_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "turnsignal_status__513_test",
+    size = "small",
+    srcs = ["protocol/turnsignal_status__513_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_ch",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_package()
 
 cpplint()

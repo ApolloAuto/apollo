@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/pull_over_path/libpull_over_path.so">
+    <class type="apollo::planning::PullOverPath" base_class="apollo::planning::Task"></class>
+</library>

@@ -1,100 +1,55 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    data_dest = "common",
-    targets = [
-        ":libfilters.so",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-
-cc_binary(
-    name = "libfilters.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-        ":digital_filter_coefficients",
-        ":digital_filter",
-        ":mean_filter",
-    ],
-)
-
-cc_library(
+apollo_cc_library(
     name = "filters",
-    srcs = ["libfilters.so"],
     hdrs = [
-        "digital_filter_coefficients.h",
         "digital_filter.h",
+        "digital_filter_coefficients.h",
         "mean_filter.h",
     ],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
-    name = "digital_filter",
-    srcs = ["digital_filter.cc"],
-    hdrs = ["digital_filter.h"],
-    alwayslink = True,
+    srcs = [
+        "digital_filter.cc",
+        "digital_filter_coefficients.cc",
+        "mean_filter.cc",
+    ],
     deps = [
-        "//cyber:cyber",
+        "//cyber",
     ],
 )
 
-cc_library(
-    name = "mean_filter",
-    srcs = ["mean_filter.cc"],
-    hdrs = ["mean_filter.h"],
-    alwayslink = True,
-    deps = [
-        "//cyber:cyber",
-    ],
-)
-
-cc_library(
-    name = "digital_filter_coefficients",
-    srcs = ["digital_filter_coefficients.cc"],
-    hdrs = ["digital_filter_coefficients.h"],
-    alwayslink = True,
-    deps = [
-        "//cyber:cyber",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "digital_filter_test",
     size = "small",
     srcs = ["digital_filter_test.cc"],
+    linkstatic = True,
     deps = [
-        ":digital_filter",
+        ":filters",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "mean_filter_test",
     size = "small",
     srcs = ["mean_filter_test.cc"],
+    linkstatic = True,
     deps = [
-        ":mean_filter",
+        ":filters",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "digital_filter_coefficients_test",
     size = "small",
     srcs = ["digital_filter_coefficients_test.cc"],
     deps = [
-        ":digital_filter_coefficients",
+        ":filters",
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+apollo_package()
 
 cpplint()

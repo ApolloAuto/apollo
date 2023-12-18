@@ -1,0 +1,40 @@
+{
+  "row": 1,
+  "col": 1,
+  "subplot": [
+    {
+      "title": "xy",
+      "x_label": "x",
+      "y_label": "y",
+      "row": 0,
+      "col": 0
+    }
+  ],
+  "line": [
+    {
+      "label": "roi_parking_boundary",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": ".*parking_polygon",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "adc_corners",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "ego_box",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "end_box",
+      "marker": "*-",
+      "subplot": "xy"
+    }
+  ]
+}

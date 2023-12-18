@@ -29,15 +29,15 @@ function setup() {
 function start() {
   local rtk_recorder_binary
   TIME="$(date +%F_%H_%M)"
-  if [ -f ${TOP_DIR}/data/log/garage.csv ]; then
+  if [ -f ${TOP_DIR}/data/log/garage.csv ] && [ "$1" != "rename" ] && [ "$1" != "delete" ]; then
     cp ${TOP_DIR}/data/log/garage.csv ${TOP_DIR}/data/log/garage-${TIME}.csv
   fi
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"
-  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
+  if [[ ! -z "$(which rtk_recorder)" ]]; then
+    rtk_recorder_binary="rtk_recorder" 
+  elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
     rtk_recorder_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder"
-  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder ]]; then
-    rtk_recorder_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder
   else
     rtk_recorder_binary=
   fi
@@ -47,7 +47,7 @@ function start() {
     exit -1
   fi
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    ${rtk_recorder_binary}
+    ${rtk_recorder_binary} $1 $2
   fi
 }
 
@@ -60,16 +60,16 @@ case $1 in
     setup
     ;;
   start)
-    start
+    start $2 $3
     ;;
   stop)
     stop
     ;;
   restart)
     stop
-    start
+    start $2 $3
     ;;
   *)
-    start
+    start $2 $3
     ;;
 esac

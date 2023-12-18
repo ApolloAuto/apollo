@@ -1,0 +1,16 @@
+<package>
+    <name>planning-scenario-stop-sign-unprotected</name>
+    <version>local</version>
+    <description>
+     stop sign unprotected scenario
+    </description>
+    <maintainer email="apollo-support">apollo-support@baidu.com</maintainer>
+    <type>module</type>
+    <src_path>//modules/planning/scenarios/stop_sign_unprotected</src_path>
+    <license>Apache License 2.0</license>
+    <author>Apollo</author>
+    <depend>bazel-extend-tools</depend>
+    <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+    
+    <builder>bazel</builder>
+  </package>

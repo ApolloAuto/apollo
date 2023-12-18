@@ -26,7 +26,7 @@ from ctypes import cdll, POINTER
 
 
 lib = cdll.LoadLibrary(
-    '/apollo/bazel-bin/modules/planning/open_space/tools/distance_approach_problem_wrapper_lib.so')
+    '/apollo/bazel-bin/modules/planning/planning_base/open_space/tools/distance_approach_problem_wrapper_lib.so')
 
 lib.CreateHybridAPtr.argtypes = []
 lib.CreateHybridAPtr.restype = c_void_p

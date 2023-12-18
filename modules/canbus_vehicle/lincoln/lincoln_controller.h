@@ -34,12 +34,12 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/macros.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -122,9 +122,11 @@ class LincolnController final
 
   // set Electrical Park Brake
   void SetEpbBreak(const control::ControlCommand &command) override;
-  void SetBeam(const control::ControlCommand &command) override;
-  void SetHorn(const control::ControlCommand &command) override;
-  void SetTurningSignal(const control::ControlCommand &command) override;
+  common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand &command) override;
+  void SetBeam(const common::VehicleSignal &signal) override;
+  void SetHorn(const common::VehicleSignal &signal) override;
+  void SetTurningSignal(const common::VehicleSignal &signal) override;
 
   bool VerifyID() override;
   void ResetProtocol();

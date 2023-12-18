@@ -1,0 +1,7 @@
+<library path="modules/planning/scenarios/stop_sign_unprotected/libstop_sign_unprotected_scenario.so">
+    <class type="apollo::planning::StopSignUnprotectedScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::StopSignUnprotectedStageCreep" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StopSignUnprotectedStageIntersectionCruise" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StopSignUnprotectedStagePreStop" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StopSignUnprotectedStageStop" base_class="apollo::planning::Stage"></class>
+</library>

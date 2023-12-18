@@ -1,0 +1,14 @@
+module_config {
+    module_library : "modules/perception/camera_location_estimation/libcamera_location_estimation_component_camera.so"
+
+    components {
+      class_name : "CameraLocationEstimationComponent"
+      config {
+        name : "CameraLocationEstimationComponent"
+        config_file_path : "/apollo/modules/perception/camera_location_estimation/conf/camera_location_estimation_config.pb.txt"
+        readers {
+          channel: "/perception/inner/Detection"
+        }
+      }
+    }
+}

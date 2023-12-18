@@ -15,7 +15,15 @@
  *****************************************************************************/
 
 #include "modules/localization/rtk/rtk_localization_component.h"
+
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
+
 #include "cyber/time/clock.h"
+#include "cyber/time/duration.h"
+#include "modules/common/math/euler_angles_zxy.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/math/quaternion.h"
+#include "modules/transform/buffer.h"
 
 namespace apollo {
 namespace localization {
@@ -32,6 +40,12 @@ bool RTKLocalizationComponent::Init() {
 
   if (!InitIO()) {
     AERROR << "Init Interval falseed.";
+    return false;
+  }
+
+  // get imu to localizaiton transform
+  if (!GetLocalizationToImuTF()) {
+    AERROR << "Get IMU to Localization tranform failed.";
     return false;
   }
 
@@ -53,6 +67,7 @@ bool RTKLocalizationComponent::InitConfig() {
   gps_status_topic_ = rtk_config.gps_status_topic();
   broadcast_tf_frame_id_ = rtk_config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = rtk_config.broadcast_tf_child_frame_id();
+  imu_frame_id_ = rtk_config.imu_frame_id();
 
   localization_->InitConfig(rtk_config);
 
@@ -80,6 +95,65 @@ bool RTKLocalizationComponent::InitIO() {
   return true;
 }
 
+bool RTKLocalizationComponent::GetLocalizationToImuTF() {
+  transform::Buffer* tf2_buffer = transform::Buffer::Instance();
+  transform::TransformStamped tf;
+  cyber::Duration duration(1.0);
+  for (uint8_t i = 0; i < 10; ++i) {
+    try {
+      tf = tf2_buffer->lookupTransform(
+          imu_frame_id_, broadcast_tf_child_frame_id_, cyber::Time(0));
+    } catch (std::exception& ex) {
+      AERROR << ex.what();
+      duration.Sleep();
+      continue;
+    }
+    AINFO << "read localization to imu transform: " << tf.DebugString();
+    auto& rotation = tf.transform().rotation();
+    imu_localization_quat_.reset(new Eigen::Quaterniond(
+        rotation.qw(), rotation.qx(), rotation.qy(), rotation.qz()));
+    auto& translation = tf.transform().translation();
+    imu_localization_translation_.reset(
+        new Eigen::Vector3d(translation.x(), translation.y(), translation.z()));
+    return true;
+  }
+  return false;
+}
+
+void RTKLocalizationComponent::CompensateImuLocalizationExtrinsic(
+    LocalizationEstimate* localization) {
+  CHECK_NOTNULL(localization);
+  // calculate orientation_vehicle_world
+  apollo::localization::Pose* posepb_loc = localization->mutable_pose();
+  const apollo::common::Quaternion& orientation = posepb_loc->orientation();
+  const Eigen::Quaterniond quaternion(orientation.qw(), orientation.qx(),
+                                      orientation.qy(), orientation.qz());
+  Eigen::Quaterniond quat_vehicle_world =
+      quaternion * (*imu_localization_quat_);
+
+  // set heading according to rotation of vehicle
+  posepb_loc->set_heading(common::math::QuaternionToHeading(
+      quat_vehicle_world.w(), quat_vehicle_world.x(), quat_vehicle_world.y(),
+      quat_vehicle_world.z()));
+
+  // set euler angles according to rotation of vehicle
+  apollo::common::Point3D* eulerangles = posepb_loc->mutable_euler_angles();
+  common::math::EulerAnglesZXYd euler_angle(
+      quat_vehicle_world.w(), quat_vehicle_world.x(), quat_vehicle_world.y(),
+      quat_vehicle_world.z());
+  eulerangles->set_x(euler_angle.pitch());
+  eulerangles->set_y(euler_angle.roll());
+  eulerangles->set_z(euler_angle.yaw());
+
+  // Compensate the translation between imu and vehicle center.
+  apollo::common::PointENU* position = posepb_loc->mutable_position();
+  Eigen::Vector3d compensated_position =
+      quat_vehicle_world.toRotationMatrix() * (*imu_localization_translation_);
+  position->set_x(position->x() + compensated_position[0]);
+  position->set_y(position->y() + compensated_position[1]);
+  position->set_z(position->z() + compensated_position[2]);
+}
+
 bool RTKLocalizationComponent::Proc(
     const std::shared_ptr<localization::Gps>& gps_msg) {
   localization_->GpsCallback(gps_msg);
@@ -89,6 +163,9 @@ bool RTKLocalizationComponent::Proc(
     localization_->GetLocalization(&localization);
     LocalizationStatus localization_status;
     localization_->GetLocalizationStatus(&localization_status);
+
+    // set localization pose at rear axle center
+    CompensateImuLocalizationExtrinsic(&localization);
 
     // publish localization messages
     PublishPoseBroadcastTopic(localization);

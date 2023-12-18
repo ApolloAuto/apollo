@@ -1,109 +1,67 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_io_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
-
-cc_library(
-    name = "io",
-    deps = [
-        ":poll_data",
-        ":poll_handler",
-        ":poller",
-        ":session",
+apollo_cc_library(
+    name = "cyber_io",
+    hdrs = [
+        "poll_data.h",
+        "poll_handler.h",
+        "poller.h",
+        "session.h",
     ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "poll_data",
-    hdrs = ["poll_data.h"],
-)
-
-cc_library(
-    name = "poll_handler",
-    srcs = ["poll_handler.cc"],
-    hdrs = ["poll_handler.h"],
+    srcs = ["poll_handler.cc", "poller.cc", "session.cc"],
     deps = [
-        ":poll_data",
-        ":poller",
-        "//cyber/common:log",
-        "//cyber/croutine",
+        "//cyber/common:cyber_common",
+        "//cyber/croutine:cyber_croutine",
+        "//cyber/base:cyber_base",
+        "//cyber/scheduler:cyber_scheduler",
+        "//cyber/time:cyber_time",
     ],
 )
 
-cc_library(
-    name = "poller",
-    srcs = ["poller.cc"],
-    hdrs = ["poller.h"],
-    deps = [
-        ":poll_data",
-        "//cyber/base:atomic_rw_lock",
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "//cyber/scheduler:scheduler_factory",
-        "//cyber/time",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "poller_test",
     size = "small",
     srcs = ["poller_test.cc"],
     deps = [
-        ":poller",
-        "//cyber:cyber_core",
+        "//cyber",
         "@com_google_googletest//:gtest",
     ],
 )
 
-cc_library(
-    name = "session",
-    srcs = ["session.cc"],
-    hdrs = ["session.h"],
-    deps = [
-        ":poll_handler",
-        "//cyber/common:log",
-    ],
-    alwayslink = True,
-)
-
-cc_binary(
+apollo_cc_binary(
     name = "tcp_echo_client",
     srcs = ["example/tcp_echo_client.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "tcp_echo_server",
     srcs = ["example/tcp_echo_server.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "udp_echo_client",
     srcs = ["example/udp_echo_client.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "udp_echo_server",
     srcs = ["example/udp_echo_server.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
     ],
 )
 
+apollo_package()
 cpplint()

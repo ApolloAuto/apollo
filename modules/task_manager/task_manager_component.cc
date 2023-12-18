@@ -24,9 +24,11 @@ namespace task_manager {
 
 using apollo::cyber::ComponentBase;
 using apollo::cyber::Rate;
+using apollo::external_command::CommandStatus;
+using apollo::external_command::LaneFollowCommand;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::routing::RoutingRequest;
+using apollo::planning::PlanningCommand;
 using apollo::routing::RoutingResponse;
 
 bool TaskManagerComponent::Init() {
@@ -46,51 +48,47 @@ bool TaskManagerComponent::Init() {
         localization_.CopyFrom(*localization);
       });
 
-  response_reader_ = node_->CreateReader<RoutingResponse>(
-      task_manager_conf.topic_config().routing_response_topic(),
-      [this](const std::shared_ptr<RoutingResponse>& response) {
-        ADEBUG << "Received routing_response data: run response callback.";
+  planning_command_reader_ = node_->CreateReader<PlanningCommand>(
+      task_manager_conf.topic_config().planning_command_topic(),
+      [this](const std::shared_ptr<PlanningCommand>& planning_command) {
+        ADEBUG << "Received planning_command: run response callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        routing_response_.CopyFrom(*response);
+        planning_command_.CopyFrom(*planning_command);
       });
 
-  cyber::proto::RoleAttributes attr;
-  attr.set_channel_name(
-      task_manager_conf.topic_config().routing_request_topic());
-  auto qos = attr.mutable_qos_profile();
-  qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
-  qos->set_reliability(
-      apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-  // Don't send the history message when new readers are found.
-  qos->set_durability(
-      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_SYSTEM_DEFAULT);
-  request_writer_ = node_->CreateWriter<RoutingRequest>(attr);
+  lane_follow_command_client_ =
+      node_->CreateClient<LaneFollowCommand, CommandStatus>(
+          task_manager_conf.topic_config().lane_follow_command_topic());
   return true;
 }
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
-  if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING) {
-    AERROR << "Task type is not cycle_routing or parking_routing.";
+  if (task->task_type() != CYCLE_ROUTING) {
+    AERROR << "Task type is not cycle_routing.";
     return false;
   }
 
   if (task->task_type() == CYCLE_ROUTING) {
     cycle_routing_manager_ = std::make_shared<CycleRoutingManager>();
     cycle_routing_manager_->Init(task->cycle_routing_task());
-    routing_request_ = task->cycle_routing_task().routing_request();
+    lane_follow_command_ = task->cycle_routing_task().lane_follow_command();
     Rate rate(1.0);
 
     while (cycle_routing_manager_->GetCycle() > 0) {
       if (cycle_routing_manager_->GetNewRouting(localization_.pose(),
-                                                &routing_request_)) {
-        auto last_routing_response_ = routing_response_;
-        common::util::FillHeader(node_->Name(), &routing_request_);
-        request_writer_->Write(routing_request_);
+                                                &lane_follow_command_)) {
+        auto last_planning_command_ = planning_command_;
+        common::util::FillHeader(node_->Name(), &lane_follow_command_);
+        auto lane_follow_command = std::make_shared<LaneFollowCommand>();
+        lane_follow_command->CopyFrom(lane_follow_command_);
+        lane_follow_command_client_->SendRequest(lane_follow_command);
         AINFO << "[TaskManagerComponent]Reach begin/end point: "
               << "routing manager send a routing request. ";
         rate.Sleep();
 
+        auto routing_response_ = planning_command_.lane_follow_command();
+        auto last_routing_response_ =
+            last_planning_command_.lane_follow_command();
         if (!routing_response_.has_header()) {
           AINFO << "[TaskManagerComponent]routing failed";
           return false;
@@ -106,13 +104,6 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       }
       rate.Sleep();
     }
-  } else if (task->task_type() == PARKING_ROUTING) {
-    parking_routing_manager_ = std::make_shared<ParkingRoutingManager>();
-    parking_routing_manager_->ConstructParkingRoutingRequest(
-        task->mutable_parking_routing_task());
-    RoutingRequest msg;
-    msg.CopyFrom(task->parking_routing_task().routing_request());
-    request_writer_->Write(msg);
   }
   return true;
 }

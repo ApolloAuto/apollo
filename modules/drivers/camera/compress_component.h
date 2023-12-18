@@ -17,6 +17,8 @@
 #pragma once
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
@@ -42,6 +44,8 @@ class CompressComponent : public Component<Image> {
   std::shared_ptr<CCObjectPool<CompressedImage>> image_pool_;
   std::shared_ptr<Writer<CompressedImage>> writer_ = nullptr;
   Config config_;
+  uint width_;
+  uint height_;
 };
 
 CYBER_REGISTER_COMPONENT(CompressComponent)

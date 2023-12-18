@@ -34,10 +34,10 @@ class ResultGenerator {
   ~ResultGenerator() = default;
 
   bool GeneratePassageRegion(const std::string& map_version,
-                             const RoutingRequest& request,
+                             const routing::RoutingRequest& request,
                              const std::vector<NodeWithRange>& nodes,
                              const TopoRangeManager& range_manager,
-                             RoutingResponse* const result);
+                             routing::RoutingResponse* const result);
 
  private:
   struct PassageInfo {
@@ -51,15 +51,15 @@ class ResultGenerator {
 
   bool GeneratePassageRegion(const std::vector<NodeWithRange>& nodes,
                              const TopoRangeManager& range_manager,
-                             RoutingResponse* const result);
+                             routing::RoutingResponse* const result);
 
   void CreateRoadSegments(const std::vector<PassageInfo>& passages,
-                          RoutingResponse* result);
+                          routing::RoutingResponse* result);
 
   void AddRoadSegment(const std::vector<PassageInfo>& passages,
                       const std::pair<std::size_t, std::size_t>& start_index,
                       const std::pair<std::size_t, std::size_t>& end_index,
-                      RoutingResponse* result);
+                      routing::RoutingResponse* result);
   void ExtendPassages(const TopoRangeManager& range_manager,
                       std::vector<PassageInfo>* const passages);
   bool ExtractBasicPassages(const std::vector<NodeWithRange>& nodes,

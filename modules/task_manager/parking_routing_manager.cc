@@ -113,6 +113,9 @@ bool ParkingRoutingManager::ConstructParkingRoutingRequest(
   auto last_waypoint = parking_routing_task->mutable_routing_request()
                            ->mutable_waypoint()
                            ->rbegin();
+  auto extend_waypoint = parking_routing_task->mutable_routing_request()
+                           ->mutable_waypoint()
+                           ->Add();
   static constexpr double kExtendParkingLength = 20;
   apollo::common::PointENU extend_point;
   extend_point.set_x(last_waypoint->pose().x() +
@@ -122,10 +125,10 @@ bool ParkingRoutingManager::ConstructParkingRoutingRequest(
   hdmap_->GetNearestLaneWithHeading(extend_point, 20, lane_heading, M_PI_2,
                                     &nearest_lane, &nearest_s, &nearest_l);
   extend_point = nearest_lane->GetSmoothPoint(nearest_s);
-  last_waypoint->mutable_pose()->set_x(extend_point.x());
-  last_waypoint->mutable_pose()->set_y(extend_point.y());
-  last_waypoint->set_id(nearest_lane->id().id());
-  last_waypoint->set_s(nearest_s);
+  extend_waypoint->mutable_pose()->set_x(extend_point.x());
+  extend_waypoint->mutable_pose()->set_y(extend_point.y());
+  extend_waypoint->set_id(nearest_lane->id().id());
+  extend_waypoint->set_s(nearest_s);
 
   return true;
 }

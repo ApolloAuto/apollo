@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioTrafficLightProtectedConfig {
+  // Switch to "TrafficLightProtectedScenario" when ego-vehicle is
+  // within the distance of "start_traffic_light_scenario_distance" to the
+  // traffic overlap.
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];  // meter
+  // ego-vehicle must stop at the distance of "max_valid_stop_distance" to
+  // the traffic light overlap when the signal color is not green.
+  optional double max_valid_stop_distance = 2 [default = 2.0];  // meter
+}

@@ -21,6 +21,7 @@ self-check the validity of the uploaded data and able to inform developer's when
 the data is not qualified, and reduce the size of uploaded data significantly.
 """
 from datetime import datetime
+import math
 import os
 import shutil
 import six
@@ -64,9 +65,6 @@ SMALL_TOPICS = [
     '/apollo/planning',
     '/apollo/prediction',
     '/apollo/relative_map',
-    '/apollo/routing_request',
-    '/apollo/routing_response',
-    '/apollo/routing_response_history',
     '/apollo/sensor/conti_radar',
     '/apollo/sensor/delphi_esr',
     '/apollo/sensor/gnss/best_pose',
@@ -90,7 +88,7 @@ flags.DEFINE_string('root_dir', '/apollo/modules/tools/sensor_calibration',
                     'program root dir')
 
 FLAGS = flags.FLAGS
-
+POINTCLOUD_LOCALIZATION_TS_DIFF = 2 * 1000 * 1000 * 1000
 
 class Extractor(object):
     def __init__(self):
@@ -102,6 +100,11 @@ class Extractor(object):
         self.progress.percentage = 0.0
         self.progress.log_string = "Preprocessing in progress..."
         self.progress.status = preprocess_table_pb2.Status.UNKNOWN
+        self.has_check_xyzit_legality = False
+        # first localization pose timestamp before first pointcloud 
+        self.first_localization_ts = None
+        # first pointcloud timestamp from all sensor lidar channels
+        self.first_pointcloud_ts = dict()
         try:
             get_pb_from_text_file(FLAGS.config, self.config)
         except text_format.ParseError:
@@ -198,6 +201,24 @@ class Extractor(object):
         self.writer.write(self.progress)
         time.sleep(0.5)
 
+    def check_xyzit_legality(self):
+        """
+        check point cloud data legality.
+        xyzit is a point cloud message: x, y, z, intensity, timestamp. 
+        """
+        # check point cloud data timestamp legality.
+        self.has_check_xyzit_legality = True
+        for msg_topic, first_pointcloud_ts in self.first_pointcloud_ts.items():
+            pointcloud_localization_ts_diff = math.fabs(first_pointcloud_ts - self.first_localization_ts)
+            if pointcloud_localization_ts_diff > POINTCLOUD_LOCALIZATION_TS_DIFF:
+                log_str = (f"The pointcloud data contains illegal data in channel:{msg_topic},"
+                f"the difference between pointcloud data timestamp and localization data timestamp is:{pointcloud_localization_ts_diff}")
+                self.print_and_publish(
+                            log_str, preprocess_table_pb2.Status.FAIL)
+                raise ValueError(
+                f"The pointcloud data contains illegal data in channel:{msg_topic},"
+                f"the difference between pointcloud data timestamp and localization data timestamp is:{pointcloud_localization_ts_diff}")
+
     def extract_data(self, record_files, output_path, channels,
                      extraction_rates):
         """
@@ -230,7 +251,8 @@ class Extractor(object):
         channel_parsers = {}
         channel_message_number = {}
         channel_processed_msg_num = {}
-
+        lidar_sensor_channels_num = 0
+        
         for channel in channels:
             channel_success[channel] = True
             channel_occur_time[channel] = -1
@@ -247,12 +269,14 @@ class Extractor(object):
                     channel] += record_reader.get_messagenumber(channel)
             channel_message_number[channel] = channel_message_number[
                 channel] // extraction_rates[channel]
+            if "/PointCloud2" in channel:
+                lidar_sensor_channels_num += 1
 
         channel_message_number_total = 0
         for num in channel_message_number.values():
             channel_message_number_total += num
         channel_processed_msg_num = 0
-
+        
         # if channel in SMALL_TOPICS:
         # channel_messages[channel] = list()
         for record_file in record_files:
@@ -271,7 +295,15 @@ class Extractor(object):
                     if channel_occur_time[msg.topic] % extraction_rates[
                             msg.topic] != 0:
                         continue
-
+                    # check pointcloud data legality
+                    if not self.has_check_xyzit_legality:
+                        if "/localization" in msg.topic:
+                            self.first_localization_ts = channel_parsers[msg.topic].get_timestamps(msg) 
+                        if "/PointCloud2" in msg.topic:
+                            self.first_pointcloud_ts[msg.topic] = channel_parsers[msg.topic].get_timestamps(msg)
+                            if len(self.first_pointcloud_ts) == lidar_sensor_channels_num and self.first_localization_ts is not None:
+                                self.check_xyzit_legality()
+                
                     ret = channel_parsers[msg.topic].parse_sensor_message(msg)
                     channel_processed_msg_num += 1
                     self.progress.percentage = channel_processed_msg_num / \

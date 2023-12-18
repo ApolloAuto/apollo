@@ -106,6 +106,7 @@ message ADCTrajectory {
     PATH_FALLBACK = 2;
     SPEED_FALLBACK = 3;
     PATH_REUSED = 4;
+    OPEN_SPACE = 5;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
 

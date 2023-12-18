@@ -15,14 +15,14 @@ _**Tip**: 为了更好的展示本文档中的等式，我们建议使用者使�
 
 规划模块的运动总体流程图如下：
 
-![总体流程图](../images/task/lane_follow.png)
+![总体流程图](images/lane_follow.png)
 
 总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
 
 Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 `分段加加速度路径优化`的流程如下图：
-![总体流程图](../images/task/piecewise_jerk_path/piecewise_jerk_path.png)
+![总体流程图](images/piecewise_jerk_path.png)
 
 
 # 相关代码及对应版本
@@ -47,7 +47,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 `分段加加速度路径优化`代码的流程图如下。
 
-![代码流程图](../images/task/piecewise_jerk_path/code.png)
+![代码流程图](images/code.png)
 
 - 如果重复使用path则return
 ```C++
@@ -219,7 +219,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 `分段加加速度路径优化`算法详细介绍在论文[Optimal Vehicle Path Planning Using Quadratic Optimization for Baidu Apollo Open Platform
 ](https://ieeexplore.ieee.org/document/9304787)中。
 
-![算法](../images/task/piecewise_jerk_path/path.png)
+![算法](images/path.png)
 
 路径优化算法：
 - 根据导引线和障碍物生成路径边界
@@ -230,7 +230,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
 ### （1）轨迹平滑
 
-![平滑](../images/task/piecewise_jerk_path/smooth.png)
+![平滑](images/smooth.png)
 
 $$
 min \sum_{k=1}^{n-2} ||2P_k - P_{k-1} + P_{k+1}||_2^2 +\\

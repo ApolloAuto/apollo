@@ -158,11 +158,11 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   const char *cursor = total_buf + offset;
   memcpy(header_size_buf, cursor, sizeof(hsize));
   hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
-  if (header_size > FRAME_SIZE) {
-    AINFO << "header size is more than FRAME_SIZE!";
+  offset += sizeof(hsize) + 1;
+  if (header_size > FRAME_SIZE || header_size < offset) {
+    AINFO << "header size is more than FRAME_SIZE or less than offset!";
     return false;
   }
-  offset += sizeof(hsize) + 1;
 
   BridgeHeader header;
   size_t buf_size = header_size - offset;
@@ -184,7 +184,19 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   }
 
   cursor = total_buf + header_size;
+  if (header.GetFramePos() > header.GetMsgSize()) {
+    return false;
+  }
   char *buf = proto_buf->GetBuf(header.GetFramePos());
+  // check cursor size
+  if (header.GetFrameSize() < 0 ||
+    header.GetFrameSize() > (total_recv - header_size)) {
+    return false;
+  }
+  // check buf size
+  if (header.GetFrameSize() > (header.GetMsgSize() - header.GetFramePos())) {
+    return false;
+  }
   memcpy(buf, cursor, header.GetFrameSize());
   proto_buf->UpdateStatus(header.GetIndex());
   if (proto_buf->IsReadyDiserialize()) {

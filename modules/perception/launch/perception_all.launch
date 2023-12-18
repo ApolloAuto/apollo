@@ -1,0 +1,29 @@
+<cyber>
+    <desc>Apollo lidar 3d object detection</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>perception</name>
+        <process_name>perception</process_name>
+        <!-- camera front -->
+        <dag_conf>/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_front.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_front.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_tracking/dag/camera_tracking_front.dag</dag_conf>
+        <!-- camera rear -->
+        <dag_conf>/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_rear.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_rear.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_rear.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_tracking/dag/camera_tracking_rear.dag</dag_conf>
+        <!-- lidar -->
+        <dag_conf>/apollo/modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag</dag_conf>
+        <!-- radar -->
+        <dag_conf>/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag</dag_conf>
+        <!-- fusion -->
+        <dag_conf>/apollo/modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag</dag_conf>
+    </module>
+</cyber>

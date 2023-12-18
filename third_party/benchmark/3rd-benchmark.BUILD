@@ -9,6 +9,7 @@ cc_library(
     includes = [
         "include",
     ],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lbenchmark",
         "-pthread",

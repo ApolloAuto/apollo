@@ -1,0 +1,13 @@
+camera_name: "front_6mm"
+timestamp_offset: 0.0
+plugin_param {
+  name: "SmokeObstacleDetector"
+  config_path: "perception/camera_detection_single_stage/data"
+  config_file: "smoke_config.pb.txt"
+}
+enable_undistortion: false
+gpu_id: 0
+channel {
+  input_camera_channel_name: "/apollo/sensor/camera/front_6mm/image"
+  output_obstacles_channel_name: "/perception/inner/Detection"
+}

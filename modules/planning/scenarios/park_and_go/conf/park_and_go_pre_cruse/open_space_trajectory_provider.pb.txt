@@ -1,0 +1,13 @@
+open_space_trajectory_optimizer_config {
+  planner_open_space_config {
+    iterative_anchoring_smoother_config {
+      s_curve_config {
+        acc_weight: 1.0
+        jerk_weight: 1.0
+        kappa_penalty_weight: 100.0
+        ref_s_weight: 100.0
+        ref_v_weight: 0.0
+      }
+    }
+  }
+}

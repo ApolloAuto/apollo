@@ -1,0 +1,1 @@
+stop_type: PARKING

@@ -46,13 +46,15 @@ DEFINE_int32(guardian_cmd_pending_queue_size, 10,
              "Max guardian cmd pending queue size");
 DEFINE_int32(control_cmd_pending_queue_size, 10,
              "Max control cmd pending queue size");
-
+DEFINE_int32(chassis_cmd_pending_queue_size, 10,
+             "Max control cmd pending queue size");
 // enable forward Ultrasonic AEB
 DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");
 
 // vehicle factory dynamic library path and class name
 DEFINE_string(load_vehicle_library,
-              "/opt/apollo/neo/lib/canbus-dev/vehicle/libch_vehicle_factory.so",
+              "/opt/apollo/neo/lib/modules/canbus_vehicle/lincoln/"
+              "liblincoln_vehicle_factory_lib.so",
               "Default load vehicle library");
-DEFINE_string(load_vehicle_class_name, "ChVehicleFactory",
+DEFINE_string(load_vehicle_class_name, "LincolnVehicleFactory",
               "Default vehicle factory name");

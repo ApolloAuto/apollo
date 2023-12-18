@@ -1,0 +1,2 @@
+stop_distance: 0.5
+min_reference_line_remain_length: 50.0

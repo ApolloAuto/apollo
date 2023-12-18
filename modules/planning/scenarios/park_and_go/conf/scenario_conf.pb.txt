@@ -1,0 +1,4 @@
+  front_obstacle_buffer: 10.0
+  heading_buffer: 0.3
+  min_dist_to_dest: 10.0
+  max_steering_percentage_when_cruise: 20.0

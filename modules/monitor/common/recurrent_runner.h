@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "modules/monitor/common/monitor_manager.h"
+
 /**
  * @namespace apollo::monitor
  * @brief apollo::monitor

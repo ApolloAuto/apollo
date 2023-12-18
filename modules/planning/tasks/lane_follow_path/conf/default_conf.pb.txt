@@ -1,0 +1,10 @@
+is_extend_lane_bounds_to_include_adc: false
+extend_buffer: 0.2
+path_optimizer_config {
+  l_weight: 1.0
+  dl_weight: 20.0
+  ddl_weight: 1000.0
+  dddl_weight: 50000.0
+  lateral_derivative_bound_default: 2.0
+  path_reference_l_weight:100
+}

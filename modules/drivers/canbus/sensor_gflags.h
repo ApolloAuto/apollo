@@ -33,3 +33,5 @@ DECLARE_string(sensor_node_name);
 
 // esd Can Extended frame supported or not
 DECLARE_bool(esd_can_extended_frame);
+
+DECLARE_bool(enable_can_err_check);

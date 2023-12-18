@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message OpenSpaceFallBackDeciderConfig {
+  // prediction time horizon for prediction obstacles
+  optional double open_space_prediction_time_period = 1 [default = 5.0];
+  // fallback collision check distance
+  optional double open_space_fallback_collision_distance = 2 [default = 5.0];
+  // fallback stop trajectory safety gap to obstacles
+  optional double open_space_fallback_stop_distance = 3 [default = 2.0];
+  // fallback collision time buffer (s)
+  optional double open_space_fallback_collision_time_buffer = 4
+      [default = 10.0];
+}

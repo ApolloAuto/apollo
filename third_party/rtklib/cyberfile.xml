@@ -12,6 +12,9 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>module</type>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-gpus</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/rtklib</src_path>
 
 </package>

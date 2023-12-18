@@ -17,16 +17,15 @@
 #include "modules/canbus_vehicle/lincoln/lincoln_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -35,6 +34,7 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
+using ::apollo::common::VehicleSignal;
 using ::apollo::drivers::canbus::ProtocolData;
 using common::ErrorCode;
 using control::ControlCommand;
@@ -613,27 +613,32 @@ void LincolnController::SetEpbBreak(const ControlCommand &command) {
   }
 }
 
-void LincolnController::SetBeam(const ControlCommand &command) {
-  if (command.signal().high_beam()) {
+ErrorCode LincolnController::HandleCustomOperation(
+    const external_command::ChassisCommand &command) {
+  return ErrorCode::OK;
+}
+
+void LincolnController::SetBeam(const VehicleSignal &vehicle_signal) {
+  if (vehicle_signal.has_high_beam() && vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     // None
   } else {
     // None
   }
 }
 
-void LincolnController::SetHorn(const ControlCommand &command) {
-  if (command.signal().horn()) {
+void LincolnController::SetHorn(const VehicleSignal &vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void LincolnController::SetTurningSignal(const ControlCommand &command) {
+void LincolnController::SetTurningSignal(const VehicleSignal &vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_68_->set_turn_left();
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {

@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/control/control_component/libcontrol_component.so"
+
+    timer_components {
+        class_name : "ControlComponent"
+        config {
+            name: "control"
+            flag_file_path: "/apollo/modules/control/control_component/conf/control.conf"
+            interval: 10
+        }
+    }
+}

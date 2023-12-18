@@ -1,0 +1,2 @@
+follow_min_obs_lateral_distance: 2.5
+follow_min_time_sec: 2.0

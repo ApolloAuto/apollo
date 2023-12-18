@@ -25,7 +25,7 @@ DEV_INSIDE="in-dev-docker"
 HOST_ARCH="$(uname -m)"
 TARGET_ARCH="$(uname -m)"
 DOCKER_RUN="docker run"
-FAST_MODE="no"
+FAST_MODE="y"
 USE_GPU_HOST=0
 VOLUME_VERSION="latest"
 MAP_VOLUME_CONF=
@@ -39,7 +39,6 @@ DEFAULT_MAPS=(
 )
 
 DEFAULT_TEST_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
 )
 
@@ -47,14 +46,16 @@ eval $(grep ^VERSION_X86_64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 eval $(grep ^VERSION_AARCH64= ${APOLLO_ROOT_DIR}/docker/scripts/dev_start.sh)
 
 function parse_arguments() {
+    local fast_mode=""
     while [ $# -gt 0 ]; do
         local opt="$1"
         shift
         case "${opt}" in
             -f | --fast)
-                FAST_MODE="yes"
+                fast_mode="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${fast_mode}"
                 ;;
-
             *)
                 warning "Unknown option: ${opt}"
                 exit 2
@@ -62,6 +63,7 @@ function parse_arguments() {
         esac
     done # End while loop
 
+    [[ -n "${fast_mode}" ]] && FAST_MODE="${fast_mode}"
 }
 
 function determine_dev_image() {
@@ -196,7 +198,7 @@ function start_map_volume() {
 
 function mount_map_volumes() {
     info "Starting mounting map volumes ..."
-    if [ "$FAST_MODE" = "no" ]; then
+    if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
             start_map_volume "${map_name}" "${VOLUME_VERSION}"
         done

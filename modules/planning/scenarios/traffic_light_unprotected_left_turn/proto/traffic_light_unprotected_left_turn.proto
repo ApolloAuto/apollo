@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_interface_base/scenario_base/proto/creep_stage.proto";
+
+message ScenarioTrafficLightUnprotectedLeftTurnConfig {
+  // Switch to "TrafficLightUnprotectedLeftTurnScenario" when ego-vehicle is
+  // within the distance of "start_traffic_light_scenario_distance" to the
+  // traffic overlap.
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];  // meter
+  // The cruise speed for apprach stage to slow down ego-vehicle.
+  optional double approach_cruise_speed = 2 [default = 2.78];  // m/s (10km/h)
+  // ego-vehicle must stop at the distance of "max_valid_stop_distance" to
+  // the traffic light overlap when the signal color is not green.
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  // Condition for exiting creep stage. If ego-vehicle has passed the creep zone
+  // or the creeping time > "creep_timeout_sec", the creep can be considered as
+  // finished.
+  optional float creep_timeout_sec = 4 [default = 10.0];  // sec
+  // If the speed of ego-vehicle > "max_adc_speed_before_creep" at the end of
+  // stop stage(first stage of this scenario), the creep stage(ego-vehicle moves
+  // with slow speed) can be skipped.
+  optional double max_adc_speed_before_creep = 5
+      [default = 5.56];  // m/s (20m/h)
+  // Configuration for creep stage.
+  optional CreepStageConfig creep_stage_config = 6;
+}

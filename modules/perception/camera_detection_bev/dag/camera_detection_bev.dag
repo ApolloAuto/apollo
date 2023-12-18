@@ -1,0 +1,11 @@
+module_config {
+    module_library : "modules/perception/camera_detection_bev/libcamera_detection_bev_component.so"
+
+    components {
+      class_name : "CameraDetectionBevComponent"
+      config {
+        name : "CameraDetectionBevComponent"
+        config_file_path : "/apollo/modules/perception/camera_detection_bev/conf/camera_detection_bev_config.pb.txt"
+      }
+    }
+}

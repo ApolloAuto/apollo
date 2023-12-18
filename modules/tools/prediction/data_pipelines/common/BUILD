@@ -1,8 +1,9 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_library(
+apollo_py_library(
     name = "bounding_rectangle",
     srcs = ["bounding_rectangle.py"],
     deps = [
@@ -12,17 +13,17 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "configure",
     srcs = ["configure.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "data_preprocess",
     srcs = ["data_preprocess.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "feature_io",
     srcs = ["feature_io.py"],
     deps = [
@@ -31,12 +32,12 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "log",
     srcs = ["log.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "online_to_offline",
     srcs = ["online_to_offline.py"],
     deps = [
@@ -46,7 +47,7 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "rotation2d",
     srcs = ["rotation2d.py"],
     deps = [
@@ -54,7 +55,7 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "trajectory",
     srcs = ["trajectory.py"],
     deps = [
@@ -63,12 +64,14 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "util",
     srcs = ["util.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "vector2d",
     srcs = ["vector2d.py"],
 )
+
+apollo_package()

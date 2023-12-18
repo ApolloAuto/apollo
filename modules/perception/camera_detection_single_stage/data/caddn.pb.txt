@@ -1,0 +1,61 @@
+info {
+  name: "caddn_paddle"
+  version: ""
+  dataset: "kitti"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: PaddlePaddle
+
+  proto_file {
+    file: "caddn.pdmodel"
+  }
+  weight_file {
+    file: "caddn.pdiparams"
+  }
+  inputs {
+    name: "images"
+    shape: 1
+    shape: 3
+    shape: 640
+    shape: 960
+  }
+  inputs {
+    name: "trans_cam_to_img"
+    shape: 1
+    shape: 3
+    shape: 4
+  }
+  inputs {
+    name: "trans_lidar_to_cam"
+    shape: 1
+    shape: 4
+    shape: 4
+  }
+  outputs {
+    name: "pred_boxes"
+  }
+  outputs {
+    name: "pred_labels"
+  }
+  outputs {
+    name: "pred_scores"
+  }
+  class_names: "Car"
+  class_names: "Pedestrian"
+  class_names: "Cyclist"
+}
+resize {
+  width: 960
+  height: 640
+  fx: 0
+  fy: 0
+}
+normalize {
+  mean: 0.485
+  mean: 0.456
+  mean: 0.406
+  std: 0.229
+  std: 0.224
+  std: 0.225
+}
+score_threshold: 0.5

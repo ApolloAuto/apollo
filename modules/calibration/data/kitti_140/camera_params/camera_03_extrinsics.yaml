@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: camera_00
+child_frame_id: camera_03
+transform:
+  translation:
+    x: -0.4731050133705139
+    y: 0.005551469977945089
+    z: -0.005250881891697645
+  rotation:
+    x: 0.0010083899350152186
+    y: -0.01214932515849306
+    z: -0.008510799889275113
+    w: 0.9998894655576569

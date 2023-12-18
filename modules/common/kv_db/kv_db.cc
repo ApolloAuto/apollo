@@ -76,6 +76,8 @@ class SqliteWraper {
     return true;
   }
 
+  sqlite3* GetDB() const { return db_; }
+
  private:
   void Release() {
     if (db_ != nullptr) {
@@ -113,6 +115,38 @@ std::optional<std::string> KVDB::Get(std::string_view key) {
   }
   return {};
 }
+
+std::vector<std::pair<std::string, std::string>> KVDB::GetWithStart(
+    std::string_view start) {
+  SqliteWraper sqlite;
+  std::vector<std::pair<std::string, std::string>> results;
+
+  // Use the SQL LIKE operator to match any key that starts with the 'start'
+  // parameter.
+  std::string sql = absl::StrCat(
+      "SELECT key, value FROM key_value WHERE key LIKE '", start, "%';");
+
+  // Modify the callback function to handle multiple rows.
+  auto callback = [](void *data, int argc, char **argv,
+                     char **col_name) -> int {
+    auto *vec =
+        static_cast<std::vector<std::pair<std::string, std::string>> *>(data);
+    if (argc == 2 && argv[0] && argv[1]) {
+      vec->emplace_back(argv[0], argv[1]);
+    }
+    return 0;
+  };
+
+  char *error = nullptr;
+  if (sqlite3_exec(sqlite.GetDB(), sql.c_str(), callback, &results, &error) !=
+      SQLITE_OK) {
+    AERROR << "Failed to execute SQL: " << error;
+    sqlite3_free(error);
+  }
+
+  return results;
+}
+
 
 }  // namespace common
 }  // namespace apollo

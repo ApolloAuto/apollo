@@ -1,8 +1,9 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_library(
+apollo_py_library(
     name = "combine_features_and_labels",
     srcs = ["combine_features_and_labels.py"],
     deps = [
@@ -10,7 +11,7 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "combine_features_and_labels_for_junction",
     srcs = ["combine_features_and_labels_for_junction.py"],
     deps = [
@@ -18,7 +19,7 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "features_labels_utils",
     srcs = ["features_labels_utils.py"],
     deps = [
@@ -26,7 +27,7 @@ py_library(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "generate_cruise_labels",
     srcs = ["generate_cruise_labels.py"],
     deps = [
@@ -34,7 +35,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "generate_future_trajectory",
     srcs = ["generate_future_trajectory.py"],
     deps = [
@@ -42,7 +43,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "generate_junction_labels",
     srcs = ["generate_junction_labels.py"],
     deps = [
@@ -50,7 +51,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "generate_labels",
     srcs = ["generate_labels.py"],
     deps = [
@@ -58,10 +59,12 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "merge_label_dicts",
     srcs = ["merge_label_dicts.py"],
     deps = [
         ":features_labels_utils",
     ],
 )
+
+apollo_package()

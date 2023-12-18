@@ -26,13 +26,13 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/macros.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/gem/protocol/accel_cmd_67.h"
 #include "modules/canbus_vehicle/gem/protocol/brake_cmd_6b.h"
 #include "modules/canbus_vehicle/gem/protocol/global_cmd_69.h"
 #include "modules/canbus_vehicle/gem/protocol/shift_cmd_65.h"
 #include "modules/canbus_vehicle/gem/protocol/steering_cmd_6d.h"
 #include "modules/canbus_vehicle/gem/protocol/turn_cmd_63.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
@@ -100,11 +100,12 @@ class GemController final : public VehicleController<::apollo::canbus::Gem> {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
-  void SetBeam(const ::apollo::control::ControlCommand& command) override;
-  void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetEpbBreak(const control::ControlCommand& command) override;
+  common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand& command) override;
+  void SetBeam(const common::VehicleSignal& signal) override;
+  void SetHorn(const common::VehicleSignal& signal) override;
+  void SetTurningSignal(const common::VehicleSignal& signal) override;
 
   bool VerifyID() override;
   void ResetProtocol();

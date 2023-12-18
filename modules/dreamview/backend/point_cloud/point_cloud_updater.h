@@ -36,7 +36,7 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 /**
  * @namespace apollo::dreamview

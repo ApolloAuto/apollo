@@ -20,9 +20,9 @@
 #include <string>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
-#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 
 /**
  * @namespace apollo::dreamview

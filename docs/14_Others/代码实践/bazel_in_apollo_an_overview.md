@@ -82,7 +82,7 @@ source cyber/setup.bash
 ## Bazel Build, Test and Coverage
 
 Please refer to
-[Apollo Build and Test Explained](../../01_Installation%20Instructions/`apollo_build_and_test_explained.md).
+[Apollo Build and Test Explained](../../01_Installation%20Instructions/apollo_build_and_test_explained.md).
 
 ### Apollo's Special
 

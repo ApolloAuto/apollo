@@ -1,0 +1,6 @@
+<library path="modules/planning/scenarios/traffic_light_unprotected_left_turn/libtraffic_light_unprotected_left_turn_scenario.so">
+    <class type="apollo::planning::TrafficLightUnprotectedLeftTurnScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::TrafficLightUnprotectedLeftTurnStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::TrafficLightUnprotectedLeftTurnStageCreep" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::TrafficLightUnprotectedLeftTurnStageIntersectionCruise" base_class="apollo::planning::Stage"></class>
+</library>

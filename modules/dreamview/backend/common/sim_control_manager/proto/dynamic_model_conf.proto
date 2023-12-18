@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message DynamicModelConf {
+    optional string dynamic_model_name  = 1;
+    optional string library_name = 2;
+    repeated string dynamic_model_files = 3;
+    optional string depend_model_package = 4;
+}

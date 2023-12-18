@@ -53,7 +53,7 @@ How to _install_ `libplanning_component.so` with all the shared objects (i.e.,
 `runfiles_data`, while `patchelf --force-rpath --set-rpath` can be used to
 change RPATH settings.
 
-Refer to [tools/install/install.bzl](../../tools/install/install.bzl) for a
+Refer to [tools/install/install.bzl](../../../tools/install/install.bzl) for a
 thorough understanding.
 
 ## How to Run Release Build for Apollo
@@ -127,7 +127,7 @@ install(
 )
 ```
 
-This is a snippet from [modules/planning/BUILD](../../modules/planning/BUILD):
+This is a snippet from [modules/planning/BUILD](../../../modules/planning/BUILD):
 
 ```python
 filegroup(
@@ -161,7 +161,7 @@ install(
 
 ## Arguments of the `install` Bazel Rule
 
-From [tools/install/install.bzl](../../tools/install/install.bzl):
+From [tools/install/install.bzl](../../../tools/install/install.bzl):
 
 ```python
 install = rule(

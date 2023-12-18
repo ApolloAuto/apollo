@@ -1,0 +1,61 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// SpeedHeuristicOptimizerConfig
+
+message SpeedHeuristicOptimizerConfig {
+  optional DpStSpeedOptimizerConfig default_speed_config = 1;
+  optional DpStSpeedOptimizerConfig lane_change_speed_config = 2;
+}
+
+message DpStSpeedOptimizerConfig {
+  optional double unit_t = 1 [default = 1.0];
+  optional int32 dense_dimension_s = 2 [default = 41];
+  optional double dense_unit_s = 3 [default = 0.5];
+  optional double sparse_unit_s = 4 [default = 1.0];
+
+  optional double speed_weight = 10 [default = 0.0];
+  optional double accel_weight = 11 [default = 10.0];
+  optional double jerk_weight = 12 [default = 10.0];
+  optional double obstacle_weight = 13 [default = 1.0];
+  optional double reference_weight = 14 [default = 0.0];
+  optional double go_down_buffer = 15 [default = 5.0];
+  optional double go_up_buffer = 16 [default = 5.0];
+
+  // obstacle cost config
+  optional double default_obstacle_cost = 20 [default = 1e10];
+
+  // speed cost config
+  optional double default_speed_cost = 31 [default = 1.0];
+  optional double exceed_speed_penalty = 32 [default = 10.0];
+  optional double low_speed_penalty = 33 [default = 2.5];
+  optional double reference_speed_penalty = 34 [default = 1.0];
+  optional double keep_clear_low_speed_penalty = 35 [default = 10.0];
+
+  // accel cost config
+  optional double accel_penalty = 40 [default = 2.0];
+  optional double decel_penalty = 41 [default = 2.0];
+
+  // jerk cost config
+  optional double positive_jerk_coeff = 50 [default = 1.0];
+  optional double negative_jerk_coeff = 51 [default = 300.0];
+
+  // other constraint
+  optional double max_acceleration = 60 [default = 4.5];
+  optional double max_deceleration = 61 [default = -4.5];
+
+  // buffer
+  optional double safe_time_buffer = 70 [default = 3.0];
+  optional double safe_distance = 71 [default = 20.0];
+
+  // spatial potential cost config for minimal time traversal
+  optional double spatial_potential_penalty = 80 [default = 1.0];
+
+  optional bool is_lane_changing = 81 [default = false];
+  // Enable multiple thread to calculation curve cost in dp_st_graph.
+  optional bool enable_multi_thread_in_dp_st_graph = 82 [default = false];
+  // True to penalize dp result towards default cruise speed
+  optional bool enable_dp_reference_speed = 83 [default = true];
+}

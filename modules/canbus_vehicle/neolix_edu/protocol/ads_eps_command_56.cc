@@ -35,6 +35,12 @@ uint32_t Adsepscommand56::GetPeriod() const {
   return PERIOD;
 }
 
+void Adsepscommand56::Parse(const std::uint8_t* bytes, int32_t length,
+                             Neolix_edu* chassis) const {
+  chassis->mutable_ads_eps_command_56()->set_drive_enable(
+      drive_enable(bytes, length));
+}
+
 void Adsepscommand56::UpdateData(uint8_t* data) {
   set_p_drive_enable(data, drive_enable_);
   set_p_auto_target_angle(data, auto_target_angle_);
@@ -68,6 +74,15 @@ void Adsepscommand56::set_p_drive_enable(uint8_t* data, bool drive_enable) {
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
+}
+
+bool Adsepscommand56::drive_enable(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  bool ret = x;
+  return ret;
 }
 
 Adsepscommand56* Adsepscommand56::set_auto_target_angle(

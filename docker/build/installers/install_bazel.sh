@@ -58,6 +58,7 @@ if [[ "$TARGET_ARCH" == "x86_64" ]]; then
   info "Done installing bazel ${BAZEL_VERSION} with buildifier ${BUILDTOOLS_VERSION}"
 
 elif [[ "$TARGET_ARCH" == "aarch64" ]]; then
+  BAZEL_VERSION="5.2.0"
   ARM64_BINARY="bazel-${BAZEL_VERSION}-linux-arm64"
   CHECKSUM="af2b09fc30123af7aee992eba285c61758c343480116ba76d880268e40d081a5"
   DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${ARM64_BINARY}"
@@ -87,6 +88,16 @@ fi
 # Note(storypku):
 # Used by `apollo.sh config` to determine native cuda compute capability.
 bash ${CURR_DIR}/install_deviceQuery.sh
+
+curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+
+sudo apt update
+
+sudo apt install --only-upgrade bazel=5.2.0
+
+rm -f /etc/apt/sources.list.d/bazel.list
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

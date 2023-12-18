@@ -75,9 +75,9 @@ TEST_F(GemControllerTest, Status) {
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
 
-  controller_.SetHorn(control_cmd_);
-  controller_.SetBeam(control_cmd_);
-  controller_.SetTurningSignal(control_cmd_);
+  controller_.SetHorn(control_cmd_.signal());
+  controller_.SetBeam(control_cmd_.signal());
+  controller_.SetTurningSignal(control_cmd_.signal());
   EXPECT_FALSE(controller_.CheckChassisError());
 }
 

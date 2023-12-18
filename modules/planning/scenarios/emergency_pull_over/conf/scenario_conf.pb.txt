@@ -1,0 +1,4 @@
+  max_stop_deceleration: 4.5
+  slow_down_deceleration_time: 3.0
+  target_slow_down_speed: 1.0
+  stop_distance: 1.5

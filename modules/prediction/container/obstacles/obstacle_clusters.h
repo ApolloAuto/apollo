@@ -86,6 +86,8 @@ class ObstacleClusters {
   void AddObstacle(const int obstacle_id, const std::string& lane_id,
                    const double lane_s, const double lane_l);
 
+  void ClearObstacle();
+
   /**
    * @brief Sort lane obstacles by lane s
    */

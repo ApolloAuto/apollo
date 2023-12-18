@@ -25,16 +25,15 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/hmi/hmi_worker.h"
+#include "modules/dreamview/backend/common/util/hmi_util.h"
 
 namespace apollo {
 namespace monitor {
 
 using apollo::canbus::Chassis;
-using apollo::dreamview::HMIWorker;
 
 MonitorManager::MonitorManager()
-    : hmi_config_(HMIWorker::LoadConfig()),
+    : hmi_config_(apollo::dreamview::util::HMIUtil::LoadConfig()),
       log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
 
 void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
@@ -45,6 +44,7 @@ void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
 }
 
 bool MonitorManager::StartFrame(const double current_time) {
+  status_.set_detect_immediately(false);
   // Get latest HMIStatus.
   static auto hmi_status_reader =
       CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
@@ -53,12 +53,15 @@ bool MonitorManager::StartFrame(const double current_time) {
   if (hmi_status == nullptr) {
     AERROR << "No HMIStatus was received.";
     return false;
+  } else if (hmi_status->expected_modules() > 0) {
+    status_.set_detect_immediately(true);
   }
 
   if (current_mode_ != hmi_status->current_mode()) {
     // Mode changed, update configs and monitored.
     current_mode_ = hmi_status->current_mode();
-    mode_config_ = HMIWorker::LoadMode(hmi_config_.modes().at(current_mode_));
+    mode_config_ = apollo::dreamview::util::HMIUtil::LoadMode(
+        hmi_config_.modes().at(current_mode_));
     status_.clear_hmi_modules();
     for (const auto& iter : mode_config_.modules()) {
       status_.mutable_hmi_modules()->insert({iter.first, {}});
@@ -71,9 +74,17 @@ bool MonitorManager::StartFrame(const double current_time) {
     for (const auto& iter : mode_config_.other_components()) {
       status_.mutable_other_components()->insert({iter.first, {}});
     }
+    status_.clear_global_components();
+    for (const auto& iter : mode_config_.global_components()) {
+      status_.mutable_global_components()->insert({iter.first, {}});
+    }
   } else {
     // Mode not changed, clear component summary from the last frame.
     for (auto& iter : *status_.mutable_components()) {
+      iter.second.clear_summary();
+    }
+    // clear global component summary from the last frame.
+    for (auto& iter : *status_.mutable_global_components()) {
       iter.second.clear_summary();
     }
   }

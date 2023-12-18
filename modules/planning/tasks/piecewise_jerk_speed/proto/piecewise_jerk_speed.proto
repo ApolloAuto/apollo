@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// PiecewiseJerkSpeedOptimizerConfig
+
+message PiecewiseJerkSpeedOptimizerConfig {
+  optional double acc_weight = 1 [default = 1.0];
+  optional double jerk_weight = 2 [default = 10.0];
+  optional double kappa_penalty_weight = 3 [default = 1000.0];
+  optional double ref_s_weight = 4 [default = 10.0];
+  optional double ref_v_weight = 5 [default = 10.0];
+  optional double follow_distance_buffer = 6 [default = 8.0];
+}

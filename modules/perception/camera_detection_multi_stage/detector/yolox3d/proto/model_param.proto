@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package apollo.perception.camera.yolox3d;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional common.Normalize normalize = 3;
+
+  optional float confidence_threshold = 4;
+  optional int32 output_object_num = 5;
+  optional int32 output_object_size = 6;
+  optional bool with_box3d = 7 [default = true];
+  optional float border_ratio = 8;
+  optional NMSParam nms_param = 9;
+  optional Model3DParam info_3d = 10;
+
+  optional ObjTemplate car_template = 11;
+  optional ObjTemplate ped_template = 12;
+  optional ObjTemplate cyclist_template = 13;
+  optional ObjTemplate trafficcone_template = 14;
+}
+
+message NMSParam {
+  optional string type = 1 [default = "NormalNMS"];
+  optional float threshold = 2 [default = 0.5];
+  optional float sigma = 3 [default = 0.4];
+  optional float inter_cls_conf_thresh = 4 [default = 0.1];
+  optional float inter_cls_nms_thresh = 5 [default = 1.0];
+}
+
+// add 3d proto
+message Model3DParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional int32 bin_num = 15 [default = 2];
+}
+
+message ObjTemplate {
+  optional float l = 1;
+  optional float w = 2;
+  optional float h = 3;
+}

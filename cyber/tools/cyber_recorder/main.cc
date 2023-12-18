@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
   float opt_rate = 1.0f;
   uint64_t opt_begin = 0;
   uint64_t opt_end = std::numeric_limits<uint64_t>::max();
-  uint64_t opt_start = 0;
+  double opt_start = 0;
   uint64_t opt_delay = 0;
   uint32_t opt_preload = 3;
   auto opt_header = HeaderBuilder::GetHeader();
@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
         break;
       case 's':
         try {
-          opt_start = std::stoi(optarg);
+          opt_start = std::stod(optarg);
         } catch (const std::invalid_argument& ia) {
           std::cout << "Invalid argument: -s/--start " << std::string(optarg)
                     << std::endl;

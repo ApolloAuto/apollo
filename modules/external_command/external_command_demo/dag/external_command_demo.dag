@@ -1,0 +1,11 @@
+# Define all coms in DAG streaming.
+module_config {
+  module_library : "modules/external_command/external_command_demo/libexternal_command_demo_component.so"
+  timer_components {
+    class_name : "ExternalCommandDemo"
+    config {
+      name: "external_command_demo_component"
+      interval: 200 # milliseconds
+    }
+  }
+}

@@ -62,6 +62,14 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   return LoadMapFromProto(map_);
 }
 
+bool HDMapImpl::GetMapHeader(Header* map_header) const {
+  if (!map_.has_header()) {
+    return false;
+  }
+  *map_header = map_.header();
+  return true;
+}
+
 int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   if (&map_proto != &map_) {  // avoid an unnecessary copy
     Clear();
@@ -492,6 +500,45 @@ int HDMapImpl::GetPNCJunctions(
   for (const auto& id : ids) {
     pnc_junctions->emplace_back(GetPNCJunctionById(CreateHDMapId(id)));
   }
+
+  return 0;
+}
+
+int HDMapImpl::GetNearestLaneWithDistance(const apollo::common::PointENU& point,
+                                          const double distance,
+                                          LaneInfoConstPtr* nearest_lane,
+                                          double* nearest_s,
+                                          double* nearest_l) const {
+  return GetNearestLaneWithDistance({point.x(), point.y()}, distance,
+                                    nearest_lane, nearest_s, nearest_l);
+}
+
+int HDMapImpl::GetNearestLaneWithDistance(
+    const apollo::common::math::Vec2d& point, const double distance,
+    LaneInfoConstPtr* nearest_lane, double* nearest_s,
+    double* nearest_l) const {
+  CHECK_NOTNULL(nearest_lane);
+  CHECK_NOTNULL(nearest_s);
+  CHECK_NOTNULL(nearest_l);
+  const auto* segment_object = lane_segment_kdtree_->GetNearestObject(point);
+  if (segment_object == nullptr) {
+    return -1;
+  }
+  const Id& lane_id = segment_object->object()->id();
+  *nearest_lane = GetLaneById(lane_id);
+  ACHECK(*nearest_lane);
+  const int id = segment_object->id();
+  const auto& segment = (*nearest_lane)->segments()[id];
+  Vec2d nearest_pt;
+  double apart_distance = segment.DistanceTo(point, &nearest_pt);
+
+  if (apart_distance > distance) {
+    return -1;
+  }
+
+  *nearest_s = (*nearest_lane)->accumulate_s()[id] +
+               nearest_pt.DistanceTo(segment.start());
+  *nearest_l = segment.unit_direction().CrossProd(point - segment.start());
 
   return 0;
 }

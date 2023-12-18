@@ -217,6 +217,8 @@ almost_equal(T x, T y, int ulp) {
          std::fabs(x - y) < std::numeric_limits<T>::min();
 }
 
+double check_negative(double input_data);
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

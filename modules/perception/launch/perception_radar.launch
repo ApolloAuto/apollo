@@ -1,0 +1,11 @@
+<cyber>
+    <desc>Apollo radar 3d object detection</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>radar</name>
+        <dag_conf>/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag</dag_conf>
+        <process_name>radar</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

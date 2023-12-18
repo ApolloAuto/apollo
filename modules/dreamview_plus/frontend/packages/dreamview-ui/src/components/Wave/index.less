@@ -1,0 +1,16 @@
+@keyframes wave-motion {
+    0% {
+        opacity: 0.5;
+        box-shadow: 0 0 0 0 currentColor;
+    }
+    100% {
+        opacity: 0;
+        box-shadow: 0 0 0 6px currentColor;
+    }
+}
+
+.dreamview-btn-wave {
+    &.wave-motion-appear-active {
+      animation: wave-motion .6s cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+}

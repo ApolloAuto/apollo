@@ -31,4 +31,6 @@ COPY rcfiles/setup.sh /opt/apollo/neo/
 
 RUN echo "source /opt/apollo/neo/setup.sh" >> /etc/skel/.bashrc
 
-RUN echo "deb https://apollo-pkg-beta.bj.bcebos.com/neo/beta bionic main" >> /etc/apt/sources.list
+RUN sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
+
+RUN echo "deb https://apollo-pkg-beta.bj.bcebos.com/apollo/core bionic main" >> /etc/apt/sources.list.d/apolloauto.list

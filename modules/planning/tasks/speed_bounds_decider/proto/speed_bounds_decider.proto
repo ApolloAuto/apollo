@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// SpeedBoundsDeciderConfig
+
+message SpeedBoundsDeciderConfig {
+  optional double total_time = 1 [default = 7.0];
+  optional double boundary_buffer = 2 [default = 0.1];
+  optional double max_centric_acceleration_limit = 3 [default = 2.0];
+  optional double minimal_kappa = 4 [default = 0.00001];
+  optional double point_extension = 5 [default = 1.0];
+  optional double lowest_speed = 6 [default = 2.5];
+  optional double collision_safety_range = 7 [default = 1.0];
+  optional double static_obs_nudge_speed_ratio = 8;
+  optional double dynamic_obs_nudge_speed_ratio = 9;
+  // True to slow down when nudge obstacles.
+  optional bool enable_nudge_slowdown = 10 [default = true];
+  // minimum l-distance to nudge when changing lane (meters)
+  optional double lane_change_obstacle_nudge_l_buffer = 11 [default = 0.3];
+  // (unit: meter) max possible trajectory length
+  optional double max_trajectory_len = 12 [default = 1000.0];
+}

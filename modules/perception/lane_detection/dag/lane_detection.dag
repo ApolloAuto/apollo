@@ -1,0 +1,11 @@
+module_config {
+  module_library : "modules/perception/lane_detection/liblane_detection.so"
+
+ components {
+    class_name : "LaneDetectionComponent"
+    config {
+      name: "LaneComponent"
+      config_file_path: "/apollo/modules/perception/lane_detection/conf/lane_detection_config.pb.txt"
+    }
+  }
+}

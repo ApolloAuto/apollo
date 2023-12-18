@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>old_routing_adapter</name>
+        <dag_conf>/apollo/modules/external_command/old_routing_adapter/dag/old_routing_adapter.dag</dag_conf>
+        <process_name>old_routing_adapter</process_name>
+    </module>
+</cyber>

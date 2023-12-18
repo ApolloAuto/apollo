@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message MotionType {
+  optional float m00 = 1;
+  optional float m01 = 2;
+  optional float m02 = 3;
+  optional float m03 = 4;
+  optional float m10 = 5;
+  optional float m11 = 6;
+  optional float m12 = 7;
+  optional float m13 = 8;
+  optional float m20 = 9;
+  optional float m21 = 10;
+  optional float m22 = 11;
+  optional float m23 = 12;
+  optional float m30 = 13;
+  optional float m31 = 14;
+  optional float m32 = 15;
+  optional float m33 = 16;
+}
+
+message VehicleStatus {
+  optional float roll_rate = 1;
+  optional float pitch_rate = 2;
+  optional float yaw_rate = 3;
+  optional float velocity = 4;
+  optional float velocity_x = 5;
+  optional float velocity_y = 6;
+  optional float velocity_z = 7;
+  optional double time_ts = 8;  // time stamp
+  optional double time_d = 9;
+  optional MotionType motion = 10;
+}
+
+message MotionService {
+  repeated VehicleStatus vehicle_status =
+      1;  // An array of vehicle_information stored for previous timestamps
+  optional apollo.common.Header header = 2;  // Header
+}

@@ -147,11 +147,26 @@ bool Polygon2d::IsPointIn(const Vec2d &point) const {
 
 bool Polygon2d::HasOverlap(const Polygon2d &polygon) const {
   CHECK_GE(points_.size(), 3U);
+  CHECK_GE(polygon.num_points(), 3);
   if (polygon.max_x() < min_x() || polygon.min_x() > max_x() ||
       polygon.max_y() < min_y() || polygon.min_y() > max_y()) {
     return false;
   }
-  return DistanceTo(polygon) <= kMathEpsilon;
+
+  if (IsPointIn(polygon.points()[0])) {
+    return true;
+  }
+
+  if (polygon.IsPointIn(points_[0])) {
+    return true;
+  }
+
+  for (int i = 0; i < polygon.num_points(); ++i) {
+    if (HasOverlap(polygon.line_segments()[i])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool Polygon2d::Contains(const LineSegment2d &line_segment) const {
@@ -364,9 +379,14 @@ bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
       (line_segment.start().y() > max_y_ && line_segment.end().y() > max_y_)) {
     return false;
   }
-  Vec2d first;
-  Vec2d last;
-  return GetOverlap(line_segment, &first, &last);
+
+  if (std::any_of(line_segments_.begin(), line_segments_.end(),
+    [&](const LineSegment2d &poly_seg) {
+      return poly_seg.HasIntersect(line_segment);
+    })) {
+      return true;
+    }
+  return false;
 }
 
 bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,

@@ -1,0 +1,4 @@
+foreground_mathcer_method: "MultiHmBipartiteGraphMatcher"
+background_matcher_method: "GnnBipartiteGraphMatcher"
+bound_value: 100
+max_match_distance: 4.0

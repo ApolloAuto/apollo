@@ -17,6 +17,8 @@
 #pragma once
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/util/future.h"
 
@@ -55,6 +57,16 @@ class KVDB {
    *     Use `value_or("")` to get existing value or fallback to default.
    */
   static std::optional<std::string> Get(std::string_view key);
+
+  /**
+   * @brief Get the tuple whose key starts with start.
+   * @return An optional value.
+   *     Use `has_value()` to check if there is non-empty value.
+   *     Use `value()` to get real value.
+   *     Use `value_or("")` to get existing value or fallback to default.
+   */
+  static std::vector<std::pair<std::string, std::string>> GetWithStart(
+      std::string_view start);
 };
 
 }  // namespace common

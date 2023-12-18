@@ -1,0 +1,236 @@
+data_files {
+  source_path: "vehicle_param.pb.txt"
+  dest_path: "/apollo/modules/common/data/vehicle_param.pb.txt"
+}
+data_files {
+  source_path: "control_conf.pb.txt"
+  dest_path: "/apollo/modules/control/conf/control_conf.pb.txt"
+}
+data_files {
+  source_path: "control.conf"
+  dest_path: "/apollo/modules/control/conf/control.conf"
+}
+data_files {
+  source_path: "cancard_params"
+  dest_path: "/apollo/modules/canbus/conf"
+}
+data_files {
+  source_path: "canbus_dag"
+  dest_path: "/apollo/modules/canbus/dag"
+}
+data_files {
+  source_path: "data_conf"
+  dest_path: "/apollo/modules/data/tools/smart_recorder/conf"
+}
+data_files {
+  source_path: "dreamview_conf/data_collection_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview_plus/conf/data_collection_table.pb.txt"
+}
+data_files {
+  source_path: "dreamview_conf/preprocess_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview_plus/conf/preprocess_table.pb.txt"
+}
+data_files {
+  source_path: "dreamview_conf/lidar_to_gnss_preprocess_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview_plus/conf/lidar_to_gnss_preprocess_table.pb.txt"
+}
+data_files {
+  source_path: "navigation_lincoln.pb.txt"
+  dest_path: "/apollo/modules/control/conf/navigation_lincoln.pb.txt"
+}
+data_files {
+  source_path: "novatel_localization_extrinsics.yaml"
+  dest_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "/apollo/modules/localization/msf/params/velodyne_params"
+}
+data_files {
+  source_path: "velodyne_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "camera_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "radar_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "microphone_params"
+  dest_path: "/apollo/modules/audio/conf/respeaker_extrinsics.yaml"
+}
+data_files {
+  source_path: "gnss_params/ant_imu_leverarm.yaml"
+  dest_path: "/apollo/modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
+}
+data_files {
+  source_path: "vehicle_params"
+  dest_path: "/apollo/modules/localization/msf/params/vehicle_params"
+}
+data_files {
+  source_path: "vehicle_info.pb.txt"
+  dest_path: "/apollo/modules/tools/ota/vehicle_info.pb.txt"
+}
+data_files {
+  source_path: "radar_conf"
+  dest_path: "/apollo/modules/drivers/radar/conti_radar/conf"
+}
+data_files {
+  source_path: "radar_dag"
+  dest_path: "/apollo/modules/drivers/radar/conti_radar/dag"
+}
+data_files {
+  source_path: "gnss_conf"
+  dest_path: "/apollo/modules/drivers/gnss/conf"
+}
+data_files {
+  source_path: "velodyne_conf"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/conf"
+}
+data_files {
+  source_path: "hesai_conf"
+  dest_path: "/apollo/modules/drivers/lidar/hesai/conf"
+}
+data_files {
+  source_path: "camera_conf"
+  dest_path: "/apollo/modules/drivers/camera/conf"
+}
+data_files {
+  source_path: "camera_dag"
+  dest_path: "/apollo/modules/drivers/camera/dag"
+}
+data_files {
+  source_path: "video_conf"
+  dest_path: "/apollo/modules/drivers/video/conf"
+}
+data_files {
+  source_path: "video_dag"
+  dest_path: "/apollo/modules/drivers/video/dag"
+}
+data_files {
+  source_path: "cyber_conf"
+  dest_path: "/apollo/cyber/conf"
+}
+data_files {
+  source_path: "teleop_conf/voip_decoder/voip_decoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip_decoder/conf/voip_decoder_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/voip_encoder/voip_encoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip_encoder/conf/voip_encoder_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/daemon/daemon_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/daemon/conf/daemon_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/modem/modem_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/modem/conf/modem_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/router/router_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/router/conf/router_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/router/initial_routes_and_filters.pb.txt"
+  dest_path: "/apollo/modules/teleop/router/conf/initial_routes_and_filters.pb.txt"
+}
+data_files {
+  source_path: "transform_conf/static_transform_conf.pb.txt"
+  dest_path: "/apollo/modules/transform/conf/static_transform_conf.pb.txt"
+}
+data_files {
+  source_path: "planning_conf"
+  dest_path: "/apollo/modules/planning/planning_component/conf"
+}
+data_files {
+  source_path: "localization_conf"
+  dest_path: "/apollo/modules/localization/conf"
+}
+data_files {
+  source_path: "localization_dag"
+  dest_path: "/apollo/modules/localization/dag"
+}
+data_files {
+  source_path: "perception_dag"
+  dest_path: "/apollo/modules/perception/production/dag"
+}
+data_files {
+  source_path: "perception_launch"
+  dest_path: "/apollo/modules/perception/production/launch"
+}
+data_files {
+  source_path: "perception_conf"
+  dest_path: "/apollo/modules/perception/production/conf/perception"
+}
+data_files {
+  source_path: "perception_conf"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar"
+}
+data_files {
+  source_path: "lidar_dag"
+  dest_path: "/apollo/modules/drivers/lidar/dag"
+}
+data_files {
+  source_path: "lidar_conf"
+  dest_path: "/apollo/modules/drivers/lidar/conf"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/localization/msf/params/velodyne_params"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "perception_conf/pointcloud_preprocessor.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
+}
+data_files {
+  source_path: "canbus_conf/canbus_conf.pb.txt"
+  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_camera_params"
+  dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
+}
+data_files {
+  source_path: "perception_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "perception_conf/fusion_component_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/perception_common.flag"
+  dest_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+}
+data_files {
+  source_path: "perception_conf/mlf_engine.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
+}
+data_files {
+  source_path: "perception_pipeline_config"
+  dest_path: "/apollo/modules/perception/pipeline/config"
+}
+data_files {
+  source_path: "v2x_conf"
+  dest_path: "/apollo/modules/v2x/conf"
+}
+data_files {
+  source_path: "sensor_meta.pb.txt"
+  dest_path: "/apollo/modules/perception/data/conf/sensor_meta.pb.txt"
+}

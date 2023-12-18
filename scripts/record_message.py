@@ -147,7 +147,6 @@ class Recorder(object):
         if not flags_package_management:
             cmd = '''
                 source /apollo/scripts/apollo_base.sh
-                source /apollo/cyber/setup.bash
                 nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
             '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
         else:

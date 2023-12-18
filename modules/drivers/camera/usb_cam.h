@@ -111,7 +111,8 @@ class UsbCam {
 
   virtual bool init(const std::shared_ptr<Config>& camera_config);
   // user use this function to get camera frame data
-  virtual bool poll(const CameraImagePtr& raw_image);
+  virtual bool poll(const CameraImagePtr& raw_image, 
+                    const CameraImagePtr& sensor_raw_image);
 
   bool is_capturing();
   bool wait_for_device(void);
@@ -130,7 +131,6 @@ class UsbCam {
 
   int init_mjpeg_decoder(int image_width, int image_height);
   void mjpeg2rgb(char* mjepg_buffer, int len, char* rgb_buffer, int pixels);
-
 #ifdef __aarch64__
   int convert_yuv_to_rgb_pixel(int y, int u, int v);
   int convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
@@ -143,7 +143,7 @@ class UsbCam {
   bool set_adv_trigger(void);
   bool close_device(void);
   bool open_device(void);
-  bool read_frame(CameraImagePtr raw_image);
+  bool read_frame(CameraImagePtr raw_image, CameraImagePtr sensor_raw_image);
   bool process_image(void* src, int len, CameraImagePtr dest);
   bool start_capturing(void);
   bool stop_capturing(void);

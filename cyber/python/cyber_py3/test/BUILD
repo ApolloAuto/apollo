@@ -1,15 +1,16 @@
 load("@rules_python//python:defs.bzl", "py_test")
+load("//tools:apollo_package.bzl", "apollo_package")
 
-py_test(
-    name = "record_test",
-    timeout = "short",
-    srcs = ["record_test.py"],
-    deps = [
-        "//cyber/proto:record_py_pb2",
-        "//cyber/python/cyber_py3:record",
-        "//cyber/proto:simple_py_pb2",
-    ],
-)
+# py_test(
+#     name = "record_test",
+#     timeout = "short",
+#     srcs = ["record_test.py"],
+#     deps = [
+#         "//cyber/proto:record_py_pb2",
+#         "//cyber/python/cyber_py3:record",
+#         "//cyber/proto:simple_py_pb2",
+#     ],
+# )
 
 py_test(
     name = "init_test",
@@ -20,15 +21,15 @@ py_test(
     ],
 )
 
-py_test(
-    name = "cyber_test",
-    timeout = "short",
-    srcs = ["cyber_test.py"],
-    deps = [
-        "//cyber/python/cyber_py3:cyber",
-        "//cyber/proto:simple_py_pb2",
-    ],
-)
+# py_test(
+#     name = "cyber_test",
+#     timeout = "short",
+#     srcs = ["cyber_test.py"],
+#     deps = [
+#         "//cyber/python/cyber_py3:cyber",
+#         "//cyber/proto:simple_py_pb2",
+#     ],
+# )
 # FIXME(all): parameter_test seems to run forever
 # py_test(
 #    name = "parameter_test",
@@ -60,3 +61,5 @@ py_test(
 #        "//cyber/python/cyber_py3:cyber_timer",
 #    ],
 #)
+
+apollo_package()

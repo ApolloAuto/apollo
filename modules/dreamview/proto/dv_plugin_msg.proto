@@ -17,4 +17,5 @@ message DvPluginMsg {
     }
     optional ComponentType source_type =6;
     optional ComponentType target_type = 7;
+    optional string request_id = 8;
 }

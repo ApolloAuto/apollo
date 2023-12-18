@@ -89,8 +89,11 @@ class ControlInfo(object):
         self.gear_location = []
 
         self.is_full_stop = []
+        self.is_full_stop_soft = []
         self.path_remain = []
         self.pid_saturation_status = []
+        self.is_stop_reason_by_prdestrian = []
+        self.is_stop_reason_by_destination = []
 
         self.heading_error = []
         self.lateral_error = []
@@ -237,7 +240,10 @@ class ControlInfo(object):
         self.calibration_value.append(
             entity.debug.simple_lon_debug.calibration_value)
         self.is_full_stop.append(entity.debug.simple_lon_debug.is_full_stop)
+        self.is_full_stop_soft.append(entity.debug.simple_lon_debug.is_full_stop_soft)
         self.path_remain.append(entity.debug.simple_lon_debug.path_remain)
+        self.is_stop_reason_by_destination.append(entity.debug.simple_lon_debug.is_stop_reason_by_destination)
+        self.is_stop_reason_by_prdestrian.append(entity.debug.simple_lon_debug.is_stop_reason_by_prdestrian)
         self.pid_saturation_status.append(
             entity.debug.simple_lon_debug.pid_saturation_status)
         self.acc_open.append(
@@ -418,6 +424,7 @@ class ControlInfo(object):
         ax[0].set_xlabel('Time-s')
 
         ax[1].plot(self.controltime, self.is_full_stop, label='is_full_stop')
+        ax[1].plot(self.controltime, self.is_full_stop_soft, label='is_full_stop_soft')
         ax[1].plot(self.controltime,
                    self.pid_saturation_status,
                    label='pid_saturation_status')
@@ -535,19 +542,28 @@ class ControlInfo(object):
         ax[1, 1].set_xlabel('Time-s')
 
         ax[1, 2].plot(self.controltime, self.is_full_stop, label='is_full_stop')
+        ax[1, 2].plot(self.controltime,
+                      self.is_full_stop_soft,
+                      label='is_full_stop_soft')
         ax[1, 2].plot(self.canbustime,
                       self.gear_location,
                       label='gear_location')
         ax[1, 2].plot(self.planningtime,
                       self.trajectory_gear,
                       label='trajectory_gear')
+        # ax[1, 2].plot(self.controltime,
+        #               self.is_stop_reason_by_destination,
+        #               label='is_stop_reason_by_destination')
+        # ax[1, 2].plot(self.controltime,
+        #               self.is_stop_reason_by_prdestrian,
+        #               label='is_stop_reason_by_prdestrian')
         # ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
         # ax[1, 2].plot(self.controltime, self.Driving_mode, label='Driving_mode')
         # ax[1, 2].plot(self.controltime,
         #               self.drivingAction,
         #               label='drivingAction')
         # ax[1, 2].plot(self.planningtime, self.numpoints_sum, label='numpoints')
-        # ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
+        ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
         # ax[1, 2].plot(self.planningtime,
         #               self.trajectory_type,
         #               label='trajectory_type')
@@ -659,7 +675,7 @@ class ControlInfo(object):
                       label='lateral_error')
         ax[0, 0].plot(self.controltime,
                       self.heading_error_feedback,
-                      label='lateral_error_feedback')
+                      label='heading_error_feedback')
         ax[0, 0].plot(self.controltime,
                       self.lateral_error_feedback,
                       label='lateral_error_feedback')
@@ -788,6 +804,11 @@ class ControlInfo(object):
                         self.cary,
                         color='red',
                         label='localization pose')
+        self.axarr.plot(self.carx,
+                        self.cary,
+                        'ro',
+                        markersize=5,
+                        label='localization pose dot')
         self.axarr.plot(self.planning_pathx,
                         self.planning_pathy,
                         color='green',
@@ -1031,9 +1052,7 @@ if __name__ == "__main__":
         description='Process and analyze control and planning data')
     parser.add_argument('--bag', type=str, help='use Rosbag')
     parser.add_argument('--path', type=str, help='path for bag files')
-
     args = parser.parse_args()
-
     fig, axarr = plt.subplots()
     controlinfo = ControlInfo(axarr)
 
@@ -1108,24 +1127,11 @@ if __name__ == "__main__":
             pathv_sheet.write(0, 0, "timestamp_sec", book_format)
 
         controlinfo.read_bag(args.bag)
-
     else:
-        cyber.init()
-        # rospy.init_node('control_info', anonymous=True)
-        node = cyber.Node("rtk_recorder")
-        planningsub = node.create_reader('/apollo/planning',
-                                         planning_pb2.ADCTrajectory,
-                                         controlinfo.callback_planning)
-        localizationsub = node.create_reader(
-            '/apollo/localization/pose', localization_pb2.LocalizationEstimate,
-            controlinfo.callback_localization)
-        controlsub = node.create_reader('/apollo/control',
-                                        control_cmd_pb2.ControlCommand,
-                                        controlinfo.callback_control)
-        canbussub = node.create_reader('/apollo/canbus/chassis',
-                                       chassis_pb2.Chassis,
-                                       controlinfo.callback_canbus)
-        raw_input("Press Enter To Stop")
+        #create datafile
+        excel_name = 'data.xlsx'
+        book = xlsxwriter.Workbook(excel_name)
+        book_format = book.add_format({'align': 'center', 'text_wrap': True})
 
     controlinfo.Print_len()
     # controlinfo.show_longitudinal()

@@ -1,0 +1,8 @@
+controller {
+  name: "LAT_CONTROLLER"
+  type: "LatController"
+}
+controller {
+  name: "LON_CONTROLLER"
+  type: "LonController"
+}

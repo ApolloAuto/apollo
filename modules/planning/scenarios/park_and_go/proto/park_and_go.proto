@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioParkAndGoConfig {
+  // Obstacle distance buffer to check if vehicle is blocked by obstacle
+  optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
+  // Heading buffer to check if the heading of vehicle is aligned
+  // to reference line
+  optional double heading_buffer = 2 [default = 0.5];         // rad
+  // If the distance of vehicle and destination < "min_dist_to_dest", the
+  // vehicle can be considered as reaching the end
+  optional double min_dist_to_dest = 3 [default = 25.0];      // meter
+  // Only when steering of vehicle is smaller than this value, the vehicle
+  // can start to cruise.
+  optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_sissue</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="ic_sissue" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="矩形" fill="#FFFFFF" opacity="0" xlink:href="#path-1"></use>
+        <g id="发布" mask="url(#mask-2)" fill="#FFFFFF" fill-rule="nonzero">
+            <g transform="translate(0.758652, 0.712814)" id="路径">
+                <polygon points="13.7493876 2.01658598 13.1077492 1.37494762 5.40807929 10.2662234 5.40807929 14.5743726 6.3247062 14.5743726 6.3247062 10.6328812"></polygon>
+                <polygon points="13.2910814 1.55827977 11.7328161 12.8327832 7.69966027 10.4495555 7.24134762 11.2745196 12.3744609 14.3910469 14.4826952 0 0 7.24134762 4.49147816 9.44124641 4.94979081 8.61628235 2.10824077 7.24134279"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

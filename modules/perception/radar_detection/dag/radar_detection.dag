@@ -1,0 +1,26 @@
+module_config {
+  module_library : "modules/perception/radar_detection/libradar_detection.so"
+  components {
+    class_name: "RadarDetectionComponent"
+    config {
+      name: "FrontRadarDetection"
+      config_file_path: "/apollo/modules/perception/radar_detection/conf/front_radar_detection_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/apollo/sensor/radar/front"
+      }
+    }
+  }
+
+  components {
+    class_name: "RadarDetectionComponent"
+    config {
+      name: "RearRadarDetection"
+      config_file_path: "/apollo/modules/perception/radar_detection/conf/rear_radar_detection_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/apollo/sensor/radar/rear"
+      }
+    }
+  }
+}

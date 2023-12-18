@@ -1,0 +1,26 @@
+{
+  "extends": "../tslint-config-dreamview/index.json",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+,   "src/icons/index.ts", 
+    "src/index.ts",
+    "src/@types/index.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules"
+  ],
+  "compilerOptions": {
+    "typeRoots": ["src/@types", "./node_modules/@types"],
+    "sourceMap": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "declaration": true,
+  "rules": {
+    "no-unused-variable": false
+  }
+}

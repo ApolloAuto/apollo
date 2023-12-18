@@ -1,130 +1,88 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "zhongyun_vehicle_factory",
-    srcs = ["zhongyun_vehicle_factory.cc"],
-    hdrs = ["zhongyun_vehicle_factory.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_zhongyun",
+    srcs = [
+        "protocol/brake_control_a4.cc",
+        "protocol/enable_state_feedback_c3.cc",
+        "protocol/error_state_e1.cc",
+        "protocol/gear_control_a1.cc",
+        "protocol/parking_control_a5.cc",
+        "protocol/steering_control_a2.cc",
+        "protocol/torque_control_a3.cc",
+        "protocol/vehicle_state_feedback_2_c4.cc",
+        "protocol/vehicle_state_feedback_c1.cc",
+        "zhongyun_controller.cc",
+        "zhongyun_message_manager.cc",
+        "zhongyun_vehicle_factory.cc",
+    ],
+    hdrs = [
+        "protocol/brake_control_a4.h",
+        "protocol/enable_state_feedback_c3.h",
+        "protocol/error_state_e1.h",
+        "protocol/gear_control_a1.h",
+        "protocol/parking_control_a5.h",
+        "protocol/steering_control_a2.h",
+        "protocol/torque_control_a3.h",
+        "protocol/vehicle_state_feedback_2_c4.h",
+        "protocol/vehicle_state_feedback_c1.h",
+        "zhongyun_controller.h",
+        "zhongyun_message_manager.h",
+        "zhongyun_vehicle_factory.h",
+    ],
     deps = [
-        ":zhongyun_controller",
-        ":zhongyun_message_manager",
-        "//modules/canbus/common:canbus_gflags",
+        "//modules/canbus:apollo_canbus",
+        "//modules/canbus_vehicle/zhongyun/proto:zhongyun_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
-    ],
-)
-
-cc_binary(
-    name = "libzhongyun_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":zhongyun_vehicle_factory"],
-)
-
-cc_library(
-    name = "zhongyun_message_manager",
-    srcs = ["zhongyun_message_manager.cc"],
-    hdrs = ["zhongyun_message_manager.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        "//modules/canbus_vehicle/zhongyun/proto:zhongyun_cc_proto",
-        "//modules/canbus_vehicle/zhongyun/protocol:canbus_zhongyun_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_library(
-    name = "zhongyun_controller",
-    srcs = ["zhongyun_controller.cc"],
-    hdrs = ["zhongyun_controller.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        ":zhongyun_message_manager",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus_vehicle/zhongyun/protocol:canbus_zhongyun_protocol",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
     ],
 )
 
-cc_test(
+
+apollo_component(
+    name = "libzhongyun_vehicle_factory_lib.so",
+    deps = [":apollo_canbus_vehicle_zhongyun"],
+)
+
+apollo_cc_test(
     name = "zhongyun_message_manager_test",
     size = "small",
     srcs = ["zhongyun_message_manager_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        ":zhongyun_message_manager",
+        ":apollo_canbus_vehicle_zhongyun",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "zhongyun_vehicle_factory_test",
     size = "small",
     srcs = ["zhongyun_vehicle_factory_test.cc"],
     data = ["//modules/canbus:test_data"],
     linkstatic = True,
     deps = [
-        ":zhongyun_vehicle_factory",
+        ":apollo_canbus_vehicle_zhongyun",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "zhongyun_controller_test",
     size = "small",
     srcs = ["zhongyun_controller_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        ":zhongyun_controller",
-        "//modules/common/util",
+        ":apollo_canbus_vehicle_zhongyun",
+        "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-zhongyun/lib",
-    data_dest = "canbus-vehicle-zhongyun",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-zhongyun.BUILD",
-    ],
-    targets = [
-        ":libzhongyun_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_zhongyun",
-        ":pb_hdrs",
-    ],
-)
-
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-zhongyun/include",
-    data = [
-        "//modules/canbus_vehicle/zhongyun/proto:zhongyun_cc_proto",
-    ],
-)
-
-install_files(
-    name = "pb_zhongyun",
-    dest = "canbus-vehicle-zhongyun",
-    files = [
-        "//modules/canbus_vehicle/zhongyun/proto:zhongyun_py_pb2",
     ],
 )
 
@@ -135,26 +93,99 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
+apollo_cc_test(
+    name = "brake_control_a4_test",
+    size = "small",
+    srcs = ["protocol/brake_control_a4_test.cc"],
     deps = [
-        ":install_zhongyun_src",
-        ":install_zhongyun_hdrs"
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
-install_src_files(
-    name = "install_zhongyun_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-zhongyun/src",
-    filter = "*",
+apollo_cc_test(
+    name = "enable_state_feedback_c3_test",
+    size = "small",
+    srcs = ["protocol/enable_state_feedback_c3_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
 )
 
-install_src_files(
-    name = "install_zhongyun_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-zhongyun/include",
-    filter = "*.h",
+apollo_cc_test(
+    name = "error_state_e1_test",
+    size = "small",
+    srcs = ["protocol/error_state_e1_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
+
+apollo_cc_test(
+    name = "gear_control_a1_test",
+    size = "small",
+    srcs = ["protocol/gear_control_a1_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "parking_control_a5_test",
+    size = "small",
+    srcs = ["protocol/parking_control_a5_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "steering_control_a2_test",
+    size = "small",
+    srcs = ["protocol/steering_control_a2_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "torque_control_a3_test",
+    size = "small",
+    srcs = ["protocol/torque_control_a3_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "vehicle_state_feedback_2_c4_test",
+    size = "small",
+    srcs = ["protocol/vehicle_state_feedback_2_c4_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "vehicle_state_feedback_c1_test",
+    size = "small",
+    srcs = ["protocol/vehicle_state_feedback_c1_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_zhongyun",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_package()
 
 cpplint()

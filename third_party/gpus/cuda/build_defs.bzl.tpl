@@ -4,6 +4,58 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 def cuda_extra_copts():
     return %{cuda_extra_copts}
 
+def if_cuda(if_true, if_false = []):
+    """Shorthand for select()'ing on whether we're building with CUDA.
+
+    Returns a select statement which evaluates to if_true if we're building
+    with CUDA enabled.  Otherwise, the select statement evaluates to if_false.
+
+    """
+    return select({
+        "@local_config_cuda//cuda:using_nvcc": if_true,
+        "@local_config_cuda//cuda:using_clang": if_true,
+        "//conditions:default": if_false,
+    })
+
+def if_cuda_clang(if_true, if_false = []):
+   """Shorthand for select()'ing on wheteher we're building with cuda-clang.
+
+    Returns a select statement which evaluates to if_true if we're building
+    with cuda-clang.  Otherwise, the select statement evaluates to if_false.
+
+   """
+   return select({
+       "@local_config_cuda//cuda:using_clang": if_true,
+       "//conditions:default": if_false
+   })
+
+def if_cuda_clang_opt(if_true, if_false = []):
+   """Shorthand for select()'ing on wheteher we're building with cuda-clang
+   in opt mode.
+
+    Returns a select statement which evaluates to if_true if we're building
+    with cuda-clang in opt mode. Otherwise, the select statement evaluates to
+    if_false.
+
+   """
+   return select({
+       "@local_config_cuda//cuda:using_clang_opt": if_true,
+       "//conditions:default": if_false
+   })
+
+# TODO(storypku): revisit the APOLLO_CUDA macro
+def cuda_default_copts():
+    """Default options for all CUDA compilations."""
+    return if_cuda([
+        "-x", "cuda",
+        "-DAPOLLO_CUDA=1",
+        "-Xcuda-fatbinary=--compress-all",
+        "--no-cuda-include-ptx=all"
+    ] + %{cuda_extra_copts}) + if_cuda_clang_opt(
+        # Some important CUDA optimizations are only enabled at O3.
+        ["-O3"]
+    )
+
 def cuda_is_configured():
     """Returns true if CUDA was enabled during the configure process."""
     return %{cuda_is_configured}
@@ -50,4 +102,15 @@ def cuda_header_library(
         deps = deps + [":%s_virtual" % name],
         **kwargs
     )
+
+def cuda_library(mandatory = True, copts = [], **kwargs):
+    """Wrapper over cc_library which adds default CUDA options."""
+    if mandatory:
+        cc_library(copts = cuda_default_copts() + copts, linkstatic = True, **kwargs)
+
+        cc_binary(name = "lib{}.so".format(kwargs["name"]), deps = [":{}".format(kwargs["name"])],
+            linkshared = True, linkstatic = True, visibility = ["//visibility:public"],
+            tags = ["export_library", kwargs["name"]])
+    else:
+        cc_library(copts = cuda_default_copts() + copts, **kwargs)
 

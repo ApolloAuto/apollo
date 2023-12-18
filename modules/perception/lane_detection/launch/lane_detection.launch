@@ -1,0 +1,17 @@
+<!--this file list the modules which will be loaded dynamicly and
+    their process name to be running in -->
+<cyber>
+    <desc>cyber modules list config</desc>
+    <version>1.0.0</version>
+    <!-- sample module config, and the files should have relative path like
+         ./bin/cyber_launch
+         ./bin/mainboard
+         ./conf/dag_streaming_0.conf -->
+    <module>
+        <name>lane_detection</name>
+        <dag_conf>/apollo/modules/perception/lane_detection/dag/lane_detection.dag</dag_conf>
+        <!-- if not set, use default process -->
+        <process_name>lane_detection</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

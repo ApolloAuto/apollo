@@ -30,7 +30,9 @@ APOLLO_TEST_SH="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
 APOLLO_LINT_SH="${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh"
 
 function run_ci_build() {
-  env USE_ESD_CAN=${USE_ESD_CAN} bash "${APOLLO_BUILD_SH}"
+  [[ -e "${TOP_DIR}/output" ]] && error "${TOP_DIR}/output is detected" && return -1
+  mkdir -p "${TOP_DIR}/output"
+  cp -rv ${TOP_DIR}/`ls -A ${TOP_DIR} | grep -vE "output|\.git*|\.cache"` ${TOP_DIR}/output/
 }
 
 function run_ci_test() {

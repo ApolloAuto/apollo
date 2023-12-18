@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_base/proto/plugin_declare_info.proto";
+
+message PlannerPublicRoadConfig {
+  repeated PluginDeclareInfo scenario = 1;
+}

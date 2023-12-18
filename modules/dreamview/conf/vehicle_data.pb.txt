@@ -148,7 +148,7 @@ data_files {
 }
 data_files {
   source_path: "planning_conf"
-  dest_path: "/apollo/modules/planning/conf"
+  dest_path: "/apollo/modules/planning/planning_component/conf"
 }
 data_files {
   source_path: "localization_conf"
@@ -223,6 +223,14 @@ data_files {
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
 }
 data_files {
+  source_path: "perception_pipeline_config"
+  dest_path: "/apollo/modules/perception/pipeline/config"
+}
+data_files {
   source_path: "v2x_conf"
   dest_path: "/apollo/modules/v2x/conf"
+}
+data_files {
+  source_path: "sensor_meta.pb.txt"
+  dest_path: "/apollo/modules/perception/data/conf/sensor_meta.pb.txt"
 }

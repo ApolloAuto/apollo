@@ -15,6 +15,7 @@ load("//third_party/ffmpeg:workspace.bzl", ffmpeg = "repo")
 load("//third_party/fftw3:workspace.bzl", fftw3 = "repo")
 load("//third_party/fastrtps:workspace.bzl", fastrtps = "repo")
 load("//third_party/glog:workspace.bzl", glog = "repo")
+load("//third_party/nvjpeg:workspace.bzl", nvjpeg = "repo")
 load("//third_party/gtest:workspace.bzl", gtest = "repo")
 load("//third_party/gflags:workspace.bzl", gflags = "repo")
 load("//third_party/ipopt:workspace.bzl", ipopt = "repo")
@@ -35,6 +36,7 @@ load("//third_party/sqlite3:workspace.bzl", sqlite3 = "repo")
 load("//third_party/tinyxml2:workspace.bzl", tinyxml2 = "repo")
 load("//third_party/uuid:workspace.bzl", uuid = "repo")
 load("//third_party/yaml_cpp:workspace.bzl", yaml_cpp = "repo")
+load("//third_party/localization_msf:workspace.bzl", localization_msf = "repo")
 
 # load("//third_party/glew:workspace.bzl", glew = "repo")
 
@@ -82,8 +84,10 @@ def initialize_third_party():
     qt5()
     sqlite3()
     tinyxml2()
+    nvjpeg()
     uuid()
     yaml_cpp()
+    localization_msf()
 
 # Define all external repositories required by
 def apollo_repositories():

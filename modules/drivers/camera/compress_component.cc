@@ -17,7 +17,8 @@
 #include "modules/drivers/camera/compress_component.h"
 
 #include <exception>
-#include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -42,17 +43,30 @@ bool CompressComponent::Init() {
     return false;
   }
 
+  width_ = config_.compress_conf().width();
+  height_ = config_.compress_conf().height();
+
   writer_ = node_->CreateWriter<CompressedImage>(
       config_.compress_conf().output_channel());
+
   return true;
 }
 
 bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
   ADEBUG << "procing compressed";
+  if (cyber_unlikely(
+      image->height() != height_ || image->width() != width_)) {
+    AERROR << "Setting resolution is " << width_ << "x" << height_ <<
+      ", but received " << image->width() << "x" << image->height();
+    return false;
+  }
   auto compressed_image = image_pool_->GetObject();
   compressed_image->mutable_header()->CopyFrom(image->header());
   compressed_image->set_frame_id(image->frame_id());
   compressed_image->set_measurement_time(image->measurement_time());
+  compressed_image->set_height(height_);
+  compressed_image->set_width(width_);
+
   compressed_image->set_format(image->encoding() + "; jpeg compressed bgr8");
 
   std::vector<int> params;
@@ -71,11 +85,12 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
       return false;
     }
     compressed_image->set_data(compress_buffer.data(), compress_buffer.size());
-    writer_->Write(compressed_image);
   } catch (std::exception& e) {
     AERROR << "cv::imencode (jpeg) exception :" << e.what();
     return false;
   }
+
+  writer_->Write(compressed_image);
   return true;
 }
 

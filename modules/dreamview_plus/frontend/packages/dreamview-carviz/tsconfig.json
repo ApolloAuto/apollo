@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declarationDir": ".",
+        "declaration": true,
+        "importHelpers": true,
+        "jsx": "react-jsx",
+        "esModuleInterop": true,
+        "lib": ["dom", "esnext"]
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "**.d.ts"],
+    "moduleResolution": "node"
+}

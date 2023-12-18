@@ -1,0 +1,34 @@
+# point pillars params
+
+info {
+  name: "point_pillars_radar4d_torch"
+  version: ""
+  dataset: "kitti"
+  task_type: Detection3D
+  sensor_type: Radar
+  framework: PyTorch
+
+  weight_file {
+    file: "radar_libtorch_all.zip"
+  }
+}
+
+preprocess {
+  gpu_id: 0
+  normalizing_factor: 255
+  num_point_feature: 7
+  enable_ground_removal: false
+  ground_removal_height: -1.5
+  enable_fuse_frames: true
+  num_fuse_frames: 5
+  fuse_time_interval: 0.5
+  max_num_points: 2147483647
+  reproduce_result_mode: false
+  enable_roi_outside_removal: false
+}
+
+postprocess {
+  score_threshold: 0.1
+  nms_overlap_threshold: 0.01
+  num_output_box_feature: 7
+}

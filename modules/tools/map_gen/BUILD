@@ -1,9 +1,10 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "add_signal",
     srcs = ["add_signal.py"],
     deps = [
@@ -13,7 +14,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_path",
     srcs = ["extract_path.py"],
     deps = [
@@ -23,7 +24,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "map_gen_single_lane",
     srcs = ["map_gen_single_lane.py"],
     deps = [
@@ -33,7 +34,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "map_gen_two_lanes_right_ext",
     srcs = ["map_gen_two_lanes_right_ext.py"],
     deps = [
@@ -43,7 +44,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "map_gen",
     srcs = ["map_gen.py"],
     deps = [
@@ -52,15 +53,17 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/map_gen",
-    targets = [
-        "add_signal",
-        "extract_path",
-        "map_gen_single_lane",
-        "map_gen_two_lanes_right_ext",
-        "map_gen",
-    ]
+# install(
+#     name = "install",
+#     py_dest = "tools/map_gen",
+#     targets = [
+#         "add_signal",
+#         "extract_path",
+#         "map_gen_single_lane",
+#         "map_gen_two_lanes_right_ext",
+#         "map_gen",
+#     ]
 
-)
+# )
+
+apollo_package()

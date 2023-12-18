@@ -1,0 +1,8 @@
+plugin_param {
+  name: "MultiCueTransformer"
+  config_path: "perception/camera_location_estimation/data"
+  config_file: "config.pb.txt"
+}
+channel {
+  output_obstacles_channel_name: "/perception/inner/location_estimation"
+}

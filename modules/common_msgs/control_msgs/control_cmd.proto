@@ -1,6 +1,7 @@
 syntax = "proto2";
 package apollo.control;
 
+import "google/protobuf/any.proto";
 import "modules/common_msgs/basic_msgs/drive_state.proto";
 import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/basic_msgs/pnc_point.proto";
@@ -108,6 +109,13 @@ message SimpleLongitudinalDebug {
   optional apollo.common.TrajectoryPoint current_reference_point = 33;
   optional apollo.common.TrajectoryPoint preview_reference_point = 34;
   optional double acceleration_lookup_limit = 35;
+  optional double vehicle_pitch = 36;
+  optional bool is_epb_brake = 37;
+  optional double current_steer_interval = 38;
+  optional bool is_wait_steer = 39;
+  optional bool is_stop_reason_by_destination = 40;
+  optional bool is_stop_reason_by_prdestrian = 41;
+  optional bool is_full_stop_soft = 42;
 }
 
 message SimpleLateralDebug {
@@ -226,6 +234,25 @@ message SimpleMPCDebug {
   optional double jerk_reference = 47;
   optional double jerk_feedback = 48;
   optional double jerk_error = 49;
+
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
+  optional double lateral_error_feedback = 50;
+  optional double heading_error_feedback = 51;
+  // Augmented feedback control term in addition to MPC control
+  optional double steer_angle_feedback_augment = 52;
+  optional apollo.common.TrajectoryPoint current_matched_point = 53;
+  optional apollo.common.TrajectoryPoint current_reference_point = 54;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 55;
+  optional double preview_station_error = 56;
+  optional double preview_speed_reference = 57;
+  optional double preview_speed_error = 58;
+  optional double preview_acceleration_reference = 59;
+  optional double vehicle_pitch = 60;
+  optional double slope_offset_compensation = 61;
+  optional double path_remain = 62;
+  optional double acceleration_lookup_offset = 63;
+  optional double acceleration_vrf = 64;
 }
 
 message MracDebug {

@@ -26,7 +26,8 @@ namespace record {
 
 const uint64_t Player::kSleepIntervalMiliSec = 100;
 
-Player::Player(const PlayParam& play_param)
+Player::Player(const PlayParam& play_param, const NodePtr& node,
+               const bool preload_fill_buffer_mode)
     : is_initialized_(false),
       is_stopped_(true),
       consumer_(nullptr),
@@ -34,7 +35,8 @@ Player::Player(const PlayParam& play_param)
       task_buffer_(nullptr) {
   task_buffer_ = std::make_shared<PlayTaskBuffer>();
   consumer_.reset(new PlayTaskConsumer(task_buffer_, play_param.play_rate));
-  producer_.reset(new PlayTaskProducer(task_buffer_, play_param));
+  producer_.reset(new PlayTaskProducer(task_buffer_, play_param, node,
+                                       preload_fill_buffer_mode));
 }
 
 Player::~Player() { Stop(); }
@@ -78,6 +80,55 @@ static char Getch() {
   return buf;
 }
 
+bool Player::ThreadFunc_Play_Nohup() {
+  if (!is_initialized_.load()) {
+    AERROR << "please call Init firstly.";
+    return false;
+  }
+
+  if (!is_stopped_.exchange(false)) {
+    AERROR << "player has been stopped.";
+    return false;
+  }
+  auto& play_param = producer_->play_param();
+  producer_->Start();
+  consumer_->Start(play_param.begin_time_ns);
+  const double total_progress_time_s =
+      static_cast<double>(play_param.end_time_ns - play_param.begin_time_ns) /
+          1e9 +
+      static_cast<double>(play_param.start_time_s);
+  while (!is_stopped_.load() && apollo::cyber::OK()) {
+    if (is_paused_) {
+      consumer_->Pause();
+    } else {
+      consumer_->Continue();
+    }
+
+    double progress_time_s =
+        static_cast<double>(producer_->play_param().start_time_s);
+    if (consumer_->last_played_msg_real_time_ns() > 0) {
+      progress_time_s +=
+          static_cast<double>(consumer_->last_played_msg_real_time_ns() -
+                              consumer_->base_msg_play_time_ns() +
+                              consumer_->base_msg_real_time_ns() -
+                              producer_->play_param().begin_time_ns) /
+          1e9;
+    }
+
+    producer_->WriteRecordProgress(progress_time_s, total_progress_time_s);
+
+    if (producer_->is_stopped() && task_buffer_->Empty()) {
+      consumer_->Stop();
+      break;
+    }
+    std::this_thread::sleep_for(
+        std::chrono::milliseconds(kSleepIntervalMiliSec));
+  }
+  return true;
+}
+
+void Player::HandleNohupThreadStatus() { is_paused_ = !is_paused_; }
+
 void Player::ThreadFunc_Term() {
   while (!is_stopped_.load()) {
     char ch = Getch();
@@ -92,6 +143,33 @@ void Player::ThreadFunc_Term() {
         break;
     }
   }
+}
+
+void Player::NohupPlayRecord() {
+  nohup_play_th_.reset(new std::thread(&Player::ThreadFunc_Play_Nohup, this));
+}
+
+bool Player::PreloadPlayRecord(const double& progress_s, bool paused_status) {
+  if (!producer_->is_initialized()) {
+    return false;
+  }
+  if (is_preloaded_.load()) {
+    producer_->Reset(progress_s);
+    is_preloaded_.store(false);
+  }
+  if (progress_s == 0) {
+    // When the progress is 0, it is completely reloaded. At this
+    // time, the is_paused_ of the player should change to the initial
+    // state to avoid being disturbed by the last state.On the contrary,
+    // reset the progress needs to preserve the past state to ensure the
+    // unity of the state before and after.
+    is_paused_.exchange(false);
+  } else {
+    is_paused_.exchange(paused_status);
+  }
+  producer_->FillPlayTaskBuffer();
+  is_preloaded_.store(true);
+  return true;
 }
 
 bool Player::Start() {
@@ -188,6 +266,24 @@ bool Player::Stop() {
   if (term_thread_ != nullptr && term_thread_->joinable()) {
     term_thread_->join();
     term_thread_ = nullptr;
+  }
+  return true;
+}
+
+bool Player::Reset() {
+  if (is_stopped_.exchange(true)) {
+    return false;
+  }
+  // produer may not be stopped under reset progress
+  // reset is_stopped_ to true to ensure logical unity
+  producer_->set_stopped();
+  producer_->Stop();
+  consumer_->Stop();
+  // clear task buffer for refill it
+  task_buffer_->Clear();
+  if (nohup_play_th_ != nullptr && nohup_play_th_->joinable()) {
+    nohup_play_th_->join();
+    nohup_play_th_ = nullptr;
   }
   return true;
 }

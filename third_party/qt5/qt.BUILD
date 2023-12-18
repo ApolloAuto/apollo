@@ -2,7 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "qt_core",
-    hdrs = glob(["*"]),
+    hdrs = glob(["**/*"]),
     copts = [
         "-I.",
     ],
@@ -18,7 +18,7 @@ cc_library(
 
 cc_library(
     name = "qt_widgets",
-    hdrs = glob(["*"]),
+    hdrs = glob(["**/*"]),
     copts = [
         "-I.",
     ],
@@ -33,7 +33,7 @@ cc_library(
 
 cc_library(
     name = "qt_gui",
-    hdrs = glob(["*"]),
+    hdrs = glob(["**/*"]),
     copts = [
         "-I.",
     ],
@@ -51,7 +51,7 @@ cc_library(
 
 cc_library(
     name = "qt_opengl",
-    hdrs = glob(["*"]),
+    hdrs = glob(["**/*"]),
     copts = [
         "-I.",
     ],

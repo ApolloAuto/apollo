@@ -82,6 +82,18 @@ void ProcessMonitor::RunOnce(const double current_time) {
     const auto& config = iter.second;
     UpdateStatus(running_processes, config, &other_components->at(name));
   }
+
+  // Check global components.
+  auto* global_components = manager->GetStatus()->mutable_global_components();
+  for (const auto& iter : mode.global_components()) {
+    const std::string& name = iter.first;
+    if (iter.second.has_process() &&
+        apollo::common::util::ContainsKey(*global_components, name)) {
+      const auto& config = iter.second.process();
+      auto* status = global_components->at(name).mutable_process_status();
+      UpdateStatus(running_processes, config, status);
+    }
+  }
 }
 
 void ProcessMonitor::UpdateStatus(

@@ -288,7 +288,7 @@ double LaneInfo::GetWidthFromSample(
   int low = 0;
   int high = static_cast<int>(samples.size());
   while (low + 1 < high) {
-    const int mid = (low + high) / 2;
+    const int mid = (low + high) >> 1;
     if (samples[mid].first <= s) {
       low = mid;
     } else {
@@ -405,6 +405,52 @@ bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
   int seg_num = static_cast<int>(segments_.size());
   int min_index = 0;
   for (int i = 0; i < seg_num; ++i) {
+    const double distance = segments_[i].DistanceSquareTo(point);
+    if (distance < min_dist) {
+      min_index = i;
+      min_dist = distance;
+    }
+  }
+  min_dist = std::sqrt(min_dist);
+  const auto &nearest_seg = segments_[min_index];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
+    }
+  } else if (min_index == seg_num - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
+    }
+  } else {
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * min_dist;
+  }
+  return true;
+}
+
+bool LaneInfo::GetProjection(const Vec2d &point, const double heading,
+                             double *accumulate_s, double *lateral) const {
+  RETURN_VAL_IF_NULL(accumulate_s, false);
+  RETURN_VAL_IF_NULL(lateral, false);
+
+  if (segments_.empty()) {
+    return false;
+  }
+  double min_dist = std::numeric_limits<double>::infinity();
+  int seg_num = static_cast<int>(segments_.size());
+  int min_index = 0;
+  for (int i = 0; i < seg_num; ++i) {
+    if (abs(common::math::AngleDiff(segments_[i].heading(), heading)) >= M_PI_2)
+      continue;
     const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < min_dist) {
       min_index = i;

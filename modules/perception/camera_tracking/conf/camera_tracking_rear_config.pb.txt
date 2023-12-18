@@ -1,0 +1,9 @@
+output_channel_name: "/perception/inner/PrefusedObjects"
+plugin_param {
+  name: "OMTObstacleTracker"
+  config_path: "perception/camera_tracking/data"
+  config_file: "omt.pb.txt"
+}
+image_width: 1920
+image_height: 1080
+gpu_id: 0

@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/lane_change_path/liblane_change_path.so">
+    <class type="apollo::planning::LaneChangePath" base_class="apollo::planning::Task"></class>
+</library>

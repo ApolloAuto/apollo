@@ -1,0 +1,19 @@
+detector_param {
+  name: "Radar4dDetection"
+  config_path: "perception/radar4d_detection/data"
+  config_file: "point_pillars_param.pb.txt"
+}
+roi_filter_param {
+  name: "HdmapRadarRoiFilter"
+}
+multi_target_tracker_param {
+  name: "MrfEngine"
+  config_path: "perception/radar4d_detection/data/tracking"
+  config_file: "mrf_engine.pb.txt"
+}
+fusion_classifier_param {
+  name: "FusedClassifier"
+  config_path: "perception/radar4d_detection/data/fused_classifier"
+  config_file: "fused_classifier.pb.txt"
+}
+enable_roi_filter: true

@@ -1,0 +1,14 @@
+node_modules/
+yarn-error.log
+yarn.lock
+yarn-lock.json
+dist_offline/
+
+
+lerna-debug.log
+
+packages/dreamview-ui/storybook-static
+
+
+# build
+.web_build

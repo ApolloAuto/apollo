@@ -11,6 +11,18 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
+  <depend>libx265-146</depend>
+  <depend>libass9</depend>
+  <depend>libfdk-aac1</depend>
+  <depend>libmp3lame0</depend>
+  <depend>libopus0</depend>
+  <depend>libtheora0</depend>
+  <depend>libvorbis0a</depend>
+  <depend>libvorbisenc2</depend>
+  <depend>libvpx5</depend>
+  <depend>libx264-152</depend>
+  <depend so_names="numa">libnuma-dev</depend>
+
   <type>third-binary</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/ffmpeg</src_path>
 

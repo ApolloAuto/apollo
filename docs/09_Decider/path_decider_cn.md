@@ -12,7 +12,7 @@
 
 规划模块的运动总体流程图如下：
 
-![总体流程图](../images/task/lane_follow.png)
+![总体流程图](images/lane_follow.png)
 
 总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
 
@@ -37,7 +37,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 `路径决策`的整体流程如下图：
 
-![流程图](../images/task/path_decider/path_decider.png)
+![流程图](images/path_decider.png)
 
 在`Process`函数主要功能是调用了`MakeObjectDecision`函数。而在`MakeObjectDecision`函数中调用了`MakeStaticObstacleDecision`函数。
 

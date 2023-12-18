@@ -28,7 +28,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/fuel_monitor/fuel_monitor_manager.h"
+#include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
 namespace apollo {

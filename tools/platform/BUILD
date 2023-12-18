@@ -42,3 +42,10 @@ config_setting(
         "WITH_TELEOP": "true",
     },
 )
+
+config_setting(
+    name = "enable_profiler",
+    define_values = {
+        "ENABLE_PROFILER": "true",
+    },
+)

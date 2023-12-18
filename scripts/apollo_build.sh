@@ -22,6 +22,7 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function main() {
+  site_restore
   parse_cmdline_arguments "$@"
   run_bazel "Build"
   if [ -z "${SHORTHAND_TARGETS}" ]; then

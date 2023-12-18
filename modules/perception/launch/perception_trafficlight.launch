@@ -1,0 +1,13 @@
+<cyber>
+    <desc>Apollo trafficlight detection</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>trafficlight</name>
+        <dag_conf>/apollo/modules/perception/traffic_light_region_proposal/dag/traffic_light_region_proposal.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/traffic_light_detection/dag/traffic_light_detection.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/traffic_light_recognition/dag/traffic_light_recognition.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/traffic_light_tracking/dag/traffic_light_tracking.dag</dag_conf>
+        <process_name>trafficlight</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

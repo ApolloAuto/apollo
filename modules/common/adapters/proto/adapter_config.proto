@@ -15,6 +15,7 @@ message AdapterConfig {
     MONITOR = 7;
     PAD = 8;
     CONTROL_COMMAND = 9;
+    CHASSIS_COMMAND = 76;
     PREDICTION = 10;
     PERCEPTION_OBSTACLES = 11;
     TRAFFIC_LIGHT_DETECTION = 12;

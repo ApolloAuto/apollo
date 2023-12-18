@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2023 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
-
+#include "modules/canbus_vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
 #include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -31,7 +29,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t %(classname)s::ID = 0x%(id_upper)s;
 
 void %(classname)s::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
+                         %(car_type_capitalize)s* chassis) const {
 %(set_var_to_protocol_list)s
 }
 %(func_impl_list)s

@@ -1,0 +1,7 @@
+output_channel_name: "/perception/lidar/detection_filter"
+use_object_filter_bank: true
+plugin_param {
+    name: "ObjectFilterBank"
+    config_path: "perception/lidar_detection_filter/data"
+    config_file: "filter_bank.pb.txt"
+}

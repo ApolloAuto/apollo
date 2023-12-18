@@ -1,0 +1,8 @@
+  start_yield_sign_scenario_distance: 10.0
+  max_valid_stop_distance: 4.5
+  creep_timeout_sec: 10.0
+  creep_stage_config {
+    min_boundary_t: 6.0
+    ignore_max_st_min_t: 0.1
+    ignore_min_st_min_s: 15.0
+}

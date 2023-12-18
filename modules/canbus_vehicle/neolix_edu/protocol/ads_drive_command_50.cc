@@ -35,6 +35,12 @@ uint32_t Adsdrivecommand50::GetPeriod() const {
   return PERIOD;
 }
 
+void Adsdrivecommand50::Parse(const std::uint8_t* bytes, int32_t length,
+                             Neolix_edu* chassis) const {
+  chassis->mutable_ads_drive_command_50()->set_drive_enable(
+      drive_enable(bytes, length));
+}
+
 void Adsdrivecommand50::UpdateData(uint8_t* data) {
   set_p_drive_enable(data, drive_enable_);
   set_p_auto_shift_command(data, auto_shift_command_);
@@ -70,6 +76,15 @@ void Adsdrivecommand50::set_p_drive_enable(uint8_t* data, bool drive_enable) {
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
+}
+
+bool Adsdrivecommand50::drive_enable(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  bool ret = x;
+  return ret;
 }
 
 Adsdrivecommand50* Adsdrivecommand50::set_auto_shift_command(

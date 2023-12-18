@@ -1,8 +1,8 @@
 <package format="2">
-  <name>origin-scripts</name>
+  <name>apollo-scripts</name>
   <version>local</version>
   <description>
-    Some apollo origin scripts.
+    apollo scripts in source env.
   </description>
   
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
@@ -11,7 +11,14 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
-  <type>module-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//dev/scripts</src_path>
+  <type>module</type>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <src_path url="https://github.com/ApolloAuto/apollo">//scripts</src_path>
   
 </package>

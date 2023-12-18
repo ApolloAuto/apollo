@@ -19,7 +19,6 @@
 #include <string>
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
@@ -33,6 +32,7 @@ namespace canbus {
 namespace devkit {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -436,6 +436,13 @@ Chassis DevkitController::chassis() {
         chassis_detail.throttle_report_500().throttle_en_state() == 1);
   }
 
+  if (CheckChassisError()) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Chassis has some fault, please check the chassis_detail.");
+  }
+
   return chassis_;
 }
 
@@ -645,27 +652,30 @@ void DevkitController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void DevkitController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode DevkitController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void DevkitController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.low_beam()) {
+    // None
+  }
+}
+
+void DevkitController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void DevkitController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
-    // None
-  } else {
-    // None
-  }
-}
-
-void DevkitController::SetTurningSignal(const ControlCommand& command) {
+void DevkitController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     vehicle_mode_command_105_->set_turn_light_ctrl(
         Vehicle_mode_command_105::TURN_LIGHT_CTRL_LEFT_TURNLAMP_ON);
@@ -715,9 +725,14 @@ bool DevkitController::CheckChassisError() {
   Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ChassisDetail has no devkit vehicle info.");
     return false;
+  } else {
+    chassis_.clear_engage_advice();
   }
 
   // steer fault
@@ -800,7 +815,7 @@ void DevkitController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by steer manual intervention";
+        AERROR << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -814,12 +829,14 @@ void DevkitController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by speed manual intervention";
+        AERROR << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
       vertical_ctrl_fail = 0;
     }
+
+    // 3. chassis fault check
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;

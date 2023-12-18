@@ -32,6 +32,9 @@ class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
 
   uint32_t GetPeriod() const override;
 
+  void Parse(const std::uint8_t* bytes, int32_t length,
+             Neolix_edu* chassis) const override;
+
   void UpdateData(uint8_t* data) override;
 
   void Reset() override;
@@ -113,6 +116,8 @@ class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
   // ''}
   void set_p_auto_drivercmd_checksum(uint8_t* data,
                                      int auto_drivercmd_checksum);
+
+  bool drive_enable(const std::uint8_t* bytes, const int32_t length) const;
 
  private:
   bool drive_enable_;

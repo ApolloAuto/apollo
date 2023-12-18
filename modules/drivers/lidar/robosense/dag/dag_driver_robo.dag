@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/libsuteng_driver_component.so"
+    module_library : "modules/drivers/lidar/robosense/libsuteng_driver_component.so"
     
     ##################################################
     #                   drivers                      #
@@ -67,7 +67,7 @@ module_config {
 #                   fusion                      #
 ##################################################
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/fusion/librobosense_fusion_component.so"
+    module_library : "modules/drivers/lidar/robosense/fusion/librobosense_fusion_component.so"
 
     components {
       class_name : "PriSecFusionComponent"
@@ -85,7 +85,7 @@ module_config {
 ##################################################
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
+    module_library : "modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
 
     components {
       class_name : "CompensatorComponent"

@@ -1,0 +1,8 @@
+sensor_name: "velodyne64"
+lidar_query_tf_offset: 0
+output_channel_name: "/perception/lidar/pointcloud_preprocess"
+plugin_param {
+  name: "PointCloudPreprocessor"
+  config_path: "perception/pointcloud_preprocess/data"
+  config_file: "pointcloud_preprocessor.pb.txt"
+}

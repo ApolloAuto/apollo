@@ -343,6 +343,6 @@ module.exports = {
     performanceMonitor: false,
   },
   server: {
-    port: 8888,
+    port: 8899,
   },
 };

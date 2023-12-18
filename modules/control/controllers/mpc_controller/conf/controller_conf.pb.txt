@@ -1,0 +1,149 @@
+ts: 0.01
+cf: 155494.663
+cr: 155494.663
+mass_fl: 45
+mass_fr: 45
+mass_rl: 57
+mass_rr: 57
+eps: 0.01
+matrix_q: 40.0
+matrix_q: 0.0
+matrix_q: 30.0
+matrix_q: 0.0
+matrix_q: 70.0
+matrix_q: 10.0
+matrix_r: 3.25
+matrix_r: 1.0
+cutoff_freq: 10
+mean_filter_window_size: 10
+max_iteration: 3000
+max_lateral_acceleration: 4.0
+standstill_acceleration: -1.0
+brake_minimum_action: 1.0
+throttle_minimum_action: 1.0
+enable_mpc_feedforward_compensation: false
+use_lookup_acc_pid: true
+use_pitch_angle_filter: true
+lat_err_gain_scheduler {
+  scheduler {
+    speed: 0.6
+    ratio: 1.5
+  }
+  scheduler {
+    speed: 1.2
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 2.0
+    ratio: 0.6
+  }
+  scheduler {
+    speed: 3.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 4.0
+    ratio: 0.05
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 0.4
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 0.3
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.1
+  }
+}
+heading_err_gain_scheduler {
+  scheduler {
+    speed: 0.6
+    ratio: 1.5
+  }
+  scheduler {
+    speed: 1.0
+    ratio: 1.2
+  }
+  scheduler {
+    speed: 1.5
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 2.0
+    ratio: 0.8
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.1
+  }
+}
+feedforwardterm_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 0.7
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 0.05
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.0
+  }
+}
+steer_weight_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 1.1
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 1.1
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 1.35
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 1.55
+  }
+}
+acc_lookup_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.3
+  kp: 0.1
+  ki: 0.0
+  kd: 0.0
+}

@@ -23,6 +23,7 @@
 # """
 function start() {
   local APOLLO_ROOT_DIR="/apollo"
+  local APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
   TIME="$(date +%F-%H-%M-%S)"
   MODULE="smart_recorder"
 
@@ -38,7 +39,7 @@ function start() {
   fi
 
   if [[ ! -f ${RECORD_EXE} ]]; then
-    echo "can't fine smart_recorder. Have you installed apollo-data-dev?"
+    echo "can't find smart_recorder. Have you installed apollo-data-dev?"
     exit -1
   fi
 

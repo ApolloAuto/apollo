@@ -1,0 +1,2 @@
+roi_type: PULL_OVER
+perception_obstacle_buffer: 0.5

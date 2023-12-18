@@ -21,7 +21,7 @@ import math
 from ctypes import cdll, c_ushort, c_int, c_char_p, c_double, POINTER
 
 lib = cdll.LoadLibrary(
-    '/apollo/bazel-bin/modules/planning/open_space/tools/open_space_roi_wrapper_lib.so')
+    '/apollo/bazel-bin/modules/planning/planning_base/open_space/tools/open_space_roi_wrapper_lib.so')
 
 
 class open_space_roi(object):

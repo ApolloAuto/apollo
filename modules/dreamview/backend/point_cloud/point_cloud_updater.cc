@@ -247,7 +247,11 @@ void PointCloudUpdater::UpdatePointCloud(
   if (!enabled_) {
     return;
   }
-  last_point_cloud_time_ = point_cloud->header().timestamp_sec();
+  if (point_cloud->header().has_timestamp_sec()) {
+    last_point_cloud_time_ = point_cloud->header().timestamp_sec();
+  } else {
+    last_point_cloud_time_ = point_cloud->measurement_time();
+  }
   if (simworld_updater_->LastAdcTimestampSec() == 0.0 ||
       simworld_updater_->LastAdcTimestampSec() - last_point_cloud_time_ > 0.1) {
     AWARN << "skipping outdated point cloud data";

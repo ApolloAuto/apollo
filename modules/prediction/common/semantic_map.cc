@@ -59,6 +59,9 @@ SemanticMap::SemanticMap() {}
 void SemanticMap::Init() {
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   obstacle_id_history_map_.clear();
+#ifdef __aarch64__
+  affine_transformer_.Init(cv::Size(2000, 2000), CV_8UC3);
+#endif
 }
 
 void SemanticMap::RunCurrFrame(
@@ -364,10 +367,15 @@ void SemanticMap::DrawADCTrajectory(const cv::Scalar& color,
 cv::Mat SemanticMap::CropArea(const cv::Mat& input_img,
                               const cv::Point2i& center_point,
                               const double heading) {
+  cv::Mat rotated_mat;
+#ifdef __aarch64__
+  affine_transformer_.AffineTransformsFromMat(input_img,
+    center_point, heading, 1.0, &rotated_mat);
+#else
   cv::Mat rotation_mat =
       cv::getRotationMatrix2D(center_point, 90.0 - heading * 180.0 / M_PI, 1.0);
-  cv::Mat rotated_mat;
   cv::warpAffine(input_img, rotated_mat, rotation_mat, input_img.size());
+#endif
   cv::Rect rect(center_point.x - 200, center_point.y - 300, 400, 400);
   cv::Mat output_img;
   cv::resize(rotated_mat(rect), output_img, cv::Size(224, 224));

@@ -1,85 +1,58 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_time_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
-
-cc_library(
-    name = "time",
-    srcs = ["time.cc"],
-    hdrs = ["time.h"],
-    deps = [
-        ":duration",
+apollo_cc_library(
+    name = "cyber_time",
+    srcs = [
+        "clock.cc",
+        "duration.cc",
+        "rate.cc",
+        "time.cc",
     ],
-)
-
-cc_test(
-    name = "time_test",
-    size = "small",
-    srcs = ["time_test.cc"],
-    deps = [
-        ":time",
-        "@com_google_googletest//:gtest_main",
+    hdrs = [
+        "clock.h",
+        "duration.h",
+        "rate.h",
+        "time.h",
     ],
-)
-
-cc_library(
-    name = "rate",
-    srcs = ["rate.cc"],
-    hdrs = ["rate.h"],
     deps = [
-        ":duration",
-        ":time",
-        "//cyber/common:log",
-    ],
-)
-
-cc_library(
-    name = "duration",
-    srcs = ["duration.cc"],
-    hdrs = ["duration.h"],
-)
-
-cc_test(
-    name = "duration_test",
-    size = "small",
-    srcs = ["duration_test.cc"],
-    deps = [
-        ":duration",
-        ":time",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "clock",
-    srcs = ["clock.cc"],
-    hdrs = ["clock.h"],
-    deps = [
-        ":time",
-        "//cyber/base:atomic_rw_lock",
-        "//cyber/common:global_data",
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "//cyber/common:util",
+        "//cyber/common:cyber_common",
+        "//cyber/base:cyber_base",
         "//cyber/proto:run_mode_conf_cc_proto",
     ],
 )
 
-cc_test(
-    name = "clock_test",
+apollo_cc_test(
+    name = "time_test",
     size = "small",
-    srcs = ["clock_test.cc"],
+    srcs = ["time_test.cc"],
     deps = [
-        ":clock",
+        ":cyber_time",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
+apollo_cc_test(
+    name = "duration_test",
+    size = "small",
+    srcs = ["duration_test.cc"],
+    deps = [
+        ":cyber_time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "clock_test",
+    size = "small",
+    srcs = ["clock_test.cc"],
+    deps = [
+        ":cyber_time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_package()
 cpplint()

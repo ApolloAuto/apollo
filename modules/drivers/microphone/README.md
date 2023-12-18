@@ -1,4 +1,49 @@
-This serves as the audio driver folder
+# drivers-microphone
+
+## Introduction
+This package is responsible for receiving the native audio input and parsing it to send it to the audio package for subsequent processing.
+
+## Directory Structure
+```shell
+modules/drivers/microphone/
+├── BUILD
+├── conf
+├── cyberfile.xml
+├── dag
+├── drivers-microphone.BUILD
+├── launch
+├── microphone_component.cc
+├── microphone_component.h
+├── proto
+├── README.md
+├── respeaker.cc
+└── respeaker.h
+```
+
+## Modules
+
+### MicrophoneComponent
+
+apollo::drivers::microphone::MicrophoneComponent
+
+
+#### Input
+
+| Name   | Type| Description         |
+| ------ | --- | ------------------- |
+| stream |  -  |          -          |
+
+#### Output
+
+| Name  | Type                                             | Description           |
+| ----- | -------------------------------------------------| --------------------- |
+| `msg` | `apollo::drivers::microphone::config::AudioDate` |  Raw microphone data  |
+
+#### configs
+
+| file path                                      | type / struct                                           | Description           |
+| ---------------------------------------------- | ------------------------------------------------------- | --------------------- |
+| `modules/drivers/microphone/respeaker.pb.txt`  | `apollo::drivers::microphone::config::MicrophoneConfig` |    microphone config  |
 
 ## Microphone Configuration
 
@@ -23,5 +68,8 @@ You might see other metrics elsewhere as follows:
 * **BIT DEPTH** same to sample_width except that the unit is bit.
 * **BIT RATE** number of bits encoded per second (kbps or k) -- for compressed format like mp3.
 
-## Output
-  * Raw microphone data (cyber channel `apollo/sensor/microphone`).
+#### How to Launch
+
+```bash
+cyber_launch start modules/drivers/microphone/launch/microphone.launch
+```

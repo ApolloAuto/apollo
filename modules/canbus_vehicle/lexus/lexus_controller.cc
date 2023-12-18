@@ -17,11 +17,10 @@
 #include "modules/canbus_vehicle/lexus/lexus_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/lexus/lexus_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -30,6 +29,7 @@ namespace canbus {
 namespace lexus {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -531,26 +531,31 @@ void LexusController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void LexusController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode LexusController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void LexusController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.has_high_beam() && vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     // None
   } else {
     // None
   }
 }
 
-void LexusController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void LexusController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void LexusController::SetTurningSignal(const ControlCommand& command) {
-  auto signal = command.signal().turn_signal();
+void LexusController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     turn_cmd_130_->set_turn_signal_cmd(Turn_cmd_130::TURN_SIGNAL_CMD_LEFT);
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {

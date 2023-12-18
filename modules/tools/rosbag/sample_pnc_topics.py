@@ -61,8 +61,6 @@ class SamplePNC(object):
         '/apollo/perception/traffic_light',
         '/apollo/planning',
         '/apollo/prediction',
-        '/apollo/routing_request',
-        '/apollo/routing_response',
         '/apollo/localization/pose',
         '/apollo/drive_event',
         '/tf',

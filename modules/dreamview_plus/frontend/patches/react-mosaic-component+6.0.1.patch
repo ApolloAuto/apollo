@@ -1,0 +1,47 @@
+diff --git a/node_modules/react-mosaic-component/lib/MosaicWindow.js b/node_modules/react-mosaic-component/lib/MosaicWindow.js
+index 11aaefa..9c7c0d5 100644
+--- a/node_modules/react-mosaic-component/lib/MosaicWindow.js
++++ b/node_modules/react-mosaic-component/lib/MosaicWindow.js
+@@ -120,6 +120,10 @@ var InternalMosaicWindow = /** @class */ (function (_super) {
+             var connectDragSource = _this.props.connectDragSource;
+             return connectDragSource(connectedElements);
+         };
++        _this.connectDragPreview = function (connectedElements) {
++            var connectDragPreview = _this.props.connectDragPreview;
++            return connectDragPreview(connectedElements);
++        };
+         _this.childContext = {
+             blueprintNamespace: _this.context.blueprintNamespace,
+             mosaicWindowActions: {
+@@ -128,6 +132,7 @@ var InternalMosaicWindow = /** @class */ (function (_super) {
+                 setAdditionalControlsOpen: _this.setAdditionalControlsOpen,
+                 getPath: _this.getPath,
+                 connectDragSource: _this.connectDragSource,
++                connectDragPreview: _this.connectDragPreview,
+             },
+         };
+         return _this;
+@@ -143,7 +148,7 @@ var InternalMosaicWindow = /** @class */ (function (_super) {
+             react_1.default.createElement("div", { className: "mosaic-window-body" }, this.props.children),
+             react_1.default.createElement("div", { className: "mosaic-window-body-overlay", onClick: function () { return _this.setAdditionalControlsOpen(false); } }),
+             react_1.default.createElement("div", { className: "mosaic-window-additional-actions-bar" }, additionalControls),
+-            connectDragPreview(renderPreview(this.props)),
++            // connectDragPreview(renderPreview(this.props)),
+             react_1.default.createElement("div", { className: "drop-target-container" }, (0, values_1.default)(internalTypes_1.MosaicDropTargetPosition).map(this.renderDropTarget))))));
+     };
+     InternalMosaicWindow.prototype.getToolbarControls = function () {
+diff --git a/node_modules/react-mosaic-component/lib/contextTypes.d.ts b/node_modules/react-mosaic-component/lib/contextTypes.d.ts
+index 2dd7a2a..7609155 100644
+--- a/node_modules/react-mosaic-component/lib/contextTypes.d.ts
++++ b/node_modules/react-mosaic-component/lib/contextTypes.d.ts
+@@ -81,6 +81,10 @@ export interface MosaicWindowActions {
+      * Enables connecting a different drag source besides the react-mosaic toolbar
+      */
+     connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement | null;
++    /**
++     * Enables connecting a different drag source besides the react-mosaic toolbar
++     */
++    connectDragPreview: (connectedElements: React.ReactElement<any>) => React.ReactElement | null;
+ }
+ export declare const MosaicContext: React.Context<MosaicContext<MosaicKey>>;
+ export declare const MosaicWindowContext: React.Context<MosaicWindowContext>;

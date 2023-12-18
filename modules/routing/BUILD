@@ -1,45 +1,77 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 ROUTING_COPTS = ['-DMODULE_NAME=\\"routing\\"']
 
-cc_library(
-    name = "routing",
-    srcs = ["routing.cc"],
-    hdrs = ["routing.h"],
+apollo_cc_library(
+    name = "apollo_routing",
+    srcs = [
+        "common/routing_gflags.cc",
+        "core/black_list_range_generator.cc",
+        "core/navigator.cc",
+        "core/result_generator.cc",
+        "graph/node_with_range.cc",
+        "graph/sub_topo_graph.cc",
+        "graph/topo_graph.cc",
+        "graph/topo_node.cc",
+        "graph/topo_range.cc",
+        "graph/topo_range_manager.cc",
+        "graph/topo_test_utils.cc",
+        "routing.cc",
+        "strategy/a_star_strategy.cc",
+        "topo_creator/edge_creator.cc",
+        "topo_creator/graph_creator.cc",
+        "topo_creator/node_creator.cc",
+    ],
+    hdrs = [
+        "common/routing_gflags.h",
+        "core/black_list_range_generator.h",
+        "core/navigator.h",
+        "core/result_generator.h",
+        "graph/node_with_range.h",
+        "graph/range_utils.h",
+        "graph/sub_topo_graph.h",
+        "graph/topo_graph.h",
+        "graph/topo_node.h",
+        "graph/topo_range.h",
+        "graph/topo_range_manager.h",
+        "graph/topo_test_utils.h",
+        "routing.h",
+        "strategy/a_star_strategy.h",
+        "strategy/strategy.h",
+        "topo_creator/edge_creator.h",
+        "topo_creator/graph_creator.h",
+        "topo_creator/node_creator.h",
+    ],
     copts = ROUTING_COPTS,
     deps = [
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
-        "//modules/common/util",
-        "//modules/map/hdmap:hdmap_util",
-        "//modules/routing/core",
-        "//modules/routing/proto:routing_config_cc_proto",
+        "//modules/common/util:common_util",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
         "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/map:apollo_map",
+        "//modules/routing/proto:routing_config_cc_proto",
+        "//modules/routing/proto:topo_graph_cc_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
-    alwayslink = True,
 )
 
-cc_library(
-    name = "routing_component_lib",
+apollo_component(
+    name = "librouting_component.so",
     srcs = ["routing_component.cc"],
     hdrs = ["routing_component.h"],
     copts = ROUTING_COPTS,
     deps = [
-        ":routing",
+        ":apollo_routing",
         "//cyber",
     ],
-    alwayslink = True,
-)
-
-cc_binary(
-    name = "librouting_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":routing_component_lib"],
 )
 
 filegroup(
@@ -52,65 +84,102 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    data_dest = "routing",
-    library_dest = "routing/lib",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":routing.BUILD",
+apollo_cc_test(
+    name = "graph_creator_test",
+    size = "small",
+    srcs = ["topo_creator/graph_creator_test.cc"],
+    copts = ["-fno-access-control"],
+    deps = [
+        ":apollo_routing",
+        "@com_google_googletest//:gtest_main",
     ],
-    targets = [
-        ":librouting_component.so",
+)
+
+apollo_cc_binary(
+    name = "topo_creator",
+    srcs = ["topo_creator/topo_creator.cc"],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
+    deps = [
+        ":apollo_routing",
+        "//modules/map:apollo_map",
+    ],
+)
+
+apollo_cc_binary(
+    name = "routing_dump",
+    srcs = ["tools/routing_dump.cc"],
+    deps = [
+        ":apollo_routing",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
+    ],
+)
+
+apollo_cc_binary(
+    name = "routing_cast",
+    srcs = ["tools/routing_cast.cc"],
+    deps = [
+        ":apollo_routing",
+    ],
+)
+
+filegroup(
+    name = "test_data",
+    srcs = glob([
+        "tools/routing_tester/*.pb.txt",
+    ]),
+)
+
+apollo_cc_binary(
+    name = "routing_tester",
+    srcs = ["tools/routing_tester/routing_tester.cc"],
+    data = [
+        ":test_data",
     ],
     deps = [
-        ":pb_routing",
-        ":pb_hdrs",
-        "//modules/routing/topo_creator:install",
-        "//modules/routing/tools/routing_tester:install",
-        "//modules/routing/tools:install",
-        "//modules/routing/proto:py_pb_routing"
+        ":apollo_routing",
     ],
 )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "routing/include",
-    data = [
-        "//modules/routing/proto:routing_config_cc_proto",
-        "//modules/routing/proto:topo_graph_cc_proto",
-
-    ],
-)
-
-install_files(
-    name = "pb_routing",
-    dest = "routing",
-    files = [
-        "//modules/common_msgs/routing_msgs:routing_py_pb2",
-    ],
-)
-
-install_src_files(
-    name = "install_src",
+apollo_cc_test(
+    name = "topo_node_test",
+    size = "small",
+    srcs = ["graph/topo_node_test.cc"],
     deps = [
-        ":install_routing_src",
-        ":install_routing_hdrs"
+        ":apollo_routing",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
-install_src_files(
-    name = "install_routing_src",
-    src_dir = ["."],
-    dest = "routing/src",
-    filter = "*",
+apollo_cc_test(
+    name = "topo_range_test",
+    size = "small",
+    srcs = ["graph/topo_range_test.cc"],
+    deps = [
+        ":apollo_routing",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
-install_src_files(
-    name = "install_routing_hdrs",
-    src_dir = ["."],
-    dest = "routing/include",
-    filter = "*.h",
+apollo_cc_test(
+    name = "topo_graph_test",
+    size = "small",
+    srcs = ["graph/topo_graph_test.cc"],
+    deps = [
+        ":apollo_routing",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
+
+apollo_cc_test(
+    name = "sub_topo_graph_test",
+    size = "small",
+    srcs = ["graph/sub_topo_graph_test.cc"],
+    deps = [
+        ":apollo_routing",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_package()
+
 cpplint()

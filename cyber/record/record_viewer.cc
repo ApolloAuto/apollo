@@ -78,6 +78,10 @@ RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
 
+RecordViewer::Iterator RecordViewer::curr_itr() { return itr_; }
+
+void RecordViewer::set_curr_itr(const Iterator& curr_itr) { itr_ = curr_itr; }
+
 void RecordViewer::Init() {
   // Init the channel list
   for (auto& reader : readers_) {

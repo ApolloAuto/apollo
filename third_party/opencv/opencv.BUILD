@@ -10,6 +10,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "core",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lopencv_core",
@@ -19,6 +20,7 @@ cc_library(
 cc_library(
     name = "highgui",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lopencv_highgui",
@@ -33,6 +35,7 @@ cc_library(
 cc_library(
     name = "imgproc",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lopencv_imgproc",
@@ -45,6 +48,7 @@ cc_library(
 cc_library(
     name = "imgcodecs",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lopencv_imgcodecs",

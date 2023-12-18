@@ -86,9 +86,3 @@ DEFINE_bool(multithread_run, false,
 // localization
 DEFINE_bool(enable_map_reference_unify, true,
             "enable IMU data convert to map reference");
-
-// planning
-DEFINE_double(replan_lateral_distance_threshold, 0.5,
-              "The lateral distance threshold of replan");
-DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
-              "The longitudinal distance threshold of replan");

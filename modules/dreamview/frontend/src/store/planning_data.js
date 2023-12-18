@@ -236,12 +236,12 @@ export default class PlanningData {
         this.scenarioHistory = [];
       }
 
-      if (currScenario.scenarioType !== newScenario.scenarioType
-            || currScenario.stageType !== newScenario.stageType) {
+      if (currScenario.scenarioPluginType !== newScenario.scenarioPluginType
+            || currScenario.stagePluginType !== newScenario.stagePluginType) {
         this.scenarioHistory.push({
           timeSec: newTimeInSec,
-          scenarioType: newScenario.scenarioType,
-          stageType: newScenario.stageType,
+          scenarioPluginType: newScenario.scenarioPluginType,
+          stagePluginType: newScenario.stagePluginType,
         });
         if (this.scenarioHistory.length > MAX_SCENARIO_LENGTH) {
           this.scenarioHistory.shift();

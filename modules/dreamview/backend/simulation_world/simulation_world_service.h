@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -40,19 +41,25 @@
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+#include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/valet_parking_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/action_command.pb.h"
 #include "modules/common_msgs/localization_msgs/gps.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
+#include "modules/common_msgs/dreamview_msgs/simulation_world.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/common/map_service/map_service.h"
 
 /**
  * @namespace apollo::dreamview
@@ -146,8 +153,15 @@ class SimulationWorldService {
 
   void PublishNavigationInfo(
       const std::shared_ptr<apollo::relative_map::NavigationInfo> &);
-  void PublishRoutingRequest(
-      const std::shared_ptr<apollo::routing::RoutingRequest> &);
+
+  void PublishLaneFollowCommand(
+      const std::shared_ptr<apollo::external_command::LaneFollowCommand> &);
+
+  void PublishValetParkingCommand(
+      const std::shared_ptr<apollo::external_command::ValetParkingCommand> &);
+
+  void PublishActionCommand(
+      const std::shared_ptr<apollo::external_command::ActionCommand> &);
 
   void PublishTask(const std::shared_ptr<apollo::task_manager::Task> &);
 
@@ -381,10 +395,8 @@ class SimulationWorldService {
       drive_event_reader_;
   std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>>
       monitor_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
-      routing_request_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
-      routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::planning::PlanningCommand>>
+      planning_command_reader_;
   std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>
       storytelling_reader_;
   std::shared_ptr<cyber::Reader<apollo::audio::AudioDetection>>
@@ -394,8 +406,15 @@ class SimulationWorldService {
   // Writers.
   std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>
       navigation_writer_;
-  std::shared_ptr<cyber::Writer<apollo::routing::RoutingRequest>>
-      routing_request_writer_;
+  std::shared_ptr<cyber::Client<apollo::external_command::LaneFollowCommand,
+                                apollo::external_command::CommandStatus>>
+      lane_follow_command_client_;
+  std::shared_ptr<cyber::Client<apollo::external_command::ValetParkingCommand,
+                                apollo::external_command::CommandStatus>>
+      valet_parking_command_client_;
+  std::shared_ptr<cyber::Client<apollo::external_command::ActionCommand,
+                                apollo::external_command::CommandStatus>>
+      action_command_client_;
   std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
       routing_response_writer_;
   std::shared_ptr<cyber::Writer<apollo::task_manager::Task>> task_writer_;

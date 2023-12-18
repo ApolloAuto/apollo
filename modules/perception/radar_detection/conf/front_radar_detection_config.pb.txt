@@ -1,0 +1,15 @@
+radar_name: "radar_front"
+tf_child_frame_id: "radar_front"
+radar_forward_distance: 200.0
+preprocessor_param {
+  name: "ContiArsPreprocessor"
+  config_path: "perception/radar_detection/data"
+  config_file: "preprocessor.pb.txt"
+}
+perception_param {
+  name: "RadarObstaclePerception"
+  config_path: "perception/radar_detection/data"
+  config_file: "radar_obstacle_perception.pb.txt"
+}
+odometry_channel_name: "/apollo/localization/pose"
+output_channel_name: "/perception/inner/PrefusedObjects"

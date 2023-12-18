@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message RecognitionParam {
+  optional int32 gpu_id = 1;
+  optional perception.PluginParam plugin_param = 2;
+  optional string recognition_output_channel_name = 3;
+}

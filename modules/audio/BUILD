@@ -1,32 +1,56 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "audio_component_lib",
+apollo_cc_library(
+    name = "apollo_audio",
+    srcs = [
+        "common/audio_gflags.cc",
+        "common/audio_info.cc",
+        "common/message_process.cc",
+        "inference/direction_detection.cc",
+        "inference/moving_detection.cc",
+        "inference/siren_detection.cc",
+    ],
+    hdrs = [
+        "common/audio_gflags.h",
+        "common/audio_info.h",
+        "common/message_process.h",
+        "inference/direction_detection.h",
+        "inference/moving_detection.h",
+        "inference/siren_detection.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common/math",
+        "//modules/common_msgs/audio_msgs:audio_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        "//modules/drivers/microphone/proto:audio_cc_proto",
+        "//modules/drivers/microphone/proto:microphone_config_cc_proto",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@eigen",
+        "@fftw3",
+    ] + ["@libtorch_gpu"],
+)
+
+apollo_component(
+    name = "libaudio_component.so",
     srcs = ["audio_component.cc"],
     hdrs = ["audio_component.h"],
     copts = [
         "-DMODULE_NAME=\\\"audio\\\"",
     ],
     deps = [
+        ":apollo_audio",
         "//cyber",
-        "//modules/audio/common:message_process",
         "//modules/audio/proto:audio_conf_cc_proto",
+        "//modules/common/util:util_tool",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
-        "//modules/common/util:util_tool",
     ],
-    alwayslink = True,
-)
-
-cc_binary(
-    name = "libaudio_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":audio_component_lib"],
 )
 
 filegroup(
@@ -38,64 +62,26 @@ filegroup(
     ]),
 )
 
-# Data->Models:
-# modules/audio/data/torch_siren_detection_model.pt
-
-install(
-    name = "install",
-    library_dest = "audio/lib",
-    data_dest = "audio",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":audio.BUILD",
-    ],
-    targets = [
-        ":libaudio_component.so",
-    ],
+apollo_cc_test(
+    name = "moving_detection_test",
+    size = "small",
+    srcs = ["inference/moving_detection_test.cc"],
     deps = [
-        ":pb_hdrs",
-        "//modules/audio/tools:install",
+        ":apollo_audio",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "audio/include",
-    data = [
-        "//modules/audio/proto:audio_conf_cc_proto",
-    ],
-)
-
-install_src_files(
-    name = "install_src",
+apollo_cc_test(
+    name = "siren_detection_test",
+    size = "small",
+    srcs = ["inference/siren_detection_test.cc"],
     deps = [
-        ":install_audio_src",
-        ":install_audio_hdrs",
-        ":install_audio_model",
-        "//modules/audio/proto:py_pb_audio",
+        ":apollo_audio",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
-install_src_files(
-    name = "install_audio_src",
-    src_dir = ["."],
-    dest = "audio/src",
-    filter = "*",
-)
-
-install_src_files(
-    name = "install_audio_model",
-    src_dir = ["data"],
-    dest = "audio/data",
-    filter = "*"
-)
-
-install_src_files(
-    name = "install_audio_hdrs",
-    src_dir = ["."],
-    dest = "audio/include",
-    filter = "*.h",
-)
+apollo_package()
 
 cpplint()

@@ -1,5 +1,6 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,7 +9,7 @@ filegroup(
     srcs = glob(["*.json"]) + ["garage_perception.bash"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "empty_prediction",
     srcs = ["empty_prediction.py"],
     deps = [
@@ -18,7 +19,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extend_prediction",
     srcs = ["extend_prediction.py"],
     deps = [
@@ -27,7 +28,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "print_perception",
     srcs = ["print_perception.py"],
     deps = [
@@ -36,7 +37,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "replay_perception",
     srcs = ["replay_perception.py"],
     data = [":garage_config"],
@@ -48,14 +49,16 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    data_dest = "tools/perception",
-    py_dest = "tools/perception",
-    targets = [
-        ":empty_prediction",
-        ":extend_prediction",
-        ":print_perception",
-        ":replay_perception"
-    ]
-)
+# install(
+#     name = "install",
+#     data_dest = "tools/perception",
+#     py_dest = "tools/perception",
+#     targets = [
+#         ":empty_prediction",
+#         ":extend_prediction",
+#         ":print_perception",
+#         ":replay_perception"
+#     ]
+# )
+
+apollo_package()

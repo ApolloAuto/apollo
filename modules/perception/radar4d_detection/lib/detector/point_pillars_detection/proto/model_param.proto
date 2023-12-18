@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.radar4d.pointpillars;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.PointCloudPreProcess preprocess = 2;
+  optional common.PointCloudPostProcess postprocess = 3;
+}

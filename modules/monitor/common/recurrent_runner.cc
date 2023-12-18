@@ -25,7 +25,10 @@ RecurrentRunner::RecurrentRunner(const std::string &name, const double interval)
     : name_(name), interval_(interval) {}
 
 void RecurrentRunner::Tick(const double current_time) {
-  if (next_round_ <= current_time) {
+  if (name_ == "ProcessMonitor" &&
+      MonitorManager::Instance()->GetStatus()->detect_immediately()) {
+    RunOnce(current_time);
+  } else if (next_round_ <= current_time) {
     ++round_count_;
     AINFO_EVERY(100) << name_ << " is running round #" << round_count_;
     next_round_ = current_time + interval_;

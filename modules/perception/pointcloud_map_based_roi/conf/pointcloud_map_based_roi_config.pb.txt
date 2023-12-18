@@ -1,0 +1,10 @@
+output_channel_name: "/perception/lidar/pointcloud_map_based_roi"
+use_map_manager: true
+enable_hdmap: true
+plugin_param {
+  name: "HdmapROIFilter"
+  config_path: "perception/pointcloud_map_based_roi/data"
+  config_file: "hdmap_roi_filter.pb.txt"
+}
+map_manager_config_path: "perception/pointcloud_map_based_roi/data"
+map_manager_config_file: "map_manager.pb.txt"

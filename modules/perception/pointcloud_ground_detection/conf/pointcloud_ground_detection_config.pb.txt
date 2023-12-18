@@ -1,0 +1,6 @@
+output_channel_name: "/perception/lidar/pointcloud_ground_detection"
+plugin_param {
+  name: "SpatioTemporalGroundDetector"
+  config_path: "perception/pointcloud_ground_detection/data"
+  config_file: "spatio_temporal_ground_detector.pb.txt"
+}

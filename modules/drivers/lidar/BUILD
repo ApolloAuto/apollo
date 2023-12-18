@@ -1,26 +1,7 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
-
-install(
-    name = "install",
-    data_dest = "drivers/addition_data/lidar",
-    library_dest = "drivers/lib/lidar",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        "liblidar_driver_component.so",
-    ],
-    deps = [
-        "//modules/drivers/lidar/hesai:install",
-        "//modules/drivers/lidar/robosense:install",
-        "//modules/drivers/lidar/velodyne:install",
-        "//modules/drivers/lidar/lslidar:install",
-    ]
-)
 
 filegroup(
     name = "runtime_data",
@@ -32,11 +13,10 @@ filegroup(
     ]),
 )
 
-cc_library(
-    name = "lidar_driver_component_lib",
+apollo_component(
+    name = "liblidar_driver_component.so",
     srcs = ["lidar_driver_component.cc"],
     hdrs = ["lidar_driver_component.h"],
-    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:lidar_driver_factory",
@@ -44,11 +24,6 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "liblidar_driver_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":lidar_driver_component_lib"],
-)
+apollo_package()
 
 cpplint()

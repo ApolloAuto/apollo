@@ -5,6 +5,7 @@ cc_library(
     includes = [
         "include",
     ],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-ltinyxml2",
     ],

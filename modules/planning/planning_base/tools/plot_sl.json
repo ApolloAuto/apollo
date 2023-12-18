@@ -1,0 +1,101 @@
+{
+  "row": 2,
+  "col": 2,
+  "subplot": [
+    {
+      "title": "xy",
+      "x_label": "x",
+      "y_label": "y",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "title": "sl",
+      "x_label": "s",
+      "y_label": "l",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "title": "sdl",
+      "x_label": "s",
+      "y_label": "dl",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "title": "sddl",
+      "x_label": "s",
+      "y_label": "ddl",
+      "row": 1,
+      "col": 1
+    }
+  ],
+  "line": [
+    {
+      "label": ".*_obs_sl_boundary",
+      "marker": "*-",
+      "subplot": "sl"
+    },
+    {
+      "label": "trajxy",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": ".*_l_lower",
+      "marker": "-*",
+      "subplot": "sl"
+    },
+    {
+      "label": ".*_l_upper",
+      "marker": "-*",
+      "subplot": "sl"
+    },
+    {
+      "label": ".*_opt_l",
+      "marker": "-*",
+      "subplot": "sl"
+    },
+    {
+      "label": ".*_ref_l",
+      "marker": "-*",
+      "subplot": "sl"
+    },
+    {
+      "label": ".*_ref_l_weight",
+      "marker": "-*",
+      "subplot": "sl"
+    },
+    {
+      "label": ".*_dl_lower",
+      "marker": "-*",
+      "subplot": "sdl"
+    },
+    {
+      "label": ".*_dl_upper",
+      "marker": "-*",
+      "subplot": "sdl"
+    },
+    {
+      "label": ".*_opt_dl",
+      "marker": "-*",
+      "subplot": "sdl"
+    },
+    {
+      "label": ".*_ddl_lower",
+      "marker": "-*",
+      "subplot": "sddl"
+    },
+    {
+      "label": ".*_ddl_upper",
+      "marker": "-*",
+      "subplot": "sddl"
+    },
+    {
+      "label": ".*_opt_ddl",
+      "marker": "-*",
+      "subplot": "sddl"
+    }
+  ]
+}

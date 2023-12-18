@@ -1,0 +1,7 @@
+plugin_param {
+  name: "SemanticReviser"
+  config_path: "perception/traffic_light_tracking/data"
+  config_file: "semantic.pb.txt"
+}
+traffic_light_output_channel_name : "/apollo/perception/traffic_light"
+v2x_trafficlights_input_channel_name : "/apollo/v2x/traffic_light"

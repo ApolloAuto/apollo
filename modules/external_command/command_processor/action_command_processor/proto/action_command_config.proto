@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+message ActionCommandConfig {
+  // The name of pull over scenario.
+  required string pull_over_scenario_name = 1;
+  // The name of stop scenario.
+  required string stop_scenario_name = 2;
+  // The minimum speed above which the vehicle is considered as moving.
+  required double minimun_non_zero_speed = 3;
+}

@@ -32,12 +32,12 @@ in Apollo 5.0!
    image below. As this app is in Beta testing, it is not open to all our
    developers.
 
-   ![](../specs/images/form.png)
+   ![](images/form.png)
 
 4. You should receive the following activation confirmation via email within 3
    business days:
 
-![](../specs/images/email.png)
+![](images/email.png)
 
 ## Using Scenario Editor
 

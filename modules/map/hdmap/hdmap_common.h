@@ -222,6 +222,9 @@ class LaneInfo {
       const apollo::common::math::Vec2d &point, double *distance) const;
   bool GetProjection(const apollo::common::math::Vec2d &point,
                      double *accumulate_s, double *lateral) const;
+  bool GetProjection(const apollo::common::math::Vec2d &point,
+                     const double heading, double *accumulate_s,
+                     double *lateral) const;
 
  private:
   friend class HDMapImpl;

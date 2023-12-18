@@ -95,7 +95,7 @@ message PerceptionObstacle {
   // Format: [x0, y0, z0, x1, y1, z1...]
   repeated double point_cloud = 12 [packed = true];
 
-  optional double confidence = 13 [deprecated = true];
+  optional double confidence = 13;
   enum ConfidenceType {
     CONFIDENCE_UNKNOWN = 0;
     CONFIDENCE_CNN = 1;
@@ -126,6 +126,9 @@ message PerceptionObstacle {
     ST_TRICYCLIST = 9;
     ST_PEDESTRIAN = 10;
     ST_TRAFFICCONE = 11;
+    ST_SMALLMOT = 12;
+    ST_BIGMOT = 13;
+    ST_NONMOT = 14;
   };
   optional SubType sub_type = 19;  // obstacle sub_type
 

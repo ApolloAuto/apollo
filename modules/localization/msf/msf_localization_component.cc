@@ -108,7 +108,9 @@ bool MSFLocalizationComponent::Proc(
 
 LocalizationMsgPublisher::LocalizationMsgPublisher(
     const std::shared_ptr<cyber::Node>& node)
-    : node_(node), tf2_broadcaster_(node) {}
+    : node_(node), localization_gnss_compensator_(
+      LocalizationGnssCompensator::Instance()),
+      tf2_broadcaster_(node) {}
 
 bool LocalizationMsgPublisher::InitConfig() {
   localization_topic_ = FLAGS_localization_topic;
@@ -140,9 +142,20 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
     const LocalizationEstimate& localization) {
   // broadcast tf message
   apollo::transform::TransformStamped tf2_msg;
+  // uint64_t compensated_delta;
+  uint64_t current_send_tf_time = apollo::cyber::Clock::Now().ToNanosecond();
+  uint64_t measurement_time =
+      apollo::cyber::Time(localization.measurement_time()).ToNanosecond();
 
   auto mutable_head = tf2_msg.mutable_header();
-  mutable_head->set_timestamp_sec(localization.measurement_time());
+
+  localization_gnss_compensator_ = LocalizationGnssCompensator::Instance();
+
+  localization_gnss_compensator_->ProcessCompensation(
+      current_send_tf_time, &measurement_time);
+
+  mutable_head->set_timestamp_sec(
+    apollo::cyber::Time(measurement_time).ToSecond());
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 

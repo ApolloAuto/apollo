@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+message ProcessComponentConfig {
+  // The name of command status request interface.
+  required string output_command_status_name = 1
+      [default = "/apollo/external_command/command_status"];
+  // The enabled external command processor list.
+  repeated string processor = 2;
+}

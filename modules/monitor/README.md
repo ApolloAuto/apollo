@@ -14,6 +14,22 @@ In Apollo 5.5, the monitor module now performs the following checks among others
 Note: You can configure the modules that you would like to monitor for the first 3 capabilities mentioned above.
 ```
 
+## Directory Structure
+
+```shell
+modules/monitor/
+├── BUILD
+├── common              // common function
+├── cyberfile.xml
+├── dag
+├── hardware            // hardware monitor implementation
+├── launch
+├── monitor.cc
+├── monitor.h
+├── README.md
+└── software            // software monitor implementation 
+```
+ 
 ## Hardware Monitors
 Hardware related monitoring, e.g. CAN card / GPS status health check. Check
 results are reported back to HMI.
@@ -34,3 +50,9 @@ apollo::monitor::TopicConf proto.
 ### Summary Monitor
 It summarizes all other specific monitor's results to a simple conclusion such
 as OK, WARN, ERROR or FATAL.
+
+## How to Launch
+
+```bash
+cyber_launch start modules/monitor/launch/monitor.launch
+```

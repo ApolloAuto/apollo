@@ -1,6 +1,6 @@
 topic_config {
-  routing_request_topic: "/apollo/routing_request"
-  routing_response_topic: "/apollo/routing_response"
+  planning_command_topic: "/apollo/planning/command"
   localization_pose_topic: "/apollo/localization/pose"
+  lane_follow_command_topic: "/apollo/external_command/lane_follow"
   planning_topic: "/apollo/planning"
 }

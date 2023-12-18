@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "google/protobuf/any.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/vehicle_signal.proto";
+
+message ChassisCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // The basic vehicle signals which can also be controlled by apollo system.
+  optional apollo.common.VehicleSignal basic_signal = 3;
+  // Custom chassis operation command defined by user for extensibility.
+  optional google.protobuf.Any custom_operation = 4;
+}

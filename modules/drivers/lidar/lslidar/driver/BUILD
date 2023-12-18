@@ -1,28 +1,26 @@
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_component", "apollo_package")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/install:install.bzl", "install")
 
-
 package(default_visibility = ["//visibility:public"])
 
+# install(
+#     name = "install",
+#     library_dest = "drivers/lib/lidar/lslidar/driver",
+#     targets = [
+#         ":liblslidar_driver_component.so",
+#     ],
+# )
 
-
-install(
-    name = "install",
-    library_dest = "drivers/lib/lidar/lslidar/driver",
-    targets = [
-        ":liblslidar_driver_component.so",
-    ],
-)
-
-cc_binary(
+apollo_cc_binary(
     name = "liblslidar_driver_component.so",
     linkshared = True,
     linkstatic = True,
     deps = [":lslidar_driver_component_lib"],
 )
 
-cc_library(
+apollo_cc_library(
     name = "lslidar_driver_component_lib",
     srcs = ["lslidar_driver_component.cc"],
     hdrs = ["lslidar_driver_component.h"],
@@ -32,10 +30,9 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/drivers/lidar/lslidar/driver",
     ],
-    alwayslink = True,
 )
 
-cc_library(
+apollo_cc_library(
     name = "driver",
     srcs = [
         "driver.cc",
@@ -47,7 +44,7 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"lslidar\\"'],
     linkopts = [
-            "-lpcap",
+        "-lpcap",
     ],
     deps = [
         "//cyber",
@@ -55,5 +52,7 @@ cc_library(
         "//modules/drivers/lidar/lslidar/proto:config_cc_proto",
     ],
 )
+
+apollo_package()
 
 cpplint()

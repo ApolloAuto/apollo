@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+message PluginParam {
+  optional string name = 1;
+  optional string config_path = 2;
+  optional string config_file = 3;
+}

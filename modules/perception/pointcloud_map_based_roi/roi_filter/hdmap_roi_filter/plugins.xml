@@ -1,0 +1,3 @@
+<library path="modules/perception/pointcloud_map_based_roi/roi_filter/hdmap_roi_filter/libhdmap_roi_filter.so">
+    <class type="apollo::perception::lidar::HdmapROIFilter" base_class="apollo::perception::lidar::BaseROIFilter"></class>
+</library>

@@ -92,7 +92,7 @@ bool IsReachable(const TopoNode* from_node, const TopoNode* to_node) {
 }  // namespace
 
 SubTopoGraph::SubTopoGraph(
-    const std::unordered_map<const TopoNode*, std::vector<NodeSRange> >&
+    const std::unordered_map<const TopoNode*, std::vector<NodeSRange>>&
         black_map) {
   std::vector<NodeSRange> valid_range;
   for (const auto& map_iter : black_map) {

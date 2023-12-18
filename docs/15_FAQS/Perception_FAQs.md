@@ -11,7 +11,7 @@ There are 5 types of calibration:
 - IMU - Vehicle
 
 For additional information on Sensor Calibration, please refer to our
-[calibration guide](../10Hardware%20Integration%20and%20Calibration/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/apollo_2_0_sensor_calibration_guide.md)
+[calibration guide](../11Hardware%20Integration%20and%20Calibration/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/apollo_2_0_sensor_calibration_guide.md)
 
 For additional information on LiDAR - GNSS calibration please refer to our
 [LiDAR - GNSS calibration guide](https://github.com/ApolloAuto/apollo/blob/r1.5.0/docs/quickstart/apollo_1_5_lidar_calibration_guide.md)

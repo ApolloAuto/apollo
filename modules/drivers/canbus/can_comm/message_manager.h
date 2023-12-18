@@ -28,9 +28,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/canbus/common/byte.h"
 
@@ -165,9 +166,10 @@ void MessageManager<SensorType>::AddSendProtocolData() {
 }
 
 template <typename SensorType>
-ProtocolData<SensorType>
-    *MessageManager<SensorType>::GetMutableProtocolDataById(
-        const uint32_t message_id) {
+ProtocolData<SensorType> *
+MessageManager<SensorType>::GetMutableProtocolDataById(
+    const uint32_t message_id) {
+  ADEBUG << "get protocol data message_id is:" << Byte::byte_to_hex(message_id);
   if (protocol_data_map_.find(message_id) == protocol_data_map_.end()) {
     ADEBUG << "Unable to get protocol data because of invalid message_id:"
            << Byte::byte_to_hex(message_id);

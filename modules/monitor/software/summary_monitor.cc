@@ -67,6 +67,16 @@ void SummaryMonitor::RunOnce(const double current_time) {
     EscalateStatus(other_status.status(), other_status.message(), summary);
   }
 
+  // For global components
+  for (auto& component : *status->mutable_global_components()) {
+    auto* summary = component.second.mutable_summary();
+    const auto& process_status = component.second.process_status();
+    EscalateStatus(process_status.status(), process_status.message(), summary);
+    const auto& resource_status = component.second.resource_status();
+    EscalateStatus(resource_status.status(), resource_status.message(),
+                   summary);
+  }
+
   // Get fingerprint of current status.
   // Don't use DebugString() which has known bug on Map field. The string
   // doesn't change though the value has changed.

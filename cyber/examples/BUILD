@@ -1,10 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+apollo_cc_binary(
     name = "talker",
     srcs = ["talker.cc"],
     deps = [
@@ -13,7 +12,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "listener",
     srcs = ["listener.cc"],
     deps = [
@@ -22,22 +21,7 @@ cc_binary(
     ],
 )
 
-install(
-    name = "install",
-    targets = [
-        ":talker",
-        ":listener",
-    ],
-    runtime_dest = "cyber/examples",
-    deps = [
-        "//cyber/examples/common_component_example:install",
-        "//cyber/examples/timer_component_example:install",
-        "//cyber/examples/proto:cyber_examples_proto_hdrs",
-        "//cyber/examples/proto:cyber_examples_proto_so",
-    ],
-)
-
-cc_binary(
+apollo_cc_binary(
     name = "paramserver",
     srcs = ["paramserver.cc"],
     deps = [
@@ -45,7 +29,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "service",
     srcs = ["service.cc"],
     deps = [
@@ -54,7 +38,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "record",
     srcs = ["record.cc"],
     deps = [
@@ -63,4 +47,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -1,0 +1,119 @@
+.ant-modal-root .ant-modal-mask {
+    z-index: 1040;
+}
+.ant-modal-root .ant-modal-wrap {
+    z-index: 1040;
+}
+.dreamview-modal-root {
+    .dreamview-modal {
+        font-family: PingFangSC-Medium;
+        font-size: 16px;
+        font-weight: 500;
+        color: #808B9D;
+    
+        .dreamview-modal-content {
+            background-color: #282D38;
+
+            .dreamview-modal-close{
+                position: absolute;
+                top: 12px;
+            }
+        }
+    
+        .dreamview-modal-header {
+            color: #fff;
+            background-color: #282D38;
+            border-bottom: 1px solid #383B45;
+            margin: 0 -24px;
+            padding: 0 24px;
+    
+            .dreamview-modal-title {
+                color: #fff;
+                position: relative;
+                top: -8px;
+            }
+        }
+    
+        .dreamview-modal-close {
+            color: #808B9D;
+        }
+    
+        .dreamview-modal-close:hover {
+            color: #808B9D;
+        }
+    
+        .dreamview-modal-footer {
+            margin-top: 32px;
+            margin-bottom: 10px;
+            .dreamview-btn {
+                margin-bottom: 0;
+                margin-inline-start: 8px;
+            }
+        }
+    }
+    
+    .dreamview-modal-mask {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+}
+
+.dreamview-modal-confirm{
+    .ant-modal-content{
+        width: 400px;
+        background: #282B36;
+        border-radius: 10px;
+        padding: 30px 0px 30px 0px;
+        display: flex;
+        justify-content: center;
+        .ant-modal-body{
+            max-width: 352px;
+            display: flex;
+            justify-content: center;
+            .ant-modal-confirm-body{
+                display: flex;
+                flex-wrap: nowrap;
+                position: relative;
+                & > svg{
+                    position: absolute;
+                    top: 4px;
+                }
+            }
+            .ant-modal-confirm-content{
+                max-width: 324px;
+                margin-left: 28px;
+                font-family: PingFang-SC-Medium;
+                font-size: 16px;
+                color: #A6B5CC;
+                font-weight: 500;
+            }
+            .ant-modal-confirm-btns{
+                margin-top: 24px;
+                display: flex;
+                justify-content: center;
+
+                & > button{
+                    width: 72px;
+                    height: 40px;
+                }
+
+                & > button:nth-child(1){
+                    color: #FFFFFF;
+                    background: #282B36;
+                    border: 1px solid rgba(124,136,153,1);
+                }
+                & > button:nth-child(1):hover{ 
+                    color: #3288FA;
+                    border: 1px solid #3288FA;
+                }
+                & > button:nth-child(1):active{
+                    color: #1252C0;
+                    border: 1px solid #1252C0;
+                }
+
+                & > button:nth-child(2){
+                    padding: 4px 12px 4px 12px !important;
+                }
+            }
+        }
+    }
+}

@@ -27,7 +27,6 @@
 
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common_msgs/guardian_msgs/guardian.pb.h"
-
 #include "cyber/common/macros.h"
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
@@ -82,6 +81,8 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
 
   void PublishChassis();
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
+  void OnChassisCommand(
+      const apollo::external_command::ChassisCommand &chassis_command);
   void OnGuardianCommand(
       const apollo::guardian::GuardianCommand &guardian_command);
   apollo::common::Status OnError(const std::string &error_msg);
@@ -94,7 +95,8 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
       guardian_cmd_reader_;
   std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>
       control_command_reader_;
-
+  std::shared_ptr<cyber::Reader<apollo::external_command::ChassisCommand>>
+      chassis_command_reader_;
   int64_t last_timestamp_ = 0;
   ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;

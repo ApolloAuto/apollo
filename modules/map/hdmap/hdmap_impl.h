@@ -214,6 +214,20 @@ class HDMapImpl {
       std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
 
   /**
+   * @brief get nearest lane from target point with search radius,
+   * @param point the target point
+   * @param distance the search radius
+   * @param nearest_lane the nearest lane that match search conditions
+   * @param nearest_s the offset from lane start point along lane center line
+   * @param nearest_l the lateral offset from lane center line
+   * @return 0:success, otherwise, failed.
+   */
+  int GetNearestLaneWithDistance(const apollo::common::PointENU& point,
+                                 const double distance,
+                                 LaneInfoConstPtr* nearest_lane,
+                                 double* nearest_s, double* nearest_l) const;
+
+  /**
    * @brief get nearest lane from target point,
    * @param point the target point
    * @param nearest_lane the nearest lane that match search conditions
@@ -344,6 +358,8 @@ class HDMapImpl {
                     double max_heading_difference,
                     std::vector<RSUInfoConstPtr>* rsus) const;
 
+  bool GetMapHeader(Header* map_header) const;
+
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,
                std::vector<LaneInfoConstPtr>* lanes) const;
@@ -382,6 +398,10 @@ class HDMapImpl {
                           std::vector<LaneInfoConstPtr>* lanes) const;
   int GetRoads(const apollo::common::math::Vec2d& point, double distance,
                std::vector<RoadInfoConstPtr>* roads) const;
+  int GetNearestLaneWithDistance(const apollo::common::math::Vec2d& point,
+                                 const double distance,
+                                 LaneInfoConstPtr* nearest_lane,
+                                 double* nearest_s, double* nearest_l) const;
 
   template <class Table, class BoxTable, class KDTree>
   static void BuildSegmentKDTree(

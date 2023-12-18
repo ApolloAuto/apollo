@@ -5,10 +5,10 @@
 The required hardware for each version of Apollo can be found at the following
 links:
 
-- [Hardware for Apollo 1.0](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_0_hardware_system_installation_guide.md)
-- [Hardware for Apollo 1.5](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_5_hardware_system_installation_guide.md)
-- [Hardware for Apollo 2.0](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_0_hardware_system_installation_guide_v1.md)
-- [Hardware for Apollo 2.5](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
+- [Hardware for Apollo 1.0](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_0_hardware_system_installation_guide.md)
+- [Hardware for Apollo 1.5](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_5_hardware_system_installation_guide.md)
+- [Hardware for Apollo 2.0](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_0_hardware_system_installation_guide_v1.md)
+- [Hardware for Apollo 2.5](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 ---
 
@@ -16,7 +16,7 @@ links:
 
 Currently, the Apollo control algorithm is configured for our default vehicle,
 which is a Lincoln MKZ. If you would like to use a different vehicle type,
-please visit [this](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%80%82%E9%85%8D/how_to_add_a_new_vehicle.md) page.
+please visit [this](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%80%82%E9%85%8D/how_to_add_a_new_vehicle.md) page.
 
 ---
 
@@ -30,7 +30,7 @@ to ROS in order to support other models of LiDAR.
 ### Do you have a list of Hardware devices that are compatible with Apollo
 
 Refer to the
-[Hardware Installation Guide 3.0](../quickstart/apollo_3_0_hardware_system_installation_guide.md)
+[Hardware Installation Guide 3.0](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_0_hardware_system_installation_guide.md)
 for information on all devices that are compatible with Apollo 3.0. If you are
 looking for a different version of Apollo, refer to that version's Hardware
 Installation guide found under `docs/quickstart`
@@ -75,7 +75,7 @@ design. Whether VLP-16 works for your project, you will need to find out.
 ### Is HDL32 (Velodyne 32 line LiDAR) compatible with Apollo?
 
 Apollo can work successfully for HDL32 Lidars. You could follow the
-[Puck Series Guide](../specs/Lidar/VLP_Series_Installation_Guide.md) alongwith
+[Puck Series Guide](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/VLP_Series_Installation_Guide.md) alongwith
 the following
 [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51).
 However, please note that you would need to change the intrinsics for HDL32 in

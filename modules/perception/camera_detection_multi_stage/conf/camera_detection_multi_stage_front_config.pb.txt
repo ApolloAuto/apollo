@@ -1,0 +1,12 @@
+camera_name: "front_6mm"
+timestamp_offset: 0.0
+plugin_param {
+  name: "YoloObstacleDetector"
+  config_path: "perception/camera_detection_multi_stage/data"
+  config_file: "yolo.pb.txt"
+}
+enable_undistortion: false
+channel {
+  output_obstacles_channel_name: "/perception/inner/Detection"
+}
+gpu_id: 0

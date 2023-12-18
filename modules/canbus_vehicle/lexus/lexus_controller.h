@@ -20,14 +20,13 @@
 #include <thread>
 
 #include "gtest/gtest_prod.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/lexus/proto/lexus.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/lexus/protocol/accel_cmd_100.h"
 #include "modules/canbus_vehicle/lexus/protocol/brake_cmd_104.h"
 #include "modules/canbus_vehicle/lexus/protocol/cruise_control_buttons_cmd_108.h"
@@ -40,7 +39,6 @@
 #include "modules/canbus_vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus_vehicle/lexus/protocol/turn_cmd_130.h"
 #include "modules/canbus_vehicle/lexus/protocol/wiper_cmd_134.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
@@ -107,11 +105,12 @@ class LexusController final
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
-  void SetBeam(const ::apollo::control::ControlCommand& command) override;
-  void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetEpbBreak(const control::ControlCommand& command) override;
+  common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand& command) override;
+  void SetBeam(const common::VehicleSignal& signal) override;
+  void SetHorn(const common::VehicleSignal& signal) override;
+  void SetTurningSignal(const common::VehicleSignal& signal) override;
 
   bool VerifyID() override;
   void ResetProtocol();

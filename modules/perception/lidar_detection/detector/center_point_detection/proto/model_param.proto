@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.perception.lidar.centerpoint;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.PointCloudPreProcess preprocess = 2;
+  optional common.PointCloudPostProcess postprocess = 3;
+  optional common.PaddleSettings paddle_settings = 4;
+  optional int32 point2box_max_num = 5;
+  optional float quantize = 6;
+  optional bool filter_by_points = 7;
+  optional int32 min_points_threshold = 8;
+  optional bool diff_class_nms = 9 [default = true];
+  optional float diff_class_iou = 10 [default = 0.25];
+  optional bool nms_strategy = 11 [default = true];
+}

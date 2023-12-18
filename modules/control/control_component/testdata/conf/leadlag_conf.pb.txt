@@ -1,0 +1,4 @@
+innerstate_saturation_level: 1000
+alpha: 1.0
+beta: 0.8
+tau: 0.0

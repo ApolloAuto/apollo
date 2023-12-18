@@ -24,6 +24,10 @@
 #include "cyber/common/macros.h"
 #include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
+#ifdef __aarch64__
+#include "modules/prediction/common/affine_transform.h"
+#endif
+
 namespace apollo {
 namespace prediction {
 
@@ -108,6 +112,10 @@ class SemanticMap {
   std::future<void> task_future_;
 
   bool started_drawing_ = false;
+
+#ifdef __aarch64__
+  AffineTransform affine_transformer_;
+#endif
 };
 
 }  // namespace prediction

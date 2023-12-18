@@ -1,0 +1,3 @@
+<library path="modules/planning/pnc_map/lane_follow_map/liblane_follow_map.so">
+    <class type="apollo::planning::LaneFollowMap" base_class="apollo::planning::PncMapBase"></class>
+</library>

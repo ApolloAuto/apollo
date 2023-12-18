@@ -1,0 +1,119 @@
+stage: {
+  name: "PULL_OVER_APPROACH"
+  type: "PullOverStageApproach"
+  enabled: true
+  task {
+    name: "PULL_OVER_PATH"
+    type: "PullOverPath"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+  task {
+    name: "RSS_DECIDER"
+    type: "RssDecider"
+  }
+}
+stage: {
+  name: "PULL_OVER_RETRY_APPROACH_PARKING"
+  type: "PullOverStageRetryApproachParking"
+  enabled: false
+  task {
+    name: "OPEN_SPACE_PRE_STOP_DECIDER"
+    type: "OpenSpacePreStopDecider"
+  }
+  task {
+    name: "PULL_OVER_PATH"
+    type: "PullOverPath"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "ST_BOUNDS_DECIDER"
+    type: "STBoundsDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+stage: {
+  name: "PULL_OVER_RETRY_PARKING"
+  type: "PullOverStageRetryParking"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_ROI_DECIDER"
+    type: "OpenSpaceRoiDecider"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_PROVIDER"
+    type: "OpenSpaceTrajectoryProvider"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_PARTITION"
+    type: "OpenSpaceTrajectoryPartition"
+  }
+  task {
+    name: "OPEN_SPACE_FALLBACK_DECIDER"
+    type: "OpenSpaceFallbackDecider"
+  }
+}

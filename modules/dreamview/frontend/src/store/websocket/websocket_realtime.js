@@ -548,6 +548,18 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
+  setStartPoint({x, y, heading}) {
+    const request = {
+      type: 'SetStartPoint',
+      point: {
+        x,
+        y,
+        heading,
+      }
+    };
+    this.websocket.send(JSON.stringify(request));
+  }
+
   sendParkingRequest(
     start,
     waypoint,

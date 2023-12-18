@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message PointCloudMapROIComponentConfig {
+  optional string output_channel_name = 1;
+  optional bool use_map_manager = 2;
+  optional bool enable_hdmap = 3;
+  optional PluginParam plugin_param = 4;
+  optional string map_manager_config_path = 5;
+  optional string map_manager_config_file = 6;
+}

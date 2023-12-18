@@ -22,8 +22,8 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -31,6 +31,7 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -329,6 +330,13 @@ Chassis ChController::chassis() {
         chassis_detail.throttle_status__510().throttle_pedal_en_sts() == 1);
   }
 
+  if (CheckChassisError()) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Chassis has some fault, please check the chassis_detail.");
+  }
+
   return chassis_;
 }
 
@@ -485,22 +493,27 @@ void ChController::Steer(double angle, double angle_spd) {
 
 void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {
+ErrorCode ChController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void ChController::SetBeam(const VehicleSignal& vehicle_signal) {
   // Set low beam
-  if (command.signal().low_beam()) {
+  if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     turnsignal_command_113_->set_low_beam_cmd(
         Turnsignal_command_113::LOW_BEAM_CMD_ON);
-  } else {
+  } else if (vehicle_signal.has_low_beam() && !vehicle_signal.low_beam()) {
     turnsignal_command_113_->set_low_beam_cmd(
         Turnsignal_command_113::LOW_BEAM_CMD_OFF);
   }
 }
 
-void ChController::SetHorn(const ControlCommand& command) {}
+void ChController::SetHorn(const VehicleSignal& vehicle_signal) {}
 
-void ChController::SetTurningSignal(const ControlCommand& command) {
+void ChController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_command_113_->set_turn_signal_cmd(
         Turnsignal_command_113::TURN_SIGNAL_CMD_LEFT);
@@ -559,9 +572,14 @@ bool ChController::CheckChassisError() {
   Ch chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO ch vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has no ch vehicle info.";
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ChassisDetail has no ch vehicle info.");
     return false;
+  } else {
+    chassis_.clear_engage_advice();
   }
   // steer motor fault
   if (chassis_detail.has_steer_status__512()) {
@@ -626,7 +644,7 @@ void ChController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by steer manual intervention";
+        AERROR << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -640,12 +658,14 @@ void ChController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by speed manual intervention";
+        AERROR << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
       vertical_ctrl_fail = 0;
     }
+
+    // 3. chassis fault check
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;

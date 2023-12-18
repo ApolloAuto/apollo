@@ -1,0 +1,31 @@
+.dreamview-list-item-item {
+    position: relative;
+    color: #A6B5CC;
+    border-radius: 6px;
+    padding: 9px 14px 9px 36px;
+    
+    &:hover:not(.dreamview-list-item-active) {
+        cursor: pointer;
+        background-color: rgba(115,193,250,0.08);
+
+        .icon-use {
+            display: inline-block;
+        }
+    }
+
+    .icon-use {
+        display: none;
+        position: absolute !important;
+        color: #fff;
+        right: 14px; 
+    }
+
+    &.dreamview-list-item-active {
+        color: #fff;
+        background-color: #1971E6;
+
+        .icon-use {
+            display: inline-block;
+        }
+    }
+}

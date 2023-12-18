@@ -1,5 +1,6 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +11,7 @@ filegroup(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "gmapviewer",
     srcs = ["gmapviewer.py"],
     deps = [
@@ -19,7 +20,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "hdmapviewer",
     srcs = ["hdmapviewer.py"],
     deps = [
@@ -28,14 +29,15 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    data = [":readme"],
-    data_dest = "tools/mapviewers",
-    py_dest = "tools/mapviewers",
-    targets = [
-        "gmapviewer",
-        "hdmapviewer",
-    ]
-)
+# install(
+#     name = "install",
+#     data = [":readme"],
+#     data_dest = "tools/mapviewers",
+#     py_dest = "tools/mapviewers",
+#     targets = [
+#         "gmapviewer",
+#         "hdmapviewer",
+#     ]
+# )
 
+apollo_package()

@@ -1,11 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component", "apollo_cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "rtk_localization_component_lib",
+apollo_component(
+    name = "librtk_localization_component.so",
     srcs = [
         "rtk_localization.cc",
         "rtk_localization_component.cc",
@@ -15,13 +14,13 @@ cc_library(
         "rtk_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
-    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
         "//modules/common/util:util_tool",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
         "//modules/common_msgs/sensor_msgs:gnss_best_pose_cc_proto",
         "//modules/common_msgs/sensor_msgs:gnss_cc_proto",
         "//modules/common_msgs/sensor_msgs:ins_cc_proto",
@@ -29,38 +28,24 @@ cc_library(
         "//modules/common_msgs/localization_msgs:imu_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/localization/proto:rtk_config_cc_proto",
-        "//modules/transform:transform_broadcaster",
+        "//modules/transform:apollo_transform",
         "@com_google_googletest//:gtest",
         "@eigen",
     ],
 )
 
-cc_binary(
-    name = "librtk_localization_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":rtk_localization_component_lib"],
-)
-
-cc_test(
+apollo_cc_test(
     name = "rtk_localization_test",
     size = "small",
     srcs = ["rtk_localization_test.cc"],
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
-        "//modules/common/util",
+        "//modules/common/util:common_util",
         "//modules/localization/rtk:rtk_localization_component_lib",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "localization/lib/rtk",
-    targets = [
-        ":librtk_localization_component.so",
-    ],
-)
-
+apollo_package()
 cpplint()

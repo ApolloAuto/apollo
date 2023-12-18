@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "fftw3",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-lfftw3",
         "-lm",
@@ -16,6 +17,7 @@ cc_library(
 cc_library(
     name = "fftw3_omp",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-lgomp",
         "-pthread",
@@ -29,6 +31,7 @@ cc_library(
 cc_library(
     name = "fftw3_threads",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-pthread",
     ],

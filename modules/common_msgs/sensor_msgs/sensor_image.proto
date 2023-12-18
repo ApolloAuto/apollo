@@ -86,4 +86,6 @@ message CompressedImage {
   optional bytes data = 4;  // Compressed image buffer
   optional double measurement_time = 5;
   optional uint32 frame_type = 6;
+  optional uint32 width = 7;
+  optional uint32 height = 8;
 }

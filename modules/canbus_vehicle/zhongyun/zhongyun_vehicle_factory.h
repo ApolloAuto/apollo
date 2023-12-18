@@ -26,7 +26,6 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -79,6 +78,9 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
    */
   void UpdateCommand(
       const apollo::control::ControlCommand *control_command) override;
+
+  void UpdateCommand(
+      const apollo::external_command::ChassisCommand *chassis_command) override;
 
   /**
    * @brief publish chassis messages

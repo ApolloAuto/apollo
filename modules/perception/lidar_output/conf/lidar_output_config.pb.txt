@@ -1,0 +1,3 @@
+output_channel_name: "/apollo/perception/obstacles"
+save_benchmark_frame: false
+benchmark_frame_output_dir: "/apollo/data/benchmark/dt"

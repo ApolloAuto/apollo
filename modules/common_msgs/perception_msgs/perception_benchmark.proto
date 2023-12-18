@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+import "modules/common_msgs/basic_msgs/error_code.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+
+message SensorFrameInfo {
+  optional string sensor_id = 1;
+  optional double timestamp = 2;
+  repeated double sensor2world_pose = 3;  // size should be 16
+}
+
+// For perception benchmark
+message PerceptionBenchmarkFrame {
+  repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
+  optional apollo.common.Header header = 2;             // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
+  optional SensorFrameInfo sensor_frame_info = 4;
+}

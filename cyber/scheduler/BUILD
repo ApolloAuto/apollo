@@ -1,124 +1,46 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_scheduler_hdrs",
-    srcs = glob([
-        "*.h",
-        "**/*.h"
-    ]),
-)
-
-cc_library(
-    name = "processor",
-    srcs = ["processor.cc"],
-    hdrs = ["processor.h"],
-    deps = [
-        "//cyber/data",
-        "//cyber/scheduler:processor_context",
+apollo_cc_library(
+    name = "cyber_scheduler",
+    srcs = [
+        "processor.cc",
+        "processor_context.cc",
+        "scheduler.cc",
+        "scheduler_factory.cc",
+        "common/pin_thread.cc",
+        "policy/choreography_context.cc",
+        "policy/classic_context.cc",
+        "policy/scheduler_choreography.cc",
+        "policy/scheduler_classic.cc",
     ],
-)
-
-cc_library(
-    name = "processor_context",
-    srcs = ["processor_context.cc"],
-    hdrs = ["processor_context.h"],
-    deps = [
-        "//cyber/croutine",
-        "//cyber/data",
+    hdrs = [
+        "processor.h",
+        "processor_context.h",
+        "scheduler.h",
+        "scheduler_factory.h",
+        "common/cv_wrapper.h",
+        "common/mutex_wrapper.h",
+        "common/pin_thread.h",
+        "policy/choreography_context.h",
+        "policy/classic_context.h",
+        "policy/scheduler_choreography.h",
+        "policy/scheduler_classic.h",
     ],
-)
-
-cc_library(
-    name = "scheduler",
-    srcs = ["scheduler.cc"],
-    hdrs = ["scheduler.h"],
     deps = [
-        "//cyber/croutine",
-        "//cyber/scheduler:mutex_wrapper",
-        "//cyber/scheduler:pin_thread",
-        "//cyber/scheduler:processor",
-    ],
-)
-
-cc_library(
-    name = "mutex_wrapper",
-    hdrs = ["common/mutex_wrapper.h"],
-)
-
-cc_library(
-    name = "cv_wrapper",
-    hdrs = ["common/cv_wrapper.h"],
-)
-
-cc_library(
-    name = "pin_thread",
-    srcs = ["common/pin_thread.cc"],
-    hdrs = ["common/pin_thread.h"],
-    deps = [
-        "//cyber/common:log",
-    ],
-)
-
-cc_library(
-    name = "scheduler_factory",
-    srcs = ["scheduler_factory.cc"],
-    hdrs = ["scheduler_factory.h"],
-    deps = [
+        "//cyber/croutine:cyber_croutine",
+        "//cyber/data:cyber_data",
+        "//cyber/common:cyber_common",
+        "//cyber/time:cyber_time", 
         "//cyber/proto:component_conf_cc_proto",
-        "//cyber/scheduler:scheduler_choreography",
-        "//cyber/scheduler:scheduler_classic",
-    ],
-)
-
-cc_library(
-    name = "scheduler_choreography",
-    srcs = ["policy/scheduler_choreography.cc"],
-    hdrs = ["policy/scheduler_choreography.h"],
-    deps = [
-        "//cyber/scheduler",
-        "//cyber/scheduler:choreography_context",
-        "//cyber/scheduler:classic_context",
-    ],
-)
-
-cc_library(
-    name = "scheduler_classic",
-    srcs = ["policy/scheduler_classic.cc"],
-    hdrs = ["policy/scheduler_classic.h"],
-    deps = [
-        "//cyber/scheduler",
-        "//cyber/scheduler:classic_context",
-    ],
-)
-
-cc_library(
-    name = "choreography_context",
-    srcs = ["policy/choreography_context.cc"],
-    hdrs = ["policy/choreography_context.h"],
-    deps = [
-        "//cyber/croutine",
         "//cyber/proto:choreography_conf_cc_proto",
-        "//cyber/scheduler:processor",
-    ],
-)
-
-cc_library(
-    name = "classic_context",
-    srcs = ["policy/classic_context.cc"],
-    hdrs = ["policy/classic_context.h"],
-    deps = [
-        "//cyber/croutine",
         "//cyber/proto:classic_conf_cc_proto",
-        "//cyber/scheduler:cv_wrapper",
-        "//cyber/scheduler:mutex_wrapper",
-        "//cyber/scheduler:processor",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "scheduler_test",
     size = "small",
     srcs = ["scheduler_test.cc"],
@@ -129,7 +51,7 @@ cc_test(
     linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "scheduler_classic_test",
     size = "small",
     srcs = ["scheduler_classic_test.cc"],
@@ -140,7 +62,7 @@ cc_test(
     linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "scheduler_choreo_test",
     size = "small",
     srcs = ["scheduler_choreo_test.cc"],
@@ -151,7 +73,7 @@ cc_test(
     linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "processor_test",
     size = "small",
     srcs = ["processor_test.cc"],
@@ -162,7 +84,7 @@ cc_test(
     linkstatic = True,
 )
 
-cc_test(
+apollo_cc_test(
     name = "pin_thread_test",
     size = "small",
     srcs = ["common/pin_thread_test.cc"],
@@ -173,4 +95,5 @@ cc_test(
     linkstatic = True,
 )
 
+apollo_package()
 cpplint()

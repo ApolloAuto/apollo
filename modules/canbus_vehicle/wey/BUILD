@@ -1,131 +1,256 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "wey_vehicle_factory",
-    srcs = ["wey_vehicle_factory.cc"],
-    hdrs = ["wey_vehicle_factory.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_wey",
+    srcs = [
+        "protocol/ads1_111.cc",
+        "protocol/ads3_38e.cc",
+        "protocol/ads_eps_113.cc",
+        "protocol/ads_req_vin_390.cc",
+        "protocol/ads_shifter_115.cc",
+        "protocol/fail_241.cc",
+        "protocol/fbs1_243.cc",
+        "protocol/fbs2_240.cc",
+        "protocol/fbs3_237.cc",
+        "protocol/fbs4_235.cc",
+        "protocol/status_310.cc",
+        "protocol/vin_resp1_391.cc",
+        "protocol/vin_resp2_392.cc",
+        "protocol/vin_resp3_393.cc",
+        "wey_controller.cc",
+        "wey_message_manager.cc",
+        "wey_vehicle_factory.cc",
+    ],
+    hdrs = [
+        "protocol/ads1_111.h",
+        "protocol/ads3_38e.h",
+        "protocol/ads_eps_113.h",
+        "protocol/ads_req_vin_390.h",
+        "protocol/ads_shifter_115.h",
+        "protocol/fail_241.h",
+        "protocol/fbs1_243.h",
+        "protocol/fbs2_240.h",
+        "protocol/fbs3_237.h",
+        "protocol/fbs4_235.h",
+        "protocol/status_310.h",
+        "protocol/vin_resp1_391.h",
+        "protocol/vin_resp2_392.h",
+        "protocol/vin_resp3_393.h",
+        "wey_controller.h",
+        "wey_message_manager.h",
+        "wey_vehicle_factory.h",
+    ],
     deps = [
-        ":wey_controller",
-        ":wey_message_manager",
-        "//modules/canbus/common:canbus_gflags",
+        "//modules/canbus:apollo_canbus",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
+        "//modules/canbus_vehicle/wey/proto:wey_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
     ],
 )
 
-cc_binary(
+
+apollo_component(
     name = "libwey_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":wey_vehicle_factory"],
+    deps = [":apollo_canbus_vehicle_wey"],
 )
 
-cc_test(
+apollo_cc_test(
     name = "wey_vehicle_factory_test",
     size = "small",
     srcs = ["wey_vehicle_factory_test.cc"],
     data = ["//modules/canbus:test_data"],
     linkstatic = True,
     deps = [
-        ":wey_vehicle_factory",
+        ":apollo_canbus_vehicle_wey",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_library(
-    name = "wey_message_manager",
-    srcs = ["wey_message_manager.cc"],
-    hdrs = ["wey_message_manager.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        "//modules/canbus_vehicle/wey/proto:wey_cc_proto",
-        "//modules/canbus_vehicle/wey/protocol:canbus_wey_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "wey_message_manager_test",
     size = "small",
     srcs = ["wey_message_manager_test.cc"],
     deps = [
-        ":wey_message_manager",
+        ":apollo_canbus_vehicle_wey",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_library(
-    name = "wey_controller",
-    srcs = ["wey_controller.cc"],
-    hdrs = ["wey_controller.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        ":wey_message_manager",
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus_vehicle/wey/protocol:canbus_wey_protocol",
-        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
-        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "wey_controller_test",
     size = "small",
     srcs = ["wey_controller_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        ":wey_controller",
-        "//modules/common/util",
+        ":apollo_canbus_vehicle_wey",
+        "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-wey/lib",
-    data_dest = "canbus-vehicle-wey",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-wey.BUILD",
-    ],
-    targets = [
-        ":libwey_vehicle_factory_lib.so",
-    ],
+apollo_cc_test(
+    name = "ads1_111_test",
+    size = "small",
+    srcs = ["protocol/ads1_111_test.cc"],
     deps = [
-        ":pb_wey",
-        ":pb_hdrs",
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-wey/include",
-    data = [
-        "//modules/canbus_vehicle/wey/proto:wey_cc_proto",
+apollo_cc_test(
+    name = "ads3_38e_test",
+    size = "small",
+    srcs = ["protocol/ads3_38e_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-install_files(
-    name = "pb_wey",
-    dest = "canbus-vehicle-wey",
-    files = [
-        "//modules/canbus_vehicle/wey/proto:wey_py_pb2",
+apollo_cc_test(
+    name = "ads_eps_113_test",
+    size = "small",
+    srcs = ["protocol/ads_eps_113_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "ads_req_vin_390_test",
+    size = "small",
+    srcs = ["protocol/ads_req_vin_390_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "ads_shifter_115_test",
+    size = "small",
+    srcs = ["protocol/ads_shifter_115_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "fail_241_test",
+    size = "small",
+    srcs = ["protocol/fail_241_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "fbs1_243_test",
+    size = "small",
+    srcs = ["protocol/fbs1_243_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "fbs2_240_test",
+    size = "small",
+    srcs = ["protocol/fbs2_240_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "fbs3_237_test",
+    size = "small",
+    srcs = ["protocol/fbs3_237_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "fbs4_235_test",
+    size = "small",
+    srcs = ["protocol/fbs4_235_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "status_310_test",
+    size = "small",
+    srcs = ["protocol/status_310_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "vin_resp1_391_test",
+    size = "small",
+    srcs = ["protocol/vin_resp1_391_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "vin_resp2_392_test",
+    size = "small",
+    srcs = ["protocol/vin_resp2_392_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "vin_resp3_393_test",
+    size = "small",
+    srcs = ["protocol/vin_resp3_393_test.cc"],
+    deps = [
+        "apollo_canbus_vehicle_wey",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
 )
 
 filegroup(
@@ -135,26 +260,6 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_wey_src",
-        ":install_wey_hdrs"
-    ],
-)
-
-install_src_files(
-    name = "install_wey_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-wey/src",
-    filter = "*",
-)
-
-install_src_files(
-    name = "install_wey_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-wey/include",
-    filter = "*.h",
-)
+apollo_package()
 
 cpplint()

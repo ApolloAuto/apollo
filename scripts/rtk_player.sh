@@ -27,16 +27,17 @@ function setup() {
 }
 
 function start() {
+  local file=$@
   local rtk_player_binary
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_player" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
     pkill -SIGKILL -f rtk_player
   fi
 
-  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
+  if [[ ! -z "$(which rtk_player)" ]]; then
+    rtk_player_binary="rtk_player" 
+  elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
     rtk_player_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player"
-  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player ]]; then
-    rtk_player_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player
   else
     rtk_player_binary=
   fi
@@ -46,7 +47,8 @@ function start() {
     exit -1
   fi
 
-  ${rtk_player_binary}
+  local cmdStr=$rtk_player_binary" -f "$file
+  ${cmdStr}
 }
 
 function stop() {
@@ -58,7 +60,7 @@ case $1 in
     setup
     ;;
   start)
-    start
+    start "$2"
     ;;
   stop)
     stop
@@ -68,6 +70,6 @@ case $1 in
     start
     ;;
   *)
-    start
+    start "$1"
     ;;
 esac

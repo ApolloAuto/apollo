@@ -15,37 +15,33 @@
  *****************************************************************************/
 
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
-
+#include "gtest/gtest.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace yield_sign {
 
 class YieldSignStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(StageType::YIELD_SIGN_APPROACH);
+    config_.set_name("YIELD_SIGN_APPROACH");
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  StagePipeline config_;
   std::shared_ptr<DependencyInjector> injector_;
+  YieldSignContext context_;
 };
 
 TEST_F(YieldSignStageApproachTest, Init) {
-  YieldSignStageApproach yield_sign_stage_approach(config_, injector_);
-  EXPECT_EQ(
-      yield_sign_stage_approach.Name(),
-      StageType_Name(StageType::YIELD_SIGN_APPROACH));
+  YieldSignStageApproach yield_sign_stage_approach;
+  yield_sign_stage_approach.Init(config_, injector_,
+                                 "scenarios/yield_sign/conf", &context_);
+  EXPECT_EQ(yield_sign_stage_approach.Name(), ("YIELD_SIGN_APPROACH"));
 }
 
-}  // namespace yield_sign
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

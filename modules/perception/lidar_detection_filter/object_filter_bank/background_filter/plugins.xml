@@ -1,0 +1,3 @@
+<library path="modules/perception/lidar_detection_filter/object_filter_bank/background_filter/libbackground_filter.so">
+    <class type="apollo::perception::lidar::BackgroundFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>
