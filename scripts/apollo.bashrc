@@ -120,6 +120,8 @@ function determine_gpu_use_target() {
       if lsmod | grep -q nvgpu; then
         if ldconfig -p | grep -q cudart; then
           use_gpu=1
+          need_cuda=1
+          gpu_platform="NVIDIA"
         fi
       fi
     else ## x86_64 mode

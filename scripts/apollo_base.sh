@@ -573,20 +573,12 @@ function _determine_planning_disabled() {
   fi
 }
 
-function _determine_map_disabled() {
-  if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/map/pnc_map:cuda_pnc_util \
-                      except //modules/map/pnc_map:cuda_util_test"
-  fi
-}
-
 function determine_disabled_targets() {
   if [[ "$#" -eq 0 ]]; then
     _determine_drivers_disabled
     _determine_localization_disabled
     _determine_perception_disabled
     _determine_planning_disabled
-    _determine_map_disabled
     echo "${DISABLED_TARGETS}"
     return
   fi
@@ -604,9 +596,6 @@ function determine_disabled_targets() {
         ;;
       planning*)
         _determine_planning_disabled
-        ;;
-      map*)
-        _determine_map_disabled
         ;;
     esac
   done
@@ -741,7 +730,11 @@ function run_bazel() {
   info "${TAB}$1 Targets: ${sp}${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  if [[ "$(uname -m)" == "x86_64" ]]; then
+    job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  else
+    job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  fi
   set -x
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
   set +x

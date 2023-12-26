@@ -48,6 +48,7 @@ function determine_gpu_use_host() {
   if [[ "${HOST_ARCH}" == "aarch64" ]]; then
     if lsmod | grep -q "^nvgpu"; then
       USE_GPU_HOST=1
+      USE_NVIDIA_GPU=1
     fi
   elif [[ "${HOST_ARCH}" == "x86_64" ]]; then
     if [[ ! -x "$(command -v nvidia-smi)" ]]; then
@@ -55,6 +56,7 @@ function determine_gpu_use_host() {
     elif [[ -z "$(nvidia-smi)" ]]; then
       warning "No NVIDIA GPU device found."
     else
+      USE_GPU_HOST=1
       USE_NVIDIA_GPU=1
     fi
     if [[ ! -x "$(command -v rocm-smi)" ]]; then
