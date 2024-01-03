@@ -47,10 +47,10 @@ proto_library(
     name = "cyber_conf_proto",
     srcs = ["cyber_conf.proto"],
     deps = [
+        ":perf_conf_proto",
+        ":run_mode_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
-        ":run_mode_conf_proto",
-        ":perf_conf_proto",
     ],
 )
 
@@ -75,11 +75,16 @@ proto_library(
 )
 
 proto_library(
+    name = "simple_proto",
+    srcs = ["simple.proto"],
+)
+
+proto_library(
     name = "scheduler_conf_proto",
     srcs = ["scheduler_conf.proto"],
     deps = [
-        ":classic_conf_proto",
         ":choreography_conf_proto",
+        ":classic_conf_proto",
     ],
 )
 
