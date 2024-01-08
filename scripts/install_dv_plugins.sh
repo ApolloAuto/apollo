@@ -20,6 +20,9 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 mkdir -p /opt/apollo/neo/src
+
+sudo cp -f /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo_source.conf
+
 dpkg -l apollo-neo-buildtool >/dev/null 2>&1
 # install buildtool
 [[ $? -ne 0 ]] && set -e && sudo rm -rf /etc/apt/keyrings/apolloauto.gpg && \
@@ -41,10 +44,11 @@ if [ -e "/apollo/.workspace.json" ]; then
     cp /apollo/.workspace.json ./
 fi
 sudo rm -rf modules/studio_connector
-sudo cp /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo_source.conf
 
 buildtool init
 buildtool install --legacy sim-obstacle studio-connector
+
+sudo cp -f /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo_pkg.conf
 
 # remove buildtool and tmp dir
 sudo apt remove -y apollo-neo-buildtool
