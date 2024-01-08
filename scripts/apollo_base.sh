@@ -496,9 +496,6 @@ function parse_cmdline_arguments() {
         known_bazel_opt=1
         ;;
       -o)
-        ((++pos))
-        optarg="${!pos}"
-        known_options="${known_options} ${opt}"
         APOLLO_OUTSIDE_DOCKER=1
         ;;
       -c)
