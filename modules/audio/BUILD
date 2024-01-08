@@ -22,6 +22,7 @@ apollo_cc_library(
         "inference/moving_detection.h",
         "inference/siren_detection.h",
     ],
+    linkopts = ["-fopenmp"],
     deps = [
         "//cyber",
         "//modules/common/math",
