@@ -41,6 +41,7 @@ if [ -e "/apollo/.workspace.json" ]; then
     cp /apollo/.workspace.json ./
 fi
 sudo rm -rf modules/studio_connector
+sudo cp /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo_source.conf
 
 buildtool init
 buildtool install --legacy sim-obstacle studio-connector
@@ -49,6 +50,7 @@ buildtool install --legacy sim-obstacle studio-connector
 sudo apt remove -y apollo-neo-buildtool
 rm -rf ~/apollo_tmp
 mv /opt/apollo/neo/setup.sh.bak /opt/apollo/neo/setup.sh
+sudo ldconfig
 
 ok "Successfully install dreamview plugins."
 ok "Please restart dreamview. Enjoy!"
