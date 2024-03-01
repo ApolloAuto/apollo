@@ -179,14 +179,13 @@ bool IsLibraryLoaded(const std::string& library_path,
     return true;
   }
 
-  ClassFactoryVector lib_loader_class_factory_objs;
+  size_t num_lib_loader_class_factory_objs = 0;
   for (auto& class_factory_obj : lib_class_factory_objs) {
     if (class_factory_obj->IsOwnedBy(class_loader)) {
-      lib_loader_class_factory_objs.emplace_back(class_factory_obj);
+      ++num_lib_loader_class_factory_objs;
     }
   }
 
-  auto num_lib_loader_class_factory_objs = lib_loader_class_factory_objs.size();
   return (is_lib_loaded_by_anyone &&
           (num_lib_loader_class_factory_objs <= num_lib_class_factory_objs));
 }
