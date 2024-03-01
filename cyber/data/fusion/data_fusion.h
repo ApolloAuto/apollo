@@ -31,34 +31,11 @@ namespace cyber {
 namespace data {
 namespace fusion {
 
-template <typename M0, typename M1 = NullType, typename M2 = NullType,
-          typename M3 = NullType>
+template <typename ...M>
 class DataFusion {
  public:
   virtual ~DataFusion() {}
-  virtual bool Fusion(uint64_t* index, std::shared_ptr<M0>& m0,  // NOLINT
-                      std::shared_ptr<M1>& m1,                   // NOLINT
-                      std::shared_ptr<M2>& m2,                   // NOLINT
-                      std::shared_ptr<M3>& m3) = 0;              // NOLINT
-};
-
-template <typename M0, typename M1, typename M2>
-class DataFusion<M0, M1, M2, NullType> {
- public:
-  virtual ~DataFusion() {}
-
-  virtual bool Fusion(uint64_t* index, std::shared_ptr<M0>& m0,  // NOLINT
-                      std::shared_ptr<M1>& m1,                   // NOLINT
-                      std::shared_ptr<M2>& m2) = 0;              // NOLINT
-};
-
-template <typename M0, typename M1>
-class DataFusion<M0, M1, NullType, NullType> {
- public:
-  virtual ~DataFusion() {}
-
-  virtual bool Fusion(uint64_t* index, std::shared_ptr<M0>& m0,  // NOLINT
-                      std::shared_ptr<M1>& m1) = 0;              // NOLINT
+  virtual bool Fusion(uint64_t* index, std::shared_ptr<M>& ...m) = 0;              // NOLINT
 };
 
 }  // namespace fusion

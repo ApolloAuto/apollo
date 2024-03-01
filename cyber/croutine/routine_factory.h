@@ -47,18 +47,19 @@ class RoutineFactory {
   std::shared_ptr<data::DataVisitorBase> data_visitor_ = nullptr;
 };
 
-template <typename M0, typename F>
+template <typename ...M, size_t ...N, typename F>
 RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor<M0>>& dv) {
+    F&& f, const std::shared_ptr<data::DataVisitor<M...>>& dv,
+    std::index_sequence<N...>) {
   RoutineFactory factory;
   factory.SetDataVisitor(dv);
   factory.create_routine = [=]() {
     return [=]() {
-      std::shared_ptr<M0> msg;
+      auto msg = std::make_tuple(std::shared_ptr<M>()...);
       for (;;) {
         CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
-        if (dv->TryFetch(msg)) {
-          f(msg);
+        if (dv->TryFetch(std::get<N>(msg)...)) {
+          f(std::get<N>(msg)...);
           CRoutine::Yield(RoutineState::READY);
         } else {
           CRoutine::Yield();
@@ -69,76 +70,10 @@ RoutineFactory CreateRoutineFactory(
   return factory;
 }
 
-template <typename M0, typename M1, typename F>
+template <typename ...M, typename F>
 RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1>>& dv) {
-  RoutineFactory factory;
-  factory.SetDataVisitor(dv);
-  factory.create_routine = [=]() {
-    return [=]() {
-      std::shared_ptr<M0> msg0;
-      std::shared_ptr<M1> msg1;
-      for (;;) {
-        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
-        if (dv->TryFetch(msg0, msg1)) {
-          f(msg0, msg1);
-          CRoutine::Yield(RoutineState::READY);
-        } else {
-          CRoutine::Yield();
-        }
-      }
-    };
-  };
-  return factory;
-}
-
-template <typename M0, typename M1, typename M2, typename F>
-RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1, M2>>& dv) {
-  RoutineFactory factory;
-  factory.SetDataVisitor(dv);
-  factory.create_routine = [=]() {
-    return [=]() {
-      std::shared_ptr<M0> msg0;
-      std::shared_ptr<M1> msg1;
-      std::shared_ptr<M2> msg2;
-      for (;;) {
-        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
-        if (dv->TryFetch(msg0, msg1, msg2)) {
-          f(msg0, msg1, msg2);
-          CRoutine::Yield(RoutineState::READY);
-        } else {
-          CRoutine::Yield();
-        }
-      }
-    };
-  };
-  return factory;
-}
-
-template <typename M0, typename M1, typename M2, typename M3, typename F>
-RoutineFactory CreateRoutineFactory(
-    F&& f, const std::shared_ptr<data::DataVisitor<M0, M1, M2, M3>>& dv) {
-  RoutineFactory factory;
-  factory.SetDataVisitor(dv);
-  factory.create_routine = [=]() {
-    return [=]() {
-      std::shared_ptr<M0> msg0;
-      std::shared_ptr<M1> msg1;
-      std::shared_ptr<M2> msg2;
-      std::shared_ptr<M3> msg3;
-      for (;;) {
-        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
-        if (dv->TryFetch(msg0, msg1, msg2, msg3)) {
-          f(msg0, msg1, msg2, msg3);
-          CRoutine::Yield(RoutineState::READY);
-        } else {
-          CRoutine::Yield();
-        }
-      }
-    };
-  };
-  return factory;
+    F&& f, const std::shared_ptr<data::DataVisitor<M...>>& dv) {
+  return CreateRoutineFactory(f, dv, std::make_index_sequence<sizeof...(M)>{});
 }
 
 template <typename Function>
