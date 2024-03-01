@@ -159,7 +159,7 @@ function _check_command() {
 }
 
 function check_config_cpu() {
-  if [[ $* == *--config?cpu* ]]; then
+  if [[ $* == build_cpu* ]] || [[ $* == *--config?cpu* ]]; then
     export USE_GPU_TARGET="0"
   fi
 }
