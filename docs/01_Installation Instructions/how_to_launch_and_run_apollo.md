@@ -59,7 +59,7 @@ To see if the system works, use the demo record to "feed" the system.
 
 ```
 # You need to download the demo record using the following commands
-cd docs/demo_guide/
+cd docs/02_Quick\ Start/demo_guide/
 python3 record_helper.py demo_3.5.record
 
 # You can now replay this demo "record" in a loop with the '-l' flag
