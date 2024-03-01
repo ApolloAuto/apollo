@@ -121,10 +121,10 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
       }
 
       if (j > 0 && path.segs_lengths[j] * path.segs_lengths[j - 1] < 0) {
-        cost += cost + traj_gear_switch_penalty_;
+        cost += traj_gear_switch_penalty_;
       }
       if (j == 0 && start_dire * path.segs_lengths[j] < 0) {
-        cost += cost + traj_gear_switch_penalty_;
+        cost += traj_gear_switch_penalty_;
       }
     }
     if (cost < min_cost) {
