@@ -12,7 +12,7 @@ don't need to install low-latency/real-time kernels described here at all.
 
 ## Ubuntu Low-Latency Kernel
 
-Ubuntu low-latency kernel (availabe in Ubuntu repository) is completely capable
+Ubuntu low-latency kernel (available in Ubuntu repository) is completely capable
 of low- to no- latency for running Apollo in the vehicle. Preempt optimization
 is enabled in its kernel configuration, and latency as low as 0.1 millisecond
 can and has been achieved using it.
@@ -30,7 +30,7 @@ sudo apt-get install linux-image-$(uname -r)-lowlatency linux-headers-$(uname -r
 **Note**:
 
 > Please change `$(uname -r)` to the latest kernel should there be newer kernel
-> packages available. (You can view newer packages availabe with
+> packages available. (You can view newer packages available with
 > `apt list --upgradable`.) The latest kernel version on Ubuntu 18.04 as of this
 > writing (Dec 02, 2020) is `5.4.0-56`.
 

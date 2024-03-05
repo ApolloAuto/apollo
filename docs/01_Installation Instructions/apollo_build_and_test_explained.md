@@ -52,7 +52,7 @@ To build everything,
 bash apollo.sh build
 ```
 
-![tip_icon](images/tip_icon.png) For simplicty, Apollo 6.0 introduces the notion
+![tip_icon](images/tip_icon.png) For simplicity, Apollo 6.0 introduces the notion
 of `bash apollo.sh build [module]` to replace the notion of `build_cyber`,
 `build_planning`, etc in previous Apollo releases.
 
