@@ -38,7 +38,7 @@ class Node;
  * If you want to set a key-value, and hope other nodes to get the value,
  * Routing, sensor internal/external references are set by Parameter Service
  * ParameterServer can set a parameter, and then you can get/list
- * paramter(s) by start a ParameterClient to send responding request
+ * parameter(s) by start a ParameterClient to send responding request
  * @warning You should only have one ParameterServer works
  */
 class ParameterServer {
@@ -58,9 +58,9 @@ class ParameterServer {
   /**
    * @brief Set the Parameter object
    *
-   * @param parmeter parameter to be set
+   * @param parameter parameter to be set
    */
-  void SetParameter(const Parameter& parmeter);
+  void SetParameter(const Parameter& parameter);
 
   /**
    * @brief Get the Parameter object
@@ -75,7 +75,7 @@ class ParameterServer {
   /**
    * @brief get all the parameters
    *
-   * @param parameters result Paramter vector
+   * @param parameters result Parameter vector
    */
   void ListParameters(std::vector<Parameter>* parameters);
 

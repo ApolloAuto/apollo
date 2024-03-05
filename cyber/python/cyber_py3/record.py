@@ -63,7 +63,7 @@ class RecordReader(object):
     # @param start_time the start time to read.
     # @param end_time the end time to read.
     #
-    # @return return (channnel, data, data_type, timestamp)
+    # @return return (channel, data, data_type, timestamp)
     def read_messages(self, start_time=0, end_time=18446744073709551615):
         while True:
             message = _CYBER_RECORD.PyRecordReader_ReadMessage(
@@ -91,7 +91,7 @@ class RecordReader(object):
     #
     # @param channel_name channel name.
     #
-    # @return return the name of ther string type.
+    # @return return the name of the string type.
     def get_messagetype(self, channel_name):
         return _CYBER_RECORD.PyRecordReader_GetMessageType(
             self.record_reader, channel_name).decode('utf-8')

@@ -208,7 +208,7 @@ class Reader : public ReaderBase {
 
  protected:
   double latest_recv_time_sec_ = -1.0;
-  double second_to_lastest_recv_time_sec_ = -1.0;
+  double second_to_latest_recv_time_sec_ = -1.0;
   uint32_t pending_queue_size_;
 
  private:
@@ -244,7 +244,7 @@ Reader<MessageT>::~Reader() {
 
 template <typename MessageT>
 void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
-  second_to_lastest_recv_time_sec_ = latest_recv_time_sec_;
+  second_to_latest_recv_time_sec_ = latest_recv_time_sec_;
   latest_recv_time_sec_ = Time::Now().ToSecond();
   blocker_->Publish(msg);
 }
@@ -361,11 +361,11 @@ double Reader<MessageT>::GetDelaySec() const {
   if (latest_recv_time_sec_ < 0) {
     return -1.0;
   }
-  if (second_to_lastest_recv_time_sec_ < 0) {
+  if (second_to_latest_recv_time_sec_ < 0) {
     return Time::Now().ToSecond() - latest_recv_time_sec_;
   }
   return std::max((Time::Now().ToSecond() - latest_recv_time_sec_),
-                  (latest_recv_time_sec_ - second_to_lastest_recv_time_sec_));
+                  (latest_recv_time_sec_ - second_to_latest_recv_time_sec_));
 }
 
 template <typename MessageT>
