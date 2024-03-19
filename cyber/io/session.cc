@@ -86,13 +86,14 @@ int Session::Connect(const struct sockaddr *addr, socklen_t addrlen) {
   return res;
 }
 
-int Session::Close() {
+void Session::Close() {
   ACHECK(fd_ != -1);
 
-  poll_handler_->Unblock();
-  int res = close(fd_);
+  poll_handler_->Unblock([fd = fd_]() {
+    ACHECK(close(fd) == 0);
+  });
   fd_ = -1;
-  return res;
+  return;
 }
 
 ssize_t Session::Recv(void *buf, size_t len, int flags, int timeout_ms) {
