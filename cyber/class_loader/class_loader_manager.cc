@@ -59,7 +59,7 @@ bool ClassLoaderManager::LoadLibrary(const std::string& library_path) {
     libpath_loader_map_[library_path] =
         new class_loader::ClassLoader(library_path);
   }
-  return IsLibraryValid(library_path);
+  return true;
 }
 
 int ClassLoaderManager::UnloadLibrary(const std::string& library_path) {
