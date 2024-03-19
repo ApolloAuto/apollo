@@ -66,6 +66,9 @@ void ObstaclesContainer::CleanUp() {
   curr_frame_movable_obstacle_ids_.clear();
   curr_frame_unmovable_obstacle_ids_.clear();
   curr_frame_considered_obstacle_ids_.clear();
+
+  // reset lane obstacles
+  clusters_->Init();
 }
 
 // This is called by Perception module at every frame to insert all

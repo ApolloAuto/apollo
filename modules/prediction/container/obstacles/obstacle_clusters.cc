@@ -45,6 +45,10 @@ LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
   return lane_graph;
 }
 
+void ObstacleClusters::Init() {
+  lane_obstacles_.clear();
+}
+
 void ObstacleClusters::AddObstacle(const int obstacle_id,
                                    const std::string& lane_id,
                                    const double lane_s, const double lane_l) {
