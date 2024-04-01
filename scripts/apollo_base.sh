@@ -731,9 +731,9 @@ function run_bazel() {
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
   if [[ "$(uname -m)" == "x86_64" ]]; then
-    job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+    job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=8 --local_ram_resources=HOST_RAM*0.7"
   else
-    job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.7 --copt=-fPIC --host_copt=-fPIC"
+    job_args="--copt=-march=native --host_copt=-march=native --jobs=8 --local_ram_resources=HOST_RAM*0.7 --copt=-fPIC --host_copt=-fPIC"
   fi
   set -x
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}

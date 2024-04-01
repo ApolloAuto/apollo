@@ -15,7 +15,7 @@ export PREFIX_DIR="${PREFIX_DIR:=${APOLLO_DISTRIBUTION_HOME}}"
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5 --cxxopt=-fPIC"
+BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=8 --local_ram_resources=HOST_RAM*0.5 --cxxopt=-fPIC"
 SHORTHAND_TARGETS=
 CMDLINE_OPTIONS=
 INSTALL_OPTIONS=
