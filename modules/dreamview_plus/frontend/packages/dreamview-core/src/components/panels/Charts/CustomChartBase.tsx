@@ -73,7 +73,7 @@ function useStyle() {
             marginBottom: theme.tokens.margin.speace,
         },
         'chart-item-active': {
-            border: `1px solid ${theme.tokens.colors.brand2}`,
+            border: `1px solid ${theme.tokens.colors.brand3}`,
         },
     }));
 

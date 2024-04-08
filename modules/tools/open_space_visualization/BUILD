@@ -7,9 +7,6 @@ package(default_visibility = ["//visibility:public"])
 apollo_py_library(
     name = "distance_approach_python_interface",
     srcs = ["distance_approach_python_interface.py"],
-    data = [
-        "//modules/planning/planning_base:distance_approach_problem_wrapper_lib.so",
-    ],
 )
 
 apollo_py_binary(
@@ -23,9 +20,6 @@ apollo_py_binary(
 apollo_py_library(
     name = "hybrid_a_star_python_interface",
     srcs = ["hybrid_a_star_python_interface.py"],
-    data = [
-        "//modules/planning/planning_base:hybrid_a_star_wrapper_lib.so",
-    ],
 )
 
 apollo_py_binary(
@@ -39,9 +33,6 @@ apollo_py_binary(
 apollo_py_library(
     name = "open_space_roi_interface",
     srcs = ["open_space_roi_interface.py"],
-    data = [
-        "//modules/planning/planning_base:open_space_roi_wrapper_lib.so",
-    ],
 )
 
 apollo_py_binary(

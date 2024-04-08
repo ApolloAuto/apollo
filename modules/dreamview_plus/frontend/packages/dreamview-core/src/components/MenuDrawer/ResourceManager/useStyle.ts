@@ -9,6 +9,13 @@ export default function useStyle() {
             position: 'relative',
         },
         'profile-manager-tab': {
+            '& .dreamview-tabs-nav-wrap .dreamview-tabs-nav-list .dreamview-tabs-tab': {
+                margin: '0 20px !important',
+                background: theme.components.meneDrawer.tabBackgroundColor,
+                '& .dreamview-tabs-tab-btn': {
+                    color: theme.components.meneDrawer.tabColor,
+                },
+            },
             '&.dreamview-tabs .dreamview-tabs-tab': {
                 fontSize: theme.tokens.font.size.large,
                 padding: '0 4px',
@@ -17,12 +24,19 @@ export default function useStyle() {
                 minWidth: '80px',
                 justifyContent: 'center',
             },
+            '& .dreamview-tabs-tab.dreamview-tabs-tab-active': {
+                background: theme.components.meneDrawer.tabActiveBackgroundColor,
+                '& .dreamview-tabs-tab-btn': {
+                    color: theme.components.meneDrawer.tabActiveColor,
+                },
+            },
             '&.dreamview-tabs .dreamview-tabs-nav .dreamview-tabs-nav-list': {
-                background: '#242933',
+                background: theme.components.meneDrawer.tabBackgroundColor,
                 borderRadius: '10px',
             },
             '& .dreamview-tabs-ink-bar': {
                 height: '1px !important',
+                display: 'block !important',
             },
         },
 
@@ -47,13 +61,13 @@ export function useTableHover() {
     return useMakeStyle((theme, prop) => ({
         'table-active': {
             [`&  tr:nth-of-type(${prop.activeIndex + 1}):hover td`]: {
-                background: theme.tokens.colors.brand3,
+                background: theme.components.table.activeBgColor,
             },
             [`&  tr:nth-of-type(${prop.activeIndex + 1}) td`]: {
-                background: theme.tokens.colors.brand3,
-                color: theme.tokens.colors.fontColor1,
+                background: theme.components.table.activeBgColor,
+                color: theme.tokens.colors.fontColor5,
                 '& .download-active': {
-                    color: theme.tokens.colors.fontColor1,
+                    color: theme.tokens.colors.fontColor5,
                 },
             },
         },

@@ -80,7 +80,8 @@ class PlanningBase {
    *
    * @return True if vehicle reaches the end point.
    */
-  bool IsPlanningFinished() const;
+  bool IsPlanningFinished(
+      const ADCTrajectory::TrajectoryType& current_trajectory_type) const;
 
  protected:
   virtual void FillPlanningPb(const double timestamp,

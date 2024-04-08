@@ -199,6 +199,9 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
          fabs(measurement.dot(odirection)) * kVarianceAmplifier) *
             odirection * odirection.transpose();
   }
+  // when association_cost is larger, we scale measurement for protect
+  float scale = pow(1 + new_object->association_score, 2) * 1.1;
+  measurement_covariance *= scale;
 
   Eigen::Matrix<double, 2, 4> observation_transform;
   observation_transform.block<2, 2>(0, 0).setIdentity();

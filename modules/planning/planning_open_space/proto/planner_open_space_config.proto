@@ -1,0 +1,332 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/math/fem_pos_deviation_smoother_config.proto";
+
+package apollo.planning;
+
+enum DualWarmUpMode {
+  IPOPT = 0;
+  IPOPTQP = 1;
+  OSQP = 2;
+  DEBUG = 3;
+  SLACKQP = 4;
+}
+
+enum DistanceApproachMode {
+  DISTANCE_APPROACH_IPOPT = 0;
+  DISTANCE_APPROACH_IPOPT_CUDA = 1;
+  DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
+  DISTANCE_APPROACH_IPOPT_FIXED_DUAL = 3;
+  DISTANCE_APPROACH_IPOPT_RELAX_END = 4;
+  DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK = 5;
+}
+
+message PlannerOpenSpaceConfig {
+  // Open Space ROIConfig
+  optional ROIConfig roi_config = 1;
+  // Hybrid A Star Warm Start
+  optional WarmStartConfig warm_start_config = 2;
+  // Dual Variable Warm Start
+  optional DualVariableWarmStartConfig dual_variable_warm_start_config = 3;
+  // Distance Approach Configs
+  optional DistanceApproachConfig distance_approach_config = 4;
+  // Iterative Anchoring Configs
+  optional IterativeAnchoringConfig iterative_anchoring_smoother_config = 5;
+  // sample time for speed planning
+  optional float delta_t = 7 [default = 1.0];
+  // Distance threshold to judge if vehicle is near destination
+  optional double near_destination_threshold = 8 [default = 0.001];
+  // If enable linear interpolation to get smoother path
+  optional bool enable_linear_interpolation = 10 [default = false];
+  // Theta error to judge if vehicle is near destination
+  optional double is_near_destination_theta_threshold = 11 [default = 0.05];
+}
+
+message ROIConfig {
+  // longitudinal range of parking roi backward
+  optional double roi_longitudinal_range_start = 1 [default = 10.0];
+  // longitudinal range of parking roi forward
+  optional double roi_longitudinal_range_end = 2 [default = 10.0];
+  // parking spot range detection threshold
+  optional double parking_start_range = 3 [default = 7.0];
+  // Parking orientation for reverse parking
+  optional bool parking_inwards = 4 [default = false];
+}
+
+//////////////////////////////////
+// SpeedOptimizerConfig
+
+message SpeedOptimizerConfig {
+  // Acceleration weight
+  optional double acc_weight = 1 [default = 1.0];
+  // Jerk weight
+  optional double jerk_weight = 2 [default = 10.0];
+  // Kappa penalty weight
+  optional double kappa_penalty_weight = 3 [default = 1000.0];
+  // Reference line distance weight
+  optional double ref_s_weight = 4 [default = 10.0];
+  // Reference line speed weight
+  optional double ref_v_weight = 5 [default = 10.0];
+}
+// Hybrid a star for warm start
+message WarmStartConfig {
+  // Distance resolution of grid
+  optional double xy_grid_resolution = 1 [default = 0.2];
+  // Theta resolution of grid
+  optional double phi_grid_resolution = 2 [default = 0.05];
+  // Node num of next step
+  optional uint64 next_node_num = 3 [default = 10];
+  // Hybird a star traj point nums between two node
+  optional double step_size = 4 [default = 0.5];
+  // Penalty for moving forward
+  optional double traj_forward_penalty = 5 [default = 0.0];
+  // Penalty for moving backward
+  optional double traj_back_penalty = 6 [default = 0.0];
+  // Penalty for switching gear
+  optional double traj_gear_switch_penalty = 7 [default = 10.0];
+  // Penalty for steering
+  optional double traj_steer_penalty = 8 [default = 100.0];
+  // Penalty for chaning steering
+  optional double traj_steer_change_penalty = 9 [default = 10.0];
+  // Penalty when path is too short
+  optional double traj_short_length_penalty = 10 [default = 10.0];
+  // Grid a star xy axis resolution
+  optional double grid_a_star_xy_resolution = 11 [default = 0.1];
+  // Node radius for collision check
+  optional double node_radius = 12 [default = 0.5];
+  optional SpeedOptimizerConfig s_curve_config = 13;
+  // Maximum curvature ratio in warm start trajectory
+  optional double traj_kappa_contraint_ratio = 14 [default = 0.7];
+  // Maximum expolored number for searching
+  optional int32 max_explored_num = 15 [default = 10000];
+  // Minimum number of valid results to stop searching
+  optional int32 desired_explored_num= 16 [default = 10000];
+  // Path of length shorter than "traj_expected_shortest_length" will be 
+  // considered as short path and set penalty
+  optional double traj_expected_shortest_length = 17 [default = 1.0];
+  // Stop searching if searching time exceeds "astar_max_search_time"
+  optional double astar_max_search_time = 18 [default = 5.0];
+  // Generate a star grad map local esdf range
+  optional double esdf_range = 19 [default = 2.0];
+  // Generate a star grad map local esdf range
+  optional double soft_boundary_penalty = 20 [default = 2.0];
+  // if generate esdf
+  optional bool use_esdf = 21 [default = true];
+}
+
+message DualVariableWarmStartConfig {
+  // Parameter for weighing the weights between the two variables
+  optional double weight_d = 1 [default = 1.0];
+  // Config of ipopt
+  optional IpoptConfig ipopt_config = 2;
+  // qp warm up mode
+  optional DualWarmUpMode qp_format = 3;
+  // Minimum safety distance
+  optional double min_safety_distance = 4 [default = 0.0];
+  // If print debug information of osqp
+  optional bool debug_osqp = 5 [default = false];
+  // Parameter for adjusting adjust the weight between the objective function
+  // and constraint conditions
+  optional double beta = 6 [default = 1.0];
+  // Config of osqp
+  optional OSQPConfig osqp_config = 7;
+}
+
+message DistanceApproachConfig {
+  // Distance approach weight configs
+  optional double weight_steer = 1;
+  optional double weight_a = 2;
+  optional double weight_steer_rate = 3;
+  optional double weight_a_rate = 4;
+  optional double weight_x = 5;
+  optional double weight_y = 6;
+  optional double weight_phi = 7;
+  optional double weight_v = 8;
+  optional double weight_steer_stitching = 9;
+  optional double weight_a_stitching = 10;
+  optional double weight_first_order_time = 11;
+  optional double weight_second_order_time = 12;
+  // Minimum safety distance
+  optional double min_safety_distance = 13 [default = 0.0];
+  // Maximum speed for moving forward
+  optional double max_speed_forward = 14 [default = 3.0];
+  // Maximum speed for moving backward
+  optional double max_speed_reverse = 15 [default = 2.0];
+  // Maximum acceleration for moving forward
+  optional double max_acceleration_forward = 16 [default = 2.0];
+  // Maximum acceleration for moving backward
+  optional double max_acceleration_reverse = 17 [default = 2.0];
+  // Minimum scaling for time sample
+  optional double min_time_sample_scaling = 18 [default = 0.1];
+  // Maximum scaling for time sample
+  optional double max_time_sample_scaling = 19 [default = 10.0];
+  // If use fix time for planning
+  optional bool use_fix_time = 20 [default = false];
+  // Config of ipopt
+  optional IpoptConfig ipopt_config = 21;
+  // If enable constraint check
+  optional bool enable_constraint_check = 22;
+  // If enable hand derivative(not used any more)
+  optional bool enable_hand_derivative = 23;
+  // True to enable hand derived derivative inside open space planner
+  optional bool enable_derivative_check = 24;
+  // True to enable derivative check inside open space planner
+  optional bool enable_initial_final_check = 25 [default = false];
+  optional DistanceApproachMode distance_approach_mode = 26;
+  // If enable automatic differentiation of Jacobian matrix
+  optional bool enable_jacobian_ad = 27 [default = false];
+  // If enable initial state check
+  optional bool enable_check_initial_state = 28 [default = false];
+  // Weight of end state
+  optional double weight_end_state = 29 [default = 0.0];
+  // Weight of the slack variables
+  optional double weight_slack = 30 [default = 0.0];
+}
+
+message IpoptConfig {
+  // Ipopt log print level
+  optional int32 ipopt_print_level = 1;
+  // Parameter for representing a percentage of the total available memory that
+  // will be allocated to MUMPS
+  optional int32 mumps_mem_percent = 2;
+  // Parameter for controling the pivot tolerance for the MUMPS linear solver
+  optional double mumps_pivtol = 3;
+  // Maximum number of iterations allowed for the optimization process
+  optional int32 ipopt_max_iter = 4;
+  // Tolerance for convergence
+  optional double ipopt_tol = 5;
+  // Tolerance for constraint violations
+  optional double ipopt_acceptable_constr_viol_tol = 6;
+  // Minimum allowed perturbation for the Hessian matrix during the optimization
+  // process. It ensures that the Hessian matrix is appropriately regularized, 
+  // which can help with numerical stability
+  optional double ipopt_min_hessian_perturbation = 7;
+  // Regularization value for the Jacobian matrix during the optimization 
+  // process. It helps stabilize the numerical calculations by adding a small 
+  // amount of artificial noise to the Jacobian
+  optional double ipopt_jacobian_regularization_value = 8;
+  // If Ipopt will print timing statistics to the console
+  optional string ipopt_print_timing_statistics = 9;
+  // Value of alpha for the constraint multipliers. It typically requires 
+  // calibration and depends on the specific problem being solved
+  optional string ipopt_alpha_for_y = 10;
+  // if Ipopt should recalculate the constraint multipliers during the 
+  // optimization process
+  optional string ipopt_recalc_y = 11;
+  // Initial value for the barrier parameter used in Ipopt's barrier algorithm
+  optional double ipopt_mu_init = 12 [default = 0.1];
+  // ipopt barrier parameter, default 0.1
+}
+
+// Dual variable configs for OSQP
+message OSQPConfig {
+  // Parameter deciding mode of initial problem solving, usually no need to change
+  optional double alpha = 1 [default = 1.0];
+  // Tolerance for absolute error
+  optional double eps_abs = 2 [default = 1.0e-3];
+  // Tolerance for relative error
+  optional double eps_rel = 3 [default = 1.0e-3];
+  // Maximum iteration times for stopping optimization
+  optional int32 max_iter = 4 [default = 10000];
+  // If "polishing" step will be performed after finding the preliminary solution
+  optional bool polish = 5 [default = true];
+  // If print debug log of osqp
+  optional bool osqp_debug_log = 6 [default = false];
+}
+
+message IterativeAnchoringConfig {
+  // Interpolation distance between two anchor points
+  optional double interpolated_delta_s = 1 [default = 0.1];
+  // The number of attempts during re-anchoring
+  optional int32 reanchoring_trails_num = 2 [default = 50];
+  // Parameter for controling the uncertainty of the position during re-anchoring
+  optional double reanchoring_pos_stddev = 3 [default = 0.25];
+  // Parameter for controling the uncertainty of the length during re-anchoring
+  optional double reanchoring_length_stddev = 4 [default = 1.0];
+  // Flag to indicate if estimate bound
+  optional bool estimate_bound = 5 [default = false];
+  // The default bound
+  optional double default_bound = 6 [default = 2.0];
+  // The minimum size of the vehicle, used to calculate some restrictions
+  optional double vehicle_shortest_dimension = 7 [default = 1.04];
+  // Config of FEM (finite element method) position deviation smoother
+  optional FemPosDeviationSmootherConfig fem_pos_deviation_smoother_config = 8;
+  // The collision reduction ratio may be used to adjust the effectiveness of 
+  // collision avoidance strategies
+  optional double collision_decrease_ratio = 9 [default = 0.9];
+  // TODO(QiL, Jinyun): Merge following with overall config for open space
+  // Maximum speed for moving forward
+  optional double max_forward_v = 10 [default = 2.0];
+  // Maximum speed for moving backward
+  optional double max_reverse_v = 11 [default = 2.0];
+  // Maximum acceleration for moving forward
+  optional double max_forward_acc = 12 [default = 3.0];
+  // Maximum acceleration for moving backward
+  optional double max_reverse_acc = 13 [default = 2.0];
+  // Maximum jerk
+  optional double max_acc_jerk = 14 [default = 4.0];
+  // Time step
+  optional double delta_t = 15 [default = 0.2];
+  // Config for speed optimization
+  optional SpeedOptimizerConfig s_curve_config = 16;
+}
+
+// Dual variable configs for warm starting distance approach trajectory
+// smoothing
+message DualVariableConfig {
+  // Parameter for weighing the weights between the two variables
+  optional double weight_d = 1 [default = 1.0];
+  // Config of ipopt
+  optional IpoptSolverConfig ipopt_config = 2;
+  // qp warm up mode
+  optional DualVariableMode qp_format = 3;
+  // Minimum safety distance
+  optional double min_safety_distance = 4 [default = 0.0];
+  // If print debug information of osqp
+  optional bool debug_osqp = 5 [default = false];
+  // Parameter for adjusting adjust the weight between the objective function
+  // and constraint conditions
+  optional double beta = 6 [default = 1.0];
+}
+
+enum DualVariableMode {
+  DUAL_VARIABLE_IPOPT = 0;
+  DUAL_VARIABLE_IPOPTQP = 1;
+  DUAL_VARIABLE_OSQP = 2;
+  DUAL_VARIABLE_DEBUG = 3;
+}
+
+// Ipopt configs
+message IpoptSolverConfig {
+  // Log print level of ipopt
+  optional int32 ipopt_print_level = 1;
+  // Percentage of the total available memory that will be allocated to MUMPS
+  optional int32 mumps_mem_percent = 2;
+  // Pivot tolerance for the MUMPS linear solver
+  optional double mumps_pivtol = 3;
+  // Maximum number of iterations allowed for the optimization process
+  optional int32 ipopt_max_iter = 4;
+  // Tolerance for convergence
+  optional double ipopt_tol = 5;
+  // // Tolerance for constraint violations
+  optional double ipopt_acceptable_constr_viol_tol = 6;
+  // Minimum allowed perturbation for the Hessian matrix during the optimization
+  // process. It ensures that the Hessian matrix is appropriately regularized, 
+  // which can help with numerical stability
+  optional double ipopt_min_hessian_perturbation = 7;
+  // Regularization value for the Jacobian matrix during the optimization 
+  // process. It helps stabilize the numerical calculations by adding a small 
+  // amount of artificial noise to the Jacobian
+  optional double ipopt_jacobian_regularization_value = 8;
+  // If Ipopt will print timing statistics to the console
+  optional string ipopt_print_timing_statistics = 9;
+  // Value of alpha for the constraint multipliers. It typically requires 
+  // calibration and depends on the specific problem being solved
+  optional string ipopt_alpha_for_y = 10;
+  // if Ipopt should recalculate the constraint multipliers during the 
+  // optimization process
+  optional string ipopt_recalc_y = 11;
+  // Initial value for the barrier parameter used in Ipopt's barrier algorithm
+  optional double ipopt_mu_init = 12 [default = 0.1];
+  // ipopt barrier parameter, default 0.1
+}

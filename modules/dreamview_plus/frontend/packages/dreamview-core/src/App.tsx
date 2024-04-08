@@ -1,13 +1,12 @@
 import React from 'react';
-import { Provider as ThemeProvider } from '@dreamview/dreamview-theme';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { GlobalStyles, CSSInterpolation } from 'tss-react';
 import { PanelLayoutStoreProvider } from './store/PanelLayoutStore';
+import { ThemeProvider } from './store/ThemeProviderStore';
 import CombineContext from './store/combineContext';
 import { PanelCatalogProvider } from './store/PanelCatalogStore';
 import PageLayout from './components/PageLayout';
-import globalStyles from './style/globalStyles';
+import GlobalStyles from './style/globalStyles';
 import { EventHandlersProvider } from './store/EventHandlersStore';
 import { MenuStoreProvider } from './store/MenuStore';
 import { HmiStoreProvider, PickHmiStoreProvider } from './store/HmiStore';
@@ -16,9 +15,11 @@ import InitAppData from './InitAppData';
 import { UserInfoStoreProvider } from './store/UserInfoStore';
 import 'mac-scrollbar/dist/mac-scrollbar.css';
 import { PanelInfoStoreProvider } from './store/PanelInfoStore';
+import { AppInitProvider } from './store/AppInitStore';
 
 export function App() {
     const Providers = [
+        <AppInitProvider key='AppInitProvider' />,
         <EventHandlersProvider key='EventHandlersProvider' />,
         <WebSocketManagerProvider key='WebSocketManagerProvider' />,
         <UserInfoStoreProvider key='UserInfoStoreProvider' />,
@@ -34,8 +35,8 @@ export function App() {
 
     return (
         <ThemeProvider>
-            <GlobalStyles styles={globalStyles as CSSInterpolation} />
             <DndProvider backend={HTML5Backend}>
+                <GlobalStyles />
                 <CombineContext providers={Providers}>
                     <InitAppData />
                     <PageLayout />

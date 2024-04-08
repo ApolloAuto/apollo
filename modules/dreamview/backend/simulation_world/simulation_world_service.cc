@@ -312,7 +312,7 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   InitWriters();
 
   if (routing_from_file) {
-    ReadRoutingFromFile(FLAGS_routing_response_file);
+    ReadPlanningCommandFromFile(FLAGS_routing_response_file);
   }
 
   // Populate vehicle parameters.
@@ -1282,20 +1282,23 @@ Json SimulationWorldService::GetRoutePathAsJson() const {
   return response;
 }
 
-void SimulationWorldService::ReadRoutingFromFile(
-    const std::string &routing_response_file) {
-  auto routing_response = std::make_shared<RoutingResponse>();
-  if (!GetProtoFromFile(routing_response_file, routing_response.get())) {
-    AWARN << "Unable to read routing response from file: "
-          << routing_response_file;
+void SimulationWorldService::ReadPlanningCommandFromFile(
+    const std::string &planning_command_file) {
+  auto planning_command = std::make_shared<PlanningCommand>();
+  if (!GetProtoFromFile(planning_command_file, planning_command.get())) {
+    AWARN << "Unable to read planning command from file: "
+          << planning_command_file;
     return;
   }
-  AINFO << "Loaded routing from " << routing_response_file;
+  AINFO << "Loaded planning command from " << planning_command_file;
 
   sleep(1);  // Wait to make sure the connection has been established before
              // publishing.
-  routing_response_writer_->Write(routing_response);
-  AINFO << "Published RoutingResponse read from file.";
+
+  auto planning_command_writer =
+      node_->CreateWriter<PlanningCommand>(FLAGS_planning_command);
+  planning_command_writer->Write(planning_command);
+  AINFO << "Published PlanningCommand read from file.";
 }
 
 template <>

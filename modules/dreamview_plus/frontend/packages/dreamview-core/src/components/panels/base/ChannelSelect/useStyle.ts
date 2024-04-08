@@ -11,17 +11,17 @@ export default function useStyle() {
             width: '100%',
             fontFamily: 'PingFangSC-Regular',
             fontSize: '14px',
-            color: '#5D6573',
-            backgroundColor: '#0F1014',
+            color: theme.tokens.colors.fontColor4,
+            backgroundColor: theme.tokens.colors.background3,
         },
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

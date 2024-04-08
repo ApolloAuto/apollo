@@ -31,18 +31,20 @@ apollo::perception::lidar::PointCloudPreprocessComponent
 
 #### Input
 
-| Name  | Type                          | Description         |
-| ----- | ----------------------------- | ------------------- |
-| `msg` | `apollo::drivers::PointCloud` | point cloud message |
+| Name  | Type                          | Description         | Input channal |
+| ----- | ----------------------------- | ------------------- | ------------- |
+| `msg` | `apollo::drivers::PointCloud` | point cloud message | /apollo/sensor/velodyne64/compensator/PointCloud2 |
 
 Point cloud data from driver: If there is one lidar, output point cloud after motion compensation. If there are multiple
-lidars, concatenate the point clouds into one frame after motion compensation.
+lidars, concatenate the point clouds into one frame after motion compensation. The default trigger channel is `/apollo/sensor/velodyne64/compensator/PointCloud2`. The detailed input channel information is in `modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag` file.
 
 #### Output
 
-| Name    | Type                                             | Description         |
-| ------- | ------------------------------------------------ | ------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+| Name    | Type                                             | Description         | Output channal |
+| ------- | ------------------------------------------------ | ------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message | /perception/lidar/pointcloud_preprocess |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/lidar_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt` file.
 
 #### How to Launch
 

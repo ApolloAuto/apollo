@@ -92,8 +92,6 @@ export const reducerHander = {
                     newStatus.currentScenarioId,
                     newStatus.scenarioSet,
                 );
-            } else if (['modules', 'modulesLock'].includes(key)) {
-                draftHmi[key] = new Map(Object.entries(newValue).sort());
             } else if (key === 'currentRecordStatus') {
                 draftHmi.currentRecordId = newStatus.currentRecordStatus?.currentRecordId;
                 draftHmi.currentRecordStatus = newStatus.currentRecordStatus;
@@ -103,6 +101,10 @@ export const reducerHander = {
                 draftHmi[key] = newStatus[key];
             }
         });
+
+        draftHmi.modules = new Map(Object.entries(newStatus.modules ?? []).sort());
+
+        draftHmi.modulesLock = new Map(Object.entries(newStatus.modulesLock ?? []).sort());
 
         draftHmi.backendShutdown = newStatus.backendShutdown;
 

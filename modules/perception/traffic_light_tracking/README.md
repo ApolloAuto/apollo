@@ -39,15 +39,19 @@ apollo::perception::onboard::TrafficLightTrackComponent
 
 #### Input
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Input channal |
+| ------- | --------------------------------------------------- | -------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Tracking |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/Tracking`. The detailed input channel information is in `modules/perception/traffic_light_tracking/dag/traffic_light_tracking.dag` file. By default, the upstream components of the messages received by the component include `traffic_light_recognition`.
 
 #### Output
 
-| Name  | Type                                        | Description                 |
-| ----- | ------------------------------------------- | --------------------------- |
-| `msg` | `apollo::perception::TrafficLightDetection` | trafficlight output message |
+| Name  | Type                                        | Description                 | Output channal |
+| ----- | ------------------------------------------- | --------------------------- | -------------- |
+| `msg` | `apollo::perception::TrafficLightDetection` | trafficlight output message | /apollo/perception/traffic_light |
+
+>Note: The output channel is proto type data. The detailed output channel information is in `modules/perception/traffic_light_tracking/conf/traffic_light_tracking_config.pb.txt` file.
 
 #### How to Launch
 

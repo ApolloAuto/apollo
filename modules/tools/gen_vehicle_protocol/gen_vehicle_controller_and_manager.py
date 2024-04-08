@@ -67,8 +67,13 @@ def gen_vehicle_controller_header(content, output_dir, protocol_template_dir):
         header.write(FMT % fmt_val)
 
 
-def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
-    controller_cpp_tpl_file = protocol_template_dir + "controller.cc.tpl"
+def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir, use_demo_dbc=False):
+    if not use_demo_dbc:
+        # print("not use demo")
+        controller_cpp_tpl_file = protocol_template_dir + "controller.cc.tpl"
+    else:
+        # print("use demo")
+        controller_cpp_tpl_file = protocol_template_dir + "controllerdemo.cc.tpl"
     with open(controller_cpp_tpl_file, 'r') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
@@ -260,6 +265,7 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                 protocol_add_list.append(protocol_add)
 
                 for var in p["vars"]:
+                    # print("var keys is", var.keys())
                     if "signal_type" in var.keys():
                         if "command" in var["signal_type"]:
                             if "protocol_category" in p.keys():
@@ -283,10 +289,11 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["gear_command_protocol_name"] = p["name"].lower()
                                     fmt_val["gear_command_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["gear_command_park_enum"] = var["enum"][1]
-                                        fmt_val["gear_command_reverse_enum"] = var["enum"][2]
-                                        fmt_val["gear_command_neutral_enum"] = var["enum"][3]
-                                        fmt_val["gear_command_drive_enum"] = var["enum"][4]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["gear_command_park_enum"] = var["enum"][var_enum_key_list[1]]
+                                        fmt_val["gear_command_reverse_enum"] = var["enum"][var_enum_key_list[2]]
+                                        fmt_val["gear_command_neutral_enum"] = var["enum"][var_enum_key_list[3]]
+                                        fmt_val["gear_command_drive_enum"] = var["enum"][var_enum_key_list[4]]
                                     gear_command_get = protocol_gear_command_fmt % fmt_val
                                     protocol_gear_command_list.append(gear_command_get)
                         if "enable" in var["signal_type"]:
@@ -296,8 +303,9 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["throttle_command_protocol_name"] = p["name"].lower()
                                     fmt_val["throttle_command_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["throttle_command_enable_disable_enum"] = var["enum"][0]
-                                        fmt_val["throttle_command_enable_enable_enum"] = var["enum"][1]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["throttle_command_enable_disable_enum"] = var["enum"][var_enum_key_list[0]]
+                                        fmt_val["throttle_command_enable_enable_enum"] = var["enum"][var_enum_key_list[1]]
                                     protocol_auto_enable_add_list.append(protocol_throttle_enable_command_fmt % fmt_val)
                                     protocol_steer_enable_add_list.append(protocol_throttle_disenable_command_fmt % fmt_val)
                                     protocol_speed_enable_add_list.append(protocol_throttle_enable_command_fmt % fmt_val)
@@ -306,8 +314,9 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["brake_command_protocol_name"] = p["name"].lower()
                                     fmt_val["brake_command_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["brake_command_enable_disable_enum"] = var["enum"][0]
-                                        fmt_val["brake_command_enable_enable_enum"] = var["enum"][1]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["brake_command_enable_disable_enum"] = var["enum"][var_enum_key_list[0]]
+                                        fmt_val["brake_command_enable_enable_enum"] = var["enum"][var_enum_key_list[1]]
                                     protocol_auto_enable_add_list.append(protocol_brake_enable_command_fmt % fmt_val)
                                     protocol_steer_enable_add_list.append(protocol_brake_disenable_command_fmt % fmt_val)
                                     protocol_speed_enable_add_list.append(protocol_brake_enable_command_fmt % fmt_val)
@@ -316,8 +325,9 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["steer_command_protocol_name"] = p["name"].lower()
                                     fmt_val["steer_command_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["steer_command_enable_disable_enum"] = var["enum"][0]
-                                        fmt_val["steer_command_enable_enable_enum"] = var["enum"][1]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["steer_command_enable_disable_enum"] = var["enum"][var_enum_key_list[0]]
+                                        fmt_val["steer_command_enable_enable_enum"] = var["enum"][var_enum_key_list[1]]
                                     protocol_auto_enable_add_list.append(protocol_steer_enable_command_fmt % fmt_val)
                                     protocol_steer_enable_add_list.append(protocol_steer_enable_command_fmt % fmt_val)
                                     protocol_speed_enable_add_list.append(protocol_steer_disenable_command_fmt % fmt_val)
@@ -326,8 +336,9 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["gear_command_protocol_name"] = p["name"].lower()
                                     fmt_val["gear_command_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["gear_command_enable_disable_enum"] = var["enum"][0]
-                                        fmt_val["gear_command_enable_enable_enum"] = var["enum"][1]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["gear_command_enable_disable_enum"] = var["enum"][var_enum_key_list[0]]
+                                        fmt_val["gear_command_enable_enable_enum"] = var["enum"][var_enum_key_list[1]]
                                     protocol_auto_enable_add_list.append(protocol_gear_enable_command_fmt % fmt_val)
                                     protocol_steer_enable_add_list.append(protocol_gear_disenable_command_fmt % fmt_val)
                                     protocol_speed_enable_add_list.append(protocol_gear_enable_command_fmt % fmt_val)
@@ -365,10 +376,11 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
                                     fmt_val["gear_protocol_name"] = p["name"].lower()
                                     fmt_val["gear_report_protocol_name_cap"] = p["name"].capitalize()
                                     if var["type"] == "enum":
-                                        fmt_val["gear_report_park_enum"] = var["enum"][1]
-                                        fmt_val["gear_report_reverse_enum"] = var["enum"][2]
-                                        fmt_val["gear_report_neutral_enum"] = var["enum"][3]
-                                        fmt_val["gear_report_drive_enum"] = var["enum"][4]
+                                        var_enum_key_list = list(var["enum"].keys())
+                                        fmt_val["gear_report_park_enum"] = var["enum"][var_enum_key_list[1]]
+                                        fmt_val["gear_report_reverse_enum"] = var["enum"][var_enum_key_list[2]]
+                                        fmt_val["gear_report_neutral_enum"] = var["enum"][var_enum_key_list[3]]
+                                        fmt_val["gear_report_drive_enum"] = var["enum"][var_enum_key_list[4]]
                                     gear_get = protocol_chassis_gear_fmt % fmt_val
                                     protocol_chassis_get_list.append(gear_get)
                         if "enable" in var["signal_type"]:
@@ -394,20 +406,22 @@ def gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir):
 
         protocol_ptr_get_list.sort()
         protocol_add_list.sort()
-        protocol_chassis_get_list.sort()
-        protocol_auto_enable_add_list.sort()
-        protocol_steer_enable_add_list.sort()
-        protocol_speed_enable_add_list.sort()
         fmt_val["protocol_ptr_get_list"] = "\n".join(protocol_ptr_get_list)
         fmt_val["protocol_add_list"] = "\n".join(protocol_add_list)
-        fmt_val["protocol_chassis_get_list"] = "\n".join(protocol_chassis_get_list)
-        fmt_val["protocol_auto_enable_add_list"] = "\n".join(protocol_auto_enable_add_list)
-        fmt_val["protocol_steer_enable_add_list"] = "\n".join(protocol_steer_enable_add_list)
-        fmt_val["protocol_speed_enable_add_list"] = "\n".join(protocol_speed_enable_add_list)
-        fmt_val["protocol_brake_command_list"] = "\n".join(protocol_brake_command_list)
-        fmt_val["protocol_throttle_command_list"] = "\n".join(protocol_throttle_command_list)
-        fmt_val["protocol_steer_command_list"] = "\n".join(protocol_steer_command_list)
-        fmt_val["protocol_gear_command_list"] = "\n".join(protocol_gear_command_list)
+
+        if use_demo_dbc:
+            protocol_chassis_get_list.sort()
+            protocol_auto_enable_add_list.sort()
+            protocol_steer_enable_add_list.sort()
+            protocol_speed_enable_add_list.sort()
+            fmt_val["protocol_chassis_get_list"] = "\n".join(protocol_chassis_get_list)
+            fmt_val["protocol_auto_enable_add_list"] = "\n".join(protocol_auto_enable_add_list)
+            fmt_val["protocol_steer_enable_add_list"] = "\n".join(protocol_steer_enable_add_list)
+            fmt_val["protocol_speed_enable_add_list"] = "\n".join(protocol_speed_enable_add_list)
+            fmt_val["protocol_brake_command_list"] = "\n".join(protocol_brake_command_list)
+            fmt_val["protocol_throttle_command_list"] = "\n".join(protocol_throttle_command_list)
+            fmt_val["protocol_steer_command_list"] = "\n".join(protocol_steer_command_list)
+            fmt_val["protocol_gear_command_list"] = "\n".join(protocol_gear_command_list)
 
         cpp.write(FMT % fmt_val)
 
@@ -516,6 +530,34 @@ def gen_build_file(content, output_dir, protocol_template_dir):
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
+        protocols = content["protocols"]
+
+        control_header_list = []
+        report_header_list = []
+        control_cpp_list = []
+        report_cpp_list = []
+        header_fmt = "\"protocol/%s.h\","
+        cpp_fmt = "\"protocol/%s.cc\","
+
+        for p_name in protocols:
+            p = protocols[p_name]
+            var_name = "%s" % p["name"].lower()
+            header = header_fmt % var_name
+            cpp = cpp_fmt % var_name
+            if p["protocol_type"] == "control":
+                control_header_list.append(header)
+                control_cpp_list.append(cpp)
+            elif p["protocol_type"] == "report":
+                report_header_list.append(header)
+                report_cpp_list.append(cpp)
+        control_header_list.sort()
+        report_header_list.sort()
+        control_cpp_list.sort()
+        report_cpp_list.sort()
+        fmt_val["control_header_list"] = "\n        ".join(control_header_list)
+        fmt_val["report_header_list"] = "\n        ".join(report_header_list)
+        fmt_val["control_cpp_list"] = "\n        ".join(control_cpp_list)
+        fmt_val["report_cpp_list"] = "\n        ".join(report_cpp_list)
         fp.write(FMT % fmt_val)
 
 def gen_cyberfile(content, output_dir, protocol_template_dir):
@@ -540,18 +582,19 @@ def gen_canbus_vehicle_build_file(content, output_dir, protocol_template_dir):
         FMT = "".join(fmt)
         fp.write(FMT)
 
-def gen_vehicle_controller_and_manager(config_file, output_dir, protocol_template_dir):
+def gen_vehicle_controller_and_manager(config_file, output_dir, protocol_template_dir, use_demo_dbc):
     print("Generating controller and manager")
     with open(config_file, 'r') as fp:
         content = yaml.safe_load(fp)
         gen_vehicle_controller_header(content, output_dir, protocol_template_dir)
-        gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir)
+        gen_vehicle_controller_cpp(content, output_dir, protocol_template_dir, use_demo_dbc)
         gen_message_manager_header(content, output_dir, protocol_template_dir)
         gen_message_manager_cpp(content, output_dir, protocol_template_dir)
         gen_vehicle_factory_header(content, output_dir, protocol_template_dir)
         gen_vehicle_factory_cpp(content, output_dir, protocol_template_dir)
         gen_build_file(content, output_dir, protocol_template_dir)
         gen_cyberfile(content, output_dir, protocol_template_dir)
+
         # gen_canbus_vehicle_build_file(content, output_dir, protocol_template_dir)
 
 

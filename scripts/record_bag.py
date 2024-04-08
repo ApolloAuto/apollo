@@ -242,6 +242,9 @@ class Recorder(object):
 
     def file_exist_check(self, task_dir, old_paths, new_paths, task_dir_flag=False):
         """Check if the file exists"""
+        if not os.path.exists(task_dir):
+            print('The dreamview recording package does not exist, please record through dreamview.')
+            exit(-1)
         for filename in os.listdir(task_dir):
             if "record" in filename:
                 # Extract the part of the filename before ".record".

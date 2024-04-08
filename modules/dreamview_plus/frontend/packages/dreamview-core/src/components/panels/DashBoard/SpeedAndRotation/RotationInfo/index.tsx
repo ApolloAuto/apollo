@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { IconIcAimingCircle, IconIcDextroversionHighlight, IconIcLeftTurnDefault } from '@dreamview/dreamview-ui';
+import { useImagePrak, IconIcDextroversionHighlight, IconIcLeftTurnDefault } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 import './index.less';
 
@@ -11,6 +11,7 @@ type RotationInfoProps = {
 
 function RotationInfo(props: RotationInfoProps) {
     const { classes } = useStyle();
+    const img = useImagePrak('ic_aiming_circle');
 
     const isLeftOn = useMemo(
         () => props?.turnSignal === 'LEFT' || props?.turnSignal === 'EMERGENCY',
@@ -74,7 +75,7 @@ function RotationInfo(props: RotationInfoProps) {
                         transform: `rotate(${steeringAngle}deg)`,
                     }}
                     // eslint-disable-next-line global-require
-                    src={require('./ic_aiming_circle@3x.png')}
+                    src={img}
                     alt=''
                 />
                 <IconIcDextroversionHighlight

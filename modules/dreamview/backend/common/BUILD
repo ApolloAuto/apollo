@@ -78,7 +78,7 @@ apollo_cc_test(
     name = "vehicle_manager_test",
     size = "small",
     srcs = ["vehicle_manager/vehicle_manager_test.cc"],
-    data = glob(["testdata/**"]),
+    data = glob(["vehicle_manager/testdata/**"]),
     deps = [
         ":dreamview_common",
         "//cyber",

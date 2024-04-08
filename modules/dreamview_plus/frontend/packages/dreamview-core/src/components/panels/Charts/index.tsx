@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { Popover, IconIcAddPanel } from '@dreamview/dreamview-ui';
+import { OperatePopover, IconIcAddPanel } from '@dreamview/dreamview-ui';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
 import { useTranslation } from 'react-i18next';
 import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
@@ -118,8 +118,8 @@ function ChartsInner() {
     const { onRef, contextValue } = useCreateViewBoxPosInfo();
 
     return (
-        <Popover
-            rootClassName={cx(classes['charts-popover'], 'js-chart-popover')}
+        <OperatePopover
+            rootClassName={cx('js-chart-popover')}
             placement='right'
             destroyTooltipOnHide
             open={isPopoverOpen}
@@ -143,7 +143,7 @@ function ChartsInner() {
                     </Div>
                 </CustomScroll>
             </viewBoxPosInfoContext.Provider>
-        </Popover>
+        </OperatePopover>
     );
 }
 

@@ -8,9 +8,12 @@ export default class Pullover {
 
     private group;
 
-    constructor(scene) {
+    private colors;
+
+    constructor(scene, colors?) {
         this.scene = scene;
         this.group = null;
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     dispose() {
@@ -31,7 +34,7 @@ export default class Pullover {
             new THREE.Vector3(-lengthBack, -widthLeft, 0),
         ];
         const polygonMesh = drawPolygon(points, {
-            color: colorMapping.PULLOVER,
+            color: this.colors.PULLOVER,
             linewidth: 2,
             zOffset: zOffset.pullover,
             opacity: 1,
@@ -40,7 +43,7 @@ export default class Pullover {
         this.group.add(polygonMesh);
 
         const material = new THREE.MeshBasicMaterial({
-            color: colorMapping.PULLOVER,
+            color: this.colors.PULLOVER,
             transparent: true,
             opacity: 0.5,
         });
@@ -51,7 +54,7 @@ export default class Pullover {
             new THREE.Vector3(-1, 0, 0),
             new THREE.Vector3(0, 0, 0),
             1.5,
-            colorMapping.PULLOVER,
+            this.colors.PULLOVER,
             0.5,
             0.5,
         );

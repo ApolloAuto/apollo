@@ -42,9 +42,19 @@ class MsgSerializer {
     const std::vector<base::ObjectPtr>& objects,
     PerceptionBenchmarkFrame* obstacles);
 
+  static bool SerializeLidarFrameMsg(
+    double timestamp, uint64_t lidar_timestamp,
+    int seq_num, const Eigen::Affine3d& pose,
+    const std::vector<base::ObjectPtr>& objects,
+    PerceptionBenchmarkFrame* obstacles, bool use_lidar_cooridinate = true);
+
  private:
   static bool ConvertObjectToPb(const base::ObjectPtr& object_ptr,
                                 PerceptionObstacle* pb_msg);
+
+  static bool ConvertSegmentedObjectToPb(const base::ObjectPtr& object_ptr,
+    PerceptionObstacle* pb_msg, const Eigen::Affine3d& pose,
+    bool use_lidar_cooridinate = true);
 };
 
 }  // namespace onboard

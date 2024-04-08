@@ -39,12 +39,13 @@ export default function useStyle() {
                 color: theme.tokens.font.reactive.mainActive,
             },
         },
+        'mosaic-custom-toolbar-operate-popover': {
+            margin: '-6px 0',
+        },
         'mosaic-custom-toolbar-operate-popover-select': {
             cursor: 'pointer',
-            padding: `0 ${theme.tokens.padding.speace3}`,
-            color: theme.tokens.colors.fontColor2,
+            padding: '0 12px',
             height: '32px',
-            marginBottom: '6px',
             display: 'flex',
             alignItems: 'center',
             ...theme.tokens.typography.content,
@@ -56,7 +57,7 @@ export default function useStyle() {
                 marginBottom: 0,
             },
             '&:hover': {
-                backgroundColor: theme.tokens.colors.backgroundHover,
+                backgroundColor: theme.components.operatePopover.hoverColor,
             },
         },
         'mosaic-custom-toolbar-operate-popover-select-remove': {
@@ -71,29 +72,15 @@ export default function useStyle() {
                 color: '#fff',
             },
         },
-        'mosaic-custom-toolbar-popover': {
-            '& .dreamview-popover-content .dreamview-popover-inner': {
-                padding: '12px 0',
-            },
-        },
         'mosaic-custom-toolbar-icmove': {
             '& .dreamview-popover-inner-content': {
                 ...theme.tokens.typography.content,
                 width: '170px',
             },
-            '& .dreamview-popover-content .dreamview-popover-inner': {
-                backgroundColor: 'rgba(61,67,78,0.80)',
-                padding: '5px 10px',
-            },
-            '& .dreamview-popover-arrow::before': {
-                backgroundColor: 'rgba(61,67,78,0.80)',
-            },
-            '& .dreamview-popover-arrow::after': {
-                display: 'none',
-            },
         },
         'panel-desc-item': {
             lineHeight: '76px',
+            height: '76px',
 
             display: 'flex',
             justifyContent: 'center',
@@ -107,7 +94,7 @@ export default function useStyle() {
         'panel-desc-item-right': {
             width: '584px',
             height: '22px',
-            color: '#808B9D',
+            color: theme.tokens.colors.fontColor5,
             fontWeight: 400,
             fontFamily: 'PingFangSC-Regular',
         },
@@ -117,14 +104,15 @@ export default function useStyle() {
             textAlign: 'center',
             minWidth: '32px',
             height: '32px',
-            lineHeight: '32px',
-            background: '#343C4D',
+            background: theme.components.panelBase.functionRectBgColor,
             borderRadius: '6px',
             marginTop: '12px',
             fontSize: '16px',
-            color: '#96A5C1',
+            color: theme.components.panelBase.functionRectColor,
             padding: '0 6px 0 6px',
             marginRight: '6px',
+            ...theme.tokens.typography.content,
+            lineHeight: '32px',
         },
     }));
     return hoc();

@@ -46,7 +46,7 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
 
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new TrafficLightUnprotectedLeftTurnScenario());
-  scenario_->Init(injector, "STOP_SIGN_UNPROTECTED");
+  scenario_->Init(injector, "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN");
   EXPECT_EQ(scenario_->Name(), "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN");
 }
 

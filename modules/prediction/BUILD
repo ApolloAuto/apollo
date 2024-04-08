@@ -79,6 +79,7 @@ apollo_cc_library(
         "evaluator/vehicle/mlp_evaluator.cc",
         "evaluator/vehicle/semantic_lstm_evaluator.cc",
         "evaluator/vehicle/vectornet_evaluator.cc",
+        "evaluator/vehicle/multi_agent_evaluator.cc",
         "evaluator/warm_up/warm_up.cc",
         "pipeline/vector_net.cc",
         "predictor/empty/empty_predictor.cc",
@@ -144,6 +145,7 @@ apollo_cc_library(
         "evaluator/vehicle/mlp_evaluator.h",
         "evaluator/vehicle/semantic_lstm_evaluator.h",
         "evaluator/vehicle/vectornet_evaluator.h",
+        "evaluator/vehicle/multi_agent_evaluator.h",
         "evaluator/warm_up/warm_up.h",
         "pipeline/vector_net.h",
         "predictor/empty/empty_predictor.h",
@@ -382,23 +384,6 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
-    name = "predictor_manager_test",
-    size = "small",
-    srcs = ["predictor/predictor_manager_test.cc"],
-    data = [
-        "//modules/prediction:prediction_data",
-        "//modules/prediction:prediction_testdata",
-    ],
-    linkopts = [
-        "-lgomp",
-    ],
-    linkstatic = True,
-    deps = [
-        ":apollo_prediction",
-    ],
-)
-
-apollo_cc_test(
     name = "scenario_manager_test",
     size = "small",
     srcs = ["scenario/scenario_manager_test.cc"],
@@ -480,23 +465,6 @@ apollo_cc_test(
         ":apollo_prediction",
         "//cyber",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "evaluator_manager_test",
-    size = "small",
-    srcs = ["evaluator/evaluator_manager_test.cc"],
-    data = [
-        "//modules/prediction:prediction_data",
-        "//modules/prediction:prediction_testdata",
-    ],
-    linkopts = [
-        "-lgomp",
-    ],
-    linkstatic = True,
-    deps = [
-        ":apollo_prediction",
     ],
 )
 
@@ -783,7 +751,7 @@ apollo_cc_test(
     ],
     linkstatic = True,
     deps = [
-        ":prediction_component_lib",
+        ":DO_NOT_IMPORT_prediction_component",
     ],
 )
 

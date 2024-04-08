@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Form, Input, IconIcDelete, IconIcAddPanel, IconIcClose, message } from '@dreamview/dreamview-ui';
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/lib/interface';
 import tinycolor from 'tinycolor2';
@@ -9,38 +9,23 @@ import BlueButton from './BlueButton';
 import ChartLine from './ChartLine';
 import { IChartConfig, KEY, IChannelList, initChartValue, initLineValue, IChartListItem } from './const';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
+function useStyle(themeText: string) {
+    const hoc = useMakeStyle((theme, prop) => ({
         bottom14: {
             marginBottom: '14px',
         },
         'chart-editing': {
             height: '80vh',
-            background: '#232731',
+            background: theme.components.pncMonitor.chartEditingBgColor,
             width: '372px',
+            margin: '-12px 0',
             borderRadius: theme.tokens.border.borderRadius.large,
             '& .dreamview-radio-wrapper': {
                 color: '#808B9D',
             },
-            '& .dreamview-input-affix-wrapper': {
-                background: theme.tokens.colors.background4,
-                borderColor: 'transparent',
-                overflow: 'visible',
-                padding: '0 0 0 11px',
-                boxShadow: 'none',
-                border: 'none',
+            '.ant-form-item-control-input .dreamview-select-single .dreamview-select-selector': {
+                background: prop.themeText === 'drak' ? '#343C4D' : 'white',
             },
-            '& .dreamview-input-clear-icon': {
-                fontSize: theme.tokens.font.size.large,
-                display: 'flex',
-                marginRight: theme.tokens.margin.speace,
-                width: '16px',
-                height: '16px',
-                overflow: 'hidden',
-                borderRadius: '50%',
-                background: 'white',
-            },
-
             '& .anticon-close-circle': {
                 width: '20px',
                 height: '20px',
@@ -67,7 +52,7 @@ function useStyle() {
                 flex: 1,
                 '&  > label': {
                     height: '40px',
-                    color: theme.tokens.colors.fontColor3,
+                    color: theme.tokens.colors.fontColor4,
                     ...theme.tokens.typography.content,
                 },
             },
@@ -78,7 +63,7 @@ function useStyle() {
             '& .ant-form-item': {
                 marginBottom: theme.tokens.margin.speace2,
             },
-            '& .dreamview-input': {
+            '& .dreamview-input-affix-wrapper': {
                 height: '40px',
             },
             '& .ant-form-item-control-input': {
@@ -97,12 +82,13 @@ function useStyle() {
         title: {
             padding: `${theme.tokens.padding.speace} ${theme.tokens.padding.speace3}`,
             ...theme.tokens.typography.title,
+            color: theme.components.pncMonitor.chartTitleColor,
             '& .anticon': {
                 position: 'absolute',
                 right: theme.tokens.margin.speace2,
                 top: '12px',
                 cursor: 'pointer',
-                color: theme.tokens.colors.fontColor2,
+                color: theme.tokens.colors.fontColor5,
             },
         },
         'content-box': {
@@ -116,7 +102,7 @@ function useStyle() {
             marginBottom: theme.tokens.margin.speace,
             paddingLeft: theme.tokens.padding.speace,
             position: 'relative',
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             fontFamily: 'PingFangSC-Medium',
             fontWeight: 500,
             '&::after': {
@@ -126,7 +112,7 @@ function useStyle() {
                 top: '4px',
                 width: '2px',
                 height: '12px',
-                backgroundColor: theme.tokens.colors.brand2,
+                backgroundColor: theme.tokens.colors.brand3,
             },
         },
         'chart-editing-extra': {
@@ -142,7 +128,7 @@ function useStyle() {
             height: '40px',
             lineHeight: '40px',
             textAlign: 'center',
-            background: theme.tokens.colors.background4,
+            background: theme.components.pncMonitor.deleteBtnBgColor,
             borderRadius: theme.tokens.border.borderRadius.large,
             color: '#F75660',
             cursor: 'pointer',
@@ -151,7 +137,7 @@ function useStyle() {
                 fontSize: theme.tokens.font.size.large,
             },
             '&:hover': {
-                background: tinycolor(theme.tokens.colors.background4).setAlpha(0.9).toRgbString(),
+                background: tinycolor(theme.tokens.colors.background1).setAlpha(0.9).toRgbString(),
             },
             '&:active': {
                 opacity: 0.8,
@@ -159,16 +145,18 @@ function useStyle() {
         },
     }));
 
-    return hoc();
+    return hoc({ themeText });
 }
 
 function Divider() {
-    const { classes } = useStyle();
+    const { theme } = useThemeContext();
+    const { classes } = useStyle(theme);
     return <div className={classes['chart-editing-divider']} />;
 }
 
 function Title(props: PropsWithChildren<{ extra?: React.ReactNode; className?: string }>) {
-    const { classes, cx } = useStyle();
+    const { theme } = useThemeContext();
+    const { classes, cx } = useStyle(theme);
     return (
         <div className={cx(classes['chart-editing-title'], props.className)}>
             {props.children}
@@ -186,7 +174,8 @@ interface ChartEditingProps {
 }
 function ChartEditing(props: ChartEditingProps) {
     const { onChange, activeChartConfig, onDeleteChart, onCloseClick, channelList } = props;
-    const { classes } = useStyle();
+    const { theme } = useThemeContext();
+    const { classes } = useStyle(theme);
     const [form] = Form.useForm();
     const { t } = useTranslation('chartEditing');
 

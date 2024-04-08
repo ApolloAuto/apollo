@@ -1,16 +1,15 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
-import { Modal } from '@dreamview/dreamview-ui';
-import viewLoginStepFirst from '@dreamview/dreamview-core/src/assets/view_login_step_first.png';
-import viewLoginStepSecond from '@dreamview/dreamview-core/src/assets/view_login_step_second.jpg';
-import viewLoginStepThirdOne from '@dreamview/dreamview-core/src/assets/view_login_step_third_one.png';
-import viewLoginStepThirdTwo from '@dreamview/dreamview-core/src/assets/view_login_step_third_two.png';
-import viewLoginStepFourth from '@dreamview/dreamview-core/src/assets/view_login_step_fourth.png';
+import { Modal, useImagePrak } from '@dreamview/dreamview-ui';
 import showModal, { WithModalComponentProps } from '@dreamview/dreamview-core/src/util/modal';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import useStyle from './useStyle';
 
-function welcomeGuideLoginStepsArr(translation: TFunction) {
+function welcomeGuideLoginStepsArr(translation: TFunction, imgSrc: string[]) {
+    const [
+        viewLoginStepFirst, viewLoginStepSecond, viewLoginStepThirdOne, viewLoginStepThirdTwo, viewLoginStepFourth,
+    ] = imgSrc;
     return [
         {
             loginStepsItemText: translation('viewLoginStepOne'),
@@ -63,6 +62,13 @@ function WelcomeGuide(props: WithModalComponentProps) {
     const { destroy } = props;
     const { classes } = useStyle();
     const { t } = useTranslation('guide');
+    const imgSrc = useImagePrak([
+        'view_login_step_first',
+        'view_login_step_second',
+        'view_login_step_third_one',
+        'view_login_step_third_two',
+        'view_login_step_fourth',
+    ]);
     return (
         <Modal
             width={1000}
@@ -73,7 +79,7 @@ function WelcomeGuide(props: WithModalComponentProps) {
             onOk={destroy}
             className={classes['welcome-guide-login-modal']}
         >
-            {welcomeGuideLoginStepsArr(t).map((item, index) => (
+            {welcomeGuideLoginStepsArr(t, imgSrc).map((item, index) => (
                 <LoginStepsItem
                     loginStepsItemText={item.loginStepsItemText}
                     loginStepsItemImage={item.loginStepsItemImage}

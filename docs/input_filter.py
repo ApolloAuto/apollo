@@ -16,16 +16,31 @@ def resolve_markdown_linkpath(filename: str, match, strip_prefix=None):
     if strip_prefix is None:
         strip_prefix = '.'
 
+    matched_path = match.group(2)
+
+    # relative to the file path
+    fpath = pathlib.Path(filename).parent.joinpath(matched_path).resolve()
+    # absolute path, use project root as the base path
+    # TODO: the project root should be configurable, here we use the current
+    if matched_path.startswith('/'):
+        fpath = pathlib.Path(matched_path).relative_to('/').resolve()
+    elif not fpath.exists():
+        # relative to the current directory
+        fpath = pathlib.Path(matched_path).resolve()
+
+    # get the relative path of project root
+    # TODO: the project root should be configurable, here we use the current
     npath = fpath.relative_to(pathlib.Path(strip_prefix).resolve())
     return f'{match.group(1)}{npath.as_posix()}{match.group(5)}'
 
 
 def process_markdown(filename: str):
     """process markdown file"""
-    patt = re.compile(r'(\(|\[|"|\')'
-                      r'(([0-9a-zA-Z-_.]+/)*[0-9a-zA-Z-_.]+'
-                      r'\.(png|jpeg|jpg))'
-                      r'(\)|\]|"|\')')
+    patt = re.compile(
+        r'(\(|\[|"|\')'
+        r'((/?[0-9a-zA-Z-_.\u4e00-\u9fa5]+/)*[0-9a-zA-Z-_.\u4e00-\u9fa5]+'
+        r'\.(png|jpeg|jpg))'
+        r'(\)|\]|"|\')')
     with open(filename, 'r', encoding='utf-8') as fin:
         content = fin.read()
         # if not re.compile(r'^#\s+.*').match(content):

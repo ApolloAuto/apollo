@@ -571,7 +571,7 @@ void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 bool ChController::CheckChassisError() {
   Ch chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_check_response()) {
+  if (!chassis_.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has no ch vehicle info.";
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -587,11 +587,6 @@ bool ChController::CheckChassisError() {
         chassis_detail.steer_status__512().steer_err()) {
       return true;
     }
-    // cancel the sensor err check because of discarding the steer sensor
-    // if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
-    //     ch.steer_status__512().sensor_err()) {
-    //   return false;
-    // }
   }
   // drive error
   if (chassis_detail.has_throttle_status__510()) {
@@ -701,19 +696,19 @@ bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
+      is_eps_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_eps_online() &&
+                      chassis_.check_response().is_eps_online();
       check_ok = check_ok && is_eps_online;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
+      is_vcu_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_vcu_online() &&
+                      chassis_.check_response().is_vcu_online();
+      is_esp_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_esp_online() &&
+                      chassis_.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
     if (check_ok) {

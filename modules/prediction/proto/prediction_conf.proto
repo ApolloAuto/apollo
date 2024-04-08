@@ -28,6 +28,7 @@ message ObstacleConf {
     SEMANTIC_LSTM_EVALUATOR = 10;
     JOINTLY_PREDICTION_PLANNING_EVALUATOR = 11;
     VECTORNET_EVALUATOR = 12;
+    MULTI_AGENT_EVALUATOR = 13;
   }
 
   enum PredictorType {

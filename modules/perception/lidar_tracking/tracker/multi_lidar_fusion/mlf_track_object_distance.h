@@ -72,6 +72,8 @@ class MlfTrackObjectDistance {
   static const std::vector<float> kBackgroundDefaultWeight;
 
   double background_object_match_threshold_ = 4.0;
+  float euclidean_distance_threshold_ = 2.0;
+  float out_gate_match_cost_ = 10.0;
 };  // class MlfTrackObjectDistance
 
 }  // namespace lidar

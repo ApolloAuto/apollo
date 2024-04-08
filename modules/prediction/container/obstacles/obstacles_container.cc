@@ -320,7 +320,7 @@ void ObstaclesContainer::BuildJunctionFeature() {
     }
     const std::string& junction_id = junction_analyzer_.GetJunctionId();
     if (obstacle_ptr->IsInJunction(junction_id)) {
-      ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
+      AINFO << "Build junction feature for obstacle [" << obstacle_ptr->id()
              << "] in junction [" << junction_id << "]";
       obstacle_ptr->BuildJunctionFeature();
     }

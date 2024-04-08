@@ -127,7 +127,8 @@ void MsgExporter::PointCloudMessageHandler(
     SavePose(pose, timestamp, folder);
   } else {
     std::cout << "Failed to query lidar pose, child_frame_id " << child_frame_id
-              << std::endl;
+              << " but still export pointcloud." << std::endl;
+    SavePointCloud(cloud, timestamp, folder);
   }
 }
 

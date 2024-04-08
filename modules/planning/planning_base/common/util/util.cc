@@ -16,6 +16,7 @@
 
 #include "modules/planning/planning_base/common/util/util.h"
 
+#include <algorithm>
 #include <limits>
 #include <vector>
 
@@ -150,6 +151,90 @@ void GetFilesByPath(const boost::filesystem::path& path,
       GetFilesByPath(entry.path(), files);
     }
   }
+}
+
+/*
+ * @brief: get path equivalent ego width
+ */
+double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
+                                   double s) {
+  const auto& vehicle_param =
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
+  double max_kappa = 1.0 / vehicle_param.min_turn_radius();
+  double half_wb = 0.5 * vehicle_param.wheel_base();
+  double front_l = vehicle_param.front_edge_to_center() - half_wb;
+  double half_w = 0.5 * vehicle_param.width();
+  double current_heading = reference_line_info.reference_line()
+                               .GetReferencePoint(s - front_l)
+                               .heading();
+  double heading_f =
+      reference_line_info.reference_line().GetReferencePoint(s).heading();
+  double heading_b = reference_line_info.reference_line()
+                         .GetReferencePoint(s - front_l - half_wb)
+                         .heading();
+  // average kappa from front edge to center
+  double kappa_f =
+      apollo::common::math::NormalizeAngle(heading_f - current_heading) /
+      front_l;
+  // average kappa from center to rear axle
+  double kappa_b =
+      apollo::common::math::NormalizeAngle(current_heading - heading_b) /
+      half_wb;
+  // prevent devide by 0, and quit if lane bends to difference direction
+  if (kappa_f * kappa_b < 0.0 || fabs(kappa_f) < 1e-6) {
+    return half_w;
+  }
+
+  kappa_f = std::min(fabs(kappa_f), max_kappa);
+  kappa_b = std::min(fabs(kappa_b), max_kappa);
+  double theta = apollo::common::math::Vec2d(1.0, half_wb * kappa_b).Angle();
+  double sint = std::sin(theta);
+  double cost = std::cos(theta);
+  double r_f = 1.0 / kappa_f;
+  double eq_half_w =
+      apollo::common::math::Vec2d(front_l * cost - half_w * sint,
+                                  r_f + front_l * sint + half_w * cost)
+          .Length() -
+      r_f;
+  return std::max(eq_half_w, half_w);
+}
+
+double CalculateEquivalentEgoWidth(
+    const apollo::hdmap::LaneInfoConstPtr lane_info, double s) {
+  const auto& vehicle_param =
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
+  double max_kappa = 1.0 / vehicle_param.min_turn_radius();
+  double half_wb = 0.5 * vehicle_param.wheel_base();
+  double front_l = vehicle_param.front_edge_to_center() - half_wb;
+  double half_w = 0.5 * vehicle_param.width();
+  double current_heading = lane_info->Heading(s - front_l);
+  double heading_f = lane_info->Heading(s);
+  double heading_b = lane_info->Heading(s - front_l - half_wb);
+  // average kappa from front edge to center
+  double kappa_f =
+      apollo::common::math::NormalizeAngle(heading_f - current_heading) /
+      front_l;
+  // average kappa from center to rear axle
+  double kappa_b =
+      apollo::common::math::NormalizeAngle(current_heading - heading_b) /
+      half_wb;
+  // prevent devide by 0, and quit if lane bends to difference direction
+  if (kappa_f * kappa_b < 0.0 || fabs(kappa_f) < 1e-6) {
+    return half_w;
+  }
+
+  kappa_f = std::min(fabs(kappa_f), max_kappa);
+  kappa_b = std::min(fabs(kappa_b), max_kappa);
+  double theta = apollo::common::math::Vec2d(1.0, half_wb * kappa_b).Angle();
+  double sint = std::sin(theta);
+  double cost = std::cos(theta);
+  double r_f = 1.0 / kappa_f;
+  double eq_half_w =
+      apollo::common::math::Vec2d(front_l * cost - half_w * sint,
+                                  r_f + front_l * sint + half_w * cost)
+          .Length() -
+      r_f;
+  return std::max(eq_half_w, half_w);
 }
 
 }  // namespace util

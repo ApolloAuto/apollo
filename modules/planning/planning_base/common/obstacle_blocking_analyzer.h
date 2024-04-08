@@ -13,6 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+/**
+ * @file obstacle_blocking_analyzer.h
+ */
+
+#pragma once
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/planning_base/common/frame.h"

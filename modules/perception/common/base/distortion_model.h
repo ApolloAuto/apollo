@@ -76,13 +76,13 @@ class BrownCameraDistortionModel : public BaseCameraDistortionModel {
     return intrinsic_params_;
   }
 
-  inline Eigen::Matrix<float, 5, 1> get_distort_params() const {
+  inline Eigen::Matrix<float, 8, 1> get_distort_params() const {
     return distort_params_;
   }
 
  protected:
   Eigen::Matrix3f intrinsic_params_;
-  Eigen::Matrix<float, 5, 1> distort_params_;
+  Eigen::Matrix<float, 8, 1> distort_params_;
 };
 
 using BrownCameraDistortionModelPtr =

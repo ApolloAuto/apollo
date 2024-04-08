@@ -66,7 +66,7 @@ class HeaderBuilder {
       proto::CompressType::COMPRESS_NONE;
   static const uint64_t CHUNK_INTERVAL_ = 20 * 1000 * 1000 * 1000ULL;    // 20s
   static const uint64_t SEGMENT_INTERVAL_ = 60 * 1000 * 1000 * 1000ULL;  // 60s
-  static const uint64_t CHUNK_RAW_SIZE_ = 1 * 1024 * 1024ULL;            // 1MB
+  static const uint64_t CHUNK_RAW_SIZE_ = 16 * 1024 * 1024ULL;           // 16MB
   static const uint64_t SEGMENT_RAW_SIZE_ = 2048 * 1024 * 1024ULL;       // 2GB
 };
 

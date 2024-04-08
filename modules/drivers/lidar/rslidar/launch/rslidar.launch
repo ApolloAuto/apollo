@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>rslidar</name>
+        <dag_conf>/apollo/modules/drivers/lidar/rslidar/dag/rslidar.dag</dag_conf>
+        <process_name>rslidar</process_name>
+    </module>
+</cyber>

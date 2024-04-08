@@ -1,9 +1,20 @@
-dbc_file: lincoln.dbc
-protocol_conf: lincoln.yml
+# 指定dbc文件，这里以lincoln.dbc为例，注意这里需要指定到文件在apollo容器内的绝对路径
+# 默认把dbc放入在 /apollo_workspace/output/ 文件夹下
+dbc_file: /apollo_workspace/output/lincoln.dbc
+# 定义dbc转换成yml文件名称
+protocol_conf: /apollo_workspace/output/lincoln.yml
+# 定义车型名称，根据车型自定义
 car_type: lincoln
+# 定义控制报文协议列表，一般为空
 sender_list: []
+# 自动驾驶模块在dbc中的ECU网络node名称，lincoln.dbc内定义的node名称为MAB
 sender: MAB
+# 定义哪些信号ID不需要生成，一般为空
 black_list: []
+# 是否基于apollo_demo.dbc生成车型适配代码，现在dbc使用的是lincoln.dbc，false为否
+use_demo_dbc: false
 
-output_dir: output/
-
+# 定义dbc转换成代码的生成文件夹，默认如下文件夹即可
+output_dir: /apollo_workspace/modules/canbus_vehicle
+# 定义新车型所对应的canbus配置文件，默认如下文件夹即可
+output_canbus_conf_dir: /apollo_workspace/output

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/planning/planning_base/common/obstacle.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"

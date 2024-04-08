@@ -15,7 +15,7 @@
     <!-- 目录结构 -->
 {{ docs_structure_html }}
 
-    <tab type="usergroup" visible="yes" title="源代码文档" intro="">
+    <tab type="usergroup" visible="yes" title="源代码文档" intro="" url="[none]">
       <tab type="namespaces" visible="nmo" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="no" title="" intro=""/>

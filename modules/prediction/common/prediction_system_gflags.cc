@@ -54,6 +54,9 @@ DEFINE_int32(prediction_offline_mode, 0,
              "3: dump predicted trajectory to predict_result.*.bin"
              "4: dump frame environment info to frame_env.*.bin"
              "5: dump data for tuning to datatuning.*.bin");
+DEFINE_bool(enable_multi_agent_pedestrian_evaluator, true, "If enable multi agent pedestrian evaluator.");
+DEFINE_bool(enable_multi_agent_vehicle_evaluator, true, "If enable multi agent vehicle evaluator.");
+DEFINE_bool(prediction_eval_mode, false, "Set prediction to eval mode");
 DEFINE_bool(enable_multi_thread, true, "If enable multi-thread.");
 DEFINE_int32(max_thread_num, 8, "Maximal number of threads.");
 DEFINE_int32(max_caution_thread_num, 2,

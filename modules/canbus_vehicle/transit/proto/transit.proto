@@ -323,17 +323,6 @@ message Llc_diag_brakecontrol_721 {
   optional double llc_dbg_brakefeedforward = 6;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false]; 
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Transit {
   optional Llc_vehiclelimits_24 llc_vehiclelimits_24 = 1;    // report message
   optional Adc_motioncontrol1_10 adc_motioncontrol1_10 = 2;  // control message
@@ -353,5 +342,4 @@ message Transit {
       11;  // control message
   optional Llc_diag_brakecontrol_721 llc_diag_brakecontrol_721 =
       12;  // control message
-  optional CheckResponseSignal check_response = 100;
 }

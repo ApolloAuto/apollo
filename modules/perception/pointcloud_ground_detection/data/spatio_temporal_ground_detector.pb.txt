@@ -4,5 +4,5 @@ roi_rad_x: 120.0
 roi_rad_y: 120.0
 roi_rad_z: 120.0
 nr_smooth_iter: 5
-use_roi: false
+use_roi: true
 use_ground_service: true

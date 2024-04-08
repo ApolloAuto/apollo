@@ -22,30 +22,24 @@ function ModeSettingTitle(props: React.PropsWithChildren<IModeSettingTitle>) {
     const obverDomRef = useRef<any>();
 
     useEffect(() => {
-        let div: any;
         let resizeObsizeOberver: any;
+        let timer: number;
         if (hasExpendChild) {
-            div = document.createElement('div');
             resizeObsizeOberver = new ResizeObserver(() => {
                 if (hasExpendChild) {
-                    div.innerHTML = obverDomRef.current?.innerHTML;
-                    div.style.overflow = 'hidden';
-                    div.style.position = 'absolute';
-                    div.style.top = '-9999px';
-                    div.style.visibility = 'hidden';
-                    document.documentElement.appendChild(div);
-                    setTimeout(() => {
-                        setScrollHeight(div.offsetHeight ? `${div.offsetHeight}px` : 'auto');
-                        div.remove();
+                    clearTimeout(timer);
+                    timer = window.setTimeout(() => {
+                        clearTimeout(timer);
+                        setScrollHeight(
+                            obverDomRef.current.offsetHeight ? `${obverDomRef.current.offsetHeight}px` : 'auto',
+                        );
                     });
                 }
             });
             resizeObsizeOberver.observe(obverDomRef.current);
         }
         return () => {
-            if (div) {
-                div.remove();
-            }
+            clearTimeout(timer);
             if (resizeObsizeOberver) {
                 resizeObsizeOberver.disconnect();
             }
@@ -73,7 +67,9 @@ function ModeSettingTitle(props: React.PropsWithChildren<IModeSettingTitle>) {
                 }}
                 className={cx(classes['mode-setting-expend'])}
             >
-                <div ref={obverDomRef}>{expendChild}</div>
+                <div className={cx(classes['overflow-hidden'])} ref={obverDomRef}>
+                    {expendChild}
+                </div>
             </div>
         </>
     );

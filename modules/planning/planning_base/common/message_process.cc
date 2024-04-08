@@ -127,7 +127,8 @@ void MessageProcess::OnHMIStatus(apollo::dreamview::HMIStatus hmi_status) {
 }
 
 void MessageProcess::OnLocalization(const LocalizationEstimate& le) {
-  if (last_localization_message_timestamp_sec_ == 0.0) {
+  static constexpr double kEpsilon = 1e-12;
+  if (std::abs(last_localization_message_timestamp_sec_) < kEpsilon) {
     last_localization_message_timestamp_sec_ = le.header().timestamp_sec();
   }
   const double time_diff =
@@ -697,9 +698,9 @@ bool MessageProcess::GenerateLocalRouting(
   }
   */
 
-  int adc_road_index;
-  int adc_passage_index;
-  double adc_passage_s;
+  int adc_road_index = 0;
+  int adc_passage_index = 0;
+  double adc_passage_s = 0.0;
   if (!GetADCCurrentRoutingIndex(&adc_road_index, &adc_passage_index,
                                  &adc_passage_s) ||
       adc_road_index < 0 || adc_passage_index < 0 || adc_passage_s < 0) {

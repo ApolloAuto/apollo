@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_stop_playing</title>
+    <g id="ic_stop_playing" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+        <path d="M12.8453906,6.33798927 L19.8763808,17.4658513 C20.171383,17.9327476 20.0320352,18.5503884 19.5651389,18.8453906 C19.4052874,18.9463906 19.2200762,19 19.0309902,19 L4.96900976,19 C4.41672501,19 3.96900976,18.5522847 3.96900976,18 C3.96900976,17.810914 4.02261918,17.6257028 4.12361921,17.4658513 L11.1546094,6.33798927 C11.4496116,5.87109296 12.0672524,5.73174522 12.5341487,6.02674739 C12.6597245,6.10609081 12.7660471,6.2124134 12.8453906,6.33798927 Z" id="三角形" fill="#A6B5CC" fill-rule="nonzero" transform="translate(12.000000, 12.000000) rotate(-270.000000) translate(-12.000000, -12.000000) "></path>
+    </g>
+</svg>

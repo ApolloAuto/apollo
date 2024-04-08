@@ -28,6 +28,18 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+float EuclideanDistance(const TrackedObjectConstPtr& last_object,
+        const Eigen::VectorXf& track_predict,
+        const TrackedObjectConstPtr& new_object,
+        const double time_diff) {
+    Eigen::Vector3f measured_anchor = (new_object->barycenter).cast<float>();
+    Eigen::Vector3f predicted_anchor = track_predict.head(3);
+    Eigen::Vector3f measured_diff = measured_anchor - predicted_anchor;
+
+    float location_dist = measured_diff.head(2).norm();
+    return location_dist;
+}
+
 float LocationDistance(const TrackedObjectConstPtr& last_object,
                        const Eigen::VectorXf& track_predict,
                        const TrackedObjectConstPtr& new_object,

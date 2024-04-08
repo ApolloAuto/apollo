@@ -1,0 +1,45 @@
+syntax = "proto2";
+
+package apollo.drivers.robosense;
+
+import "modules/drivers/lidar/common/proto/lidar_config_base.proto";
+
+message Config {
+
+  // lidar base
+  required apollo.drivers.lidar.LidarConfigBase config_base = 33;
+
+  // general param
+  optional string model = 1;
+  // Input Param
+  optional string ip = 3;
+  optional uint32 msop_port = 4;
+  optional uint32 difop_port = 5;
+  // Decoder Param
+  optional uint32 echo_mode = 6;
+  optional float start_angle = 7;
+  optional float end_angle = 8;
+  optional float min_distance = 9;
+  optional float max_distance = 10;
+  optional float cut_angle = 11;
+  optional bool use_lidar_clock = 12 [default = false];
+  optional uint32 num_pkts_split = 13 [default = 0];
+  optional uint32 split_frame_node = 14 [default = 1];
+  // others
+  optional string calibration_file=17;
+  // supplementary parameters of Decoder Param
+  optional bool dense_points = 18 [default = false];
+  optional bool ts_first_point = 19 [default = false];
+  optional bool wait_for_difop = 20 [default = true];
+  optional bool config_from_file = 21 [default = false];
+  optional string angle_path = 22 [default = ""];
+  optional float split_angle= 23 [default = 0.0];
+  // supplementary parameters of Input Param
+  optional string host_address = 24 [default = "0.0.0.0"];
+  optional string group_address = 25 [default = "0.0.0.0"];
+  optional bool use_vlan = 26 [default = false];
+  optional bool user_layer_bytes = 27 [default = false];
+  optional bool tail_layer_bytes = 28 [default = false];
+  // others
+  optional bool send_raw_packet = 29 [default = true];
+}

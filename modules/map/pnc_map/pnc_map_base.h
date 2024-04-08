@@ -25,9 +25,11 @@
 #include <vector>
 
 #include "gflags/gflags.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/map/pnc_map/route_segments.h"
 
 namespace apollo {
@@ -84,6 +86,10 @@ class PncMapBase {
    * @param id The id of the lane.
    */
   virtual hdmap::LaneInfoConstPtr GetLaneById(const hdmap::Id &id) const = 0;
+
+  virtual bool GetNearestPointFromRouting(
+      const common::VehicleState &state,
+      apollo::hdmap::LaneWaypoint *waypoint) const = 0;
 
  protected:
   planning::PlanningCommand last_command_;

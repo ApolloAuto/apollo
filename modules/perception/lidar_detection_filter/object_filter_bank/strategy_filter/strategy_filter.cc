@@ -159,7 +159,8 @@ void StrategyFilter::MergeInclusiveObjects(LidarFrame* frame) {
                 small_obj->lidar_supplement.cloud.clear();
                 small_obj->lidar_supplement.cloud_world.clear();
                 sorted_objects[j].need_refine = true;
-                AINFO << "BIG INCLUDE SMALL";
+                AINFO << "BIG: " << std::to_string(big_obj->id)
+                      << " INCLUDE SMALL: " << std::to_string(small_obj->id);
                 break;
             }
         }

@@ -60,9 +60,6 @@ void Scuvcu1312::Parse(const std::uint8_t* bytes, int32_t length,
       vcu_gearfaultst(bytes, length));
   chassis->mutable_scu_vcu_1_312()->set_vcu_gearact(
       vcu_gearact(bytes, length));
-  // newcode
-  chassis->mutable_check_response()->set_is_vcu_online(
-      vcu_drvmode(bytes, length) == 3);
 }
 
 // config detail: {'description': 'Gear fault status', 'enum': {0:

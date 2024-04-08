@@ -79,25 +79,23 @@ class LatControllerTest : public ::testing::Test, LatController {
     return planning_trajectory_pb;
   }
 
-  // LatControllerConf lateral_conf_;
-
   double timestamp_ = 0.0;
 };
 
 TEST_F(LatControllerTest, ComputeLateralErrors) {
   auto localization_pb = LoadLocalizaionPb(
-      "/apollo/modules/control/testdata/lateral_controller_test/"
-      "1_localization.pb.txt");
+      "/apollo/modules/control/controllers/lat_based_lqr_controller/"
+      "lateral_controller_test/1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(
-      "/apollo/modules/control/testdata/lateral_controller_test/"
-      "1_chassis.pb.txt");
+      "/apollo/modules/control/controllers/lat_based_lqr_controller/"
+      "lateral_controller_test/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
   auto vehicle_state = injector_->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
-      "/apollo/modules/control/testdata/lateral_controller_test/"
-      "1_planning.pb.txt");
+      "/apollo/modules/control/controllers/lat_based_lqr_controller/"
+      "lateral_controller_test/1_planning.pb.txt");
   TrajectoryAnalyzer trajectory_analyzer(&planning_trajectory_pb);
 
   ControlCommand cmd;

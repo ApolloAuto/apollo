@@ -105,7 +105,7 @@ class LatController : public ControlTask {
   std::string Name() const override;
 
  protected:
-  void UpdateState(SimpleLateralDebug *debug);
+  void UpdateState(SimpleLateralDebug *debug, const canbus::Chassis *chassis);
 
   // logic for reverse driving mode
   void UpdateDrivingOrientation();
@@ -120,7 +120,8 @@ class LatController : public ControlTask {
                             const double linear_v, const double angular_v,
                             const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
-                            SimpleLateralDebug *debug);
+                            SimpleLateralDebug *debug,
+                            const canbus::Chassis *chassis);
   bool LoadControlConf();
   void InitializeFilters();
   void LoadLatGainScheduler();

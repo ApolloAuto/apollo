@@ -16,7 +16,11 @@ export function createStoreProvider<InitialStateType, ActionType>({
 }: StoreProviderProps<InitialStateType, ActionType>) {
     const StoreContext = createContext<Store<InitialStateType, ActionType>>(null);
 
-    const middlewareExtra = [asyncActionMiddleware, crashReporterMiddleware, reduxDevToolsMiddleware];
+    const middlewareExtra = [
+        asyncActionMiddleware,
+        // crashReporterMiddleware,
+        // reduxDevToolsMiddleware,
+    ];
 
     const StoreProvider: React.FC<Partial<StoreProviderProps<InitialStateType, ActionType>>> = function (props) {
         const iPersistor = props.persistor || persistor;

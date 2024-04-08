@@ -1,5 +1,6 @@
 /* eslint-disable global-require */
 import React, { useMemo } from 'react';
+import { useImagePrak } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 
 export enum SignalEnum {
@@ -17,6 +18,7 @@ export type SignalProps = {
 function Signal(props: SignalProps) {
     const { classes } = useStyle();
 
+    const [green, yellow, red] = useImagePrak(['icon_green_light', 'icon_yellow_light', 'icon_red_light']);
     const child = useMemo(() => {
         switch (props.signal) {
             case SignalEnum.GREEN:
@@ -27,7 +29,7 @@ function Signal(props: SignalProps) {
                                 width: 18,
                                 height: 18,
                             }}
-                            src={require('./imgs/icon_green_light@3x.png')}
+                            src={green}
                             alt='green light'
                         />
                         &nbsp;GREEN
@@ -41,7 +43,7 @@ function Signal(props: SignalProps) {
                                 width: 18,
                                 height: 18,
                             }}
-                            src={require('./imgs/icon_yellow_light@3x.png')}
+                            src={yellow}
                             alt='yellow light'
                         />
                         &nbsp;YELLOW
@@ -55,7 +57,7 @@ function Signal(props: SignalProps) {
                                 width: 18,
                                 height: 18,
                             }}
-                            src={require('./imgs/icon_red_light@3x.png')}
+                            src={red}
                             alt='green light'
                         />
                         &nbsp;RED

@@ -17,4 +17,15 @@ message SpeedDeciderConfig {
   optional double overtake_time_buffer = 5 [default = 3.0];
   optional double overtake_min_distance = 6 [default = 10.0];
   optional double yield_distance_buffer = 7 [default = 5.0];
+  optional double stop_follow_distance = 8 [default = 2.0];
+  optional FollowDistanceSchedulerInfo follow_distance_scheduler = 9;
+}
+
+message FollowDistanceSchedulerInfo {
+  repeated FollowDistance follow_distance = 1;
+}
+
+message FollowDistance {
+  optional double speed = 1;  // m/s
+  optional double slope = 2; //
 }

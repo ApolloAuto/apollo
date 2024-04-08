@@ -2,8 +2,8 @@ import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import Legend from '@dreamview/dreamview-core/src/components/panels/PncMonitor/Chart/Legend';
 import * as echarts from 'echarts';
 import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
-import { IconIcResetView, IconRefresh } from '@dreamview/dreamview-ui';
-import CustomPopover from '@dreamview/dreamview-core/src/components/CustomPopover';
+import { IconIcResetView, IconRefresh, Popover } from '@dreamview/dreamview-ui';
+import { useThemeContext } from '@dreamview/dreamview-theme';
 import shortUUID from 'short-uuid';
 import useStyle from './useStyle';
 import { useViewBoxPosInfo } from './viewBoxPosContext';
@@ -48,13 +48,13 @@ function ChartBaseInner(props: {
             <div className={classes['moniter-item-toolbox']}>
                 <span className={classes['moniter-item-yaxis']}>{yAxisName}</span>
                 <div className={classes['moniter-item-operate']}>
-                    <CustomPopover trigger='hover' content='Clear view'>
+                    <Popover trigger='hover' content='Clear view'>
                         <IconIcResetView onClick={onReset} />
-                    </CustomPopover>
+                    </Popover>
                     {!!onRefresh && (
-                        <CustomPopover trigger='hover' content='Refresh view'>
+                        <Popover trigger='hover' content='Refresh view'>
                             <IconRefresh onClick={onRefresh} className={classes['refresh-ic']} />
-                        </CustomPopover>
+                        </Popover>
                     )}
                 </div>
             </div>
@@ -100,7 +100,7 @@ export default function ChartBase(props: {
     const rotateRef = useRef(0);
     const context = useViewBoxPosInfo();
     const isInView = useRef(true);
-
+    const { tokens } = useThemeContext();
     const onForceUpdate = () => {
         setForceUpdate((prev) => prev + 1);
     };
@@ -162,6 +162,52 @@ export default function ChartBase(props: {
         }
     }
 
+    function addToolTip(opt: any, fontColor: any, colors: any) {
+        opt.tooltip = {
+            position(pos: any, params: any, dom: any, rect: any, size: any) {
+                //  防止tooltip溢出面板后被隐藏
+                const maxLeft = size.viewSize[0] - size.contentSize[0];
+                const minLeft = 0;
+                const posLeft = pos[0];
+                return [Math.max(Math.min(posLeft, maxLeft), minLeft), pos[1]];
+            },
+            trigger: 'axis',
+            formatter(params: any) {
+                const tit = params[0].value?.[0]; // 这里假设第一个数据是标题
+
+                // 自定义标题的样式和内容
+                const formattedTitle = `<div style="font-weight: bold; font-size: 16px;">${tit}</div>`;
+
+                // 以下是示例，您可以根据您的需求自定义 Tooltip 内容
+                const content = params.reduce((result: string, param: any) => {
+                    const seriesColor =
+                        opt.series[param.seriesIndex]?.lineStyle?.color ||
+                        opt.series.color ||
+                        colors[param.seriesIndex];
+                    const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${seriesColor};"></span>`;
+                    return `${result}${marker} <span></span>${param.seriesName}: ${param.value?.[1] || '-'}<br>`;
+                }, '');
+                return formattedTitle + content;
+            },
+            padding: [
+                10, // 上
+                16, // 右
+                10, // 下
+                16, // 左
+            ],
+            backgroundColor: 'rgba(255,255,255,0.21)',
+            extraCssText: 'box-shadow:  0px 6px 12px 2px rgba(0,0,0,0.1);backdrop-filter: blur(5px);',
+            borderColor: 'transparent',
+            textStyle: {
+                color: fontColor,
+            },
+        };
+    }
+
+    function addColor(opt: any, color: any) {
+        opt.color = color;
+    }
+
     const setOption = (opt: any) => {
         if (chartRef.current && isInView.current) {
             chartRef.current?.setOption(opt, { replaceMerge: ['dataset', 'graphic'] });
@@ -205,10 +251,13 @@ export default function ChartBase(props: {
                 translateYAxisName(opt);
             }
 
+            addToolTip(opt, tokens.components.pncMonitor.toolTipColor, tokens.components.pncMonitor.chartColors);
+            addColor(opt, tokens.components.pncMonitor.chartColors);
+
             setOption(opt);
             setLegends((opt.series || []).map((item: any) => ({ name: item.name, color: item.lineStyle?.color })));
         }
-    }, [options, forceUpdate]);
+    }, [options, forceUpdate, tokens]);
 
     const unDo = useRef({
         unDo: () => false,

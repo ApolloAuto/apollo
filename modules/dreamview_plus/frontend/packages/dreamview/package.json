@@ -1,6 +1,6 @@
 {
     "name": "@dreamview/dreamview",
-    "version": "1.0.1",
+    "version": "1.1.4",
     "description": "The message type of dreamview",
     "author": "wangkang12 <wangkang12@baidu.com>",
     "homepage": "",
@@ -22,7 +22,7 @@
         "protobufjs-cli": "^1.1.1"
     },
     "devDependencies": {
-        "@dreamview/eslint-config-dreamview": "1.0.1",
-        "@dreamview/tslint-config-dreamview": "1.0.1"
+        "@dreamview/eslint-config-dreamview": "1.1.4",
+        "@dreamview/tslint-config-dreamview": "1.1.4"
     }
 }

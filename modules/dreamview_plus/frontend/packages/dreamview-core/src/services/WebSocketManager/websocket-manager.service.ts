@@ -45,16 +45,23 @@ interface IArrayItem {
     protoPath: string;
     channelName?: string;
 }
+export enum IEventName {
+    ChannelTotal = 'channelTotal',
+    ChannelChange = 'channelChange',
+    BaseProtoChange = 'baseProtoChange',
+}
 export class WebSocketManager {
     private childWsManagerQueue = new MessageQueue<string>({
         name: 'WebSocketManager',
     });
 
-    private readonly mainConnection: WebSocketConnection;
+    readonly mainConnection: WebSocketConnection;
 
     private readonly pluginConnection: WebSocketConnection;
 
     private readonly protoLoader = new ProtoLoader();
+
+    private registeInitEvent = new Map();
 
     private activeWorkers: { [key: string]: ChildWsWorkerClass } = {};
 
@@ -63,6 +70,14 @@ export class WebSocketManager {
     private metadata: MetadataItem[] = [];
 
     private metadataSubject: BehaviorSubject<MetadataItem[]> = new BehaviorSubject<MetadataItem[]>([]);
+
+    readonly initProtoFiles: string[] = [
+        'modules/common_msgs/basic_msgs/error_code.proto',
+        'modules/common_msgs/basic_msgs/header.proto',
+        'modules/common_msgs/dreamview_msgs/hmi_status.proto',
+        'modules/common_msgs/basic_msgs/geometry.proto',
+        'modules/common_msgs/map_msgs/map_id.proto',
+    ];
 
     private dataSubjects: MultiKeyMap<
         { name: string; channel?: Emptyable<string> },
@@ -97,7 +112,6 @@ export class WebSocketManager {
 
         this.metadataSubject.pipe(debounceTime(200)).subscribe(() => {
             this.consumeChildWsManagerQueue();
-            // console.log("metadata: ", this.metadata);
             const protoList: {
                 level0: IArrayItem[];
                 level1: IArrayItem[];
@@ -137,6 +151,10 @@ export class WebSocketManager {
             });
 
             if (this.metadata.length > 0) {
+                this.triggerEvent(
+                    IEventName.ChannelTotal,
+                    protoList.level0.length + protoList.level1.length + protoList.level2.length,
+                );
                 protoList.level0.forEach((item) => {
                     this.protoLoader
                         .loadAndCacheProto(item.protoPath, {
@@ -144,6 +162,9 @@ export class WebSocketManager {
                         })
                         .catch((error) => {
                             logger.error(error);
+                        })
+                        .finally(() => {
+                            this.triggerEvent(IEventName.ChannelChange);
                         });
                 });
 
@@ -154,6 +175,9 @@ export class WebSocketManager {
                         })
                         .catch((error) => {
                             logger.error(error);
+                        })
+                        .finally(() => {
+                            this.triggerEvent(IEventName.ChannelChange);
                         });
                 });
                 protoList.level2.forEach((item) => {
@@ -164,11 +188,13 @@ export class WebSocketManager {
                         })
                         .catch((error) => {
                             logger.error(error);
+                        })
+                        .finally(() => {
+                            this.triggerEvent(IEventName.ChannelChange);
                         });
                 });
             }
         });
-
         if (process.env.NODE_ENV === 'development') {
             setInterval(() => {
                 this.workerPoolManager.visualize();
@@ -177,23 +203,47 @@ export class WebSocketManager {
     }
 
     loadInitProtoFiles() {
-        const initProtoFiles: string[] = [
-            'modules/common_msgs/basic_msgs/error_code.proto',
-            'modules/common_msgs/basic_msgs/header.proto',
-            'modules/common_msgs/dreamview_msgs/hmi_status.proto',
-            'modules/common_msgs/basic_msgs/geometry.proto',
-            'modules/common_msgs/map_msgs/map_id.proto',
-        ];
-
-        initProtoFiles.forEach((file) => {
-            this.protoLoader.loadProto(file).catch((error) => {
-                logger.error(error);
-            });
+        this.initProtoFiles.forEach((file) => {
+            this.protoLoader
+                .loadProto(file)
+                .catch((error) => {
+                    logger.error(error);
+                })
+                .finally(() => {
+                    this.triggerEvent(IEventName.BaseProtoChange);
+                });
         });
     }
 
     public registerPlugin(plugins: WebSocketPlugin[]): void {
         plugins.forEach((plugin) => this.pluginManager.registerPlugin(plugin));
+    }
+
+    private triggerEvent(eventName: IEventName, value?: any) {
+        this.registeInitEvent.get(eventName)?.forEach((callback: any) => {
+            callback(value);
+        });
+    }
+
+    public addEventListener(eventName: IEventName, callback: any) {
+        let events = this.registeInitEvent.get(eventName);
+        if (!events) {
+            this.registeInitEvent.set(eventName, []);
+            events = this.registeInitEvent.get(eventName);
+        }
+        events.push(callback);
+    }
+
+    public removeEventListener(eventName: IEventName, callback: any) {
+        const events = this.registeInitEvent.get(eventName);
+        if (!events) {
+            this.registeInitEvent.set(eventName, []);
+        } else {
+            this.registeInitEvent.set(
+                eventName,
+                events.filter((item: any) => item !== callback),
+            );
+        }
     }
 
     handleMessage(msg: HandleMessageType, socketName: SocketNameEnum) {
@@ -639,6 +689,9 @@ export class WebSocketManager {
         this.responseResolvers[requestId] = {
             resolver: (response: ResponseMessage<Res>) => {
                 responseSubject.next(response);
+            },
+            reject: (response: ResponseMessage<Res>) => {
+                responseSubject.error(response);
             },
             shouldDelete: false,
         };

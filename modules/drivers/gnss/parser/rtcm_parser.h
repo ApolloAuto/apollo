@@ -39,7 +39,7 @@ class RtcmParser {
   void ParseRtcmData(const std::string& msg);
 
  private:
-  void DispatchMessage(Parser::MessageType type, MessagePtr message);
+  void DispatchMessage(MessageType type, MessagePtr message);
   void PublishEphemeris(const MessagePtr& message);
   void PublishObservation(const MessagePtr& message);
 

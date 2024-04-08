@@ -20,6 +20,12 @@ export enum MainApiTypes {
     TriggerPncMonitor = 'TriggerPncMonitor',
     GetDefaultRoutings = 'GetDefaultRoutings',
     SendScenarioSimulationRequest = 'SendScenarioSimulationRequest',
+    CheckMapCollectStatus = 'CheckMapCollectStatus',
+    StartRecordMapData = 'StartRecordMapData',
+    StopRecordMapData = 'StopRecordMapData',
+    StartMapCreator = 'StartMapCreator',
+    BreakMapCreator = 'BreakMapCreator',
+    ExportMapFile = 'ExportMapFile',
     StopScenarioSimulation = 'StopScenarioSimulation',
     ResetScenarioSimulation = 'ResetScenarioSimulation',
     DeleteDefaultRouting = 'DeleteDefaultRouting',
@@ -140,6 +146,7 @@ export type AccountInfo = {
     avatar_url: string;
     displayname: string;
     id: string;
+    map_prerogative: boolean;
 };
 
 export type VehicleInfoRecord = {
@@ -318,6 +325,49 @@ export type GetMapElementsByIdsInfo = {
     param: {
         mapElementIds: IMapElementIds;
     };
+};
+
+export enum CHECK_MAP_COLLECT_STATUS {
+    OK = 'Ok',
+    LOADING = 'Loading',
+    WARNING = 'Warning',
+    ERROR = 'Error',
+}
+
+export type CheckMapCollectInfo = {
+    Gps: {
+        info: string;
+        status: CHECK_MAP_COLLECT_STATUS;
+    };
+    Lidar: {
+        info: string;
+        status: CHECK_MAP_COLLECT_STATUS;
+    };
+    Localization: {
+        info: string;
+        status: CHECK_MAP_COLLECT_STATUS;
+    };
+    Lidar2world: {
+        info: string;
+        status: CHECK_MAP_COLLECT_STATUS;
+    };
+};
+
+export enum CREATE_MAP_FILE_STATUS {
+    OK = 'Ok',
+    CREATING = 'Creating',
+    ERROR = 'Error',
+}
+
+export type CreateMapFileInfo = {
+    progress: number;
+    mapFilePath: string;
+    mapCreatorTime?: string;
+    status: CREATE_MAP_FILE_STATUS;
+};
+
+export type ExportMapFileInfo = {
+    map_file_url: string;
 };
 
 export type HMIActionsOperationInfo = {

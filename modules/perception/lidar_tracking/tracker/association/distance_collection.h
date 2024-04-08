@@ -25,6 +25,19 @@ namespace perception {
 namespace lidar {
 
 /**
+ * @brief: compute euclidean distance for given track & object
+ * @param last_object object for computing distance
+ * @param track_predict predicted state of track for computing distance
+ * @param new_object new detected object for computing distance
+ * @param time_diff time interval from last matching
+ * @return: euclidean distance
+*/
+float EuclideanDistance(const TrackedObjectConstPtr& last_object,
+        const Eigen::VectorXf& track_predict,
+        const TrackedObjectConstPtr& new_object,
+        const double time_diff);
+
+/**
  * @brief Compute location distance for given track & object
  *
  * @param last_object object for computing distance

@@ -90,10 +90,12 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles,
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
-  static constexpr double kOutOfReferenceLineL = 10.0;  // in meters
+  static constexpr double kOutOfReferenceLineL = 14.0;  // in meters
   if (adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
       adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
-    AERROR << "Ego vehicle is too far away from reference line.";
+    AERROR << "Ego vehicle is too far away from reference line."
+           << "adc_sl_boundary_.start_l:" << adc_sl_boundary_.start_l()
+           << "adc_sl_boundary_.end_l:" << adc_sl_boundary_.end_l();
     return false;
   }
   is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
@@ -547,6 +549,16 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     trajectory_point.set_a(speed_point.a());
     trajectory_point.set_relative_time(speed_point.t() + relative_time);
     ptr_discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
+  }
+  if (path_data_.is_reverse_path()) {
+    std::for_each(ptr_discretized_trajectory->begin(),
+                  ptr_discretized_trajectory->end(),
+                  [](common::TrajectoryPoint& trajectory_point) {
+                    trajectory_point.set_v(-trajectory_point.v());
+                    trajectory_point.set_a(-trajectory_point.a());
+                  });
+    AINFO << "reversed path";
+    ptr_discretized_trajectory->SetIsReversed(true);
   }
   return true;
 }
@@ -1099,9 +1111,22 @@ hdmap::PathOverlap* ReferenceLineInfo::GetOverlapOnReferenceLine(
         return const_cast<hdmap::PathOverlap*>(&yield_sign_overlap);
       }
     }
+  } else if (overlap_type == ReferenceLineInfo::JUNCTION) {
+    // yield_sign_overlap
+    const auto& junction_overlaps =
+        reference_line_.map_path().junction_overlaps();
+    for (const auto& junction_overlap : junction_overlaps) {
+      if (junction_overlap.object_id == overlap_id) {
+        return const_cast<hdmap::PathOverlap*>(&junction_overlap);
+      }
+    }
   }
 
   return nullptr;
+}
+
+std::vector<PathData>* ReferenceLineInfo::MutableCandidatePathData() {
+  return &candidate_path_data_;
 }
 
 }  // namespace planning

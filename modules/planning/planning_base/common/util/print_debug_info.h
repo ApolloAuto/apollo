@@ -63,5 +63,18 @@ class PrintCurves {
   std::map<std::string, PrintPoints> curve_map_;
 };
 
+class PrintBox {
+ public:
+  explicit PrintBox(std::string id) : id_(id) {}
+  void AddAdcBox(double x, double y, double heading,
+                 bool is_rear_axle_point = true);
+  void PrintToLog();
+
+ private:
+  std::string id_;
+  // x,y, theta, lenth ,width
+  std::vector<std::vector<double>> box_points;
+};
+
 }  // namespace planning
 }  // namespace apollo

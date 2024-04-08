@@ -247,13 +247,23 @@ void PredictorManager::PredictObstacle(
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        RunVehiclePredictor(adc_trajectory_container, obstacle,
+        if (FLAGS_enable_multi_agent_vehicle_evaluator) {
+          RunEmptyPredictor(adc_trajectory_container, obstacle,
                             obstacles_container);
+        } else {
+          RunVehiclePredictor(adc_trajectory_container, obstacle,
+                              obstacles_container);
+        }
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
-        RunPedestrianPredictor(adc_trajectory_container, obstacle,
-                               obstacles_container);
+        if (FLAGS_enable_multi_agent_pedestrian_evaluator) {
+          RunEmptyPredictor(adc_trajectory_container, obstacle,
+                            obstacles_container);
+        } else {
+          RunPedestrianPredictor(adc_trajectory_container, obstacle,
+                                 obstacles_container);
+        }
         break;
       }
       case PerceptionObstacle::BICYCLE: {

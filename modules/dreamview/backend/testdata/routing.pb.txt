@@ -3,31 +3,20 @@ header {
   timestamp_sec: 1234.5
   sequence_num: 1
 }
-routing_request {
-   waypoint {
-        id: "l1"
-        s: 0.0
-        pose {
-            x: 586392.840030
-            y: 4140673.012320
-        }
+command_id: 9
+lane_follow_command {
+  road {
+    passage {
+      segment {
+        id: "1_-1"
+        start_s: 0.000000000
+        end_s: 16.752481892
+      }
+      can_exit: 1
+      change_lane_type: FORWARD
     }
-    waypoint {
-        id: "l1"
-        s: 153.0
-        pose {
-            x: 586367.706490
-            y: 4140785.357946
-        }
-    }
-}
-road {
-   passage {
-       can_exit: true
-       segment {
-           id: "l1"
-           start_s: 0.0
-           end_s: 153.0
-       }
-   }
+  }
+  measurement {
+    distance: 16.752481892
+  }
 }

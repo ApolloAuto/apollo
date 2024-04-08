@@ -56,8 +56,6 @@ void Vcudrivereport52::Parse(const std::uint8_t* bytes, int32_t length,
       vcu_real_torque(bytes, length));
   chassis->mutable_gear()->set_gear_state(
       (apollo::canbus::Chassis_GearPosition)vcu_real_shift(bytes, length));
-  chassis->mutable_check_response()->set_is_vcu_online(
-      drive_enable_resp(bytes, length) == 1);
 }
 
 // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,

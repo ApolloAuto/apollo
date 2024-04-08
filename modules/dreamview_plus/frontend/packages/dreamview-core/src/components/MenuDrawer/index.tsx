@@ -1,6 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { useMenuStore } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore/actionTypes';
+import { useThemeContext } from '@dreamview/dreamview-theme';
 import AddPanel from './AddPanel';
 import ModeSetting from './ModeSetting';
 import ResourceManager from './ResourceManager';
@@ -18,15 +19,17 @@ const DrawerCatalogKeys = Object.keys(DrawerCatalog);
 
 function MenuDrawer() {
     const [{ activeMenu }] = useMenuStore();
+    const { tokens } = useThemeContext();
     const [, { menuDrawerWidthString }] = useComponentDisplay();
 
     const style = useMemo(() => {
-        const backgroundColor = activeMenu === ENUM_MENU_KEY.PROFILE_MANAGEER ? '#16181E' : '';
+        const backgroundColor =
+            activeMenu === ENUM_MENU_KEY.PROFILE_MANAGEER ? tokens.components.meneDrawer.backgroundColor : '';
         return {
             width: menuDrawerWidthString,
             backgroundColor,
         };
-    }, [activeMenu, menuDrawerWidthString]);
+    }, [activeMenu, menuDrawerWidthString, tokens]);
 
     const { classes, cx } = useStyle()(style);
 

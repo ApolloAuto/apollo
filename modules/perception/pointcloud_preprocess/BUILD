@@ -44,7 +44,7 @@ apollo_component(
     name = "libpointcloud_preprocess_component.so",
     srcs = ["pointcloud_preprocess_component.cc"],
     hdrs = ["pointcloud_preprocess_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     linkopts = ["-lleveldb"],
     deps = [
         "//cyber",

@@ -49,6 +49,16 @@ apollo_py_binary(
     ],
 )
 
+apollo_py_binary(
+    name = "manual_perception",
+    srcs = ["manual_perception.py"],
+    deps = [
+        "//cyber/python/cyber_py3:cyber",
+        "//cyber/python/cyber_py3:cyber_time",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
+    ],
+)
+
 # install(
 #     name = "install",
 #     data_dest = "tools/perception",

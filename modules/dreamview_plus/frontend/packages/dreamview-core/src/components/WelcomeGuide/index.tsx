@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Button } from '@dreamview/dreamview-ui';
-import welcomeGuideTabsImageDefault from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_default.png';
-import welcomeGuideTabsImagePerception from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_perception.png';
-import welcomeGuideTabsImageVehicle from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_vehicle.jpg';
-import welcomeGuideDecorateEle from '@dreamview/dreamview-core/src/assets/welcome_guide_decorate_ele.png';
-import welcomeGuideTabsImagePNC from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_pnc.png';
+import { Tabs, Button, useImagePrak } from '@dreamview/dreamview-ui';
 import { usePickHmiStore, CURRENT_MODE, changeMode } from '@dreamview/dreamview-core/src/store/HmiStore';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +57,20 @@ type WelcomeGuideProps = {
 
 function WelcomeGuide(props: WelcomeGuideProps) {
     const { clickEnterThisModeToGuide, setLocalFirstUseGuideMode } = props;
+
+    const [
+        welcomeGuideTabsImageDefault,
+        welcomeGuideTabsImagePerception,
+        welcomeGuideTabsImageVehicle,
+        welcomeGuideDecorateEle,
+        welcomeGuideTabsImagePNC,
+    ] = useImagePrak([
+        'welcome_guide_tabs_image_default',
+        'welcome_guide_tabs_image_perception',
+        'welcome_guide_tabs_image_vehicle',
+        'welcome_guide_decorate_ele',
+        'welcome_guide_tabs_image_pnc',
+    ]);
 
     const [hmi, dispatch] = usePickHmiStore();
 
@@ -139,6 +148,11 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                 />
             ),
         },
+        // {
+        //     key: CURRENT_MODE.MAP_COLLECTION,
+        //     label: 'Map Collection Mode',
+        //     children: <WelcomeGuideTabsContent contentImageUrl='' clickEnterThisMode={clickEnterThisMode} />,
+        // },
     ];
 
     return (
@@ -175,7 +189,7 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                         items={WelcomeGuideTabsItem}
                         onTabClick={clickWelcomeGuideTabs}
                         defaultActiveKey={activeWelcomeGuideItemKey}
-                        className={classes['welcome-guide-tabs-class']}
+                        rootClassName={classes['welcome-guide-tabs-class']}
                     />
                 </div>
             </div>

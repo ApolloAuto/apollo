@@ -23,4 +23,6 @@ message DemoConfig {
   optional double end_pose_x = 13;
   optional double end_pose_y = 14;
   optional double end_pose_heading = 15 [default = 0.0];
+  optional string file_of_path_follow_with_localization_record = 16;
+  optional string file_of_path_follow_with_planning_record = 17;
 }

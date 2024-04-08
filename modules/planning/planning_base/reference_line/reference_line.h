@@ -160,6 +160,9 @@ class ReferenceLine {
                     double* const road_right_width) const;
 
   hdmap::Road::Type GetRoadType(const double s) const;
+  void GetLaneBoundaryType(const double s,
+        hdmap::LaneBoundaryType::Type* const left_boundary_type,
+        hdmap::LaneBoundaryType::Type* const right_boundary_type) const;
 
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;

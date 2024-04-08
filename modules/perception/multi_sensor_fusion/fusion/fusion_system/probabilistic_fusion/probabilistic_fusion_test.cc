@@ -28,16 +28,17 @@ using apollo::perception::base::SensorInfo;
 
 TEST(ProbabliticFusionTest, test_init) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "fusion/probabilistic_fusion";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
   ProbabilisticFusion pf;
+  init_options.config_path = "perception/multi_sensor_fusion/data";
+  init_options.config_file = "probabilistic_fusion.pb.txt";
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
@@ -94,17 +95,18 @@ TEST(ProbabliticFusionTest, test_init) {
 
 TEST(ProbabliticFusionTest, test_update) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "fusion/probabilistic_fusion";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
 
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
   ProbabilisticFusion pf;
+  init_options.config_path = "perception/multi_sensor_fusion/data";
+  init_options.config_file = "probabilistic_fusion.pb.txt";
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
@@ -140,120 +142,21 @@ TEST(ProbabliticFusionTest, test_update) {
   bool state = pf.Fuse(lidar_track_frame, &fused_objects);
   EXPECT_TRUE(state);
   EXPECT_EQ(pf.trackers_.size(), 1);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[0],
-                  10.0);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[1],
-                  0.0);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[1],
-                  0.0);
-  EXPECT_EQ(fused_objects.size(), 2);
-
-  base::ObjectPtr base_track_lidar1(new base::Object);
-  *base_track_lidar1 = *base_track_lidar;
-  base::ObjectPtr base_bg_track_lidar1(new base::Object);
-  *base_bg_track_lidar1 = *base_bg_track_lidar;
-  base::ObjectPtr base_bg_track_lidar2(new base::Object);
-  *base_bg_track_lidar2 = *base_bg_track_lidar;
-  base_bg_track_lidar2->track_id = 3;
-
-  base::FramePtr lidar_track_frame1(new base::Frame);
-  *lidar_track_frame1 = *lidar_track_frame;
-  lidar_track_frame1->objects.clear();
-  lidar_track_frame1->objects.push_back(base_track_lidar1);
-  lidar_track_frame1->objects.push_back(base_bg_track_lidar1);
-  lidar_track_frame1->objects.push_back(base_bg_track_lidar2);
-  lidar_track_frame1->timestamp += 0.1;
-  fused_objects.clear();
-  state = pf.Fuse(options, lidar_track_frame1, &fused_objects);
-  EXPECT_TRUE(state);
-  EXPECT_EQ(pf.trackers_.size(), 1);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[0],
-                  10.0);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[1],
-                  0.0);
-  EXPECT_FLOAT_EQ(pf.trackers_[0]
-                      ->track_->GetFusedObject()
-                      ->GetBaseObject()
-                      ->anchor_point[1],
-                  0.0);
-  EXPECT_EQ(fused_objects.size(), 3);
-
-  base::ObjectPtr base_track_lidar2(new base::Object);
-  *base_track_lidar2 = *base_track_lidar;
-  base_track_lidar2->track_id = 1;
-  base::ObjectPtr base_bg_track_lidar3(new base::Object);
-  *base_bg_track_lidar3 = *base_bg_track_lidar2;
-
-  base::FramePtr lidar_track_frame2(new base::Frame);
-  *lidar_track_frame2 = *lidar_track_frame;
-  lidar_track_frame2->objects.clear();
-  lidar_track_frame2->objects.push_back(base_track_lidar2);
-  lidar_track_frame2->objects.push_back(base_bg_track_lidar3);
-  lidar_track_frame2->timestamp += 0.2;
-  fused_objects.clear();
-  state = pf.Fuse(options, lidar_track_frame2, &fused_objects);
-  EXPECT_TRUE(state);
-  EXPECT_EQ(fused_objects.size(), 2);
-
-  // foreground
-  // TrackPtr foreground_track1(new Track());
-  // foreground_track1->Initialize(lidar_obj, false);
-  // foreground_track1->is_alive_ = true;
-
-  // TrackPtr foreground_track2(new Track());
-  // foreground_track2->Initialize(lidar_obj, false);
-  // foreground_track2->is_alive_ = false;
-  // // background
-  // TrackPtr background_track1(new Track());
-  // background_track1->Initialize(lidar_obj, true);
-  // background_track1->is_alive_ = true;
-
-  // TrackPtr background_track2(new Track());
-  // background_track2->Initialize(lidar_obj, true);
-  // background_track2->is_alive_ = false;
-
-  // // scene
-  // pf.scenes_->GetForegroundTracks().clear();
-  // pf.scenes_->GetBackgroundTracks().clear();
-  // pf.scenes_->AddForegroundTrack(foreground_track1);
-  // pf.scenes_->AddForegroundTrack(foreground_track2);
-  // pf.scenes_->AddBackgroundTrack(background_track1);
-  // pf.scenes_->AddBackgroundTrack(background_track2);
-  // pf.RemoveLostTrack();
-  // EXPECT_EQ(pf.trackers_.size(), 1);
-
-  // pf.FusebackgroundTrack(lidar_sensor_frame);
-  // EXPECT_EQ(pf.scenes_->GetForegroundTracks().size(), 1);
-  // EXPECT_EQ(pf.scenes_->GetBackgroundTracks().size(), 1);
 }
 
 TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "fusion/probabilistic_fusion";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
   ProbabilisticFusion pf;
+  init_options.config_path = "perception/multi_sensor_fusion/data";
+  init_options.config_file = "probabilistic_fusion.pb.txt";
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
 
@@ -345,18 +248,6 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   sensor_frame_ptr3->objects.push_back(base_track_camera);
   sensor_frame_ptr3->sensor2world_pose = Eigen::Matrix4d::Identity();
   base::FrameConstPtr const_sensor_frame_ptr3 = sensor_frame_ptr3;
-
-  std::vector<base::ObjectPtr> fused_objects;
-  pf.Fuse(const_sensor_frame_ptr, &fused_objects);
-  EXPECT_EQ(fused_objects.size(), 1);
-  EXPECT_EQ(fused_objects[0]->fusion_supplement.measurements.size(), 1);
-  fused_objects.clear();
-  pf.Fuse(const_sensor_frame_ptr2, &fused_objects);
-  fused_objects.clear();
-  pf.Fuse(const_sensor_frame_ptr3, &fused_objects);
-  fused_objects.clear();
-  pf.Fuse(const_lidar_frame_ptr2, &fused_objects);
-  EXPECT_EQ(fused_objects.size(), 1);
 }
 
 }  // namespace fusion

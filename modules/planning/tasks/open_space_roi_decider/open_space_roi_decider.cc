@@ -23,10 +23,13 @@
 #include <limits>
 #include <memory>
 #include <utility>
+
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/planning_base/common/planning_context.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
-#include "modules/planning/planning_base/open_space/utils/open_space_roi_util.h"
+#include "modules/planning/planning_open_space/utils/open_space_roi_util.h"
 namespace apollo {
 namespace planning {
 
@@ -83,6 +86,9 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
 
+    frame->mutable_open_space_info()->set_parking_type(
+        parking_info.parking_type);
+
     SetOrigin(parking_info, frame);
 
     SetParkingSpotEndPose(parking_info, frame);
@@ -131,20 +137,20 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     hdmap::LaneInfoConstPtr lane;
     double s = 0.0;
     double l = 0.0;
-    if (!isofflane_) {
-      isofflane_ = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-                       adc_point, 2.0, vehicle_state_.heading(), M_PI / 3.0,
-                       &lane, &s, &l) == -1;
+    if (!is_parking_out) {
+      is_parking_out = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+                           adc_point, 2.0, vehicle_state_.heading(), M_PI / 3.0,
+                           &lane, &s, &l) == -1;
     }
-    if (isofflane_) {
-      AINFO << "in GetParkingBoundary";
-      if (!GetParkingBoundary(nearby_path, frame, &roi_boundary)) {
+    if (is_parking_out) {
+      AINFO << "GetParkingOutBoundary!!";
+      if (!GetParkingOutBoundary(nearby_path, frame, &roi_boundary)) {
         const std::string msg = "Fail to get park and go boundary from map";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
     } else {
-      AINFO << "in ParkAndGoBoundary";
+      AINFO << "GetParkAndGoBoundary!!!";
       if (!GetParkAndGoBoundary(frame, nearby_path, &roi_boundary)) {
         const std::string msg = "Fail to get park and go boundary from map";
         AERROR << msg;
@@ -857,9 +863,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
         center_lane_s_left.begin(), center_lane_s_left.end(), right_top_s);
     size_t point_right_to_right_top_connor_index = std::distance(
         center_lane_s_left.begin(), point_right_to_right_top_connor_s);
-    if (point_right_to_right_top_connor_index > 0) {
-      --point_right_to_right_top_connor_index;
-    }
+
     auto point_right_to_right_top_connor_itr =
         left_lane_boundary.begin() + point_right_to_right_top_connor_index;
 
@@ -867,6 +871,10 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
         center_lane_s_left.begin(), center_lane_s_left.end(), left_top_s);
     size_t point_left_to_left_top_connor_index = std::distance(
         center_lane_s_left.begin(), point_left_to_left_top_connor_s);
+    point_left_to_left_top_connor_index =
+        point_left_to_left_top_connor_index == 0
+            ? point_left_to_left_top_connor_index
+            : point_left_to_left_top_connor_index - 1;
     auto point_left_to_left_top_connor_itr =
         left_lane_boundary.begin() + point_left_to_left_top_connor_index;
 
@@ -899,28 +907,28 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
 
     size_t left_lane_boundary_last_index = left_lane_boundary.size() - 1;
     for (size_t i = left_lane_boundary_last_index;
-         i > point_left_to_left_top_connor_index; i--) {
+         i > point_right_to_right_top_connor_index; i--) {
       std::vector<Vec2d> segment{left_lane_boundary[i],
                                  left_lane_boundary[i - 1]};
       roi_parking_boundary->push_back(segment);
     }
 
     std::vector<Vec2d> left_stitching_segment{
-        left_lane_boundary[point_left_to_left_top_connor_index], left_top};
+        left_lane_boundary[point_right_to_right_top_connor_index], right_top};
     roi_parking_boundary->push_back(left_stitching_segment);
 
-    std::vector<Vec2d> left_parking_spot_segment{left_top, left_down};
-    std::vector<Vec2d> down_parking_spot_segment{left_down, right_down};
-    std::vector<Vec2d> right_parking_spot_segment{right_down, right_top};
-    roi_parking_boundary->push_back(left_parking_spot_segment);
-    roi_parking_boundary->push_back(down_parking_spot_segment);
+    std::vector<Vec2d> right_parking_spot_segment{right_top, right_down};
+    std::vector<Vec2d> down_parking_spot_segment{right_down, left_down};
+    std::vector<Vec2d> left_parking_spot_segment{left_down, left_top};
     roi_parking_boundary->push_back(right_parking_spot_segment);
+    roi_parking_boundary->push_back(down_parking_spot_segment);
+    roi_parking_boundary->push_back(left_parking_spot_segment);
 
     std::vector<Vec2d> right_stitching_segment{
-        right_top, left_lane_boundary[point_right_to_right_top_connor_index]};
+        left_top, left_lane_boundary[point_left_to_left_top_connor_index]};
     roi_parking_boundary->push_back(right_stitching_segment);
 
-    for (size_t i = point_right_to_right_top_connor_index; i > 0; --i) {
+    for (size_t i = point_left_to_left_top_connor_index; i > 0; --i) {
       std::vector<Vec2d> segment{left_lane_boundary[i],
                                  left_lane_boundary[i - 1]};
       roi_parking_boundary->push_back(segment);
@@ -1223,6 +1231,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   nearby_path_->GetProjection(center_point, &s, &l);
   if (l > 0) {
     parking_info->is_on_left = true;
+    std::swap(points[1], points[3]);
   } else {
     parking_info->is_on_left = false;
   }
@@ -1416,10 +1425,20 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
       }
       ++perception_obstacles_num;
 
-      Box2d original_box = obstacle->PerceptionBoundingBox();
-      original_box.Shift(-1.0 * origin_point);
-      original_box.LongitudinalExtend(config_.perception_obstacle_buffer());
-      original_box.LateralExtend(config_.perception_obstacle_buffer());
+      std::vector<Vec2d> vertices_ccw;
+      if (config_.expand_polygon_of_obstacle_by_distance()) {
+        common::math::Polygon2d original_polygon =
+            obstacle->PerceptionPolygon();
+        original_polygon.ExpandByDistance(config_.perception_obstacle_buffer());
+        original_polygon.CalculateVertices(-1.0 * origin_point);
+        vertices_ccw = original_polygon.GetAllVertices();
+      } else {
+        Box2d original_box = obstacle->PerceptionBoundingBox();
+        original_box.Shift(-1.0 * origin_point);
+        original_box.LongitudinalExtend(config_.perception_obstacle_buffer());
+        original_box.LateralExtend(config_.perception_obstacle_buffer());
+        vertices_ccw = original_box.GetAllCorners();
+      }
 
       // TODO(Jinyun): Check correctness of ExpandByDistance() in polygon
       // Polygon2d buffered_box(original_box);
@@ -1427,7 +1446,7 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
       //    config_.perception_obstacle_buffer());
       // TODO(Runxin): Rotate from origin instead
       // original_box.RotateFromCenter(-1.0 * origin_heading);
-      std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
+
       std::vector<Vec2d> vertices_cw;
       while (!vertices_ccw.empty()) {
         auto current_corner_pt = vertices_ccw.back();
@@ -1618,6 +1637,7 @@ bool OpenSpaceRoiDecider::IsInParkingLot(
   if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, &parking_lots) ==
       0) {
     GetParkSpotFromMap(parking_lots.front(), parking_lot_vertices);
+    AINFO << "Get park lot from map!!";
     return true;
   }
   return false;
@@ -1737,27 +1757,23 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
   std::vector<LaneSegment> segments_vector;
   int next_lanes_num = nearest_lane->lane().successor_id_size();
   if (next_lanes_num != 0) {
-    for (int i = 0; i < next_lanes_num; ++i) {
-      auto next_lane_id = nearest_lane->lane().successor_id(i);
-      segments_vector.push_back(nearest_lanesegment);
-      auto next_lane = hdmap_->GetLaneById(next_lane_id);
-      LaneSegment next_lanesegment =
-          LaneSegment(next_lane, next_lane->accumulate_s().front(),
-                      next_lane->accumulate_s().back());
-      segments_vector.push_back(next_lanesegment);
-      size_t succeed_lanes_num = next_lane->lane().successor_id_size();
-      if (succeed_lanes_num != 0) {
-        for (size_t j = 0; j < succeed_lanes_num; j++) {
-          auto succeed_lane_id = next_lane->lane().successor_id(j);
-          auto succeed_lane = hdmap_->GetLaneById(succeed_lane_id);
-          LaneSegment succeed_lanesegment =
-              LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
-                          succeed_lane->accumulate_s().back());
-          segments_vector.push_back(succeed_lanesegment);
-        }
-      }
-      *nearby_path = std::make_shared<Path>(segments_vector);
+    auto next_lane_id = nearest_lane->lane().successor_id(0);
+    segments_vector.push_back(nearest_lanesegment);
+    auto next_lane = hdmap_->GetLaneById(next_lane_id);
+    LaneSegment next_lanesegment =
+        LaneSegment(next_lane, next_lane->accumulate_s().front(),
+                    next_lane->accumulate_s().back());
+    segments_vector.push_back(next_lanesegment);
+    size_t succeed_lanes_num = next_lane->lane().successor_id_size();
+    if (succeed_lanes_num != 0) {
+      auto succeed_lane_id = next_lane->lane().successor_id(0);
+      auto succeed_lane = hdmap_->GetLaneById(succeed_lane_id);
+      LaneSegment succeed_lanesegment =
+          LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
+                      succeed_lane->accumulate_s().back());
+      segments_vector.push_back(succeed_lanesegment);
     }
+    *nearby_path = std::make_shared<Path>(segments_vector);
   } else {
     segments_vector.push_back(nearest_lanesegment);
     *nearby_path = std::make_shared<Path>(segments_vector);
@@ -1776,7 +1792,7 @@ bool OpenSpaceRoiDecider::AdjustPointsOrderToClockwise(
   }
 }
 
-bool OpenSpaceRoiDecider::GetParkingBoundary(
+bool OpenSpaceRoiDecider::GetParkingOutBoundary(
     const hdmap::Path &nearby_path, Frame *const frame,
     std::vector<std::vector<common::math::Vec2d>> *const roi_parking_boundary) {
   const auto &park_and_go_status =
@@ -1789,16 +1805,57 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
   const double adc_width = vehicle_params_.width();
   AINFO << std::fixed << "adc_init_x is " << adc_init_x << "adc_init_y is "
         << adc_init_y << "adc_init_heading is " << adc_init_heading;
-  // ADC box
-  Box2d adc_box(adc_init_position, adc_init_heading, adc_length + 2.0,
-                adc_width + 2.0);
+  // Current localization position is not in the center of vehicle
+  double shift_distance =
+      vehicle_params_.front_edge_to_center() - 0.5 * adc_length;
+  adc_init_position = adc_init_position +
+                      Vec2d::CreateUnitVec2d(adc_init_heading) * shift_distance;
+  // ADC box of Vehcile
+  Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
   std::vector<common::math::Vec2d> adc_corners;
   adc_box.GetAllCorners(&adc_corners);
-  auto right_top = adc_corners[0];
-  auto left_top = adc_corners[1];
-  auto left_down = adc_corners[2];
-  auto right_down = adc_corners[3];
+  // Get the parking spot points where the vehicle is currently located
+  std::vector<ParkingSpaceInfoConstPtr> parking_lots;
+  auto adc_parking_spot =
+      common::util::PointFactory::ToPointENU(adc_init_x, adc_init_y, 0);
+  const double kDistance = 1.0;
+  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, &parking_lots) !=
+      0) {
+    AINFO << "Failed to get the parking spot!!!";
+    return false;
+  } else {
+    AINFO << "Get " << parking_lots.size() << " parking spots";
+  }
+  std::vector<Vec2d> parking_boundary;
+  for (const auto &parking_overlap : parking_lots) {
+    const auto parking_polygon = parking_overlap->polygon();
+    AINFO << "parking_polygon: " << parking_polygon.DebugString();
+    bool is_in_parking_spot = true;
+    for (const auto &corner : adc_corners) {
+      if (!parking_polygon.IsPointIn(corner)) {
+        is_in_parking_spot = false;
+        AINFO << "Vehicle is out of parking spot!";
+        break;
+      }
+    }
+    if (is_in_parking_spot) {
+      auto points = parking_polygon.points();
+      OpenSpaceRoiUtil::UpdateParkingPointsOrder(nearby_path, &points);
+      for (size_t i = 0; i < points.size(); i++) {
+        int t = static_cast<int>(i + 1) % static_cast<int>(points.size());
+        parking_boundary.emplace_back(points.at(t).x(), points.at(t).y());
+      }
+    }
+  }
+  if (parking_boundary.size() < 4) {
+    AINFO << " Current parking spot is invalid!";
+    return false;
+  }
+  auto left_top = parking_boundary[3];
+  auto right_top = parking_boundary[0];
+  auto right_down = parking_boundary[1];
+  auto left_down = parking_boundary[2];
 
   double left_top_s = 0.0;
   double left_top_l = 0.0;
@@ -2059,7 +2116,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
   PrintCurves print_curves;
   const auto &origin_point = frame->mutable_open_space_info()->origin_point();
   double origin_heading = frame->mutable_open_space_info()->origin_heading();
-  AddParkingSpaceBoundary(frame, nearby_path, roi_parking_boundary);
+  // AddParkingSpaceBoundary(frame, nearby_path, roi_parking_boundary);
   for (auto it : *roi_parking_boundary) {
     for (auto pt : it) {
       print_curves.AddPoint("roi_parking_boundary", pt);

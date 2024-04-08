@@ -36,15 +36,19 @@ apollo::perception::radar::RadarDetectionComponent
 
 #### Input
 
-| Channel                      | Type                          | Description         |
+| Input channel                      | Type                          | Description         |
 | ---------------------------- | ----------------------------- | ------------------- |
 | `/apollo/sensor/radar/front` | `apollo::drivers::ContiRadar` | radar drive message |
 
+>Note: Radar data from driver. The default trigger channel is `/apollo/sensor/radar/front`. The detailed input channel information is in `modules/perception/radar_detection/dag/radar_detection_front.dag` file.
+
 #### Output
 
-| Channel                             | Type                                              | Description                     |
+| Output channel                             | Type                                              | Description                     |
 | ----------------------------------- | ------------------------------------------------- | ------------------------------- |
 | `/perception/inner/PrefusedObjects` | `apollo::perception::onboard::SensorFrameMessage` | frame contains object detection |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/radar_detection/conf/front_radar_detection_config.pb.txt` file.
 
 #### How to run
 

@@ -25,3 +25,4 @@ RUN bash /opt/apollo/installers/install_release_deps.sh
 # RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
 
 RUN bash /opt/apollo/installers/post_install.sh dev
+RUN bash /opt/apollo/installers/install_rsdriver.sh

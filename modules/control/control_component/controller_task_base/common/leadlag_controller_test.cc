@@ -33,17 +33,24 @@ class LeadlagControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string controllers_dir =
         "/apollo/modules/control/control_component/testdata/conf/";
-    std::string control_conf_file = controllers_dir + "leadlag_conf.pb.txt";
-    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &leadlag_conf_));
+    std::string leadlag_station_conf_file =
+        controllers_dir + "leadlag_station_conf.pb.txt";
+    std::string leadlag_speed_conf_file =
+        controllers_dir + "leadlag_speed_conf.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(leadlag_station_conf_file,
+                                           &leadlag_station_conf_));
+    ACHECK(cyber::common::GetProtoFromFile(leadlag_speed_conf_file,
+                                           &leadlag_speed_conf_));
   }
 
  protected:
-  LeadlagConf leadlag_conf_;
+  LeadlagConf leadlag_station_conf_;
+  LeadlagConf leadlag_speed_conf_;
 };
 
 TEST_F(LeadlagControllerTest, StationLeadlagController) {
   double dt = 0.01;
-  LeadlagConf leadlag_conf = leadlag_conf_;
+  LeadlagConf leadlag_conf = leadlag_station_conf_;
   LeadlagController leadlag_controller;
   leadlag_controller.Init(leadlag_conf, dt);
   leadlag_controller.Reset();
@@ -59,7 +66,7 @@ TEST_F(LeadlagControllerTest, StationLeadlagController) {
 
 TEST_F(LeadlagControllerTest, SpeedLeadlagController) {
   double dt = 0.01;
-  LeadlagConf leadlag_conf = leadlag_conf_;
+  LeadlagConf leadlag_conf = leadlag_speed_conf_;
   LeadlagController leadlag_controller;
   leadlag_controller.Init(leadlag_conf, dt);
   leadlag_controller.Reset();

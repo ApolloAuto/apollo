@@ -55,6 +55,7 @@ class ControlTestBase : public ::testing::Test {
 
   bool test_control();
   bool test_control(const std::string &test_case_name, int case_num);
+  void LoadControllerPlugin();
 
  private:
   void trim_control_command(apollo::control::ControlCommand *origin);

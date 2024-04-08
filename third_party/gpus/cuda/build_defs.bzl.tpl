@@ -1,5 +1,6 @@
 # Macros for building CUDA code.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@//tools:apollo_package.bzl", "apollo_cc_library")
 
 def cuda_extra_copts():
     return %{cuda_extra_copts}
@@ -106,11 +107,7 @@ def cuda_header_library(
 def cuda_library(mandatory = True, copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
     if mandatory:
-        cc_library(copts = cuda_default_copts() + copts, linkstatic = True, **kwargs)
-
-        cc_binary(name = "lib{}.so".format(kwargs["name"]), deps = [":{}".format(kwargs["name"])],
-            linkshared = True, linkstatic = True, visibility = ["//visibility:public"],
-            tags = ["export_library", kwargs["name"]])
+        apollo_cc_library(copts = cuda_default_copts() + copts, linkstatic = True, **kwargs)
     else:
-        cc_library(copts = cuda_default_copts() + copts, **kwargs)
+        native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
 

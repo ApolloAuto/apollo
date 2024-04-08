@@ -4,3 +4,4 @@ output_predict_objects: false
 reserved_invisible_time: 0.3
 use_frame_timestamp: true
 set_static_outside_hdmap: true
+print_debug_log: false

@@ -1,0 +1,15 @@
+vehicle_parameter {
+  max_enable_fail_attempt: 5
+  driving_mode: COMPLETE_AUTO_DRIVE
+}
+
+can_card_parameter {
+  brand: SOCKET_CAN_RAW
+  type: PCI_CARD
+  channel_id: CHANNEL_ID_ZERO
+  interface: NATIVE
+}
+
+enable_debug_mode: false
+enable_receiver_log: false
+enable_sender_log: true

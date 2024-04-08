@@ -14,11 +14,14 @@ export default class ClearArea {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
         this.scene = scene;
         this.coordinates = coordinates;
         this.groups = {};
         this.currentIds = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     drawCrosswalk(crosswalks) {
@@ -39,13 +42,13 @@ export default class ClearArea {
             const group = new THREE.Group();
             const points = this.coordinates.applyOffsetToArray(crosswalk.polygon.point);
             const zoneMesh = drawZone(points, {
-                color: colorMapping.PURE_WHITE,
+                color: this.colors.PURE_WHITE,
                 zOffset: zOffset.clearArea,
                 opacity: 0.3,
                 matrixAutoUpdate: true,
             });
             const lineMesh = drawPolygon(points, {
-                color: colorMapping.YELLOW,
+                color: this.colors.YELLOW,
                 linewidth: 1,
                 zOffset: zOffset.clearArea,
                 opacity: 1,

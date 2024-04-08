@@ -74,7 +74,7 @@ class MlfEngine : public BaseMultiTargetTracker {
    */
   void SplitAndTransformToTrackedObjects(
       const std::vector<base::ObjectPtr>& objects,
-      const base::SensorInfo& sensor_info);
+      const base::SensorInfo& sensor_info, double frame_timestamp);
 
   /**
    * @brief Match tracks and objets and object-track assignment
@@ -116,6 +116,15 @@ class MlfEngine : public BaseMultiTargetTracker {
                             std::vector<MlfTrackDataPtr>* tracks);
 
   /**
+   * @brief Output object-detection-model results and latest track results
+   * 
+   * @param frame lidar frame
+   * @param log model or cluster
+   */
+  void ObjectsDebugInfo(LidarFrame* frame, bool foreground_log = true);
+  void TrackDebugInfo(LidarFrame* frame);
+
+  /**
    * @brief Clear all data
    *
    */
@@ -149,6 +158,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   bool use_frame_timestamp_ = false;
   bool set_static_outside_hdmap_ = false;
   bool use_semantic_map_ = false;
+  bool print_debug_log_ = false;
 };
 
 }  // namespace lidar

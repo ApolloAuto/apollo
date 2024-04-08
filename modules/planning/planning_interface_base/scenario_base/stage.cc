@@ -128,6 +128,8 @@ StageResult Stage::ExecuteTaskOnReferenceLine(
       ADEBUG << "after task[" << task->Name()
              << "]: " << reference_line_info.PathSpeedDebugString();
       ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
+      AINFO << "Planning Perf: task name [" << task->Name() << "], "
+            << time_diff_ms << " ms.";
       RecordDebugInfo(&reference_line_info, task->Name(), time_diff_ms);
 
       if (!ret.ok()) {
@@ -205,13 +207,24 @@ StageResult Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
   auto ret = common::Status::OK();
   StageResult stage_result;
   for (auto task : task_list_) {
+    const double start_timestamp = Clock::NowInSeconds();
+
     ret = task->Execute(frame);
+
     if (!ret.ok()) {
       stage_result.SetTaskStatus(ret);
       AERROR << "Failed to run tasks[" << task->Name()
              << "], Error message: " << ret.error_message();
+      const double end_timestamp = Clock::NowInSeconds();
+      const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+      AINFO << "Planning Perf: task name [" << task->Name() << "], "
+            << time_diff_ms << " ms.";
       return stage_result;
     }
+    const double end_timestamp = Clock::NowInSeconds();
+    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+    AINFO << "Planning Perf: task name [" << task->Name() << "], "
+          << time_diff_ms << " ms.";
   }
 
   if (frame->open_space_info().fallback_flag() ||

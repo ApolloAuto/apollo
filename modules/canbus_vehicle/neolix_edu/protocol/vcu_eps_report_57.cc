@@ -52,8 +52,6 @@ void Vcuepsreport57::Parse(const std::uint8_t* bytes, int32_t length,
       vcu_eps_rept_checksum(bytes, length));
 
   chassis->mutable_eps()->set_steering_angle(vcu_real_angle(bytes, length));
-  chassis->mutable_check_response()->set_is_eps_online(
-      drive_enable_resp(bytes, length) == 1);
 }
 
 // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,

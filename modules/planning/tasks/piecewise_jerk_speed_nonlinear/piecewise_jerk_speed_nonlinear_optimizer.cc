@@ -244,7 +244,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
             break;
           case STBoundary::BoundaryType::FOLLOW:
             s_upper_bound =
-                std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
+                std::fmin(s_upper_bound, s_upper);
             if (!speed_data.EvaluateByTime(curr_t, &sp)) {
               const std::string msg =
                   "rough speed profile estimation for soft follow fence failed";
@@ -253,8 +253,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
             }
             s_soft_upper_bound =
                 std::fmin(s_soft_upper_bound,
-                          s_upper - FLAGS_follow_min_distance -
-                              std::min(7.0, FLAGS_follow_time_buffer * sp.v()));
+                          s_upper -
+                              std::min(7.0, 2.5 * sp.v()));
             break;
           case STBoundary::BoundaryType::OVERTAKE:
             s_lower_bound = std::fmax(s_lower_bound, s_lower);

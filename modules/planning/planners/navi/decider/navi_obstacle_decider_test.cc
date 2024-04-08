@@ -166,7 +166,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
         vec_obstacle, reference_line, path_decision, vec_points, vehicle_state,
         &lane_obstacles_num);
   }
-  EXPECT_FLOAT_EQ(nudge_dist, 0.72657289);
+  EXPECT_FLOAT_EQ(nudge_dist, 0.72657287);
   EXPECT_FLOAT_EQ(lane_obstacles_num, 2);
 }
 

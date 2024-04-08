@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Input, Modal } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
 import showModal, { WithModalComponentProps } from '@dreamview/dreamview-core/src/util/modal';
 import {
     usePickHmiStore,
@@ -51,11 +51,10 @@ function useModalStyle() {
         'record-modal-item': {
             display: 'flex',
             alignItems: 'center',
-            marginTop: theme.tokens.margin.speace3,
             position: 'relative',
         },
         'record-modal-label': {
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             whiteSpace: 'nowrap',
             ...theme.tokens.typography.content,
             paddingRight: theme.tokens.margin.speace,
@@ -64,23 +63,8 @@ function useModalStyle() {
                 content: '":"',
             },
         },
-        'record-modal-input': {
-            padding: '8px 16px',
-            color: theme.tokens.colors.fontColor1,
-            background: theme.tokens.colors.background4,
-            fontWeight: '400',
-            '&:hover': {
-                background: theme.tokens.colors.background4,
-            },
-            '&:active': {
-                background: theme.tokens.colors.background4,
-            },
-            '&:focus': {
-                background: theme.tokens.colors.background4,
-            },
-        },
         'record-error': {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
             fontSize: theme.tokens.font.size.sm,
             paddingLeft: '100px',
             marginTop: '4px',
@@ -173,7 +157,7 @@ function ConfirmModal(props: WithModalComponentProps<ConfirmModalProps>) {
         >
             <div className={classes['record-modal-item']}>
                 <span className={classes['record-modal-label']}>{t('labelName')}</span>
-                <Input onChange={onChange} value={name} bordered={false} className={classes['record-modal-input']} />
+                <Input allowClear onChange={onChange} value={name} />
             </div>
             <div className={classes['record-error']}>{error}</div>
         </Modal>
@@ -187,7 +171,8 @@ function RecordBtn() {
     const { mainApi, isMainConnected } = useWebSocketServices();
     const { classes, cx } = useStyle();
     const { t } = useTranslation('bottomBar');
-
+    const { theme } = useThemeContext();
+    const isDrak = theme === 'drak';
     const isInRecord = (() => {
         if (hmi.currentOperation === HMIModeOperation.WAYPOINT_FOLLOW) {
             return hmi.globalComponents?.RTKRecorder?.processStatus?.status === ENUM_RTKRECORD_PROCESS_STATUS.OK;
@@ -249,20 +234,37 @@ function RecordBtn() {
 
     return (
         <div onClick={onRecord} className={cx(classes['player-record-btn'])}>
-            <svg
-                width='16px'
-                height='16px'
-                viewBox='0 0 16 16'
-                version='1.1'
-                xmlns='http://www.w3.org/2000/svg'
-                xmlnsXlink='http://www.w3.org/1999/xlink'
-            >
-                <g strokeWidth='1' fill='none' fillRule='evenodd'>
-                    <rect fill='currentColor' opacity='0' x='0' y='0' width='16' height='16' />
-                    <circle stroke='currentColor' cx='8' cy='8' r='7' />
-                    <circle fill={isInRecord ? '#F75660' : 'currentColor'} cx='8' cy='8' r='5' />
-                </g>
-            </svg>
+            {isDrak ? (
+                <svg
+                    width='16px'
+                    height='16px'
+                    viewBox='0 0 16 16'
+                    version='1.1'
+                    xmlns='http://www.w3.org/2000/svg'
+                    xmlnsXlink='http://www.w3.org/1999/xlink'
+                >
+                    <g strokeWidth='1' fill='none' fillRule='evenodd'>
+                        <rect fill='currentColor' opacity='0' x='0' y='0' width='16' height='16' />
+                        <circle stroke='currentColor' cx='8' cy='8' r='7' />
+                        <circle fill={isInRecord ? '#F75660' : 'currentColor'} cx='8' cy='8' r='5' />
+                    </g>
+                </svg>
+            ) : (
+                <svg
+                    width='16px'
+                    height='16px'
+                    viewBox='0 0 16 16'
+                    version='1.1'
+                    xmlns='http://www.w3.org/2000/svg'
+                    xmlnsXlink='http://www.w3.org/1999/xlink'
+                >
+                    <g id='icon/ic_recording' stroke='none' strokeWidth='1' fill='none' fillRule='evenodd'>
+                        <rect fill='currentColor' opacity='0' x='0' y='0' width='16' height='16' />
+                        <circle stroke='currentColor' cx='8' cy='8' r='7' />
+                        <circle fill={isInRecord ? '#F53145' : 'currentColor'} fillRule='nonzero' cx='8' cy='8' r='3' />
+                    </g>
+                </svg>
+            )}
             <span className={classes['player-record-text']}>{isInRecord ? t('stopRecord') : t('record')}</span>
         </div>
     );

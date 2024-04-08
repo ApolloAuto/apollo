@@ -6,7 +6,7 @@ import useStyle from '../useStyle';
 
 export function VehicleVizPanelHelpOrigin() {
     const { t } = useTranslation('panels');
-    const { classes } = useStyle();
+    const { classes, cx } = useStyle();
 
     return (
         <>
@@ -15,7 +15,7 @@ export function VehicleVizPanelHelpOrigin() {
             <SubHeader>{t('panelHelpAbilityDesc')}</SubHeader>
             <div className={classes['panel-desc-item']}>
                 <div className={classes['panel-desc-item-left']}>
-                    <span className={classes['viz-btn-item']}>
+                    <span className={classes['viz-help-btn-item']}>
                         <IconIcCoverageHover />
                     </span>
                 </div>
@@ -24,17 +24,17 @@ export function VehicleVizPanelHelpOrigin() {
 
             <div className={classes['panel-desc-item']}>
                 <div className={classes['panel-desc-item-left']}>
-                    <span className={classes['viz-btn-item']}>D</span>
+                    <span className={classes['viz-help-btn-item']}>D</span>
                 </div>
                 <div className={classes['panel-desc-item-right']}>{t('viewSwitchDescription')}</div>
             </div>
 
             <div className={classes['panel-desc-item']}>
                 <div className={classes['panel-desc-item-left']}>
-                    <div className={classes['view-menu-btn-container']}>
-                        <IconIcAmplification style={{ fontSize: '16px', color: '#96A5C1', marginBottom: '8px' }} />
-                        <IconIcReduce style={{ fontSize: '16px', color: '#96A5C1' }} />
-                    </div>
+                    <span className={cx(classes['viz-help-btn-item'], classes['viz-btn-item-flex'])}>
+                        <IconIcAmplification style={{ fontSize: '16px', marginBottom: '8px' }} />
+                        <IconIcReduce style={{ fontSize: '16px' }} />
+                    </span>
                 </div>
                 <div className={classes['panel-desc-item-right']}>{t('viewBtnDescription')}</div>
             </div>

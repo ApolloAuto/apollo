@@ -1,23 +1,35 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
-import tinycolor from 'tinycolor2';
 
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
+        'setting-modal': {
+            '&.dreamview-modal-root .dreamview-modal .dreamview-modal-content': {
+                padding: '20px',
+            },
+            '&.dreamview-modal-root .dreamview-modal .dreamview-modal-header': {
+                margin: '-20px',
+                marginBottom: '16px',
+                padding: '0 20px',
+            },
+            '&.dreamview-modal-root .dreamview-modal .dreamview-modal-footer': {
+                marginTop: '20px',
+            },
+        },
         'setting-root': {
             display: 'flex',
-            marginTop: theme.tokens.margin.speace3,
+            marginTop: theme.tokens.margin.speace2,
         },
         'setting-right': {
             flex: 1,
             marginLeft: '12px',
-            background: '#181A1F',
+            background: theme.components.settingModal.cardBgColor,
             borderRadius: '8px',
             height: '358px',
-            padding: theme.tokens.padding.speace3,
+            padding: theme.tokens.padding.speace2,
         },
         tabs: {
             width: '144px',
-            borderRight: '1px solid #383B45',
+            borderRight: `1px solid ${theme.tokens.colors.divider2}`,
             height: '358px',
         },
         'tabs-item': {
@@ -26,25 +38,25 @@ export default function useStyle() {
             height: '32px',
             lineHeight: '32px',
             borderRadius: '6px',
-            color: theme.tokens.colors.fontColor3,
+            color: theme.components.settingModal.tabColor,
             cursor: 'pointer',
             textIndent: '16px',
             marginBottom: '6px',
             '&:hover': {
-                backgroundColor: tinycolor(theme.tokens.colors.background2).setAlpha(0.5).toRgbString(),
+                background: theme.components.settingModal.tabBgHoverColor,
             },
         },
         active: {
-            color: theme.tokens.colors.fontColor1,
-            backgroundColor: theme.tokens.colors.brand2,
+            color: theme.components.settingModal.tabActiveColor,
+            backgroundColor: theme.components.settingModal.tabActiveBgColor,
             '&:hover': {
-                backgroundColor: theme.tokens.colors.brand2,
+                backgroundColor: theme.components.settingModal.tabActiveBgColor,
             },
         },
         laguage: {
             '& > p': {
-                ...theme.tokens.typography.content,
-                color: theme.tokens.colors.fontColor2,
+                ...theme.tokens.typography.title,
+                color: theme.tokens.colors.fontColor6,
                 marginBottom: theme.tokens.margin.speace,
             },
         },
@@ -64,24 +76,27 @@ export default function useStyle() {
             },
         },
         logo: {
-            height: 46,
-            marginLeft: -6,
+            height: '90px',
+            marginLeft: '-18px',
+            display: 'block',
+            marginTop: '-34px',
+            marginBottom: '-18px',
         },
         about: {
             ...theme.tokens.typography.content,
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
         },
         aboutitem: {
             marginBottom: theme.tokens.margin.speace,
         },
         blod: {
             fontWeight: 500,
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             marginBottom: '6px',
         },
         divider: {
             height: '1px',
-            background: '#383b45',
+            background: theme.tokens.colors.divider2,
             margin: `${theme.tokens.margin.speace2} 0`,
         },
     }));

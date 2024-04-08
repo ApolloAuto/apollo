@@ -395,6 +395,9 @@ void ObstaclesPrioritizer::AssignCautionLevelPedestrianByEgoReferenceLine(
       continue;
     }
     Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+    if (latest_feature_ptr->priority().priority() == ObstaclePriority::IGNORE) {
+      continue;
+    }
     if (latest_feature_ptr->type() != PerceptionObstacle::PEDESTRIAN) {
       continue;
     }

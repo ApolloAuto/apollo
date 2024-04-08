@@ -61,8 +61,6 @@ void Vcubrakereport47::Parse(const std::uint8_t* bytes, int32_t length,
     chassis->mutable_epb()->set_parking_brake_status(Epb::PBRAKE_ON);
   if (vcu_real_parking_status(bytes, length) == 0)
     chassis->mutable_epb()->set_parking_brake_status(Epb::PBRAKE_OFF);
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_enable_resp(bytes, length) == 1);
 }
 
 // config detail: {'description': '0x0:disable;0x1:enable', 'offset': 0.0,

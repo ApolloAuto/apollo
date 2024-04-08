@@ -16,6 +16,7 @@ import {
     IconIcSettingNormal,
     IconIcMoveHover,
     IconIcEitFullScreen,
+    OperatePopover,
     IconIcDelete,
     Modal,
 } from '@dreamview/dreamview-ui';
@@ -186,13 +187,13 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
                         <IconIcHelpNormal />
                     </div>
                     <div className={classes['mosaic-custom-toolbar-operate-item']}>
-                        <Popover
+                        <OperatePopover
                             trigger='hover'
                             rootClassName={classes['mosaic-custom-toolbar-popover']}
                             content={operate}
                         >
                             <IconIcSettingNormal />
-                        </Popover>
+                        </OperatePopover>
                     </div>
                     <div className={classes['mosaic-custom-toolbar-operate-item']}>
                         <Popover

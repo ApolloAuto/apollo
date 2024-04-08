@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { IconIcBottomRailDelete } from '@dreamview/dreamview-ui';
+import { IconIcBottomRailDelete, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import useStyle from './useStyle';
 import { useTimeDown, popoverStatus, EMUN_OPERATE_STATUS, EMUN_TIMEDOWN_STATUS } from '../util';

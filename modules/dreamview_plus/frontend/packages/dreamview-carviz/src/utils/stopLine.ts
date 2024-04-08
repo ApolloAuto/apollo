@@ -1,7 +1,7 @@
 import { drawSegmentsFromPoints } from './line';
 import { colorMapping, zOffset } from '../constant/common';
 
-export const drawStopLine = (stopLine, coordinates) => {
+export const drawStopLine = (stopLine, coordinates, propColor?) => {
     if (!stopLine) {
         return [];
     }
@@ -9,7 +9,7 @@ export const drawStopLine = (stopLine, coordinates) => {
     stopLine.segment?.forEach((segment) => {
         const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
         const mesh = drawSegmentsFromPoints(points, {
-            color: colorMapping.PURE_WHITE,
+            color: propColor || colorMapping.PURE_WHITE,
             linewidth: 5,
             zOffset: zOffset.stopLine,
             opacity: 1,

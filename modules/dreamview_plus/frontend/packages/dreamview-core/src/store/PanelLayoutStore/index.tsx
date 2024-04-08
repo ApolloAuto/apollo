@@ -12,18 +12,18 @@ export const { StoreProvider: PanelLayoutStoreProvider, useStore: usePanelLayout
 >({
     initialState: initState,
     reducer,
-    persistor: createLocalStoragePersistor('dv-panel-layout-stoer-v1'),
+    persistor: createLocalStoragePersistor('dv-panel-layout-stoer-v4'),
 });
 
 export function useMosaicId() {
     const [store] = usePanelLayoutStore();
     const [hmi] = usePickHmiStore();
-    return store[hmi.currentMode]?.mosaicId || mosaicId;
+    return store.layout[hmi.currentMode]?.mosaicId || mosaicId;
 }
 
 export function useGetCurrentLayout() {
     const [hmi] = usePickHmiStore();
     const [store] = usePanelLayoutStore();
 
-    return store[hmi.currentMode]?.layout;
+    return store.layout[hmi.currentMode]?.layout;
 }

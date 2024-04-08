@@ -1,10 +1,11 @@
 import classNames from 'classnames';
 import RcSwitch from 'rc-switch';
 import React, { useState } from 'react';
+import { useMakeStyle } from '@dreamview/dreamview-theme';
 import PropTypes from 'prop-types';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
 import { IconIcAmplification } from '../../icons';
-import './switch-loading.less';
+// import './switch-loading.less';
 
 export type SwitchSize = 'small' | 'default';
 export type SwitchChangeEventHandler = (
@@ -33,6 +34,138 @@ export interface SwitchProps {
     id?: string;
 }
 
+function useStyle(classname: string) {
+    const hoc = useMakeStyle(() => ({
+        [classname]: {
+            '&.dreamview-switch-loading': {
+                boxSizing: 'border-box',
+                margin: 0,
+                padding: 0,
+                color: 'rgba(0, 0, 0, 0.88)',
+                fontSize: '14px',
+                lineHeight: '12px',
+                listStyle: 'none',
+                fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji'",
+                position: 'relative',
+                display: 'block',
+                minWidth: '26px',
+                height: '12px',
+                verticalAlign: 'middle',
+                // background: '#343C4D',
+                background: '#A0A3A7',
+                border: 0,
+                borderRadius: '3px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                userSelect: 'none',
+
+                '&.dreamview-switch-loading.dreamview-switch-loading-checked': {
+                    background: '#055FE7',
+
+                    '& .dreamview-switch-loading-inner': {
+
+                        '& .dreamview-switch-loading-inner-checked': {
+                            marginInlineStart: 0,
+                            marginInlineEnd: 0,
+                        },
+
+                        '& .dreamview-switch-loading-inner-unchecked': {
+                            marginInlineStart: 'calc(100% - 22px + 48px)',
+                            marginInlineEnd: 'calc(-100% + 22px - 48px)',
+                        },
+                    },
+
+                    '& .dreamview-switch-loading-handle': {
+                        insetInlineStart: 'calc(100% - 12px)',
+                    },
+
+                    '& .dreamview-switch-loading-handle::before': {
+                        backgroundColor: '#fff',
+                    },
+                },
+
+                '& .dreamview-switch-loading-handle': {
+                    position: 'absolute',
+                    top: '1px',
+                    insetInlineStart: '2px',
+                    width: '10px',
+                    height: '10px',
+                    transition: 'all 0.2s ease-in-out',
+                },
+
+                '& .dreamview-switch-loading-handle::before': {
+                    position: 'absolute',
+                    top: 0,
+                    insetInlineEnd: 0,
+                    bottom: 0,
+                    insetInlineStart: 0,
+                    backgroundColor: 'white',
+                    borderRadius: '3px',
+                    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+                    transition: 'all 0.2s ease-in-out',
+                    content: '""',
+                },
+
+                '& .dreamview-switch-loading-inner': {
+                    display: 'block',
+                    overflow: 'hidden',
+                    borderRadius: '100px',
+                    height: '100%',
+                    transition: 'padding-inline-start 0.2s ease-in-out,padding-inline-end 0.2s ease-in-out',
+
+                    '& .dreamview-switch-loading-inner-checked': {
+                        display: 'block',
+                        color: '#fff',
+                        fontSize: '10px',
+                        transition: 'margin-inline-start 0.2s ease-in-out,margin-inline-end 0.2s ease-in-out',
+                        pointerEvents: 'none',
+                        marginInlineStart: 'calc(-100% + 22px - 48px)',
+                        marginInlineEnd: 'calc(100% - 22px + 48px)',
+                        paddingRight: '13px',
+                        marginTop: '-1px',
+                    },
+
+                    '& .dreamview-switch-loading-inner-unchecked': {
+                        display: 'block',
+                        color: '#fff',
+                        fontSize: '10px',
+                        transition: 'margin-inline-start 0.2s ease-in-out,margin-inline-end 0.2s ease-in-out',
+                        pointerEvents: 'none',
+                        marginTop: '-11px',
+                        marginInlineStart: 0,
+                        marginInlineEnd: 0,
+                        paddingLeft: '14px',
+                    },
+                },
+
+                '&.dreamview-switch-loading-disabled': {
+                    cursor: 'not-allowed',
+                    opacity: 0.65,
+
+                    '& .dreamview-switch-loading-handle::before': {
+                        display: 'none',
+                    },
+                },
+                '&.dreamview-switch-loading-loading': {
+                    cursor: 'not-allowed',
+                    opacity: 0.65,
+
+                    '& .dreamview-switch-loading-handle::before': {
+                        display: 'none',
+                    },
+                },
+
+                '& .dreamview-switch-loading-loading-icon': {
+                    color: '#BDC3CD',
+                    fontSize: '12px',
+                },
+            },
+        },
+    }));
+
+    return hoc();
+}
+
 export const SwitchLoading = React.forwardRef<HTMLButtonElement, SwitchProps>(
     (
         {
@@ -56,12 +189,14 @@ export const SwitchLoading = React.forwardRef<HTMLButtonElement, SwitchProps>(
         );
 
         const mergedSize = customizeSize || 'default';
+        const { classes, cx } = useStyle(prefixCls);
 
-        const classes = classNames(
+        const cls = cx(
             {
                 [`${prefixCls}-small`]: mergedSize === 'small',
                 [`${prefixCls}-loading`]: loading,
             },
+            classes[prefixCls],
             className,
             rootClassName,
         );
@@ -70,7 +205,7 @@ export const SwitchLoading = React.forwardRef<HTMLButtonElement, SwitchProps>(
             <RcSwitch
                 {...props}
                 prefixCls={prefixCls}
-                className={classes}
+                className={cls}
                 disabled={mergedDisabled}
                 ref={ref}
                 loadingIcon={loadingIcon}

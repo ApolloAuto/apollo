@@ -17,6 +17,7 @@ apollo_component(
         "navi_planning.h",
         "on_lane_planning.h",
         "planning_base.h",
+        "integration_tests/planning_test_base.h",
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -28,6 +29,20 @@ apollo_component(
         "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "//cyber",
     ],
+)
+
+apollo_cc_test(
+    name = "planning_test_base",
+    srcs = ["integration_tests/planning_test_base.cc"],
+    deps = [
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "DO_NOT_IMPORT_planning_component",
+        "@com_google_googletest//:gtest",
+    ],
+    linkstatic = True,
 )
 
 filegroup(

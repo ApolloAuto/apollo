@@ -34,15 +34,19 @@ apollo::perception::camera::CameraLocationEstimationComponent
 
 #### Input
 
-| Name    | Type                                       | Description          |
-| ------- | ------------------------------------------ | -------------------- |
-| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |
+| Name    | Type                                       | Description          | Input channal |
+| ------- | ------------------------------------------ | -------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message | /perception/inner/Detection |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/Detection`. The detailed input channel information is in `modules/perception/camera_location_estimation/dag/camera_location_estimation.dag` file. By default, the upstream components of the messages received by the component include `camera_detection_multi_stage`.
 
 #### Output
 
-| Name    | Type                                       | Description          |
-| ------- | ------------------------------------------ | -------------------- |
-| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |
+| Name    | Type                                       | Description          | Output channal |
+| ------- | ------------------------------------------ | -------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message | /perception/inner/location_estimation |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/camera_detection_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/camera_location_estimation/conf/camera_location_estimation_config.pb.txt` file.
 
 ## Reference
 

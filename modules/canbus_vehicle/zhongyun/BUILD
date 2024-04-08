@@ -35,6 +35,7 @@ apollo_cc_library(
         "zhongyun_message_manager.h",
         "zhongyun_vehicle_factory.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/zhongyun/proto:zhongyun_cc_proto",

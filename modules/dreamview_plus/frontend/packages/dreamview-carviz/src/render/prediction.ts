@@ -19,7 +19,10 @@ export default class Prediction {
 
     private coordinates;
 
-    constructor(scene, option, coordinates) {
+    private colors;
+
+    constructor(scene, option, coordinates, colors?) {
+        this.colors = colors?.obstacleColorMapping || obstacleColorMapping;
         this.majorMeshs = [];
         this.minorMeshs = [];
         this.guassMeshs = [];
@@ -46,7 +49,7 @@ export default class Prediction {
         for (let i = 0; i < obstacles.length; i += 1) {
             const obstacle = obstacles[i];
             const predictions = obstacle.prediction;
-            const color = obstacleColorMapping[obstacle.type] || obstacleColorMapping.DEFAULT;
+            const color = this.colors[obstacle.type] || this.colors.DEFAULT;
             if (!predictions || predictions.length === 0) {
                 continue;
             }
@@ -90,7 +93,7 @@ export default class Prediction {
         for (let i = 0; i < obstacles.length; i += 1) {
             const obstacle = obstacles[i];
             const predictions = obstacle.prediction;
-            const color = obstacleColorMapping[obstacle.type] || obstacleColorMapping.DEFAULT;
+            const color = this.colors[obstacle.type] || this.colors.DEFAULT;
             if (!predictions || predictions.length === 0) {
                 continue;
             }

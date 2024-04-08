@@ -28,6 +28,24 @@ proto_library(
 )
 
 proto_library(
+    name = "control_debug_proto",
+    srcs = ["control_debug.proto"],
+    deps = [
+        ":check_status_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
+        "//modules/common_msgs/routing_msgs:routing_geometry_proto",
+    ]
+)
+
+proto_library(
+    name = "check_status_proto",
+    srcs = ["check_status.proto"],
+)
+
+proto_library(
     name = "control_plugin_declare_info_proto",
     srcs = ["plugin_declare_info.proto"],
 )

@@ -37,7 +37,6 @@ class MlfBaseFilter {
  public:
   MlfBaseFilter() = default;
   virtual ~MlfBaseFilter() = default;
-
   /**
    * @brief Init mlf fitler
    *

@@ -1,0 +1,25 @@
+<package format="2">
+  <name>module-external-command</name>
+  <version>local</version>
+  <description>
+    Apollo external-command module.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//collection/external-command</src_path>
+  <depend repo_name="external-command-action" type="binary">external-command-action</depend>
+  <depend repo_name="external-command-demo" type="binary">external-command-demo</depend>
+  <depend repo_name="external-command-lane-follow" type="binary">external-command-lane-follow</depend>
+  <depend repo_name="external-command-process" type="binary">external-command-process</depend>
+  <depend repo_name="external-command-processor-base" type="binary">external-command-processor-base</depend>
+  <depend repo_name="external-command-valet-parking" type="binary">external-command-valet-parking</depend>
+  <depend repo_name="old-routing-adpter" type="binary">old-routing-adpter</depend>
+  <depend repo_name="routing" type="binary">routing</depend>
+
+</package>

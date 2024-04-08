@@ -1,0 +1,25 @@
+.dvc-floating-layer {
+    position: fixed;
+    z-index: 99;
+    max-width: 250px;
+    padding: 12px;
+    font-family: PingFangSC-Regular, serif;
+    font-size: 14px;
+    color: #fff;
+    pointer-events: none;
+    background: #505866;
+    border-radius: 6px;
+    /* 添加的阴影样式 */
+    -webkit-box-shadow: 0 6px 12px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 12px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dvc-floating-layer__tooltip {
+    margin-top: 4px;
+    font-family: PingFangSC-Regular, serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: #a6b5cc;
+}
+

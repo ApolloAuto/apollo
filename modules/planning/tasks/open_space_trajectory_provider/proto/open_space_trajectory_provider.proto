@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "modules/planning/planning_base/proto/planner_open_space_config.proto";
+import "modules/planning/planning_open_space/proto/planner_open_space_config.proto";
 package apollo.planning;
 
 message OpenSpaceTrajectoryProviderConfig {

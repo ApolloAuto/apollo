@@ -13,16 +13,16 @@ export default function useStyle() {
             },
         },
         downloaded: {
-            color: theme.tokens.colors.success,
+            color: `${theme.tokens.colors.success2} !important`,
         },
         downloading: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         tobeupdate: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
         downloadfail: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
     }));
 

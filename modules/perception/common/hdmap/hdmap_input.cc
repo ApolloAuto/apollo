@@ -157,7 +157,7 @@ void HDMapInput::MergeBoundaryJunction(
     const std::vector<apollo::common::PointENU>& left_line_points =
         left_boundary.line_points;
     ADEBUG << "Input left road_boundary size = " << left_line_points.size();
-    step = left_line_points.size() > 5 ? hdmap_sample_step_ : 1;
+    step = (left_line_points.size() > 2) ? hdmap_sample_step_ : 1;
     for (unsigned int idx = 0; idx < left_line_points.size(); idx += step) {
       PointD pointd;
       pointd.x = left_line_points.at(idx).x();
@@ -181,7 +181,7 @@ void HDMapInput::MergeBoundaryJunction(
     const std::vector<apollo::common::PointENU>& right_line_points =
         right_boundary.line_points;
     ADEBUG << "Input right road_boundary size = " << right_line_points.size();
-    step = right_line_points.size() > 5 ? hdmap_sample_step_ : 1;
+    step = (right_line_points.size() > 2) ? hdmap_sample_step_ : 1;
     for (unsigned int idx = 0; idx < right_line_points.size(); idx += step) {
       PointD pointd;
       pointd.x = right_line_points.at(idx).x();
@@ -295,7 +295,7 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
   }
   // The last point
   polygon_ptr->push_back(raw_cloud[raw_cloud_size - 1]);
-  AINFO << "Downsample road boundary points from " << raw_cloud_size << " to "
+  ADEBUG << "Downsample road boundary points from " << raw_cloud_size << " to "
         << polygon_ptr->size();
 }
 

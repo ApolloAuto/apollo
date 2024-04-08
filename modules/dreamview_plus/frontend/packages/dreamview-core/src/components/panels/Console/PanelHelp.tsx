@@ -10,7 +10,7 @@ function useStyle() {
         },
         'desc-title': {
             ...theme.tokens.typography.title,
-            color: theme.tokens.colors.fontColor1,
+            color: theme.tokens.colors.fontColor5,
             marginBottom: '6px',
         },
         'desc-content': {

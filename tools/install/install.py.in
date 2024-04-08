@@ -24,6 +24,7 @@ import subprocess
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
+from multiprocessing import Pool, Lock
 from subprocess import check_output, check_call
 
 # Stores subdirectories that have already been created.
@@ -69,9 +70,11 @@ export_library_dict = {}
 packages = {}
 plugins = {}
 plugins_meta = {}
+installed_ele = set()
 meta_prefix = "share/packages"
 EMPTY_BUILD_TMP = '''
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_import")
+load("@apollo_src//tools:apollo_package.bzl", "apollo_deps_library")
 cc_library(
     name = "{}",
     hdrs = glob(["include/{}/**/*.h"]) + glob(["include/{}/**/*.hpp"]),
@@ -81,14 +84,16 @@ cc_library(
 )
 '''
 BUILD_TMP = '''
-cc_library(
+apollo_deps_library(
     name = "{}",
     srcs = ["{}"],
-    linkopts = [{}],
+    deps = [{}],
     visibility = ["//visibility:public"],
     alwayslink = True,
 )
 '''
+
+L = Lock()
 
 def generate_pack_file(meta_path):
     global plugins_meta
@@ -318,21 +323,26 @@ def needs_install(src, dst):
     # Check if destination exists.
     if not os.path.exists(dst_full):
         # Destination doesn't exist -> installation needed.
-        create_cache(src)  
+        create_cache(src)
+        installed_ele.add(src)
         return True
     
     cache = os.path.join(lib_cache_prefix, src)
     if not os.path.exists(cache):
         create_cache(src)
+        installed_ele.add(src)
         return True
 
     # Check if files are different.
     if cachecmp(src, cache):
         # Files are the same -> no installation needed.
+        if src in installed_ele:
+            return True
         return False
-
-    # File needs to be installed.
-    return True
+    else:
+        # File needs to be installed.
+        installed_ele.add(src)
+        return True
 
 
 def copy_or_link(src, dst):
@@ -367,32 +377,39 @@ def install(src, dst, action_type=None, package_path=None,
         package_in_cache = False
         deprecated_flag = False
 
+        true_pkg_path = None
+
         for k in packages:
             if package_path.startswith(k):
-                package_in_cache = True
-                packages[k].append("{}:{}".format(src, dst))
-                break
+                if package_path == k or package_path[len(k)] == "/":
+                    package_in_cache = True
+                    packages[k].append("{}:{}".format(src, dst))
+                    true_pkg_path = k
+                    break
 
         if not package_in_cache:
-            find_flag = False
             src_list = src.split("/")
             for i in range(0, len(src_list)):
                 temp_path = "/".join(src_list[0: i])
                 temp_cyberfile_path = os.path.join(temp_path, "cyberfile.xml")
                 if os.path.exists(temp_cyberfile_path):
-                    packages[temp_path] = ["{}:{}".format(src, dst)]
-                    find_flag = True
+                    if temp_path in packages:
+                        packages[temp_path].append("{}:{}".format(src, dst))
+                    else:
+                        packages[temp_path] = ["{}:{}".format(src, dst)]
+                    true_pkg_path = temp_path
                     break
-            if not find_flag:
-                print("\033[31m[ERROR]\033[0m orphan install file: {} -> {}".format(
+
+        if true_pkg_path is None:
+            print("\033[31m[ERROR]\033[0m orphan install file: {} -> {}".format(
                     src, dst), file=sys.stderr)
-                exit(-1)
+            exit(-1)
 
         if shared_library_export is not None and target_name is not None:
-            if package_path not in export_library_dict:
-                export_library_dict[package_path] = [{"target": target_name, "dst": dst}]
+            if true_pkg_path not in export_library_dict:
+                export_library_dict[true_pkg_path] = [{"target": target_name, "dst": dst}]
             else:
-                export_library_dict[package_path].append({"target": target_name, "dst": dst})
+                export_library_dict[true_pkg_path].append({"target": target_name, "dst": dst})
     else:
         dst = rename_package_name(dst)
 
@@ -504,10 +521,226 @@ def install(src, dst, action_type=None, package_path=None,
     elif may_be_binary(dst_full):  # May be an executable.
         potential_binaries_to_fix_rpath.append(dst_full)
 
-def create_package_meta(prefix):
+def meta_executor(package_path):
     global meta
     global packages
     global export_library_dict
+
+    cyberfile_parser = ET.parse(os.path.join(package_path, "cyberfile.xml"))
+    root = cyberfile_parser.getroot()
+
+    pkg_name = root.find("name").text
+    package_index_path = os.path.join(prefix, meta_prefix, pkg_name)
+    os.makedirs(package_index_path, exist_ok=True)
+
+    package_install_files = []
+    files_dst = set()
+    for install_file in packages[package_path]:
+        package_install_files.append(install_file)
+        files_dst.add(install_file.split(":")[-1])
+    package_install_files.append(
+        "src_path:{}".format(package_path))
+    if os.path.exists(os.path.join(package_index_path, "meta.txt")):
+        with open(os.path.join(package_index_path, "meta.txt"), "r+") as f:
+            # delete redundant files
+            contents = f.read().split("\n")
+            contents = contents[: len(contents)-1]
+            for i in contents:
+                file_name = i.split(":")[-1]
+                file_full_name = os.path.join(prefix, file_name)
+                if file_name not in files_dst and \
+                        os.path.exists(file_full_name):
+                    os.remove(file_full_name)
+            f.seek(0)
+            f.truncate(0)
+            f.write("\n".join(package_install_files))
+    else:
+        with open(os.path.join(package_index_path, "meta.txt"), "w+") as f:
+            f.write("\n".join(package_install_files))
+
+    so_files = []
+    for i in package_install_files:
+        info = i.split(":")
+        if info[1].startswith("lib") and not info[1].startswith("lib/plugin"):
+            if info[1].split("/")[-1].startswith("lib"):
+                so_files.append(info[1])
+
+    package_build_content = []
+    if package_path in export_library_dict:
+        package_library_list = export_library_dict[package_path]
+        for lib_info in package_library_list:
+            target_name = lib_info["target"]
+            dst = lib_info["dst"]
+            path_list = dst.split("/")
+            target_name_prefix = "/".join(
+                path_list[1: len(path_list)-1]).replace("/", "_S")
+
+            ldd_query = "ldd {}".format(os.path.join(prefix, dst))
+            elf_query = "patchelf --print-needed {}".format(os.path.join(prefix, dst))
+
+            ld_result = subprocess.check_output(
+                ldd_query, shell=True).decode("utf-8").split("\n")
+
+            ld_result_str = "".join(ld_result)
+            loop = False
+            fatal = False
+            while "not found" in ld_result_str:
+                if loop:
+                    print("\033[31m[FATAL]\033[0m missing library when processing {}".format(dst), file=sys.stderr)
+                    fatal = True
+                    break
+                print("[WARNNING] missing dynamic library in ld, try refreash ld cache")
+                update_sh = os.path.join(prefix, "update_dylib.sh")
+                ld_cache = os.path.join(prefix, "ld.cache") 
+                if os.path.exists(update_sh):
+                    L.acquire()
+                    subprocess.check_output(
+                        "rm -f {} && bash {}".format(ld_cache, update_sh), shell=True).decode("utf-8").split("\n")
+                    L.release() 
+                else:
+                    print("\033[31m[ERROR]\033[0m missing file {}".format(update_sh), file=sys.stderr)
+                    fatal = True
+                    break
+                ld_result = subprocess.check_output(
+                    ldd_query, shell=True).decode("utf-8").split("\n")
+                ld_result_str = "".join(ld_result)
+                loop = True 
+            
+            if fatal:
+                return -1
+
+            shared_obj_dict = {}
+            ld_path = []
+            for i in ld_result:
+                items = i.split(" ")
+                library_name = items[0].replace("\t", "")
+                if library_name.startswith("/"):
+                    system_library_name = library_name.split("/")[-1]
+                    shared_obj_dict[system_library_name] = None
+                if len(items) < 3:
+                    continue
+                if library_name in shared_obj_dict:
+                    print("\033[31m[FATAL]\033[0m duplicated apollo_cc_library found: {}".format(
+                        dst), file=sys.stderr)
+                    return -1
+                shared_obj_dict[library_name] = items[2]
+
+            needed_so = subprocess.check_output(
+                elf_query, shell=True).decode("utf-8").split("\n")
+            needed_so = list(filter(None, needed_so))
+            for i in needed_so:
+                if i not in shared_obj_dict:
+                    continue
+                if i.startswith("lib") and i.endswith(".so"):
+                    ld_path.append({"name": i, "path": shared_obj_dict[i]})
+
+            # link_paths = []
+            apollo_deps_list = []
+            for i in ld_path:
+                name = i["name"]
+                path = "/".join(i["path"].split("/")[0: len(i["path"].split("/"))-1])
+                lib_name = (i["path"].split("/"))[-1]
+                if path.startswith("/opt/apollo/neo/lib") and not path.startswith("/opt/apollo/neo/lib/3rd-"):
+                    path = os.path.relpath(os.path.abspath(path), "/opt/apollo/neo/lib")
+                    src_path = f"/opt/apollo/neo/src/{path}"
+                    cyberfile = os.path.join(src_path, "cyberfile.xml")
+                    while not os.path.exists(cyberfile):
+                        if not src_path.startswith("/opt/apollo/neo/src"):
+                            fatal = 1
+                            break
+                        src_path = os.path.abspath(os.path.join(src_path, "../"))
+                        cyberfile = os.path.join(src_path, "cyberfile.xml")
+                    depend_pkg_name = None
+                    if fatal:
+                        pkg_cyberfile = os.path.join(package_index_path, "cyberfile.xml")
+                        parser = ET.parse(pkg_cyberfile)
+                        source_path = parser.getroot().find("src_path").text.replace("//", "")
+                        if path.startswith(source_path) and \
+                                (path == source_path or path[len(source_path)] == "/"):
+                            depend_pkg_name = pkg_name
+                        else:
+                            for dep_name in os.listdir(os.path.join(prefix, meta_prefix)):
+                                dep_cyberfile = os.path.join(prefix, meta_prefix, dep_name, "cyberfile.xml")
+                                parser = ET.parse(dep_cyberfile) 
+                                source_path = parser.getroot().find("src_path").text.replace("//", "")
+                                if path.startswith(source_path) and \
+                                        (path == source_path or path[len(source_path)] == "/"):
+                                    depend_pkg_name = dep_name 
+                                    break
+                    else:
+                        parser = ET.parse(cyberfile)
+                        depend_pkg_name = parser.getroot().find("name").text
+
+                    if depend_pkg_name is None:
+                        print(f"\033[31m[FATAL]\033[0m unable to calculate the package to which {name} belongs")
+                        print(f"\033[31m[FATAL]\033[0m you may forget to add the depend to which {name} belongs")
+                        return -1
+
+                    target_prefix = "_S".join(path.split("/"))
+                    proto_path_abbr = "".join([i[0] for i in path.split("/")])
+                    proto_suffix = f"_{proto_path_abbr}_bin.so"
+                    if lib_name.startswith("lib_") and lib_name.endswith(proto_suffix):
+                        # proto_library output
+                        lib_mid_name = lib_name[4: len(lib_name)-len(proto_suffix)]
+                        lib_name = f"lib{lib_mid_name}.so"
+                    mid = lib_name[3: len(lib_name)-3]
+                    target_full_name = f"{target_prefix}_C{mid}"
+
+                    # Shorten the target name to prevent bazel from being able to handle it.
+                    # if len(target_full_name) > 100:
+                    #     target_full_name = target_full_name[int(len(target_full_name) / 2):]
+
+                    if depend_pkg_name[0].isdigit():
+                        depend_pkg_name = "{}-{}".format("placeholder", depend_pkg_name)
+                    apollo_deps_list.append(f'"@{depend_pkg_name}//:{target_full_name}"')
+
+                    # i = "/".join(i.split("/")[0: len(i.split("/"))-1])
+                    # link_paths.append('"-L{}"'.format(i))
+                    # link_paths.append('"-Wl,-rpath,{}"'.format(i))
+
+            # link_opts = []
+            # for so_lib in needed_so:
+            #     if so_lib.startswith("lib") and so_lib.endswith(".so"):
+            #         link_opts.append('"-l{}"'.format(so_lib[3: len(so_lib)-3]))
+            # link_opts.sort()
+            # link_paths = list(set(link_paths))
+            # link_paths.sort()
+            # link_opts = link_paths + link_opts
+            # link_opts_str = ",".join(link_opts)
+
+            apollo_deps_list.sort()
+            apollo_deps_str = ",".join(apollo_deps_list)
+
+            target_name = "{}_C{}".format(target_name_prefix, target_name)
+            # if len(target_name) > 100:
+            #    target_name = target_name[int(len(target_name) / 2):]
+
+            package_build_content.append(
+                BUILD_TMP.format(target_name, dst, apollo_deps_str)
+            )
+
+            package_build_content.sort() 
+
+    build_content = EMPTY_BUILD_TMP.format(
+        pkg_name, package_path, package_path)
+
+    import_file = os.path.join(package_index_path,
+                        "{}.BUILD".format(pkg_name))
+    if os.path.exists(import_file):
+        with open(import_file, "r") as f:
+            content = f.read()
+        if not content == "\n".join([build_content] + package_build_content):
+            with open(import_file, "w+") as f:
+                f.write("\n".join([build_content] + package_build_content))
+    else:
+        with open(import_file, "w+") as f:
+            f.write("\n".join([build_content] + package_build_content))
+
+    generate_pack_file(package_index_path)
+
+    return 0
+
+def create_package_meta(prefix):
 
     if list_only:
         return
@@ -515,136 +748,13 @@ def create_package_meta(prefix):
     if len(packages) == 0:
         return
 
-    for package_path in packages:
-        cyberfile_parser = ET.parse(os.path.join(package_path, "cyberfile.xml"))
-        root = cyberfile_parser.getroot()
+    cpu_count = os.cpu_count()
+    p = Pool(cpu_count)
 
-        pkg_name = root.find("name").text
-        package_index_path = os.path.join(prefix, meta_prefix, pkg_name)
-        os.makedirs(package_index_path, exist_ok=True)
-
-        package_install_files = []
-        files_dst = set()
-        for install_file in packages[package_path]:
-            package_install_files.append(install_file)
-            files_dst.add(install_file.split(":")[-1])
-        package_install_files.append(
-            "src_path:{}".format(package_path))
-        if os.path.exists(os.path.join(package_index_path, "meta.txt")):
-            with open(os.path.join(package_index_path, "meta.txt"), "r+") as f:
-                # delete redundant files
-                contents = f.read().split("\n")
-                contents = contents[: len(contents)-1]
-                for i in contents:
-                    file_name = i.split(":")[-1]
-                    file_full_name = os.path.join(prefix, file_name)
-                    if file_name not in files_dst and \
-                            os.path.exists(file_full_name):
-                        os.remove(file_full_name)
-                f.seek(0)
-                f.truncate(0)
-                f.write("\n".join(package_install_files))
-        else:
-            with open(os.path.join(package_index_path, "meta.txt"), "w+") as f:
-                f.write("\n".join(package_install_files))
-
-        so_files = []
-        for i in package_install_files:
-            info = i.split(":")
-            if info[1].startswith("lib") and not info[1].startswith("lib/plugin"):
-                if info[1].split("/")[-1].startswith("lib"):
-                    so_files.append(info[1])
-
-        package_build_content = []
-        if package_path in export_library_dict:
-            package_library_list = export_library_dict[package_path]
-            for lib_info in package_library_list:
-                target_name = lib_info["target"]
-                dst = lib_info["dst"]
-                path_list = dst.split("/")
-                target_name_prefix = "/".join(
-                    path_list[1: len(path_list)-1]).replace("/", "_S")
-
-                ldd_query = "ldd {}".format(os.path.join(prefix, dst))
-                elf_query = "patchelf --print-needed {}".format(os.path.join(prefix, dst))
-
-                ld_result = subprocess.check_output(
-                    ldd_query, shell=True).decode("utf-8").split("\n")
-
-                ld_result_str = "".join(ld_result)
-                if "not found" in ld_result_str:
-                    print("[WARNNING] missing dynamic library in ld, try refreash ld cache")
-                    update_sh = os.path.join(prefix, "update_dylib.sh")
-                    ld_cache = os.path.join(prefix, "ld.cache") 
-                    if os.path.exists(update_sh):
-                        subprocess.check_output(
-                            "rm -f {} && bash {}".format(ld_cache, update_sh), shell=True).decode("utf-8").split("\n")
-                    else:
-                        print("\033[31m[ERROR]\033[0m missing dynamic library when processing {}".format(dst))
-                        exit(-1)    
-
-                shared_obj_dict = {}
-                ld_path = []
-                for i in ld_result:
-                    items = i.split(" ")
-                    library_name = items[0].replace("\t", "")
-                    if library_name.startswith("/"):
-                        system_library_name = library_name.split("/")[-1]
-                        shared_obj_dict[system_library_name] = None
-                    if len(items) < 3:
-                        continue
-                    if library_name in shared_obj_dict:
-                        print("\033[31m[ERROR]\033[0m duplicated apollo_cc_library found: {}".format(
-                            dst), file=sys.stderr)
-                        exit(-1)
-                    shared_obj_dict[library_name] = items[2]
-
-                needed_so = subprocess.check_output(
-                    elf_query, shell=True).decode("utf-8").split("\n")
-                needed_so = list(filter(None, needed_so))
-                for i in needed_so:
-                    if i not in shared_obj_dict:
-                        continue
-                    if i.startswith("lib") and i.endswith(".so"):
-                        ld_path.append(shared_obj_dict[i])
-
-                link_paths = []
-                for i in ld_path:
-                    if i.startswith("/opt/apollo/neo/lib") and not i.startswith("/opt/apollo/neo/lib/3rd-"):
-                        i = "/".join(i.split("/")[0: len(i.split("/"))-1])
-                        link_paths.append('"-L{}"'.format(i))
-                        link_paths.append('"-Wl,-rpath,{}"'.format(i))
-
-                link_opts = []
-                for so_lib in needed_so:
-                    if so_lib.startswith("lib") and so_lib.endswith(".so"):
-                        link_opts.append('"-l{}"'.format(so_lib[3: len(so_lib)-3]))
-                link_opts.sort()
-                link_paths = list(set(link_paths))
-                link_paths.sort()
-                link_opts = link_paths + link_opts
-                link_opts_str = ",".join(link_opts)
-
-                package_build_content.append(
-                    BUILD_TMP.format("{}_C{}".format(target_name_prefix, target_name), dst, link_opts_str)
-                )
-
-        build_content = EMPTY_BUILD_TMP.format(
-            pkg_name, package_path, package_path)
-
-        import_file = os.path.join(package_index_path,
-                            "{}.BUILD".format(pkg_name))
-        if os.path.exists(import_file):
-            with open(import_file, "r") as f:
-                content = f.read()
-            if not content == "\n".join([build_content] + package_build_content):
-                with open(import_file, "w+") as f:
-                    f.write("\n".join([build_content] + package_build_content))
-        else:
-            with open(import_file, "w+") as f:
-                f.write("\n".join([build_content] + package_build_content))
-
-        generate_pack_file(package_index_path)
+    # for package_path in packages:
+    results = p.map(meta_executor, packages)
+    if -1 in results:
+        exit(-1)
 
 
 # TODO(liangjinping): create index at building phase instead of installing phase

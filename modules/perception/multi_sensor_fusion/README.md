@@ -34,15 +34,19 @@ apollo::perception::fusion::MultiSensorFusionComponent
 
 #### Input
 
-| Channel                             | Type                                              | Description                     |
+| Input channel                             | Type                                              | Description                     |
 | ----------------------------------- | ------------------------------------------------- | ------------------------------- |
 | `/perception/inner/PrefusedObjects` | `apollo::perception::onboard::SensorFrameMessage` | frame contains object detection |
 
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/PrefusedObjects`. The detailed input channel information is in `modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag` file. By default, the upstream components of the messages received by the component include `lidar_detection_tracking`, `camera_tracking`, `radar_detection`.
+
 #### Output
 
-| Channel                        | Type                                      | Description                    |
+| Output channel                        | Type                                      | Description                    |
 | ------------------------------ | ----------------------------------------- | ------------------------------ |
 | `/apollo/perception/obstacles` | `apollo::perception::PerceptionObstacles` | detection results after fusion |
+
+>Note: The output channel is proto type data. The detailed output channel information is in `modules/perception/multi_sensor_fusion/conf/multi_sensor_fusion_config.pb.txt` file.
 
 #### How to run
 

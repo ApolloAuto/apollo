@@ -28,7 +28,7 @@ namespace lidar {
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kForegroundDefaultWeight = {
-    0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f};
+    0.7f, 0.2f, 0.3f, 0.1f, 0.2f, 0.f, 0.f};
 // location dist weight, irection dist weight, bbox size dist weight,
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
@@ -47,6 +47,8 @@ bool MlfTrackObjectDistance::Init(
 
   foreground_weight_table_.clear();
   background_weight_table_.clear();
+  euclidean_distance_threshold_ = config.euclidean_distance_threshold();
+  out_gate_match_cost_ = config.out_gate_match_cost();
   for (int i = 0; i < config.foreground_weights_size(); ++i) {
     const auto& fgws = config.foreground_weights(i);
     const std::string& name = fgws.sensor_name_pair();
@@ -112,6 +114,14 @@ float MlfTrackObjectDistance::ComputeDistance(
 
   double time_diff =
       track->age_ ? current_time - track->latest_visible_time_ : 0;
+
+  // gate
+  float euclidean_distance =
+    EuclideanDistance(latest_object, track->predict_.state, object, time_diff);
+  if (euclidean_distance > euclidean_distance_threshold_) {
+    return out_gate_match_cost_;
+  }
+
   if (weights->at(0) > delta) {
     distance +=
         weights->at(0) * LocationDistance(latest_object, track->predict_.state,

@@ -7,10 +7,11 @@ export default function useStyle(areaProps: any) {
             position: 'absolute',
             top: 25,
             left: 24,
+            color: '',
             ...theme.util.flex('column', 'space-around', 'center'),
         },
         'routing-editing-function-area__group': {
-            background: '#343C4D',
+            background: theme.components.layerMenu.menuItemBg,
             borderRadius: 6,
             marginBottom: 10,
         },
@@ -19,17 +20,18 @@ export default function useStyle(areaProps: any) {
             minWidth: 32,
             height: 32,
             minHeight: 32,
-            background: '#343C4D',
+            background: theme.components.layerMenu.menuItemBg,
             borderRadius: 6,
+            color: theme.components.layerMenu.menuItemColor,
             ...theme.util.flexCenterCenter,
             '&:hover': {
                 cursor: 'pointer',
-                background: '#38465A',
+                background: theme.components.layerMenu.menuItemBg,
             },
         },
         'hover-color-change': {
             '&:hover': {
-                color: '#fff',
+                color: theme.components.layerMenu.menuItemHoverColor,
             },
         },
         'routing-editing-functional__item--active': {

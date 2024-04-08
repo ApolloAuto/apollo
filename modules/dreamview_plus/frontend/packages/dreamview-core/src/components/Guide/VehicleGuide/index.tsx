@@ -26,7 +26,7 @@ function tooltip(props: { isLogin: boolean; theme: any; currentIndex: number }) 
             width: '494px',
             padding: '0px',
             borderRadius: '10px',
-            backgroundColor: theme.tokens.colors.background1,
+            backgroundColor: theme.tokens.colors.background2,
         },
         tooltipTitle: {
             ...theme.tokens.typography.title,
@@ -39,7 +39,7 @@ function tooltip(props: { isLogin: boolean; theme: any; currentIndex: number }) 
         },
         tooltipContent: {
             ...theme.tokens.typography.content,
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             padding: '16px 24px 24px 24px',
             textAlign: 'left',
         },
@@ -50,7 +50,7 @@ function tooltip(props: { isLogin: boolean; theme: any; currentIndex: number }) 
             padding: '0px 24px 30px 24px',
         },
         options: {
-            arrowColor: theme.tokens.colors.background1,
+            arrowColor: theme.tokens.colors.background2,
         },
     };
     return tooltipValue;

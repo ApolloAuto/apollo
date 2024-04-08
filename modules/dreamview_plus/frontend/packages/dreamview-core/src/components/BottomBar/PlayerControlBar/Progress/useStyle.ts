@@ -1,8 +1,5 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 
-interface IUseStyle {
-    width: string;
-}
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'progress-container': {
@@ -11,23 +8,21 @@ export default function useStyle() {
             padding: '4px 0',
             cursor: 'pointer',
             '& .progress-background': {
-                backgroundColor: '#343947',
+                backgroundColor: theme.components.bottomBar.progressBgColor,
             },
             '& .progress-inner': {
                 height: '4px',
-                backgroundImage: 'linear-gradient(270deg, #559CFA 1%, #3288FA 100%)',
-                // width: prop.width,
+                ...theme.components.bottomBar.progressColorActiveColor,
             },
             '& .progress-pointer': {
                 position: 'absolute',
                 borderRadius: '12px',
                 width: '12px',
                 height: '12px',
-                backgroundColor: theme.tokens.colors.brand2,
+                backgroundColor: theme.tokens.colors.brand3,
                 border: '2px solid white',
                 boxShadow: '0px 6px 6px 0px rgba(0,75,179,0.5)',
                 top: '0px',
-                // left: `calc(${prop.width} - 6px)`,
                 '&::after': {
                     content: '""',
                     position: 'absolute',

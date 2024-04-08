@@ -203,6 +203,7 @@ DECLARE_int32(min_past_history_points_len);
 
 // Parameter for scenario or task process.
 DECLARE_double(path_bounds_decider_resolution);
+DECLARE_double(path_bounds_horizon);
 DECLARE_double(num_extra_tail_bound_point);
 DECLARE_bool(enable_pull_over_at_destination);
 
@@ -230,3 +231,34 @@ DECLARE_double(near_stop_deceleration);
 
 DECLARE_double(referfece_line_max_forward_heading_diff);
 DECLARE_double(referfece_line_max_backward_heading_diff);
+
+// Nudge decisider
+DECLARE_bool(enable_nudge_decider);
+// park generic
+DECLARE_double(sqp_obstacle_weight);
+DECLARE_bool(enable_obstacle_potential_field);
+
+DECLARE_double(open_space_delta_t);
+
+DECLARE_double(open_space_acc_weight);
+
+DECLARE_double(open_space_jerk_weight);
+
+DECLARE_double(open_space_kappa_weight);
+
+DECLARE_double(open_space_reference_s_weight);
+
+DECLARE_double(open_space_reference_v_weight);
+
+DECLARE_double(open_space_max_forward_v);
+
+DECLARE_double(open_space_max_reverse_v);
+
+DECLARE_double(open_space_max_forward_acc);
+
+DECLARE_double(open_space_max_reverse_acc);
+
+DECLARE_double(open_space_max_jerk);
+
+// Edge follow buffer
+DECLARE_double(edge_follow_buffer);

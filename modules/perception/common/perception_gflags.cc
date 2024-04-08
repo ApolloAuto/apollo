@@ -67,7 +67,7 @@ DEFINE_string(lidar_sensor_name, "velodyne128", "lidar sensor name");
 DEFINE_string(object_template_file, "object_template.pb.txt",
               "object template config file");
 
-DEFINE_int32(hdmap_sample_step, 5, "hdmap sample step");
+DEFINE_int32(hdmap_sample_step, 1, "hdmap sample step");
 
 // lidar_center_point
 DEFINE_bool(use_trt, false, "True if preprocess in CPU mode.");

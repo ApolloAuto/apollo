@@ -1,7 +1,7 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 import { keyframes } from 'tss-react';
 import tinycolor from 'tinycolor2';
-import ImageAmbientLight from '@dreamview/dreamview-core/src/assets/image_ambient_light.png';
+import { useImagePrak } from '@dreamview/dreamview-ui';
 
 export enum DynamicEffectButtonStatus {
     DISABLE = 'DISABLE',
@@ -11,6 +11,7 @@ export enum DynamicEffectButtonStatus {
 }
 
 export function useStyle() {
+    const ImageAmbientLight = useImagePrak('image_ambient_light');
     const hoc = useMakeStyle((theme) => ({
         'btn-container': {
             position: 'relative',
@@ -33,7 +34,7 @@ export function useStyle() {
         },
         'btn-doing': {
             color: '#FFFFFF',
-            backgroundColor: theme.tokens.colors.brand2,
+            backgroundColor: theme.tokens.colors.brand3,
             inset: 0,
             '& span': {
                 position: 'relative',
@@ -59,15 +60,15 @@ export function useStyle() {
         },
         'btn-reactive': {
             '&:hover': {
-                backgroundColor: theme.tokens.colors.brand3,
+                backgroundColor: theme.tokens.colors.brand2,
             },
             '&:active': {
-                backgroundColor: theme.tokens.colors.brand4,
+                backgroundColor: theme.tokens.colors.brand1,
             },
         },
         'btn-start': {
             color: '#FFFFFF',
-            backgroundColor: theme.tokens.colors.brand2,
+            backgroundColor: theme.tokens.colors.brand3,
             '& .anticon': {
                 fontSize: theme.tokens.font.size.large,
             },
@@ -83,11 +84,11 @@ export function useStyle() {
             },
         },
         'btn-disabled': {
-            color: theme.tokens.colors.fontColor4,
+            color: theme.tokens.colors.fontColor1,
             cursor: 'not-allowed',
             background: '#454A54',
             '& .anticon': {
-                color: theme.tokens.colors.fontColor4,
+                color: theme.tokens.colors.fontColor1,
             },
         },
         'btn-ripple': {

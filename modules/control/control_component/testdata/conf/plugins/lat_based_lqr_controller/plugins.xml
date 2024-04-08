@@ -1,0 +1,3 @@
+<library path="modules/control/controllers/lat_based_lqr_controller/liblat_controller.so">
+    <class type="apollo::control::LatController" base_class="apollo::control::ControlTask"></class>
+</library>

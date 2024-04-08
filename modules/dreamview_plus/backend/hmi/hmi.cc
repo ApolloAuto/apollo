@@ -604,20 +604,30 @@ void HMI::RegisterMessageHandlers() {
           return;
         }
         response["data"]["requestId"] = request_id;
-        bool ret;
+        int ret;
         if (hmi_worker_->GetStatus().current_operation() ==
             HMIModeOperation::Waypoint_Follow) {
           ret = hmi_worker_->SaveRtkDataRecorder(new_name);
         } else {
           ret = hmi_worker_->SaveDataRecorder(new_name);
         }
-        if (ret) {
+        if (ret == 1) {
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";
-        } else {
+        } else if (ret == -1) {
           response["data"]["info"]["code"] = -1;
           response["data"]["info"]["message"] =
               "Failed to save record: a file with the same name exists";
+        } else if (ret == -2) {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to save the record: the dreamview recording record does "
+              "not exist, please record through dreamview";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to save record: please try again or check whether your "
+              "record is legal";
         }
         websocket_->SendData(conn, response.dump());
       });
@@ -778,6 +788,10 @@ bool HMI::StartScenarioSimulation() {
 
 bool HMI::StopScenarioSimulation() {
   return hmi_worker_->StopScenarioSimulation();
+}
+
+bool HMI::isProcessRunning(const std::string& process_name) {
+  return hmi_worker_->isProcessRunning(process_name);
 }
 
 }  // namespace dreamview

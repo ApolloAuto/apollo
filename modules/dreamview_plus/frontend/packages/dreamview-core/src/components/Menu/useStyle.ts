@@ -1,10 +1,9 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
 import tinycolor from 'tinycolor2';
-import icAddDesktopShortcut from '@dreamview/dreamview-core/src/assets/ic_add_desktop_shortcut.png';
-import icAddDesktopShortcutHover from '@dreamview/dreamview-core/src/assets/ic_add_desktop_shortcut_hover.png';
-import logo from '@dreamview/dreamview-core/src/assets/dreamview.png';
+import { useImagePrak } from '@dreamview/dreamview-ui';
 
 export default function useStyle() {
+    const [icAddDesktopShortcut, logo] = useImagePrak(['ic_add_desktop_shortcut', 'dreamview']);
     const hoc = useMakeStyle((theme) => ({
         'menu-container': {
             height: '100%',
@@ -12,7 +11,6 @@ export default function useStyle() {
             flexDirection: 'column',
             justifyContent: 'space-between',
             color: theme.tokens.font.color.mainLight,
-            borderRight: `1px solid ${theme.tokens.colors.divider3}`,
         },
         'menu-item': {
             height: 50,
@@ -21,25 +19,25 @@ export default function useStyle() {
             ...theme.util.flexCenterCenter,
             borderLeft: `${theme.tokens.divider.width.large}px solid ${theme.tokens.colors.transparent}`,
             '&:hover': {
-                color: theme.tokens.colors.brand2,
+                color: theme.tokens.colors.brand3,
             },
             '&:hover .add-desktop-hover': {
-                backgroundColor: tinycolor(theme.tokens.colors.brand2).setAlpha(0.2).toRgbString(),
+                backgroundColor: tinycolor(theme.tokens.colors.brand3).setAlpha(0.2).toRgbString(),
                 borderColor: '#559CFA',
             },
         },
         active: {
-            color: theme.tokens.colors.brand2,
-            backgroundColor: tinycolor(theme.tokens.colors.brand2).setAlpha(0.15).toRgbString(),
-            borderLeft: `${theme.tokens.divider.width.large}px solid ${theme.tokens.colors.brand2}`,
+            color: theme.tokens.colors.brand3,
+            backgroundColor: tinycolor(theme.tokens.colors.brand3).setAlpha(0.15).toRgbString(),
+            borderLeft: `${theme.tokens.divider.width.large}px solid ${theme.tokens.colors.brand3}`,
             '&:hover': {
-                color: theme.tokens.colors.brand2,
+                color: theme.tokens.colors.brand3,
             },
         },
         logo: {
             height: 56,
             background: `url(${logo})`,
-            backgroundSize: '90%',
+            backgroundSize: '34px',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
         },
@@ -56,6 +54,21 @@ export default function useStyle() {
             ...theme.tokens.typography.content,
             color: theme.tokens.font.color.white,
         },
+        'theme-btn': {
+            width: '20px',
+            height: '20px',
+            borderRadius: '20px',
+            fontSize: '20px',
+        },
+        'change-theme': {
+            color: theme.components.menu.themeBtnColor,
+            '&:hover': {
+                color: theme.components.menu.themeHoverColor,
+            },
+            '& svg': {
+                display: 'block',
+            },
+        },
         'menu-item-image': {
             svg: {
                 width: '24px',
@@ -70,23 +83,12 @@ export default function useStyle() {
             backgroundRepeat: 'no-repeat',
         },
         popover: {
-            '& .dreamview-popover-inner': {
-                padding: `${theme.tokens.padding.speace2} ${theme.tokens.padding.speace3} 4px !important`,
+            '& .dreamview-operate-popover-inner-content': {
+                padding: '0 12px',
+                marginBottom: '-20px',
             },
-            '& .dreamview-popover-content': {
+            '& .dreamview-operate-popover-content': {
                 width: '268px',
-            },
-        },
-        popoverBg: {
-            '& .dreamview-popover-content .dreamview-popover-inner': {
-                padding: '5px 10px',
-                background: 'rgba(61,67,78,0.80)',
-            },
-            '& .dreamview-popover-arrow::before': {
-                background: 'rgba(61,67,78,0.80)',
-            },
-            '& .dreamview-popover-arrow::after': {
-                display: 'none',
             },
         },
     }));

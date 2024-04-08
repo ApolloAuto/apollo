@@ -4,6 +4,10 @@ import { usePickHmiStore, CURRENT_MODE } from '@dreamview/dreamview-core/src/sto
 import { flushSync } from 'react-dom';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useLocalStorageState, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
+import useComponentDisplay from '@dreamview/dreamview-core/src/hooks/useComponentDisplay';
+import { useMenuStore } from '@dreamview/dreamview-core/src/store/MenuStore';
+import { useAppInitContext } from '@dreamview/dreamview-core/src/store/AppInitStore';
+import { ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore/actionTypes';
 import Menu from '../Menu';
 import PanelLayout from '../PanelLayout';
 import MenuDrawer from '../MenuDrawer';
@@ -12,12 +16,21 @@ import PerceptionGuide from '../Guide/PerceptionGuide';
 import WelcomeGuide from '../WelcomeGuide';
 import DefaultGuide from '../Guide/DefaultGuide';
 import PNCGuide from '../Guide/PNCGuide';
-import useComponentDisplay from '../../hooks/useComponentDisplay';
 import VehicleGuide from '../Guide/VehicleGuide';
 import BottomBar from '../BottomBar';
+import PageLoading from './PageLoading';
+import { IfComponents } from '../panels/Charts/Div';
+
+const IfPageLoading = IfComponents(PageLoading);
 
 function PageLayout() {
+    const { hasInit } = useAppInitContext();
+
     const [hmi] = usePickHmiStore();
+
+    const [{ activeMenu }] = useMenuStore();
+
+    const hidepanel = activeMenu === ENUM_MENU_KEY.PROFILE_MANAGEER;
 
     const { isMainConnected } = useWebSocketServices();
 
@@ -61,9 +74,9 @@ function PageLayout() {
         },
         [isMainConnected],
     );
-
     return (
         <div className={c['dv-root']}>
+            <IfPageLoading rif={!hasInit} />
             {!localFirstUseGuideMode && (
                 <WelcomeGuide
                     clickEnterThisModeToGuide={clickEnterThisModeToGuide}
@@ -86,7 +99,10 @@ function PageLayout() {
                     <div className={c['dv-layout-content']}>
                         <div className={c['dv-layout-window']}>
                             <MenuDrawer />
-                            <div className={cx(c['dv-layout-panellayout'])}>
+                            <div
+                                style={{ display: hidepanel ? 'none' : 'block' }}
+                                className={cx(c['dv-layout-panellayout'])}
+                            >
                                 <div id='perception-guide-perceived-effects' className={css(perceptionGuideLastStep)} />
                                 <PanelLayout />
                             </div>

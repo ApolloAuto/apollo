@@ -218,13 +218,18 @@ bool PlanningComponent::Proc(
   if (nullptr != local_view_.planning_command) {
     command_status.set_command_id(local_view_.planning_command->command_id());
   }
+
+  ADCTrajectory::TrajectoryType current_trajectory_type =
+      adc_trajectory_pb.trajectory_type();
   if (adc_trajectory_pb.header().status().error_code() !=
       common::ErrorCode::OK) {
     command_status.set_status(external_command::CommandStatusType::ERROR);
     command_status.set_message(adc_trajectory_pb.header().status().msg());
-  } else if (planning_base_->IsPlanningFinished()) {
+  } else if (planning_base_->IsPlanningFinished(current_trajectory_type)) {
+    AINFO << "Set the external_command: FINISHED";
     command_status.set_status(external_command::CommandStatusType::FINISHED);
   } else {
+    AINFO << "Set the external_command: RUNNING";
     command_status.set_status(external_command::CommandStatusType::RUNNING);
   }
   command_status_writer_->Write(command_status);

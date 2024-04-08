@@ -36,7 +36,7 @@ apollo::perception::MsgAdapterComponent
 
 #### Input
 
-| Channel                                 | Type                                              | Description                         |
+| Input channel                                 | Type                                              | Description                         |
 | --------------------------------------- | ------------------------------------------------- | ----------------------------------- |
 | `/perception/inner/location_refinement` | `apollo::perception::onboard::CameraFrame`        | camera detection message            |
 | `/perception/lidar/detection`           | `apollo::perception::onboard::LidarFrameMessage`  | lidar detection message             |
@@ -47,7 +47,7 @@ channels are to be enabled, it is best to modify the output channel at the same 
 
 #### Output
 
-| Channel                        | Type                                      | Description        |
+| Out channel                        | Type                                      | Description        |
 | ------------------------------ | ----------------------------------------- | ------------------ |
 | `/apollo/perception/obstacles` | `apollo::perception::PerceptionObstacles` | obstacles detected |
 

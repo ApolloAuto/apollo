@@ -27,6 +27,7 @@
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/planning_base/common/reference_line_info.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 
@@ -54,6 +55,12 @@ bool CheckInsideJunction(const ReferenceLineInfo& reference_line_info);
 
 void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files);
+
+double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
+                                   double s);
+
+double CalculateEquivalentEgoWidth(
+    const apollo::hdmap::LaneInfoConstPtr lane_info, double s);
 
 }  // namespace util
 }  // namespace planning

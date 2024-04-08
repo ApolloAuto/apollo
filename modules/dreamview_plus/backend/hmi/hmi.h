@@ -59,6 +59,7 @@ class HMI : public UpdaterBase {
   bool StartScenarioSimulation();
   bool StopScenarioSimulation();
   nlohmann::json GetCurrentScenarioExtremPoint();
+  bool isProcessRunning(const std::string &process_name);
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.

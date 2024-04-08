@@ -38,6 +38,15 @@ readdir() {
 
 function main {
   pushd ${TOP_DIR} 
+  
+  if [[ -z `which buildozer` ]]; then
+    arch=`uname -m`
+    url="https://apollo-system.cdn.bcebos.com/archive/9.0/buildozer-linux-"
+    [[ $arch -eq "x86_64" ]] && url="${url}amd64"
+    [[ $arch -eq "aarch64" ]] && url="${url}arm64" 
+    wget ${url} -O ~/buildozer && sudo chmod 777 ~/buildozer
+    sudo ln -snf ~/buildozer /usr/bin/buildozer
+  fi
   readdir ${TOP_DIR}
   for subpackage in ${BAZEL_PACKAGE[*]}; do
     cc_library_ret=`buildozer 'print name' "${subpackage}":%cc_library`

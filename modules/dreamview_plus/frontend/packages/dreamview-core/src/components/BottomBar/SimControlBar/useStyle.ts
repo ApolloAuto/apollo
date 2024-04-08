@@ -21,7 +21,7 @@ export default function useStyle() {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: `0 ${theme.tokens.padding.speace3}`,
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
             '& .ic-play-container': {
                 height: '40px',
                 display: 'flex',
@@ -30,7 +30,7 @@ export default function useStyle() {
             },
             '& .anticon': {
                 fontSize: theme.tokens.font.size.large,
-                color: theme.tokens.colors.fontColor2,
+                color: theme.tokens.colors.fontColor5,
             },
             '& .record-start-record-btn': {
                 cursor: 'pointer',
@@ -106,7 +106,7 @@ export default function useStyle() {
                 background: 'rgba(31,204,77,0.25)',
             },
             '& .dreamview-popover-content .dreamview-popover-inner .dreamview-popover-inner-content': {
-                color: theme.tokens.colors.success,
+                color: theme.tokens.colors.success2,
             },
         },
         'operate-failed': {

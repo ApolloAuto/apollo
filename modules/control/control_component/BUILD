@@ -59,7 +59,7 @@ apollo_cc_test(
     data = ["//modules/control/control_component:test_data"],
     linkstatic = True,
     deps = [
-        ":control_component_lib",
+        ":DO_NOT_IMPORT_control_component",
         "@com_google_googletest//:gtest_main",
     ],
 )

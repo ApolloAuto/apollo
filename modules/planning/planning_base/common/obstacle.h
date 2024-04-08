@@ -37,6 +37,7 @@
 #include "modules/planning/planning_base/common/indexed_list.h"
 #include "modules/planning/planning_base/common/speed/st_boundary.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
+#include "modules/planning/planning_base/common/util/print_debug_info.h"
 
 namespace apollo {
 namespace planning {
@@ -139,6 +140,8 @@ class Obstacle {
   const ObjectDecisionType& LongitudinalDecision() const;
 
   std::string DebugString() const;
+
+  void PrintPolygonCurve() const;
 
   const SLBoundary& PerceptionSLBoundary() const;
 

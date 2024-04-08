@@ -55,7 +55,7 @@ apollo_component(
     name = "libpointcloud_ground_detection_component.so",
     srcs = ["pointcloud_ground_detection_component.cc"],
     hdrs = ["pointcloud_ground_detection_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     linkopts = ["-lleveldb"],
     deps = [
         "//cyber",

@@ -7,6 +7,7 @@ import os
 import pathlib
 import subprocess
 import jinja2
+import yaml
 from urllib.parse import quote
 from urllib.parse import unquote
 from xml.etree import ElementTree as ET
@@ -115,6 +116,7 @@ class Package():
         """
         self.path = path
         self.cyberfile = ET.parse(os.path.join(path, 'cyberfile.xml'))
+        self.category = ''
 
     @property
     def name(self):
@@ -522,7 +524,7 @@ def generate_treeview_html3():
             )
             upper_dir = name.split('/')[-2]
             if upper_dir == '核心模块':
-                for line in generate_treeview_modules_html():
+                for line in generate_treeview_modules_html_old():
                     output.append(line)
         last_level = level
 
@@ -538,8 +540,174 @@ def generate_treeview_html3():
     return output
 
 
-def generate_treeview_modules_html():
+class PageItem():
+    """PageItem"""
+
+    def __init__(self, **attrs):
+        """__init__
+
+        Args:
+            title (str): title
+
+        Returns:
+            None
+
+        """
+        self.title = attrs.get('title', '')
+        self.intro = attrs.get('intro', '')
+        self.type = attrs.get('type', '')
+        self.prefix = attrs.get('prefix', '')
+        self._url = attrs.get('url', '')
+        self.pages = []
+        if 'pages' in attrs:
+            for page in attrs['pages']:
+                if type(page) in (str, bytes):
+                    self.pages.append(
+                        PageItem(prefix=pathlib.Path(self.prefix).joinpath(
+                            self.title).as_posix(),
+                                 title=page))
+                else:
+                    self.pages.append(
+                        PageItem(prefix=pathlib.Path(self.prefix).joinpath(
+                            self.title).as_posix(),
+                                 **page))
+
+        if 'path' in attrs:
+            self.path = pathlib.Path(attrs['path'])
+
+    @property
+    def url(self):
+        """url
+        """
+        if self._url:
+            return self._url
+        if hasattr(self, 'path'):
+            encoded_path = doxylink_encode_unescape(self.path.as_posix())
+            return f'@ref md_{encoded_path}'
+        elif pathlib.Path(self.prefix).joinpath(f'{self.title}.md').exists():
+            encoded_path = doxylink_encode_unescape(
+                pathlib.Path(
+                    self.prefix).joinpath(f'{self.title}.md').as_posix())
+            return f'@ref md_{encoded_path}'
+        elif len(self.pages) > 0:
+            # dir, no url
+            return '[none]'
+        elif pathlib.Path(self.prefix).joinpath(self.title).is_dir():
+            return '[none]'
+        return '[none]'
+
+    def html(self, level=0):
+        """html
+        """
+        indent = '  ' * level
+        if self.type == 'apollomodules':
+            return '\n'.join([(f'{indent}<tab type="usergroup" visible="yes"'
+                               f' title="{self.title}"'
+                               f' intro="{self.intro}"'
+                               f' url="{self.url}">'),
+                              *[page.html(level + 1) for page in self.pages],
+                              *generate_treeview_modules_html(level + 1),
+                              f'{indent}</tab>'])
+        if self.type == 'apollopackages':
+            return '\n'.join([(f'{indent}<tab type="usergroup" visible="yes"'
+                               f' title="{self.title}"'
+                               f' intro="{self.intro}"'
+                               f' url="{self.url}">'),
+                              *[page.html(level + 1) for page in self.pages],
+                              *generate_treeview_packages_html(level + 1),
+                              f'{indent}</tab>'])
+        if len(self.pages) > 0:
+            return '\n'.join([(f'{indent}<tab type="usergroup" visible="yes"'
+                               f' title="{self.title}"'
+                               f' intro="{self.intro}"'
+                               f' url="{self.url}">'),
+                              *[page.html(level + 1) for page in self.pages],
+                              f'{indent}</tab>'])
+        return (f'{indent}<tab type="user" visible="yes"'
+                f' title="{self.title}"'
+                f' intro="{self.intro}"'
+                f' url="{self.url}" />')
+
+
+def generate_treeview_html4():
+    """generate_treeview_html4
+    """
+    with open('./docs/pages_structure.yaml', 'r') as fin:
+        structure = yaml.safe_load(fin)
+
+    output = []
+
+    for page in structure.get('pages', []):
+        if type(page) in (str, bytes):
+            # if page is a string, use it as title
+            item = PageItem(prefix='docs', title=page)
+            output.append(item.html(2))
+            continue
+        item = PageItem(prefix='docs', **page)
+        output.append(item.html(2))
+
+    # print('\n'.join(output))
+    with open('./docs/DoxygenLayout.xml.tpl', 'r') as fin:
+        template = jinja2.Template(fin.read())
+        print(template.render(docs_structure_html='\n'.join(output)))
+    return output
+
+
+def generate_treeview_packages_html(level=0):
+    """generate_treeview_packages_html
+    """
+    output = []
+    pkg_map = {}
+
+    categories = CATEGORIES
+    for repo, category, path in categories:
+        for pkg in find_packages(path):
+            pkg.category = category
+            if pkg.readme_path.exists():
+                pkg_map.setdefault(category, []).append(pkg)
+
+    indent = '  ' * level
+    for category, pkgs in pkg_map.items():
+        output.append(f'{indent}<tab type="usergroup" visible="yes"'
+                      f' title="{category}" intro="" url="[none]">')
+        sub_indent = '  ' * (level + 1)
+        for pkg in pkgs:
+            output.append(f'{sub_indent}<tab type="user" visible="yes"'
+                          f' title="{pkg.name}"'
+                          f' intro="" url="{pkg.readme_md_doxylink_ref()}" />')
+        output.append(f'{indent}</tab>')
+
+    return output
+
+
+def generate_treeview_modules_html(level=0):
     """generate_treeview_modules_html
+    """
+    output = []
+
+    modules = (
+        'collection/planning',
+        'collection/control',
+        'collection/canbus',
+        'collection/perception',
+        'collection/prediction',
+        'collection/localization',
+    )
+
+    indent = '  ' * level
+    for module_path in modules:
+        module = module_path.split('/')[-1]
+        module_pkg = Package(f'{module_path}')
+        output.append(f'{indent}<tab type="user" visible="yes"'
+                      f' title="{module}"'
+                      r' intro=""'
+                      f' url="{module_pkg.readme_md_doxylink_ref()}" />')
+
+    return output
+
+
+def generate_treeview_modules_html_old():
+    """generate_treeview_modules_html_old
     """
     output = []
     pkg_map = {}

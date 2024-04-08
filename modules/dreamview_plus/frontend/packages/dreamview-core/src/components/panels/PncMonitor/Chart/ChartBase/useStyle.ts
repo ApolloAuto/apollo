@@ -3,18 +3,19 @@ import { useMakeStyle } from '@dreamview/dreamview-theme';
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'moniter-item-container': {
-            backgroundColor: '#282D38',
-            color: theme.tokens.colors.fontColor2,
+            backgroundColor: theme.components.pncMonitor.chartBgColor,
+            color: theme.tokens.colors.fontColor5,
             borderRadius: '6px',
         },
         'moniter-item-title': {
             ...theme.tokens.typography.sideText,
             lineHeight: '32px',
             textAlign: 'center',
-            background: '#343C4D',
             borderRadius: '6px 6px 0px 0px',
             marginBottom: theme.tokens.margin.speace2,
             position: 'relative',
+            backgroundColor: theme.components.pncMonitor.chartTitleBgColor,
+            borderBottom: theme.components.pncMonitor.titleBorder,
         },
         'moniter-item-title-extra': {
             position: 'absolute',

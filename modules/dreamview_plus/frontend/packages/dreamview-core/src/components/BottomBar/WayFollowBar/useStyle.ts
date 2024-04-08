@@ -21,7 +21,7 @@ export default function useStyle() {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: `0 ${theme.tokens.padding.speace3}`,
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
             '& .ic-play-container': {
                 // width: '72px',
                 height: '40px',

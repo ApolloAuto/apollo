@@ -12,11 +12,14 @@ export default class Junction {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
         this.scene = scene;
         this.coordinates = coordinates;
         this.meshs = {};
         this.currentJunctionIds = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     drawJunctions(junctions) {
@@ -36,7 +39,7 @@ export default class Junction {
             }
             const points = this.coordinates.applyOffsetToArray(junction.polygon.point);
             const junctionMesh = drawPolygon(points, {
-                color: colorMapping.BLUE,
+                color: this.colors.BLUE,
                 linewidth: 1,
                 zOffset: zOffset.junction,
                 opacity: 1,

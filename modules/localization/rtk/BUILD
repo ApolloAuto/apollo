@@ -42,7 +42,7 @@ apollo_cc_test(
     deps = [
         "//cyber",
         "//modules/common/util:common_util",
-        "//modules/localization/rtk:rtk_localization_component_lib",
+        "//modules/localization/rtk:DO_NOT_IMPORT_rtk_localization_component",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -51,7 +51,7 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
 
   for (double curr_s = init_sl_state.first[0];
        curr_s < std::fmin(init_sl_state.first[0] +
-                              std::fmax(kPathBoundsDeciderHorizon,
+                              std::fmax(FLAGS_path_bounds_horizon,
                                         reference_line_info.GetCruiseSpeed() *
                                             FLAGS_trajectory_time_length),
                           reference_line.Length() - ego_front_to_center);
@@ -199,7 +199,8 @@ bool CompareRightBound(const std::pair<std::string, double>& lhs,
 bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
     const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
     PathBoundary* const path_boundaries,
-    std::string* const blocking_obstacle_id) {
+    std::string* const blocking_obstacle_id,
+    double* const narrowest_width) {
   // Preprocessing.
   auto indexed_obstacles = reference_line_info.path_decision().obstacles();
   auto sorted_obstacles =
@@ -521,8 +522,8 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
 }
 
 bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
-    const SLState& init_sl_state, const double extend_buffer,
-    PathBoundary* const path_bound) {
+    const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
+    const double extend_buffer, PathBoundary* const path_bound) {
   double adc_l_to_lane_center = init_sl_state.second[0];
   static constexpr double kMaxLateralAccelerations = 1.5;
 
@@ -538,14 +539,26 @@ bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
       std::fmin(adc_l_to_lane_center, adc_l_to_lane_center + ADC_speed_buffer) -
       adc_half_width - extend_buffer;
 
+  static constexpr double kEpsilon = 0.05;
   for (size_t i = 0; i < path_bound->size(); ++i) {
+    double road_left_width = std::fabs(left_bound_adc) + kEpsilon;
+    double road_right_width = std::fabs(right_bound_adc) + kEpsilon;
+    reference_line_info.reference_line().GetRoadWidth(
+        (*path_bound)[i].s, &road_left_width, &road_right_width);
+    double left_bound_road = road_left_width - adc_half_width;
+    double right_bound_road = -road_right_width + adc_half_width;
+
     if (left_bound_adc > (*path_bound)[i].l_upper.l) {
-      (*path_bound)[i].l_upper.l = left_bound_adc;
+      (*path_bound)[i].l_upper.l =
+          std::max(std::min(left_bound_adc, left_bound_road),
+                   (*path_bound)[i].l_upper.l);
       (*path_bound)[i].l_upper.type = BoundType::ADC;
       (*path_bound)[i].l_upper.id = "adc";
     }
     if (right_bound_adc < (*path_bound)[i].l_lower.l) {
-      (*path_bound)[i].l_lower.l = right_bound_adc;
+      (*path_bound)[i].l_lower.l =
+          std::min(std::max(right_bound_adc, right_bound_road),
+                   (*path_bound)[i].l_lower.l);
       (*path_bound)[i].l_lower.type = BoundType::ADC;
       (*path_bound)[i].l_lower.id = "adc";
     }

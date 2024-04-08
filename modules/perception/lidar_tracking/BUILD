@@ -39,6 +39,9 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_distance.cc",
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.cc",
         "tracker/multi_lidar_fusion/mlf_tracker.cc",
+        "tracker/multi_lidar_fusion/mlf_type_filter.cc",
+        "tracker/type_fusion/ccrf_type_fusion.cc",
+        "tracker/type_fusion/util.cc"
     ],
     hdrs = [
         "classifier/fused_classifier/ccrf_type_fusion.h",
@@ -65,6 +68,10 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_distance.h",
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.h",
         "tracker/multi_lidar_fusion/mlf_tracker.h",
+        "tracker/multi_lidar_fusion/mlf_type_filter.h",
+        "tracker/type_fusion/ccrf_type_fusion.h",
+        "tracker/type_fusion/type_fusion_interface.h",
+        "tracker/type_fusion/util.h"
     ],
     deps = [
         "//cyber",
@@ -82,6 +89,7 @@ apollo_cc_library(
         "//modules/perception/lidar_tracking/classifier/fused_classifier/proto:fused_classifier_config_cc_proto",
         "//modules/perception/lidar_tracking/proto:lidar_tracking_component_config_cc_proto",
         "//modules/perception/lidar_tracking/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
+        "//modules/perception/lidar_tracking/tracker/type_fusion/proto:ccrf_type_filter_config_cc_proto",
         "@com_google_googletest//:gtest_main",
         "@eigen",
     ],
@@ -91,7 +99,7 @@ apollo_component(
     name = "liblidar_tracking_component.so",
     srcs = ["lidar_tracking_component.cc"],
     hdrs = ["lidar_tracking_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     linkopts = ["-lleveldb"],
     deps = [
         "//cyber",

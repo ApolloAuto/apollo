@@ -10,9 +10,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { Spin } from '@dreamview/dreamview-ui';
+import { Spin, useImagePrak } from '@dreamview/dreamview-ui';
 import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
-import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import ErrorBoundary from '@dreamview/dreamview-core/src/components/ErrorBoundery';
 import { MosaicPath, MosaicWindow, MosaicWindowContext } from 'react-mosaic-component';
 import { CustomizeEvent, useEventHandlersContext } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
@@ -24,11 +23,9 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { refreshPanel, usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { usePanelInfoStore } from '@dreamview/dreamview-core/src/store/PanelInfoStore';
-import errorImg from '@dreamview/dreamview-core/src/assets/ic_fail_to_load.png';
 import useStyle from './style';
 import RenderToolbar from '../RenderToolbar';
 import { FullScreen } from '../FullScreen';
-import { SubscribeInfo } from '../../type/RenderToolBar';
 
 import './index.less';
 import { usePickHmiStore } from '../../../../store/HmiStore';
@@ -41,10 +38,7 @@ export interface RenderTileProps {
 
 interface ChildProps {
     path: MosaicPath;
-    panel: IPanelMetaInfo;
     panelId: string;
-    inFullScreen: boolean;
-    updateChannel: (newChannel: SubscribeInfo) => void;
 }
 
 function Child(props: PropsWithChildren<ChildProps>) {
@@ -91,6 +85,7 @@ function Child(props: PropsWithChildren<ChildProps>) {
         dispatch(refreshPanel({ mode: hmi.currentMode, path }));
     };
 
+    const errorImg = useImagePrak('ic_fail_to_load');
     const errorComponent = (
         <div className={classes['panel-error']}>
             <div>
@@ -121,6 +116,8 @@ function Child(props: PropsWithChildren<ChildProps>) {
         </div>
     );
 }
+
+const ChildMemo = React.memo(Child);
 
 function RenderTile(props: RenderTileProps) {
     const { panelId, path } = props;
@@ -228,15 +225,22 @@ function RenderTile(props: RenderTileProps) {
     if (!PanelComponent) {
         return (
             <MosaicWindow<string> path={path} title='unknown'>
-                <RenderToolbar
+                <PanelTileProvider
                     path={path}
-                    panel={panel}
-                    panelId={panelId}
-                    inFullScreen={inFullScreen}
-                    updateChannel={updateChannel}
-                />
-                unknown component type：
-                {panelId}
+                    enterFullScreen={enterFullScreen}
+                    exitFullScreen={exitFullScreen}
+                    fullScreenFnObj={fullScreenFnRef.current}
+                >
+                    <RenderToolbar
+                        path={path}
+                        panel={panel}
+                        panelId={panelId}
+                        inFullScreen={inFullScreen}
+                        updateChannel={updateChannel}
+                    />
+                    unknown component type：
+                    {panelId}
+                </PanelTileProvider>
             </MosaicWindow>
         );
     }
@@ -252,16 +256,10 @@ function RenderTile(props: RenderTileProps) {
                             exitFullScreen={exitFullScreen}
                             fullScreenFnObj={fullScreenFnRef.current}
                         >
-                            <Child
-                                path={path}
-                                panel={panel}
-                                panelId={panelId}
-                                inFullScreen={inFullScreen}
-                                updateChannel={updateChannel}
-                            >
+                            <ChildMemo path={path} panelId={panelId}>
                                 <PanelComponent panelId={panelId} />
                                 {toolBar}
-                            </Child>
+                            </ChildMemo>
                         </PanelTileProvider>
                     </React.Suspense>
                 </ErrorBoundary>

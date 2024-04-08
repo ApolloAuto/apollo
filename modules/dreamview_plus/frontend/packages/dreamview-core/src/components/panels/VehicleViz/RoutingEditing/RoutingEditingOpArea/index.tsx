@@ -74,22 +74,12 @@ export function RoutingEditingOpArea() {
         <div className={cx(routingDisable && classes['routing-editing-disable'], classes['routing-editing-op-area'])}>
             {routingDisable ? (
                 <>
-                    <Popover
-                        content={popoverText?.popoverDisableText}
-                        trigger='hover'
-                        placement='top'
-                        rootClassName={classes['routing-editing-btn-popover']}
-                    >
+                    <Popover content={popoverText?.popoverDisableText} trigger='hover' placement='top'>
                         <>
                             <RoutingEditingBtn onClick={editRouting} />
                         </>
                     </Popover>
-                    <Popover
-                        content={popoverText?.popoverDisableText}
-                        trigger='hover'
-                        placement='top'
-                        rootClassName={classes['routing-editing-btn-popover']}
-                    >
+                    <Popover content={popoverText?.popoverDisableText} trigger='hover' placement='top'>
                         <>
                             <CommonRoutingEditingBtn />
                         </>
@@ -104,7 +94,6 @@ export function RoutingEditingOpArea() {
                         placement='top'
                         open={commonRoutingHovered}
                         onOpenChange={handleHoverChange}
-                        rootClassName={classes['routing-editing-btn-popover']}
                     >
                         <Popover
                             content={functionalFavoriteNotFullScreen}

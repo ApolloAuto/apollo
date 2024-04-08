@@ -30,16 +30,20 @@ apollo::perception::onboard::TrafficLightsPerceptionComponent
 
 #### Input
 
-| Name     | Type                                  | Description         |
-| -------- | ------------------------------------- | ------------------- |
-| `msg`    | `apollo::drivers::Image`              | camera sensor image |
-| `hd-map` | `apollo::perception::map::HDMapInput` | HD map              |
+| Name     | Type                                  | Description         | Input channal |
+| -------- | ------------------------------------- | ------------------- | ------------- |
+| `msg`    | `apollo::drivers::Image`              | camera sensor image | /apollo/sensor/camera/front_6mm/image <br/> /apollo/sensor/camera/front_6mm/image |
+| `hd-map` | `apollo::perception::map::HDMapInput` | HD map              | - |
+
+>Note: Image data from driver. The default trigger channel include `/apollo/sensor/camera/front_6mm/image` and `/apollo/sensor/camera/front_12mm/image`. The detailed input channel information is in `modules/perception/traffic_light_region_proposal/conf/traffic_light_region_proposal_config.pb.txt` file.
 
 #### Output
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Output channal |
+| ------- | --------------------------------------------------- | -------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Detection |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/traffic_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process.
 
 #### How to Launch
 

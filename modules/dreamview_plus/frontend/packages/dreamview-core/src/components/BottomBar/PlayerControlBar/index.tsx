@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import Logger from '@dreamview/log';
-import { IconIcPlay, IconIcStopPlaying, IconIcSissue } from '@dreamview/dreamview-ui';
+import { Popover, IconIcPlay, IconIcStopPlaying, IconIcSissue } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { BusinessEventTypes, BusinessEventInfo } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
@@ -29,7 +28,6 @@ function PlayerControlBar(props: PlayerControlBarProps) {
     const { isMainConnected, mainApi } = useWebSocketServices();
     const { t } = useTranslation('bottomBar');
     const [hmi] = useHmiStore();
-
     const routingManager = useSendRouting(props.routingInfo, false);
 
     const recordInfo = useMemo(

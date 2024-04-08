@@ -136,8 +136,10 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if int(items[2]) > STANDARD_CAN_ID:
                     protocol_id = gen_can_id_extended(protocol_id)
                 for var in protocols[protocol_id]["vars"]:
+                    # print("var is", var)
                     if var["name"] == items[3]:
                         var["description"] = items[4][:-1]
+                        # print("var description is ", var["description"])
                         if "enable" in var["description"]:
                             var["signal_type"] = "enable"
                         if "command" in var["description"]:
@@ -145,7 +147,6 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                         if "speed" in var["description"]:
                             var["signal_type"] = "speed"
                         # extract_description_info(items)
-
 
             if len(items) > 2 and items[0] == "VAL_":
                 protocol_id = "%x" % int(items[1])

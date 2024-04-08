@@ -60,7 +60,7 @@ RUN mkdir -p /opt/apollo/neo/data/log && chmod -R 777 /opt/apollo/neo
 
 COPY rcfiles/setup.sh /opt/apollo/neo/   
 
-RUN echo "source /opt/apollo/neo/setup.sh" >> /etc/skel/.bashrc
+RUN echo "[[ -e /opt/apollo/neo/setup.sh ]] && source /opt/apollo/neo/setup.sh" >> /etc/skel/.bashrc
 
 RUN wget "https://apollo-system.cdn.bcebos.com/patch/libc-bin_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb" \
     && wget "https://apollo-system.cdn.bcebos.com/patch/libc-dev-bin_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb" \
@@ -70,3 +70,8 @@ RUN wget "https://apollo-system.cdn.bcebos.com/patch/libc-bin_2.31-0ubuntu9.9.ub
     && rm -f libc-bin_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb libc-dev-bin_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb libc6-dev_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb libc6_2.31-0ubuntu9.9.ubuntu.focal.custom_arm64.deb 
 
 RUN sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
+
+RUN RUN wget https://apollo-system.cdn.bcebos.com/archive/9.0/dep_install_aarch64.tar.gz && \
+	tar -xzvf dep_install_aarch64.tar.gz && mv dep_install_aarch64/lib/lib* /usr/local/lib/ && \
+	mv dep_install_aarch64/include/* /usr/local/include/ && rm -rf dep_install_aarch64*
+RUN bash /opt/apollo/installers/install_rsdriver.sh

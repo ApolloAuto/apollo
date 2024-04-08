@@ -92,9 +92,16 @@ class MlfMotionRefiner {
       const TrackedObjectConstPtr& new_object,
       double reasonable_angle_change_maximum) const;
 
+  bool CalculateVelocityAngleChange(
+        const TrackedObjectConstPtr& latest_object,
+        const TrackedObjectConstPtr& new_object,
+        double* vel_change_angle,
+        double* velocity_heading_angle) const;
+
  protected:
   double claping_acceleration_threshold_ = 10;
   double claping_speed_threshold_ = 1.0;
+  double cyc_refine_speed_ = 1.2;
   const double EPSION_TIME = 1e-3;
 };  // class MlfMotionRefiner
 

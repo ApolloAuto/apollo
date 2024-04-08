@@ -1,4 +1,3 @@
-import React from 'react';
 import { Story, StoryContext } from '@storybook/react';
 import { GlobalStyles, CSSInterpolation } from 'tss-react';
 import { Provider as ThemeProvider } from '@dreamview/dreamview-theme';

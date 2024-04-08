@@ -91,6 +91,7 @@ apollo_plugin(
     name = "libspeed_bounds_decider.so",
     srcs = ["speed_bounds_decider.cc"],
     hdrs = ["speed_bounds_decider.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         ":st_boundary_mapper",

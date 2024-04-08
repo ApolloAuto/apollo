@@ -80,6 +80,11 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
   size_t NumOfPoints() const;
 
   virtual void Clear();
+  bool IsReversed() const { return is_reversed_; }
+  void SetIsReversed(const bool flag) { is_reversed_ = flag; }
+
+ private:
+  bool is_reversed_ = false;
 };
 
 inline size_t DiscretizedTrajectory::NumOfPoints() const { return size(); }

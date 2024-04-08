@@ -740,14 +740,14 @@ bool LonController::IsStopByDestination(SimpleLongitudinalDebug *debug) {
   auto stop_reason = trajectory_message_->decision().main_decision().stop();
   ADEBUG << "Current stop reason is \n" << stop_reason.DebugString();
   ADEBUG << "Planning command status msg is \n"
-         << injector_->Get_planning_command_status()->ShortDebugString();
+         << injector_->get_planning_command_status()->ShortDebugString();
 
   StopReasonCode stop_reason_code = stop_reason.reason_code();
 
   if (stop_reason_code == StopReasonCode::STOP_REASON_SIGNAL ||
       stop_reason_code == StopReasonCode::STOP_REASON_REFERENCE_END ||
       stop_reason_code == StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP ||
-      injector_->Get_planning_command_status()->status() ==
+      injector_->get_planning_command_status()->status() ==
           CommandStatusType::FINISHED ||
       trajectory_message_->decision().main_decision().has_mission_complete()) {
     ADEBUG << "[IsStopByDestination]Current stop reason is in destination.";

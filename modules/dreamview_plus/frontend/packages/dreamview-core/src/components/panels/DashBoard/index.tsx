@@ -46,7 +46,7 @@ type DashBoardState = {
 
 function InnerDashBoard() {
     const panelContext = usePanelContext();
-    const { logger, panelId, initSubscription, setKeyDownHandlers } = panelContext;
+    const { initSubscription } = panelContext;
     const [rawState, setRawState] = useState<DashBoardState>({});
     const dashBoardState = useMemo(
         () => ({
@@ -57,7 +57,6 @@ function InnerDashBoard() {
     );
 
     const { classes } = useStyle();
-    const { t: tPanels } = useTranslation('panels');
 
     useEffect(() => {
         initSubscription({

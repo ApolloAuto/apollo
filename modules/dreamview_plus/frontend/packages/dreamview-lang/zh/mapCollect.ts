@@ -1,0 +1,48 @@
+export const mapCollect = {
+    localization: '定位',
+    lidar2world: 'Lidar坐标映射',
+
+    slamAlgorithm: 'Slam算法',
+    commonAlgorithm: '普通算法',
+    vehicleTitle: '当前采集车辆环境',
+    algorithmTitle: '请选择采集算法',
+
+    detectingStep: '环境检测',
+    collectingStep: '数据采集',
+    exportFileStep: '默认导出',
+
+    detectingOperation: '开始采集',
+    detectingOperationTooltip: '请确保存储空间充足',
+    gpsStatusText: 'GPS状态',
+    lidarStatusText: 'Lidar状态',
+    localizationStatusText: '定位状态',
+    SlamStatusText: 'Slam状态',
+    gpsStatusErrorText: 'GPS状态异常',
+    lidarStatusErrorText: 'Lidar状态异常',
+    localizationStatusErrorText: '定位状态异常',
+    SlamStatusErrorText: 'Slam状态异常',
+    detectingErrorTooltip: '环境异常，无法采集',
+
+    collectingTitle: '采集中...',
+    collectingNote: '注意事项:',
+    collectingNoteCircle: '1. 请沿需要采集的路线行驶至少3圈;',
+    collectingNoteSpeed: '2. ⻋辆行驶速度请保持在A~Bkm/h;',
+    collectingNoteCover: '3.采集路线上没有较多的物体遮挡，保障采集数据的准确性;',
+    collectingNoteQuit: '4. 采集过程中请勿退出本⻚面，否则采集将会中断;',
+    endCollectTooltip: ' 点击“结束采集”后完成当前采集',
+    collectingRestart: '重新开始',
+    collectingEnd: '结束采集',
+    confirmRestartContent: '确认清除当前已采集路程回到第一步吗?',
+    confirmRestartOk: '确认',
+    confirmRestartCancel: '取消',
+
+    mapFileGeneration: '底图生成中...',
+    mapFileDefaultPath: '文件默认存储路径:',
+    // saveAsFile: '另存',
+    // mapFileSaveAsTooltip: '处理完成后才能导出',
+    againMapCollect: '再次采集',
+    mapFileKnowConfirm: '知道了',
+    mapFileErrorConfirm: '数据异常，请稍后再试',
+
+    mapGenerationFailed: '底图生成失败，请重新采集',
+};

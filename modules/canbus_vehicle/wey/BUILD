@@ -45,6 +45,7 @@ apollo_cc_library(
         "wey_message_manager.h",
         "wey_vehicle_factory.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus/proto:canbus_conf_cc_proto",

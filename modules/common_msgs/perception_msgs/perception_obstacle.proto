@@ -157,6 +157,20 @@ message PerceptionObstacle {
 
   optional Source source = 27 [default = HOST_VEHICLE];
   optional V2XInformation v2x_info = 28;
+
+  enum SemanticType {
+    SM_UNKNOWN = 0;
+    SM_IGNORE = 1;
+    SM_GROUND = 2;
+    SM_OBJECT = 3;
+    SM_CURB = 4;
+    SM_VEGETATION = 5;
+    SM_FENCE = 6;
+    SM_NOISE = 7;
+    SM_WALL = 8;
+    SM_MAX_OBJECT_SEMANTIC_LABEL = 9;
+  };
+  optional SemanticType semantic_type = 29;
 }
 
 message LaneMarker {
@@ -192,4 +206,13 @@ message PerceptionObstacles {
   optional apollo.common.ErrorCode error_code = 3 [default = OK];
   optional LaneMarkers lane_marker = 4;
   optional CIPVInfo cipv_info = 5;  // Closest In Path Vehicle (CIPV)
+}
+
+message PerceptionEdgeInfo {
+  optional apollo.common.Header header = 1;
+  optional bool is_useable = 2 [default = false];
+  repeated apollo.common.Point3D edge_point = 3;
+  repeated apollo.common.Point3D edge_relative_point = 4;
+  optional double delta_s = 5 [default = 0.2];
+  optional double edge_length = 6;
 }

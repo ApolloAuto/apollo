@@ -92,11 +92,87 @@ export class Carviz {
 
     public follow: Follow;
 
+    private colors = {
+        bgColor: '#0f1014',
+        textColor: '#ffea00',
+        colorMapping: {
+            YELLOW: '#daa520',
+            WHITE: '#cccccc',
+            CORAL: '#ff7f50',
+            RED: '#ff6666',
+            GREEN: '#006400',
+            BLUE: '#30a5ff',
+            PURE_WHITE: '#ffffff',
+            DEFAULT: '#c0c0c0',
+            MIDWAY: '#ff7f50',
+            END: '#ffdab9',
+            PULLOVER: '#006aff',
+        },
+        obstacleColorMapping: {
+            PEDESTRIAN: '#ffea00',
+            BICYCLE: '#00dceb',
+            VEHICLE: '#00ff3c',
+            VIRTUAL: '#800000',
+            CIPV: '#ff9966',
+            DEFAULT: '#ff00fc',
+            TRAFFICCONE: '#e1601c',
+            UNKNOWN: '#a020f0',
+            UNKNOWN_MOVABLE: '#da70d6',
+            UNKNOWN_UNMOVABLE: '#ff00ff',
+        },
+        decisionMarkerColorMapping: {
+            STOP: '#ff3030',
+            FOLLOW: '#1ad061',
+            YIELD: '#ff30f7',
+            OVERTAKE: '#30a5ff',
+        },
+        pointCloudHeightColorMapping: {
+            0.5: {
+                r: 255,
+                g: 0,
+                b: 0,
+            },
+            1.0: {
+                r: 255,
+                g: 127,
+                b: 0,
+            },
+            1.5: {
+                r: 255,
+                g: 255,
+                b: 0,
+            },
+            2.0: {
+                r: 0,
+                g: 255,
+                b: 0,
+            },
+            2.5: {
+                r: 0,
+                g: 0,
+                b: 255,
+            },
+            3.0: {
+                r: 75,
+                g: 0,
+                b: 130,
+            },
+            10.0: {
+                r: 148,
+                g: 0,
+                b: 211,
+            },
+        },
+    };
+
     private viewLocalStorage;
 
-    constructor(id) {
+    constructor(id, colors?) {
         this.canvasId = id;
         this.initialized = false;
+        if (colors) {
+            this.colors = colors;
+        }
     }
 
     render() {
@@ -146,9 +222,13 @@ export class Carviz {
             alpha: true,
             antialias: true,
         });
+        // 启用场景中的阴影自动更新。默认是true,如果不需要动态光照/阴影, 则可以在实例化渲染器时将之设为false
+        this.renderer.shadowMap.autoUpdate = false;
+        // 如果为true，定义是否检查材质着色器程序 编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
+        this.renderer.debug.checkShaderErrors = false;
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, this.height);
-        this.renderer.setClearColor(0x0f1014);
+        this.renderer.setClearColor(this.colors.bgColor);
         this.canvasDom.appendChild(this.renderer.domElement);
 
         this.camera = new THREE.PerspectiveCamera(
@@ -176,6 +256,9 @@ export class Carviz {
             this.view?.setView();
             this.render();
         });
+        this.controls.minDistance = 2;
+        this.controls.minPolarAngle = 0;
+        this.controls.maxPolarAngle = Math.PI / 2;
         this.controls.keys = {
             LEFT: 'ArrowLeft',
             UP: 'ArrowUp',
@@ -198,6 +281,11 @@ export class Carviz {
         this.render();
     }
 
+    updateColors(color) {
+        this.colors = color;
+        this.renderer.setClearColor(color.bgColor);
+    }
+
     initCSS2DRenderer() {
         this.CSS2DRenderer = new CSS2DRenderer();
         this.CSS2DRenderer.setSize(this.width, this.height);
@@ -213,12 +301,12 @@ export class Carviz {
         this.adc = new Adc(this.scene, this.option, this.coordinates);
         this.view = new View(this.camera, this.controls, this.adc);
         this.text = new Text(this.camera);
-        this.map = new Map(this.scene, this.text, this.option, this.coordinates);
-        this.obstacles = new Obstacles(this.scene, this.view, this.text, this.option, this.coordinates);
-        this.pointCloud = new PointCloud(this.scene, this.adc, this.option);
+        this.map = new Map(this.scene, this.text, this.option, this.coordinates, this.colors);
+        this.obstacles = new Obstacles(this.scene, this.view, this.text, this.option, this.coordinates, this.colors);
+        this.pointCloud = new PointCloud(this.scene, this.adc, this.option, this.colors);
         this.routing = new Routing(this.scene, this.option, this.coordinates);
-        this.decision = new Decision(this.scene, this.option, this.coordinates);
-        this.prediction = new Prediction(this.scene, this.option, this.coordinates);
+        this.decision = new Decision(this.scene, this.option, this.coordinates, this.colors);
+        this.prediction = new Prediction(this.scene, this.option, this.coordinates, this.colors);
         this.planning = new Planning(this.scene, this.option, this.coordinates);
         this.gps = new Gps(this.scene, this.adc, this.option, this.coordinates);
         this.follow = new Follow(this.scene, this.coordinates);
@@ -331,7 +419,7 @@ export class Carviz {
             datas,
             'autoDrivingCar',
             () => {
-                this.adc.update(datas.autoDrivingCar, 'adc');
+                this.adc.update({ ...datas.autoDrivingCar, boudingBox: datas.boudingBox }, 'adc');
             },
             noop,
         );

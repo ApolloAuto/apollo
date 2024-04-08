@@ -724,7 +724,7 @@ void DevkitController::ResetProtocol() {
 bool DevkitController::CheckChassisError() {
   Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_check_response()) {
+  if (!chassis_.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -884,19 +884,19 @@ bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
+      is_eps_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_eps_online() &&
+                      chassis_.check_response().is_eps_online();
       check_ok = check_ok && is_eps_online;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
+      is_vcu_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_vcu_online() &&
+                      chassis_.check_response().is_vcu_online();
+      is_esp_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_esp_online() &&
+                      chassis_.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
     if (check_ok) {

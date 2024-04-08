@@ -19,7 +19,6 @@
 #include <utility>
 
 #include "cyber/common/log.h"
-#include "cyber/plugin_manager/plugin_manager.h"
 #include "cyber/time/clock.h"
 #include "modules/control/control_component/common/control_gflags.h"
 

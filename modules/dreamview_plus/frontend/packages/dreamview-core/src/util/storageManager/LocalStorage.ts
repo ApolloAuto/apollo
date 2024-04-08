@@ -1,5 +1,5 @@
 export class LocalStorage<T> {
-    defaultVersion = 'v0.0.2';
+    defaultVersion = 'v0.0.3';
 
     version: string;
 

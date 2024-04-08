@@ -17,7 +17,7 @@ apollo_cc_test(
     size = "small",
     srcs = ["image_decompress_test.cc"],
     deps = [
-        ":image_decompress_lib",
+        ":DO_NOT_IMPORT_image_decompress",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -86,16 +86,13 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
               << "routing manager send a routing request. ";
         rate.Sleep();
 
-        auto routing_response_ = planning_command_.lane_follow_command();
-        auto last_routing_response_ =
-            last_planning_command_.lane_follow_command();
-        if (!routing_response_.has_header()) {
+        if (!planning_command_.has_header()) {
           AINFO << "[TaskManagerComponent]routing failed";
           return false;
         }
-        if (last_routing_response_.has_header()) {
-          if (last_routing_response_.header().sequence_num() ==
-              routing_response_.header().sequence_num()) {
+        if (last_planning_command_.has_header()) {
+          if (last_planning_command_.header().sequence_num() ==
+              planning_command_.header().sequence_num()) {
             AINFO << "[TaskManagerComponent]No routing response: "
                   << "new routing failed";
             return false;

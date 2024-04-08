@@ -44,6 +44,9 @@
 namespace apollo {
 namespace planning {
 
+// park-generic
+enum class ParkingType { NO_PARKING, PARALLEL_PARKING, VERTICAL_PARKING };
+
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;
 
@@ -209,6 +212,12 @@ class OpenSpaceInfo {
 
   void set_destination_reached(const bool flag) { destination_reached_ = flag; }
 
+  bool openspace_planning_finish() const { return openspace_planning_finish_; }
+
+  void set_openspace_planning_finish(const bool flag) {
+    openspace_planning_finish_ = flag;
+  }
+
   const DiscretizedTrajectory &interpolated_trajectory_result() const {
     return interpolated_trajectory_result_;
   }
@@ -360,6 +369,8 @@ class OpenSpaceInfo {
 
   bool destination_reached_ = false;
 
+  bool openspace_planning_finish_ = false;
+
   DiscretizedTrajectory interpolated_trajectory_result_;
 
   std::vector<TrajGearPair> partitioned_trajectories_;
@@ -387,6 +398,53 @@ class OpenSpaceInfo {
   apollo::planning_internal::Debug debug_instance_;
 
   double time_latency_ = 0.0;
+
+  ParkingType parking_type_ = ParkingType::NO_PARKING;
+
+  // park-generic
+
+ public:
+  const DiscretizedTrajectory &path_planning_trajectory_result() const {
+    return path_planning_trajectory_result_;
+  }
+
+  DiscretizedTrajectory *mutable_path_planning_trajectory_result() {
+    return &path_planning_trajectory_result_;
+  }
+
+  bool replan_flag() const {
+    return replan_flag_;
+  }
+
+  void set_replan_flag(const bool flag) {
+    replan_flag_ = flag;
+  }
+
+  ParkingType parking_type() const {
+    return parking_type_;
+  }
+
+  void set_parking_type(const ParkingType type) {
+    parking_type_ = type;
+  }
+
+  const std::vector<std::vector<common::math::Vec2d>>
+  &soft_boundary_vertices_vec() const {
+    return soft_boundary_vertices_vec_;
+  }
+
+  std::vector<std::vector<common::math::Vec2d>>
+  *mutable_soft_boundary_vertices_vec() {
+    return &soft_boundary_vertices_vec_;
+  }
+
+ private:
+  DiscretizedTrajectory path_planning_trajectory_result_;
+
+  bool replan_flag_ = false;
+
+  // @brief vector storing the vertices of obstacles in counter-clock-wise order
+  std::vector<std::vector<common::math::Vec2d>> soft_boundary_vertices_vec_;
 };
 
 }  // namespace planning

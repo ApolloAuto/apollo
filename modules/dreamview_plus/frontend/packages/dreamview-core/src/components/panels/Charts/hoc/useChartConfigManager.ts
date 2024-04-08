@@ -48,6 +48,7 @@ export function useChartConfigManager(panelId: string, onInit: (data: Array<ICha
                 icon: null,
                 okText: tChartEditing('ok'),
                 cancelText: tChartEditing('cancel'),
+                zIndex: 100000,
                 onOk() {
                     const nextChartConfigList = chartConfigList.filter((item) => item.uid !== chart.uid);
                     setChartConfigList(nextChartConfigList);

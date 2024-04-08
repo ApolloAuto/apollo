@@ -13,11 +13,14 @@ export default class SpeedBump {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
         this.scene = scene;
         this.coordinates = coordinates;
         this.groups = {};
         this.currentIds = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     drawSpeedBumps(speedBumps) {
@@ -42,7 +45,7 @@ export default class SpeedBump {
                 line.segment.forEach((segment) => {
                     const points = this.coordinates.applyOffsetToArray(segment.lineSegment.point);
                     const mesh = drawSegmentsFromPoints(points, {
-                        color: colorMapping.RED,
+                        color: this.colors.RED,
                         linewidth: 5,
                         zOffset: zOffset.speedBump,
                         opacity: 1,

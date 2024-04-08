@@ -222,7 +222,7 @@ bool RecordFileWriter::WriteMessage(const proto::SingleMessage& message) {
           header_.chunk_interval()) {
     need_flush = true;
   }
-  if (header_.chunk_raw_size() > 0 &&
+  if (!in_writing_ && header_.chunk_raw_size() > 0 &&
       chunk_active_->header_.raw_size() > header_.chunk_raw_size()) {
     need_flush = true;
   }
@@ -248,9 +248,11 @@ void RecordFileWriter::Flush() {
     if (chunk_flush_->empty()) {
       continue;
     }
+    in_writing_ = true;
     if (!WriteChunk(chunk_flush_->header_, *(chunk_flush_->body_.get()))) {
       AERROR << "Write chunk fail.";
     }
+    in_writing_ = false;
     chunk_flush_->clear();
   }
 }

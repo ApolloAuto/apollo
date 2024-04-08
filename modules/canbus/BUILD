@@ -39,7 +39,7 @@ apollo_cc_test(
     size = "small",
     srcs = ["canbus_test.cc"],
     deps = [
-        ":canbus_component_lib",
+        ":DO_NOT_IMPORT_canbus_component",
         "//modules/common/status",
         "@com_google_googletest//:gtest_main",
     ],

@@ -16,7 +16,7 @@ export default function useStyle() {
             display: 'flex',
             alignItems: 'center',
             padding: `0 ${theme.tokens.padding.speace3}`,
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
             '& .player-progress-text': {
                 marginRight: theme.tokens.margin.speace3,
                 fontSize: theme.tokens.font.size.regular,

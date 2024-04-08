@@ -126,7 +126,7 @@ def gen_proto_file(config_file, work_dir, template_dir):
             for pid in protocols:
                 p = protocols[pid]
                 write_single_protocol_vars(pb_fp, p)
-            gen_checkresponse(pb_fp)
+            # gen_checkresponse(pb_fp)
             # pb_fp.write("\n// CheckResponseSignal\nmessage CheckResponseSignal {\n}\n")
             pb_fp.write("\nmessage %s {\n" % car_type.capitalize())
 
@@ -141,7 +141,7 @@ def gen_proto_file(config_file, work_dir, template_dir):
                     pb_fp.write(" // report message")
                 pb_fp.write("\n")
                 pb_var_seq = pb_var_seq + 1
-            pb_fp.write("optional CheckResponseSignal check_response = 100;\n")
+            # pb_fp.write("optional CheckResponseSignal check_response = 100;\n")
             pb_fp.write("}\n")
             gen_build_file(car_type, work_dir, template_dir)
             # update_detail_pb(car_type)

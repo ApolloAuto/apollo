@@ -25,6 +25,7 @@
 
 #include "modules/perception/traffic_light_tracking/proto/traffic_light_tracking_component.pb.h"
 
+#include "cyber/common/file.h"
 #include "cyber/profiler/profiler.h"
 #include "cyber/time/clock.h"
 #include "modules/perception/common/camera/common/trafficlight_frame.h"
@@ -33,8 +34,9 @@
 
 namespace apollo {
 namespace perception {
-namespace onboard {
+namespace trafficlight {
 
+using apollo::perception::onboard::FLAGS_start_visualizer;
 using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
 using apollo::cyber::Clock;
 
@@ -81,9 +83,7 @@ bool TrafficLightTrackComponent::Proc(
   auto time_imags = std::to_string(message->timestamp_);
   AINFO << "Enter tracking component, message timestamp: " << time_imags;
 
-  std::shared_ptr<TrafficDetectMessage> out_message(new (std::nothrow)
-                                                        TrafficDetectMessage);
-  bool status = InternalProc(message, out_message);
+  bool status = InternalProc(message);
 
   return status;
 }
@@ -143,41 +143,20 @@ int TrafficLightTrackComponent::InitV2XListener() {
 }
 
 bool TrafficLightTrackComponent::InternalProc(
-    const std::shared_ptr<TrafficDetectMessage const>& in_message,
-    std::shared_ptr<TrafficDetectMessage> out_message) {
-  camera::TrafficLightFrame traffic_light_frame;
-  traffic_light_frame.timestamp = in_message->timestamp_;
-  traffic_light_frame.data_provider =
-      in_message->traffic_light_frame_->data_provider;
-  traffic_light_frame.traffic_lights =
-      in_message->traffic_light_frame_->traffic_lights;
-
+    const std::shared_ptr<TrafficDetectMessage const>& message) {
   PERF_BLOCK("traffic_light_tracking")
-  bool status = tracker_->Track(&traffic_light_frame);
+  bool status = tracker_->Track(message->traffic_light_frame_.get());
   PERF_BLOCK_END
 
-  if (!status) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Trafficlight tracking process error!";
-    return false;
-  }
-
-  out_message->timestamp_ = in_message->timestamp_;
-  auto& frame = out_message->traffic_light_frame_;
-  frame.reset(new camera::TrafficLightFrame);
-  frame->timestamp = in_message->timestamp_;
-  frame->data_provider = traffic_light_frame.data_provider;
-  frame->traffic_lights = traffic_light_frame.traffic_lights;
-
+  auto frame = message->traffic_light_frame_;
   SyncV2XTrafficLights(frame.get());
-  stoplines_ = in_message->stoplines_;
+  stoplines_ = message->stoplines_;
 
   std::shared_ptr<TrafficLightDetection> out_msg(new TrafficLightDetection);
   auto& camera_name = frame->data_provider->sensor_name();
-  if (!TransformOutputMessage(frame.get(), camera_name, &out_msg, in_message)) {
+  if (!TransformOutputMessage(frame.get(), camera_name, &out_msg, message)) {
     AERROR << "transform_output_message failed, msg_time: "
-           << in_message->timestamp_;
+           << message->timestamp_;
     return false;
   }
 
@@ -297,7 +276,7 @@ double TrafficLightTrackComponent::stopline_distance(
 bool TrafficLightTrackComponent::TransformOutputMessage(
     camera::TrafficLightFrame* frame, const std::string& camera_name,
     std::shared_ptr<TrafficLightDetection>* out_msg,
-    const std::shared_ptr<TrafficDetectMessage const>& in_message) {
+    const std::shared_ptr<TrafficDetectMessage const>& message) {
   const std::map<std::string, TLCamID> CAMERA_ID_TO_TLCAMERA_ID = {
       {"front_24mm", TrafficLightDetection::CAMERA_FRONT_LONG},
       {"front_12mm", TrafficLightDetection::CAMERA_FRONT_NARROW},
@@ -427,7 +406,7 @@ bool TrafficLightTrackComponent::TransformOutputMessage(
     detected_trafficlight_color_ = lights.at(0)->status.color;
   }
   // add traffic light debug info
-  if (!TransformDebugMessage(frame, out_msg, in_message)) {
+  if (!TransformDebugMessage(frame, out_msg, message)) {
     AERROR << "ProcComponent::Proc failed to transform debug msg.";
     return false;
   }
@@ -591,15 +570,18 @@ void TrafficLightTrackComponent::Visualize(
   cv::putText(output_image, str, cv::Point(10, 300), cv::FONT_HERSHEY_DUPLEX,
               1.5, cv::Scalar(255, 255, 255), 3);
 
+  std::string folder = "/apollo/data/debug_vis/";
+  if (!apollo::cyber::common::EnsureDirectory(folder)) {
+    AINFO << "EnsureDirectory folder " << folder << " error.";
+  }
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
-  cv::imwrite(absl::StrCat("/apollo/debug_vis/",
-                           std::to_string(frame.timestamp), ".jpg"),
-              output_image);
+  cv::imwrite(absl::StrCat(folder, std::to_string(frame.timestamp), ".jpg"),
+      output_image);
   // todo(huqilin): need to create debug_vis folder.
   // cv::imshow("Apollo traffic light detection", output_image);
   cv::waitKey(1);
 }
 
-}  // namespace onboard
+}  // namespace trafficlight
 }  // namespace perception
 }  // namespace apollo

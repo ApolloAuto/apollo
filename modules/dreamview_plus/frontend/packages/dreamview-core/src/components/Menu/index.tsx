@@ -4,7 +4,10 @@ import {
     IconIcAddPanel,
     IconIcProfileMangerNormal,
     IconIcDefaultAvatar,
+    OperatePopover,
     Popover,
+    useImagePrak,
+    IconIcDreamview,
 } from '@dreamview/dreamview-ui';
 import {
     ENUM_MENU_KEY,
@@ -13,13 +16,16 @@ import {
     menuStoreUtils,
 } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { ChangeCertStatusAction, UpdateMenuAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
+import { useThemeContext } from '@dreamview/dreamview-theme';
 import { useTranslation } from 'react-i18next';
-import IconPersonalCenterDefault from '@dreamview/dreamview-core/src/assets/ic_personal_center_default.png';
 import useStyle from './useStyle';
 import useWebSocketServices from '../../services/hooks/useWebSocketServices';
 import User from './User';
 import { useUserInfoStore } from '../../store/UserInfoStore';
 import { CURRENT_MODE } from '../../store/HmiStore';
+import IcMoon from './moon.svg';
+import IcSun from './sun.svg';
+import { useChangeTheme } from '../../store/ThemeProviderStore';
 
 interface IActivatableMenu {
     onClick?: () => void;
@@ -43,7 +49,7 @@ function ActivatableMenu(props: PropsWithChildren<IActivatableMenu>) {
     const popoverContent = <div className={classes['menu-item-popover']}>{popover}</div>;
 
     return (
-        <Popover rootClassName={classes.popoverBg} placement='right' trigger='hover' content={popoverContent}>
+        <Popover placement='right' trigger='hover' content={popoverContent}>
             <li
                 onClick={onClick}
                 className={cx(classes['menu-item'], classes['menu-item-icon'], {
@@ -63,6 +69,7 @@ type MenuProps = {
 };
 
 function Menu(props: MenuProps) {
+    const IconPersonalCenterDefault = useImagePrak('ic_personal_center_default');
     const { setEnterGuideStateMemo } = props;
     const { classes, cx } = useStyle();
     const [{ activeMenu, certStatus }, dispatch] = useMenuStore();
@@ -71,7 +78,8 @@ function Menu(props: MenuProps) {
     const { isPluginConnected, pluginApi } = useWebSocketServices();
     const { t: tMode } = useTranslation('modeSettings');
     const { t: tAdd } = useTranslation('addPanel');
-
+    const { theme } = useThemeContext();
+    const setTheme = useChangeTheme();
     // 插件安装成功
     const isCertSuccess = menuStoreUtils.isCertSuccess(certStatus);
 
@@ -85,6 +93,10 @@ function Menu(props: MenuProps) {
         },
         [activeMenu],
     );
+
+    const changeTheme = () => {
+        setTheme((prev: string) => (prev === 'drak' ? 'light' : 'drak'));
+    };
 
     useEffect(() => {
         if (isPluginConnected) {
@@ -122,6 +134,9 @@ function Menu(props: MenuProps) {
                 {/*        <div className={cx(classes['add-desktop'], 'add-desktop-hover')} /> */}
                 {/*    </li> */}
                 {/* )} */}
+                <li onClick={changeTheme} className={cx(classes['menu-item'], classes['change-theme'])}>
+                    <div className={classes['theme-btn']}>{theme === 'drak' ? <IcSun /> : <IcMoon />}</div>
+                </li>
                 <ActivatableMenuMemo
                     popover={<>{tAdd('addPanel')}</>}
                     activeMenuKey={activeMenu}
@@ -149,7 +164,12 @@ function Menu(props: MenuProps) {
                     </ActivatableMenuMemo>
                 )}
                 <li className={cx(classes['menu-item'])}>
-                    <Popover content={UserContent} rootClassName={classes.popover} placement='right' trigger='hover'>
+                    <OperatePopover
+                        content={UserContent}
+                        rootClassName={classes.popover}
+                        placement='right'
+                        trigger='hover'
+                    >
                         <div className={cx(classes['menu-item-image'])}>
                             {/* eslint-disable-next-line no-nested-ternary */}
                             {hasLogin ? (
@@ -168,7 +188,7 @@ function Menu(props: MenuProps) {
                                 <IconIcDefaultAvatar />
                             )}
                         </div>
-                    </Popover>
+                    </OperatePopover>
                 </li>
             </ul>
         </div>

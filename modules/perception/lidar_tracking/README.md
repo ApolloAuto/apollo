@@ -32,15 +32,19 @@ apollo::perception::lidar::LidarTrackingComponent
 
 #### Input
 
-| Name    | Type                                             | Description         |
-| ------- | ------------------------------------------------ | ------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+| Name    | Type                                             | Description         | Input channal |
+| ------- | ------------------------------------------------ | ------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message | /perception/lidar/detection_filter |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/lidar/detection_filter`. The detailed input channel information is in `modules/perception/lidar_tracking/dag/lidar_tracking.dag` file. By default, the upstream components of the messages received by the component include `lidar_detection_filter`.
 
 #### Output
 
-| Name    | Type                                              | Description          |
-| ------- | ------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::SensorFrameMessage` | sensor frame message |
+| Name    | Type                                              | Description          | Output channal |
+| ------- | ------------------------------------------------- | -------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::SensorFrameMessage` | sensor frame message | /perception/inner/PrefusedObjects |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt` file.
 
 SensorFrameMessage is used in multi sensor fusion.
 

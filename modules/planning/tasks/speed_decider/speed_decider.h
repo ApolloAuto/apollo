@@ -22,9 +22,12 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+#include <utility>
 #include <unordered_map>
 
 #include "modules/planning/tasks/speed_decider/proto/speed_decider.pb.h"
+
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
@@ -109,11 +112,14 @@ class SpeedDecider : public Task {
   double EstimateProperOvertakingGap(const double target_obs_speed,
                                      const double adc_speed) const;
 
+  double EstimateProperFollowGap(const double& adc_speed) const;
+
  private:
   SLBoundary adc_sl_boundary_;
   common::TrajectoryPoint init_point_;
   const ReferenceLine* reference_line_ = nullptr;
   SpeedDeciderConfig config_;
+  std::vector<std::pair<double, double>> follow_distance_function_;
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::SpeedDecider, Task)

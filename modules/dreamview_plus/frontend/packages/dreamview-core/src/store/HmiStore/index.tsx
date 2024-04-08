@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import isEqual from 'lodash/isEqual';
 import { Factory } from '../base';
 import { reducer, initState } from './reducer';
 import { CombineAction } from './actions';
@@ -40,6 +41,15 @@ interface PickHmiStoreProviderProps {
 const defaultKeys = Object.keys(initState).filter(
     (item) => !['currentRecordStatus', 'prevStatus'].includes(item),
 ) as hmiKeys[];
+function useDeepEffect(callback: any, effect: any) {
+    const prev = useRef(null);
+    useEffect(() => {
+        if (!isEqual(prev.current, effect)) {
+            callback();
+        }
+        prev.current = effect;
+    }, effect);
+}
 export function PickHmiStoreProvider(props: React.PropsWithChildren<PickHmiStoreProviderProps>) {
     const { keys: propKeys = defaultKeys } = props;
     const [hmi, dispatch] = useHmiStore();
@@ -51,13 +61,13 @@ export function PickHmiStoreProvider(props: React.PropsWithChildren<PickHmiStore
 
     const isLoad = useRef(true);
     const dependence = keys.map((key) => hmi[key]);
-    useEffect(() => {
+    useDeepEffect(() => {
         if (isLoad.current) {
             isLoad.current = false;
             return;
         }
         setState(() => keys.reduce((result, key) => ({ ...result, [key]: hmi[key] }), {}) as IInitState);
-    }, [...dependence]);
+    }, dependence);
 
     const context = useMemo(() => [state, dispatch], [state, dispatch]);
 

@@ -22,12 +22,12 @@
 #include <iostream>
 #include <memory>
 
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/record/record_reader.h"
-
 #include "modules/drivers/gnss/parser/data_parser.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
@@ -40,7 +40,7 @@ void ParseBin(const char* filename, DataParser* parser) {
   std::ios::sync_with_stdio(false);
   std::ifstream f(filename, std::ifstream::binary);
   char b[BUFFER_SIZE];
-  while (f) {
+  while (f && cyber::OK()) {
     f.read(b, BUFFER_SIZE);
     std::string msg(reinterpret_cast<const char*>(b), f.gcount());
     parser->ParseRawData(msg);
@@ -50,7 +50,7 @@ void ParseBin(const char* filename, DataParser* parser) {
 void ParseRecord(const char* filename, DataParser* parser) {
   cyber::record::RecordReader reader(filename);
   cyber::record::RecordMessage message;
-  while (reader.ReadMessage(&message)) {
+  while (reader.ReadMessage(&message) && cyber::OK()) {
     if (message.channel_name == "/apollo/sensor/gnss/raw_data") {
       apollo::drivers::gnss::RawData msg;
       msg.ParseFromString(message.content);

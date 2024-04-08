@@ -449,7 +449,7 @@ Status LatController::ComputeControlCommand(
 
   // Update state = [Lateral Error, Lateral Error Rate, Heading Error, Heading
   // Error Rate, preview lateral error1 , preview lateral error2, ...]
-  UpdateState(debug);
+  UpdateState(debug, chassis);
 
   UpdateMatrix();
 
@@ -654,21 +654,23 @@ Status LatController::Reset() {
   return Status::OK();
 }
 
-void LatController::UpdateState(SimpleLateralDebug *debug) {
+void LatController::UpdateState(SimpleLateralDebug *debug,
+                                const canbus::Chassis *chassis) {
   auto vehicle_state = injector_->vehicle_state();
   if (FLAGS_use_navigation_mode) {
     ComputeLateralErrors(
         0.0, 0.0, driving_orientation_, vehicle_state->linear_velocity(),
         vehicle_state->angular_velocity(), vehicle_state->linear_acceleration(),
-        trajectory_analyzer_, debug);
+        trajectory_analyzer_, debug, chassis);
   } else {
     // Transform the coordinate of the vehicle states from the center of the
     // rear-axis to the center of mass, if conditions matched
     const auto &com = vehicle_state->ComputeCOMPosition(lr_);
-    ComputeLateralErrors(
-        com.x(), com.y(), driving_orientation_,
-        vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
-        vehicle_state->linear_acceleration(), trajectory_analyzer_, debug);
+    ComputeLateralErrors(com.x(), com.y(), driving_orientation_,
+                         vehicle_state->linear_velocity(),
+                         vehicle_state->angular_velocity(),
+                         vehicle_state->linear_acceleration(),
+                         trajectory_analyzer_, debug, chassis);
   }
 
   // State matrix update;
@@ -773,7 +775,8 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
     const double angular_v, const double linear_a,
-    const TrajectoryAnalyzer &trajectory_analyzer, SimpleLateralDebug *debug) {
+    const TrajectoryAnalyzer &trajectory_analyzer, SimpleLateralDebug *debug,
+    const canbus::Chassis *chassis) {
   TrajectoryPoint target_point;
 
   if (lat_based_lqr_controller_conf_.query_time_nearest_point_only()) {
@@ -873,8 +876,13 @@ void LatController::ComputeLateralErrors(
       lateral_error_dot_dot = -lateral_error_dot_dot;
     }
   }
+  auto centripetal_acceleration =
+      linear_v * linear_v / wheelbase_ *
+      std::tan(chassis->steering_percentage() / 100 *
+               vehicle_param_.max_steer_angle() / steer_ratio_);
   debug->set_lateral_error_rate(lateral_error_dot);
   debug->set_lateral_acceleration(lateral_error_dot_dot);
+  debug->set_lateral_centripetal_acceleration(centripetal_acceleration);
   debug->set_lateral_jerk(
       (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
   previous_lateral_acceleration_ = debug->lateral_acceleration();

@@ -5,6 +5,7 @@ declare interface Window {
     DREAMVIEW_VERSION: string;
     __REDUX_DEVTOOLS_EXTENSION__: any;
     self: Window;
+    dreamviewVersion: string;
 }
 
 declare module '*.png' {

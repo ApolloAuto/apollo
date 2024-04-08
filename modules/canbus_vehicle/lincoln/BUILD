@@ -63,6 +63,7 @@ apollo_cc_library(
         "protocol/version_7f.h",
         "protocol/wheelspeed_6a.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/lincoln/proto:lincoln_cc_proto",

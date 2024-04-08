@@ -26,7 +26,9 @@
 
 namespace apollo {
 namespace perception {
-namespace onboard {
+namespace trafficlight {
+
+using apollo::perception::onboard::TrafficDetectMessage;
 
 class TrafficLightDetectComponent
     : public cyber::Component<TrafficDetectMessage> {
@@ -62,8 +64,7 @@ class TrafficLightDetectComponent
   int InitConfig();
   bool InitAlgorithmPlugin();
   bool InternalProc(
-      const std::shared_ptr<TrafficDetectMessage const>& in_message,
-      std::shared_ptr<TrafficDetectMessage> out_message);
+      const std::shared_ptr<TrafficDetectMessage const>& message);
 
  private:
   trafficlight::TrafficLightDetectorInitOptions detector_init_options_;
@@ -78,6 +79,6 @@ class TrafficLightDetectComponent
 
 CYBER_REGISTER_COMPONENT(TrafficLightDetectComponent);
 
-}  // namespace onboard
+}  // namespace trafficlight
 }  // namespace perception
 }  // namespace apollo

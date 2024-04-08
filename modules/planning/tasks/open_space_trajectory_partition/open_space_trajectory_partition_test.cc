@@ -37,6 +37,9 @@ class OpenSpaceTrajectoryPartitionTest : public ::testing::Test {
 
 TEST_F(OpenSpaceTrajectoryPartitionTest, Init) {
   OpenSpaceTrajectoryPartition open_space_trajectory_partition;
+  open_space_trajectory_partition.Init(
+  "/scenarios/valet_parking/conf/valet_parking_parking",
+    "OPEN_SPACE_TRAJECTORY_PARTITION", injector_);
   EXPECT_EQ(open_space_trajectory_partition.Name(),
             "OPEN_SPACE_TRAJECTORY_PARTITION");
 }

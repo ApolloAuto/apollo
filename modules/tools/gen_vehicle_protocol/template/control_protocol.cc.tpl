@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus_vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
@@ -37,6 +38,10 @@ uint32_t %(classname)s::GetPeriod() const {
 void %(classname)s::Parse(const std::uint8_t* bytes, int32_t length,
                          %(car_type_capitalize)s* chassis) const {
 %(set_parse_var_to_protocol_list)s
+}
+
+void %(classname)s::UpdateData_Heartbeat(uint8_t* data) {
+   // TODO(All) :  you should add the heartbeat manually
 }
 
 void %(classname)s::UpdateData(uint8_t* data) {

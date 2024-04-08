@@ -30,12 +30,13 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
-
 #include "modules/planning/tasks/open_space_roi_decider/proto/open_space_roi_decider.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -47,7 +48,6 @@
 
 namespace apollo {
 namespace planning {
-enum class ParkingType { PARALLEL_PARKING, VERTICAL_PARKING };
 struct ParkingInfo {
   ParkingType parking_type;
   std::string parking_id;
@@ -140,9 +140,9 @@ class OpenSpaceRoiDecider : public Decider {
                           std::vector<std::vector<common::math::Vec2d>>
                               *const roi_parking_boundary);
 
-  bool GetParkingBoundary(const hdmap::Path &nearby_path, Frame *const frame,
-                          std::vector<std::vector<common::math::Vec2d>>
-                              *const roi_parking_boundary);
+  bool GetParkingOutBoundary(const hdmap::Path &nearby_path, Frame *const frame,
+                             std::vector<std::vector<common::math::Vec2d>>
+                                 *const roi_parking_boundary);
 
   bool GetPullOverBoundary(Frame *const frame,
                            const std::array<common::math::Vec2d, 4> &vertices,
@@ -237,7 +237,7 @@ class OpenSpaceRoiDecider : public Decider {
 
   common::VehicleState vehicle_state_;
   OpenSpaceRoiDeciderConfig config_;
-  bool isofflane_ = false;
+  bool is_parking_out = false;
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::OpenSpaceRoiDecider,

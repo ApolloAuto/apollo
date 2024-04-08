@@ -105,6 +105,14 @@ bool ExternalCommandDemo::Proc() {
       } else if (input_command_string == "vin") {
         // Send vin validation.
         SendActionCommand(apollo::external_command::ActionCommandType::VIN_REQ);
+      } else if (input_command_string == "enter_mission") {
+        // Enter mission model.
+        SendActionCommand(
+            apollo::external_command::ActionCommandType::ENTER_MISSION);
+      } else if (input_command_string == "exit_mission") {
+        // Exit mission model.
+        SendActionCommand(
+            apollo::external_command::ActionCommandType::EXIT_MISSION);
       } else if (input_command_string == "chassis") {
         SendVehicleSignalCommand();
       } else if (input_command_string == "custom_chassis") {
@@ -144,10 +152,11 @@ bool ExternalCommandDemo::Proc() {
         SendLaneFollowCommand(way_points, end_pose,
                               demo_config_.target_speed());
       } else if (input_command_string == "path_loc") {
-        SendPathFollowCommandWithLocationRecord("/apollo/data/bag/demo_loc");
+        SendPathFollowCommandWithLocationRecord(
+            demo_config_.file_of_path_follow_with_localization_record());
       } else if (input_command_string == "path_path") {
         SendPathFollowCommandWithPathRecord(
-            "/apollo/data/bag/demo_path.record");
+            demo_config_.file_of_path_follow_with_planning_record());
       } else if (input_command_string == "valet_parking") {
         std::string parking_spot_id = "451089045";
         SendValetParkingCommand(parking_spot_id, demo_config_.target_speed());

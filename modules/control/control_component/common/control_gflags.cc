@@ -126,3 +126,9 @@ DEFINE_int32(action, 1, "START = 1; RESET = 2; VIN_REQ = 3");
 DEFINE_bool(use_vehicle_epb, false, "enable epb brake for vehicle.");
 
 DEFINE_double(pitch_offset_deg, 0.0, "vehicle pitch offset when in horizon.");
+
+DEFINE_bool(is_control_ut_test_mode, false,
+            "True to run control in ut test mode");
+
+DEFINE_bool(publish_control_debug_info, false,
+            "True to run control in ut test mode");

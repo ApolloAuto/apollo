@@ -201,7 +201,7 @@ class ReferenceLineInfo {
       std::vector<PathBoundary>&& candidate_path_boundaries);
 
   const std::vector<PathData>& GetCandidatePathData() const;
-
+  std::vector<PathData>* MutableCandidatePathData();
   void SetCandidatePathData(std::vector<PathData>&& candidate_path_data);
 
   Obstacle* GetBlockingObstacle() const { return blocking_obstacle_; }
@@ -240,6 +240,7 @@ class ReferenceLineInfo {
     SIGNAL = 5,
     STOP_SIGN = 6,
     YIELD_SIGN = 7,
+    JUNCTION = 8,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&

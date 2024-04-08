@@ -39,15 +39,19 @@ apollo::perception::lidar::PointCloudMapROIComponent
 
 #### 输入
 
-| Name    | Type                                             | Description         |
-| ------- | ------------------------------------------------ | ------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+| Name    | Type                                             | Description         | Input channal |
+| ------- | ------------------------------------------------ | ------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message | /perception/lidar/pointcloud_preprocess |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/lidar/pointcloud_preprocess`. The detailed input channel information is in `modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag` file. By default, the upstream components of the messages received by the component include `pointcloud_preprocess`.
 
 #### 输出
 
-| Name    | Type                                             | Description                                                        |
-| ------- | ------------------------------------------------ | ------------------------------------------------------------------ |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | LidarFrame's roi_indices: save the indices of point inside the ROI |
+| Name    | Type                                             | Description                                                        | Output channal |
+| ------- | ------------------------------------------------ | ------------------------------------------------------------------ | -------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | LidarFrame's roi_indices: save the indices of point inside the ROI | /perception/lidar/pointcloud_map_based_roi |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/lidar_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/pointcloud_map_based_roi/conf/pointcloud_map_based_roi_config.pb.txt` file.
 
 #### How to use
 

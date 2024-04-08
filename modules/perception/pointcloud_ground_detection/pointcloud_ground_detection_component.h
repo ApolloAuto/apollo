@@ -59,8 +59,6 @@ class PointCloudGroundDetectComponent
  private:
   std::shared_ptr<apollo::cyber::Writer<onboard::LidarFrameMessage>> writer_;
   std::string output_channel_name_;
-  std::shared_ptr<base::AttributePointCloud<base::PointF>> roi_cloud_;
-  std::shared_ptr<base::AttributePointCloud<base::PointD>> roi_world_cloud_;
   BaseGroundDetector* ground_detector_;
 };
 

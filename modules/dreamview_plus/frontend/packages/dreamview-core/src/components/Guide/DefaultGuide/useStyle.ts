@@ -9,20 +9,20 @@ export default function useStyle() {
         'dv-default-guide-current-value': {
             ...theme.tokens.typography.content,
             fontSize: '18px',
-            color: '#FFFFFF',
+            color: theme.components.setupPage.guideStepColor,
         },
         'dv-default-guide-all-value': {
             ...theme.tokens.typography.content,
-            color: '#D3DCEB',
+            color: theme.components.setupPage.guideStepTotalColor,
         },
 
         'dv-default-guide-back-node': {
             width: '72px',
             height: '40px',
             ...theme.tokens.typography.content,
-            color: '#FFFFFF',
-            backgroundColor: theme.tokens.backgroundColor.mainLight,
-            border: '1px solid rgba(124,136,153,1)',
+            color: theme.components.setupPage.guideBackColor,
+            backgroundColor: theme.components.setupPage.guideBackBgColor,
+            border: theme.components.setupPage.guideBackBorderColor,
             borderRadius: '8px',
             '&:hover': {
                 color: '#3288FA',
@@ -36,7 +36,7 @@ export default function useStyle() {
             height: '40px',
             ...theme.tokens.typography.content,
             color: '#FFFFFF',
-            backgroundColor: theme.colors.blue6,
+            backgroundColor: theme.tokens.colors.brand2,
             borderRadius: '8px',
         },
         'dv-default-guide-close-node': {
@@ -44,7 +44,7 @@ export default function useStyle() {
             height: '40px',
             ...theme.tokens.typography.content,
             color: '#FFFFFF',
-            backgroundColor: theme.colors.blue6,
+            backgroundColor: theme.tokens.colors.brand2,
             borderRadius: '8px',
         },
     }));

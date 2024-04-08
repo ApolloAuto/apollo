@@ -49,6 +49,7 @@ apollo_cc_library(
         "protocol/scu_vcu_1_312.h",
         "protocol/scu_vcu_2_313.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",

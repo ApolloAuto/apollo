@@ -26,6 +26,7 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/%(car_type_lower)s/proto/%(car_type_lower)s.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -90,6 +91,11 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
    * @brief publish chassis for vehicle messages
    */
   void PublishChassisDetail() override;
+
+  /**
+   * @brief create cansender heartbeat
+   */
+  void UpdateHeartbeat();
 
  private:
   /**

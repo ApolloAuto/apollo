@@ -25,6 +25,7 @@
 
 #include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -49,7 +50,19 @@ bool SpeedDecider::Init(const std::string& config_dir, const std::string& name,
     return false;
   }
   // Load the config this task.
-  return Task::LoadConfig<SpeedDeciderConfig>(&config_);
+  if (!Task::LoadConfig<SpeedDeciderConfig>(&config_)) {
+    return false;
+  }
+  for (const auto& follow_function :
+       config_.follow_distance_scheduler().follow_distance()) {
+    follow_distance_function_.emplace_back(
+        std::make_pair(follow_function.speed(), follow_function.slope()));
+  }
+  std::sort(follow_distance_function_.begin(), follow_distance_function_.end());
+  for (const auto& iter : follow_distance_function_) {
+    AINFO << "speed: " << iter.first << ", slope: " << iter.second;
+  }
+  return true;
 }
 
 common::Status SpeedDecider::Execute(Frame* frame,
@@ -383,8 +396,7 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
 bool SpeedDecider::CreateFollowDecision(
     const Obstacle& obstacle, ObjectDecisionType* const follow_decision) const {
   const double follow_speed = init_point_.v();
-  const double follow_distance_s =
-      -StGapEstimator::EstimateProperFollowingGap(follow_speed);
+  const double follow_distance_s = -EstimateProperFollowGap(follow_speed);
 
   const auto& boundary = obstacle.path_st_boundary();
   const double reference_s =
@@ -586,6 +598,27 @@ double SpeedDecider::EstimateProperOvertakingGap(const double target_obs_speed,
       std::fmax(adc_speed, target_obs_speed) * config_.overtake_time_buffer(),
       config_.overtake_min_distance());
   return overtake_distance_s;
+}
+
+double SpeedDecider::EstimateProperFollowGap(const double& adc_speed) const {
+  double follow_distance = config_.stop_follow_distance();
+  for (int i = 1; i < follow_distance_function_.size(); i++) {
+    if (adc_speed <= follow_distance_function_[i].first) {
+      follow_distance += follow_distance_function_[i - 1].second *
+                         (adc_speed - follow_distance_function_[i - 1].first);
+      break;
+    } else {
+      follow_distance += follow_distance_function_[i - 1].second *
+                         (follow_distance_function_[i].first -
+                          follow_distance_function_[i - 1].first);
+    }
+  }
+  if (adc_speed > follow_distance_function_.back().first) {
+    follow_distance += follow_distance_function_.back().second *
+                       (adc_speed - follow_distance_function_.back().first);
+  }
+  AINFO << "follow_distance: " << follow_distance;
+  return follow_distance;
 }
 
 }  // namespace planning

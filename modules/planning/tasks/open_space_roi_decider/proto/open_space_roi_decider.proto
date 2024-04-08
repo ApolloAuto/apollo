@@ -49,4 +49,6 @@ message OpenSpaceRoiDeciderConfig {
   optional double extend_left_x_buffer = 17 [default = 0.0];
   // get road boundary from HD map
   optional bool use_road_boundary_from_map = 18 [default = false];
+  // expand polygon of obstacle 
+  optional bool expand_polygon_of_obstacle_by_distance = 19 [default = false];
 }

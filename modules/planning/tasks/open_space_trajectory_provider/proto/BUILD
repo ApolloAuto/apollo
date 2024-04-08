@@ -11,7 +11,7 @@ proto_library(
     srcs = ["open_space_trajectory_provider.proto"],
     deps = [
         "//modules/planning/planning_base/proto/math:fem_pos_deviation_smoother_config_proto",
-        "//modules/planning/planning_base/proto:planner_open_space_config_proto"
+        "//modules/planning/planning_open_space/proto:planner_open_space_config_proto"
     ],
 )
 

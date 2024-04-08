@@ -40,7 +40,7 @@ TEST_F(ContiArsPreprocessorTest, init) {
   EXPECT_FLOAT_EQ(delay_time, 0.0);
   PreprocessorInitOptions preprocessor_init_options;
   preprocessor_init_options.config_path =
-      "modules/perception/radar_detection/data";
+      "perception/radar_detection/data";
   preprocessor_init_options.config_file = "preprocessor.pb.txt";
   bool init_result = preprocessor.Init(preprocessor_init_options);
   EXPECT_TRUE(init_result);

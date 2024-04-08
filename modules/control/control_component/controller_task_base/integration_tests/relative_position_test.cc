@@ -32,10 +32,10 @@ class RelativePositionTest : public ControlTestBase {
  public:
   virtual void SetUp() {
     FLAGS_test_data_dir =
-        "/apollo/modules/control/testdata/relative_position_test/";
-    FLAGS_control_conf_file =
-        "/apollo/modules/control/testdata/conf/control_conf_lite.pb.txt";
+        "/apollo/modules/control/control_component/testdata/"
+        "relative_position_test/";
     FLAGS_use_navigation_mode = true;
+    FLAGS_is_control_ut_test_mode = true;
   }
 };
 
@@ -46,6 +46,7 @@ TEST_F(RelativePositionTest, simple_left) {
   FLAGS_test_planning_file = "0_apollo_planning.pb.txt";
   FLAGS_test_chassis_file = "0_apollo_canbus_chassis.pb.txt";
   ControlTestBase::SetUp();
+  ControlTestBase::SetUpTestCase();
   RUN_GOLDEN_TEST;
 }
 

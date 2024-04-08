@@ -62,7 +62,7 @@ export default function RoutingEditingOperationArea() {
 
     return (
         <div className={classes['routing-editing-op-con']}>
-            <Button onClick={handleCancel}>{t('cancel')}</Button>
+            <Button ghost onClick={handleCancel}>{t('cancel')}</Button>
             <Button onClick={handleSave}>{t('saveEditing')}</Button>
         </div>
     );

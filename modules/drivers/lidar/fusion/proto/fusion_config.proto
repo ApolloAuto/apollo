@@ -1,0 +1,10 @@
+syntax = "proto2";
+package apollo.drivers.fusion;
+
+message FusionConfig {
+  optional uint32 max_interval_ms = 1;
+  optional bool drop_expired_data = 2;
+  optional string fusion_channel = 3;
+  repeated string input_channel = 4;
+  optional float wait_time_s = 5;
+}

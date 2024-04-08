@@ -460,17 +460,6 @@ message Vin_resp3_516 {
   optional string vin16 = 1;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Devkit {
   optional Throttle_command_100 throttle_command_100 = 1; // control message
   optional Brake_command_101 brake_command_101 = 2; // control message
@@ -494,6 +483,4 @@ message Devkit {
   optional Vin_resp1_514 vin_resp1_514 = 20; // report message
   optional Vin_resp2_515 vin_resp2_515 = 21; // report message
   optional Vin_resp3_516 vin_resp3_516 = 22; // report message
-
-  optional CheckResponseSignal check_response = 100;
 }

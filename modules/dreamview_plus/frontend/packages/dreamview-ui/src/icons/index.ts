@@ -1,5 +1,3 @@
-export { default as IconIcResetView } from './components/IcResetView';
-
 export { default as IconIcNotApplicable } from './components/IcNotApplicable';
 
 export { default as IconIcAddADesktopShortcut } from './components/IcAddADesktopShortcut';
@@ -10,7 +8,7 @@ export { default as IconIcAddPanel } from './components/IcAddPanel';
 
 export { default as IconIcAddPanelPitchOn } from './components/IcAddPanelPitchOn';
 
-export { default as IconIcAimingCircle } from './components/IcAimingCircle';
+export { default as IconIcAimingcircle } from './components/IcAimingcircle';
 
 export { default as IconIcAmplification } from './components/IcAmplification';
 
@@ -73,6 +71,8 @@ export { default as IconIcDownload } from './components/IcDownload';
 export { default as IconIcDownloading } from './components/IcDownloading';
 
 export { default as IconIcDownloadingCancel } from './components/IcDownloadingCancel';
+
+export { default as IconIcDreamview } from './components/IcDreamview';
 
 export { default as IconIcEitFullScreen } from './components/IcEitFullScreen';
 
@@ -156,6 +156,8 @@ export { default as IconIcRegularMessage } from './components/IcRegularMessage';
 
 export { default as IconIcRemoveAllPoints } from './components/IcRemoveAllPoints';
 
+export { default as IconIcResetView } from './components/IcResetView';
+
 export { default as IconIcRoutingEditing } from './components/IcRoutingEditing';
 
 export { default as IconIcRoutingEditingEnter } from './components/IcRoutingEditingEnter';
@@ -197,6 +199,12 @@ export { default as IconIcSuggest } from './components/IcSuggest';
 export { default as IconIcToBeDownloaded } from './components/IcToBeDownloaded';
 
 export { default as IconIcToBeUpdated } from './components/IcToBeUpdated';
+
+export { default as IconIcToastFail } from './components/IcToastFail';
+
+export { default as IconIcToastSuccess } from './components/IcToastSuccess';
+
+export { default as IconIcToastWarning } from './components/IcToastWarning';
 
 export { default as IconIcUse } from './components/IcUse';
 

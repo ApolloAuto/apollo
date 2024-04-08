@@ -102,9 +102,10 @@ if __name__ == '__main__':
             act.command = action_pb2.ActionCommandType.PULL_OVER
             client_pull_over.send_request(act)
         elif m == "2":
+            park_name = input("please input parking spot id:")
             parking = parking_pb2.ValetParkingCommand()
             add_header(parking)
-            parking.parking_spot_id = "parking_3"
+            parking.parking_spot_id = park_name
             print(client_parking.send_request(parking))
         elif m == "3":  # parking out
             fsc = free_space_command_pb2.FreeSpaceCommand()

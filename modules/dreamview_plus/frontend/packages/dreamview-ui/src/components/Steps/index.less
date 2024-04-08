@@ -1,0 +1,65 @@
+.dreamview-steps{
+    height: 80px;
+    border-radius: 10px;
+    background: #343C4D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .dreamview-steps-item{
+        flex:none;
+    }
+
+    .dreamview-steps-item-container{
+        display: flex;
+        align-items: center;
+        .dreamview-steps-item-icon{
+            height: 40px !important;
+            margin-right: 12px;
+        }
+        .dreamview-steps-item-content{
+            display: flex;
+        }
+        .dreamview-steps-item-content::after{
+            content: '···';
+            font-size: 20px;
+            scale: 2;
+            display: block;
+            color:  #464C59;
+            padding: 0px 24px;
+        }
+    }
+
+    .dreamview-steps-item-finish{
+        .dreamview-steps-item-content::after{
+            color: #3288FA;
+        }
+    }
+
+    .dreamview-steps-item-active, .dreamview-steps-item-finish {
+        .dreamview-steps-item-title{
+            font-family: PingFangSC-Semibold;
+            font-size: 20px;
+            color: #FFFFFF !important;
+            font-weight: 600;
+        }
+        .dreamview-steps-item-title::after{
+            height: 0px;
+        }
+    }
+
+    .dreamview-steps-item-wait{
+        .dreamview-steps-item-title{
+            font-family: PingFangSC-Semibold;
+            font-size: 20px;
+            color: #5A6270 !important;
+            font-weight: 600;
+        }
+    }
+}
+
+.dreamview-steps > div:nth-last-child(1){
+    .dreamview-steps-item-content::after{
+        display: none;
+    }
+}

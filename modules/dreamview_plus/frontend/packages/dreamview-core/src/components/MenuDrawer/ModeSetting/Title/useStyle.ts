@@ -7,12 +7,12 @@ export default function useStyle() {
             paddingLeft: '10px',
             position: 'relative',
             cursor: 'pointer',
-            marginBottom: theme.tokens.margin.speace,
+            marginBottom: '12px',
             '&::after': {
                 position: 'absolute',
                 width: '2px',
                 height: '12px',
-                background: theme.tokens.colors.brand2,
+                background: theme.tokens.colors.brand3,
                 content: '""',
                 left: 0,
                 top: 0,
@@ -24,6 +24,7 @@ export default function useStyle() {
                 right: 0,
                 top: '4px',
                 transform: 'rotate(0)',
+                color: theme.tokens.colors.fontColor1,
                 transition: theme.tokens.transitions.easeInOut(),
             },
         },
@@ -38,6 +39,9 @@ export default function useStyle() {
             overflow: 'hidden',
             padding: '0 14px',
             margin: '0 -14px',
+        },
+        'overflow-hidden': {
+            overflow: 'hidden',
         },
     }));
     return hoc();

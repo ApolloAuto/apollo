@@ -3,6 +3,7 @@ import React from 'react';
 export interface IPanelMetaInfo {
     title: string;
     type: string;
+    originType?: 'remote' | 'local';
     description: string;
     thumbnail?: string;
     renderToolbar?: (props: any) => React.JSX.Element;
@@ -18,6 +19,7 @@ export enum PanelType {
     DashBoard = 'dashBoard',
     PncMonitor = 'pncMonitor',
     Components = 'components',
+    MapCollect = 'MapCollect',
     Charts = 'charts',
     TerminalWin = 'terminalWin',
 }

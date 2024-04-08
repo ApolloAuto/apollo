@@ -126,15 +126,15 @@ Predictor generates predicted trajectories for obstacles. Currently, the support
 
 #### Input
 
-| Name    | Type                                      | Description      |
-| ------- | ----------------------------------------- | ---------------- |
-| `frame` | `apollo::perception::PerceptionObstacles` | Obstacle message |
+| Name    | Type                                      | Description      | Input channal |
+| ------- | ----------------------------------------- | ---------------- | ------------- |
+| `frame` | `apollo::perception::PerceptionObstacles` | Obstacle message | /apollo/perception/obstacles |
 
 #### Output
 
-| Name    | Type                                      | Description                 |
-| ------- | ----------------------------------------- | --------------------------- |
-| `frame` | `apollo::prediction::PredictionObstacles` | Obstacle prediction message |
+| Name    | Type                                      | Description                 | Output channal |
+| ------- | ----------------------------------------- | --------------------------- | -------------- |
+| `frame` | `apollo::prediction::PredictionObstacles` | Obstacle prediction message | /apollo/prediction |
 
 #### How to use
 

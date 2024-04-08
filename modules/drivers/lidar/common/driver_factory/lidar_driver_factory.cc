@@ -17,7 +17,7 @@
 #include "modules/drivers/lidar/common/driver_factory/lidar_driver_factory.h"
 
 #include "modules/drivers/lidar/hesai/driver/driver.h"
-// #include "modules/drivers/lidar/robosense/driver/driver.h"
+// #include "modules/drivers/lidar/rslidar/driver/driver.h"
 #include "modules/drivers/lidar/velodyne/driver/driver.h"
 
 namespace apollo {

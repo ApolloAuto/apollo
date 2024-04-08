@@ -180,7 +180,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
       GenerateStopTrajectory(trajectory_data);
-      is_generation_thread_stop_.store(true);
+      // is_generation_thread_stop_.store(true);
       AINFO << "Vehicle is near to destination";
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
@@ -351,6 +351,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                              .is_near_destination_theta_threshold()) {
     ADEBUG << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);
+    frame_->mutable_open_space_info()->set_openspace_planning_finish(true);
     return true;
   }
   return false;

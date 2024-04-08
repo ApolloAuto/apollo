@@ -14,11 +14,14 @@ export default class PncJunction {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
         this.groups = {};
         this.scene = scene;
         this.coordinates = coordinates;
         this.currentIds = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     drawPncJunctions(pncJunctions) {
@@ -39,14 +42,14 @@ export default class PncJunction {
             const pncJunctionGroup = new THREE.Group();
             const points = this.coordinates.applyOffsetToArray(pncJunction.polygon.point);
             const zoneMesh = drawZone(points, {
-                color: colorMapping.BLUE,
+                color: this.colors.BLUE,
                 zOffset: zOffset.pncJunction,
                 opacity: 0.3,
                 matrixAutoUpdate: true,
             });
 
             const lineMesh = drawPolygon(points, {
-                color: colorMapping.BLUE,
+                color: this.colors.BLUE,
                 linewidth: 1,
                 zOffset: zOffset.pncJunction,
                 opacity: 1,

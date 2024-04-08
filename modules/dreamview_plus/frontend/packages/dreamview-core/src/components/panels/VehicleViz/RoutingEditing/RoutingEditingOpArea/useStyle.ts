@@ -59,16 +59,6 @@ export default function useStyle() {
                 background: '#383D47',
             },
         },
-        'routing-editing-btn-popover': {
-            '& .dreamview-popover-inner-content': {
-                padding: '5px 10px',
-                fontFamily: 'PingFangSC-Regular',
-                fontSize: '14px',
-                fontWeight: '400',
-                borderRadius: '6px',
-            },
-            '& .dreamview-popover-arrow::after': {},
-        },
 
         'common-routing-popover-ordinary': {
             '& .dreamview-popover-inner, & .dreamview-popover-arrow::after': {

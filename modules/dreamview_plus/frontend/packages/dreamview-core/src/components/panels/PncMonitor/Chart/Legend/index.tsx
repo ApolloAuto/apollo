@@ -1,7 +1,6 @@
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
 import React, { useEffect, useMemo, useState } from 'react';
 import { IconIcClassificationNotes } from '@dreamview/dreamview-ui';
-import { defaultColor } from '../ChartBase/util';
 
 function useStyle() {
     const hoc = useMakeStyle((theme) => ({
@@ -20,7 +19,7 @@ function useStyle() {
             display: 'flex',
             alignItems: 'center',
             userSelect: 'none',
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             ...theme.tokens.typography.sideText,
             marginRight: '10px',
             '& .anticon': {
@@ -29,9 +28,9 @@ function useStyle() {
         },
         'legend-unactive': {
             position: 'relative',
-            color: theme.tokens.colors.fontColor4,
+            color: theme.tokens.colors.fontColor1,
             '& .anticon': {
-                color: `${theme.tokens.colors.fontColor4} !important`,
+                color: `${theme.tokens.colors.fontColor1} !important`,
             },
             '&::after': {
                 content: '""',
@@ -40,7 +39,7 @@ function useStyle() {
                 right: 0,
                 margin: 'auto',
                 height: '1px',
-                background: theme.tokens.colors.fontColor4,
+                background: theme.tokens.colors.fontColor1,
             },
         },
         'legend-icon': {},
@@ -58,7 +57,8 @@ function Legend(props: LegendProps) {
     const { legends, onClick: propOnClick } = props;
     const { classes, cx } = useStyle();
     const [selected, setSelected] = useState<Record<string, boolean>>({});
-
+    const { useStyles } = useThemeContext();
+    const { theme } = useStyles();
     useEffect(() => {
         const result: Record<string, boolean> = {};
         legends.forEach(({ name }) => {
@@ -95,8 +95,8 @@ function Legend(props: LegendProps) {
                         key={`${item.name}_${index + 1}`}
                     >
                         <IconIcClassificationNotes
-                            className={classes}
-                            style={{ color: item.color || defaultColor[index] }}
+                            // className={classes}
+                            style={{ color: item.color || theme.components.pncMonitor.chartColors[index] }}
                         />
                         {item.name}
                     </div>

@@ -4,13 +4,27 @@ import set from 'lodash/set';
 import get from 'lodash/get';
 import shortUUID from 'short-uuid';
 import { PanelType } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
+import { LocalStorage } from '@dreamview/dreamview-core/src/util/storageManager';
 import { genereatePanelId, genereateNewMosaicNode } from '@dreamview/dreamview-core/src/util/layout';
-import { UPDATE, ADD_PANEL_FROM_OUTSIDE, REFRESH_PANEL, RESET_LAYOUT } from './actionTypes';
+import {
+    EXPAND_MODE_LAYOUT_RELATION,
+    UPDATE,
+    ADD_PANEL_FROM_OUTSIDE,
+    REFRESH_PANEL,
+    RESET_LAYOUT,
+} from './actionTypes';
 import { CombineAction, AddPanelFromOutsidePayload, IResetLayoutByMode, RefreshPanelPayload } from './actions';
 import { CURRENT_MODE } from '../HmiStore';
 
-export type IInitState = {
+type ILayout = {
     [key in CURRENT_MODE]: {
+        mosaicId: string;
+        layout: MosaicNode<string>;
+    };
+};
+
+type IExpandLayout = {
+    [key: string]: {
         mosaicId: string;
         layout: MosaicNode<string>;
     };
@@ -20,7 +34,16 @@ type IModeLayoutRelation = {
     [key in CURRENT_MODE]: MosaicNode<string>;
 };
 
-const modeLayoutRelation: () => IModeLayoutRelation = () => ({
+type IExpandModeLayoutRelation = {
+    [key: string]: MosaicNode<string>;
+};
+
+export type IInitState = {
+    layout: ILayout & IExpandLayout;
+    modeLayoutRelation: IModeLayoutRelation & IExpandModeLayoutRelation;
+};
+
+const initModeLayoutRelation: () => IModeLayoutRelation = () => ({
     [CURRENT_MODE.NONE]: null,
     [CURRENT_MODE.PERCEPTION]: {
         first: {
@@ -96,20 +119,50 @@ const modeLayoutRelation: () => IModeLayoutRelation = () => ({
         splitPercentage: 72,
         direction: 'row',
     },
+    [CURRENT_MODE.MAP_COLLECT]: {
+        direction: 'row',
+        first: genereatePanelId(PanelType.MapCollect),
+        second: {
+            direction: 'column',
+            // first: {
+            //     direction: 'column',
+            //     first: genereatePanelId(PanelType.PointCloud),
+            //     second: genereatePanelId(PanelType.VehicleViz),
+            // },
+            first: genereatePanelId(PanelType.PointCloud),
+            second: genereatePanelId(PanelType.Components),
+        },
+        splitPercentage: 75,
+    },
+    [CURRENT_MODE.MAP_EDITOR]: genereatePanelId('MapEditor'),
+    [CURRENT_MODE.CAMERA_CALIBRATION]: genereatePanelId('CameraCalibration'),
+    [CURRENT_MODE.LiDAR_CALIBRATION]: genereatePanelId('LidarCalibration'),
 });
 
-export const mosaicId = shortUUID.generate();
+export const mosaicId = (() => {
+    const uid = shortUUID.generate();
+    const storageManager = new LocalStorage('mosaicId');
+    if (storageManager.get()) {
+        return storageManager.get();
+    }
+    storageManager.set(uid);
+    return uid;
+})();
 
-export const initState: IInitState = Object.entries(modeLayoutRelation()).reduce(
-    (result, [key, layout]) => ({
-        ...result,
-        [key]: {
-            mosaicId,
-            layout,
-        },
-    }),
-    {} as IInitState,
-);
+const relations = initModeLayoutRelation();
+export const initState: IInitState = {
+    layout: Object.entries(relations).reduce(
+        (result, [key, layout]) => ({
+            ...result,
+            [key]: {
+                mosaicId,
+                layout,
+            },
+        }),
+        {} as IInitState['layout'],
+    ),
+    modeLayoutRelation: relations,
+};
 
 function addPanelFromOutside(state: IInitState, payload: AddPanelFromOutsidePayload) {
     const { path, position, originPanelConfig, panelId, mode } = payload;
@@ -118,16 +171,23 @@ function addPanelFromOutside(state: IInitState, payload: AddPanelFromOutsidePayl
 
     const isLeve1 = !path || path.length === 0;
 
-    const hasLayout = !!state[mode].layout;
+    if (!state.layout[mode]) {
+        state.layout[mode] = {
+            mosaicId,
+            layout: '',
+        };
+    }
 
-    const newNode = genereateNewMosaicNode(state[mode].layout, path, position, newPanelType);
+    const hasLayout = !!state.layout[mode].layout;
+
+    const newNode = genereateNewMosaicNode(state.layout[mode].layout, path, position, newPanelType);
 
     if (!hasLayout) {
-        state[mode].layout = newPanelType;
+        state.layout[mode].layout = newPanelType;
     } else if (isLeve1) {
-        state[mode].layout = newNode;
+        state.layout[mode].layout = newNode;
     } else {
-        set(state[mode].layout as object, path, newNode) as MosaicNode<string>;
+        set(state.layout[mode].layout as object, path, newNode) as MosaicNode<string>;
     }
 }
 
@@ -135,23 +195,40 @@ function refreshPanel(draftState: IInitState, payload: RefreshPanelPayload) {
     const { path, mode } = payload;
     const isLeve1 = path.length === 0;
     if (isLeve1) {
-        draftState[mode].layout = genereatePanelId(draftState[mode].layout as string);
+        draftState.layout[mode].layout = genereatePanelId(draftState.layout[mode].layout as string);
     } else {
-        const newPanelType = genereatePanelId(get(draftState[mode].layout, path));
-        set(draftState[mode].layout as object, path, newPanelType) as MosaicNode<string>;
+        const newPanelType = genereatePanelId(get(draftState.layout[mode].layout, path));
+        set(draftState.layout[mode].layout as object, path, newPanelType) as MosaicNode<string>;
     }
 }
 
 function resetLayoutByModeHandler(draftState: IInitState, payload: IResetLayoutByMode) {
-    draftState[payload.mode].layout = modeLayoutRelation()[payload.mode];
+    draftState.layout[payload.mode].layout = initModeLayoutRelation()[payload.mode];
+}
+
+function expandModeLayoutRelation(draftState: IInitState, payload: { mode: string; layout: MosaicNode<string> }) {
+    draftState.modeLayoutRelation[payload.mode as string] = payload.layout;
+
+    if (!draftState.layout) {
+        draftState.layout[payload.mode as string] = {
+            mosaicId,
+            layout: payload.layout,
+        };
+    }
 }
 
 export const reducer = (state: IInitState, action: CombineAction) =>
     produce(state, (draftState: IInitState) => {
-        const { mode } = action.payload;
         switch (action.type) {
             case UPDATE:
-                draftState[mode].layout = action.payload.layout;
+                if (!draftState.layout[action.payload.mode]) {
+                    draftState.layout[action.payload.mode] = {
+                        mosaicId,
+                        layout: action.payload.layout,
+                    };
+                } else {
+                    draftState.layout[action.payload.mode].layout = action.payload.layout;
+                }
                 break;
             case REFRESH_PANEL:
                 refreshPanel(draftState, action.payload);
@@ -161,6 +238,9 @@ export const reducer = (state: IInitState, action: CombineAction) =>
                 break;
             case RESET_LAYOUT:
                 resetLayoutByModeHandler(draftState, action.payload);
+                break;
+            case EXPAND_MODE_LAYOUT_RELATION:
+                expandModeLayoutRelation(draftState, action.payload);
                 break;
             default:
                 break;

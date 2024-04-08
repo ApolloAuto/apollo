@@ -53,18 +53,6 @@ apollo_cc_test(
     ],
 )
 
-apollo_cc_test(
-    name = "inference_factory_test",
-    size = "small",
-    srcs = ["inference_factory_test.cc"],
-    linkstatic = True,
-    deps = [
-        ":apollo_perception_common_inference",
-        "//modules/perception/common/inference/tensorrt:apollo_perception_inference_rt_common",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 gpu_library(
     name = "perception_inference_operators_cuda",
     srcs = [

@@ -55,6 +55,7 @@ apollo_cc_library(
         "protocol/vin_resp3_51d.h",
         "protocol/wheelspeed_report_51e.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus/proto:canbus_conf_cc_proto",

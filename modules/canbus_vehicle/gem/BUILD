@@ -77,6 +77,7 @@ apollo_cc_library(
         "protocol/wiper_rpt_91.h",
         "protocol/yaw_rate_rpt_81.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/gem/proto:gem_cc_proto",

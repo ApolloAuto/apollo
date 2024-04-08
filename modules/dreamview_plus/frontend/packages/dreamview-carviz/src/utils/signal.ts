@@ -88,7 +88,7 @@ export const getPositionAndHeading = (signal) => {
     if (locations.length === 0) {
         if (signal.boundary?.point?.length) {
             console.warn('subsignal locations not found,use signal bounday instead.');
-            locations.push(signal.boundary.point);
+            locations.push(...signal.boundary.point);
         } else {
             console.warn('unable to determine signal location,skip.');
             return {};

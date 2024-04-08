@@ -38,8 +38,6 @@ void Steerstatus512::Parse(const std::uint8_t* bytes, int32_t length,
       steer_err(bytes, length));
   chassis->mutable_steer_status__512()->set_sensor_err(
       sensor_err(bytes, length));
-  chassis->mutable_check_response()->set_is_eps_online(
-      steer_angle_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'bit': 0, 'description': 'steering angle enable bit(Status)',

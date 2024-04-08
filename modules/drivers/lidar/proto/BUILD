@@ -5,21 +5,8 @@ load("//tools/proto:proto.bzl", "proto_library")
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
-    name = "robosense_config_proto",
-    srcs = ["robosense_config.proto"],
-)
-
-proto_library(
     name = "hesai_proto",
     srcs = ["hesai.proto"],
-    deps = [
-        "//modules/common_msgs/basic_msgs:header_proto",
-    ],
-)
-
-proto_library(
-    name = "robosense_proto",
-    srcs = ["robosense.proto"],
     deps = [
         "//modules/common_msgs/basic_msgs:header_proto",
     ],
@@ -61,7 +48,6 @@ proto_library(
         ":hesai_config_proto",
         ":velodyne_config_proto",
         ":lidar_parameter_proto",
-        ":robosense_config_proto",
     ],
 )
 

@@ -66,12 +66,14 @@ void GnnBipartiteGraphMatcher::Match(
   unassigned_cols->clear();
   row_tag_.clear();
   col_tag_.clear();
+  ignore_track_.clear();
   algorithm::SecureMat<float>* cost_matrix = cost_matrix_;
   float max_dist = options.cost_thresh;
   int num_rows = static_cast<int>(cost_matrix->height());
   int num_cols = static_cast<int>(cost_matrix->width());
   row_tag_.assign(num_rows, 0);
   col_tag_.assign(num_cols, 0);
+  ignore_track_.assign(num_rows, 0);
 
   std::vector<MatchCost> match_costs;
   for (int r = 0; r < num_rows; r++) {
@@ -90,10 +92,17 @@ void GnnBipartiteGraphMatcher::Match(
   for (size_t i = 0; i < match_costs.size(); ++i) {
     size_t rid = match_costs[i].RowIdx();
     size_t cid = match_costs[i].ColIdx();
-    if (row_tag_[rid] == 0 && col_tag_[cid] == 0) {
+    // if (row_tag_[rid] == 0 && col_tag_[cid] == 0) {
+    //   row_tag_[rid] = 1;
+    //   col_tag_[cid] = 1;
+    //   assignments->push_back(std::make_pair(rid, cid));
+    // }
+    if (row_tag_[rid] == 0 && col_tag_[cid] == 0 && ignore_track_[rid] <= 1) {
       row_tag_[rid] = 1;
       col_tag_[cid] = 1;
       assignments->push_back(std::make_pair(rid, cid));
+    } else if (row_tag_[rid] == 0 && col_tag_[cid] != 0) {
+      ignore_track_[rid]++;
     }
   }
 

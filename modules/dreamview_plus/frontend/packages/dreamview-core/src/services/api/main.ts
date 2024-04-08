@@ -1,4 +1,5 @@
 import Logger from '@dreamview/log';
+import { mergeMap, throwError, of, catchError } from 'rxjs';
 import { apollo } from '@dreamview/dreamview';
 import { webSocketManager } from '../WebSocketManager';
 import { ReqDataType, RequestDataType } from '../models/request-message.model';
@@ -8,6 +9,9 @@ import {
     MainApiTypes,
     DefaultRoutings,
     StartScenario,
+    CheckMapCollectInfo,
+    CreateMapFileInfo,
+    ExportMapFileInfo,
     SaveDefaultRoutingInfo,
     GetStartPointInfo,
     SetStartPointInfo,
@@ -105,6 +109,29 @@ export class MainApi {
                 );
                 return Promise.reject(err);
             });
+    }
+
+    requestStream<Req, Res>(req: ReqDataType<Req>) {
+        return webSocketManager
+            .requestStream<Req, Res>(this.generateRequest(req), SocketNameEnum.MAIN, req.data.requestId)
+            .pipe(
+                mergeMap((res) => {
+                    if (res.data.info.code !== 0) {
+                        logger.error(
+                            `Received error message from PluginRequest name: ${
+                                req.data.name
+                            }, message: ${JSON.stringify(res.data.info, null, 0)}`,
+                        );
+                        return throwError(new Error(res.data.info.message));
+                    }
+                    return of(res.data.info.data);
+                }),
+                catchError((error) => {
+                    // Handle the error here
+                    console.error(error);
+                    return throwError(error);
+                }),
+            );
     }
 
     startPlayRecorder() {
@@ -877,6 +904,71 @@ export class MainApi {
                 info: '',
             },
             type: MainApiTypes.RequestRoutePath,
+        });
+    }
+
+    checkMapCollect() {
+        return this.request<'', CheckMapCollectInfo>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.CheckMapCollectStatus,
+        });
+    }
+
+    startMapCollect() {
+        return this.request<'', null>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.StartRecordMapData,
+        });
+    }
+
+    endMapCollect() {
+        return this.request<'', null>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.StopRecordMapData,
+        });
+    }
+
+    createMapFile(requestId: string) {
+        return this.requestStream<'', CreateMapFileInfo>({
+            data: {
+                name: '',
+                info: '',
+                requestId,
+            },
+            type: MainApiTypes.StartMapCreator,
+        });
+    }
+
+    breakMapfile(requestId: string) {
+        return this.request<{ requestId: string }, null>({
+            data: {
+                name: '',
+                info: {
+                    requestId,
+                },
+            },
+            type: MainApiTypes.BreakMapCreator,
+        });
+    }
+
+    exportMapFile(info: { source_path: string }) {
+        return this.request<{ source_path: string }, ExportMapFileInfo>({
+            data: {
+                name: '',
+                info: {
+                    source_path: info.source_path,
+                },
+            },
+            type: MainApiTypes.ExportMapFile,
         });
     }
 }

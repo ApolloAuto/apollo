@@ -53,7 +53,7 @@ modules/dreamview_plus
 1. Build apollo in source env or install `dreamview-plus` and `monitor` package in package management env
 2. in source env:
 ```shell
-bash scripts/bootstrap.sh start_plus
+bash scripts/bootstrap.sh --plus
 ```
 
 in package management env:

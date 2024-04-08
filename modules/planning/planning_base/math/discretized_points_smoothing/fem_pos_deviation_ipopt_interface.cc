@@ -353,7 +353,7 @@ void FemPosDeviationIpoptInterface::generate_tapes(int n, int m, int* nnz_jac_g,
   std::vector<adouble> g(m, 0.0);
   std::vector<double> lam(m, 0.0);
 
-  double sig;
+  double sig = 0.0;
   adouble obj_value;
 
   double dummy = 0.0;

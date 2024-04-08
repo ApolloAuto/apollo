@@ -14,6 +14,9 @@ export default function usePageLayoutStyles() {
             width: 64,
             height: '100%',
             background: theme.tokens.backgroundColor.main,
+            borderRight: `1px solid ${theme.tokens.colors.divider2}`,
+            position: 'relative',
+            zIndex: 2,
         },
         'dv-layout-content': {
             flex: 1,
@@ -26,7 +29,7 @@ export default function usePageLayoutStyles() {
             flex: 1,
             display: 'flex',
             position: 'relative',
-            background: '#383C4D',
+            background: theme.tokens.colors.background3,
             overflow: 'hidden',
         },
         'dv-layout-panellayout': {
@@ -37,14 +40,17 @@ export default function usePageLayoutStyles() {
         'dv-layout-playercontrol': {
             height: 0,
             transition: theme.tokens.transitions.easeIn('height'),
-            background: theme.tokens.colors.background2,
-            borderTop: '1px solid #252833',
-            marginTop: '-1px',
+            background: theme.components.bottomBar.bgColor,
             position: 'relative',
+            zIndex: 1,
             overflow: 'hidden',
+            boxShadow: 'none',
+            border: 'none',
         },
         'dv-layout-playercontrol-active': {
             height: 64,
+            boxShadow: theme.components.bottomBar.boxShadow,
+            borderTop: theme.components.bottomBar.border,
         },
     }));
     return hoc();

@@ -2,21 +2,30 @@ const fs = require('fs');
 const path = require('path');
 
 const ICONS_DIR = path.resolve(__dirname, '../src/icons/components');
+const ICONS_DRAK_DIR = path.resolve(__dirname, '../src/iconDrak/icons/components');
 const OUTPUT_FILE = path.resolve(__dirname, '../src/mdxs/IconList.mdx');
 
 const generateIconListMDX = () => {
     const iconFiles = fs.readdirSync(ICONS_DIR).filter((file) => file.endsWith('.tsx'));
 
-    const icons = iconFiles.map((file) => {
+    const iconsLight = iconFiles.map((file) => {
         const iconName = file.replace('.tsx', '');
         return { name: iconName };
     });
 
-    const importString = `import { ${icons
-        .map((icon) => `Icon${icon.name}`)
-        .join(
-            ', ',
-        )} } from '../icons';\nimport { Canvas, Meta } from '@storybook/blocks';\nimport { message } from 'antd';`;
+    const iconDrakFiles = fs.readdirSync(ICONS_DRAK_DIR).filter((file) => file.endsWith('.tsx'));
+    const iconsDrak = iconDrakFiles.map((file) => {
+        const iconName = file.replace('.tsx', '');
+        return { name: `${iconName}Drak` };
+    });
+
+    const icons = iconsLight.reduce((result, icon, index) => [...result, icon, iconsDrak[index]], []);
+
+    const importString = `import { ${iconsLight.map((icon) => `Icon${icon.name}`).join(', ')} } from '../icons';
+import { ${iconsDrak.map((icon) => `Icon${icon.name}`).join(', ')} } from '../iconDrak/icons';
+import { Canvas, Meta } from '@storybook/blocks';
+import { message } from 'antd';
+`;
 
     const cols = 5;
     const iconTable = `<table><tbody>${Array.from({ length: Math.ceil(icons.length / cols) })

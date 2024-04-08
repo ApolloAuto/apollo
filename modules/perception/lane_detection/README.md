@@ -49,6 +49,6 @@ apollo::perception::onboard::LaneDetectionComponent
 
 You can start the lane detection module with the following command.
 
-```
+```bash
 cyber_launch start modules/perception/launch/perception_lane.launch
 ```

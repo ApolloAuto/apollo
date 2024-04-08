@@ -40,11 +40,11 @@ TEST(CameraUtilTest, test_is_pt_in_frustum) {
 }
 
 TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
-  FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "fusion/base/params";
+  FLAGS_work_root =
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
+  FLAGS_obs_sensor_intrinsic_path =
+      "/apollo/modules/perception/data/params";
 
   // create a lidar sensor object
   base::ObjectPtr base_lidar_object(new base::Object());
@@ -64,7 +64,7 @@ TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
       new SensorObject(base_lidar_object, lidar_sensor_frame));
 
   Eigen::Affine3d pose(Eigen::Affine3d::Identity());
-  std::string sensor_id = "camera_smartereye";
+  std::string sensor_id = "front_6mm";
   base::BaseCameraModelPtr camera_model =
       algorithm::SensorManager::Instance()->GetUndistortCameraModel(sensor_id);
   EXPECT_NE(camera_model, nullptr);

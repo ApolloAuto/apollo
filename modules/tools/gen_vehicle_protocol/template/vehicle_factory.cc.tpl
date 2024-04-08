@@ -159,6 +159,10 @@ void %(car_type_cap)sVehicleFactory::PublishChassisDetail() {
   chassis_detail_writer_->Write(chassis_detail);
 }
 
+void %(car_type_cap)sVehicleFactory::UpdateHeartbeat() {
+    can_sender_.Update_Heartbeat();
+}
+
 std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>
 %(car_type_cap)sVehicleFactory::CreateVehicleController() {
   return std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>(

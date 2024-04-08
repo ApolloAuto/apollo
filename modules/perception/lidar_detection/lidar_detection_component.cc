@@ -63,6 +63,7 @@ bool LidarDetectionComponent::Init() {
     ACHECK(builder_.Init(builder_init_options));
   }
 
+  AINFO << "Successfully init lidar detection component.";
   return true;
 }
 

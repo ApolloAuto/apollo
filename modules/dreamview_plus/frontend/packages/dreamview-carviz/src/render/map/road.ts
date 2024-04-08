@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { without } from 'lodash';
 import { drawLaneMesh } from '../../utils/line';
 import { disposeGroup } from '../../utils/common';
+import { colorMapping } from '../../constant/common';
 
 export default class Road {
     private roadMap;
@@ -12,11 +13,14 @@ export default class Road {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
         this.scene = scene;
         this.coordinates = coordinates;
         this.roadMap = {};
         this.currentRoadIds = [];
+        this.colors = colors;
     }
 
     drawRoads(roads) {
@@ -39,7 +43,7 @@ export default class Road {
                 section.boundary.outerPolygon.edge.forEach((edge) => {
                     edge.curve.segment.forEach((segment) => {
                         const points = this.coordinates.applyOffsetToArray(segment.lineSegment.point);
-                        const boundary = drawLaneMesh('CURB', points);
+                        const boundary = drawLaneMesh('CURB', points, this.colors?.colorMapping || colorMapping);
                         group.add(boundary);
                     });
                 });

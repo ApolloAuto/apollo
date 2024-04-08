@@ -31,7 +31,7 @@ struct TrafficLightFrame {
   // frame sequence id
   int frame_id = 0;
   // data provider
-  DataProvider *data_provider = nullptr;
+  std::shared_ptr<camera::DataProvider> data_provider;
   // detected traffic lights
   std::vector<base::TrafficLightPtr> traffic_lights;
 };  // struct TrafficLightFrame

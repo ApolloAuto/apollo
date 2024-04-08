@@ -53,4 +53,3 @@ sudo ldconfig
 
 ok "Successfully install dreamview plugins."
 ok "Please restart dreamview. Enjoy!"
-

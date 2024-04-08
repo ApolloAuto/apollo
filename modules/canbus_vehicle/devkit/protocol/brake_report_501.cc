@@ -39,8 +39,6 @@ void Brakereport501::Parse(const std::uint8_t* bytes, int32_t length,
       brake_flt1(bytes, length));
   chassis->mutable_brake_report_501()->set_brake_en_state(
       brake_en_state(bytes, length));
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_en_state(bytes, length) == 1);
 }
 
 // config detail: {'name': 'brake_pedal_actual', 'offset': 0.0, 'precision':

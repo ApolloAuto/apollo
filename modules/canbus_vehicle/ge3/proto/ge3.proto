@@ -612,17 +612,6 @@ message Scu_eps_311 {
   optional Eps_drvmodeType eps_drvmode = 5;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Ge3 {
   optional Pc_bcm_201 pc_bcm_201 = 1;         // control message
   optional Scu_bcs_3_308 scu_bcs_3_308 = 2;   // report message
@@ -640,5 +629,4 @@ message Ge3 {
   optional Scu_epb_310 scu_epb_310 = 14;      // report message
   optional Scu_vcu_1_312 scu_vcu_1_312 = 15;  // report message
   optional Scu_eps_311 scu_eps_311 = 16;      // report message
-  optional CheckResponseSignal check_response = 100;
 }

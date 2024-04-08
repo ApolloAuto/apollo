@@ -336,7 +336,7 @@ DEFINE_bool(
 
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
-
+DEFINE_double(path_bounds_horizon, 100, "path bounds horizon");
 DEFINE_bool(export_chart, false, "export chart in planning");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug info in chart format");
@@ -436,3 +436,9 @@ DEFINE_double(
 DEFINE_double(
     referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
     "max angle difference between the backward reference line and ego heading");
+
+// Nudge decisider
+DEFINE_bool(enable_nudge_decider, true, "Enable use nudge decider");
+
+// Edge follow buffer
+DEFINE_double(edge_follow_buffer, 0.3, "the edge follow buffer");

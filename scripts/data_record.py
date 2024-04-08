@@ -22,10 +22,14 @@ Usage:
     1. record all channels
     > python data_record.py --all
 
-    2. record channels exclude lidar and image channels, but include compensator channel
-    > python data_record.py --middle
+    2. record channels exclude image channels
+    // exclude all pointcloud channel
+    > python data_record.py --middle 
+    
+    // include compensator channel
+    > python data_record.py --middle --with_compensator
 
-    3. record channels exclude lidar and image channels
+    3. record channels exclude all lidar and image channels
     > python data_record.py --small
 
     4. stop record
@@ -41,9 +45,11 @@ APOLLO_ENV_ROOT = os.getenv("APOLLO_ENV_WORKROOT") or "/apollo"
 default_record_dir = os.path.join(APOLLO_ENV_ROOT, 'data/record')
 record_args_dict = {
     "all": "-a",
-    "middle": "-a  -k '^(?!.*compensator).*/PointCloud2' -k '/apollo/.*/image'",
+    "middle": "-a -k '/apollo/.*/image' -k '/apollo/.*/PointCloud2'",
+    "middle_with_compensator": "-a  -k '^(?!.*compensator).*/PointCloud2' -k '/apollo/.*/image'",
     "small": "-a -k '/apollo/.*/PointCloud2' -k '/apollo/.*/image'"
 }
+
 
 def shell_cmd(cmd, alert_on_failure=True):
     """ Execute shell command and return (ret-code, stdout, stderr)
@@ -77,8 +83,9 @@ class ArgManager(object):
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all channels')
         self.parser.add_argument('--middle', default=False, action="store_true",
-                                 help='record channels exclude lidar and image channels,'
-                                 'but include compensator channel')
+                                 help='record channels exclude lidar and image channels')
+        self.parser.add_argument('--with_compensator', default=False, action="store_true",
+                                 help='record middle channels but include compensator channel')
         self.parser.add_argument('--small', default=False, action="store_true",
                                  help='record channels exclude lidar and image channels')
         self.parser.add_argument('--foreground', default=False, action="store_true",
@@ -113,7 +120,12 @@ class Recorder(object):
             self.record_task('all', record_args_dict['all'])
             has_record_task = True
         if self.args.middle:
-            self.record_task('middle', record_args_dict['middle'])
+            print(self.args.with_compensator)
+            if self.args.with_compensator:
+                self.record_task('middle',
+                                 record_args_dict['middle_with_compensator'])
+            else:
+                self.record_task('middle', record_args_dict['middle'])
             has_record_task = True
         if self.args.small:
             self.record_task('small', record_args_dict['small'])
@@ -139,7 +151,7 @@ class Recorder(object):
         log_file = f'{APOLLO_ENV_ROOT}/data/log/apollo_record_{mode}.out'
         cmd = '''cd "{task_dir}"
                  nohup cyber_recorder record {record_args} >{log_file} 2>&1'''.format(
-                task_dir=task_dir, record_args=record_args, log_file=log_file)
+            task_dir=task_dir, record_args=record_args, log_file=log_file)
         if not self.args.foreground:
             cmd += " &"
         shell_cmd(cmd)
@@ -148,7 +160,8 @@ class Recorder(object):
     def is_running():
         """ Test if the given process running.
         """
-        _, stdout, _ = shell_cmd('pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
+        _, stdout, _ = shell_cmd(
+            'pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 

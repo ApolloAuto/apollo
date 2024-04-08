@@ -30,7 +30,9 @@
 
 namespace apollo {
 namespace perception {
-namespace onboard {
+namespace trafficlight {
+
+using apollo::perception::onboard::TrafficDetectMessage;
 
 class TrafficLightTrackComponent
     : public cyber::Component<TrafficDetectMessage> {
@@ -46,8 +48,7 @@ class TrafficLightTrackComponent
   bool InitAlgorithmPlugin();
 
   bool InternalProc(
-      const std::shared_ptr<TrafficDetectMessage const>& in_message,
-      std::shared_ptr<TrafficDetectMessage> out_message);
+      const std::shared_ptr<TrafficDetectMessage const>& message);
 
   void OnReceiveV2XMsg(
       const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData> v2x_msg);
@@ -65,12 +66,12 @@ class TrafficLightTrackComponent
   bool TransformOutputMessage(
       camera::TrafficLightFrame* frame, const std::string& camera_name,
       std::shared_ptr<apollo::perception::TrafficLightDetection>* out_msg,
-      const std::shared_ptr<TrafficDetectMessage const>& in_message);
+      const std::shared_ptr<TrafficDetectMessage const>& message);
 
   bool TransformDebugMessage(
       const camera::TrafficLightFrame* frame,
       std::shared_ptr<apollo::perception::TrafficLightDetection>* out_msg,
-      const std::shared_ptr<TrafficDetectMessage const>& in_message);
+      const std::shared_ptr<TrafficDetectMessage const>& message);
 
  private:
   std::mutex mutex_;
@@ -109,6 +110,6 @@ class TrafficLightTrackComponent
 
 CYBER_REGISTER_COMPONENT(TrafficLightTrackComponent);
 
-}  // namespace onboard
+}  // namespace trafficlight
 }  // namespace perception
 }  // namespace apollo

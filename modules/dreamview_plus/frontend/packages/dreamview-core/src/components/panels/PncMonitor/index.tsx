@@ -147,6 +147,7 @@ function PncMonitorInner() {
                         onChange={onTabChange}
                         activeKey={activeTab}
                         rootClassName={classes.tabs}
+                        inGray
                         items={items}
                     />
                     {activeTab !== ENUM_PNCMONITOR_TAB.LATENCY && (

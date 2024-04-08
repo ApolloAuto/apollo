@@ -22,6 +22,7 @@ function LayerMenu(props: any) {
         handleReferenceLineVisible,
         handleBoundaryLineVisible,
         handleTrajectoryLineVisible,
+        handleBoudingBoxVisible,
     } = props;
     const { t } = useTranslation('layerMenu');
     const panelContext = usePanelContext();
@@ -304,6 +305,10 @@ function LayerMenu(props: any) {
 
                                                 if (key === 'planningTrajectoryLine') {
                                                     handleTrajectoryLineVisible(checked);
+                                                }
+
+                                                if (key === 'egoBoudingBox') {
+                                                    handleBoudingBoxVisible(checked);
                                                 }
                                             }}
                                         />

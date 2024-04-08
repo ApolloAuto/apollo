@@ -26,6 +26,7 @@ export * from './menu';
 export * from './bottomBar';
 export * from './layerMenu';
 export * from './table';
+export * from './mapCollect';
 export * from './carviz';
 export * from './pncMonitor';
 export * from './routeEditing';

@@ -8,11 +8,11 @@ export default function useStyle() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            background: '#282B36',
+            background: theme.components.dashBoard.cardBgColor,
             borderRadius: '6px',
             fontFamily: 'PingFangSC-Semibold',
             fontSize: '14px',
-            color: '#A6B5CC',
+            color: theme.components.dashBoard.lightFontColor,
             fontWeight: 600,
             width: '100%',
             height: '100%',
@@ -22,14 +22,13 @@ export default function useStyle() {
             height: '35px',
             fontFamily: 'DINAlternate-Bold',
             fontSize: '30px',
-            color: '#A6B5CC',
+            color: theme.components.dashBoard.color,
             textAlign: 'center',
         },
         'dashboard-rotation-info-font-small': {
             height: '18px',
             fontFamily: 'PingFangSC-Regular',
             fontSize: '12px',
-            color: '#808B9D',
         },
         'dashboard-rotation-info-wheel': {
             display: 'flex',
@@ -37,13 +36,13 @@ export default function useStyle() {
             height: '60px',
         },
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

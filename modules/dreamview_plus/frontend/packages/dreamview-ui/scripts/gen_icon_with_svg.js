@@ -26,13 +26,27 @@ const svgoConfig = (prefix) => ({
     ],
 });
 
-const RAW_DIR = path.resolve(__dirname, '../src/raw_svgs');
-const SVG_DIR = path.resolve(__dirname, '../src/svgs');
 const ICON_PATTERN = /^(.+)\.svg$/;
-const ICON_TPL_DIR = path.resolve(__dirname, '../src/icon_templates');
-const MODULE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'component.tpl'), 'utf8');
-const EXPORT_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'export.tpl'), 'utf8');
-const TYPE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'type.tpl'), 'utf8');
+
+function genPath(filePath) {
+    const RAW_DIR = path.resolve(__dirname, `${filePath}/raw_svgs`);
+    const SVG_DIR = path.resolve(__dirname, `${filePath}/svgs`);
+    const ICON_TPL_DIR = path.resolve(__dirname, `${filePath}/icon_templates`);
+    const MODULE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'component.tpl'), 'utf8');
+    const EXPORT_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'export.tpl'), 'utf8');
+    const TYPE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'type.tpl'), 'utf8');
+    const ICON_SRC = path.resolve(__dirname, filePath);
+
+    return {
+        RAW_DIR,
+        SVG_DIR,
+        ICON_TPL_DIR,
+        MODULE_TPL,
+        EXPORT_TPL,
+        TYPE_TPL,
+        ICON_SRC,
+    };
+}
 
 function walkElement(el, { enter, leave }) {
     if (typeof enter === 'function') {
@@ -115,6 +129,7 @@ async function normalizeSVG(content, file, keepSvgFill) {
                 const ctxStroke = (getContextAttr(node, 'stroke') || '').toLowerCase();
                 const attrFill = (attributes.fill || '').toLowerCase();
                 const attrStroke = (attributes.stroke || '').toLowerCase();
+                const arrtNoParseFill = (attributes['fill-noparse'] || '').toLowerCase();
 
                 // Check if current node is a 'mask'
                 if (node.name === 'mask') {
@@ -156,6 +171,10 @@ async function normalizeSVG(content, file, keepSvgFill) {
                         console.log(`  stroke: ${attrStroke} → currentColor (different from context)`);
                     }
                 }
+
+                if (arrtNoParseFill) {
+                    attributes.fill = arrtNoParseFill;
+                }
             },
         });
     }
@@ -169,30 +188,28 @@ async function normalizeSVG(content, file, keepSvgFill) {
     };
 }
 
-const ICON_SRC = path.resolve(__dirname, '../src');
+async function generate(paths) {
+    rimraf.sync(paths.SVG_DIR);
+    mkdirp.sync(paths.SVG_DIR);
 
-async function generate() {
-    rimraf.sync(SVG_DIR);
-    mkdirp.sync(SVG_DIR);
-
-    const iconsDir = path.join(ICON_SRC, 'icons');
+    const iconsDir = path.join(paths.ICON_SRC, 'icons');
     const iconComponentsDir = path.join(iconsDir, 'components');
     rimraf.sync(iconsDir);
     mkdirp.sync(iconsDir);
     mkdirp.sync(iconComponentsDir);
 
-    const iconSvgs = await getSVGFiles(RAW_DIR, { keepSvgFill: false });
+    const iconSvgs = await getSVGFiles(paths.RAW_DIR, { keepSvgFill: false });
     const flattenIconSvgs = flatten(iconSvgs);
     Promise.all(
         flattenIconSvgs.map(async ({ slug, content, keepSvgFill }) => {
             const file = `${slug}.svg`;
             const { content: svg } = await normalizeSVG(content, file, keepSvgFill);
 
-            fs.writeFileSync(path.join(SVG_DIR, file), svg, 'utf8');
+            fs.writeFileSync(path.join(paths.SVG_DIR, file), svg, 'utf8');
 
             const name = upperFirst(camelCase(slug));
 
-            const moduleCode = MODULE_TPL.replace(/\{type\}/g, 'Icon')
+            const moduleCode = paths.MODULE_TPL.replace(/\{type\}/g, 'Icon')
                 .replace(/\{slug\}/g, slug)
                 .replace(/\{name\}/g, name);
 
@@ -203,14 +220,17 @@ async function generate() {
     )
         .then((iconInfos) => {
             const exportFile = iconInfos
-                .map(({ slug, name, file }) => `${EXPORT_TPL.replace(/\{name\}/g, name)}\n`)
+                .map(({ slug, name, file }) => `${paths.EXPORT_TPL.replace(/\{name\}/g, name)}\n`)
                 .join('');
             fs.writeFileSync(path.join(iconsDir, 'index.ts'), exportFile, 'utf8');
-            fs.writeFileSync(path.join(iconsDir, 'type.ts'), TYPE_TPL, 'utf8');
+            fs.writeFileSync(path.join(iconsDir, 'type.ts'), paths.TYPE_TPL, 'utf8');
         })
         .catch((error) => {
             console.error('Error generating icons:', error);
         });
 }
+const drakFilePath = genPath('../src/iconDrak');
+const lightFilePath = genPath('../src');
 
-generate();
+generate(drakFilePath);
+generate(lightFilePath);

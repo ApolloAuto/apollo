@@ -6,9 +6,9 @@ import {
     IconIcSucceed as IconIcInUse,
     IconIcUseRetry,
     IconIcDownloadingCancel,
+    Popover,
 } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useStyle from './useStyle';
 
 interface IRenderDownLoadStatus {

@@ -11,7 +11,7 @@ modules {
 cyber_modules {
   key: "Prediction"
   value: {
-    dag_files: "/apollo/modules/prediction/dag/prediction_navi.dag"
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
   }
 }
 cyber_modules {

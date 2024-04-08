@@ -156,3 +156,10 @@
 # --lidarframe_to_obstacles_in=/perception/lidar/detection
 --sensorframe_message_to_obstacles_in=/perception/inner/PrefusedObjects
 
+###########################################################################
+# Flags for hdmap
+
+# hdmap sample step
+# type: int
+# default: 1
+--hdmap_sample_step=1

@@ -37,7 +37,10 @@ export default class TrafficSignal {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
+        this.colors = colors;
         this.trafficBaseMeshTemplate = null;
         this.trafficMaterials = {};
         this.baseSignalMeshs = {};
@@ -141,7 +144,7 @@ export default class TrafficSignal {
             this.scene.add(mesh);
 
             signal.stopLine.forEach((item) => {
-                const lines = drawStopLine(item, this.coordinates);
+                const lines = drawStopLine(item, this.coordinates, this.colors?.colorMapping.PURE_WHITE);
                 lines.forEach((line) => {
                     this.stopLineMeshs[id] = this.stopLineMeshs[id] || [];
                     this.stopLineMeshs[id].push(line);

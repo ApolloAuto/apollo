@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import { union } from 'lodash';
 import { planningParams } from '../constant/params';
-import { drawDashedLineFromPoints } from '../utils/line';
 import { disposeMesh, drawThickBandFromPoints } from '../utils/common';
 
 const DEFAULT_WIDTH = planningParams.defaults.width;

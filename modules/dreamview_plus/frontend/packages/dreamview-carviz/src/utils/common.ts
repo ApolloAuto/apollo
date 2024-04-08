@@ -20,9 +20,6 @@ export const getObjectLengthAndWidth = (object) => {
 };
 
 export const disposeMesh = (mesh) => {
-    if (mesh?.memoName) {
-        return;
-    }
     mesh?.geometry?.dispose();
     mesh?.material?.dispose();
 };

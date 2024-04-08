@@ -793,5 +793,19 @@ common::math::Polygon2d Obstacle::GetObstacleTrajectoryPolygon(
   return trajectory_point_polygon;
 }
 
+void Obstacle::PrintPolygonCurve() const {
+  if (perception_polygon_.points().size() < 1) {
+    return;
+  }
+
+  PrintCurves print_curve;
+  for (const auto& p : perception_polygon_.points()) {
+    print_curve.AddPoint(id_ + "_ObsPolygon", p.x(), p.y());
+  }
+  print_curve.AddPoint(id_ + "_ObsPolygon", perception_polygon_.points()[0].x(),
+                       perception_polygon_.points()[0].y());
+  print_curve.PrintToLog();
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -12,7 +12,7 @@ export default function useStyle() {
             },
         },
         'charts-container': {
-            padding: theme.tokens.margin.speace2,
+            padding: theme.tokens.padding.speace2,
             height: '100%',
         },
         'fixed-left': {

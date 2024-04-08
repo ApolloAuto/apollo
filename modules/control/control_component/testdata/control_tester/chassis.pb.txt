@@ -17,10 +17,3 @@ header {
   module_name: "chassis"
   sequence_num: 718141
 }
-signal {
-  turn_signal: TURN_NONE
-  high_beam: false
-  low_beam: false
-  horn: false
-  emergency_light: false
-}

@@ -1,4 +1,9 @@
 gpu_id: 0
+# plugin_param {
+#   name: "EfficientNetRecognition"
+#   config_path: "perception/traffic_light_recognition/data"
+#   config_file: "efficient_net.pb.txt"
+# }
 plugin_param {
   name: "TrafficLightRecognition"
   config_path: "perception/traffic_light_recognition/data"

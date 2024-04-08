@@ -29,7 +29,10 @@ export default class Decision {
 
     private coordinates;
 
-    constructor(scene, option, coordinates) {
+    private colors;
+
+    constructor(scene, option, coordinates, colors?) {
+        this.colors = colors?.decisionMarkerColorMapping || decisionMarkerColorMapping;
         this.scene = scene;
         this.option = option;
         this.coordinates = coordinates;
@@ -163,7 +166,7 @@ export default class Decision {
                         if (!obstacle.positionX || !obstacle.positionY) {
                             continue;
                         }
-                        const color = decisionMarkerColorMapping[type];
+                        const color = this.colors[type];
                         const points = [
                             new THREE.Vector3(obstacle.positionX - positionX, obstacle.positionY - positionY, 0),
                             new THREE.Vector3(0, 0, 0),

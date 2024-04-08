@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/planning/planning_base/proto/math/fem_pos_deviation_smoother_config.pb.h"
+#include "modules/common/math/vec2d.h"
 
 namespace apollo {
 namespace planning {
@@ -48,10 +49,6 @@ class FemPosDeviationSmoother {
  public:
   explicit FemPosDeviationSmoother(const FemPosDeviationSmootherConfig& config);
 
-  bool Solve(const std::vector<std::pair<double, double>>& raw_point2d,
-             const std::vector<double>& bounds, std::vector<double>* opt_x,
-             std::vector<double>* opt_y);
-
   bool QpWithOsqp(const std::vector<std::pair<double, double>>& raw_point2d,
                   const std::vector<double>& bounds, std::vector<double>* opt_x,
                   std::vector<double>* opt_y);
@@ -66,6 +63,18 @@ class FemPosDeviationSmoother {
 
  private:
   FemPosDeviationSmootherConfig config_;
+
+// park generic
+ public:
+  bool Solve(const std::vector<std::pair<double, double>>& raw_point2d,
+             const std::vector<double>& bounds, std::vector<double>* opt_x,
+             std::vector<double>* opt_y,
+             std::vector<std::vector<common::math::Vec2d>> point_box = {});
+
+  bool SqpWithOsqp(const std::vector<std::pair<double, double>>& raw_point2d,
+                   const std::vector<double>& bounds,
+                   std::vector<double>* opt_x, std::vector<double>* opt_y,
+                   std::vector<std::vector<common::math::Vec2d>> point_box);
 };
 }  // namespace planning
 }  // namespace apollo

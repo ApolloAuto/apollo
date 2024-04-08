@@ -22,7 +22,6 @@ function InternalModuleDelay() {
 
     const [delay, setDelay] = useState<Record<string, number>>({});
     const [data, setData] = useState<ISimulationWorld>();
-    const { t: tPanels } = useTranslation('panels');
 
     useEffect(() => {
         initSubscription({
@@ -39,7 +38,6 @@ function InternalModuleDelay() {
             return Object.keys(delay)
                 .sort()
                 .map((key) => {
-                    const module = delay[key];
                     const warning = Number(delay[key]) > 2000 && key !== 'TrafficLight';
                     return {
                         name: key,

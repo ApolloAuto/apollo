@@ -151,14 +151,14 @@ class HMIWorker {
   // Start / Stop Data Recorder
   bool StartDataRecorder();
   bool StopDataRecorder();
-  bool SaveDataRecorder(const std::string& new_name);
+  int SaveDataRecorder(const std::string& new_name);
   bool DeleteDataRecorder();
 
   // Start / Stop rtk Data Recorder
   bool StartRtkDataRecorder();
   bool StopRtkDataRecorder();
   bool DeleteRtkDataRecorder();
-  bool SaveRtkDataRecorder(const std::string &new_name);
+  int SaveRtkDataRecorder(const std::string& new_name);
   bool StopPlayRtkRecorder();
   nlohmann::json StartPlayRtkRecorder();
 
@@ -172,6 +172,13 @@ class HMIWorker {
       const std::string& type);
 
   bool StartTerminal();
+
+  /**
+   * @brief Check if a process exists
+   * @param process_name The name of the process to check
+   * @return True if the process exists
+   */
+  bool isProcessRunning(const std::string& process_name);
 
  private:
   void InitReadersAndWriters();
@@ -282,7 +289,7 @@ class HMIWorker {
   mutable size_t record_count_ = 0;
   std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
-
+  std::map<std::string, bool> previous_modules_lock_;
   // Cyber members.
   std::shared_ptr<apollo::cyber::Node> node_;
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;

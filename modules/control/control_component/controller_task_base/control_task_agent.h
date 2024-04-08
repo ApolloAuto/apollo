@@ -28,6 +28,7 @@
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/control/control_component/proto/pipeline.pb.h"
 
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/factory.h"
 #include "modules/control/control_component/controller_task_base/common/dependency_injector.h"
 #include "modules/control/control_component/controller_task_base/control_task.h"

@@ -40,9 +40,6 @@ void Scueps311::Parse(const std::uint8_t* bytes, int32_t length,
       eps_faultst(bytes, length));
   chassis->mutable_scu_eps_311()->set_eps_drvmode(
       eps_drvmode(bytes, length));
-  // newcode
-  chassis->mutable_check_response()->set_is_eps_online(
-      eps_drvmode(bytes, length) == 3);
 }
 
 // config detail: {'description': 'EPS interrupt index', 'enum': {0:

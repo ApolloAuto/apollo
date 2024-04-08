@@ -94,24 +94,6 @@ apollo_cc_library(
         "math/smoothing_spline/spline_2d_kernel.cc",
         "math/smoothing_spline/spline_2d_seg.cc",
         "math/smoothing_spline/spline_seg_kernel.cc",
-        "open_space/coarse_trajectory_generator/grid_search.cc",
-        "open_space/coarse_trajectory_generator/hybrid_a_star.cc",
-        "open_space/coarse_trajectory_generator/node3d.cc",
-        "open_space/coarse_trajectory_generator/reeds_shepp_path.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_relax_end_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_ipopt_relax_end_slack_interface.cc",
-        "open_space/trajectory_smoother/distance_approach_problem.cc",
-        "open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.cc",
-        "open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.cc",
-        "open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.cc",
-        "open_space/trajectory_smoother/dual_variable_warm_start_problem.cc",
-        "open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.cc",
-        "open_space/trajectory_smoother/iterative_anchoring_smoother.cc",
-        "open_space/utils/open_space_roi_util.cc",
         "reference_line/discrete_points_reference_line_smoother.cc",
         "reference_line/qp_spline_reference_line_smoother.cc",
         "reference_line/reference_line.cc",
@@ -132,6 +114,7 @@ apollo_cc_library(
         "common/learning_based_data.h",
         "common/local_view.h",
         "common/message_process.h",
+        "common/nudge_info.h",
         "common/obstacle.h",
         "common/obstacle_blocking_analyzer.h",
         "common/open_space_info.h",
@@ -142,6 +125,7 @@ apollo_cc_library(
         "common/path_decision.h",
         "common/planning_context.h",
         "common/reference_line_info.h",
+        "common/sl_polygon.h",
         "common/smoothers/smoother.h",
         "common/speed/speed_data.h",
         "common/speed/st_boundary.h",
@@ -211,25 +195,6 @@ apollo_cc_library(
         "math/smoothing_spline/spline_2d_seg.h",
         "math/smoothing_spline/spline_2d_solver.h",
         "math/smoothing_spline/spline_seg_kernel.h",
-        "open_space/coarse_trajectory_generator/grid_search.h",
-        "open_space/coarse_trajectory_generator/hybrid_a_star.h",
-        "open_space/coarse_trajectory_generator/node3d.h",
-        "open_space/coarse_trajectory_generator/reeds_shepp_path.h",
-        "open_space/trajectory_smoother/distance_approach_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_relax_end_interface.h",
-        "open_space/trajectory_smoother/distance_approach_ipopt_relax_end_slack_interface.h",
-        "open_space/trajectory_smoother/distance_approach_problem.h",
-        "open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h",
-        "open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h",
-        "open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h",
-        "open_space/trajectory_smoother/dual_variable_warm_start_problem.h",
-        "open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h",
-        "open_space/trajectory_smoother/iterative_anchoring_smoother.h",
-        "open_space/utils/open_space_roi_util.h",
         "reference_line/discrete_points_reference_line_smoother.h",
         "reference_line/qp_spline_reference_line_smoother.h",
         "reference_line/reference_line.h",
@@ -288,7 +253,6 @@ apollo_cc_library(
         "//modules/planning/planning_base/proto:lattice_structure_cc_proto",
         "//modules/planning/planning_base/proto:learning_data_cc_proto",
         "//modules/planning/planning_base/proto:piecewise_jerk_path_config_cc_proto",
-        "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
         "//modules/planning/planning_base/proto:planning_semantic_map_config_cc_proto",
         "//modules/planning/planning_base/proto:planning_status_cc_proto",
@@ -311,21 +275,7 @@ apollo_cc_library(
         "@opencv//:core",
         "@opencv//:imgcodecs",
         "@osqp",
-    ] + if_gpu([":planning_block"]),
-)
-
-gpu_library(
-    name = "planning_block",
-    srcs = ["open_space/trajectory_smoother/planning_block.cu"],
-    hdrs = ["open_space/trajectory_smoother/planning_block.h"],
-    mandatory = False,
-    deps = if_cuda([
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-        "@local_config_rocm//rocm:rocm_headers",
-    ]),
+    ],
 )
 
 filegroup(
@@ -333,19 +283,6 @@ filegroup(
     srcs = glob([
         "testdata/**",
     ]),
-)
-
-apollo_cc_test(
-    name = "distance_approach_ipopt_interface_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/distance_approach_ipopt_interface_test.cc"],
-    copts = PLANNING_FOPENMP,
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
 )
 
 apollo_cc_test(
@@ -445,66 +382,6 @@ apollo_cc_binary(
     deps = [
         ":apollo_planning_planning_base",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
-    ],
-)
-
-apollo_cc_test(
-    name = "distance_approach_ipopt_cuda_interface_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface_test.cc"],
-    copts = PLANNING_FOPENMP,
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "distance_approach_problem_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/distance_approach_problem_test.cc"],
-    copts = PLANNING_FOPENMP,
-    linkopts = ["-lgomp"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "dual_variable_warm_start_ipopt_interface_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface_test.cc"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "dual_variable_warm_start_osqp_interface_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface_test.cc"],
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
-        "@ipopt",
-    ],
-)
-
-apollo_cc_test(
-    name = "dual_variable_warm_start_problem_test",
-    size = "small",
-    srcs = ["open_space/trajectory_smoother/dual_variable_warm_start_problem_test.cc"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -628,44 +505,6 @@ apollo_cc_test(
     deps = [
         ":apollo_planning_planning_base",
         "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "reeds_shepp_path_test",
-    size = "small",
-    srcs = ["open_space/coarse_trajectory_generator/reeds_shepp_path_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math",
-        "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "node3d_test",
-    size = "small",
-    srcs = ["open_space/coarse_trajectory_generator/node3d_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "hybrid_a_star_test",
-    size = "small",
-    srcs = ["open_space/coarse_trajectory_generator/hybrid_a_star_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -850,45 +689,6 @@ apollo_cc_test(
         ":apollo_planning_planning_base",
         "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_binary(
-    name = "hybrid_a_star_wrapper_lib.so",
-    srcs = ["open_space/tools/hybrid_a_star_wrapper.cc"],
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-    ],
-)
-
-apollo_cc_binary(
-    name = "distance_approach_problem_wrapper_lib.so",
-    srcs = ["open_space/tools/distance_approach_problem_wrapper.cc"],
-    copts = ["-fopenmp"],
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-    ],
-)
-
-apollo_cc_binary(
-    name = "open_space_roi_wrapper_lib.so",
-    srcs = ["open_space/tools/open_space_roi_wrapper.cc"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-        ":apollo_planning_planning_base",
-        "//cyber",
-        "//modules/common/math",
-        "//modules/map:apollo_map",
-        "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
-        "@eigen",
     ],
 )
 

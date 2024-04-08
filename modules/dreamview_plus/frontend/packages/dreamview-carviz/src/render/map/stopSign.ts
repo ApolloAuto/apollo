@@ -22,7 +22,10 @@ export default class StopSign {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors?) {
+        this.colors = colors;
         this.stopSignTemplate = null;
         this.scene = scene;
         this.coordinates = coordinates;
@@ -96,7 +99,7 @@ export default class StopSign {
             const stopLine = stopSign.stopLine;
             if (stopLine) {
                 stopLine.forEach((item) => {
-                    const meshs = drawStopLine(item, this.coordinates);
+                    const meshs = drawStopLine(item, this.coordinates, this.colors?.colorMapping.PURE_WHITE);
                     meshs.forEach((mesh) => {
                         this.stopLineMeshs[id] = this.stopLineMeshs[id] || [];
                         this.stopLineMeshs[id].push(mesh);

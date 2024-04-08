@@ -19,7 +19,6 @@
 #include <NvInferLegacyDims.h>
 
 namespace nvinfer1 {
-#ifdef __aarch64__
 class DimsNCHW : public Dims4 {
  public:
     DimsNCHW() : Dims4() {}
@@ -91,6 +90,5 @@ class DimsCHW : public Dims3 {
       return d[2];
     }
 };
-#endif
 }  // namespace nvinfer1
 

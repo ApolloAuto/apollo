@@ -44,6 +44,12 @@ class PathOptimizerUtil {
 
   static std::vector<common::PathPoint>
   ConvertPathPointRefFromFrontAxeToRearAxe(const PathData& path_data);
+  static void CalculateVertexConstraints(
+      const SLState& init_state, const PathBoundary& path_boundary,
+      ADCVertexConstraints* adc_vertex_constraints);
+  static void FormulateExtraConstraints(
+      PathBound extra_path_bound, const PathBoundary& path_boundary,
+      InterPolatedPointVec* extra_constraints);
 
   /**
    * @brief Piecewise jerk path optimizer.
@@ -64,6 +70,10 @@ class PathOptimizerUtil {
   static void UpdatePathRefWithBound(const PathBoundary& path_boundary,
                                      double weight, std::vector<double>* ref_l,
                                      std::vector<double>* weight_ref_l);
+  static void UpdatePathRefWithBoundInSidePassDirection(
+      const PathBoundary& path_boundary, double weight,
+      std::vector<double>* ref_l, std::vector<double>* weight_ref_l,
+      bool is_left_side_pass);
 
   /**
    * @brief calculate ddl bound by referenceline kappa and adc lat accleration

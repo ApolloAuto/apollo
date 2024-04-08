@@ -98,10 +98,10 @@ export default class View {
                     this.camera.up.set(0, 0, 1);
                     this.camera.lookAt(x, y, 0);
                     this.controls.enabled = true;
+                    this.controls.enabledRotate = true;
+                    this.controls.zoom0 = this.camera.zoom;
                     this.controls.target0 = new THREE.Vector3(x, y, 0);
                     this.controls.position0 = this.camera.position.clone();
-                    this.controls.zoom0 = this.camera.zoom;
-                    this.controls.enabledRotate = true;
                     this.controls.reset();
                 }
                 break;

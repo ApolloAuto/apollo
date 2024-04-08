@@ -48,9 +48,12 @@ DEFINE_bool(test_update_golden_log, false, "true to update golden log file.");
 class ControlComponentTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    FLAGS_control_conf_file =
-        "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+    AINFO << "Into setup";
+    FLAGS_pipeline_file =
+        "/apollo/modules/control/control_component/testdata/conf/"
+        "pipeline.pb.txt";
     FLAGS_is_control_test_mode = true;
+    FLAGS_is_control_ut_test_mode = true;
 
     SetupCyber();
   }
@@ -89,6 +92,7 @@ class ControlComponentTest : public ::testing::Test {
 };
 
 void ControlComponentTest::SetupCyber() {
+  AINFO << "into setup cyber.";
   if (is_cyber_initialized_) {
     return;
   }
@@ -183,12 +187,12 @@ bool ControlComponentTest::RunControl(const std::string& test_case_name) {
 
   control_component_.reset(new ControlComponent());
   control_component_->Initialize(component_config_);
+  ACHECK(control_component_);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // feed topics
   planning_writer_->Write(trajectory_);
-  chassis_writer_->Write(chassis_);
   localization_writer_->Write(localization_);
   chassis_writer_->Write(chassis_);
   pad_writer_->Write(pad_message_);
@@ -239,7 +243,9 @@ void ControlComponentTest::TrimControlCommand(ControlCommand* origin) {
 }
 
 TEST_F(ControlComponentTest, simple_test) {
-  FLAGS_test_data_dir = "/apollo/modules/control/testdata/simple_control_test/";
+  AINFO << "Into the simple test";
+  FLAGS_test_data_dir =
+      "/apollo/modules/control/control_component/testdata/simple_control_test/";
   FLAGS_enable_csv_debug = true;
   FLAGS_test_localization_file = "1_localization.pb.txt";
   FLAGS_test_pad_file = "1_pad.pb.txt";

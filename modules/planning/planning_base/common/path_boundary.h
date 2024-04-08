@@ -33,12 +33,40 @@ struct BoundEdge {
   std::string id;
 };
 
+struct InterPolatedPoint {
+  InterPolatedPoint(double left_weight, double right_weight, double lower_bound,
+                    double upper_bound, size_t left_index, size_t right_index,
+                    double rear_axle_s)
+      : left_weight(left_weight),
+        right_weight(right_weight),
+        lower_bound(lower_bound),
+        upper_bound(upper_bound),
+        left_index(left_index),
+        right_index(right_index),
+        rear_axle_s(rear_axle_s) {}
+
+  double left_weight;
+  double right_weight;
+  double lower_bound;
+  double upper_bound;
+  size_t left_index;
+  size_t right_index;
+  double rear_axle_s;
+};
+using InterPolatedPointVec = std::vector<InterPolatedPoint>;
+class ADCVertexConstraints : public std::vector<InterPolatedPoint> {
+ public:
+  double front_edge_to_center;
+};
+
 struct PathBoundPoint {
+  PathBoundPoint() {}
   PathBoundPoint(double s_init, double l_min, double l_max) {
     s = s_init;
     l_lower.l = l_min;
     l_upper.l = l_max;
   }
+  bool operator<(const PathBoundPoint& other) const { return s < other.s; }
   double s = 0;
   BoundEdge l_lower;
   BoundEdge l_upper;
@@ -63,17 +91,28 @@ class PathBoundary : public std::vector<PathBoundPoint> {
 
   void set_boundary(const std::vector<std::pair<double, double>>& boundary);
   std::vector<std::pair<double, double>> boundary() const;
-
+  bool get_interpolated_s_weight(const double& s, double* left_weight,
+                                 double* right_weight, size_t* left_index,
+                                 size_t* right_index) const;
+  double get_lower_bound_by_s(const double s);
+  double get_upper_bound_by_s(const double s);
   void set_label(const std::string& label);
   const std::string& label() const;
 
   void set_blocking_obstacle_id(const std::string& obs_id);
   const std::string& blocking_obstacle_id() const;
   void DebugString(std::string name);
+  InterPolatedPointVec* mutable_extra_path_bound() {
+    return &extra_path_bound_;
+  }
+  const InterPolatedPointVec& extra_path_bound() const {
+    return extra_path_bound_;
+  }
 
  private:
   double start_s_ = 0.0;
   double delta_s_ = 0.0;
+  InterPolatedPointVec extra_path_bound_;
   std::string label_ = "regular";
   std::string blocking_obstacle_id_ = "";
 };

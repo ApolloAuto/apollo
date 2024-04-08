@@ -57,4 +57,21 @@ message AgentConfig {
   optional bool avoid_rear_end_collision = 17 [default = true];
   optional double rear_end_collision_distance = 18
       [default = 3.0, deprecated = true];
+
+  // When an obstacle approaches the adc at a certain distance,
+  // it needs to decelerate.
+  message NearCar {
+    optional double distance = 1 [default = 20];
+    optional double acceleration = 2 [default = -2];
+    optional bool is_same_lane = 3 [default = false];
+    optional bool only_include_behind = 4 [default = true];
+  }
+  optional NearCar near_car = 19;
+
+  // Need to decelerate when an obstacle meets the crosswalk
+  message NearCrosswalk {
+    optional double distance = 1 [default = 15];
+    optional double acceleration = 2 [default = -1];
+  }
+  optional NearCrosswalk near_crosswalk = 22;
 }

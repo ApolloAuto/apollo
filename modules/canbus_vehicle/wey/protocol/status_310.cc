@@ -100,11 +100,6 @@ void Status310::Parse(const std::uint8_t* bytes, int32_t length,
       bcm_availsts(bytes, length));
   chassis->mutable_status_310()->set_brakelmpsts(
       brakelmpsts(bytes, length));
-  // Added for response check
-  chassis->mutable_check_response()->set_is_esp_online(
-      longitudedrivingmode(bytes, length) != 0);
-  chassis->mutable_check_response()->set_is_vcu_online(
-      longitudedrivingmode(bytes, length) != 0);
 }
 
 // config detail: {'description': 'Longitude acceleration valid', 'enum':

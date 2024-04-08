@@ -1,5 +1,4 @@
 import { useMakeStyle } from '@dreamview/dreamview-theme';
-import tinycolor from 'tinycolor2';
 
 export default function useStyle() {
     const hoc = useMakeStyle((theme, props) => ({
@@ -14,15 +13,15 @@ export default function useStyle() {
             borderRadius: '6px',
             padding: '0 20px',
             cursor: 'pointer',
-            background: theme.tokens.colors.background1,
+            background: theme.tokens.colors.background2,
             ...theme.tokens.typography.sideText,
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             '&:hover': {
-                color: theme.tokens.colors.fontColor1,
+                color: theme.tokens.colors.fontColor5,
                 background: '#353946',
             },
             '&:active': {
-                color: theme.tokens.colors.fontColor2,
+                color: theme.tokens.colors.fontColor5,
                 background: '#252830',
             },
         },

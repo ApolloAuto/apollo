@@ -39,17 +39,11 @@ using apollo::common::VehicleStateProvider;
 
 class MPCControllerTest : public ::testing::Test, MPCController {
  public:
-  virtual void SetupTestCase() {
-    FLAGS_v = 4;
-    // FLAGS_control_conf_file =
-    //     "/apollo/modules//control/testdata/mpc_controller_test/"
-    //     "control_conf.pb.txt ";
-    // ControlConf control_conf;
-    // ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_conf_file,
-    //                                        &control_conf));
-    // mpc_conf_ = control_conf.mpc_controller_conf();
-
+  virtual void SetUp() {
+    FLAGS_v = 3;
+    injector_ = std::make_shared<DependencyInjector>();
     timestamp_ = Clock::NowInSeconds();
+    AINFO << "into setup test.";
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
@@ -86,27 +80,27 @@ class MPCControllerTest : public ::testing::Test, MPCController {
     return planning_trajectory_pb;
   }
 
-  // MPCControllerConf mpc_conf_;
-
   double timestamp_ = 0.0;
 };
 
 TEST_F(MPCControllerTest, ComputeLateralErrors) {
   auto localization_pb = LoadLocalizaionPb(
-      "/apollo/modules//control/testdata/mpc_controller_test/"
-      "1_localization.pb.txt");
+      "/apollo/modules/control/controllers/mpc_controller/"
+      "mpc_controller_test_data/1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(
-      "/apollo/modules/control/testdata/mpc_controller_test/1_chassis.pb.txt");
+      "/apollo/modules/control/controllers/mpc_controller/"
+      "mpc_controller_test_data/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto injector = std::make_shared<DependencyInjector>();
-  auto vehicle_state = injector->vehicle_state();
+  auto vehicle_state = injector_->vehicle_state();
+  ACHECK(vehicle_state);
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
-      "/apollo/modules//control/testdata/mpc_controller_test/"
-      "1_planning.pb.txt");
+      "/apollo/modules/control/controllers/mpc_controller/"
+      "mpc_controller_test_data/1_planning.pb.txt");
   TrajectoryAnalyzer trajectory_analyzer(&planning_trajectory_pb);
 
+  AINFO << "Finsh load pb";
   ControlCommand cmd;
   SimpleMPCDebug *debug = cmd.mutable_debug()->mutable_simple_mpc_debug();
 

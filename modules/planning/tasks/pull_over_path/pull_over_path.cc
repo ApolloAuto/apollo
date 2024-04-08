@@ -81,6 +81,7 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   }
   boundary->emplace_back();
   auto& path_bound = boundary->back();
+  double path_narrowest_width = 0;
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!PathBoundsDeciderUtil::InitPathBoundary(*reference_line_info_,
                                                &path_bound, init_sl_state_)) {
@@ -121,7 +122,7 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   PathBound temp_path_bound = path_bound;
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           *reference_line_info_, init_sl_state_, &path_bound,
-          &blocking_obstacle_id)) {
+          &blocking_obstacle_id, &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
     return false;
@@ -206,7 +207,7 @@ bool PullOverPath::OptimizePath(
     }
 
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
-        std::fmax(init_sl_state_.first[1], 1.0));
+        std::fmax(init_sl_state_.first[1], 1e-12));
 
     bool res_opt = PathOptimizerUtil::OptimizePath(
         init_sl_state_, end_state, ref_l, weight_ref_l, path_boundary,

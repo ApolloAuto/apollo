@@ -37,9 +37,8 @@ common::Status CycleRoutingManager::Init(
   map_service_.reset(new apollo::dreamview::MapService());
 
   AINFO << "New cycle routing task: cycle " << cycle_ << ", begin point "
-        << begin_point_.x() << " " << begin_point_.y()
-        << ", end point " << end_point_.x() << " "
-        << end_point_.y();
+        << begin_point_.x() << " " << begin_point_.y() << ", end point "
+        << end_point_.x() << " " << end_point_.y();
 
   return common::Status::OK();
 }
@@ -48,15 +47,16 @@ bool CycleRoutingManager::GetNewRouting(
     const localization::Pose& pose,
     external_command::LaneFollowCommand* lane_follow_command) {
   AINFO << "GetNewRouting: localization_pose: " << pose.position().x() << " "
-        << pose.position().y() << ", begin point " << begin_point_.x()
-        << " " << begin_point_.y() << ", end point "
-        << end_point_.x() << " " << end_point_.y()
-        << ", threshold " << FLAGS_threshold_for_destination_check
+        << pose.position().y() << ", begin point " << begin_point_.x() << " "
+        << begin_point_.y() << ", end point " << end_point_.x() << " "
+        << end_point_.y() << ", threshold "
+        << FLAGS_task_manager_threshold_for_destination_check
         << ", allowed_to_send_routing_request " << is_allowed_to_route_;
 
   if (is_allowed_to_route_) {
-    if (CheckPointDistanceInThreshold(begin_point_, pose.position(),
-                                      FLAGS_threshold_for_destination_check)) {
+    if (CheckPointDistanceInThreshold(
+            begin_point_, pose.position(),
+            FLAGS_task_manager_threshold_for_destination_check)) {
       AINFO << "GetNewRouting: reach begin point."
             << "Remaining cycles: " << cycle_;
       lane_follow_command->CopyFrom(original_lane_follow_command_);
@@ -69,8 +69,9 @@ bool CycleRoutingManager::GetNewRouting(
       return true;
     }
   } else {
-    if (CheckPointDistanceInThreshold(end_point_, pose.position(),
-                                      FLAGS_threshold_for_destination_check)) {
+    if (CheckPointDistanceInThreshold(
+            end_point_, pose.position(),
+            FLAGS_task_manager_threshold_for_destination_check)) {
       AINFO << "GetNewRouting: reach end point. "
             << "Remaining cycles: " << cycle_;
       lane_follow_command->clear_way_point();

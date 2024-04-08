@@ -82,6 +82,30 @@ bool MsgSerializer::SerializeBenchmarkMsg(
   return true;
 }
 
+bool MsgSerializer::SerializeLidarFrameMsg(
+    double timestamp, uint64_t lidar_timestamp, int seq_num,
+    const Eigen::Affine3d &pose, const std::vector<base::ObjectPtr> &objects,
+    PerceptionBenchmarkFrame *obstacles, bool use_lidar_cooridinate) {
+    ::apollo::common::Header *header = obstacles->mutable_header();
+    header->set_timestamp_sec(timestamp);
+    header->set_module_name("perception_LidarFrame_benchmark");
+    header->set_sequence_num(seq_num);
+    header->set_lidar_timestamp(lidar_timestamp);
+    header->set_camera_timestamp(0);
+    header->set_radar_timestamp(0);
+
+    for (const auto &obj : objects) {
+        PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+        if (!ConvertSegmentedObjectToPb(obj, obstacle,
+              pose, use_lidar_cooridinate)) {
+            AERROR << "ConvertSegmentedObjectToPb failed, Object:"
+                   << obj->ToString();
+            return false;
+        }
+    }
+    return true;
+}
+
 bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
                                       PerceptionObstacle *pb_msg) {
   if (object_ptr == nullptr || pb_msg == nullptr) {
@@ -153,6 +177,8 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
   pb_msg->set_sub_type(
       static_cast<PerceptionObstacle::SubType>(object_ptr->sub_type));
   pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
+  pb_msg->set_semantic_type(static_cast<PerceptionObstacle::SemanticType>(
+      object_ptr->lidar_supplement.semantic_type));
 
   if (object_ptr->lidar_supplement.height_above_ground != kFloatMax) {
     pb_msg->set_height_above_ground(
@@ -223,6 +249,118 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
 //  }
 
   return true;
+}
+
+bool MsgSerializer::ConvertSegmentedObjectToPb(
+    const base::ObjectPtr &object_ptr, PerceptionObstacle *pb_msg,
+    const Eigen::Affine3d &pose, bool use_lidar_cooridinate) {
+    if (object_ptr == nullptr || pb_msg == nullptr) {
+        return false;
+    }
+
+    pb_msg->set_id(object_ptr->id);
+    pb_msg->set_confidence(object_ptr->confidence);
+
+    pb_msg->set_length(object_ptr->size(0));
+    pb_msg->set_width(object_ptr->size(1));
+    pb_msg->set_height(object_ptr->size(2));
+
+    pb_msg->set_type(static_cast<PerceptionObstacle::Type>(object_ptr->type));
+    pb_msg->set_sub_type(static_cast<PerceptionObstacle::SubType>(
+        object_ptr->sub_type));
+    pb_msg->set_semantic_type(static_cast<PerceptionObstacle::SemanticType>(
+      object_ptr->lidar_supplement.semantic_type));
+
+    if (use_lidar_cooridinate) {
+        pb_msg->set_theta(object_ptr->theta);
+        pb_msg->mutable_position()->set_x(object_ptr->center(0));
+        pb_msg->mutable_position()->set_y(object_ptr->center(1));
+        pb_msg->mutable_position()->set_z(object_ptr->center(2));
+
+        for (size_t i = 0; i < object_ptr->polygon.size(); ++i) {
+            auto &pt = object_ptr->polygon.at(i);
+            apollo::common::Point3D *p = pb_msg->add_polygon_point();
+            p->set_x(pt.x);
+            p->set_y(pt.y);
+            p->set_z(pt.z);
+        }
+        if (FLAGS_obs_benchmark_mode) {
+            for (auto &point : object_ptr->lidar_supplement.cloud.points()) {
+                pb_msg->add_point_cloud(point.x);
+                pb_msg->add_point_cloud(point.y);
+                pb_msg->add_point_cloud(point.z);
+            }
+        }
+    } else {
+        // theta
+        Eigen::Vector3d dir = pose.rotation() *
+            object_ptr->direction.cast<double>();
+        double world_theta = std::atan2(dir(1), dir(0));
+        pb_msg->set_theta(world_theta);
+
+        // center [Attention: Z is CENTER-Z, but tracking is BOTTOM-Z]
+        Eigen::Vector3d lidar_center(object_ptr->center(0),
+            object_ptr->center(1), object_ptr->center(2));
+        lidar_center = pose * lidar_center;
+        pb_msg->mutable_position()->set_x(lidar_center[0]);
+        pb_msg->mutable_position()->set_y(lidar_center[1]);
+        pb_msg->mutable_position()->set_z(lidar_center[2]);
+
+        // polygon
+        for (size_t i = 0; i < object_ptr->polygon.size(); ++i) {
+            auto &pt = object_ptr->polygon.at(i);
+            Eigen::Vector3d trans_point_polygon(pt.x, pt.y, pt.z);
+            trans_point_polygon = pose * trans_point_polygon;
+
+            apollo::common::Point3D *p = pb_msg->add_polygon_point();
+            p->set_x(trans_point_polygon[0]);
+            p->set_y(trans_point_polygon[1]);
+            p->set_z(trans_point_polygon[2]);
+        }
+        if (FLAGS_obs_benchmark_mode) {
+            auto cloud = object_ptr->lidar_supplement.cloud_world;
+            for (auto &point : cloud.points()) {
+                pb_msg->add_point_cloud(point.x);
+                pb_msg->add_point_cloud(point.y);
+                pb_msg->add_point_cloud(point.z);
+            }
+        }
+    }
+
+    // valued in tracking, this NOT-care
+    apollo::common::Point3D *obj_anchor_point = pb_msg->mutable_anchor_point();
+    obj_anchor_point->set_x(object_ptr->anchor_point(0));
+    obj_anchor_point->set_y(object_ptr->anchor_point(1));
+    obj_anchor_point->set_z(object_ptr->anchor_point(2));
+
+    BBox2D *obj_bbox2d = pb_msg->mutable_bbox2d();
+    const base::BBox2DF &box = object_ptr->camera_supplement.box;
+    obj_bbox2d->set_xmin(box.xmin);
+    obj_bbox2d->set_ymin(box.ymin);
+    obj_bbox2d->set_xmax(box.xmax);
+    obj_bbox2d->set_ymax(box.ymax);
+
+    if (object_ptr->lidar_supplement.height_above_ground != kFloatMax) {
+        pb_msg->set_height_above_ground(
+            object_ptr->lidar_supplement.height_above_ground);
+    } else {
+        pb_msg->set_height_above_ground(
+            std::numeric_limits<double>::quiet_NaN());
+    }
+
+    if (object_ptr->type == base::ObjectType::VEHICLE) {
+        LightStatus *light_status = pb_msg->mutable_light_status();
+        const base::CarLight &car_light = object_ptr->car_light;
+        light_status->set_brake_visible(car_light.brake_visible);
+        light_status->set_brake_switch_on(car_light.brake_switch_on);
+
+        light_status->set_left_turn_visible(car_light.left_turn_visible);
+        light_status->set_left_turn_switch_on(car_light.left_turn_switch_on);
+
+        light_status->set_right_turn_visible(car_light.right_turn_visible);
+        light_status->set_right_turn_switch_on(car_light.right_turn_switch_on);
+    }
+    return true;
 }
 
 }  // namespace onboard

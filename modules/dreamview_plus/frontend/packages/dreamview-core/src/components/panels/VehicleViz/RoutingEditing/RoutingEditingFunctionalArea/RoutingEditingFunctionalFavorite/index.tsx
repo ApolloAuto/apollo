@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, message } from '@dreamview/dreamview-ui';
-import SourceEmptyImg from '@dreamview/dreamview-core/src/assets/ic_default_page_no_data.png';
+import { Button, message, useImagePrak } from '@dreamview/dreamview-ui';
 import IconIcRemoveAllPoints from '@dreamview/dreamview-ui/src/icons/components/IcRemoveAllPoints';
 import EventEmitter from 'eventemitter3';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +39,8 @@ function RoutingEditingFunctionalFavorite(props: RoutingEditingFunctionalFavorit
     const { activeOrigin, destroyFunFavoriteNotFullScreen } = props;
 
     const { cx, classes } = useStyle();
+
+    const SourceEmptyImg = useImagePrak('ic_default_page_no_data');
 
     const EE = useEventEmitter();
 
@@ -169,17 +170,6 @@ function RoutingEditingFunctionalFavorite(props: RoutingEditingFunctionalFavorit
             });
         }
     }, [isMainConnected]);
-
-    // useEffect(() => {
-    //     const unSubScribeCurrentRoute = currentRouteManager.subScribeCurrentRoute((editingRouting) => {
-    //         if (editingRouting?.routeOrigin === RouteOrigin.EDITING_ROUTE) {
-    //             setEditRouting(editingRouting);
-    //         }
-    //     });
-    //     return () => {
-    //         unSubScribeCurrentRoute.unsubscribe();
-    //     };
-    // }, []);
 
     useEffect(() => {
         setActiveRouting(compareRoutingPoint(routingList, currentRouteManager.getCurrentRoute()));

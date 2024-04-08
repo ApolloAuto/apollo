@@ -77,14 +77,6 @@ proto_library(
 )
 
 proto_library(
-    name = "planner_open_space_config_proto",
-    srcs = ["planner_open_space_config.proto"],
-    deps = [
-        "//modules/planning/planning_base/proto/math:fem_pos_deviation_smoother_config_proto",
-    ],
-)
-
-proto_library(
     name = "planning_config_proto",
     srcs = ["planning_config.proto"],
     deps = [

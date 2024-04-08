@@ -118,7 +118,8 @@ bool TrafficLightUnprotectedLeftTurnScenario::IsTransferable(
     ADEBUG << "traffic_light_id[" << overlap.object_id << "] start_s["
            << overlap.start_s << "] color[" << signal_color << "]";
 
-    if (signal_color != perception::TrafficLight::GREEN) {
+    if (signal_color != perception::TrafficLight::GREEN &&
+        signal_color != perception::TrafficLight::BLACK) {
       traffic_light_scenario = true;
       break;
     }

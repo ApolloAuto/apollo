@@ -179,17 +179,6 @@ message Vehicle_state_feedback_2_c4 {
   optional double driven_torque_feedback = 2;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Zhongyun {
   optional Gear_control_a1 gear_control_a1 = 1;          // control message
   optional Torque_control_a3 torque_control_a3 = 2;      // control message
@@ -203,5 +192,4 @@ message Zhongyun {
   optional Error_state_e1 error_state_e1 = 8;  // report message
   optional Vehicle_state_feedback_2_c4 vehicle_state_feedback_2_c4 =
       9;  // report message
-  optional CheckResponseSignal check_response = 100;
 }

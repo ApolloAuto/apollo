@@ -27,11 +27,42 @@ export default class Text3D {
 
     private camera;
 
+    private meshBasicMaterialMemo = new Map();
+
+    private chartMemo = new Map();
+
     constructor(camera) {
         this.charMeshes = {};
         this.charPointers = {};
         this.charWidths = {};
         this.camera = camera;
+    }
+
+    getText(char, size, height) {
+        const key = `${char}_${size}_${height}`;
+        const text = this.chartMemo.get(key);
+        if (text) {
+            return text;
+        }
+        this.chartMemo.set(
+            key,
+            new TextGeometry(char, {
+                font,
+                size,
+                height,
+                curveSegments: 1,
+            }),
+        );
+        return this.chartMemo.get(key);
+    }
+
+    getMeshBasicMaterial(color) {
+        const material = this.meshBasicMaterialMemo.get(color);
+        if (material) {
+            return material;
+        }
+        this.meshBasicMaterialMemo.set(color, new THREE.MeshBasicMaterial({ color, side: THREE.FrontSide }));
+        return this.meshBasicMaterialMemo.get(color);
     }
 
     reset() {
@@ -81,7 +112,6 @@ export default class Text3D {
                     mesh = charMesh;
                     this.charWidths[idx] = Number.isFinite(charWidth) ? charWidth : 0.2;
                 }
-                mesh.memoName = true;
                 this.charMeshes[idx].push(mesh);
             }
 
@@ -100,12 +130,8 @@ export default class Text3D {
     }
 
     drawChar3D(char, color, font = fonts.gentilis_bold, size = 0.6, height = 0) {
-        const charGeo = new TextGeometry(char, {
-            font,
-            size,
-            height,
-        });
-        const charMaterial = new THREE.MeshBasicMaterial({ color });
+        const charGeo = this.getText(char, size, height);
+        const charMaterial = this.getMeshBasicMaterial(color);
         const charMesh = new THREE.Mesh(charGeo, charMaterial);
 
         charGeo.computeBoundingBox();

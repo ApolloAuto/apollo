@@ -15,16 +15,15 @@
  *****************************************************************************/
 #include "modules/perception/traffic_light_recognition/traffic_light_recognition_component.h"
 
-#include "modules/perception/traffic_light_recognition/proto/traffic_light_recognition_component.pb.h"
-
 #include "cyber/time/clock.h"
 #include "cyber/profiler/profiler.h"
 #include "modules/perception/common/camera/common/trafficlight_frame.h"
 #include "modules/perception/traffic_light_recognition/interface/base_traffic_light_recognitor.h"
+#include "modules/perception/traffic_light_recognition/proto/traffic_light_recognition_component.pb.h"
 
 namespace apollo {
 namespace perception {
-namespace onboard {
+namespace trafficlight {
 
 bool TrafficLightRecognComponent::Init() {
   // init component config
@@ -37,7 +36,7 @@ bool TrafficLightRecognComponent::Init() {
     AERROR << "TrafficLightRecognComponent InitAlgorithmPlugin failed.";
     return false;
   }
-
+  AINFO << "Successfully init traffic light recognition component.";
   return true;
 }
 
@@ -47,11 +46,9 @@ bool TrafficLightRecognComponent::Proc(
   auto time_imags = std::to_string(message->timestamp_);
   AINFO << "Enter recognition component, message timestamp: " << time_imags;
 
-  std::shared_ptr<TrafficDetectMessage> out_message(new (std::nothrow)
-                                                        TrafficDetectMessage);
-  bool status = InternalProc(message, out_message);
+  bool status = InternalProc(message);
   if (status) {
-    writer_->Write(out_message);
+    writer_->Write(message);
     AINFO << "Send trafficlight recognition output message.";
   }
   return status;
@@ -100,42 +97,14 @@ bool TrafficLightRecognComponent::InitAlgorithmPlugin() {
 }
 
 bool TrafficLightRecognComponent::InternalProc(
-    const std::shared_ptr<TrafficDetectMessage const>& in_message,
-    std::shared_ptr<TrafficDetectMessage> out_message) {
-  camera::TrafficLightFrame traffic_light_frame;
-  traffic_light_frame.timestamp = in_message->timestamp_;
-  traffic_light_frame.data_provider =
-      in_message->traffic_light_frame_->data_provider;
-  traffic_light_frame.traffic_lights =
-      in_message->traffic_light_frame_->traffic_lights;
-
+    const std::shared_ptr<TrafficDetectMessage const>& message) {
   PERF_BLOCK("traffic_light_recognition")
-  bool status = recognitor_->Detect(&traffic_light_frame);
+  bool status = recognitor_->Detect(message->traffic_light_frame_.get());
   PERF_BLOCK_END
-
-  if (!status) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Trafficlight recognition process error!";
-    return false;
-  }
-
-  out_message->timestamp_ = in_message->timestamp_;
-  out_message->stoplines_ = in_message->stoplines_;
-  // fill car pose info
-  auto& carpose = out_message->carpose_;
-  carpose.reset(new camera::CarPose);
-  carpose = in_message->carpose_;
-
-  auto& frame = out_message->traffic_light_frame_;
-  frame.reset(new camera::TrafficLightFrame);
-  frame->timestamp = in_message->timestamp_;
-  frame->data_provider = traffic_light_frame.data_provider;
-  frame->traffic_lights = traffic_light_frame.traffic_lights;
 
   return true;
 }
 
-}  // namespace onboard
+}  // namespace trafficlight
 }  // namespace perception
 }  // namespace apollo

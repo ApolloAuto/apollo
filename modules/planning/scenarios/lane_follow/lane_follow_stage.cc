@@ -32,10 +32,10 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/planning_base/common/ego_info.h"
 #include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/speed_profile_generator.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/constraint_checker/constraint_checker.h"
 #include "modules/planning/planning_interface_base/task_base/task.h"
-#include "modules/planning/planning_base/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -146,6 +146,10 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
   StageResult ret;
   for (auto task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
+    const auto start_planning_perf_timestamp =
+        std::chrono::duration<double>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
 
     ret.SetTaskStatus(task->Execute(frame, reference_line_info));
 
@@ -155,6 +159,15 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
            << "]:" << reference_line_info->PathSpeedDebugString();
     ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
     RecordDebugInfo(reference_line_info, task->Name(), time_diff_ms);
+
+    const auto end_planning_perf_timestamp =
+        std::chrono::duration<double>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
+    const auto plnning_perf_ms =
+        (end_planning_perf_timestamp - start_planning_perf_timestamp) * 1000;
+    AINFO << "Planning Perf: task name [" << task->Name() << "], "
+          << plnning_perf_ms << " ms.";
 
     if (ret.IsTaskError()) {
       AERROR << "Failed to run tasks[" << task->Name()
@@ -215,7 +228,9 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
       } else {
         SLPoint stop_sl = GetStopSL(obstacle->LongitudinalDecision().stop(),
                                     reference_line_info->reference_line());
-        if (stop_sl.s() < dest_stop_s) {
+        if (stop_sl.s() < dest_stop_s &&
+            (dest_stop_s - reference_line_info->AdcSlBoundary().end_s()) <
+                20.0) {
           add_stop_obstacle_cost = true;
         }
       }

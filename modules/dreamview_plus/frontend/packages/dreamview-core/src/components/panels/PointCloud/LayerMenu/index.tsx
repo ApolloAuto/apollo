@@ -18,6 +18,7 @@ export default function LayerMenu(props: any) {
         setCurChannel,
     } = props;
     const { t } = useTranslation('layerMenu');
+    const { t: tPanels } = useTranslation('panels');
 
     const curLayerMenuParams = getCurrentLayerParams();
 
@@ -36,6 +37,9 @@ export default function LayerMenu(props: any) {
 
     return (
         <div className={classes['layer-menu-container']}>
+            <div className={classes['layer-menu-header']}>
+                <div className={classes['layer-menu-header-left']}>{tPanels('layerMenu')}</div>
+            </div>
             <div className={classes['layer-menu-content']}>
                 <div className={classes['layer-menu-content-left']}>
                     <span

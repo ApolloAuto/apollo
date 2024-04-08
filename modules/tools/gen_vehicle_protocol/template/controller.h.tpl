@@ -25,6 +25,7 @@
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+
 %(control_protocol_include_list)s
 
 namespace apollo {

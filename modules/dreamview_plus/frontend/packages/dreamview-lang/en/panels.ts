@@ -61,6 +61,7 @@ export const panels = {
     componentsTitle: 'Components',
     componentsDescription: 'Panel to display the status of common components',
     connectionError: 'Please connect hardware device first',
+    componentsAbilityDesc: '',
 
     // operate
     pressTips: 'Long press and drag the mouse to move the panel',
@@ -95,6 +96,9 @@ export const panels = {
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
     shortCut: 'Shortcut Key Description',
-
     exitFullScreen: 'exit full screen',
+    // panel map collect
+    mapCollectTitle: 'Map Collection',
+    mapCollectDescription: '',
+    mapCollectAbilityDesc: '',
 };

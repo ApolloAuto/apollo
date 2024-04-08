@@ -13,122 +13,144 @@
     <!--
     -->
     <!-- 目录结构 -->
-<tab type="usergroup" visible="yes" title="发版说明" intro="" url="">
-    <tab type="user" visible="yes" title="快速体验" intro="" url="@ref md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE5_xBF_xAB_xE9_x80_x9F_xE4_xBD_x93_xE9_xAA_x8C" />
-    <tab type="user" visible="yes" title="新版说明" intro="" url="@ref md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE6_x96_xB0_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E" />
-    <tab type="user" visible="yes" title="历史版本文档" intro="" url="@ref md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE5_x8E_x86_xE5_x8F_xB2_xE7_x89_x88_xE6_x9C_xAC_xE6_x96_x87_xE6_xA1_xA3" />
-</tab>
-<tab type="usergroup" visible="yes" title="安装指南" intro="" url="">
-    <tab type="user" visible="yes" title="包管理安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
-    <tab type="user" visible="yes" title="源码安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE6_xBA_x90_xE7_xA0_x81_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
-    <tab type="user" visible="yes" title="安装及编译问题FAQ" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_xAE_x89_xE8_xA3_x85_xE5_x8F_x8A_xE7_xBC_x96_xE8_xAF_x91_xE9_x97_xAE_xE9_xA2_x98FAQ" />
-</tab>
-<tab type="usergroup" visible="yes" title="应用实践" intro="" url="">
-    <tab type="usergroup" visible="yes" title="开发调试教程" intro="" url="">
-        <tab type="usergroup" visible="yes" title="Dreamview+" intro="" url="">
-            <tab type="user" visible="yes" title="Studio 插件安装" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2Studio_01_xE6_x8F_x92_xE4_xBB_xB6_xE5_xAE_x89_xE8_xA3_x85" />
-            <tab type="user" visible="yes" title="播放离线数据包" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2_xE6_x92_xAD_xE6_x94_xBE_xE7_xA6_xBB_xE7_xBA_xBF_xE6_x95_xB0_xE6_x8D_xAE_xE5_x8C_x85" />
-            <tab type="user" visible="yes" title="SimControl 仿真模式使用" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2SimControl_01_xE4_xBB_xBF_xE7_x9C_x9F_xE6_xA8_xA1_xE5_xBC_x8F_xE4_xBD_xBF_xE7_x94_xA8" />
-        </tab>
-        <tab type="usergroup" visible="yes" title="Apollo感知实践" intro="" url="">
-            <tab type="user" visible="yes" title="综述" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE7_xBB_xBC_xE8_xBF_xB0" />
-            <tab type="usergroup" visible="yes" title="基于组件进行开发" intro="" url="">
-                <tab type="user" visible="yes" title="组件开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE7_xBB_x84_xE4_xBB_xB6_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
-                <tab type="user" visible="yes" title="基于组件进行开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91" />
-            </tab>
-            <tab type="usergroup" visible="yes" title="感知模型部署训练" intro="" url="">
-                <tab type="user" visible="yes" title="点云模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE7_x82_xB9_xE4_xBA_x91_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
-                <tab type="user" visible="yes" title="视觉模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE8_xA7_x86_xE8_xA7_x89_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
-            </tab>
-            <tab type="usergroup" visible="yes" title="基于配置参数开发" intro="" url="">
-                <tab type="user" visible="yes" title="激光雷达参数介绍" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE5_x8F_x82_xE6_x95_xB0_xE4_xBB_x8B_xE7_xBB_x8D" />
-                <tab type="user" visible="yes" title="激光雷达感知参数开发实践" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE6_x84_x9F_xE7_x9F_xA5_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_xE5_xAE_x9E_xE8_xB7_xB5" />
-            </tab>
-            <tab type="usergroup" visible="yes" title="基于插件进行开发" intro="" url="">
-                <tab type="user" visible="yes" title="插件开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE6_x8F_x92_xE4_xBB_xB6_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
-                <tab type="user" visible="yes" title="基于插件进行开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91" />
-            </tab>
-        </tab>
-        <tab type="usergroup" visible="yes" title="Apollo规划实践" intro="" url="">
-            <tab type="user" visible="yes" title="综述" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE7_xBB_xBC_xE8_xBF_xB0" />
-            <tab type="usergroup" visible="yes" title="基于命令发布开发" intro="" url="">
-                <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE5_x91_xBD_xE4_xBB_xA4_xE5_x8F_x91_xE5_xB8_x83_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
-                <tab type="user" visible="yes" title="Apollo规划之远程启动车辆-命令控制（9.0版）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE5_x91_xBD_xE4_xBB_xA4_xE5_x8F_x91_xE5_xB8_x83_xE5_xBC_x80_xE5_x8F_x91_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE4_xB9_x8B_xE8_xBF_x9C_xE7_xA8_x8B_xE5_x90_xAF_xE5_x8A_xA8_xE8_xBD_xA6_xE8_xBE_x86-_xE5_x91_xBD_xE4_xBB_xA4_xE6_x8E_xA7_xE5_x88_xB6_xEF_xBC_x889_80_xE7_x89_x88_xEF_xBC_x89" />
-            </tab>
-            <tab type="usergroup" visible="yes" title="基于配置参数开发" intro="" url="">
-                <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
-                <tab type="user" visible="yes" title="定速巡航仿真调试（9.0版）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xAE_x9A_xE9_x80_x9F_xE5_xB7_xA1_xE8_x88_xAA_xE4_xBB_xBF_xE7_x9C_x9F_xE8_xB0_x83_xE8_xAF_x95_xEF_xBC_x889_80_xE7_x89_x88_xEF_xBC_x89" />
-            </tab>
-            <tab type="usergroup" visible="yes" title="基于插件进行开发" intro="" url="">
-                <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
-                <tab type="user" visible="yes" title="限速区域仿真调试 - 新增traffic rule插件" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE9_x99_x90_xE9_x80_x9F_xE5_x8C_xBA_xE5_x9F_x9F_xE4_xBB_xBF_xE7_x9C_x9F_xE8_xB0_x83_xE8_xAF_x95_01-_01_xE6_x96_xB0_xE5_xA2_x9Etraffic_01rule_xE6_x8F_x92_xE4_xBB_xB6" />
-            </tab>
-        </tab>
+    <tab type="usergroup" visible="yes" title="发版说明" intro="" url="[none]">
+      <tab type="user" visible="yes" title="新版说明" intro="" url="@ref md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE6_x96_xB0_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E" />
+      <tab type="user" visible="yes" title="历史版本文档" intro="" url="@ref md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE5_x8E_x86_xE5_x8F_xB2_xE7_x89_x88_xE6_x9C_xAC_xE6_x96_x87_xE6_xA1_xA3" />
     </tab>
-</tab>
-<tab type="usergroup" visible="yes" title="框架设计" intro="" url="">
-    <tab type="usergroup" visible="yes" title="系统与环境" intro="" url="">
-        <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE7_xB3_xBB_xE7_xBB_x9F_xE4_xB8_x8E_xE7_x8E_xAF_xE5_xA2_x83_2_xE6_xA6_x82_xE8_xBF_xB0" />
+    <tab type="usergroup" visible="yes" title="安装指南" intro="" url="[none]">
+      <tab type="user" visible="yes" title="源码安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE6_xBA_x90_xE7_xA0_x81_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
+      <tab type="user" visible="yes" title="包管理安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
     </tab>
-    <tab type="user" visible="yes" title="CyberRT" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2CyberRT" />
-    <tab type="usergroup" visible="yes" title="核心模块" intro="" url="">
-        <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE6_xA0_xB8_xE5_xBF_x83_xE6_xA8_xA1_xE5_x9D_x97_2_xE6_xA6_x82_xE8_xBF_xB0" />
-        <tab type="usergroup" visible="yes" title="planning" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2planning_2README__cn" />
-            <tab type="user" visible="yes" title="planning" intro="" url="@ref md_modules_2planning_2planning__component_2README__cn" />
+    <tab type="usergroup" visible="yes" title="应用实践" intro="" url="[none]">
+      <tab type="usergroup" visible="yes" title="开发调试教程" intro="" url="[none]">
+        <tab type="usergroup" visible="yes" title="Dreamview+" intro="" url="[none]">
+          <tab type="user" visible="yes" title="Dreamview +快速使用" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2Dreamview_01_09_xE5_xBF_xAB_xE9_x80_x9F_xE4_xBD_xBF_xE7_x94_xA8" />
+          <tab type="user" visible="yes" title="Studio 插件安装" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2Studio_01_xE6_x8F_x92_xE4_xBB_xB6_xE5_xAE_x89_xE8_xA3_x85" />
+          <tab type="user" visible="yes" title="播放离线数据包" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2_xE6_x92_xAD_xE6_x94_xBE_xE7_xA6_xBB_xE7_xBA_xBF_xE6_x95_xB0_xE6_x8D_xAE_xE5_x8C_x85" />
+          <tab type="user" visible="yes" title="SimControl 仿真模式使用" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Dreamview_09_2SimControl_01_xE4_xBB_xBF_xE7_x9C_x9F_xE6_xA8_xA1_xE5_xBC_x8F_xE4_xBD_xBF_xE7_x94_xA8" />
         </tab>
-        <tab type="usergroup" visible="yes" title="control" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2control_2README__cn" />
-            <tab type="user" visible="yes" title="control-controller-demo-control-task" intro="" url="@ref md_modules_2control_2controllers_2demo__control__task_2README__cn" />
-            <tab type="user" visible="yes" title="control-controller-lat-based-lqr-controller" intro="" url="@ref md_modules_2control_2controllers_2lat__based__lqr__controller_2README__cn" />
-            <tab type="user" visible="yes" title="control-controller-lon-based-pid-controller" intro="" url="@ref md_modules_2control_2controllers_2lon__based__pid__controller_2README__cn" />
-            <tab type="user" visible="yes" title="control-controller-mpc-controller" intro="" url="@ref md_modules_2control_2controllers_2mpc__controller_2README__cn" />
-            <tab type="user" visible="yes" title="control" intro="" url="@ref md_modules_2control_2control__component_2README__cn" />
+        <tab type="usergroup" visible="yes" title="Cyber RT实践" intro="" url="[none]">
+          <tab type="usergroup" visible="yes" title="Cyber RT入门" intro="" url="[none]">
+            <tab type="user" visible="yes" title="Cyber RT 实践之 Hello Apollo" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE5_x85_xA5_xE9_x97_xA8_2Cyber_01RT_01_xE5_xAE_x9E_xE8_xB7_xB5_xE4_xB9_x8B_01Hello_01Apollo" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="Cyber RT通信机制" intro="" url="[none]">
+            <tab type="user" visible="yes" title="Cyber通信机制实践之Listener-Talker通信（C++）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE9_x80_x9A_xE4_xBF_xA1_xE6_x9C_xBA_xE5_x88_xB6_2Cyber_xE9_x80_x9A_xE4_xBF_xA1_xE6_x9C_xBA_xE5_x88_xB6_xE5_xAE_x9E_xE8_xB7_xB5_xE4_xB9_x8BListener-Talker_xE9_x80_x9A_xE4_xBF_xA1_xEF_xBC_x88C_09_09_xEF_xBC_x89" />
+            <tab type="user" visible="yes" title="Cyber通信机制实践之Listener-Talker通信（python）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE9_x80_x9A_xE4_xBF_xA1_xE6_x9C_xBA_xE5_x88_xB6_2Cyber_xE9_x80_x9A_xE4_xBF_xA1_xE6_x9C_xBA_xE5_x88_xB6_xE5_xAE_x9E_xE8_xB7_xB5_xE4_xB9_x8BListener-Talker_xE9_x80_x9A_xE4_xBF_xA1_xEF_xBC_x88python_xEF_xBC_x89" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="Cyber RT组件机制" intro="" url="[none]">
+            <tab type="user" visible="yes" title="Cyber RT 之 Component 实践" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE7_xBB_x84_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6_2Cyber_01RT_01_xE4_xB9_x8B_01Component_01_xE5_xAE_x9E_xE8_xB7_xB5" />
+            <tab type="user" visible="yes" title="Cyber RT 之 Timer Component 实践" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE7_xBB_x84_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6_2Cyber_01RT_01_xE4_xB9_x8B_01Timer_01Component_01_xE5_xAE_x9E_xE8_xB7_xB5" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="Cyber RT调度机制" intro="" url="[none]">
+            <tab type="user" visible="yes" title="Cyber调度实践之优先级策略配置" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2Cyber_01RT_xE8_xB0_x83_xE5_xBA_xA6_xE6_x9C_xBA_xE5_x88_xB6_2Cyber_xE8_xB0_x83_xE5_xBA_xA6_xE5_xAE_x9E_xE8_xB7_xB5_xE4_xB9_x8B_xE4_xBC_x98_xE5_x85_x88_xE7_xBA_xA7_xE7_xAD_x96_xE7_x95_xA5_xE9_x85_x8D_xE7_xBD_xAE" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="应用Cyber RT开发自动驾驶调试工具" intro="" url="[none]">
+            <tab type="user" visible="yes" title="Apollo工具开发之交通灯仿真控制工具制作" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBA_x94_xE7_x94_xA8Cyber_01RT_xE5_xBC_x80_xE5_x8F_x91_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE8_xB0_x83_xE8_xAF_x95_xE5_xB7_xA5_xE5_x85_xB7_2Apollo_xE5_xB7_xA5_xE5_x85_xB7_xE5_xBC_x80_xE5_x8F_x91_xE4_xB9_x8B_xE4_xBA_xA4_xE9_x80_x9A_xE7_x81_xAF_xE4_xBB_xBF_xE7_x9C_x9F_xE6_x8E_xA7_xE5_x88_xB6_xE5_xB7_xA5_xE5_x85_xB7_xE5_x88_xB6_xE4_xBD_x9C" />
+            <tab type="user" visible="yes" title="Apollo工具开发之路径设置工具制作" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Cyber_01RT_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBA_x94_xE7_x94_xA8Cyber_01RT_xE5_xBC_x80_xE5_x8F_x91_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE8_xB0_x83_xE8_xAF_x95_xE5_xB7_xA5_xE5_x85_xB7_2Apollo_xE5_xB7_xA5_xE5_x85_xB7_xE5_xBC_x80_xE5_x8F_x91_xE4_xB9_x8B_xE8_xB7_xAF_xE5_xBE_x84_xE8_xAE_xBE_xE7_xBD_xAE_xE5_xB7_xA5_xE5_x85_xB7_xE5_x88_xB6_xE4_xBD_x9C" />
+          </tab>
         </tab>
-        <tab type="usergroup" visible="yes" title="canbus" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2canbus_2README__cn" />
-            <tab type="user" visible="yes" title="canbus" intro="" url="@ref md_modules_2canbus_2README__cn" />
-            <tab type="user" visible="yes" title="canbus-vehicle-lincoln" intro="" url="@ref md_modules_2canbus__vehicle_2lincoln_2README__cn" />
+        <tab type="usergroup" visible="yes" title="Apollo感知实践" intro="" url="[none]">
+          <tab type="user" visible="yes" title="感知模块综述" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9D_x97_xE7_xBB_xBC_xE8_xBF_xB0" />
+          <tab type="usergroup" visible="yes" title="基于组件进行开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="组件开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE7_xBB_x84_xE4_xBB_xB6_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
+            <tab type="user" visible="yes" title="基于组件进行开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_x9F_xBA_xE4_xBA_x8E_xE7_xBB_x84_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="感知模型部署训练" intro="" url="[none]">
+            <tab type="user" visible="yes" title="点云模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE7_x82_xB9_xE4_xBA_x91_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
+            <tab type="user" visible="yes" title="视觉模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE8_xA7_x86_xE8_xA7_x89_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="基于配置参数开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="激光雷达参数介绍" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE5_x8F_x82_xE6_x95_xB0_xE4_xBB_x8B_xE7_xBB_x8D" />
+            <tab type="user" visible="yes" title="激光雷达感知参数开发实践" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE6_x84_x9F_xE7_x9F_xA5_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_xE5_xAE_x9E_xE8_xB7_xB5" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="基于插件进行开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="插件开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE6_x8F_x92_xE4_xBB_xB6_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
+            <tab type="user" visible="yes" title="基于插件进行开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91" />
+          </tab>
         </tab>
-        <tab type="usergroup" visible="yes" title="perception" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2perception_2README__cn" />
-            <tab type="user" visible="yes" title="perception-camera-detection-multi-stage" intro="" url="@ref md_modules_2perception_2camera__detection__multi__stage_2README" />
-            <tab type="user" visible="yes" title="perception-camera-detection-single-stage" intro="" url="@ref md_modules_2perception_2camera__detection__single__stage_2README" />
-            <tab type="user" visible="yes" title="perception-camera-detection-bev" intro="" url="@ref md_modules_2perception_2camera__detection__bev_2README" />
-            <tab type="user" visible="yes" title="perception-camera-location-estimation" intro="" url="@ref md_modules_2perception_2camera__location__estimation_2README" />
-            <tab type="user" visible="yes" title="perception-camera-location-refinement" intro="" url="@ref md_modules_2perception_2camera__location__refinement_2README" />
-            <tab type="user" visible="yes" title="perception-camera-tracking" intro="" url="@ref md_modules_2perception_2camera__tracking_2README" />
-            <tab type="user" visible="yes" title="perception-lane-detection" intro="" url="@ref md_modules_2perception_2lane__detection_2README" />
-            <tab type="user" visible="yes" title="perception-lidar-detection-filter" intro="" url="@ref md_modules_2perception_2lidar__detection__filter_2README" />
-            <tab type="user" visible="yes" title="perception-lidar-detection" intro="" url="@ref md_modules_2perception_2lidar__detection_2README" />
-            <tab type="user" visible="yes" title="perception-lidar-output" intro="" url="@ref md_modules_2perception_2lidar__output_2README" />
-            <tab type="user" visible="yes" title="perception-lidar-tracking" intro="" url="@ref md_modules_2perception_2lidar__tracking_2README" />
-            <tab type="user" visible="yes" title="perception-motion-service" intro="" url="@ref md_modules_2perception_2motion__service_2README" />
-            <tab type="user" visible="yes" title="perception-msg-adapter" intro="" url="@ref md_modules_2perception_2msg__adapter_2README" />
-            <tab type="user" visible="yes" title="perception-multi-sensor-fusion" intro="" url="@ref md_modules_2perception_2multi__sensor__fusion_2README" />
-            <tab type="user" visible="yes" title="perception-pointcloud-ground-detection" intro="" url="@ref md_modules_2perception_2pointcloud__ground__detection_2README" />
-            <tab type="user" visible="yes" title="perception-pointcloud-map-based-roi" intro="" url="@ref md_modules_2perception_2pointcloud__map__based__roi_2README" />
-            <tab type="user" visible="yes" title="perception-pointcloud-preprocess" intro="" url="@ref md_modules_2perception_2pointcloud__preprocess_2README" />
-            <tab type="user" visible="yes" title="perception-radar-detection" intro="" url="@ref md_modules_2perception_2radar__detection_2README" />
-            <tab type="user" visible="yes" title="perception-radar4d-detection" intro="" url="@ref md_modules_2perception_2radar4d__detection_2README" />
-            <tab type="user" visible="yes" title="perception-tools" intro="" url="@ref md_modules_2perception_2tools_2README" />
-            <tab type="user" visible="yes" title="perception-launch" intro="" url="@ref md_modules_2perception_2launch_2README" />
-            <tab type="user" visible="yes" title="perception-traffic-light-detection" intro="" url="@ref md_modules_2perception_2traffic__light__detection_2README" />
-            <tab type="user" visible="yes" title="perception-traffic-light-recognition" intro="" url="@ref md_modules_2perception_2traffic__light__recognition_2README" />
-            <tab type="user" visible="yes" title="perception-traffic-light-region-proposal" intro="" url="@ref md_modules_2perception_2traffic__light__region__proposal_2README" />
-            <tab type="user" visible="yes" title="perception-traffic-light-tracking" intro="" url="@ref md_modules_2perception_2traffic__light__tracking_2README" />
+        <tab type="usergroup" visible="yes" title="Apollo规划实践" intro="" url="[none]">
+          <tab type="user" visible="yes" title="规划模块综述" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xA7_x84_xE5_x88_x92_xE6_xA8_xA1_xE5_x9D_x97_xE7_xBB_xBC_xE8_xBF_xB0" />
+          <tab type="usergroup" visible="yes" title="基于命令发布开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE5_x91_xBD_xE4_xBB_xA4_xE5_x8F_x91_xE5_xB8_x83_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
+            <tab type="user" visible="yes" title="Apollo规划之远程启动车辆-命令控制（9.0版）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE5_x91_xBD_xE4_xBB_xA4_xE5_x8F_x91_xE5_xB8_x83_xE5_xBC_x80_xE5_x8F_x91_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE4_xB9_x8B_xE8_xBF_x9C_xE7_xA8_x8B_xE5_x90_xAF_xE5_x8A_xA8_xE8_xBD_xA6_xE8_xBE_x86-_xE5_x91_xBD_xE4_xBB_xA4_xE6_x8E_xA7_xE5_x88_xB6_xEF_xBC_x889_80_xE7_x89_x88_xEF_xBC_x89" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="基于配置参数开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
+            <tab type="user" visible="yes" title="定速巡航仿真调试（9.0版）" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xAE_x9A_xE9_x80_x9F_xE5_xB7_xA1_xE8_x88_xAA_xE4_xBB_xBF_xE7_x9C_x9F_xE8_xB0_x83_xE8_xAF_x95_xEF_xBC_x889_80_xE7_x89_x88_xEF_xBC_x89" />
+          </tab>
+          <tab type="usergroup" visible="yes" title="基于插件进行开发" intro="" url="[none]">
+            <tab type="user" visible="yes" title="开发模式说明" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE5_xBC_x80_xE5_x8F_x91_xE6_xA8_xA1_xE5_xBC_x8F_xE8_xAF_xB4_xE6_x98_x8E" />
+            <tab type="user" visible="yes" title="限速区域仿真调试 - 新增traffic rule插件" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE8_xA7_x84_xE5_x88_x92_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x8F_x92_xE4_xBB_xB6_xE8_xBF_x9B_xE8_xA1_x8C_xE5_xBC_x80_xE5_x8F_x91_2_xE9_x99_x90_xE9_x80_x9F_xE5_x8C_xBA_xE5_x9F_x9F_xE4_xBB_xBF_xE7_x9C_x9F_xE8_xB0_x83_xE8_xAF_x95_01-_01_xE6_x96_xB0_xE5_xA2_x9Etraffic_01rule_xE6_x8F_x92_xE4_xBB_xB6" />
+          </tab>
         </tab>
-        <tab type="usergroup" visible="yes" title="prediction" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2prediction_2README__cn" />
-            <tab type="user" visible="yes" title="prediction" intro="" url="@ref md_modules_2prediction_2README__cn" />
+        <tab type="usergroup" visible="yes" title="传感器接入实践" intro="" url="[none]">
+          <tab type="user" visible="yes" title="组合惯导接入Apollo" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2_xE4_xBC_xA0_xE6_x84_x9F_xE5_x99_xA8_xE6_x8E_xA5_xE5_x85_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE7_xBB_x84_xE5_x90_x88_xE6_x83_xAF_xE5_xAF_xBC_xE6_x8E_xA5_xE5_x85_xA5Apollo" />
+          <tab type="user" visible="yes" title="新lidar接入Apollo" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2_xE4_xBC_xA0_xE6_x84_x9F_xE5_x99_xA8_xE6_x8E_xA5_xE5_x85_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x96_xB0lidar_xE6_x8E_xA5_xE5_x85_xA5Apollo" />
         </tab>
-        <tab type="usergroup" visible="yes" title="localization" intro="" url="">
-            <tab type="user" visible="yes" title="概述" intro="" url="@ref md_collection_2localization_2README__cn" />
-            <tab type="user" visible="yes" title="localization" intro="" url="@ref md_modules_2localization_2README__cn" />
+      </tab>
+      <tab type="usergroup" visible="yes" title="车辆集成教程" intro="" url="[none]">
+        <tab type="user" visible="yes" title="上车使用教程概览" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE4_xB8_x8A_xE8_xBD_xA6_xE4_xBD_xBF_xE7_x94_xA8_xE6_x95_x99_xE7_xA8_x8B_xE6_xA6_x82_xE8_xA7_x88" />
+        <tab type="usergroup" visible="yes" title="准备符合Apollo协议的车辆" intro="" url="[none]">
+          <tab type="user" visible="yes" title="概览" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x87_x86_xE5_xA4_x87_xE7_xAC_xA6_xE5_x90_x88Apollo_xE5_x8D_x8F_xE8_xAE_xAE_xE7_x9A_x84_xE8_xBD_xA6_xE8_xBE_x86_2_xE6_xA6_x82_xE8_xA7_x88" />
+          <tab type="user" visible="yes" title="符合Apollo线控标准的车辆" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x87_x86_xE5_xA4_x87_xE7_xAC_xA6_xE5_x90_x88Apollo_xE5_x8D_x8F_xE8_xAE_xAE_xE7_x9A_x84_xE8_xBD_xA6_xE8_xBE_x86_2_xE7_xAC_xA6_xE5_x90_x88Apollo_xE7_xBA_xBF_xE6_x8E_xA7_xE6_xA0_x87_xE5_x87_x86_xE7_x9A_x84_xE8_xBD_xA6_xE8_xBE_x86" />
+          <tab type="user" visible="yes" title="利用Apollo工具生成CANBUS适配代码" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x87_x86_xE5_xA4_x87_xE7_xAC_xA6_xE5_x90_x88Apollo_xE5_x8D_x8F_xE8_xAE_xAE_xE7_x9A_x84_xE8_xBD_xA6_xE8_xBE_x86_2_xE5_x88_xA9_xE7_x94_xA8Apollo_xE5_xB7_xA5_xE5_x85_xB7_xE7_x94_x9F_xE6_x88_x90CANBUS_xE9_x80_x82_xE9_x85_x8D_xE4_xBB_xA3_xE7_xA0_x81" />
+          <tab type="user" visible="yes" title="车辆底盘开环验证DBC的方法" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x87_x86_xE5_xA4_x87_xE7_xAC_xA6_xE5_x90_x88Apollo_xE5_x8D_x8F_xE8_xAE_xAE_xE7_x9A_x84_xE8_xBD_xA6_xE8_xBE_x86_2_xE8_xBD_xA6_xE8_xBE_x86_xE5_xBA_x95_xE7_x9B_x98_xE5_xBC_x80_xE7_x8E_xAF_xE9_xAA_x8C_xE8_xAF_x81DBC_xE7_x9A_x84_xE6_x96_xB9_xE6_xB3_x95" />
         </tab>
-        <tab type="usergroup" visible="yes" title="软件包文档" intro="" url="@ref md_docs_2packages_2packages__cn">
+        <tab type="usergroup" visible="yes" title="循迹搭建" intro="" url="[none]">
+          <tab type="user" visible="yes" title="车辆集成" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90" />
+          <tab type="user" visible="yes" title="Apollo系统安装" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2Apollo_xE7_xB3_xBB_xE7_xBB_x9F_xE5_xAE_x89_xE8_xA3_x85" />
+          <tab type="user" visible="yes" title="惯导设备PP7配置" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x83_xAF_xE5_xAF_xBC_xE8_xAE_xBE_xE5_xA4_x87PP7_xE9_x85_x8D_xE7_xBD_xAE" />
+          <tab type="user" visible="yes" title="定位模块配置" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE5_xAE_x9A_xE4_xBD_x8D_xE6_xA8_xA1_xE5_x9D_x97_xE9_x85_x8D_xE7_xBD_xAE" />
+          <tab type="user" visible="yes" title="车辆控制评测分析云服务的应用" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_xBD_xA6_xE8_xBE_x86_xE6_x8E_xA7_xE5_x88_xB6_xE8_xAF_x84_xE6_xB5_x8B_xE5_x88_x86_xE6_x9E_x90_xE4_xBA_x91_xE6_x9C_x8D_xE5_x8A_xA1_xE7_x9A_x84_xE5_xBA_x94_xE7_x94_xA8" />
+          <tab type="user" visible="yes" title="车辆动力学云标定" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_xBD_xA6_xE8_xBE_x86_xE5_x8A_xA8_xE5_x8A_x9B_xE5_xAD_xA6_xE4_xBA_x91_xE6_xA0_x87_xE5_xAE_x9A" />
+          <tab type="user" visible="yes" title="车辆循迹演示" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBE_xAA_xE8_xBF_xB9_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_xBD_xA6_xE8_xBE_x86_xE5_xBE_xAA_xE8_xBF_xB9_xE6_xBC_x94_xE7_xA4_xBA" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="基于激光雷达的封闭园区自动驾驶搭建" intro="" url="[none]">
+          <tab type="user" visible="yes" title="感知设备集成" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE8_xAE_xBE_xE5_xA4_x87_xE9_x9B_x86_xE6_x88_x90" />
+          <tab type="user" visible="yes" title="感知设备标定" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE8_xAE_xBE_xE5_xA4_x87_xE6_xA0_x87_xE5_xAE_x9A" />
+          <tab type="user" visible="yes" title="虚拟车道线制作" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_x99_x9A_xE6_x8B_x9F_xE8_xBD_xA6_xE9_x81_x93_xE7_xBA_xBF_xE5_x88_xB6_xE4_xBD_x9C" />
+          <tab type="user" visible="yes" title="规划适配" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_xA7_x84_xE5_x88_x92_xE9_x80_x82_xE9_x85_x8D" />
+          <tab type="user" visible="yes" title="感知适配" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE9_x80_x82_xE9_x85_x8D" />
+          <tab type="user" visible="yes" title="自动驾驶演示" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_xBC_x94_xE7_xA4_xBA" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="基于摄像头的封闭园区自动驾驶搭建" intro="" url="[none]">
+          <tab type="user" visible="yes" title="感知设备集成" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x91_x84_xE5_x83_x8F_xE5_xA4_xB4_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE8_xAE_xBE_xE5_xA4_x87_xE9_x9B_x86_xE6_x88_x90" />
+          <tab type="user" visible="yes" title="感知设备标定" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x91_x84_xE5_x83_x8F_xE5_xA4_xB4_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE8_xAE_xBE_xE5_xA4_x87_xE6_xA0_x87_xE5_xAE_x9A" />
+          <tab type="user" visible="yes" title="感知适配" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x91_x84_xE5_x83_x8F_xE5_xA4_xB4_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE6_x84_x9F_xE7_x9F_xA5_xE9_x80_x82_xE9_x85_x8D" />
+          <tab type="user" visible="yes" title="自动驾驶演示" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE8_xBD_xA6_xE8_xBE_x86_xE9_x9B_x86_xE6_x88_x90_xE6_x95_x99_xE7_xA8_x8B_2_xE5_x9F_xBA_xE4_xBA_x8E_xE6_x91_x84_xE5_x83_x8F_xE5_xA4_xB4_xE7_x9A_x84_xE5_xB0_x81_xE9_x97_xAD_xE5_x9B_xAD_xE5_x8C_xBA_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_x90_xAD_xE5_xBB_xBA_2_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6_xE6_xBC_x94_xE7_xA4_xBA" />
+        </tab>
+      </tab>
+    </tab>
+    <tab type="usergroup" visible="yes" title="框架设计" intro="" url="[none]">
+      <tab type="usergroup" visible="yes" title="软件核心" intro="" url="[none]">
+        <tab type="usergroup" visible="yes" title="CyberRT" intro="" url="[none]">
+          <tab type="user" visible="yes" title="Cyber RT 通信机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE9_x80_x9A_xE4_xBF_xA1_xE6_x9C_xBA_xE5_x88_xB6" />
+          <tab type="user" visible="yes" title="Cyber RT 组件机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE7_xBB_x84_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6" />
+          <tab type="user" visible="yes" title="Cyber RT 插件机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE6_x8F_x92_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6" />
+          <tab type="user" visible="yes" title="Cyber RT 调度机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE8_xB0_x83_xE5_xBA_xA6_xE6_x9C_xBA_xE5_x88_xB6" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="核心模块" intro="" url="[none]">
+          <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE6_xA0_xB8_xE5_xBF_x83_xE6_xA8_xA1_xE5_x9D_x97_2_xE6_xA6_x82_xE8_xBF_xB0" />
+          <tab type="user" visible="yes" title="planning" intro="" url="@ref md_collection_2planning_2README__cn" />
+          <tab type="user" visible="yes" title="control" intro="" url="@ref md_collection_2control_2README__cn" />
+          <tab type="user" visible="yes" title="canbus" intro="" url="@ref md_collection_2canbus_2README__cn" />
+          <tab type="user" visible="yes" title="perception" intro="" url="@ref md_collection_2perception_2README__cn" />
+          <tab type="user" visible="yes" title="prediction" intro="" url="@ref md_collection_2prediction_2README__cn" />
+          <tab type="user" visible="yes" title="localization" intro="" url="@ref md_collection_2localization_2README__cn" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="包管理工具" intro="" url="[none]">
+          <tab type="user" visible="yes" title="包管理概念" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE6_x9E_x84_xE5_xBB_xBA_xE5_x8F_x8A_xE7_xBC_x96_xE8_xAF_x91_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86" />
+          <tab type="usergroup" visible="yes" title="本地工具" intro="" url="[none]">
+            <tab type="user" visible="yes" title="aem" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE5_x91_xBD_xE4_xBB_xA4_xE8_xA1_x8C_xE5_xB7_xA5_xE5_x85_xB7_2aem" />
+            <tab type="user" visible="yes" title="buildtool" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE5_x91_xBD_xE4_xBB_xA4_xE8_xA1_x8C_xE5_xB7_xA5_xE5_x85_xB7_2buildtool" />
+          </tab>
+          <tab type="user" visible="yes" title="软件包平台" intro="" url="https://apollo.baidu.com/pkgworkspace/html/index.html" />
+          <tab type="usergroup" visible="yes" title="软件包文档" intro="" url="@ref md_docs_2packages_2packages__cn">
             <tab type="usergroup" visible="yes" title="Apollo Core" intro="" url="@ref md_docs_2packages_2packages__core__cn">
+              <tab type="usergroup" visible="yes" title="cyber" intro="" url="[none]">
                 <tab type="user" visible="yes" title="cyber" intro="" url="@ref md_cyber_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="planning" intro="" url="[none]">
                 <tab type="user" visible="yes" title="external-command-action" intro="" url="@ref md_modules_2external__command_2command__processor_2action__command__processor_2README__cn" />
                 <tab type="user" visible="yes" title="external-command-lane-follow" intro="" url="@ref md_modules_2external__command_2command__processor_2lane__follow__command__processor_2README__cn" />
                 <tab type="user" visible="yes" title="external-command-processor-base" intro="" url="@ref md_modules_2external__command_2command__processor_2command__processor__base_2README__cn" />
@@ -187,13 +209,19 @@
                 <tab type="user" visible="yes" title="planning-traffic-rules-yield-sign" intro="" url="@ref md_modules_2planning_2traffic__rules_2yield__sign_2README__cn" />
                 <tab type="user" visible="yes" title="planning-traffic-rules-rerouting" intro="" url="@ref md_modules_2planning_2traffic__rules_2rerouting_2README__cn" />
                 <tab type="user" visible="yes" title="storytelling" intro="" url="@ref md_modules_2storytelling_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="control" intro="" url="[none]">
                 <tab type="user" visible="yes" title="control" intro="" url="@ref md_modules_2control_2control__component_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-lat-based-lqr-controller" intro="" url="@ref md_modules_2control_2controllers_2lat__based__lqr__controller_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-demo-control-task" intro="" url="@ref md_modules_2control_2controllers_2demo__control__task_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-mpc-controller" intro="" url="@ref md_modules_2control_2controllers_2mpc__controller_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-lon-based-pid-controller" intro="" url="@ref md_modules_2control_2controllers_2lon__based__pid__controller_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="canbus" intro="" url="[none]">
                 <tab type="user" visible="yes" title="canbus" intro="" url="@ref md_modules_2canbus_2README__cn" />
                 <tab type="user" visible="yes" title="canbus-vehicle-lincoln" intro="" url="@ref md_modules_2canbus__vehicle_2lincoln_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="perception" intro="" url="[none]">
                 <tab type="user" visible="yes" title="perception-motion-service" intro="" url="@ref md_modules_2perception_2motion__service_2README" />
                 <tab type="user" visible="yes" title="perception-pointcloud-preprocess" intro="" url="@ref md_modules_2perception_2pointcloud__preprocess_2README" />
                 <tab type="user" visible="yes" title="perception-lidar-detection-filter" intro="" url="@ref md_modules_2perception_2lidar__detection__filter_2README" />
@@ -221,7 +249,11 @@
                 <tab type="user" visible="yes" title="perception-traffic-light-detection" intro="" url="@ref md_modules_2perception_2traffic__light__detection_2README" />
                 <tab type="user" visible="yes" title="perception-msg-adapter" intro="" url="@ref md_modules_2perception_2msg__adapter_2README" />
                 <tab type="user" visible="yes" title="third-party-perception" intro="" url="@ref md_modules_2third__party__perception_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="prediction" intro="" url="[none]">
                 <tab type="user" visible="yes" title="prediction" intro="" url="@ref md_modules_2prediction_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="drivers" intro="" url="[none]">
                 <tab type="user" visible="yes" title="drivers-video" intro="" url="@ref md_modules_2drivers_2video_2README" />
                 <tab type="user" visible="yes" title="drivers-lidar" intro="" url="@ref md_modules_2drivers_2lidar_2README" />
                 <tab type="user" visible="yes" title="drivers-canbus" intro="" url="@ref md_modules_2drivers_2canbus_2README" />
@@ -231,54 +263,87 @@
                 <tab type="user" visible="yes" title="drivers-image-decompress" intro="" url="@ref md_modules_2drivers_2tools_2image__decompress_2README" />
                 <tab type="user" visible="yes" title="drivers-gnss" intro="" url="@ref md_modules_2drivers_2gnss_2README" />
                 <tab type="user" visible="yes" title="drivers-radar" intro="" url="@ref md_modules_2drivers_2radar_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="localization" intro="" url="[none]">
                 <tab type="user" visible="yes" title="localization" intro="" url="@ref md_modules_2localization_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="dreamview" intro="" url="[none]">
                 <tab type="user" visible="yes" title="dreamview" intro="" url="@ref md_modules_2dreamview_2README" />
                 <tab type="user" visible="yes" title="dreamview-plus" intro="" url="@ref md_modules_2dreamview__plus_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="task_manager" intro="" url="[none]">
                 <tab type="user" visible="yes" title="task-manager" intro="" url="@ref md_modules_2task__manager_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="monitor" intro="" url="[none]">
                 <tab type="user" visible="yes" title="monitor" intro="" url="@ref md_modules_2monitor_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="guardian" intro="" url="[none]">
                 <tab type="user" visible="yes" title="guardian" intro="" url="@ref md_modules_2guardian_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="tools" intro="" url="[none]">
                 <tab type="user" visible="yes" title="tools" intro="" url="@ref md_modules_2tools_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="audio" intro="" url="[none]">
                 <tab type="user" visible="yes" title="audio" intro="" url="@ref md_modules_2audio_2README__cn" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="bridge" intro="" url="[none]">
                 <tab type="user" visible="yes" title="bridge" intro="" url="@ref md_modules_2bridge_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="common" intro="" url="[none]">
                 <tab type="user" visible="yes" title="common" intro="" url="@ref md_modules_2common_2README__cn" />
                 <tab type="user" visible="yes" title="common-msgs" intro="" url="@ref md_modules_2common__msgs_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="contrib" intro="" url="[none]">
                 <tab type="user" visible="yes" title="cyber-bridge" intro="" url="@ref md_modules_2contrib_2cyber__bridge_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="transform" intro="" url="[none]">
                 <tab type="user" visible="yes" title="transform" intro="" url="@ref md_modules_2transform_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="calibration" intro="" url="[none]">
                 <tab type="user" visible="yes" title="calibration" intro="" url="@ref md_modules_2calibration_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="data" intro="" url="[none]">
                 <tab type="user" visible="yes" title="apollo-data" intro="" url="@ref md_modules_2data_2README" />
+              </tab>
+              <tab type="usergroup" visible="yes" title="map" intro="" url="[none]">
                 <tab type="user" visible="yes" title="map" intro="" url="@ref md_modules_2map_2README" />
+              </tab>
             </tab>
+          </tab>
         </tab>
+      </tab>
     </tab>
-    <tab type="usergroup" visible="yes" title="命令行工具" intro="" url="">
-        <tab type="user" visible="yes" title="aem" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE5_x91_xBD_xE4_xBB_xA4_xE8_xA1_x8C_xE5_xB7_xA5_xE5_x85_xB7_2aem" />
-        <tab type="user" visible="yes" title="buildtool" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE5_x91_xBD_xE4_xBB_xA4_xE8_xA1_x8C_xE5_xB7_xA5_xE5_x85_xB7_2buildtool" />
-    </tab>
-    <tab type="usergroup" visible="yes" title="构建及编译" intro="" url="">
-        <tab type="user" visible="yes" title="包管理" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE6_x9E_x84_xE5_xBB_xBA_xE5_x8F_x8A_xE7_xBC_x96_xE8_xAF_x91_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86" />
-    </tab>
-</tab>
-<tab type="usergroup" visible="yes" title="工具使用" intro="" url="">
-    <tab type="usergroup" visible="yes" title="Dreamview+" intro="" url="">
+    <tab type="usergroup" visible="yes" title="工具使用" intro="" url="[none]">
+      <tab type="usergroup" visible="yes" title="Dreamview+" intro="" url="[none]">
         <tab type="user" visible="yes" title="Dreamview+ 概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2Dreamview_09_01_xE6_xA6_x82_xE8_xBF_xB0" />
         <tab type="user" visible="yes" title="Mode Settings" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2Mode_01Settings" />
         <tab type="user" visible="yes" title="Resource Manager" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2Resource_01Manager" />
         <tab type="user" visible="yes" title="Add Panel" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2Add_01Panel" />
-        <tab type="usergroup" visible="yes" title="实车路测模式" intro="" url="">
-            <tab type="user" visible="yes" title="实车自动驾驶" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_xB7_xAF_xE6_xB5_x8B_xE6_xA8_xA1_xE5_xBC_x8F_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6" />
-            <tab type="user" visible="yes" title="循迹自动驾驶" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_xB7_xAF_xE6_xB5_x8B_xE6_xA8_xA1_xE5_xBC_x8F_2_xE5_xBE_xAA_xE8_xBF_xB9_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6" />
+        <tab type="usergroup" visible="yes" title="PNC可视化调试" intro="" url="[none]">
+          <tab type="user" visible="yes" title="轨迹绘制" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE8_xBD_xA8_xE8_xBF_xB9_xE7_xBB_x98_xE5_x88_xB6" />
+          <tab type="user" visible="yes" title="场景仿真" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE5_x9C_xBA_xE6_x99_xAF_xE4_xBB_xBF_xE7_x9C_x9F" />
+          <tab type="user" visible="yes" title="测距" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE6_xB5_x8B_xE8_xB7_x9D" />
+          <tab type="user" visible="yes" title="复制全部坐标点信息" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE5_xA4_x8D_xE5_x88_xB6_xE5_x85_xA8_xE9_x83_xA8_xE5_x9D_x90_xE6_xA0_x87_xE7_x82_xB9_xE4_xBF_xA1_xE6_x81_xAF" />
+          <tab type="user" visible="yes" title="自由仿真" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE8_x87_xAA_xE7_x94_xB1_xE4_xBB_xBF_xE7_x9C_x9F" />
         </tab>
-        <tab type="usergroup" visible="yes" title="PNC可视化调试" intro="" url="">
-            <tab type="user" visible="yes" title="轨迹绘制" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE8_xBD_xA8_xE8_xBF_xB9_xE7_xBB_x98_xE5_x88_xB6" />
-            <tab type="user" visible="yes" title="场景仿真" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE5_x9C_xBA_xE6_x99_xAF_xE4_xBB_xBF_xE7_x9C_x9F" />
-            <tab type="user" visible="yes" title="测距" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE6_xB5_x8B_xE8_xB7_x9D" />
-            <tab type="user" visible="yes" title="复制全部坐标点信息" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE5_xA4_x8D_xE5_x88_xB6_xE5_x85_xA8_xE9_x83_xA8_xE5_x9D_x90_xE6_xA0_x87_xE7_x82_xB9_xE4_xBF_xA1_xE6_x81_xAF" />
-            <tab type="user" visible="yes" title="自由仿真" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2PNC_xE5_x8F_xAF_xE8_xA7_x86_xE5_x8C_x96_xE8_xB0_x83_xE8_xAF_x95_2_xE8_x87_xAA_xE7_x94_xB1_xE4_xBB_xBF_xE7_x9C_x9F" />
+        <tab type="usergroup" visible="yes" title="实车路测模式" intro="" url="[none]">
+          <tab type="user" visible="yes" title="实车自动驾驶" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_xB7_xAF_xE6_xB5_x8B_xE6_xA8_xA1_xE5_xBC_x8F_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6" />
+          <tab type="user" visible="yes" title="循迹自动驾驶" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2Dreamview_09_2_xE5_xAE_x9E_xE8_xBD_xA6_xE8_xB7_xAF_xE6_xB5_x8B_xE6_xA8_xA1_xE5_xBC_x8F_2_xE5_xBE_xAA_xE8_xBF_xB9_xE8_x87_xAA_xE5_x8A_xA8_xE9_xA9_xBE_xE9_xA9_xB6" />
         </tab>
+      </tab>
+      <tab type="user" visible="yes" title="Fuel研发云平台" intro="" url="https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/Fuel%E7%A0%94%E5%8F%91%E4%BA%91%E5%B9%B3%E5%8F%B0/%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/%E6%A6%82%E8%A7%88" />
+      <tab type="user" visible="yes" title="仿真平台" intro="" url="https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/%E4%BB%BF%E7%9C%9F%E5%B9%B3%E5%8F%B0/%E6%A6%82%E8%A7%88" />
     </tab>
-</tab>
+    <tab type="usergroup" visible="yes" title="故障排查" intro="" url="[none]">
+      <tab type="usergroup" visible="yes" title="安装编译" intro="" url="[none]">
+        <tab type="user" visible="yes" title="安装及编译问题FAQ" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xAE_x89_xE8_xA3_x85_xE5_x8F_x8A_xE7_xBC_x96_xE8_xAF_x91_xE9_x97_xAE_xE9_xA2_x98FAQ" />
+      </tab>
+      <tab type="usergroup" visible="yes" title="Dreamview" intro="" url="[none]">
+        <tab type="user" visible="yes" title="dreamview faq" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2Dreamview_2dreamview_01faq" />
+      </tab>
+    </tab>
 
-    <tab type="usergroup" visible="yes" title="源代码文档" intro="">
+    <tab type="usergroup" visible="yes" title="源代码文档" intro="" url="[none]">
       <tab type="namespaces" visible="nmo" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="no" title="" intro=""/>

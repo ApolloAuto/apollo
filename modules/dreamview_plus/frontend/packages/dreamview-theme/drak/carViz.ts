@@ -1,0 +1,73 @@
+export default {
+    bgColor: '#0F1014',
+    textColor: '#ffea00',
+    gridColor: '#ffffff',
+    colorMapping: {
+        YELLOW: '#daa520',
+        WHITE: '#cccccc',
+        CORAL: '#ff7f50',
+        RED: '#ff6666',
+        GREEN: '#006400',
+        BLUE: '#30a5ff',
+        PURE_WHITE: '#ffffff',
+        DEFAULT: '#c0c0c0',
+        MIDWAY: '#ff7f50',
+        END: '#ffdab9',
+        PULLOVER: '#006aff',
+    },
+    obstacleColorMapping: {
+        PEDESTRIAN: '#ffea00',
+        BICYCLE: '#00dceb',
+        VEHICLE: '#00ff3c',
+        VIRTUAL: '#800000',
+        CIPV: '#ff9966',
+        DEFAULT: '#ff00fc',
+        TRAFFICCONE: '#e1601c',
+        UNKNOWN: '#a020f0',
+        UNKNOWN_MOVABLE: '#da70d6',
+        UNKNOWN_UNMOVABLE: '#ff00ff',
+    },
+    decisionMarkerColorMapping: {
+        STOP: '#ff3030',
+        FOLLOW: '#1ad061',
+        YIELD: '#ff30f7',
+        OVERTAKE: '#30a5ff',
+    },
+    pointCloudHeightColorMapping: {
+        0.5: {
+            r: 255,
+            g: 0,
+            b: 0,
+        },
+        1.0: {
+            r: 255,
+            g: 127,
+            b: 0,
+        },
+        1.5: {
+            r: 255,
+            g: 255,
+            b: 0,
+        },
+        2.0: {
+            r: 0,
+            g: 255,
+            b: 0,
+        },
+        2.5: {
+            r: 0,
+            g: 0,
+            b: 255,
+        },
+        3.0: {
+            r: 75,
+            g: 0,
+            b: 130,
+        },
+        10.0: {
+            r: 148,
+            g: 0,
+            b: 211,
+        },
+    },
+};

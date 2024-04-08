@@ -446,6 +446,9 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
   double characteristic_length = 0.0;
   if (decision.has_follow()) {
     characteristic_length = std::fabs(decision.follow().distance_s());
+    AINFO << "characteristic_length: " << characteristic_length;
+    boundary = STBoundary::CreateInstance(lower_points, upper_points)
+                   .ExpandByS(characteristic_length);
     b_type = STBoundary::BoundaryType::FOLLOW;
   } else if (decision.has_yield()) {
     characteristic_length = std::fabs(decision.yield().distance_s());

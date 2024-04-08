@@ -314,11 +314,21 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
               model_param_.postprocess().score_threshold(), &out_detections,
               &out_labels, &out_scores);
 
-  GetObjects(frame->lidar2world_pose, out_detections, out_labels, out_scores,
-             &frame->segmented_objects);
+  GetObjects(frame->lidar2world_pose, out_detections,
+             out_labels, out_scores, &frame->segmented_objects);
 
   if (model_param_.filter_by_points()) {
     FilterObjectsbyPoints(&frame->segmented_objects);
+  }
+  PERF_BLOCK("class_nms")
+  if (diff_class_nms_) {
+    FilterObjectsbyClassNMS(&frame->segmented_objects);
+  }
+  PERF_BLOCK_END
+
+  // filter semantic if it's not unknown
+  if (model_param_.filter_by_semantic_type()) {
+    FilterObjectsbySemanticType(&frame->segmented_objects);
   }
 
   FilterForegroundPoints(&frame->segmented_objects);
@@ -336,11 +346,6 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   }
   ADEBUG << sstr.str();
 
-  PERF_BLOCK("class_nms")
-  if (diff_class_nms_) {
-      FilterObjectsbyClassNMS(&frame->segmented_objects);
-  }
-  PERF_BLOCK_END
   nms_time_ = timer.toc(true);
 
   SetPointsInROI(&frame->segmented_objects);
@@ -497,7 +502,8 @@ void CenterPointDetection::GetBoxCorner(int num_objects,
 }
 
 void CenterPointDetection::GetBoxIndices(
-    int num_objects, const std::vector<float> &detections,
+    int num_objects,
+    const std::vector<float> &detections,
     const std::vector<float> &box_corner,
     const std::vector<float> &box_rectangular,
     std::vector<std::shared_ptr<Object>> *objects) {
@@ -559,17 +565,31 @@ void CenterPointDetection::GetBoxIndices(
           (angl1 >= 0 && angl2 >= 0 && angl3 >= 0 && angl4 >= 0)) {
         auto &object = objects->at(box_idx);
         const auto &world_point = original_world_cloud_->at(point_idx);
+        const double timestamp =
+            original_cloud_->points_timestamp(point_idx);
+        const float height =
+            original_cloud_->points_height(point_idx);
+        const int32_t beam_id =
+            original_cloud_->points_beam_id(point_idx);
+        const uint8_t label =
+            original_cloud_->points_label(point_idx);
+        const uint8_t semantic_label =
+            original_cloud_->points_semantic_label(point_idx);
         object->lidar_supplement.point_ids.push_back(point_idx);
-        object->lidar_supplement.cloud.push_back(point);
-        object->lidar_supplement.cloud_world.push_back(world_point);
+        object->lidar_supplement.cloud.push_back(
+            point, timestamp, height, beam_id, label, semantic_label);
+        object->lidar_supplement.cloud_world.push_back(
+            world_point, timestamp, height, beam_id, label, semantic_label);
       }
     }
   }
 }
 
 void CenterPointDetection::GetObjects(
-    const Eigen::Affine3d &pose, const std::vector<float> &detections,
-    const std::vector<int64_t> &labels, const std::vector<float> &scores,
+    const Eigen::Affine3d &pose,
+    const std::vector<float> &detections,
+    const std::vector<int64_t> &labels,
+    const std::vector<float> &scores,
     std::vector<std::shared_ptr<Object>> *objects) {
   int num_objects =
       detections.size() / model_param_.postprocess().num_output_box_feature();
@@ -623,6 +643,9 @@ void CenterPointDetection::GetObjects(
     object->lidar_supplement.raw_classification_methods.push_back(Name());
     object->sub_type = GetObjectSubType(labels.at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
+    if (object->sub_type == base::ObjectSubType::TRAFFICCONE) {
+        object->type = base::ObjectType::UNKNOWN;
+    }
     object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
         1.0f;
     // copy to type
@@ -633,7 +656,8 @@ void CenterPointDetection::GetObjects(
   std::vector<float> box_corner(num_objects * 8);
   std::vector<float> box_rectangular(num_objects * 4);
   GetBoxCorner(num_objects, detections, box_corner, box_rectangular);
-  GetBoxIndices(num_objects, detections, box_corner, box_rectangular, objects);
+  GetBoxIndices(
+    num_objects, detections, box_corner, box_rectangular, objects);
   AINFO << "[CenterPoint] we get " << num_objects << " objs";
 }
 
@@ -685,7 +709,7 @@ base::ObjectSubType CenterPointDetection::GetObjectSubType(const int label) {
     case 3:
       return base::ObjectSubType::PEDESTRIAN;
     default:
-      return base::ObjectSubType::UNKNOWN;
+      return base::ObjectSubType::TRAFFICCONE;
   }
 }
 
@@ -790,6 +814,48 @@ void CenterPointDetection::FilterObjectsbyClassNMS(
         }
     }
     objects->resize(valid_num);
+}
+
+void CenterPointDetection::FilterObjectsbySemanticType(
+    std::vector<std::shared_ptr<base::Object>> *objects) {
+  std::vector<bool> filter_flag(objects->size(), false);
+  for (size_t i = 0; i < objects->size(); i++) {
+    auto object = objects->at(i);
+    std::vector<int> type_count(static_cast<int>(
+        PointSemanticLabel::MAX_LABEL), 0);
+    for (size_t k = 0; k < object->lidar_supplement.cloud.size(); k++) {
+      uint8_t value = object->lidar_supplement.cloud.points_semantic_label(k);
+      int index = static_cast<int>(value);
+      if (index >= 0 &&
+          index < static_cast<int>(PointSemanticLabel::MAX_LABEL)) {
+        type_count[index]++;
+      }
+    }
+    // get max index
+    int max_value = -1;
+    int max_index = 0;
+    for (size_t j = 0; j < type_count.size(); j++) {
+      if (type_count.at(j) > max_value) {
+        max_value = type_count.at(j);
+        max_index = j;
+      }
+    }
+    if (max_index != 0) {
+      filter_flag.at(i) = true;
+    }
+  }
+  // filter object which semantic type is not unknown
+  int valid_size = 0;
+  for (size_t i = 0; i < objects->size(); i++) {
+    if (filter_flag.at(i)) {
+      continue;
+    }
+    objects->at(valid_size) = objects->at(i);
+    valid_size++;
+  }
+  AINFO << "Filter " << (objects->size() - valid_size)
+        << " objects from " << objects->size() << " objects.";
+  objects->resize(valid_size);
 }
 
 void CenterPointDetection::SetPointsInROI(

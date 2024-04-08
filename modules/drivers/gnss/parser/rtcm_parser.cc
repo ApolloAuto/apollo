@@ -18,11 +18,12 @@
 
 #include <memory>
 
+#include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm3_parser.h"
-#include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -57,25 +58,25 @@ void RtcmParser::ParseRtcmData(const std::string& msg) {
   }
 
   rtcm_parser_->Update(msg);
-  Parser::MessageType type;
+  MessageType type;
   MessagePtr msg_ptr;
 
   while (cyber::OK()) {
     type = rtcm_parser_->GetMessage(&msg_ptr);
-    if (type == Parser::MessageType::NONE) {
+    if (type == MessageType::NONE) {
       break;
     }
     DispatchMessage(type, msg_ptr);
   }
 }
 
-void RtcmParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
+void RtcmParser::DispatchMessage(MessageType type, MessagePtr message) {
   switch (type) {
-    case Parser::MessageType::EPHEMERIDES:
+    case MessageType::EPHEMERIDES:
       PublishEphemeris(message);
       break;
 
-    case Parser::MessageType::OBSERVATION:
+    case MessageType::OBSERVATION:
       PublishObservation(message);
       break;
 

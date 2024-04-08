@@ -82,7 +82,7 @@ apollo_cc_test(
         "-lgomp",
     ],
     deps = [
-        ":v2x_fusion_component_lib",
+        ":DO_NOT_IMPORT_v2x_fusion_component",
         "@com_google_googletest//:gtest_main",
     ],
 )

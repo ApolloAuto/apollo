@@ -3,7 +3,7 @@ import { useMakeStyle } from '@dreamview/dreamview-theme';
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'panel-item-container': {
-            height: 'calc(100% - 2px)',
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
@@ -20,12 +20,12 @@ export default function useStyle() {
             height: '100%',
             alignItems: 'center',
             textAlign: 'center',
-            color: theme.tokens.colors.fontColor4,
+            color: theme.tokens.colors.fontColor1,
             '& > div': {
                 flex: 1,
             },
             span: {
-                color: theme.tokens.colors.brand2,
+                color: theme.tokens.colors.brand3,
                 cursor: 'pointer',
             },
             img: {

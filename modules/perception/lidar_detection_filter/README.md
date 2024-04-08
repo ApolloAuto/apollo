@@ -34,15 +34,19 @@ apollo::perception::lidar::LidarDetectionFilterComponent
 
 #### Input
 
-| Name    | Type                                             | Description                    |
-| ------- | ------------------------------------------------ | ------------------------------ |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | LidarFrame‘s segmented_objects |
+| Name    | Type                                             | Description                    | Input channal |
+| ------- | ------------------------------------------------ | ------------------------------ | ------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | LidarFrame‘s segmented_objects | /perception/lidar/detection |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/lidar/detection`. The detailed input channel information is in `modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag` file. By default, the upstream components of the messages received by the component include `lidar_detection`.
 
 #### Output
 
-| Name    | Type                                             | Description                                                   |
-| ------- | ------------------------------------------------ | ------------------------------------------------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | put the preserved objects into LidarFrame‘s segmented_objects |
+| Name    | Type                                             | Description                                                   | Output channal |
+| ------- | ------------------------------------------------ | ------------------------------------------------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | put the preserved objects into LidarFrame‘s segmented_objects | /perception/lidar/detection_filter |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/lidar_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt` file.
 
 #### How to use
 

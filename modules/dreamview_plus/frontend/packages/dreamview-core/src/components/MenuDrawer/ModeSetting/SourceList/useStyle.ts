@@ -8,43 +8,43 @@ export default function useStyle() {
             },
         },
         'source-list-container-item': {
-            height: '40px',
-            lineHeight: '40px',
-            margin: '0 -14px',
+            height: '32px',
+            lineHeight: '32px',
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
+            color: theme.components.sourceItem.color,
+            padding: '0 12px',
             '&:hover': {
-                background: 'rgba(115,193,250,0.08)',
+                background: theme.components.sourceItem.bgColorHover,
                 '& .source-list-operate-hover': {
                     display: 'block',
                 },
             },
         },
         active: {
-            backgroundColor: theme.tokens.colors.brand3,
+            backgroundColor: theme.components.sourceItem.activeBgColor,
             '& .source-list-operate-hover': {
                 display: 'block',
-                color: 'white',
+                color: theme.components.sourceItem.activeIconColor,
             },
             '&:hover': {
-                backgroundColor: theme.tokens.colors.brand3,
+                backgroundColor: theme.components.sourceItem.activeBgColor,
             },
             '& > span': {
-                color: theme.tokens.colors.fontColor1,
+                color: theme.components.sourceItem.activeColor,
             },
         },
         'source-list-name': {
             ...theme.util.textEllipsis,
             ...theme.tokens.typography.content,
+            lineHeight: '32px',
             width: '250px',
-            marginLeft: '36px',
             whiteSpace: 'nowrap',
         },
         'source-list-operate': {
-            marginRight: '14px',
             display: 'none',
             fontSize: theme.tokens.font.size.large,
         },
@@ -52,15 +52,13 @@ export default function useStyle() {
             height: '40px',
             display: 'flex',
             alignItems: 'center',
-            '&:hover .source-list-title-text-hover': {
-                color: theme.tokens.colors.brand2,
-            },
         },
         'source-list-title-icon-expand': {
             transform: 'rotateZ(0)',
         },
         'source-list-title-icon': {
             fontSize: theme.tokens.font.size.large,
+            color: theme.tokens.colors.fontColor6,
             marginRight: '6px',
             transition: theme.tokens.transitions.easeInOut(),
             transform: 'rotateZ(-90deg)',
@@ -70,6 +68,10 @@ export default function useStyle() {
             width: '250px',
             ...theme.util.textEllipsis,
             whiteSpace: 'nowrap',
+            color: theme.tokens.colors.fontColor6,
+            '&:hover': {
+                color: theme.tokens.font.reactive.mainHover,
+            },
         },
         'source-list-close': {
             height: 0,
@@ -84,15 +86,16 @@ export default function useStyle() {
         },
         empty: {
             textAlign: 'center',
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
             img: {
                 display: 'block',
                 margin: '0 auto',
+                width: '160px',
             },
         },
         'empty-msg': {
             '& > span': {
-                color: theme.tokens.colors.brand2,
+                color: theme.tokens.colors.brand3,
                 cursor: 'pointer',
             },
         },

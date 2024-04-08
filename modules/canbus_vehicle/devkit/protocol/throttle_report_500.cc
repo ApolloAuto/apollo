@@ -39,8 +39,6 @@ void Throttlereport500::Parse(const std::uint8_t* bytes, int32_t length,
       throttle_flt1(bytes, length));
   chassis->mutable_throttle_report_500()->set_throttle_en_state(
       throttle_en_state(bytes, length));
-  chassis->mutable_check_response()->set_is_vcu_online(
-      throttle_en_state(bytes, length) == 1);
 }
 
 // config detail: {'name': 'throttle_pedal_actual', 'offset': 0.0, 'precision':

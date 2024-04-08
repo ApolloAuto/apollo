@@ -76,6 +76,7 @@ apollo_plugin(
         "//modules/common/util:common_util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
+        "//modules/planning/planning_open_space:apollo_planning_open_space",
         "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/open_space_trajectory_provider/proto:open_space_trajectory_provider_cc_proto",
         "@com_github_gflags_gflags//:gflags",

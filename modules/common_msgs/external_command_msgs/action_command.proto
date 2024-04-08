@@ -25,6 +25,10 @@ enum ActionCommandType {
   SWITCH_TO_AUTO = 51;
   // Varify vin code of vehicle.
   VIN_REQ = 52;
+  // Enter mission model
+  ENTER_MISSION = 53;
+  // Exit mission model
+  EXIT_MISSION = 54;
 }
 
 message ActionCommand {

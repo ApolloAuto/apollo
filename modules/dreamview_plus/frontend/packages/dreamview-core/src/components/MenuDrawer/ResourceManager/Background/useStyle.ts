@@ -5,7 +5,7 @@ export default function useStyle() {
         'table-background': {
             overflow: 'hidden',
             borderRadius: '10px',
-            background: '#282B36',
+            background: theme.components.table.bodyBgColor,
         },
     }));
 

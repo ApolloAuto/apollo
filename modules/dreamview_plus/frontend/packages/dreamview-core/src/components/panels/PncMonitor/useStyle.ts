@@ -23,7 +23,7 @@ export default function useStyle() {
             },
         },
         'pnc-monitor-filter': {
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             position: 'absolute',
             right: theme.tokens.margin.speace2,
             top: theme.tokens.margin.speace3,
@@ -43,7 +43,7 @@ export default function useStyle() {
             width: '50%',
             ...theme.util.textEllipsis,
             ...theme.tokens.typography.content,
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             marginBottom: '12px',
             '& .dreamview-check-box-wrapper': {
                 marginRight: theme.tokens.margin.speace,
@@ -51,27 +51,8 @@ export default function useStyle() {
         },
         tabs: {
             marginBottom: '20px',
-            '.dreamview-tabs-nav .dreamview-tabs-nav-list': {
-                display: 'inline-flex',
-                flex: 'none',
-                background: theme.tokens.colors.background1,
-            },
-            '.dreamview-tabs-tab': {
-                padding: '5px 0',
-                width: '100px',
-                justifyContent: 'center',
-                margin: '0 !important',
-            },
-            '.dreamview-tabs-ink-bar': {
-                display: 'none',
-            },
             '.dreamview-tabs-tab.dreamview-tabs-tab-active .dreamview-tabs-tab-btn': {
-                color: theme.tokens.colors.fontColor1,
                 ...theme.tokens.typography.content,
-            },
-            '.dreamview-tabs-tab.dreamview-tabs-tab-active ': {
-                backgroundColor: theme.tokens.colors.brand2,
-                borderRadius: '6px',
             },
         },
     }));

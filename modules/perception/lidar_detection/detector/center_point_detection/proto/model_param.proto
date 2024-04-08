@@ -17,4 +17,5 @@ message ModelParam {
   optional bool diff_class_nms = 9 [default = true];
   optional float diff_class_iou = 10 [default = 0.25];
   optional bool nms_strategy = 11 [default = true];
+  optional bool filter_by_semantic_type = 12 [default = false];
 }

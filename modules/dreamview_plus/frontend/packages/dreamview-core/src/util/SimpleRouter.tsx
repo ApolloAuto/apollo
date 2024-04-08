@@ -11,7 +11,7 @@ export type RouterContextType = {
     navigate: (path: string) => void;
 };
 
-const RouterContext = createContext<RouterContextType | undefined>(undefined);
+export const RouterContext = createContext<RouterContextType | undefined>(undefined);
 
 type SimpleRouterProps = {
     initialPath?: string;

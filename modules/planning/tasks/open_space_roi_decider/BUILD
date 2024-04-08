@@ -71,6 +71,7 @@ apollo_plugin(
     description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
+        "//modules/planning/planning_open_space:apollo_planning_open_space",
         "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/open_space_roi_decider/proto:open_space_roi_decider_cc_proto",
     ],

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { IconIcBottomRailDownload } from '@dreamview/dreamview-ui';
+import { IconIcBottomRailDownload, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import useStyle from './useStyle';
 import { useTimeDown, popoverStatus, EMUN_OPERATE_STATUS, EMUN_TIMEDOWN_STATUS } from '../util';
@@ -21,6 +20,9 @@ function DumpBtn(props: { disabled: boolean }) {
 
     // 下载record
     const onDownload = () => {
+        if (disabled) {
+            return;
+        }
         if (dumpStatus === EMUN_OPERATE_STATUS.PROGRESSING || dumpTimerStatus === EMUN_TIMEDOWN_STATUS.PORGRESSING) {
             return;
         }

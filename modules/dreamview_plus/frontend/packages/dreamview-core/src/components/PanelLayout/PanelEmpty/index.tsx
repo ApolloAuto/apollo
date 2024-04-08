@@ -6,14 +6,29 @@ import { usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLa
 import { update } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
 import { getPanelTypeByPanelId } from '@dreamview/dreamview-core/src/util/layout';
 import { useMenuStore, ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore';
+import { useThemeContext } from '@dreamview/dreamview-theme';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
 import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import useStyle from './useStyle';
+import ImgAddPanel from './icon_add_panel.png';
 
 const spaceWidth = 12;
 
 const space4 = `${spaceWidth * 4}px`;
 const space2 = `${spaceWidth * 2}px`;
+
+function AddIcon(prop: { className: string }) {
+    const { theme } = useThemeContext();
+    if (theme === 'drak') {
+        return <IconIcAddPanel />;
+    }
+
+    return (
+        <div className={prop.className}>
+            <img alt='add panel' src={ImgAddPanel} />
+        </div>
+    );
+}
 
 function PanelEmpty() {
     const { t } = useTranslation('panels');
@@ -53,7 +68,7 @@ function PanelEmpty() {
                                 onClick={() => onAddPanel(item.type)}
                                 className={cx(classes['panel-item-add'], 'panel-item-add-hover')}
                             >
-                                <IconIcAddPanel />
+                                <AddIcon className={classes['panel-item-add-icon']} />
                                 <span>{t('addPanel')}</span>
                             </div>
                         </li>

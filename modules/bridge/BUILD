@@ -116,9 +116,9 @@ apollo_cc_test(
         ":apollo_udp_bridge",
         "@com_google_googletest//:gtest_main",
         # internal component library if you really need these component depends
-        ":udp_bridge_multi_receiver_component_lib",
-        ":udp_bridge_receiver_component_lib",
-        ":udp_bridge_sender_component_lib",
+        ":DO_NOT_IMPORT_udp_bridge_multi_receiver_component",
+        ":DO_NOT_IMPORT_udp_bridge_receiver_component",
+        ":DO_NOT_IMPORT_udp_bridge_sender_component",
     ],
 )
 

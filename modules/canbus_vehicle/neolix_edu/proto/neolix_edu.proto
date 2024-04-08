@@ -509,17 +509,6 @@ message Epb {
   optional PBrakeType parking_brake_status = 4;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Neolix_edu {
   optional Aeb_systemstate_11 aeb_systemstate_11 = 1;  // report message
   optional Vcu_vehicle_fault_response_201 vcu_vehicle_fault_response_201 =
@@ -556,5 +545,4 @@ message Neolix_edu {
   optional Brake brake = 55;                                // brake pedal
   optional Eps eps = 56;                                    // Electronic Power Steering
   optional Epb epb = 57;                                    // Electronic parking brake
-  optional CheckResponseSignal check_response = 58;
 }

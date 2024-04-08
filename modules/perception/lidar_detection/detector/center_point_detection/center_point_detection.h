@@ -100,7 +100,8 @@ class CenterPointDetection : public BaseLidarDetector {
                     std::vector<float> &box_corner,
                     std::vector<float> &box_rectangular);
 
-  void GetBoxIndices(int num_objects, const std::vector<float> &detections,
+  void GetBoxIndices(int num_objects,
+                     const std::vector<float> &detections,
                      const std::vector<float> &box_corner,
                      const std::vector<float> &box_rectangular,
                      std::vector<std::shared_ptr<base::Object>> *objects);
@@ -131,6 +132,9 @@ class CenterPointDetection : public BaseLidarDetector {
     std::vector<std::shared_ptr<base::Object>> *objects);
 
   void FilterObjectsbyClassNMS(
+    std::vector<std::shared_ptr<base::Object>> *objects);
+
+  void FilterObjectsbySemanticType(
     std::vector<std::shared_ptr<base::Object>> *objects);
 
   // reference pointer of lidar frame

@@ -38,6 +38,7 @@ bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   // read from proto config
   claping_speed_threshold_ = config.claping_speed_threshold();
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();
+  cyc_refine_speed_ = config.cyc_refine_speed();
   return true;
 }
 
@@ -68,8 +69,12 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
     Eigen::Vector3d current_velocity = Eigen::Vector3d::Zero();
     current_velocity = latest_object->output_velocity;
     new_object->output_velocity = current_velocity;
-    AINFO << "Track_id " << track_data->track_id_
-          << ", keep motion because of extraodinary acceleration.";
+    // new_object->output_velocity = Eigen::Vector3d::Zero();
+    // new_object->state.tail<2>().setZero();
+    // new_object->belief_velocity = Eigen::Vector3d::Zero();
+    // new_object->state.head<2>().setZero();
+    AINFO << "[Velocity-Refine] track_id: " << track_data->track_id_
+          << " KEEP MOTION because of extraodinary acceleration.";
     return true;
   }
   // 2. static hypothesis check
@@ -79,8 +84,8 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
   if (is_static_hypothesis) {
     new_object->output_velocity = Eigen::Vector3d::Zero();
     new_object->state.tail<2>().setZero();
-    AINFO << "Track_id " << track_data->track_id_
-          << ", set velocity to zero because of noise claping.";
+    AINFO << "[Velocity-Refine] track_id: " << track_data->track_id_
+          << " set velocity to zero because of static_hypothesis.";
     return true;
   }
   return false;
@@ -90,51 +95,95 @@ bool MlfMotionRefiner::CheckStaticHypothesisByState(
     const TrackedObjectConstPtr& latest_object,
     const TrackedObjectConstPtr& new_object) const {
   // Check whether track is static or not
-  // evaluate speed noise level, the less the level is the
-  // greater the probability of noise is
-  double speed = new_object->output_velocity.head(2).norm();
-  bool velocity_noise_level_is_0 = speed < (claping_speed_threshold_ / 8);
-  bool velocity_noise_level_is_1 = speed < (claping_speed_threshold_ / 4);
-  bool velocity_noise_level_is_2 = speed < (claping_speed_threshold_ / 2);
-  bool velocity_noise_level_is_3 = speed < (claping_speed_threshold_ / 1);
-  // believe track is staic if velocity noise level is 0
-  // use loose threshold for object is not pedestrian
-  if (velocity_noise_level_is_1 &&
-      latest_object->type != base::ObjectType::PEDESTRIAN) {
-    velocity_noise_level_is_0 = true;
-  }
-  if (velocity_noise_level_is_0) {
+    // evaluate speed noise level, the less the level is the
+    // greater the probability of noise is
+    double speed = new_object->output_velocity.head(2).norm();
+
+    // TypeBasedThreshold
+    bool velocity_noise_level_0 = false;
+    bool velocity_noise_level_1 = false;
+    bool velocity_noise_level_2 = false;
+    auto type_select = new_object->type;
+    // for pedestrian we give loose threshold
+    if (type_select == base::ObjectType::PEDESTRIAN ||
+        type_select == base::ObjectType::UNKNOWN) {
+        velocity_noise_level_0 = speed < (claping_speed_threshold_ / 4.0);
+        velocity_noise_level_1 = speed < (claping_speed_threshold_ / 2.0);
+        velocity_noise_level_2 = speed < (claping_speed_threshold_ / 1.0);
+    } else if (type_select == base::ObjectType::BICYCLE) {
+        velocity_noise_level_0 = speed < (cyc_refine_speed_ / 6.0);
+        velocity_noise_level_1 = speed < (cyc_refine_speed_ / 4.0);
+        velocity_noise_level_2 = speed < (cyc_refine_speed_ / 2.0);
+    } else {
+        velocity_noise_level_0 = speed < (claping_speed_threshold_ / 8.0);
+        velocity_noise_level_1 = speed < (claping_speed_threshold_ / 4.0);
+        velocity_noise_level_2 = speed < (claping_speed_threshold_ / 2.0);
+    }
+
+    // believe track is static if speed_level 0 is so small
+    if (velocity_noise_level_0) {
+        ADEBUG << "type: " << static_cast<size_t>(type_select)
+               << " speed is " << speed << " so small";
+        return true;
+    }
+
+    double velocity_change_angle = M_PI, velocity_heading_angle = M_PI;
+    if (CalculateVelocityAngleChange(latest_object, new_object,
+        &velocity_change_angle, &velocity_heading_angle)) {
+        ADEBUG << " velocity_change_angle: " << velocity_change_angle
+               << " velocity_heading_angle: " << velocity_heading_angle;
+    }
+
+    // believe track is static
+    // speed_level 1 and velocity-change or velocity-heading change > PI/6
+    bool dir_change_level_0 = (fabs(velocity_change_angle) > M_PI / 6 ||
+          fabs(velocity_heading_angle) > M_PI / 6);
+    if (velocity_noise_level_1 && dir_change_level_0) {
+        ADEBUG << "type: " << static_cast<size_t>(type_select) << " speed is "
+               << speed << " velocity_change is " << velocity_change_angle
+               << " velocity_heading is " << velocity_heading_angle
+               << " bigger than PI/6";
+        return true;
+    }
+
+    // believe track is static
+    // speed_level 2 and velocity-change or velocity-heading change is > PI/4
+    bool dir_change_level_1 = (fabs(velocity_change_angle) > M_PI / 4 ||
+          fabs(velocity_heading_angle) > M_PI / 4);
+    if (velocity_noise_level_2 && dir_change_level_1) {
+        ADEBUG << "type: " << static_cast<size_t>(type_select) << " speed is "
+               << speed << " velocity_change is " << velocity_change_angle
+               << " velocity_heading is " << velocity_heading_angle
+               << " bigger than PI/4";
+        return true;
+    }
+    return false;
+}
+
+bool MlfMotionRefiner::CalculateVelocityAngleChange(
+        const TrackedObjectConstPtr& latest_object,
+        const TrackedObjectConstPtr& new_object,
+        double* vel_change_angle,
+        double* velocity_heading_angle) const {
+    Eigen::Vector3d pre_velocity = latest_object->output_velocity;
+    Eigen::Vector3d cur_velocity = new_object->output_velocity;
+    Eigen::Vector3d pre_direction = latest_object->output_direction;
+    constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+
+    if (pre_velocity.norm() < kEpsilon || cur_velocity.norm() < kEpsilon) {
+        return false;
+    }
+    *vel_change_angle = algorithm::CalculateTheta2DXY<double>(
+        pre_velocity, cur_velocity);
+
+    double velocity_heading_angle_1 = algorithm::CalculateTheta2DXY<double>(
+        pre_direction, cur_velocity);
+    pre_direction *= -1;
+    double velocity_heading_angle_2 = algorithm::CalculateTheta2DXY<double>(
+        pre_direction, cur_velocity);
+    *velocity_heading_angle = std::min(fabs(velocity_heading_angle_1),
+        fabs(velocity_heading_angle_2));
     return true;
-  }
-  // believe track is static if velocity noise level is
-  // 1 && angle change level is 0
-  // use loose threshold for object is not pedstrian
-  if (velocity_noise_level_is_2 &&
-      latest_object->type != base::ObjectType::PEDESTRIAN) {
-    velocity_noise_level_is_1 = true;
-  }
-  double reasonable_angle_change_maximum_0 = M_PI / 6;
-  bool velocity_angle_change_level_is_0 =
-      CheckStaticHypothesisByVelocityAngleChange(
-          latest_object, new_object, reasonable_angle_change_maximum_0);
-  if (velocity_noise_level_is_1 && velocity_angle_change_level_is_0) {
-    return true;
-  }
-  // believe track is static if velocity noise level is
-  // 2 && angle change level is 1
-  // use loose threshold for object is not pedestrian
-  if (velocity_noise_level_is_3 &&
-      latest_object->type != base::ObjectType::PEDESTRIAN) {
-    velocity_noise_level_is_2 = true;
-  }
-  double reasonable_angle_change_maximum_1 = M_PI / 4;
-  bool velocity_angle_change_level_is_1 =
-      CheckStaticHypothesisByVelocityAngleChange(
-          latest_object, new_object, reasonable_angle_change_maximum_1);
-  if (velocity_noise_level_is_2 && velocity_angle_change_level_is_1) {
-    return true;
-  }
-  return false;
 }
 
 bool MlfMotionRefiner::CheckStaticHypothesisByVelocityAngleChange(

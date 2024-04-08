@@ -26,18 +26,18 @@ namespace radar {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_init_test) {
   std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "radar/conti_ars_tracker";
   TrackerInitOptions init_options;
+  init_options.config_path = "perception/radar_detection/data";
+  init_options.config_file = "conti_ars_tracker.pb.txt";
   EXPECT_TRUE(tracker->Init(init_options));
   EXPECT_EQ(tracker->Name(), "ContiArsTracker");
 }
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_track_test) {
   std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
-  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   TrackerInitOptions init_options;
+  init_options.config_path = "perception/radar_detection/data";
+  init_options.config_file = "conti_ars_tracker.pb.txt";
   tracker->Init(init_options);
   base::Frame radar_frame;
   radar_frame.timestamp = 123456789.1;
@@ -65,8 +65,9 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
 
   std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
-  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   TrackerInitOptions init_options;
+  init_options.config_path = "perception/radar_detection/data";
+  init_options.config_file = "conti_ars_tracker.pb.txt";
   tracker->Init(init_options);
   tracker->track_manager_->ClearTracks();
   tracker->track_manager_->AddTrack(radar_track);
@@ -94,8 +95,9 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
       timestamp + ContiArsTracker::s_tracking_time_win_ + 1e-5;
 
   std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
-  FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   TrackerInitOptions init_options;
+  init_options.config_path = "perception/radar_detection/data";
+  init_options.config_file = "conti_ars_tracker.pb.txt";
   tracker->Init(init_options);
   tracker->track_manager_->ClearTracks();
   tracker->track_manager_->AddTrack(radar_track);

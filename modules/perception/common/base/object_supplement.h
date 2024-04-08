@@ -63,6 +63,8 @@ struct LidarObjectSupplement {
   bool is_clustered = false;
   // @brief object semantic type
   ObjectSemanticType semantic_type = ObjectSemanticType::UNKNOWN;
+  // @brief object dynamic state for scene-flow model
+  MotionState dynamic_state = MotionState::UNKNOWN;
   // @brief false positive indicator
   bool is_fp = false;
   // @brief false positive probability

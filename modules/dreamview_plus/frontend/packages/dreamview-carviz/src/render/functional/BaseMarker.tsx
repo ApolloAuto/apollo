@@ -10,6 +10,9 @@ import transScreenPositionToWorld from '../../utils/transScreenPositionToWorld';
 import { IThreeContext } from '../type';
 import type Coordinates from '../coordinates';
 import CopyMessage from '../../EventBus/eventListeners/CopyMessage';
+import {
+    disposeMesh,
+} from '../../utils/common';
 
 export interface IFunctionalClassContext extends IThreeContext {
     coordinates: Coordinates;
@@ -152,18 +155,45 @@ export class BaseMarker implements FunctionalClass {
             }
         });
 
+        const mesh = this.createShapeMesh();
+        scene.add(mesh);
+
         let selectedObject;
         for (let index = 0; index < ParkingSpaceModels.length; index++) {
             const element = ParkingSpaceModels[index];
-            let box3 = new THREE.Box3().setFromObject(element);
-            const point = new THREE.Vector3();
-            const isIntersecting = raycasterTemp.ray.intersectBox(box3, point);
-            if (isIntersecting) {
-                selectedObject = element;
-                break;
+            mesh.geometry.dispose();
+            const positions = element.geometry.attributes.position;
+            let vertices = [];
+            for ( let i = 0; i < positions.count-1; i++) {
+                let index = i*3;
+                vertices.push(new THREE.Vector3(positions.array[index], positions.array[index+1], positions.array[index+2]));
+            }
+            const shape = new THREE.Shape(vertices);
+            mesh.geometry = new THREE.ShapeGeometry(shape);
+            const intersects = raycasterTemp.intersectObject(mesh);
+            if (intersects.length > 0) {
+                disposeMesh(mesh);
+                return element;
             }
         }
+        disposeMesh(mesh);
         return selectedObject;
+    }
+
+    createShapeMesh() {
+        let vertices = [
+            new THREE.Vector2(0, 0),
+            new THREE.Vector2(0, 0),
+            new THREE.Vector2(0, 0),
+            new THREE.Vector2(0, 0),
+        ];
+
+        let shape = new THREE.Shape(vertices);
+        const geometry = new THREE.ShapeGeometry(shape);
+        const material = new THREE.MeshBasicMaterial({color: 0xff0000, visible: false });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        return mesh;
     }
 
     public computeNormalizationPosition(x, y) {

@@ -36,6 +36,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using onboard::LidarFrameMessage;
 using onboard::SensorFrameMessage;
 
 class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
@@ -67,6 +68,9 @@ class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
    */
   bool SaveBenchmarkFrame(const std::shared_ptr<SensorFrameMessage>& message);
 
+  bool SaveBenchmarkLidarFrame(
+      const std::shared_ptr<LidarFrameMessage>& message);
+
   /**
    * @brief Benchmark thread fucntion
    *
@@ -83,6 +87,10 @@ class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
   std::atomic<bool> is_terminate_;
   std::queue<std::shared_ptr<SensorFrameMessage>> message_buffer_;
   std::unique_ptr<std::thread> benchmark_thread_;
+
+  std::string lidar_frame_output_dir_;
+  std::shared_ptr<apollo::cyber::Reader<LidarFrameMessage>> lidar_frame_reader_;
+  bool use_lidar_cooridinate_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(LidarOutputComponent);

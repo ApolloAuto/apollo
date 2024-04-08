@@ -1,12 +1,11 @@
 {
   "name": "@dreamview/tslint-config-dreamview",
-  "version": "1.0.1",
+  "version": "1.1.4",
   "description": "Dreamview's tslint config",
   "main": "index.json",
   "scripts": {},
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
-    "@dreamview/log": "1.0.1",
     "@types/react-dom": "^18.2.4",
     "prettier": "^2.8.8"
   },

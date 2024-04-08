@@ -7,6 +7,9 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "config_proto",
     srcs = ["config.proto"],
+    deps = [
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_proto",
+    ],
 )
 
 proto_library(

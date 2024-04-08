@@ -28,16 +28,16 @@ apollo::perception::camera::MotionServiceComponent
 
 #### Input
 
-| Channel                                 | Type                                              | Description          |
-| --------------------------------------- | ------------------------------------------------- | -------------------- |
-| `/apollo/sensor/camera/front_6mm/image` | `apollo::perception::camera::ImageMsgType`        | camera drive message |
-| `/apollo/localization/pose`             | `apollo::perception::camera::LocalizationMsgType` | localization message |
+| Channel                                 | Type                                              | Description          | Name |
+| --------------------------------------- | ------------------------------------------------- | -------------------- | ---- |
+| `/apollo/sensor/camera/front_6mm/image` | `apollo::perception::camera::ImageMsgType`        | camera drive message | `msg`|
+| `/apollo/localization/pose`             | `apollo::perception::camera::LocalizationMsgType` | localization message | `msg`|
 
 #### Output
 
-| Channel                             | Type                                | Description            |
-| ----------------------------------- | ----------------------------------- | ---------------------- |
-| `/apollo/perception/motion_service` | `apollo::perception::MotionService` | motion service message |
+| Channel                             | Type                                | Description            | Name |
+| ----------------------------------- | ----------------------------------- | ---------------------- | ---- |
+| `/apollo/perception/motion_service` | `apollo::perception::MotionService` | motion service message | `msg`|
 
 #### How to run
 

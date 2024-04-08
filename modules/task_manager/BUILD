@@ -19,6 +19,7 @@ apollo_cc_library(
         "parking_routing_manager.h",
         "task_manager_component.h",
     ],
+    copts = TASK_MANAGER_COPTS,
     deps = [
         "//cyber",
         "//modules/common/monitor_log",

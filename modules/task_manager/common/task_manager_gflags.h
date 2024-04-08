@@ -20,7 +20,7 @@
 
 DECLARE_string(task_manager_node_name);
 
-DECLARE_double(threshold_for_destination_check);
+DECLARE_double(task_manager_threshold_for_destination_check);
 
 DECLARE_double(plot_size_buffer);
 

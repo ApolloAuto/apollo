@@ -59,6 +59,7 @@ apollo_cc_library(
         "protocol/vcu_vehicle_info_response_502.h",
         "protocol/vcu_vehicle_status_report_101.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/neolix_edu/proto:neolix_edu_cc_proto",

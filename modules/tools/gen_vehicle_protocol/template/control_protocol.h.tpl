@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus_vehicle/%(car_type_lower)s/proto/%(car_type_lower)s.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -34,6 +35,8 @@ class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
 
   void Parse(const std::uint8_t* bytes, int32_t length,
                      %(car_type_cap)s* chassis) const override;
+
+  void UpdateData_Heartbeat(uint8_t* data) override;
 
   void UpdateData(uint8_t* data) override;
 

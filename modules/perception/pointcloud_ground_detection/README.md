@@ -30,15 +30,19 @@ apollo::perception::lidar::PointCloudGroundDetectComponent
 
 #### Input
 
-| Name    | Type                                             | Description         |
-| ------- | ------------------------------------------------ | ------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+| Name    | Type                                             | Description         | Input channal |
+| ------- | ------------------------------------------------ | ------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message | /perception/lidar/pointcloud_map_based_roi |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/lidar/pointcloud_map_based_roi`. The detailed input channel information is in `modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag` file. By default, the upstream components of the messages received by the component include `pointcloud_map_based_roi`.
 
 #### Output
 
-| Name    | Type                                             | Description         |
-| ------- | ------------------------------------------------ | ------------------- |
-| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+| Name    | Type                                             | Description         | Output channal |
+| ------- | ------------------------------------------------ | ------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message | /perception/lidar/pointcloud_ground_detection |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/lidar_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/pointcloud_ground_detection/conf/pointcloud_ground_detection_config.pb.txt` file.
 
 #### How to Launch
 

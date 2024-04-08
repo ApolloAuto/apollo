@@ -18,8 +18,10 @@
         },
         "publish": {
             "npmClient": "npm",
+            "access": "public",
             "allowBranch": [
                 "master",
+                "beta",
                 "dev_dv2.0",
                 "dreamviewplus_vehicle"
             ],

@@ -6,9 +6,12 @@ export default function useStyle() {
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
+            '& .dreamview-select': {
+                width: '100% !important',
+            },
         },
         'mode-setting-container': {
-            padding: theme.tokens.padding.speace3,
+            padding: `12px ${theme.tokens.padding.speace3}`,
             height: prop?.height,
         },
         'modules-operation': {
@@ -16,8 +19,8 @@ export default function useStyle() {
             justifyContent: 'space-between',
             marginBottom: theme.tokens.margin.speace2,
         },
-        space20px: {
-            marginBottom: '20px',
+        space12px: {
+            marginBottom: '12px',
         },
         speace3: {
             marginBottom: theme.tokens.margin.speace3,
@@ -47,27 +50,6 @@ export default function useStyle() {
 
         resource: {
             marginBottom: '20px',
-            '.dreamview-tabs-nav .dreamview-tabs-nav-list': {
-                display: 'inline-flex',
-                flex: 'none',
-                background: theme.tokens.colors.background1,
-            },
-            '.dreamview-tabs-tab': {
-                padding: '5px 16px',
-                minWidth: '106px',
-                justifyContent: 'center',
-                margin: '0 !important',
-            },
-            '.dreamview-tabs-ink-bar': {
-                display: 'none',
-            },
-            '.dreamview-tabs-tab.dreamview-tabs-tab-active .dreamview-tabs-tab-btn': {
-                color: theme.tokens.colors.fontColor1,
-            },
-            '.dreamview-tabs-tab.dreamview-tabs-tab-active ': {
-                backgroundColor: theme.tokens.colors.brand2,
-                borderRadius: '6px',
-            },
         },
     }));
     return hoc;
@@ -76,20 +58,20 @@ export default function useStyle() {
 export function useCurrentResourceStyle() {
     const hoc = useMakeStyle((theme) => ({
         'current-resource-item': {
-            height: '40px',
+            height: '32px',
             fontSize: theme.tokens.font.size.regular,
-            lineHeight: '40px',
-            margin: '0 -14px',
+            lineHeight: '32px',
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            backgroundColor: theme.tokens.colors.brand3,
-            color: theme.tokens.colors.fontColor1,
+            backgroundColor: theme.components.sourceItem.activeBgColor,
+            color: theme.components.sourceItem.activeColor,
             marginBottom: theme.tokens.margin.speace,
+            padding: '12px',
             '& .anticon': {
-                marginRight: '14px',
+                color: theme.components.sourceItem.activeIconColor,
                 fontSize: theme.tokens.font.size.large,
             },
             '&:last-of-type': {
@@ -97,12 +79,11 @@ export function useCurrentResourceStyle() {
             },
         },
         name: {
-            marginLeft: theme.tokens.margin.speace3,
             ...theme.util.textEllipsis,
         },
         empty: {
             textAlign: 'center',
-            color: theme.tokens.colors.fontColor3,
+            color: theme.tokens.colors.fontColor4,
             marginBottom: '20px',
             fontSize: theme.tokens.font.size.regular,
             img: {

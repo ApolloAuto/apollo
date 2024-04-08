@@ -1,6 +1,15 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
-import { IconIcLoading, IconIcSucceed, message, Select, SwitchLoading, Tabs } from '@dreamview/dreamview-ui';
+import {
+    IconIcLoading,
+    IconIcSucceed,
+    message,
+    Select,
+    SwitchLoading,
+    Tabs,
+    LightButton,
+    useImagePrak,
+} from '@dreamview/dreamview-ui';
 import {
     changeDynamic,
     changeMap,
@@ -18,7 +27,6 @@ import {
     THROTTLE_TIME,
     usePickHmiStore,
 } from '@dreamview/dreamview-core/src/store/HmiStore';
-import SourceEmptyImg from '@dreamview/dreamview-core/src/assets/ic_default_page_no_data.png';
 import throttle from 'lodash/throttle';
 import Logger from '@dreamview/log';
 import { useTranslation } from 'react-i18next';
@@ -71,7 +79,7 @@ function Mode() {
     return (
         <>
             <ModeSettingTitle title={t('mode')} />
-            <Select onChange={onChange} value={hmi.currentMode} className={classes.space20px} options={options} />
+            <Select onChange={onChange} value={hmi.currentMode} className={classes.space12px} options={options} />
             <Divider />
         </>
     );
@@ -107,7 +115,7 @@ function Operations() {
     return (
         <>
             <ModeSettingTitle title={t('operations')} />
-            <Select onChange={onChange} value={hmi.currentOperation} className={classes.space20px} options={options} />
+            <Select onChange={onChange} value={hmi.currentOperation} className={classes.space12px} options={options} />
             <Divider />
         </>
     );
@@ -218,12 +226,12 @@ function Modules() {
     const expendChild = (
         <>
             <div className={classes['modules-operation']}>
-                <Button onClick={onSetupAll} width={153}>
+                <LightButton onClick={onSetupAll} width={153}>
                     {t('setupAll')}
-                </Button>
-                <Button onClick={onResetAll} width={153}>
+                </LightButton>
+                <LightButton onClick={onResetAll} width={153}>
                     {t('resetAll')}
-                </Button>
+                </LightButton>
             </div>
             <div className={classes['modules-switch-container']}>
                 {modules.map((key) => (
@@ -566,6 +574,7 @@ function CurrentResource() {
 
     const { t } = useTranslation('modeSettings');
 
+    const SourceEmptyImg = useImagePrak('ic_default_page_no_data');
     const values = useMemo(
         () =>
             [
@@ -616,6 +625,7 @@ function GudieContainer(props: PropsWithChildren<{ id: string }>) {
 }
 
 function ModeSetting() {
+    const [hmi] = usePickHmiStore();
     const [, { bottomBarHeightString }] = useComponentDisplay();
     const height = useMemo(
         () => ({
@@ -625,6 +635,17 @@ function ModeSetting() {
     );
     const { classes } = useStyle()(height);
     const { t } = useTranslation('modeSettings');
+
+    const modeDisplay = () => hmi.modules?.size > 0;
+
+    const operationsDisplay = () => hmi.currentOperation !== HMIModeOperation.None;
+
+    const curResourceDisplay = () => hmi.currentOperation !== HMIModeOperation.None;
+
+    const envResourceDisplay = () => hmi.currentOperation !== HMIModeOperation.None;
+
+    const adsResourceDisplay = () => hmi.currentOperation !== HMIModeOperation.None;
+
     return (
         <div className={classes['mode-setting']}>
             <MenuDrawerTitle title={t('modeSettings')} />
@@ -633,19 +654,27 @@ function ModeSetting() {
                 <GudieContainer id='guide-modesettings-mode'>
                     <ModeMemo />
                 </GudieContainer>
-                <GudieContainer id='guide-modesettings-modules'>
-                    <ModulesMemo />
-                </GudieContainer>
-                <GudieContainer id='guide-modesettings-operations'>
-                    <OperationsMemo />
-                </GudieContainer>
-                <CurrentResourceMemo />
-                <GudieContainer id='guide-modesettings-variable'>
-                    <EnviormentResourcesMemo />
-                </GudieContainer>
-                <GudieContainer id='guide-modesettings-fixed'>
-                    <AdsResourceMemo />
-                </GudieContainer>
+                {modeDisplay() && (
+                    <GudieContainer id='guide-modesettings-modules'>
+                        <ModulesMemo />
+                    </GudieContainer>
+                )}
+                {operationsDisplay() && (
+                    <GudieContainer id='guide-modesettings-operations'>
+                        <OperationsMemo />
+                    </GudieContainer>
+                )}
+                {curResourceDisplay() && <CurrentResourceMemo />}
+                {envResourceDisplay() && (
+                    <GudieContainer id='guide-modesettings-variable'>
+                        <EnviormentResourcesMemo />
+                    </GudieContainer>
+                )}
+                {adsResourceDisplay() && (
+                    <GudieContainer id='guide-modesettings-fixed'>
+                        <AdsResourceMemo />
+                    </GudieContainer>
+                )}
             </CustomScroll>
         </div>
     );

@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { Carviz } from '@dreamview/dreamview-carviz/src';
+import React, { useEffect, useState, useMemo, useRef, useCallback, useContext } from 'react';
 import { Popover, IconIcCoverageHover } from '@dreamview/dreamview-ui';
-import shortUUID from 'short-uuid';
 import type { apollo } from '@dreamview/dreamview';
-import { SimpleRouter, KeepAlive, Route } from '@dreamview/dreamview-core/src/util/SimpleRouter';
+import { SimpleRouter, KeepAlive, Route, RouterContext } from '@dreamview/dreamview-core/src/util/SimpleRouter';
 import { usePickHmiStore, HMIModeOperation } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
 import { useTranslation } from 'react-i18next';
 import { Subscription } from 'rxjs';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
+import useCarViz from '@dreamview/dreamview-core/src/hooks/useCarviz';
 import { useLocalStorage, useLocalStorageState, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
 import useStyle from './useStyle';
 import LayerMenu from './LayerMenu';
@@ -28,7 +27,6 @@ import { RouteOrigin, RoutePoint } from './RoutingEditing/RouteManager/type';
 import { VizCurMode } from './types';
 import CountedSubject from '../../../util/CountedSubject';
 import { FunctionalKey } from '../../../store/EventHandlersStore';
-import { usePanelInfoStore } from '../../../store/PanelInfoStore';
 
 type ISimulationWorld = apollo.dreamview.ISimulationWorld;
 type IMap = apollo.hdmap.IMap;
@@ -39,18 +37,20 @@ function Viz() {
     const [hmi] = usePickHmiStore();
     const routingTimeRef = useRef(-1);
     const panelContext = usePanelContext();
-    const [uid] = useState(shortUUID.generate);
-    const [carviz] = useState(() => new Carviz(uid));
+    const routerContext = useContext(RouterContext);
+    const [carviz, uid] = useCarViz();
     const adcPositionRef = useRef([0, 0]);
     const [currentView, setCurrentView] = useLocalStorageState(KEY_MANAGER.CurrentSwitchView, 'Default');
     const { mainApi, streamApi, isMainConnected } = useWebSocketServices();
     const { logger, panelId, subscribeToData, updateChannel, setKeyDownHandlers, removeKeyDownHandlers } = panelContext;
     const { t } = useTranslation('panels');
-    const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
     const [pointCloudVisible, setPointCloudVisible] = useState(
         getCurrentLayerParams().Perception.pointCloud.currentVisible,
     );
     const [curChannel, setCurChannel] = useState(null);
+    const [boudingBoxVisible, setBoudingBoxVisible] = useState(
+        getCurrentLayerParams().Map.boudingBox?.currentVisible ?? false,
+    );
     const [boundaryLineVisible, setBoundaryLineVisible] = useState(
         getCurrentLayerParams().Planning.planningBoundaryLine?.currentVisible ?? false,
     );
@@ -78,8 +78,15 @@ function Viz() {
     const pointCloudSubscriptionRef = useRef<Subscription>(null);
 
     const render = () => {
-        carviz.render();
-        animationFrameIdRef.current = requestAnimationFrame(render);
+        carviz?.render();
+        animationFrameIdRef.current = requestIdleCallback(
+            () => {
+                render();
+            },
+            {
+                timeout: 1000,
+            },
+        );
     };
 
     const closeChannel = () => {
@@ -195,7 +202,7 @@ function Viz() {
     }, [t]);
 
     const filterSimData = (simData: ISimulationWorld) => {
-        const simDataCopy = { ...simData };
+        const simDataCopy = { ...simData, boudingBox: !!boudingBoxVisible };
         let filterBoundaryLineKey: string[] = null;
         let planningDataPath = simDataCopy?.planningData?.path || [];
         if (!Array.isArray(simDataCopy?.planningData?.path)) return simDataCopy;
@@ -229,6 +236,8 @@ function Viz() {
 
     useEffect(() => {
         if (isMainConnected) {
+            if (routerContext.currentPath !== '/') return () => null;
+
             let mapConnectedSubscription: Subscription = null;
             let simWorldConnectedSubscription: Subscription = null;
 
@@ -311,8 +320,6 @@ function Viz() {
                 }
             }
 
-            render();
-
             return () => {
                 if (vizCurMode === VizCurMode.FOLLOW) {
                     carviz.view.setViewType('Default');
@@ -328,13 +335,30 @@ function Viz() {
                         simWorldConnectedSubscription.unsubscribe();
                     }
                 }
-                const animationFrameId = animationFrameIdRef.current;
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
             };
         }
-    }, [vizCurMode, isMainConnected, referenceLineVisible, boundaryLineVisible, trajectoryLineVisible]);
+    }, [
+        vizCurMode,
+        isMainConnected,
+        referenceLineVisible,
+        boundaryLineVisible,
+        trajectoryLineVisible,
+        boudingBoxVisible,
+        routerContext.currentPath,
+    ]);
+
+    useEffect(() => {
+        if (routerContext.currentPath === '/') {
+            render();
+        }
+
+        return () => {
+            const animationFrameId = animationFrameIdRef.current;
+            if (animationFrameId) {
+                cancelIdleCallback(animationFrameId);
+            }
+        };
+    }, [routerContext.currentPath]);
 
     const { metadata } = useWebSocketServices();
     const curMeta = useMemo(
@@ -421,6 +445,7 @@ function Viz() {
             handleReferenceLineVisible={setReferenceLineVisible}
             handleBoundaryLineVisible={setBoundaryLineVisible}
             handleTrajectoryLineVisible={setTrajectoryLineVisible}
+            handleBoudingBoxVisible={setBoudingBoxVisible}
         />
     );
 

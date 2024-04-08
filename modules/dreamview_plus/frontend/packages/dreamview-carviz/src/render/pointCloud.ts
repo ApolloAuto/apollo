@@ -18,13 +18,18 @@ export default class PointCloud {
 
     private lastHeading;
 
-    constructor(scene, adc, option) {
+    private colors;
+
+    private meshFlag;
+
+    constructor(scene, adc, option, colors?) {
+        this.colors = colors?.pointCloudHeightColorMapping || pointCloudHeightColorMapping;
         this.scene = scene;
         this.adc = adc;
         this.option = option;
-        this.pointCloudMesh = null;
         this.lastHeading = 0;
-
+        this.meshFlag = false;
+        this.pointCloudMesh = null;
         this.initPointCloudMesh();
     }
 
@@ -35,6 +40,7 @@ export default class PointCloud {
         geometry.setAttribute('position', positionBuffer);
         geometry.setAttribute('color', colorBuffer);
         geometry.setDrawRange(0, 0);
+        geometry.getAttribute('position').needsUpdate = true;
 
         const material = new THREE.PointsMaterial({
             size: 0.05,
@@ -45,7 +51,6 @@ export default class PointCloud {
 
         const pointCloudMesh = new THREE.Points(geometry, material);
         this.pointCloudMesh = pointCloudMesh;
-        this.scene.add(pointCloudMesh);
     }
 
     update(pointCloud) {
@@ -74,7 +79,7 @@ export default class PointCloud {
                 // eslint-disable-next-line no-nested-ternary
                 z < 0.5 ? 0.5 : z < 1.0 ? 1.0 : z < 1.5 ? 1.5 : z < 2.0 ? 2.0 : z < 2.5 ? 2.5 : z < 3.0 ? 3.0 : 10.0;
 
-            const color = pointCloudHeightColorMapping[colorKey];
+            const color = this.colors[colorKey];
 
             const positions = this.pointCloudMesh.geometry.attributes.position;
             const colorsArray = this.pointCloudMesh.geometry.attributes.color;
@@ -88,7 +93,8 @@ export default class PointCloud {
         this.pointCloudMesh.geometry.attributes.position.needsUpdate = true;
         this.pointCloudMesh.geometry.attributes.color.needsUpdate = true;
 
-        if (!this.scene.children.includes(this.pointCloudMesh)) {
+        if (!this.meshFlag) {
+            this.meshFlag = true;
             this.scene.add(this.pointCloudMesh);
         }
     }

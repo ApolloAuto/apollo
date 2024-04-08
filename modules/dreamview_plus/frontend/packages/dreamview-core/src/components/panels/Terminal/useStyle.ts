@@ -8,13 +8,13 @@ export default function useStyle() {
             height: '100%',
         },
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

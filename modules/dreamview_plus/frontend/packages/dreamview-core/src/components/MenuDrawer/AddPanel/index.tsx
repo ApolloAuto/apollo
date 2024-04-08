@@ -3,15 +3,13 @@ import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/Pane
 import { useMosaicId, usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import useDragPanel from '@dreamview/dreamview-core/src/util/useDragPanel';
-import { IconIcMove, IconReset } from '@dreamview/dreamview-ui';
+import { IconIcMove, IconReset, Popover, OperatePopover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import { resetLayoutByMode, addPanelFromOutside } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
 import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
-import CustomPopover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
 import MenuDrawerTitle from '../Common/MenuDrawerTitle';
 import useStyle from './useStyle';
-import CustomFuncPopoverSpec from '../../CustomFuncPopoverSpec';
 
 function PanelThumbnail(props: { panel: IPanelMetaInfo }) {
     const { classes } = useStyle();
@@ -57,12 +55,12 @@ function DragItem(props: { panel: IPanelMetaInfo }) {
 
     return (
         <div ref={connectDragSource} onClick={handleClickDragItem}>
-            <CustomFuncPopoverSpec title={<PanelThumbnailMemo panel={props.panel} />} trigger='hover' placement='right'>
+            <OperatePopover title={<PanelThumbnailMemo panel={props.panel} />} trigger='hover' placement='right'>
                 <div className={classes['add-panel-item']}>
                     {props.panel.title}
                     <IconIcMove />
                 </div>
-            </CustomFuncPopoverSpec>
+            </OperatePopover>
         </div>
     );
 }
@@ -81,11 +79,11 @@ function AddPanel() {
     }, [hmi.currentMode]);
 
     const extra = (
-        <CustomPopover trigger='hover' content={t('resetLayout')}>
+        <Popover trigger='hover' content={t('resetLayout')}>
             <span>
                 <IconReset onClick={onResetLayout} />
             </span>
-        </CustomPopover>
+        </Popover>
     );
 
     return (

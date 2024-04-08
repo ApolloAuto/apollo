@@ -950,10 +950,23 @@ WARN_LOGFILE           =
 INPUT                   = \
                           docs/MAINPAGE_cn.md \
 INPUT                   += \
-                          docs \
+                          docs/packages \
+                          docs/发版说明 \
+                          docs/安装指南 \
+                          docs/应用实践 \
+                          docs/框架设计 \
+                          docs/工具使用 \
+                          docs/故障排查 \
+INPUT                   += \
                           cyber \
                           modules \
                           collection \
+
+# INPUT                   += \
+#                           docs \
+#                           cyber \
+#                           modules \
+#                           collection \
 # INPUT                   += \
 #                           docs/installation_instructions/installation_guide_cn.md \
 #                           docs/installation_instructions/essential_software_installation_guide_cn.md \
@@ -1584,6 +1597,7 @@ HTML_STYLESHEET        =
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome-css/doxygen-awesome.css
+HTML_EXTRA_STYLESHEET  += docs/extra.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1598,6 +1612,7 @@ HTML_EXTRA_FILES       = docs/doxygen-awesome-css/doxygen-awesome-darkmode-toggl
                          docs/doxygen-awesome-css/doxygen-awesome-interactive-toc.js \
                          docs/doxygen-awesome-css/doxygen-awesome-tabs.js \
                          docs/doxygen-awesome-css/doxygen-awesome-paragraph-link.js \
+                         docs/extra.js \
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
@@ -2111,7 +2126,7 @@ SERVER_BASED_SEARCH    = YES
 # The default value is: NO.
 # This tag requires that the tag SEARCHENGINE is set to YES.
 
-EXTERNAL_SEARCH        = NO
+EXTERNAL_SEARCH        = YES
 
 # The SEARCHENGINE_URL should point to a search engine hosted by a web server
 # which will return the search results when EXTERNAL_SEARCH is enabled.
@@ -2123,7 +2138,7 @@ EXTERNAL_SEARCH        = NO
 # details.
 # This tag requires that the tag SEARCHENGINE is set to YES.
 
-SEARCHENGINE_URL       =
+SEARCHENGINE_URL       = /docs/apollo/latest/doxysearch.cgi
 
 # When SERVER_BASED_SEARCH and EXTERNAL_SEARCH are both enabled the unindexed
 # search data is written to a file for indexing by an external tool. With the

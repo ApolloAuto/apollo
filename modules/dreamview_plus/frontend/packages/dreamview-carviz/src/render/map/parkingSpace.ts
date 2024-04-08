@@ -18,7 +18,9 @@ export default class ParkingSpace {
 
     private coordinates;
 
-    constructor(scene, text, option, coordinates) {
+    private colors;
+
+    constructor(scene, text, option, coordinates, colors?) {
         this.scene = scene;
         this.coordinates = coordinates;
         this.option = option;
@@ -26,6 +28,7 @@ export default class ParkingSpace {
         this.ids = {};
         this.text = text;
         this.currentIds = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     drawParkingSpaces(parkingSpaces) {
@@ -45,14 +48,14 @@ export default class ParkingSpace {
             }
             const points = this.coordinates.applyOffsetToArray(parkingSpace.polygon.point);
             const mesh = drawPolygon(points, {
-                color: colorMapping.YELLOW,
+                color: this.colors.YELLOW,
                 linewidth: 2,
                 zOffset: zOffset.parkingSpace,
                 opacity: 1,
                 matrixAutoUpdate: true,
             });
             mesh.name = "ParkingSpace";
-            mesh.userData = {color: colorMapping.YELLOW,
+            mesh.userData = {color: this.colors.YELLOW,
                         selectedColor: 'rgb(247, 86, 96)'};
             this.meshs[id] = mesh;
             this.scene.add(mesh);
@@ -80,7 +83,7 @@ export default class ParkingSpace {
                 z: 0.04,
             };
             const rotationZ = Math.atan2(point2.y - point1.y, point2.x - point1.x);
-            const text = this.text.drawText(id, colorMapping.WHITE, position);
+            const text = this.text.drawText(id, this.colors.WHITE, position);
             text.rotation.z = rotationZ;
             this.ids[id] = text;
             this.scene.add(text);

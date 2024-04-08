@@ -1,6 +1,8 @@
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files", "install_plugin")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 load("//tools:apollo.bzl", "cyber_plugin_description")
+load("//tools/package:dynamic_deps.bzl", "STATUS", "SOURCE", "BINARY")
+load("@rules_cc//cc:defs.bzl", legacy_cc_library = "cc_library", legacy_cc_binary = "cc_binary", legacy_cc_test = "cc_test")
+
 
 INSATLL_LABEL_NAME = "install"
 INSTALL_SRC_LABEL_NAME = "install_src"
@@ -18,6 +20,12 @@ CPP_PROTO_RULE = "cc_proto_library"
 CPP_TEST_RULE = "cc_test"
 
 PLUGIN_RULE = "cyber_plugin_description"
+
+APOLLO_COMPONENT_LIBRARY_PREFIX = "DO_NOT_IMPORT_"
+
+CC_LIBRARY = native.cc_library if STATUS == 2 else legacy_cc_library
+CC_BINARY = native.cc_binary if STATUS == 2 else legacy_cc_binary
+CC_TEST = native.cc_test if STATUS == 2 else legacy_cc_test
 
 def _select2dict(select_str):
     result = dict()
@@ -187,6 +195,9 @@ def _add_install_rules(install_actions, install_src_actions,
             else:
                 install_src_files(
                     name = action["name"],
+                    src_dir =  action["src_dir"],
+                    dest = action["dest"],
+                    filter = action["filter"],
                     type = action["type"],
                     visibility = ["//visibility:public"],
                 ) 
@@ -307,6 +318,9 @@ def apollo_package(enable_source=True):
     else:
         src_code_action = {
             "name": "install_module_src",
+            "src_dir": ["__DO_NOT_INSTALL__"],
+            "dest": "src/%s" % package_name,
+            "filter": "*",
             "type": "disable_source"
         } 
     header_action = {
@@ -322,13 +336,249 @@ def apollo_package(enable_source=True):
         has_install_rule, has_install_src_rule, package_name,
         subpackages_install_target, subpackages_install_src_target)
 
+def _replace_result(origin_target, pkg_name):
+    if ":" not in origin_target:
+        origin_target = "{}:{}".format(origin_target, origin_target.split("/")[-1])
+
+    origin_target_split = origin_target.split(":")
+    target_name = origin_target_split[-1] if "proto" not in origin_target_split[-1] else origin_target_split[-1].replace("_cc_", "_")
+    prefix = origin_target_split[0].replace("//", "")
+    # Consistent with the way target is converted in the meta information: tools/install/install.py.in
+    replaced_target_name = "{}_C{}".format(prefix.replace("/", "_S"), target_name)
+    # if len(replaced_target_name) > 100:
+    #     replaced_target_name = replaced_target_name[int(len(replaced_target_name) / 2):]
+
+    replaced_repo = BINARY[pkg_name]["targets"][0].split("//:")[0]
+    res = "{}//:{}".format(replaced_repo, replaced_target_name)
+    if res not in BINARY[pkg_name]["targets"]:
+        fail("target {} is invalid since package {} does not have it".format(origin_target, pkg_name))
+    return res
+
+def _is_belong_path(instance, path):
+    if instance == path:
+        return True
+    elif instance.startswith(path) and (instance[len(path)] == "/" or instance[len(path)] == ":"):
+        return True
+    else:
+        return False
+
+def _is_replace_instance(instance):
+    for pkg in SOURCE:
+        if not instance.startswith(SOURCE[pkg]["path"]):
+            continue
+        if _is_belong_path(instance, SOURCE[pkg]["path"]):
+            return False, None
+                
+    for pkg in BINARY:
+        if not instance.startswith(BINARY[pkg]["path"]):
+            continue
+        if instance == BINARY[pkg]["path"]:
+            return True, pkg
+        else:
+            if instance[len(BINARY[pkg]["path"])] == "/" or instance[len(BINARY[pkg]["path"])] == ":":
+                return True, pkg
+    
+    return False, None
+
+def _replace_deps(deps_list):
+    for i in range(len(deps_list)):
+        if "@" not in deps_list[i]:
+            continue
+        else:
+            if ":" in deps_list[i]:
+                continue
+            else:
+                lib_name = deps_list[i].replace("//", "").replace("@", "")
+                deps_list[i] = deps_list[i] + "//:" + lib_name
+
+    for i in range(len(deps_list)):
+        status, pkg_name = _is_replace_instance(deps_list[i])
+        if status:
+            deps_list[i] = _replace_result(deps_list[i], pkg_name)
+    
+    new_deps = [] + deps_list
+
+    deps_map = {}
+    for i in new_deps:
+        deps_map[i] = i
+    new_deps = [i for i in deps_map]
+
+    return new_deps    
+
+def _auto_padding_deps(registered_deps, auto_deps=False):
+    target_location = native.package_name()
+    target_location_with_prefix = "//{}".format(target_location)
+    source_pkg = None
+    for i in SOURCE:
+        if target_location_with_prefix.startswith(SOURCE[i]["path"]) and \
+            (len(target_location_with_prefix) == len(SOURCE[i]["path"]) or \
+                ("//{}".format(target_location))[len(SOURCE[i]["path"])] == "/" or \
+                ("//{}".format(target_location))[len(SOURCE[i]["path"])] == ":"):
+            source_pkg = i
+            break
+    if source_pkg == None:
+        ret_deps = []
+        for i in registered_deps:
+            if (i.startswith("@") and "_C" not in i) or i.startswith(":"):
+                continue
+            dep_path = (i.split("//:")[1].replace("_S", "/")).split("_C")[0]
+            depend_binary = None
+            for b in BINARY:
+                if "//{}".format(dep_path).startswith(BINARY[b]["path"]) and \
+                    (len("//{}".format(dep_path)) == len(BINARY[b]["path"]) or \
+                        ("//{}".format(dep_path))[len(BINARY[b]["path"])] == "/" or \
+                        ("//{}".format(dep_path))[len(BINARY[b]["path"])] == ":"): 
+                    depend_binary = b
+                    break
+            if depend_binary == None:
+                continue
+            if len(BINARY[b]["targets"]) > 0:
+                hdr_target = "@{}//:{}".format(b, b)
+                if hdr_target in BINARY[b]["targets"]:
+                    if hdr_target in registered_deps:
+                        continue
+                    if hdr_target in ret_deps:
+                        continue
+                    ret_deps.append(hdr_target)
+                else:
+                    for i in BINARY[b]["targets"]:
+                        if i in registered_deps:
+                            continue
+                        if i in ret_deps:
+                            continue
+                        ret_deps.append(i)
+        for b in BINARY:
+            if b.startswith("3rd"):
+                for i in BINARY[b]["targets"]:
+                    if i not in ret_deps:
+                        ret_deps.append(i)
+        return ret_deps
+        # fail("Can't find package located in {} in SOURCE dict of dynamic-import file".format(target_location))
+    ret_deps = []
+    for dep in SOURCE[source_pkg]["depends"]:
+        if dep not in BINARY:
+            fail("Can't find package {} in BINARY dict of dynamic-import file".format(dep))
+        if auto_deps:
+            for depend_target in BINARY[dep]["targets"]:
+                if depend_target in registered_deps:
+                    continue
+                if APOLLO_COMPONENT_LIBRARY_PREFIX in depend_target:
+                    continue
+                ret_deps.append(depend_target)
+        else:
+            if len(BINARY[dep]["targets"]) > 0:
+                if dep[0].isdigit():
+                    for i in BINARY[dep]["targets"]:
+                        if i in registered_deps:
+                            continue
+                        ret_deps.append(i) 
+                else:
+                    hdr_target = "@{}//:{}".format(dep, dep)
+                    if hdr_target in BINARY[dep]["targets"]:
+                        if hdr_target in registered_deps:
+                            continue
+                        ret_deps.append(hdr_target)
+                    else:
+                        for i in BINARY[dep]["targets"]:
+                            if i in registered_deps:
+                                continue
+                            ret_deps.append(i)
+    return ret_deps
+
+def dynamic_fill_deps(attrs):
+    if STATUS != 2:
+        attrs.pop("auto_find_deps", None)
+        return attrs
+
+    if "deps" not in attrs:
+        attrs["deps"] = []
+
+    deps = attrs["deps"]
+    
+    current_deps_dict = {}
+    ret_deps_list = []
+    if type(deps) == "select":
+        for group_str in str(deps).strip().split(" + "):
+            if "select({" in group_str.strip():
+                s_deps_dict = _select2dict(group_str.strip())
+                for k, v in s_deps_dict.items():
+                    if type(v) == "list":
+                        s_deps_dict[k] = _replace_deps(v)
+
+                        for i in s_deps_dict[k]:
+                            current_deps_dict[i] = i
+
+                ret_deps_list.append(select(s_deps_dict))
+            else:
+                l_deps_str = group_str.strip()
+                l_deps_list = _list_str2list(l_deps_str)
+                ret_deps = _replace_deps(l_deps_list)
+
+                for dep in ret_deps:
+                    current_deps_dict[dep] = dep
+
+                ret_deps_list.append(ret_deps)
+
+        if "auto_find_deps" in attrs and attrs["auto_find_deps"] == True:
+            ret_deps_list.append(_auto_padding_deps(current_deps_dict), True)
+        else:
+            ret_deps_list.append(_auto_padding_deps(current_deps_dict)) 
+
+        n_deps = []
+        for d in ret_deps_list:
+            n_deps += d
+
+        attrs["deps"] = n_deps
+
+        attrs.pop("auto_find_deps", None)
+        return attrs
+    elif type(deps) == "list":
+        replaced_deps = _replace_deps(deps)
+        for dep in replaced_deps:
+            current_deps_dict[dep] = dep
+        if "auto_find_deps" in attrs and attrs["auto_find_deps"] == True:
+            ws_deps = _auto_padding_deps(current_deps_dict, True)
+        else:
+            ws_deps = _auto_padding_deps(current_deps_dict)
+        n_deps = replaced_deps + ws_deps
+
+        dup = {}
+        for i in n_deps:
+            dup[i] = i
+        n_deps = [i for i in dup]
+
+        attrs["deps"] = n_deps
+
+        attrs.pop("auto_find_deps", None)
+        return attrs
+    else:
+        attrs.pop("auto_find_deps", None)
+        return attrs
+
+def apollo_deps_library(**kwargs):
+    # for binary package using
+    if "deps" not in kwargs:
+        # legacy package, skip
+        native.cc_library(**dict(kwargs))
+    else:
+        # online package, redirect the deps to workspace if source existed
+        deps = []
+        for dep in kwargs["deps"]:
+            dep_pkg_name = dep.split("//:")[0].replace("@", "")
+            target_with_path = dep.split("//:")[1]
+            if dep_pkg_name in SOURCE:
+                dep = target_with_path.replace("_S", "/").replace("_C", ":")
+                dep = "@//{}".format(dep)
+            deps.append(dep)
+        native.cc_library(**dict(kwargs, deps = deps))
+
 def apollo_cc_test(**kwargs):
     # simple wrap for cc_test
-    cc_test(**kwargs)
+    CC_TEST(**(dynamic_fill_deps(kwargs)))
 
 def apollo_cc_binary(**kwargs):
     # simple wrap for cc_binary
-    cc_binary(**kwargs)
+    CC_BINARY(**(dynamic_fill_deps(kwargs)))
 
 def apollo_component(**kwargs):
     if not kwargs["name"].startswith("lib") or not kwargs["name"].endswith(".so"):
@@ -336,12 +586,13 @@ def apollo_component(**kwargs):
     if "alwayslink" in kwargs:
         fail("'apollo_component' macro has not 'alwayslink' attribute")
 
-    internal_lib_name = "{}_lib".format(kwargs["name"][3: len(kwargs["name"])-3])
+    internal_lib_name = "{}{}".format(
+        APOLLO_COMPONENT_LIBRARY_PREFIX, kwargs["name"][3: len(kwargs["name"])-3])
 
-    apollo_cc_library(**dict(kwargs, name = internal_lib_name, 
+    apollo_cc_library(**dict(dynamic_fill_deps(kwargs), name = internal_lib_name, 
                             visibility = ["//visibility:public"]))
     
-    cc_binary(
+    CC_BINARY(
         name = kwargs["name"],
         linkshared = True,
         linkstatic = True,
@@ -382,13 +633,15 @@ def apollo_cc_library(**kwargs):
     if len(select_dict_list) != 0:
         for i in select_dict_list:
             merge_src += select(i)
-        
-    cc_binary(**dict(
-        bin_kwargs, name = "lib{}.so".format(bin_kwargs["name"]),
+    
+    if "alwayslink" in bin_kwargs:
+        bin_kwargs.pop("alwayslink")
+    CC_BINARY(**dict(
+        dynamic_fill_deps(bin_kwargs), name = "lib{}.so".format(bin_kwargs["name"]),
         linkshared = True, linkstatic = True, srcs = merge_src,
         visibility = ["//visibility:public"], tags = ["export_library", kwargs["name"]]))
-    cc_library(**dict(
-        kwargs, srcs = [":lib{}.so".format(kwargs["name"])],
+    CC_LIBRARY(**dict(
+        dynamic_fill_deps(kwargs), srcs = [":lib{}.so".format(kwargs["name"])],
         alwayslink = True, visibility = ["//visibility:public"]))
 
 def apollo_plugin(**kwargs):
@@ -406,7 +659,9 @@ def apollo_plugin(**kwargs):
         plugin = kwargs["name"],
     )
 
-    cc_library(
+    kwargs = dynamic_fill_deps(kwargs)
+
+    CC_LIBRARY(
         name = cc_library_name,
         srcs = kwargs["srcs"] if "srcs" in kwargs else [],
         hdrs = kwargs["hdrs"] if "hdrs" in kwargs else [],
@@ -415,7 +670,7 @@ def apollo_plugin(**kwargs):
         alwayslink = True,
     )
 
-    cc_binary(
+    CC_BINARY(
         name = kwargs["name"],
         linkshared = True,
         linkstatic = True,
@@ -432,6 +687,8 @@ def _base_name(fileName):
     return fileName.split(".")[0]
 
 def apollo_qt_library(name, srcs, hdrs, data = [], copts = [], uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):
+    warp_kwargs = {"deps": deps}
+    deps = dynamic_fill_deps(warp_kwargs)["deps"]
     library_srcs = []
     library_hdrs = []
     for hItem in hdrs:
@@ -460,7 +717,7 @@ def apollo_qt_library(name, srcs, hdrs, data = [], copts = [], uis = [], res = [
         )
         library_hdrs.append("ui_%s.h" % base_name)
 
-    cc_library(
+    CC_LIBRARY(
         name = "__apollo_interna_qt_deps",
         deps = deps,
     )
@@ -477,7 +734,7 @@ def apollo_qt_library(name, srcs, hdrs, data = [], copts = [], uis = [], res = [
 
     library_hdrs = hdrs + normal_hdrs + library_hdrs
     library_srcs = library_srcs + srcs
-    cc_library(
+    CC_LIBRARY(
         name = name,
         srcs = library_srcs,
         hdrs = library_hdrs,

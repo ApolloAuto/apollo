@@ -37,6 +37,7 @@
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/jointly_prediction_planning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/vectornet_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/multi_agent_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -105,9 +106,17 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::LANE_SCANNING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_AGGREGATING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::VECTORNET_EVALUATOR);
+  if (!FLAGS_enable_multi_agent_pedestrian_evaluator) {
+    RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
+  }
+  if (!FLAGS_enable_multi_agent_vehicle_evaluator) {
+    RegisterEvaluator(ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR);
+    RegisterEvaluator(ObstacleConf::VECTORNET_EVALUATOR);
+  }
+  if (FLAGS_enable_multi_agent_pedestrian_evaluator ||
+      FLAGS_enable_multi_agent_vehicle_evaluator) {
+    RegisterEvaluator(ObstacleConf::MULTI_AGENT_EVALUATOR);
+  }
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -215,6 +224,17 @@ void EvaluatorManager::Run(
 
   std::vector<Obstacle*> dynamic_env;
 
+  if (FLAGS_enable_multi_agent_pedestrian_evaluator || 
+    FLAGS_enable_multi_agent_vehicle_evaluator) {
+    auto start_time_multi = std::chrono::system_clock::now();
+    EvaluateMultiObstacle(adc_trajectory_container, obstacles_container);
+    auto end_time_multi = std::chrono::system_clock::now();
+    std::chrono::duration<double> time_cost_multi =
+        end_time_multi - start_time_multi;
+    AINFO << "multi agents evaluator used time: "
+          << time_cost_multi.count() * 1000 << " ms.";
+  }
+
   if (FLAGS_enable_multi_thread) {
     IdObstacleListMap id_obstacle_map;
     GroupObstaclesByObstacleIds(obstacles_container, &id_obstacle_map);
@@ -223,7 +243,7 @@ void EvaluatorManager::Run(
         [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
           for (auto obstacle_ptr : obstacles_iter.second) {
             EvaluateObstacle(adc_trajectory_container, obstacle_ptr,
-                             obstacles_container, dynamic_env);
+                            obstacles_container, dynamic_env);
           }
         });
   } else {
@@ -239,7 +259,7 @@ void EvaluatorManager::Run(
       }
 
       EvaluateObstacle(adc_trajectory_container, obstacle,
-                       obstacles_container, dynamic_env);
+                      obstacles_container, dynamic_env);
     }
   }
 }
@@ -253,6 +273,10 @@ void EvaluatorManager::EvaluateObstacle(
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
+      if (FLAGS_enable_multi_agent_vehicle_evaluator) {
+        AINFO << "The vehicles are evaluated by multi agent evaluator!";
+        break;
+      }
       if (obstacle->IsCaution() && !obstacle->IsSlow()) {
         if (obstacle->IsInteractiveObstacle()) {
           evaluator = GetEvaluator(interaction_evaluator_);
@@ -264,6 +288,7 @@ void EvaluatorManager::EvaluateObstacle(
           evaluator = GetEvaluator(vehicle_default_caution_evaluator_);
         }
         CHECK_NOTNULL(evaluator);
+        AINFO << "Caution Obstacle: " << obstacle->id() << " used " << evaluator->GetName();
         // Evaluate and break if success
         if (evaluator->GetName() == "JOINTLY_PREDICTION_PLANNING_EVALUATOR") {
           if (evaluator->Evaluate(adc_trajectory_container,
@@ -291,10 +316,11 @@ void EvaluatorManager::EvaluateObstacle(
       } else if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
       } else {
-        ADEBUG << "Obstacle: " << obstacle->id()
+        AINFO << "Obstacle: " << obstacle->id()
                << " is neither on lane, nor in junction. Skip evaluating.";
         break;
       }
+      AINFO << "Normal Obstacle: " << obstacle->id() << " used " << evaluator->GetName();
       CHECK_NOTNULL(evaluator);
       if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
         evaluator->Evaluate(obstacle, obstacles_container, dynamic_env);
@@ -314,11 +340,18 @@ void EvaluatorManager::EvaluateObstacle(
     case PerceptionObstacle::PEDESTRIAN: {
       if (FLAGS_prediction_offline_mode ==
               PredictionConstants::kDumpDataForLearning ||
-          obstacle->latest_feature().priority().priority() ==
-              ObstaclePriority::CAUTION) {
+              (!FLAGS_enable_multi_agent_pedestrian_evaluator &&
+              obstacle->latest_feature().priority().priority() ==
+              ObstaclePriority::CAUTION)) {
         evaluator = GetEvaluator(pedestrian_evaluator_);
         CHECK_NOTNULL(evaluator);
+        auto start_time_inference = std::chrono::system_clock::now();
         evaluator->Evaluate(obstacle, obstacles_container);
+        auto end_time_inference = std::chrono::system_clock::now();
+        std::chrono::duration<double> time_cost_lstm =
+            end_time_inference - start_time_inference;
+        AINFO << "semantic lstm evaluator used time: "
+               << time_cost_lstm.count() * 1000 << " ms.";
         break;
       }
     }
@@ -329,6 +362,45 @@ void EvaluatorManager::EvaluateObstacle(
         evaluator->Evaluate(obstacle, obstacles_container);
       }
       break;
+    }
+  }
+}
+
+void EvaluatorManager::EvaluateMultiObstacle(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container) {
+  Evaluator* evaluator = nullptr;
+  evaluator = GetEvaluator(multi_agent_evaluator_);
+  CHECK_NOTNULL(evaluator);
+  std::vector<int> obs_ids = obstacles_container->curr_frame_considered_obstacle_ids();
+
+  // 1. Evaluate the pedestrain
+  if (FLAGS_enable_multi_agent_pedestrian_evaluator) {
+    for (int id : obs_ids) {
+      Obstacle* obstacle = obstacles_container->GetObstacle(id);
+      // whether the pedestrian exsit in the conside obstacle list
+      if (obstacle->type() == perception::PerceptionObstacle::PEDESTRIAN &&
+          !obstacle->IsStill()) {
+        evaluator->Evaluate(adc_trajectory_container, 
+          obstacle, obstacles_container);
+        AINFO << "Succeed to run multi agent pedestrian evaluator!";
+        break;
+      }
+    }
+  }
+
+  // 2. Evaluate the vechicle
+  if (FLAGS_enable_multi_agent_vehicle_evaluator) {
+    for (int id : obs_ids) {
+      Obstacle* obstacle = obstacles_container->GetObstacle(id);
+      // whether the vehicle exsit in the conside obstacle list
+      if (obstacle->type() == perception::PerceptionObstacle::VEHICLE &&
+          !obstacle->IsStill()) {
+        evaluator->Evaluate(adc_trajectory_container, 
+          obstacle, obstacles_container);
+        AINFO << "Succeed to run multi agent vehicle evaluator!";
+        break;
+      }
     }
   }
 }
@@ -446,6 +518,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::VECTORNET_EVALUATOR: {
       evaluator_ptr.reset(new VectornetEvaluator());
+      break;
+    }
+    case ObstacleConf::MULTI_AGENT_EVALUATOR: {
+      evaluator_ptr.reset(new MultiAgentEvaluator());
       break;
     }
     default: {

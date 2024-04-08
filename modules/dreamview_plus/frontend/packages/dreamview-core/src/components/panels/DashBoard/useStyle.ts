@@ -10,15 +10,16 @@ export default function useStyle() {
             width: '100%',
             minWidth: '380px',
             padding: '16px',
+            background: theme.components.dashBoard.bgColor,
         },
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

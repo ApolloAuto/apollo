@@ -25,7 +25,7 @@ import subprocess
 import sys
 import time
 import threading
-import traceback
+from datetime import datetime
 
 import xml.etree.ElementTree as ET
 
@@ -48,12 +48,37 @@ COLOR_SEQ = "\033[1;%dm"
 BOLD_SEQ = "\033[1m"
 
 COLORS = {
-    'INFO':     GREEN,
-    'WARNING':  YELLOW,
-    'DEBUG':    BLUE,
-    'ERROR':    RED,
+    'INFO': GREEN,
+    'WARNING': YELLOW,
+    'DEBUG': BLUE,
+    'ERROR': RED,
     'CRITICAL': YELLOW
 }
+
+logger = logging.Logger(__name__)
+
+# file logger
+workspace_path = os.getenv('APOLLO_ENV_WORKROOT') or '/apollo'
+log_dir_path = os.path.join(workspace_path, 'data/log')
+if not os.path.exists(log_dir_path):
+    os.makedirs(log_dir_path)
+log_name = 'cyber_launch.log.INFO.{}.{}'.format(
+    datetime.now().strftime("%Y%m%d-%H%M%S"), str(g_process_pid))
+log_file_path = os.path.join(log_dir_path, log_name)
+file_formater = logging.Formatter(
+    '%(levelname)s [%(asctime)s] %(lineno)s: %(message)s')
+file_hd = logging.FileHandler(filename=log_file_path)
+file_hd.setFormatter(file_formater)
+logger.addHandler(file_hd)
+link_log_file = os.path.join(log_dir_path, 'cyber_launch.INFO')
+try:
+    if os.path.exists(link_log_file) or os.path.islink(link_log_file):
+        os.remove(link_log_file)
+    os.symlink(log_name, link_log_file)
+except Exception as e:
+    # Maybe mulitple process create link, ignore it
+    pass
+
 
 class ColoredFormatter(logging.Formatter):
 
@@ -79,7 +104,6 @@ class ColoredFormatter(logging.Formatter):
 color_formatter = ColoredFormatter("[%(levelname)-18s] %(message)s")
 console = logging.StreamHandler()
 console.setFormatter(color_formatter)
-logger = logging.Logger(__name__)
 logger.addHandler(console)
 
 
@@ -105,7 +129,8 @@ def module_monitor(mod):
     while True:
         line = mod.popen.stdout.readline()
         if line:
-            logger.debug('%s# %s' % (mod.name, line.decode('utf8').strip('\n')))
+            logger.debug('%s# %s' %
+                         (mod.name, line.decode('utf8').strip('\n')))
             continue
         time.sleep(0.01)
 
@@ -190,7 +215,8 @@ class ProcessWrapper(object):
         th.start()
         self.started = True
         self.pid = self.popen.pid
-        logger.info('Start process [%s] successfully. pid: %d', self.name, self.popen.pid)
+        logger.info(
+            'Start process [%s] successfully. pid: %d', self.name, self.popen.pid)
         logger.info('-' * 120)
         return 0
 
@@ -248,9 +274,11 @@ class ProcessMonitor(object):
         @type  p: L{Process}
         """
         if self.has_process(p.name):
-            logger.error('Cannot add process due to duplicate name "%s".', p.name)
+            logger.error(
+                'Cannot add process due to duplicate name "%s".', p.name)
         elif self.is_shutdown:
-            logger.error('Cannot add process [%s] due to monitor has been stopped.', p.name)
+            logger.error(
+                'Cannot add process [%s] due to monitor has been stopped.', p.name)
         else:
             self.procs.append(p)
 
@@ -274,13 +302,15 @@ class ProcessMonitor(object):
                 continue
             if pw.exception_handler == "respawn":
                 if pw.respawn_cnt < pw.respawn_limit:
-                    logger.warning('child process [%s][%d] exit, respawn!', pw.name, pw.pid)
+                    logger.warning(
+                        'child process [%s][%d] exit, respawn!', pw.name, pw.pid)
                     pw.start()
                     pw.respawn_cnt += 1
                 else:
                     dead_cnt += 1
             elif pw.exception_handler == "exit":
-                logger.warning('child process [%s][%d] exit, stop all', pw.name, pw.pid)
+                logger.warning(
+                    'child process [%s][%d] exit, stop all', pw.name, pw.pid)
                 # stop and exit
                 stop()
             else:
@@ -318,10 +348,12 @@ class ProcessMonitor(object):
                 try:
                     p.wait(force_stop_timeout_secs)
                 except subprocess.TimeoutExpired as e:
-                    logger.warning("Begin force kill process [%s][%s].", p.name, p.pid)
+                    logger.warning(
+                        "Begin force kill process [%s][%s].", p.name, p.pid)
                     p.kill()
                 p.wait()
-                logger.info('Process [%s] has been stopped. dag_file: %s', p.name, p.dag_list)
+                logger.info(
+                    'Process [%s] has been stopped. dag_file: %s', p.name, p.dag_list)
         # Reset members
         self.procs = []
         self.dead_cnt = 0
@@ -386,7 +418,8 @@ def start(launch_file=''):
     # start each process
     for module in root.findall('module'):
         module_name = get_param_value(module, 'name')
-        process_name = get_param_value(module, 'process_name', 'mainboard_default_' + str(os.getpid()))
+        process_name = get_param_value(
+            module, 'process_name', 'mainboard_default_' + str(os.getpid()))
         sched_name = get_param_value(module, 'sched_name', 'CYBER_DEFAULT')
         process_type = get_param_value(module, 'type', 'library')
         exception_handler = get_param_value(module, 'exception_handler')
@@ -400,7 +433,8 @@ def start(launch_file=''):
 
         if process_type == 'binary':
             if len(process_name) == 0:
-                logger.error('Start binary failed. Binary process_name is null.')
+                logger.error(
+                    'Start binary failed. Binary process_name is null.')
                 continue
             pw = ProcessWrapper(process_name.split()[0], 0, [""], [], process_name, process_type,
                                 sched_name, [], exception_handler, respawn_limit)
@@ -408,7 +442,8 @@ def start(launch_file=''):
         else:
             dag_list = get_param_list(module, 'dag_conf')
             if not dag_list:
-                logger.error('module [%s] library dag conf is null.', module_name)
+                logger.error(
+                    'module [%s] library dag conf is null.', module_name)
                 continue
             plugin_list = get_param_list(module, 'plugin')
             extra_args_list = []

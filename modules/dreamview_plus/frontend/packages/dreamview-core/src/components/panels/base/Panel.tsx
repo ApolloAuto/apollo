@@ -53,7 +53,7 @@ export default function Panel(panelProps: PanelProps) {
     const logger = Logger.getInstance(`Panel-${panelId}`);
     function PanelWrapper(props: any) {
         const { isMainConnected, streamApi, metadata } = useWebSocketServices();
-        const { panelCatalog } = usePanelCatalogContext();
+        // const { panelCatalog } = usePanelCatalogContext();
         const { mosaicActions } = useContext(MosaicContext);
         const { mosaicWindowActions }: { mosaicWindowActions: MosaicWindowActions } = useContext(MosaicWindowContext);
         const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
@@ -206,7 +206,7 @@ export default function Panel(panelProps: PanelProps) {
         useRegKeyDownAddHandler(`keydown-add:${panelId}`);
         useKeyDownAddHandler(panelId, keyAddHandler);
 
-        const panel = useMemo(() => panelCatalog.get(panelId), [panelCatalog]);
+        // const panel = useMemo(() => panelCatalog.get(panelId), [panelCatalog]);
         const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
 
         // 初始化订阅相关数据的消费者
@@ -239,19 +239,19 @@ export default function Panel(panelProps: PanelProps) {
             }
         }, []);
 
-        const splitPanel = useCallback(
-            (direction: MosaicDirection) => {
-                const root = mosaicActions.getRoot();
-                const ownPath = mosaicWindowActions.getPath();
-                const newId = genereatePanelId(panel?.type);
-                mosaicActions.replaceWith(ownPath, {
-                    direction,
-                    second: newId,
-                    first: getAndAssertNodeAtPathExists(root, ownPath),
-                });
-            },
-            [mosaicWindowActions, mosaicActions, panel?.type],
-        );
+        // const splitPanel = useCallback(
+        //     (direction: MosaicDirection) => {
+        //         const root = mosaicActions.getRoot();
+        //         const ownPath = mosaicWindowActions.getPath();
+        //         const newId = genereatePanelId(panel?.type);
+        //         mosaicActions.replaceWith(ownPath, {
+        //             direction,
+        //             second: newId,
+        //             first: getAndAssertNodeAtPathExists(root, ownPath),
+        //         });
+        //     },
+        //     [mosaicWindowActions, mosaicActions, panel?.type],
+        // );
 
         const closePanel = useCallback(() => {
             const ownPath = mosaicWindowActions.getPath();
@@ -472,7 +472,7 @@ export default function Panel(panelProps: PanelProps) {
                         checkDataEmpty(val);
 
                         if (initSubscriptionMapRef.current && !isEmpty(initSubscriptionMapRef.current)) {
-                            const consumer = initSubscriptionMapRef.current[subject.name].consumer ?? defaultConsumer;
+                            const consumer = initSubscriptionMapRef.current[subject.name]?.consumer ?? defaultConsumer;
                             consumer(val);
                         }
                     });
@@ -508,7 +508,7 @@ export default function Panel(panelProps: PanelProps) {
                 initSubscription,
                 logger,
                 metaData: _panelMetaData,
-                splitPanel,
+                // splitPanel,
                 closePanel,
                 updateMetaData,
                 enterFullScreen,
@@ -528,7 +528,7 @@ export default function Panel(panelProps: PanelProps) {
                 updateChannel,
                 initSubscription,
                 _panelMetaData,
-                splitPanel,
+                // splitPanel,
                 closePanel,
                 updateMetaData,
                 enterFullScreen,

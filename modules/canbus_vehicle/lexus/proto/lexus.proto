@@ -1275,17 +1275,6 @@ message Rear_lights_rpt_418 {
   optional bool brake_lights_on = 4;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Lexus {
   optional Hazard_lights_rpt_214 hazard_lights_rpt_214 = 1;  // report message
   optional Steering_cmd_12c steering_cmd_12c = 2;            // report message
@@ -1358,5 +1347,4 @@ message Lexus {
       54;                                                   // report message
   optional Veh_dynamics_rpt_413 veh_dynamics_rpt_413 = 55;  // report message
   optional Rear_lights_rpt_418 rear_lights_rpt_418 = 56;    // report message
-  optional CheckResponseSignal check_response = 100;
 }

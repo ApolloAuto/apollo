@@ -46,7 +46,8 @@ void MlfTrackData::Reset(TrackedObjectPtr obj, int track_id) {
 }
 
 void MlfTrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj) {
-  double timestamp = obj->object_ptr->latest_tracked_time;
+  // double timestamp = obj->object_ptr->latest_tracked_time;
+  double timestamp = obj->timestamp;
   if (history_objects_.find(timestamp) == history_objects_.end()) {
     auto pair = std::make_pair(timestamp, obj);
     history_objects_.insert(pair);
@@ -194,6 +195,56 @@ void MlfTrackData::RemoveStaleHistory(double timestamp) {
   for (auto& map : sensor_history_objects_) {
     RemoveStaleDataFromMap(timestamp, &map.second);
   }
+}
+
+void MlfTrackData::GetLatestKObjects(size_t k,
+    std::vector<TrackedObjectPtr>* objects) {
+    objects->clear();
+    size_t i = 0;
+    for (auto obj_it = history_objects_.rbegin();
+      obj_it != history_objects_.rend(); ++obj_it) {
+        if (i < k) {
+            objects->push_back(obj_it->second);
+            ++i;
+        } else {
+            break;
+        }
+    }
+}
+
+void MlfTrackData::GetLatestKObjects(size_t k,
+    std::vector<TrackedObjectConstPtr>* objects) const {
+    objects->clear();
+    size_t i = 0;
+    for (auto obj_it = history_objects_.rbegin();
+      obj_it != history_objects_.rend(); ++obj_it) {
+        if (i < k) {
+            objects->push_back(obj_it->second);
+            ++i;
+        } else {
+            break;
+        }
+    }
+}
+
+void MlfTrackData::GetObjectsInIntervalByOrder(double time,
+    std::vector<TrackedObjectConstPtr>* objects) {
+    for (auto obj_it = history_objects_.begin();
+      obj_it != history_objects_.end(); ++obj_it) {
+        if (obj_it->second->timestamp >= time) {
+            objects->push_back(obj_it->second);
+        }
+    }
+}
+
+void MlfTrackData::GetObjectsInIntervalByOrder(double time,
+  std::vector<TrackedObjectConstPtr>* objects) const {
+    for (auto obj_it = history_objects_.begin();
+      obj_it != history_objects_.end(); ++obj_it) {
+        if (obj_it->second->timestamp >= time) {
+            objects->push_back(obj_it->second);
+        }
+    }
 }
 
 }  // namespace lidar

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Progress } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
+import { useThemeContext } from '@dreamview/dreamview-theme';
 
 type SpeedInfoProps = {
     speed?: number;
@@ -22,6 +23,7 @@ function toFix1(percent: number) {
 
 function SpeedInfo(props: SpeedInfoProps) {
     const { classes } = useStyle();
+    const { tokens } = useThemeContext();
 
     return (
         <div className={classes['dashboard-speed-info']}>
@@ -58,6 +60,7 @@ function SpeedInfo(props: SpeedInfoProps) {
                             top: -6,
                         }}
                         strokeColor='#F75660'
+                        trailColor={tokens.components.dashBoard.progressBgColor}
                         strokeLinecap='butt'
                         percent={props?.brakePercent ? toFix1(props?.brakePercent) : 0}
                         showInfo={false}
@@ -82,6 +85,7 @@ function SpeedInfo(props: SpeedInfoProps) {
                             top: -6,
                         }}
                         strokeColor='#3288FA'
+                        trailColor={tokens.components.dashBoard.progressBgColor}
                         strokeLinecap='butt'
                         percent={props?.throttlePercent ? toFix1(props?.throttlePercent) : 0}
                         showInfo={false}

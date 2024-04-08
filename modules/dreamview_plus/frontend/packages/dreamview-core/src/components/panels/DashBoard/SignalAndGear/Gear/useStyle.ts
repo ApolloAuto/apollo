@@ -8,11 +8,11 @@ export default function useStyle() {
             justifyContent: 'space-between',
             alignItems: 'center',
             columnGap: '15px',
-            background: '#282B36',
+            background: theme.components.dashBoard.cardBgColor,
             borderRadius: '6px',
             fontFamily: 'PingFangSC-Semibold',
             fontSize: '14px',
-            color: '#A6B5CC',
+            color: theme.components.dashBoard.color,
             fontWeight: 600,
             width: '100%',
             height: '100%',
@@ -33,13 +33,13 @@ export default function useStyle() {
             textAlign: 'center',
         },
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

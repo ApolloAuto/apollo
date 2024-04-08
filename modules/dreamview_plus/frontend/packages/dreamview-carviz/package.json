@@ -1,6 +1,6 @@
 {
     "name": "@dreamview/dreamview-carviz",
-    "version": "1.0.1",
+    "version": "1.1.4",
     "description": "dreamview 可视化框架",
     "main": "index.ts",
     "scripts": {
@@ -10,7 +10,7 @@
     "author": "hxj1234",
     "license": "MIT",
     "devDependencies": {
-        "@dreamview/eslint-config-dreamview": "1.0.1",
+        "@dreamview/eslint-config-dreamview": "1.1.4",
         "@types/react-dom": "^18.2.4",
         "@types/three": "^0.155.1",
         "circular-dependency-plugin": "^5.2.2",
@@ -29,8 +29,8 @@
         "@babel/plugin-transform-modules-commonjs": "^7.22.5",
         "@babel/preset-env": "^7.22.5",
         "@babel/preset-typescript": "^7.22.5",
-        "@dreamview/dreamview": "1.0.1",
-        "@dreamview/log": "1.0.1",
+        "@dreamview/dreamview": "1.1.4",
+        "@dreamview/log": "1.1.4",
         "@types/react-dom": "^18.2.4",
         "babel-loader": "^9.1.2",
         "copy-webpack-plugin": "^11.0.0",
@@ -42,7 +42,7 @@
         "react-dom": "^18.2.0",
         "react-spring": "^9.7.2",
         "terser-webpack-plugin": "^5.3.9",
-        "three": "^0.156.1",
+        "three": "0.160.1",
         "three.meshline": "1.4.0",
         "ts-loader": "^9.4.3",
         "webpack": "^5.85.0",

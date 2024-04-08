@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/canbus_vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
+
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 

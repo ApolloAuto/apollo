@@ -41,6 +41,7 @@ apollo_cc_library(
         "transit_message_manager.h",
         "transit_vehicle_factory.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/transit/proto:transit_cc_proto",

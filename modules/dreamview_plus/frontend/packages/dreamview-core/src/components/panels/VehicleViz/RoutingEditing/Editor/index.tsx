@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { RoutingEditor } from '@dreamview/dreamview-carviz/src';
-import shortUUID from 'short-uuid';
 import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
 import { useNavigate } from '@dreamview/dreamview-core/src/util/SimpleRouter';
 import ViewBtn from '@dreamview/dreamview-core/src/components/panels/VehicleViz/ViewBtn';
@@ -9,6 +7,7 @@ import MapElementsManager from '@dreamview/dreamview-core/src/services/WebSocket
 import { Vector3 } from 'three';
 import { message } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
+import { useRoutingEditor } from '@dreamview/dreamview-core/src/hooks/useCarviz';
 import { Subscription } from 'rxjs';
 import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { Nullable } from '@dreamview/dreamview-core/src/util/similarFunctions';
@@ -19,7 +18,7 @@ import { useVizStore } from '../../VizStore';
 import { initRoutingEditor } from '../../VizStore/actions';
 import { MutexToolNameEnum } from '../RoutingEditingFunctionalArea/types';
 import RoutingEditingOperationArea from '../RoutingEditingOperationArea';
-import { PointType, RouteInfo, RouteOrigin } from '../RouteManager/type';
+import { PointType, RouteOrigin } from '../RouteManager/type';
 
 export function Editor() {
     const { t } = useTranslation('routeEditing');
@@ -32,9 +31,7 @@ export function Editor() {
 
     const { mainApi, isMainConnected } = useWebSocketServices();
 
-    const [uid] = useState(shortUUID.generate);
-
-    const [routingEditor] = useState(() => new RoutingEditor(uid));
+    const [routingEditor, uid] = useRoutingEditor();
 
     const [mapElementsManager] = useState(() => new MapElementsManager());
 
@@ -70,7 +67,7 @@ export function Editor() {
     const getMapElements = useCallback(
         (cameraCenter: Vector3) => {
             mainApi
-                ?.getMapElementIds({ point: { x: cameraCenter.x ?? 0, y: cameraCenter.y ?? 0 }, radius: 400 })
+                ?.getMapElementIds({ point: { x: cameraCenter.x ?? 0, y: cameraCenter.y ?? 0 }, radius: 200 })
                 .then((res) => {
                     if (MapElementsManager.isMapElementIdsEmpty(res)) return;
                     const [mapElementsAlreadyRender, mapIdsWithoutCache] = mapElementsManager.getMapElement(res);
@@ -90,7 +87,7 @@ export function Editor() {
         routingEditor.removeAll();
         routingEditor.deactiveAll();
         mapElementsManager.clear();
-        mainApi?.getMapElementIds({ radius: 200 }).then((res) => {
+        mainApi?.getMapElementIds({ radius: 20 }).then((res) => {
             const [mapElementsAlreadyRender, mapIdsWithoutCache] = mapElementsManager.getMapElement(res);
 
             mainApi.getMapElementsByIds(mapIdsWithoutCache).then((mapElements) => {

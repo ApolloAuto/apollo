@@ -62,4 +62,5 @@ export const layerMenu = {
     parkingSpace: 'Parking Space',
     parkingSpaceId: 'ParkingSpace Id',
     laneId: 'Lane Id',
+    egoBoudingBox: 'Ego BoudingBox',
 };

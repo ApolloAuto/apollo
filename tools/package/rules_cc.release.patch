@@ -37,7 +37,7 @@
 +  target_name = origin_target_split[-1] if "proto" not in origin_target_split[-1] else origin_target_split[-1].replace("_cc_", "_")
 +  prefix = origin_target_split[0].replace("//", "")
 +  replaced_target_name = "{}_C{}".format(prefix.replace("/", "_S"), target_name)
-+
++  # replaced_target_name = replaced_target_name[int(len(replaced_target_name) / 2):] if len(replaced_target_name) > 100 else replaced_target_name
 +  replaced_repo = origin_replace_val.split("//:")[0]
 +  return "{}//:{}".format(replaced_repo, replaced_target_name)
 +

@@ -4,8 +4,8 @@
     "version": "0.0.0",
     "main": "app.js",
     "author": "adu-sim",
+    "private": true,
     "license": "Apache-2.0",
-    "private": "true",
     "scripts": {
         "clean": "rimraf packages/platforms/web/.web_build",
         "clean:dep": "lerna clean --yes && rimraf node_modules",

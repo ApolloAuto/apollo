@@ -42,14 +42,6 @@ void Enablestatefeedbackc3::Parse(const std::uint8_t* bytes, int32_t length,
       driven_enable_state(bytes, length));
   chassis->mutable_enable_state_feedback_c3()->set_brake_enable_state(
       brake_enable_state(bytes, length));
-  // Added for response check
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_enable_state(bytes, length) == 1);
-  chassis->mutable_check_response()->set_is_vcu_online(
-      ((driven_enable_state(bytes, length) == 1) &&
-       (gear_enable_actual(bytes, length) == 1)) == 1);
-  chassis->mutable_check_response()->set_is_eps_online(
-      steering_enable_state(bytes, length) == 1);
 }
 
 // config detail: {'name': 'parking_enable_state', 'enum': {0:

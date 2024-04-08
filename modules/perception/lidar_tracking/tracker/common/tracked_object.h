@@ -50,7 +50,8 @@ struct TrackedObject {
   void Reset(
       base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
       const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
-      const base::SensorInfo& sensor = base::SensorInfo());
+      const base::SensorInfo& sensor = base::SensorInfo(),
+      double timestamp = 0.0);
 
   /**
    * @brief Transform tracked data state to string
@@ -76,7 +77,8 @@ struct TrackedObject {
   void AttachObject(
       base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
       const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
-      const base::SensorInfo& sensor = base::SensorInfo());
+      const base::SensorInfo& sensor = base::SensorInfo(),
+      double timestamp = 0.0);
 
   /**
    * @brief Transform object cloud to world
@@ -144,7 +146,11 @@ struct TrackedObject {
   Eigen::Vector3d size;
 
   base::ObjectType type = base::ObjectType::UNKNOWN;
+  // @brief probability for each type, required
+  std::vector<float> type_probs;
   bool is_background = false;
+
+  double timestamp = 0.0;
 
   // ***************************************************
   // measurement correlative information from measurement computer

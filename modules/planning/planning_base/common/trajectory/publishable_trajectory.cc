@@ -47,6 +47,12 @@ void PublishableTrajectory::PopulateTrajectoryProtobuf(
     trajectory_pb->set_total_path_length(last_tp.path_point().s());
     trajectory_pb->set_total_path_time(last_tp.relative_time());
   }
+  AINFO << "IsReversed" << IsReversed();
+  if (IsReversed()) {
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_REVERSE);
+  } else {
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+  }
 }
 
 }  // namespace planning

@@ -24,7 +24,7 @@ cyber_modules {
 cyber_modules {
   key: "Control"
   value: {
-    dag_files: "/apollo/modules/control/dag/control.dag"
+    dag_files: "/apollo/modules/control/control_component/dag/control.dag"
   }
 }
 cyber_modules {

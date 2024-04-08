@@ -1,6 +1,6 @@
 {
     "name": "@dreamview/web",
-    "version": "3.0.0",
+    "version": "3.1.4",
     "description": "> TODO: description",
     "author": "wangkang12 <wangkang12@baidu.com>",
     "homepage": "",
@@ -19,8 +19,8 @@
         "deploy": "node scripts/deploy.js"
     },
     "devDependencies": {
-        "@dreamview/eslint-config-dreamview": "1.0.1",
-        "@dreamview/tslint-config-dreamview": "1.0.1",
+        "@dreamview/eslint-config-dreamview": "1.1.4",
+        "@dreamview/tslint-config-dreamview": "1.1.4",
         "@types/react-dom": "^18.2.4",
         "circular-dependency-plugin": "^5.2.2",
         "esbuild-loader": "^3.0.1",
@@ -35,8 +35,8 @@
         "webpack-dev-server": "^4.15.0"
     },
     "dependencies": {
-        "@dreamview/dreamview-web": "3.0.0",
-        "@dreamview/log": "1.0.1",
+        "@dreamview/dreamview-web": "3.1.4",
+        "@dreamview/log": "1.1.4",
         "@types/react-dom": "^18.2.4",
         "lodash": "^4.17.21"
     }

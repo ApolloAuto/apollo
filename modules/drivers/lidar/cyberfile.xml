@@ -32,6 +32,7 @@
 
   <depend expose="False">3rd-pcl</depend>
   <depend>libpcap-dev</depend>
+  <depend>rsdriver</depend>
 
   <depend>bazel-extend-tools</depend>
   <depend expose="False">3rd-rules-python</depend>

@@ -1,6 +1,6 @@
 # Apollo车辆适配教程
 ## 引言
-本文所介绍的Apollo新车适配方法，可以帮助开发者快速接入新车辆，以方便开发者在Apollo上进行软件开发。文中所介绍的车辆线控信号标准和要求均源自Apollo开放车辆认证平台，目前车辆认证平台已经有Lincoln，Lexus，GE3，WEY等车型，有意愿把车加入Apollo车辆认证平台的车企、车辆提供商，可以按照文档内对线控的具体要求，熟悉和准备车辆底层控制协议，节省前期准备时间，欢迎有兴趣的开发者移步至[Apollo开放车辆认证平台](http://apollo.auto/vehicle/certificate_cn.html)(http://apollo.auto/vehicle/certificate_cn.html)  了解更多详细内容。
+本文所介绍的Apollo新车适配方法，可以帮助开发者快速接入新车辆，以方便开发者在Apollo上进行软件开发。文中所介绍的车辆线控信号标准和要求均源自Apollo开放车辆认证平台，目前车辆认证平台已经有Lincoln，Lexus，GE3，WEY，Devkit，Neolix等车型，有意愿把车加入Apollo车辆认证平台的车企、车辆提供商，可以按照文档内对线控的具体要求，熟悉和准备车辆底层控制协议，节省前期准备时间，欢迎有兴趣的开发者移步至[Apollo开放车辆认证平台](http://apollo.auto/vehicle/certificate_cn.html)(http://apollo.auto/vehicle/certificate_cn.html)  了解更多详细内容。
 
 ## 适配一辆符合Apollo标准的车辆
 
@@ -224,51 +224,95 @@ VIN码一般17位，按照ASCII码格式，每一个ASCII占1字节，需要3帧
 ### 1. DBC文件转换成canbus模板代码
 Canbus适配代码可以使用apollo的工具生成，在转换代码前，要保证DBC按照上述的DBC文件要求完成，并通过gedit打开dbc文件，另存转码为UTF-8格式保存。
 
-（1）将DBC文件放置指定目录下，目录`apollo/modules/tools/gen_vehicle_protocol`内。
+（1）将DBC文件（如ge3.dbc）放置指定目录下，目录`/apollo_workspace/output/`内。
 
-（2）修改DBC转换脚本的配置文件：下面以GE3车型添加为例，在`apollo/modules/tools/gen_vehicle_protocol`目录下，复制默认存在的`mkz_conf.yml`文件并重命名为`ge3_conf.yml`，修改该配置文件，如下图所示：
+（2）修改DBC转换脚本的配置文件：下面以GE3车型添加为例，在`apollo/modules/tools/gen_vehicle_protocol`目录下，复制默认存在的`lincoln_conf.yml`文件并重命名为`ge3_conf.yml`，修改该配置文件，如下所示：
 
-![yml](images/vehicle_adaption_tutorial/yml.png)
+```yml
+# 指定dbc文件，这里以ge3.dbc为例，注意这里需要指定到文件在apollo容器内的绝对路径
+# 默认把ge3.dbc放入在 /apollo_workspace/output/ 文件夹下
+dbc_file: /apollo_workspace/output/ge3.dbc
+# 定义dbc转换成yml文件名称
+protocol_conf: /apollo_workspace/output/ge3.yml
+# 定义车型名称，根据车型自定义
+car_type: ge3
+# 定义控制报文协议列表，一般为空
+sender_list: []
+# 自动驾驶模块在dbc中的ECU网络node名称，ge3.dbc内定义的node名称为SCU
+sender: SCU
+# 定义哪些信号ID不需要生成，一般为空
+black_list: []
+# 是否基于apollo_demo.dbc生成车型适配代码，现在dbc使用的是lincoln.dbc，false为否
+use_demo_dbc: false
 
-`dbc_file`：填写对应你的DBC文件名称，DBC文件名称一般以车型名称命名，并以`.dbc`结束；
-
-`protocol_conf`：与上述DBC文件名称命名相同，填写`ge3.yml`；
-
-`car_type`：填入车型名称；
-
-`sender_list：[ ] `：发送列表，这里默认为空；
-
-`sender`：此处修改为与DBC内定义的Apollo的名称一致，ge3的DBC内定义Apollo名称为SCU。
-
-（3）完成`ge3_conf.yml`配置文件设置，启动docker，进入Apollo的容器后，在`apollo/modules/tools/gen_vehicle_protocol`目录下，找到DBC转化工具`gen.py`，执行代码：
+# 定义ge3.dbc转换成代码的生成文件夹，默认如下文件夹即可
+output_dir: /apollo_workspace/modules/canbus_vehicle
+# 定义新车型所对应的canbus配置文件，默认如下文件夹即可
+output_canbus_conf_dir: /apollo_workspace/output
 ```
-cd modules/tools/gen_vehicle_protocol
-python gen.py ge3_conf.ymal
+
+（3）完成`ge3_conf.yml`配置文件设置，进入Apollo的容器后，检查文件是否准备好，执行代码：
+
+```shell
+
+ls -al /apollo_workspace/output
 ```
-执行完成上述脚本后，在终端内会显示生成了控制协议5个，反馈协议11个。
+![ge3_check_output](images/vehicle_adaption_tutorial/ge3_check_output.png)
+
+- 执行生成脚本指令
+```python
+gen output/ge3_conf.yml
+```
+
+- 执行完成上述脚本后，在终端内会显示生成了控制协议11个，反馈协议5个。
+
 ![creat_ge3protocol](images/vehicle_adaption_tutorial/creat_ge3protocol.png)
-这时在`apollo/modules/tools/gen_vehicle_protocol`目录下，会生成一个`output`文件夹，文件夹内有2个文件夹，一个是`proto`文件夹，一个是`vehicle`文件夹；这两个文件内的代码内容就是我们要适配canbus的基本代码模板了。我们需要把文件内的代码**拷贝**到apollo的canbus层内，进行代码适配添加。
-![output](images/vehicle_adaption_tutorial/output.png)
 
-**注意**：把这个output文件夹内生成的代码模板拷贝至相应的apollo目录后，要删除该文件夹，如果不删除该文件夹，后期编译apollo时会报错。该文件夹有保护权限，请在apollo的docker内执行删除代码：
-```
-rm -rf output/
-```
-### 2. 适配代码合入apollo文件内
-下面以添加ge3车型为例，将该代码添加至apollo内：
-![output](images/vehicle_adaption_tutorial/output.png)
+- 执行完上述脚本后，在`/apollo_workspace/modules/canbus_vehicle/`目录下，会生成一个`ge3`文件夹，该文件夹就是根据ge3协议dbc转换后的车辆协议适配代码。
 
-（1）将`apollo/modules/tools/gen_vehicle_protocol/output/proto` 文件夹内`ge3.proto`文件拷贝至`apollo/modules/canbus/proto` 文件夹内，并在该文件夹内修改chassis_detail.proto，在该文件头部添加头文件`import "modules/canbus/proto/ge3.proto"`
-![importproto](images/vehicle_adaption_tutorial/importproto.png)
-在`message ChassisDetail{}` 结构体内的最后一行添加要增加的新车型变量定义： `Ge3 ge3 = 21`；
-![ge3_chassis_detail](images/vehicle_adaption_tutorial/ge3_chassis_detail.png) 
-在`pollo/modules/canbus/proto`目录的`BUILD`文件内添加上述新`proto`的依赖：`"ge3.proto"`；
-![BUILD_depend](images/vehicle_adaption_tutorial/proto_BUILD_depend.png)
-（2）将`apollo/modules/tools/gen_vehicle_protocol/output/vehicle/` 内的ge3文件夹拷贝至`apollo/modules/canbus/vehicle/` 文件夹下；
-![copy_ge3](images/vehicle_adaption_tutorial/copy_ge3.png)
-### 3.实现新的车辆控制逻辑
-实现新的车辆控制逻辑，在`apollo/modules/canbus/vehicle/ge3/ge3_controller.cc` 文件编写控制逻辑代码，主要包含将解析的底盘反馈报文的信息，通过`chassis`和`chassis_detail`广播出车辆底盘信息。`chassis`主要包括获取底盘的车速、轮速、发动机转速、踏板反馈、转角反馈等信息， `chassis_detail`是每一帧报文的实际信息，这一部分编写的代码如下所示：
+```shell
+/apollo_workspace/modules/canbus_vehicle/
+|-- ge3
+    |-- BUILD
+    |-- cyberfile.xml
+    |-- ge3_controller.cc
+    |-- ge3_controller.h
+    |-- ge3_message_manager.cc
+    |-- ge3_message_manager.h
+    |-- ge3_vehicle_factory.cc
+    |-- ge3_vehicle_factory.h
+    |-- proto
+    |-- protocol
 ```
+- 在`/apollo_workspace/output/`目录下，会生成一个`ge3`文件夹，该文件夹内的`canbus_conf`目录内的配置文件，就是ge3车型的canbus配置文件，将其中内容替换至`/apollo/modules/canbus/conf/`文件夹下的相关配置你文件内。
+
+```shell
+/apollo_workspace/output/ge3
+|-- canbus_conf
+    |-- canbus.conf
+    |-- canbus_conf.pb.txt
+```
+
+（4）编译ge3车型
+
+- 执行如下编译命令
+
+```shell
+buildtool build --opt -p modules/canbus_vehicle/ge3/
+```
+完成编译后，ge3车型的初步适配代码就完成了。
+
+### 2.实现新的车辆控制逻辑
+
+- 上一步自动生成的适配代码完成了60%的代码开发工作，这一步需要完成具体的车型实现逻辑，在`/apollo_workspace/modules/canbus_vehicle/ge3/ge3_controller.cc` 文件编写控制逻辑代码，主要包括：
+- chassis()方法实现：主要有车辆车速、轮速、档位、踏板百分比、方向盘转角、EPB状态、转向灯、喇叭信号灯，将`Ge3.proto`信息写入到`chassis.proto`，这样就实现了`/apollo/canbus/chassis`channel消息内容的更新。
+- 设置自动驾驶模式，编辑相关使能逻辑：横纵向都使能自动驾驶EnableAutoMode()、横纵向都退出自动驾驶DisableAutoMode()、只有横向使能自动驾驶EnableSteeringOnlyMode()、只有纵向使能自动驾驶EnableSpeedOnlyMode()
+- 添加必要的控制信号方法实现，包括档位控制Gear()，刹车控制Brake()，油门控制Throttle()，转向控制Steer()，其它控制信号包括车大灯控制SetBeam()、喇叭控制SetHorn、转向灯控制SetTurningSignal()、电子手刹控制SetEpbBreak()。
+- 添加`CheckResponse()`逻辑，在chassis()方法内实现车辆自动驾驶状态模式的信号反馈，然后在`CheckResponse()方法内，调节重试时间等功能。
+
+- 在chassis()方法内反馈报文信息实现，编写代码如下所示：
+
+```C++
   // 3
   chassis_.set_engine_started(true);
 
@@ -502,16 +546,18 @@ rm -rf output/
     }
   }
 ```
-设置自动驾驶模式，编辑相关使能逻辑，在Apollo中，车辆的驾驶模式主要包含：
 
-完全自动驾驶模式（`COMPLETE_AUTO_DRIVE`）：横向、纵向都使能；
+- 设置自动驾驶模式，编辑相关使能逻辑，在Apollo中，车辆的驾驶模式主要包含：
 
-横向自动驾驶模式（`AUTO_STEER_ONLY`）：横向使能，纵向不使能；
+- 完全自动驾驶模式（`COMPLETE_AUTO_DRIVE`）：横向、纵向都使能；
 
-纵向自动驾驶模式（`AUTO_SPEED_ONLY`）：横向不使能，纵向使能；
+- 横向自动驾驶模式（`AUTO_STEER_ONLY`）：横向使能，纵向不使能；
 
-车辆使能控制信号控制逻辑如下所示：
-```
+- 纵向自动驾驶模式（`AUTO_SPEED_ONLY`）：横向不使能，纵向使能；
+
+- 车辆使能控制信号控制逻辑如下所示：
+
+```C++
 ErrorCode Ge3Controller::EnableAutoMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
@@ -602,8 +648,9 @@ ErrorCode Ge3Controller::EnableSpeedOnlyMode() {
   return ErrorCode::OK;
 }
 ```
-添加控制信号的相关功能，必须要添加的控制信号包括车辆的油门、刹车踏板控制，转向控制，和档位控制；其它控制信号包括车大灯控制、喇叭控制、转向灯控制、电子手刹控制。代码如下所示：
-```
+- 添加控制信号的相关功能，必须要添加的控制信号包括车辆的油门、刹车踏板控制，转向控制，和档位控制；其它控制信号包括车大灯控制、喇叭控制、转向灯控制、电子手刹控制。代码如下所示：
+
+```C++
 // NEUTRAL, REVERSE, DRIVE
 void Ge3Controller::Gear(Chassis::GearPosition gear_position) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
@@ -765,35 +812,47 @@ void Ge3Controller::SetTurningSignal(const ControlCommand& command) {
   }
 }
 ```
-添加`CheckResponse`逻辑，Apollo程序内增加了对车辆底层是否在自动驾驶模式的监控，即车辆横向、驱动、制动模块的驾驶模式反馈是否处于自动驾驶状态，如果在一个`CheckResponse`周期内，车辆某个模块驾驶模块反馈处于接管或者手动驾驶模式，则Apollo会控制车辆使能为紧急停车模式（`Emergency`），即各模块均控制为手动模式，确保控制车辆时的安全。不同的车辆`CheckResponse`周期可能不同，需要开发者根据情况通过设置`retry_num`设定`check`周期。
+
+- 添加`CheckResponse()`逻辑，Apollo程序内增加了对车辆底层是否在自动驾驶模式的监控，即车辆横向、驱动、制动模块的驾驶模式反馈是否处于自动驾驶状态，如果在一个`CheckResponse`周期内，车辆某个模块驾驶模块反馈处于接管或者手动驾驶模式，则Apollo会控制车辆使能为紧急停车模式（`Emergency`），即各模块均控制为手动模式，确保控制车辆时的安全。不同的车辆`CheckResponse`周期可能不同，需要开发者根据情况通过设置`retry_num`设定`check`周期。
 开发者可以不改原check代码方案，将3个驾驶模式反馈报文与apollo内`chassis_detail`做映射：
 
-`is_eps_online->转向模式反馈信号` 
+`is_eps_online->转向模式反馈信号`
 
-`is_vcu_online->驱动模式反馈信号` 
+`is_vcu_online->驱动模式反馈信号`
 
 `is_esp_online->制动模式反馈信号`
 
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_eps_311.cc`文件内，增加以下代码：
+- 在Chassis()方法内，增加以下代码：
+
+```C++
+  // 19 add checkresponse signal
+  if (chassis_detail.has_scu_bcs_1_306() &&
+      chassis_detail.scu_bcs_1_306().has_bcs_drvmode()) {
+    chassis_.mutable_check_response()->set_is_esp_online(
+        chassis_detail.scu_bcs_1_306().bcs_drvmode() == 1);
+  }
+  if (chassis_detail.has_scu_eps_311() &&
+      chassis_detail.scu_eps_311().has_eps_drvmode()) {
+    chassis_.mutable_check_response()->set_is_eps_online(
+        chassis_detail.scu_eps_311().eps_drvmode() == 1);
+  }
+  if (chassis_detail.has_scu_vcu_1_312() &&
+      chassis_detail.scu_vcu_1_312().has_vcu_drvmode()) {
+    chassis_.mutable_check_response()->set_is_vcu_online(
+        chassis_detail.scu_vcu_1_312().vcu_drvmode() == 1);
+  }
 ```
-chassis->mutable_check_response()->set_is_eps_online(eps_drvmode(bytes, length) == 3);
-```
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_vcu_1_312.cc`文件内，增加以下代码：
-```
-chassis->mutable_check_response()->set_is_vcu_online(vcu_drvmode(bytes, length) == 3);
-```
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_bcs_1_306.cc`文件内，增加以下代码：
-```
-chassis->mutable_check_response()->set_is_esp_online(bcs_drvmode(bytes, length) == 3);
-```
-`CheckResponse`实现代码如下：
-```
+
+- 在CheckResponse()方法内，实现与底盘握手断线检查逻辑：
+
+```C++
 bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Ge3 chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
+  Chassis chassis = Chassis();
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -802,19 +861,19 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
+      is_eps_online = chassis.has_check_response() &&
+                      chassis.check_response().has_is_eps_online() &&
+                      chassis.check_response().is_eps_online();
       check_ok = check_ok && is_eps_online;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
+      is_vcu_online = chassis.has_check_response() &&
+                      chassis.check_response().has_is_vcu_online() &&
+                      chassis.check_response().is_vcu_online();
+      is_esp_online = chassis.has_check_response() &&
+                      chassis.check_response().has_is_esp_online() &&
+                      chassis.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
     if (check_ok) {
@@ -834,98 +893,160 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
   return false;
 }
 ```
-### 4.修改底盘车速反馈协议，将车速反馈单位由km/h转化为m/s
-Apollo系统内默认使用车速反馈量为`m/s`，底盘车速信息对Apollo非常重要，在车辆标定、控制、规划等都需要采集该数据，所以开发者要在开发适配代码时，重点检查车速反馈的单位。车速由`km/h`转化为`m/s`时，在反馈车速的信号除以`3.6`即可。
-找到Ge3车辆反馈车速的报文在文件`apollo/modules/canbus/vehicle/ge3/protocol/scu_bcs_2_307.cc` 下，反馈车速消息为`Scubcs2307::bcs_vehspd{}`，如下图所示：
+
+### 3.修改底盘车速反馈协议，将车速反馈单位由km/h转化为m/s
+
+- Apollo系统内默认使用车速反馈量为`m/s`，底盘车速信息对Apollo非常重要，在车辆标定、控制、规划等都需要采集该数据，所以开发者要在开发适配代码时，重点检查车速反馈的单位。车速由`km/h`转化为`m/s`时，在反馈车速的信号除以`3.6`即可。
+找到Ge3车辆反馈车速的报文在文件`/apollo_workspace/modules/canbus_vehicle/ge3/protocol/scu_bcs_2_307.cc` 下，反馈车速消息为`Scubcs2307::bcs_vehspd{}`，如下图所示：
 ![speed_transfer](images/vehicle_adaption_tutorial/speed_transfer.png)
 
-### 5.注册新车辆
-在`modules/canbus/vehicle/vehicle_factory.cc`里注册新的车辆，在该文件内新建如下类：
-![register_ge3](images/vehicle_adaption_tutorial/register_ge3.png)
-添加头文件
-![add_head_file](images/vehicle_adaption_tutorial/add_head_file.png)
-添加BUILD依赖库
-在`apollo/modules/canbus/vehicle/BUILD` 文件内添加`ge3_vehicle_factory`依赖库。
-![add_build_depend](images/vehicle_adaption_tutorial/add_build_depend.png)
+### 4.更新CANBUS配置文件
 
-### 6.更新配置文件
-在`modules/canbus/proto/vehicle_parameter.proto` 文件内添加GE3车辆分支。
-![register1_ge3](images/vehicle_adaption_tutorial/register1_ge3.png)
-在`modules/canbus/conf/canbus_conf.pb.txt` 更新配置，改为ge3的canbus通信程序。
-![register2_ge3](images/vehicle_adaption_tutorial/register2_ge3.png)
+- 如前所述，canbus配置文件生成在`/apollo_workspace/output/ge3/canbus_conf/`文件夹内，分别是`canbus.conf`和`canbus_conf.pb.txt`。
+
+```shell
+canbus_conf/
+|-- canbus.conf
+|-- canbus_conf.pb.txt
+```
+
+- 查看`canbus.conf`配置文件
+
+```shell
+--flagfile=/apollo/modules/common/data/global_flagfile.txt
+--canbus_conf_file=/apollo/modules/canbus/conf/canbus_conf.pb.txt
+--load_vehicle_library=/opt/apollo/neo/lib/modules/canbus_vehicle/ge3/libge3_vehicle_factory_lib.so
+--load_vehicle_class_name=Ge3VehicleFactory
+--enable_chassis_detail_pub
+```
+
+
+- 查看`canbus_conf.pb.txt`配置文件
+
+```shell
+vehicle_parameter {
+  max_enable_fail_attempt: 5
+  driving_mode: COMPLETE_AUTO_DRIVE
+}
+
+can_card_parameter {
+  brand: SOCKET_CAN_RAW
+  type: PCI_CARD
+  channel_id: CHANNEL_ID_ZERO
+  interface: NATIVE
+}
+
+enable_debug_mode: false
+enable_receiver_log: false
+```
+
+- 将上述canbus文件的内容替换至`/apollo/modules/canbus/conf/`文件夹下的`canbus.conf`和`canbus_conf.pb.txt`配置文件中。
 
 ## 三、车辆底盘开环验证DBC的方法
+
 ### 1、开环测试
- 在确定了车辆底盘DBC后，对DBC内定义的信号进行开环测试。开环测试的主要目的是测试车辆线控信号与车辆的实际功能是否相符，测试车辆的转向、加减速性能响应是否满足车辆的线控需求，测试车辆接管逻辑是否满足要求。
- 
- 底盘的开环单侧中，开发者要针对前文所述的DBC重点要求进行测试，如车辆横纵向使能独立性，横纵向接管的独立性，每个控制信号是否满足控制要求和控制边界，反馈信号是否反馈正确。在性能上，控制信号的转向和加减速延迟是否满足apollo控制性能要求，超调误差是否在线控列表范围内。请开发者根据线控列表内的性能要求，对控制信号进行测试。
- 
+
+- 在确定了车辆底盘DBC后，对DBC内定义的信号进行开环测试。开环测试的主要目的是测试车辆线控信号与车辆的实际功能是否相符，测试车辆的转向、加减速性能响应是否满足车辆的线控需求，测试车辆接管逻辑是否满足要求。
+
+- 底盘的开环单侧中，开发者要针对前文所述的DBC重点要求进行测试，如车辆横纵向使能独立性，横纵向接管的独立性，每个控制信号是否满足控制要求和控制边界，反馈信号是否反馈正确。在性能上，控制信号的转向和加减速延迟是否满足apollo控制性能要求，超调误差是否在线控列表范围内。请开发者根据线控列表内的性能要求，对控制信号进行测试。
+
 ### 2、teleop底盘联调测试
+
 底盘联调测试就是通过将Apollo与车辆进行canbus通信后，测试Apollo下发控制信号（如加速/减速/转向/使能等）是否能够准确控制车辆，测试车辆的底盘反馈信号（如当前踏板百分比反馈/当前转角反馈/使能反馈/接管反馈等）是否与反馈了车辆的实际状态，验证Apollo下发的控制指令，车辆底盘能够准确执行。
 
 #### teleop测试工具介绍
-apollo里为开发者提供了一个teleop的测试工具，在`apollo/modules/canbus/tools/teleop.cc`，在term内输入
+
+apollo里为开发者提供了一个teleop的测试工具，进入apollo容器环境后，执行
 ```
-bash scripts/canbus_teleop.sh
+teleop
 ```
 即可进入teleop界面，如下图所示：
 
 ![teleop](images/vehicle_adaption_tutorial/teleop.png)
 
 按`h`键，可以调出上图所示的帮助界面，可以查询Teleop工具的使用方法，下面简单对teleop各个控制指令介绍下。
+
 ##### Set Action 执行Apollo对车辆的使能控制：
+
 按`m`和`0`键组合，表示执行reset指令，车辆退出自动驾驶模式；
 按`m`和`1`键组合，表示执行start指令，车辆进入自动驾驶模式。
+
 ##### Set Gear 表示设置档位，按`g`和`数字`组合，进行相应档位设置：
+
 按`g`+`0`挂入N档（空挡）；
 按`g`+`1`挂入D档（前进挡）；
 按`g`+`2`挂入R档（倒车档）；
 按`g`+`3`挂入P档（驻车档）；
 其它档位控制指令暂不需要，根据我们DBC要求，一般车辆控制档位指令就这几个。
+
 ##### Throttle/Speed up  表示每次增加油门踏板量2%，车辆加速
+
 按 `w` 键增加油门踏板2%，使车辆加速。如果当前已经执行brake刹车指令，按`w`表示减少刹车踏板量2%。
 油门踏板量的控制范围是0~100%，即100%时相当于油门踏板全部踩下。默认每按`w`键一次，油门踏板量增加2%，这个值开发者可以根据实车测试，进行修改，根据经验，每次变化2%比较合适。
 
 `注意：请先用teleop执行挂D档后再执行加油命令，请在开放场地测试，注意安全`！
+
 ##### Set  Throttle 设置油门踏板百分比
+
 按`t`+`数字`可以直接设置具体的油门踏板百分比，油门踏板可设置的百分比数为0~100。如执行t20，表示直接设置当前油门踏板量为20%，并将刹车踏板百分比置为0，这一点与实际开车逻辑一致，如果踩下油门踏板，就不能踩刹车踏板。
 
 `注意：直接设置油门踏板百分比时，注意每次不要设置太大，开放场地测试，注意安全！请在车辆为D档状态下执行该命令`。
+
 ##### Brake/Speed down 表示每次增加油门踏板量2%，车辆加速
+
 按`s`键增加刹车踏板百分比，使车辆减速。如当前已经执行throttle加速指令，按`s`键表示减少油门踏板百分比。
 
 `注意：请先用teleop执行挂D档后再执行加油命令，请在开放场地测试，注意安全`！
+
 ##### Set Brake 设置刹车踏板百分比
+
 按`b`+`数字`可以直接设置具体的刹车踏板百分比，刹车踏板可设置的百分比数为0~100。如执行b20，表示直接设置当前刹车踏板量为20%，并将油门踏板百分比置为0，这一点与实际开车逻辑一致，如果踩下刹车踏板，就不能踩油门踏板。
 
 `注意：直接设置油门踏板百分比时，注意每次不要设置太大，开放场地测试，注意安全！请在车辆为D档状态下执行该命令`。
+
 ##### Steer LEFT 表示方向盘每次向左转2%
+
 按`a`键表示每次向左转2%的方向盘最大转角，具体转动角度应根据车辆设置的最大方向盘转角乘以2%进行换算。
 该指令执行可以在车辆静止时执行，也可以在车辆启动后执行。
+
 ##### Steer RIGHT表示方向盘每次向右转2%
+
 按`s`键表示每次向右转2%的方向盘最大转角，具体转动角度应根据车辆设置的最大方向盘转角乘以2%进行换算。
 该指令执行可以在车辆静止时执行，也可以在车辆启动后执行。
+
 ##### Parking Brake 打开电子手刹
+
 按`P`键（注意是大写P）可以手动控制车辆电子手刹开关。这个功能根据车辆的是否提供了电子手刹的控制接口而实现。
 
 `注意：执行电子手刹开启或释放时，请将车辆用teleop设置为P档状态`。
+
 ##### Emergency Stop 紧急停车
+
 按`E`键（注意是大写E）可以进行车辆紧急停车，默认执行50%刹车。
 建议开发者在测试时尽量少用此功能，体感差，调试车辆时多注意周围情况。发生突发情况时及时用外接踩刹车踏板的方式进行手动接管车辆。
 
 ### 诊断工具介绍
-了解了teleop的基本操作后，开发者根据相应的指令，对车辆执行具体的控制命令，然后通过Apollo的可视化监控工具`diagnostic.sh（Apollo3.0及以前版本）/cyber_monitor` 进行查看车辆当前的反馈信号，确认控制下发后车辆的执行结果是否正确。
-在Apollo里提供了一个可视化的监控工具，可以用来监控底盘`chassis`和`chassis_detail`信息，通过执行
-```
-bash scripts/diagnostic.sh    //Apollo3.0及以前版本
-cyber_monitor                 //Apollo3.5版本
-```
-在`apollo/modules/canbus/conf/canbus.conf`文件内：
-修改配置`--noenable_chassis_detail_pub`为`--enable_chassis_detail_pub`，表示在打开`chassis_detail`底盘详细信息，即可以查看底盘反馈信号的每一帧报文原始信息。
-修改配置`--receive_guardian`为`--noreceive_guardian`，即可以关闭guardian模式，进入canbus的调试模式，这样teleop时就能够控制车辆了。如下图所示是修改`canbus_conf`配置文件。
-![canbus_conf](images/vehicle_adaption_tutorial/canbus_conf.png)
 
-打开`diagnostic`或`cyber_monitor`界面如下
+了解了teleop的基本操作后，开发者根据相应的指令，对车辆执行具体的控制命令，然后通过Apollo的可视化监控工具`cyber_monitor` 进行查看车辆当前的反馈信号，确认控制下发后车辆的执行结果是否正确。
+在Apollo里提供了一个可视化的监控工具，可以用来监控底盘`chassis`和`chassis_detail`信息，通过执行
+
+```shell
+cyber_monitor
+```
+
+在`/apollo/modules/canbus/conf/canbus.conf`文件内：
+修改配置`--noenable_chassis_detail_pub`为`--enable_chassis_detail_pub`，表示在打开`chassis_detail`底盘详细信息，即可以查看底盘反馈信号的每一帧报文原始信息。
+修改配置`--receive_guardian`为`--noreceive_guardian`，即可以关闭guardian模式，进入canbus的调试模式，这样teleop时就能够控制车辆了。如下所示是修改`canbus_conf`配置文件。
+
+```shell
+--flagfile=/apollo/modules/common/data/global_flagfile.txt
+--canbus_conf_file=/apollo/modules/canbus/conf/canbus_conf.pb.txt
+--load_vehicle_library=/opt/apollo/neo/lib/modules/canbus_vehicle/ge3/libge3_vehicle_factory_lib.so
+--load_vehicle_class_name=Ge3VehicleFactory
+--enable_chassis_detail_pub
+```
+
+打开`cyber_monitor`界面如下
 
 ![cyber_monitor](images/vehicle_adaption_tutorial/cyber_monitor.png)
 

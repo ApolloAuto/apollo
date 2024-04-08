@@ -19,3 +19,12 @@ cc_library(
     visibility = ["//visibility:public"],
     alwayslink = True,
 )
+
+cc_library(
+    name = "third_party_Scan_card_library_Sesd_can_Cesd_can",
+    srcs = glob(["lib/libntcan.so.4"]),
+    hdrs = glob(["include/ntcan.h"]),
+    include_prefix = "esd_can",
+    visibility = ["//visibility:public"],
+    alwayslink = True,
+)

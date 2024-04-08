@@ -50,9 +50,6 @@ void Scubcs1306::Parse(const std::uint8_t* bytes, int32_t length,
       bcs_faultst(bytes, length));
   chassis->mutable_scu_bcs_1_306()->set_bcs_drvmode(
       bcs_drvmode(bytes, length));
-  // newcode
-  chassis->mutable_check_response()->set_is_esp_online(
-      bcs_drvmode(bytes, length) == 3);
 }
 
 // config detail: {'description': 'VDC active status', 'enum': {0:

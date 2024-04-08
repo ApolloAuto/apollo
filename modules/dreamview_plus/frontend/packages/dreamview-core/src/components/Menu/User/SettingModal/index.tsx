@@ -1,10 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Select, Checkbox } from '@dreamview/dreamview-ui';
+import { Modal, Select, Checkbox, useImagePrak } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
+// import CheckBox from 'rc-checkbox';
 import i18next from '@dreamview/dreamview-lang';
-import Logo from '@dreamview/dreamview-core/src/assets/welcome_guide_logov2.png';
 import showModal, { ModalComponentProps } from '../../../../util/modal';
 import useStyle from './useStyle';
+import useLocalStorage from '../../../../util/useLocalStorage';
+
+interface ICheckBox {
+    checked?: boolean;
+    defaultChecked?: boolean;
+}
 
 enum KEY {
     GENERAL = 'general',
@@ -19,7 +25,6 @@ interface ISettingModal {
 function Tabs(props: { tabs: KEY[]; activeKey: string; setActiveKey: (key: KEY) => void }) {
     const { classes, cx } = useStyle();
     const { tabs, activeKey, setActiveKey } = props;
-    // const [active, setActive] = useState(KEY.GENERAL);
     const { t } = useTranslation('personal');
     const onClick = (item: KEY) => {
         setActiveKey(item);
@@ -74,6 +79,7 @@ function General() {
 function About(props: { dremviewVersion: string; dockerVersion: string }) {
     const { classes, cx } = useStyle();
     const { t } = useTranslation('personal');
+    const Logo = useImagePrak('welcome_guide_logov2');
     return (
         <div className={classes.about}>
             <img className={classes.logo} alt='apollo logo' src={Logo} />
@@ -116,6 +122,7 @@ function SettingModal(props: ModalComponentProps & ISettingModal) {
             cancelButtonProps={{ style: { display: 'none' } }}
             okText={t('close')}
             width={962}
+            rootClassName={classes['setting-modal']}
             onCancel={onClose}
             onOk={onClose}
             title={t('globalSetting')}

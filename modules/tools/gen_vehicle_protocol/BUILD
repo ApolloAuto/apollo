@@ -14,10 +14,16 @@ apollo_py_binary(
     srcs = ["gen.py"],
     deps = [
         ":extract_dbc_meta",
+        ":gen_canbus_conf",
         ":gen_proto_file",
         ":gen_protocols",
         ":gen_vehicle_controller_and_manager",
     ],
+)
+
+apollo_py_binary(
+    name = "gen_canbus_conf",
+    srcs = ["gen_canbus_conf.py"],
 )
 
 apollo_py_binary(

@@ -5,6 +5,7 @@ export default function useStyle() {
         'layout-root': {
             position: 'relative',
             height: '100%',
+            marginLeft: '-1px',
         },
     }));
     return hoc();

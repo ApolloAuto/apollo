@@ -8,7 +8,7 @@ const scaleOption = {
         },
     ],
 };
-export const defaultColor = ['#3288FA', '#1FCC4D', '#FF8D26', '#44D7B6', '#FFEC3D', '#B37FEB', '#F75660'];
+
 export const initOptions = ({
     xAxis,
     xAxisFormatter,
@@ -52,7 +52,6 @@ export const initOptions = ({
         bottom?: number; // 设置图表的下边界
     };
 }) => ({
-    color: defaultColor,
     graphic,
     grid: {
         containLabel: true,
@@ -124,43 +123,6 @@ export const initOptions = ({
     dataset,
     series,
     animation: false,
-    tooltip: {
-        position(pos: any, params: any, dom: any, rect: any, size: any) {
-            //  防止tooltip溢出面板后被隐藏
-            const maxLeft = size.viewSize[0] - size.contentSize[0];
-            const minLeft = 0;
-            const posLeft = pos[0];
-            return [Math.max(Math.min(posLeft, maxLeft), minLeft), pos[1]];
-        },
-        trigger: 'axis',
-        formatter(params: any) {
-            const tit = params[0].value?.[0]; // 这里假设第一个数据是标题
-
-            // 自定义标题的样式和内容
-            const formattedTitle = `<div style="font-weight: bold; font-size: 16px;">${tit}</div>`;
-
-            // 以下是示例，您可以根据您的需求自定义 Tooltip 内容
-            const content = params.reduce((result: string, param: any) => {
-                const seriesColor =
-                    series[param.seriesIndex]?.lineStyle?.color || series.color || defaultColor[param.seriesIndex];
-                const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${seriesColor};"></span>`;
-                return `${result}${marker} ${param.seriesName}: ${param.value?.[1] || '-'}<br>`;
-            }, '');
-            return formattedTitle + content;
-        },
-        padding: [
-            10, // 上
-            16, // 右
-            10, // 下
-            16, // 左
-        ],
-        backgroundColor: 'rgba(255,255,255,0.21)',
-        extraCssText: 'box-shadow:  0px 6px 12px 2px rgba(0,0,0,0.1);backdrop-filter: blur(5px);',
-        borderColor: 'transparent',
-        textStyle: {
-            color: 'white',
-        },
-    },
     // 图例
     legend: {
         show: false,

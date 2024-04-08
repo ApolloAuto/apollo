@@ -2,16 +2,8 @@ import * as THREE from 'three';
 import { union } from 'lodash';
 import { MeshLine, MeshLineMaterial } from 'three.meshline';
 import { planningParams } from '../constant/params';
-import {
-    disposeMesh,
-    disposeGroup,
-    drawThickBandFromPoints,
-    compareLineSame,
-    drawCircle,
-    drawArrow,
-} from '../utils/common';
+import { disposeMesh, disposeGroup, drawCircle, drawArrow } from '../utils/common';
 import { drawDashedLineFromPoints, drawSegmentsFromPoints } from '../utils/line';
-import { zOffset } from '../constant/common';
 
 const DEFAULT_WIDTH = planningParams.defaults.width;
 const MIN_INTERVAL = planningParams.minInterval;
@@ -261,16 +253,15 @@ export default class Planning {
         if (!this.pullOverBox) {
             this.pullOverBox = drawPullOverBox(pullOverData);
             this.scene.add(this.pullOverBox);
-        }
-        else {
-             if (isNewDimension) {
+        } else {
+            if (isNewDimension) {
                 disposeGroup(this.pullOverBox);
                 this.scene.remove(this.pullOverBox);
                 // redraw
                 this.pullOverBox = drawPullOverBox(pullOverData);
                 this.scene.add(this.pullOverBox);
-             }
-             this.pullOverBox.visible = true;
+            }
+            this.pullOverBox.visible = true;
         }
         this.lastPullOver = pullOverData;
 

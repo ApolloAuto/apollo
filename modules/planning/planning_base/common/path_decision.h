@@ -26,6 +26,7 @@
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
 
 #include "modules/planning/planning_base/common/indexed_list.h"
+#include "modules/planning/planning_base/common/nudge_info.h"
 #include "modules/planning/planning_base/common/obstacle.h"
 
 namespace apollo {
@@ -65,10 +66,16 @@ class PathDecision {
                          const ReferenceLine &ref_line,
                          const SLBoundary &adc_sl_boundary);
 
+  const NudgeInfo &nudge_info() const;
+  NudgeInfo *mutable_nudge_info();
+
  private:
   IndexedList<std::string, Obstacle> obstacles_;
   MainStop main_stop_;
   double stop_reference_line_s_ = std::numeric_limits<double>::max();
+
+  // nudge info
+  NudgeInfo nudge_info_;
 };
 
 }  // namespace planning

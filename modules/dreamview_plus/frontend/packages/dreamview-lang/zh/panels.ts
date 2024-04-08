@@ -96,6 +96,9 @@ export const panels = {
     zoomIn: '放大',
     zoomOut: '缩小',
     shortCut: '快捷键描述',
-
     exitFullScreen: '退出全屏',
+    // panel map collect
+    mapCollectTitle: '地图采集',
+    mapCollectDescription: '',
+    mapCollectAbilityDesc: '',
 };

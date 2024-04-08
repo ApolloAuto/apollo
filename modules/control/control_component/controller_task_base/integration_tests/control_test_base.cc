@@ -23,6 +23,7 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/file.h"
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/util.h"
 #include "modules/control/control_component/controller_task_base/common/dependency_injector.h"
 
@@ -55,6 +56,7 @@ bool ControlTestBase::test_control() {
 
   // set controller
   control_.injector_ = std::make_shared<DependencyInjector>();
+
   if (!control_.control_task_agent_
            .Init(control_.injector_, control_.control_pipeline_)
            .ok()) {
@@ -65,6 +67,7 @@ bool ControlTestBase::test_control() {
 
   // Pad message
   if (!FLAGS_test_pad_file.empty()) {
+    AINFO << "Into the pad load file.";
     PadMessage pad_message;
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
@@ -77,6 +80,7 @@ bool ControlTestBase::test_control() {
 
   // Localization
   if (!FLAGS_test_localization_file.empty()) {
+    AINFO << "Into the localization load file.";
     LocalizationEstimate localization;
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_localization_file,
@@ -92,6 +96,7 @@ bool ControlTestBase::test_control() {
 
   // Planning
   if (!FLAGS_test_planning_file.empty()) {
+    AINFO << "Into the planning load file.";
     ADCTrajectory trajectory;
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_planning_file, &trajectory)) {
@@ -105,6 +110,7 @@ bool ControlTestBase::test_control() {
 
   // Chassis
   if (!FLAGS_test_chassis_file.empty()) {
+    AINFO << "Into the chassis load file.";
     Chassis chassis;
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
@@ -117,6 +123,7 @@ bool ControlTestBase::test_control() {
 
   // Monitor
   if (!FLAGS_test_monitor_file.empty()) {
+    AINFO << "Into the monitor load file.";
     MonitorMessage monitor_message;
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message)) {
@@ -138,6 +145,7 @@ bool ControlTestBase::test_control() {
     ADEBUG << "control ProduceControlCommand failed";
     return false;
   }
+  AINFO << "Finish the test_control().";
   return true;
 }
 
@@ -153,7 +161,8 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
   const std::string golden_result_file =
       absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
-  std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
+  std::string full_golden_path = FLAGS_test_data_dir + golden_result_file;
+  LoadControllerPlugin();
   control_command_.Clear();
 
   if (!test_control()) {
@@ -190,10 +199,39 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
   return true;
 }
 
+void ControlTestBase::LoadControllerPlugin() {
+  std::string apollo_root_dir_str = "/apollo";
+  // const char* apollo_root_dir = std::getenv("APOLLO_ROOT_DIR");
+  // if (apollo_root_dir != nullptr) {
+  //   apollo_root_dir_str = std::string(apollo_root_dir);
+  // }
+  std::string plugin_lib_path =
+      "APOLLO_PLUGIN_LIB_PATH=" + apollo_root_dir_str +
+      "/bazel-bin:/opt/apollo/neo/lib";
+  std::cout << "plugin_lib_path:" << plugin_lib_path << std::endl;
+  char lib_path_chars[100];
+  memcpy(lib_path_chars, plugin_lib_path.c_str(), plugin_lib_path.size());
+  lib_path_chars[plugin_lib_path.size()] = '\0';
+  std::cout << "lib_path_chars:" << lib_path_chars << std::endl;
+  putenv(lib_path_chars);
+  std::string lat_controller_plugin_xml_file =
+      "/apollo/modules/control/control_component/testdata/conf/plugins/"
+      "lat_based_lqr_controller/plugins.xml";
+  std::string lon_controller_plugin_xml_file =
+      "/apollo/modules/control/control_component/testdata/conf/plugins/"
+      "lon_based_pid_controller/plugins.xml";
+  apollo::cyber::plugin_manager::PluginManager::Instance()->LoadPlugin(
+      lat_controller_plugin_xml_file);
+  apollo::cyber::plugin_manager::PluginManager::Instance()->LoadPlugin(
+      lon_controller_plugin_xml_file);
+}
+
 void ControlTestBase::SetUpTestCase() {
-  FLAGS_control_conf_file =
-      "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
+  FLAGS_pipeline_file =
+      "/apollo/modules/control/control_component/testdata/conf/pipeline.pb.txt";
   FLAGS_is_control_test_mode = true;
+  FLAGS_is_control_ut_test_mode = true;
+  FLAGS_v = 3;
 }
 
 void ControlTestBase::SetUp() { ++s_seq_num_; }

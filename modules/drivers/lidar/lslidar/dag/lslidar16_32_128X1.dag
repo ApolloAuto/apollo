@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------------------------------
 #c16
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
 
     components {
       class_name : "LslidarDriverComponent"
@@ -13,7 +13,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
 
     components {
       class_name : "LslidarConvertComponent"
@@ -26,7 +26,7 @@ module_config {
 }
 
 #module_config {
-#    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
 #    components {
 #      class_name : "CompensatorComponent"
 #      config {
@@ -40,7 +40,7 @@ module_config {
 #----------------------------------------------------------------------------------------------------
 #c32
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
 
     components {
       class_name : "LslidarDriverComponent"
@@ -52,7 +52,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
 
     components {
       class_name : "LslidarConvertComponent"
@@ -65,7 +65,7 @@ module_config {
 }
 
 #module_config {
-#    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
 #    components {
 #      class_name : "CompensatorComponent"
 #      config {
@@ -80,7 +80,7 @@ module_config {
 #----------------------------------------------------------------------------------------------------
 #ch128x1
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
 
     components {
       class_name : "LslidarDriverComponent"
@@ -92,7 +92,7 @@ module_config {
 }
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
 
     components {
       class_name : "LslidarConvertComponent"
@@ -105,7 +105,7 @@ module_config {
 }
 
 #module_config {
-#    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
 #    components {
 #      class_name : "CompensatorComponent"
 #      config {

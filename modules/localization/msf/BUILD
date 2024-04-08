@@ -226,7 +226,7 @@ apollo_cc_test(
     deps = [
         "//cyber",
         "//modules/common/util:common_util",
-        "//modules/localization/msf:msf_localization_component_lib",
+        "//modules/localization/msf:DO_NOT_IMPORT_msf_localization_component",
         "@com_google_googletest//:gtest_main",
     ],
 )

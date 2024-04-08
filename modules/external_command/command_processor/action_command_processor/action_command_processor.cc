@@ -229,6 +229,20 @@ void ActionCommandProcessor::OnCommand(
       cyber::Async(&ActionCommandProcessor::SwitchToAutoMode, this,
                    module_name);
     } break;
+    // Send "ENTER_MISSION" message to planning.
+    case external_command::ActionCommandType::ENTER_MISSION: {
+      planning::PadMessage planning_message;
+      common::util::FillHeader(module_name, &planning_message);
+      planning_message.set_action(planning::PadMessage::ENTER_MISSION);
+      planning_action_writer_->Write(planning_message);
+    } break;
+    // Send "EXIT_MISSION" message to planning.
+    case external_command::ActionCommandType::EXIT_MISSION: {
+      planning::PadMessage planning_message;
+      common::util::FillHeader(module_name, &planning_message);
+      planning_message.set_action(planning::PadMessage::EXIT_MISSION);
+      planning_action_writer_->Write(planning_message);
+    } break;
     // Send "VIN_REQ" message to control.
     default: {
       control::PadMessage control_message;

@@ -54,7 +54,6 @@ apollo_cc_library(
 
 gpu_library(
     name = "dfmb_psroi_align_plugin",
-    mandatory = False,
     srcs = if_rocm(["dfmb_psroi_align_plugin.cu"]),
     hdrs = if_rocm(["dfmb_psroi_align_plugin.h"]),
     deps = [

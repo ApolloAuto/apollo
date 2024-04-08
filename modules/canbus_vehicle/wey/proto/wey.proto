@@ -585,17 +585,6 @@ message Ads3_38e {
   optional RwindshieldwiperType rwindshieldwiper = 13;
 }
 
-// CheckResponseSignal
-message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];
-  optional bool is_epb_online = 2 [default = false];
-  optional bool is_esp_online = 3 [default = false];
-  optional bool is_vtog_online = 4 [default = false];
-  optional bool is_scu_online = 5 [default = false];
-  optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
-}
-
 message Wey {
   optional Ads_shifter_115 ads_shifter_115 = 1;  // control message
   optional Ads_eps_113 ads_eps_113 = 2;          // control message
@@ -611,5 +600,4 @@ message Wey {
   optional Fail_241 fail_241 = 12;               // report message
   optional Fbs3_237 fbs3_237 = 13;               // report message
   optional Ads3_38e ads3_38e = 14;               // control message
-  optional CheckResponseSignal check_response = 100;
 }

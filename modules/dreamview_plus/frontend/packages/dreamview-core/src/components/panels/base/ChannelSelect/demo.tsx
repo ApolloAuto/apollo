@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 // import { DefaultOptionType } from 'antd';
 import ChannelSelect from '.';
@@ -5,10 +6,12 @@ import ChannelSelect from '.';
 import useWebSocketServices from '../../../../services/hooks/useWebSocketServices';
 import { RenderToolbarProps } from '../../type/RenderToolBar';
 import useRegisterNotifyInitialChanel from '../../../../hooks/useRegisterNotifyInitialChanel';
+import { useLocalStorage } from '../../../../util/storageManager';
 
 function DemoChannelSelect(props: RenderToolbarProps) {
     const { panelId, updateChannel } = props;
     const { metadata, isMainConnected } = useWebSocketServices();
+    const localStorageManager = useLocalStorage(`${panelId}-selected-cn`);
     const [curVal, setCurVal] = useState(undefined);
     const curMeta = useMemo(() => metadata.find((meta) => meta.dataName === props.name), [metadata, isMainConnected]);
     const channels = useMemo(() => {
@@ -30,14 +33,23 @@ function DemoChannelSelect(props: RenderToolbarProps) {
             channel: value,
             needChannel: true,
         });
+        localStorageManager.set(value);
     };
 
     useEffect(() => {
         if (channels.length > 0) {
-            setCurVal(channels[0]?.value);
+            const cacheChannel = localStorageManager.get();
+            let cn = channels[0]?.value;
+            for (const channel of channels) {
+                if (cacheChannel === channel.value) {
+                    cn = cacheChannel;
+                    break;
+                }
+            }
+            setCurVal(cn);
             notifyInitialChannel({
                 name: curMeta.dataName,
-                channel: channels[0]?.value,
+                channel: cn,
                 needChannel: true,
             });
         } else {

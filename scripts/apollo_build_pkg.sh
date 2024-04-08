@@ -255,6 +255,14 @@ function run_bazel_build() {
 
   local job_args="-j=$(nproc) -m=0.7"
 
+  # keep the bazel-extend-tools used in core and park consistent
+  if [[ ! -e /opt/apollo/neo/src/tools ]]; then
+    sudo apt install apollo-neo-bazel-extend-tools
+  fi
+  ln -snf /apollo/tools /opt/apollo/neo/src/tools 
+  rm -rf /opt/apollo/neo/packages/bazel-extend-tools/latest/src
+  ln -snf /apollo/tools /opt/apollo/neo/packages/bazel-extend-tools/latest/src 
+
   buildtool build ${CMDLINE_OPTIONS} ${job_args} -p ${build_targets}
 
   [[ $? -ne 0 ]] && error "Build failed!" && exit -1

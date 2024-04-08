@@ -3,7 +3,7 @@ import { useMakeStyle } from '@dreamview/dreamview-theme';
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'panel-module-delay-root': {
-            padding: theme.tokens.padding.speace2,
+            padding: `4px ${theme.tokens.padding.speace2}`,
             height: '100%',
             width: '100%',
         },
@@ -14,7 +14,7 @@ export default function useStyle() {
             display: 'flex',
             ...theme.tokens.typography.content,
             color: theme.tokens.font.color.main,
-            marginBottom: '10px',
+            marginBottom: theme.tokens.margin.speace,
             '&:last-of-type': {
                 marginBottom: 0,
             },

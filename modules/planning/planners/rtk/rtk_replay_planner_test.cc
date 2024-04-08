@@ -31,7 +31,7 @@ namespace planning {
 
 TEST(RTKReplayPlannerTest, ComputeTrajectory) {
   FLAGS_rtk_trajectory_filename =
-      "modules/planning/planning_base/testdata/garage.csv";
+      "modules/planning/planners/rtk/testdata/garage.csv";
   FLAGS_enable_map_reference_unify = false;
   auto injector = std::make_shared<DependencyInjector>();
   RTKReplayPlanner planner;

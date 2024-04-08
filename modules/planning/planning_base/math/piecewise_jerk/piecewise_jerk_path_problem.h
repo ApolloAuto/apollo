@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/planning_base/common/path_boundary.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_problem.h"
 
 namespace apollo {
@@ -53,12 +54,24 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
 
   virtual ~PiecewiseJerkPathProblem() = default;
 
+  void set_extra_constraints(const InterPolatedPointVec& extra_constraints) {
+    extra_constraints_ = extra_constraints;
+  }
+
+  void set_vertex_constraints(const ADCVertexConstraints& vertexs) {
+    vertex_constraints_ = vertexs;
+  }
+
  protected:
   void CalculateKernel(std::vector<c_float>* P_data,
                        std::vector<c_int>* P_indices,
                        std::vector<c_int>* P_indptr) override;
 
   void CalculateOffset(std::vector<c_float>* q) override;
+
+ private:
+  InterPolatedPointVec extra_constraints_;
+  ADCVertexConstraints vertex_constraints_;
 };
 
 }  // namespace planning

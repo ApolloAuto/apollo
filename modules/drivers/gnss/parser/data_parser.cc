@@ -22,14 +22,15 @@
 
 #include "Eigen/Geometry"
 #include "boost/array.hpp"
-#include "cyber/cyber.h"
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/message_util.h"
+
+#include "modules/common_msgs/localization_msgs/imu.pb.h"
 #include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
 #include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
 #include "modules/common_msgs/sensor_msgs/heading.pb.h"
-#include "modules/common_msgs/localization_msgs/imu.pb.h"
 
+#include "cyber/cyber.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
 
@@ -51,16 +52,6 @@ const char *WGS84_TEXT = "+proj=latlong +ellps=WGS84";
 static const boost::array<double, 36> POSE_COVAR = {
     2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,    0, 0, 0, 2, 0, 0, 0,
     0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0, 0.01};
-
-Parser *CreateParser(config::Config config, bool is_base_station = false) {
-  switch (config.data().format()) {
-    case config::Stream::NOVATEL_BINARY:
-      return Parser::CreateNovatel(config);
-
-    default:
-      return nullptr;
-  }
-}
 
 }  // namespace
 
@@ -104,7 +95,7 @@ bool DataParser::Init() {
   gnssstatus_writer_->Write(gnss_status_);
 
   AINFO << "Creating data parser of format: " << config_.data().format();
-  data_parser_.reset(CreateParser(config_, false));
+  data_parser_.reset(Parser::CreateParser(config_));
   if (!data_parser_) {
     AFATAL << "Failed to create data parser.";
     return false;
@@ -121,15 +112,10 @@ void DataParser::ParseRawData(const std::string &msg) {
   }
 
   data_parser_->Update(msg);
-  Parser::MessageType type;
-  MessagePtr msg_ptr;
-
-  while (cyber::OK()) {
-    type = data_parser_->GetMessage(&msg_ptr);
-    if (type == Parser::MessageType::NONE) {
-      break;
-    }
-    DispatchMessage(type, msg_ptr);
+  MessageInfoVec messages;
+  data_parser_->GetMessages(&messages);
+  for (auto &message : messages) {
+    DispatchMessage(message);
   }
 }
 
@@ -175,41 +161,55 @@ void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
   gnssstatus_writer_->Write(gnss_status_);
 }
 
-void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {
-  switch (type) {
-    case Parser::MessageType::GNSS:
+void DataParser::DispatchMessage(const MessageInfo &message_info) {
+  auto &message = message_info.message_ptr;
+  switch (message_info.type) {
+    case MessageType::GNSS:
       CheckGnssStatus(As<::apollo::drivers::gnss::Gnss>(message));
       break;
 
-    case Parser::MessageType::BEST_GNSS_POS:
+    case MessageType::BEST_GNSS_POS:
       PublishBestpos(message);
       break;
 
-    case Parser::MessageType::IMU:
+    case MessageType::IMU:
       PublishImu(message);
       break;
 
-    case Parser::MessageType::INS:
+    case MessageType::INS:
       CheckInsStatus(As<::apollo::drivers::gnss::Ins>(message));
       PublishCorrimu(message);
       PublishOdometry(message);
+
+      // if not has ins_stat message, publish ins_stat from best pose
+      if (!has_ins_stat_message_) {
+        MessagePtr msg_ptr;
+        if (data_parser_->GetInsStat(&msg_ptr)) {
+          auto ins_stat = std::make_shared<InsStat>(*As<InsStat>(msg_ptr));
+          if (ins_stat->has_ins_status()) {
+            common::util::FillHeader("gnss", ins_stat.get());
+            insstat_writer_->Write(ins_stat);
+          }
+        }
+      }
       break;
 
-    case Parser::MessageType::INS_STAT:
+    case MessageType::INS_STAT:
       PublishInsStat(message);
+      has_ins_stat_message_ = true;
       break;
 
-    case Parser::MessageType::BDSEPHEMERIDES:
-    case Parser::MessageType::GPSEPHEMERIDES:
-    case Parser::MessageType::GLOEPHEMERIDES:
+    case MessageType::BDSEPHEMERIDES:
+    case MessageType::GPSEPHEMERIDES:
+    case MessageType::GLOEPHEMERIDES:
       PublishEphemeris(message);
       break;
 
-    case Parser::MessageType::OBSERVATION:
+    case MessageType::OBSERVATION:
       PublishObservation(message);
       break;
 
-    case Parser::MessageType::HEADING:
+    case MessageType::HEADING:
       PublishHeading(message);
       break;
 

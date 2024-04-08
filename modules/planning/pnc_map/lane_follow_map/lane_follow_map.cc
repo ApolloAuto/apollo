@@ -495,7 +495,7 @@ bool LaneFollowMap::GetRouteSegments(
 }
 
 bool LaneFollowMap::GetNearestPointFromRouting(
-    const VehicleState &state, hdmap::LaneWaypoint *waypoint) const {
+    const common::VehicleState &state, hdmap::LaneWaypoint *waypoint) const {
   waypoint->lane = nullptr;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
   const auto point = PointFactory::ToPointENU(state);
@@ -529,7 +529,7 @@ bool LaneFollowMap::GetNearestPointFromRouting(
       }
       double lane_heading = lane->Heading(s);
       if (std::fabs(common::math::AngleDiff(lane_heading, state.heading())) >
-          M_PI_2) {
+          M_PI_2 * 1.5) {
         continue;
       }
     }
@@ -554,7 +554,7 @@ bool LaneFollowMap::GetNearestPointFromRouting(
   for (size_t i = 0; i < valid_way_points.size(); i++) {
     lane_heading = valid_way_points[i].lane->Heading(valid_way_points[i].s);
     if (std::abs(common::math::AngleDiff(lane_heading, vehicle_heading)) >
-        M_PI_2) {
+        M_PI_2 * 1.5) {
       continue;
     }
     if (std::fabs(valid_way_points[i].l) < distance) {

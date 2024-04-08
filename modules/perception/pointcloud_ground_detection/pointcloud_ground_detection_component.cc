@@ -48,10 +48,6 @@ bool PointCloudGroundDetectComponent::Init() {
   ground_detector_init_options.config_file = plugin_param.config_file();
   ACHECK(ground_detector_->Init(ground_detector_init_options))
       << "Failed to init ground detection.";
-
-  roi_cloud_ = base::PointFCloudPool::Instance().Get();
-  roi_world_cloud_ = base::PointDCloudPool::Instance().Get();
-
   return true;
 }
 
@@ -70,19 +66,7 @@ bool PointCloudGroundDetectComponent::Proc(
 bool PointCloudGroundDetectComponent::InternalProc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   auto lidar_frame_ref = message->lidar_frame_;
-  // roi cloud
-  roi_cloud_->CopyPointCloud(*lidar_frame_ref->cloud,
-                             lidar_frame_ref->roi_indices);
-  roi_world_cloud_->CopyPointCloud(*lidar_frame_ref->world_cloud,
-                                   lidar_frame_ref->roi_indices);
-  // original cloud
-  auto original_cloud_ = lidar_frame_ref->cloud;
-  auto original_world_cloud_ = lidar_frame_ref->world_cloud;
-
-  // use roi cloud for ground detection
   PERF_BLOCK("ground_detector")
-  lidar_frame_ref->cloud = roi_cloud_;
-  lidar_frame_ref->world_cloud = roi_world_cloud_;
   GroundDetectorOptions ground_detector_options;
   if (!ground_detector_->Detect(
       ground_detector_options, lidar_frame_ref.get())) {
@@ -90,14 +74,6 @@ bool PointCloudGroundDetectComponent::InternalProc(
     return false;
   }
   PERF_BLOCK_END
-
-  // recover cloud and world_cloud of lidar_frame_ref
-  if (lidar_frame_ref->cloud != original_cloud_) {
-    lidar_frame_ref->cloud = original_cloud_;
-  }
-  if (lidar_frame_ref->world_cloud != original_world_cloud_) {
-    lidar_frame_ref->world_cloud = original_world_cloud_;
-  }
 
   return true;
 }

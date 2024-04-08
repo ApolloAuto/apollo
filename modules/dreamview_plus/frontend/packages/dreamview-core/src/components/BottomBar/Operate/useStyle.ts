@@ -66,7 +66,7 @@ export default function useStyle() {
             flexDirection: 'column',
             marginRight: '28px',
             fontSize: theme.tokens.font.size.large,
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor6,
             '&:hover:not(.disabled)': {
                 color: theme.tokens.font.reactive.mainHover,
                 '& .anticon': {
@@ -84,28 +84,25 @@ export default function useStyle() {
             fontSize: theme.tokens.font.size.sm,
         },
         'operate-success': {
-            '& .dreamview-popover-inner,& .dreamview-popover-arrow::before, & .dreamview-popover-arrow::after': {
-                background: 'rgba(31,204,77,0.25)',
-            },
-            '& .dreamview-popover-arrow::before': {
-                background: 'rgba(31,204,77,0.25)',
+            '&.dreamview-popover .dreamview-popover-content .dreamview-popover-inner': {
+                background: theme.tokens.colors.success4,
             },
             '& .dreamview-popover-arrow::after': {
-                background: 'rgba(31,204,77,0.25)',
+                background: theme.tokens.colors.success4,
             },
             '& .dreamview-popover-content .dreamview-popover-inner .dreamview-popover-inner-content': {
-                color: theme.tokens.colors.success,
+                color: theme.tokens.colors.success3,
             },
         },
         'operate-failed': {
-            '& .dreamview-popover-inner, & .dreamview-popover-arrow::after': {
-                background: 'rgba(255,77,88,0.25)',
+            '&.dreamview-popover .dreamview-popover-content .dreamview-popover-inner': {
+                background: theme.tokens.colors.error4,
             },
             '& .dreamview-popover-arrow::after': {
-                background: 'rgba(255,77,88,0.25)',
+                background: theme.tokens.colors.error4,
             },
             '& .dreamview-popover-content .dreamview-popover-inner .dreamview-popover-inner-content': {
-                color: '#FF4D58',
+                color: theme.tokens.colors.error3,
             },
         },
     }));

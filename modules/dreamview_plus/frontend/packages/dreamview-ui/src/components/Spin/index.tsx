@@ -5,16 +5,17 @@ import LoaderApolloSrc from './loader_apollo.gif';
 
 import './index.less';
 
-export function Spin(props: SpinProps) {
+function SpinWithMemo(props: SpinProps) {
     const { prefixCls: customizePrefixCls, ...rest } = props;
     const prefixCls = getPrefixCls('Spin', customizePrefixCls);
-
     return <InternalSpin prefixCls={prefixCls} {...rest} />;
 }
 
-Spin.propTypes = {};
+export const Spin = React.memo(SpinWithMemo);
 
-Spin.defaultProps = {
+SpinWithMemo.propTypes = {};
+
+SpinWithMemo.defaultProps = {
     indicator: (
         <div className='lds-dual-ring'>
             <img src={LoaderApolloSrc} alt='' />

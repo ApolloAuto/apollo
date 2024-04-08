@@ -7,11 +7,11 @@ import {
     IconIcApolloDeveloperCommunity,
     IconIcSuggest,
     IconIcFaq,
+    useImagePrak,
 } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import packageJson from '@dreamview/dreamview-core/package.json';
-import IconPersonalCenterDefault from '@dreamview/dreamview-core/src/assets/ic_personal_center_default.png';
-import popupFeedbackForm from '@dreamview/dreamview-core/src/util/popupFeedbackForm';
+import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
 import useStyle, { useMenuItemStyle } from './useStyle';
 import showSettingModal from './SettingModal';
 import { CURRENT_MODE, usePickHmiStore } from '../../../store/HmiStore';
@@ -45,13 +45,25 @@ type UserProps = {
     setEnterGuideStateMemo: (currentMode: CURRENT_MODE) => void;
 };
 
+function Divider() {
+    const { classes } = useMakeStyle((theme) => ({
+        'gray-divider': {
+            height: '1px',
+            backgroundColor: theme.tokens.colors.divider2,
+        },
+    }))();
+    return <div className={classes['gray-divider']} />;
+}
+
 function User(props: UserProps) {
     const { setEnterGuideStateMemo } = props;
     const [hmi] = usePickHmiStore();
     const [{ userInfo }] = useUserInfoStore();
     const hasLogin = !!userInfo?.id;
-    const { classes } = useStyle();
+    const { theme } = useThemeContext();
+    const { classes } = useStyle(theme);
     const { t } = useTranslation('personal');
+    const IconPersonalCenterDefault = useImagePrak('ic_personal_center_default');
 
     const { menusSetting, menusProfile } = useMemo(
         () => ({
@@ -143,8 +155,9 @@ function User(props: UserProps) {
                     </div>
                 </>
             )}
-
+            <Divider />
             <MenuItemMemo menus={menusSetting} />
+            <Divider />
             <MenuItemMemo menus={menusProfile} />
         </>
     );

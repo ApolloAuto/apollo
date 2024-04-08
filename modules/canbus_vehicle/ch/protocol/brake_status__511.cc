@@ -46,9 +46,6 @@ void Brakestatus511::Parse(const std::uint8_t* bytes, int32_t length,
       back_bump_env(bytes, length));
   chassis->mutable_brake_status__511()->set_brake_light_actual(
       brake_light_actual(bytes, length));
-
-  chassis->mutable_check_response()->set_is_esp_online(
-      brake_pedal_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'bit': 48, 'enum': {0: 'OVERSPD_ENV_NOENV', 1:

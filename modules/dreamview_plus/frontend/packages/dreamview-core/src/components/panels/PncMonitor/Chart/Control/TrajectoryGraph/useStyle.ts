@@ -4,7 +4,7 @@ export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'moniter-item-container': {
             backgroundColor: '#282D38',
-            color: theme.tokens.colors.fontColor2,
+            color: theme.tokens.colors.fontColor5,
             borderRadius: '6px',
         },
         'moniter-item-title': {

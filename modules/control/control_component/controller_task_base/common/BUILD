@@ -38,6 +38,7 @@ apollo_cc_library(
     deps = [
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/common_msgs/external_command_msgs:command_status_proto",
+        "//modules/control/control_component/proto:control_debug_proto",
     ],
 )
 

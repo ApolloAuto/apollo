@@ -579,9 +579,11 @@ bool HMIWorker::SelectAndReloadMap(const std::string &map_name) {
 void HMIWorker::UpdateModeModulesAndMonitoredComponents() {
   status_.clear_modules();
   status_.clear_modules_lock();
+  previous_modules_lock_.clear();
   for (const auto &iter : current_mode_.modules()) {
     status_.mutable_modules()->insert({iter.first, false});
     status_.mutable_modules_lock()->insert({iter.first, false});
+    previous_modules_lock_.insert({iter.first, false});
   }
 
   // Update monitored components of current mode.
@@ -1852,6 +1854,11 @@ bool HMIWorker::LoadRecords() {
     }
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
+    // Skip format that dv cannot parse: record not ending in record
+    int record_suffix_length = 7;
+    if (record_id.length() - index != record_suffix_length) {
+        continue;
+    }
     if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
       const std::string record_file_path = directory_path + "/" + record_id;
@@ -2120,17 +2127,25 @@ bool HMIWorker::StopDataRecorder() {
   }
 }
 
-bool HMIWorker::SaveDataRecorder(const std::string &new_name) {
+int HMIWorker::SaveDataRecorder(const std::string &new_name) {
+  std::string data_record_default_path =
+      std::string(cyber::common::GetEnv("HOME", "/home/apollo")) +
+      "/.apollo/resources/records/" + FLAGS_data_record_default_name;
+  if (!cyber::common::PathExists(data_record_default_path)) {
+    AERROR << "Failed to save the record, the dreamview recording record does "
+              "not exist, please record through dreamview.";
+    return -2;
+  }
   std::string save_cmd = "/apollo/scripts/record_bag.py --default_name " +
-                          FLAGS_data_record_default_name + " --rename " +
-                          new_name;
+                         FLAGS_data_record_default_name + " --rename " +
+                         new_name;
   int ret = std::system(save_cmd.data());
   if (ret == 0) {
     LoadRecords();
-    return true;
+    return 1;
   } else {
     AERROR << "Failed to save the record, a file with the same name exists";
-    return false;
+    return -1;
   }
 }
 
@@ -2259,6 +2274,21 @@ void HMIWorker::OnTimer(const double& overtime_time) {
           iter.second = false;
         }
       }
+    }
+  }
+  {
+    // When there is a problem with the module and it cannot be opened or
+    // closed, unlock the loading lock state
+    WLock wlock(status_mutex_);
+    auto modules = status_.mutable_modules();
+    auto modules_lock = status_.mutable_modules_lock();
+    for (const auto &iter : current_mode_.modules()) {
+      if (previous_modules_lock_[iter.first] && (*modules_lock)[iter.first] &&
+          !isProcessRunning(iter.second.start_command())) {
+        (*modules)[iter.first] = false;
+        LockModule(iter.first, false);
+      }
+      previous_modules_lock_[iter.first] = (*modules_lock)[iter.first];
     }
   }
 }
@@ -2414,20 +2444,20 @@ bool HMIWorker::StopPlayRtkRecorder() {
   }
 }
 
-bool HMIWorker::SaveRtkDataRecorder(const std::string &new_name) {
+int HMIWorker::SaveRtkDataRecorder(const std::string &new_name) {
   std::string new_rtk_record_file =
       FLAGS_default_rtk_record_path + new_name + ".csv";
   if (cyber::common::PathExists(new_rtk_record_file)) {
     AERROR << "Failed to save the ret record, a file with the same name exists";
-    return false;
+    return -1;
   }
   if (std::rename(FLAGS_default_rtk_record_file.data(),
                   new_rtk_record_file.data()) == 0) {
     UpdateRtkRecordToStatus(new_name);
-    return true;
+    return 1;
   } else {
     AERROR << "Failed to save the ret record, save command execution failed";
-    return false;
+    return -3;
   }
 }
 
@@ -2518,6 +2548,26 @@ bool HMIWorker::StopScenarioSimulation() {
   (*status_.mutable_other_components())["ScenarioSimulation"].set_message(
       "FATAL");
   return true;
+}
+
+bool HMIWorker::isProcessRunning(const std::string &process_name) {
+  std::stringstream commandStream;
+  commandStream << "pgrep -f " << process_name;
+  std::string command = commandStream.str();
+
+  FILE *fp = popen(command.c_str(), "r");
+  if (fp) {
+    char result[128];
+    if (fgets(result, sizeof(result), fp) != nullptr) {
+      AINFO << process_name << " is running";
+      pclose(fp);
+      return true;
+    } else {
+      AINFO << process_name << " is not running";
+    }
+    pclose(fp);
+  }
+  return false;
 }
 
 }  // namespace dreamview

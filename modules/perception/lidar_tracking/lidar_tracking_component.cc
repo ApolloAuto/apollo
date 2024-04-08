@@ -49,19 +49,19 @@ bool LidarTrackingComponent::Init() {
   tracker_init_options.config_file = multi_target_tracker_param.config_file();
   ACHECK(multi_target_tracker_->Init(tracker_init_options));
 
-  // fused classifier init
-  auto fusion_classifier_param = comp_config.fusion_classifier_param();
-  std::string fusion_classifier_name = fusion_classifier_param.name();
-  fusion_classifier_ =
-      BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name);
-  CHECK_NOTNULL(fusion_classifier_);
+  // // fused classifier init
+  // auto fusion_classifier_param = comp_config.fusion_classifier_param();
+  // std::string fusion_classifier_name = fusion_classifier_param.name();
+  // fusion_classifier_ =
+  //     BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name);
+  // CHECK_NOTNULL(fusion_classifier_);
 
-  ClassifierInitOptions fusion_classifier_init_options;
-  fusion_classifier_init_options.config_path =
-      fusion_classifier_param.config_path();
-  fusion_classifier_init_options.config_file =
-      fusion_classifier_param.config_file();
-  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
+  // ClassifierInitOptions fusion_classifier_init_options;
+  // fusion_classifier_init_options.config_path =
+  //     fusion_classifier_param.config_path();
+  // fusion_classifier_init_options.config_file =
+  //     fusion_classifier_param.config_file();
+  // ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
   return true;
 }
 
@@ -109,15 +109,15 @@ bool LidarTrackingComponent::InternalProc(
   }
   PERF_BLOCK_END
 
-  // fused classifer
-  PERF_BLOCK("fusion_classifier")
-  ClassifierOptions fusion_classifier_options;
-  if (!fusion_classifier_->Classify(fusion_classifier_options,
-                                    lidar_frame.get())) {
-    AERROR << "Lidar tracking, fusion_classifier_ Classify error.";
-    return false;
-  }
-  PERF_BLOCK_END
+  // // fused classifer
+  // PERF_BLOCK("fusion_classifier")
+  // ClassifierOptions fusion_classifier_options;
+  // if (!fusion_classifier_->Classify(fusion_classifier_options,
+  //                                   lidar_frame.get())) {
+  //   AERROR << "Lidar tracking, fusion_classifier_ Classify error.";
+  //   return false;
+  // }
+  // PERF_BLOCK_END
 
   // get out_message
   out_message->hdmap_ = lidar_frame->hdmap_struct;

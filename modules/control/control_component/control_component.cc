@@ -55,12 +55,15 @@ bool ControlComponent::Init() {
 
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
-  if (!FLAGS_use_control_submodules &&
-      !control_task_agent_.Init(injector_, control_pipeline_).ok()) {
-    // set controller
-    ADEBUG << "original control";
-    monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
-    return false;
+  if (!FLAGS_is_control_ut_test_mode) {
+    if (!FLAGS_use_control_submodules &&
+        !control_task_agent_.Init(injector_, control_pipeline_).ok()) {
+      // set controller
+      ADEBUG << "original control";
+      monitor_logger_buffer_.ERROR(
+          "Control init controller failed! Stopping...");
+      return false;
+    }
   }
 
   cyber::ReaderConfig chassis_reader_config;
@@ -297,6 +300,9 @@ Status ControlComponent::ProduceControlCommand(
     control_command->set_throttle(0);
     control_command->set_brake(FLAGS_soft_estop_brake);
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
+    previous_steering_command_ =
+        injector_->previous_control_command_mutable()->steering_target();
+    control_command->set_steering_target(previous_steering_command_);
   }
   // check signal
   if (local_view_.trajectory().decision().has_vehicle_signal()) {
@@ -313,6 +319,7 @@ bool ControlComponent::Proc() {
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
   if (chassis_msg == nullptr) {
     AERROR << "Chassis msg is not ready!";
+    injector_->set_control_process(false);
     return false;
   }
   OnChassis(chassis_msg);
@@ -337,12 +344,13 @@ bool ControlComponent::Proc() {
     ADEBUG << "Planning command status msg is \n"
            << planning_command_status_.ShortDebugString();
   }
-  injector_->Set_planning_command_status(planning_command_status_);
+  injector_->set_planning_command_status(planning_command_status_);
 
   localization_reader_->Observe();
   const auto &localization_msg = localization_reader_->GetLatestObserved();
   if (localization_msg == nullptr) {
     AERROR << "localization msg is not ready!";
+    injector_->set_control_process(false);
     return false;
   }
   OnLocalization(localization_msg);
@@ -400,8 +408,11 @@ bool ControlComponent::Proc() {
   if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
       (start_time - init_time_).ToSecond() > FLAGS_control_test_duration) {
     AERROR << "Control finished testing. exit";
+    injector_->set_control_process(false);
     return false;
   }
+
+  injector_->set_control_process(true);
 
   ControlCommand control_command;
 
@@ -472,6 +483,9 @@ bool ControlComponent::Proc() {
 
   // save current control command
   injector_->Set_pervious_control_command(&control_command);
+  injector_->previous_control_command_mutable()->CopyFrom(control_command);
+  injector_->previous_control_debug_mutable()->CopyFrom(
+      injector_->control_debug_info());
 
   control_cmd_writer_->Write(control_command);
   return true;

@@ -34,15 +34,19 @@ apollo::perception::onboard::TrafficLightDetectComponent
 
 #### Input
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Input channal |
+| ------- | --------------------------------------------------- | -------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Detection |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/Detection`. The detailed input channel information is in `modules/perception/traffic_light_detection/dag/traffic_light_detection.dag` file. By default, the upstream components of the messages received by the component include `traffic_light_region_proposal`.
 
 #### Output
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Output channal |
+| ------- | --------------------------------------------------- | -------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Retection |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/traffic_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/traffic_light_detection/conf/traffic_light_detection_config.pb.txt` file.
 
 #### How to Launch
 

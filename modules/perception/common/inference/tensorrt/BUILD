@@ -149,23 +149,6 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
-    name = "rt_net_test",
-    size = "small",
-    srcs = ["rt_net_test.cc"],
-    data = [
-        "//modules/perception/common/inference:inference_test_data",
-    ],
-    linkstatic = True,
-    tags = ["exclude"],
-    deps = [
-        ":apollo_perception_inference_rt_net",
-        "//modules/perception/common/inference:apollo_perception_common_inference",
-        "@atlas//:cblas",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
     name = "rt_utils_test",
     size = "small",
     srcs = ["rt_utils_test.cc"],

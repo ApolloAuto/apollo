@@ -24,17 +24,21 @@ Convert the SensorFrameMessage to PerceptionObstacles.
 
 apollo::perception::lidar::LidarOutputComponent
 
-#### 输入
+#### Input
 
-| Name      | Type                                              | Description          |
-| --------- | ------------------------------------------------- | -------------------- |
-| `message` | `apollo::perception::onboard::SensorFrameMessage` | sensor frame message |
+| Name      | Type                                              | Description          | Input channal |
+| --------- | ------------------------------------------------- | -------------------- | ------------- |
+| `message` | `apollo::perception::onboard::SensorFrameMessage` | sensor frame message | /perception/inner/PrefusedObjects |
 
-#### 输出
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/PrefusedObjects`. The detailed input channel information is in `modules/perception/lidar_output/dag/lidar_output.dag` file.
 
-| Name          | Type                                               | Description                  |
-| ------------- | -------------------------------------------------- | ---------------------------- |
-| `out_message` | `apollo::perception::onboard::PerceptionObstacles` | /apollo/perception/obstacles |
+#### Output
+
+| Name          | Type                                               | Description                  | Output channal |
+| ------------- | -------------------------------------------------- | ---------------------------- | -------------- |
+| `out_message` | `apollo::perception::onboard::PerceptionObstacles` | lidar output message         | /apollo/perception/obstacles |
+
+>Note: The output channel is proto type data. The upstream and downstream components will be started in different processes and can receive the message normally. The detailed output channel information is in `modules/perception/lidar_output/conf/lidar_output_config.pb.txt` file.
 
 #### How to use
 

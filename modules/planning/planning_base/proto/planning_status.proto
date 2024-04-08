@@ -81,6 +81,10 @@ message PathDeciderStatus {
   optional bool is_in_path_lane_borrow_scenario = 2 [default = false];
   // Blocking obstacle id in front of the vehicle
   optional string front_static_obstacle_id = 3 [default = ""];
+  // If vehicle left borrow
+  optional bool left_borrow = 4 [default = false];
+  // If vehicle right borrow
+  optional bool right_borrow = 5 [default = false];
 }
 
 message PullOverStatus {
@@ -152,6 +156,28 @@ message YieldSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
+message LaneFollowStatus {
+  // Is lane follow ok
+  optional bool lane_follow_block = 1 [default = false];
+  // Blocking obstacle id in front of the vehicle
+  optional string block_obstacle_id = 2 [default = ""];
+  // Last block time
+  optional double last_block_timestamp = 3 [default = 0];
+  // Duration of block
+  optional double block_duration = 4 [default = 0];
+}
+
+message LaneBorrowStatus {
+  // Is lane borrow ok
+  optional bool lane_borrow_block = 1 [default = false];
+  // Blocking obstacle id in front of the vehicle
+  optional string block_obstacle_id = 2 [default = ""];
+  // Last block time
+  optional double last_block_timestamp = 3 [default = 0];
+  // Duration of block
+  optional double block_duration = 4 [default = 0];
+}
+
 // note: please keep this one as minimal as possible. do NOT pollute it.
 message PlanningStatus {
   optional ChangeLaneStatus change_lane = 2;
@@ -169,4 +195,6 @@ message PlanningStatus {
   optional StopSignStatus stop_sign = 14;
   optional TrafficLightStatus traffic_light = 15;
   optional YieldSignStatus yield_sign = 16;
+  optional LaneFollowStatus lane_follow = 17;
+  optional LaneBorrowStatus lane_borrow = 18;
 }

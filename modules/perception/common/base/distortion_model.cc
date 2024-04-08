@@ -34,6 +34,9 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
   // tangential distortion coefficients
   const float p1 = distort_params_[2];
   const float p2 = distort_params_[3];
+  const float k4 = distort_params_[5];
+  const float k5 = distort_params_[6];
+  const float k6 = distort_params_[7];
 
   Eigen::Vector2f pt2d_img;
   // normalized
@@ -50,7 +53,8 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
 
   // radial distortion
   pt2d_img = pt_normalized *
-             (1 + k1 * r_squared + k2 * r_to_the_4th + k3 * r_to_the_6th);
+             (1 + k1 * r_squared + k2 * r_to_the_4th + k3 * r_to_the_6th) /
+             (1 + k4 * r_squared + k5 * r_to_the_4th + k6 * r_to_the_6th);
 
   // tangential distortion
   pt2d_img[0] += 2 * p1 * x_mul_y + p2 * (r_squared + 2 * x_mul_x);
@@ -79,29 +83,50 @@ BrownCameraDistortionModel::get_camera_model() {
 
 bool BrownCameraDistortionModel::set_params(size_t width, size_t height,
                                             const Eigen::VectorXf& params) {
-  if (params.size() != 14) {
-    return false;
+  // Brown distortion model
+  if (params.size() == 14) {
+    width_ = width;
+    height_ = height;
+    intrinsic_params_(0, 0) = params(0);
+    intrinsic_params_(0, 1) = params(1);
+    intrinsic_params_(0, 2) = params(2);
+    intrinsic_params_(1, 0) = params(3);
+    intrinsic_params_(1, 1) = params(4);
+    intrinsic_params_(1, 2) = params(5);
+    intrinsic_params_(2, 0) = params(6);
+    intrinsic_params_(2, 1) = params(7);
+    intrinsic_params_(2, 2) = params(8);
+
+    distort_params_[0] = params[9];
+    distort_params_[1] = params[10];
+    distort_params_[2] = params[11];
+    distort_params_[3] = params[12];
+    distort_params_[4] = params[13];
+    return true;
+  } else if (params.size() == 17) {
+    width_ = width;
+    height_ = height;
+    intrinsic_params_(0, 0) = params(0);
+    intrinsic_params_(0, 1) = params(1);
+    intrinsic_params_(0, 2) = params(2);
+    intrinsic_params_(1, 0) = params(3);
+    intrinsic_params_(1, 1) = params(4);
+    intrinsic_params_(1, 2) = params(5);
+    intrinsic_params_(2, 0) = params(6);
+    intrinsic_params_(2, 1) = params(7);
+    intrinsic_params_(2, 2) = params(8);
+
+    distort_params_[0] = params[9];
+    distort_params_[1] = params[10];
+    distort_params_[2] = params[11];
+    distort_params_[3] = params[12];
+    distort_params_[4] = params[13];
+    distort_params_[5] = params[14];
+    distort_params_[6] = params[15];
+    distort_params_[7] = params[16];
+    return true;
   }
-
-  width_ = width;
-  height_ = height;
-  intrinsic_params_(0, 0) = params(0);
-  intrinsic_params_(0, 1) = params(1);
-  intrinsic_params_(0, 2) = params(2);
-  intrinsic_params_(1, 0) = params(3);
-  intrinsic_params_(1, 1) = params(4);
-  intrinsic_params_(1, 2) = params(5);
-  intrinsic_params_(2, 0) = params(6);
-  intrinsic_params_(2, 1) = params(7);
-  intrinsic_params_(2, 2) = params(8);
-
-  distort_params_[0] = params[9];
-  distort_params_[1] = params[10];
-  distort_params_[2] = params[11];
-  distort_params_[3] = params[12];
-  distort_params_[4] = params[13];
-
-  return true;
+  return false;
 }
 
 }  // namespace base

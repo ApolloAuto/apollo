@@ -16,6 +16,7 @@ limitations under the License.
 #include "modules/canbus_vehicle/ge3/ge3_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
@@ -683,9 +684,8 @@ void Ge3Controller::ResetProtocol() { message_manager_->ResetSendMessages(); }
 bool Ge3Controller::CheckChassisError() {
   Ge3 chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO ge3 vehicle info."
-                      << chassis_detail.DebugString();
+  if (!chassis_.has_check_response()) {
+    AERROR_EVERY(100) << "ChassisDetail has NO ge3 vehicle info.";
     return false;
   }
 
@@ -818,19 +818,19 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
+      is_eps_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_eps_online() &&
+                      chassis_.check_response().is_eps_online();
       check_ok = check_ok && is_eps_online;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
+      is_vcu_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_vcu_online() &&
+                      chassis_.check_response().is_vcu_online();
+      is_esp_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_esp_online() &&
+                      chassis_.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
     if (check_ok) {

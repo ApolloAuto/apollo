@@ -161,7 +161,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
     frame->world_cloud->mutable_points_height()->at(point_indices_temp_[i]) =
         z_distance;
     if (algorithm::IAbs(z_distance) > ground_thres_) {
-      non_ground_indices.indices.push_back(point_indices_temp_[i]);
+      non_ground_indices.indices.push_back(i);
     } else {
       frame->cloud->mutable_points_label()->at(point_indices_temp_[i]) =
           static_cast<uint8_t>(LidarPointLabel::GROUND);

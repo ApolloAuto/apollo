@@ -32,6 +32,9 @@ DECLARE_double(prediction_test_duration);
 
 DECLARE_string(prediction_offline_bags);
 DECLARE_int32(prediction_offline_mode);
+DECLARE_bool(enable_multi_agent_pedestrian_evaluator);
+DECLARE_bool(enable_multi_agent_vehicle_evaluator);
+DECLARE_bool(prediction_eval_mode);
 DECLARE_bool(enable_multi_thread);
 DECLARE_int32(max_thread_num);
 DECLARE_int32(max_caution_thread_num);

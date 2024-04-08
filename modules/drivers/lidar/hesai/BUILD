@@ -21,7 +21,7 @@ apollo_component(
     hdrs = ["parser/hesai_convert_component.h",],
     deps = [
         ":hesai_convert_component",
-        "//modules/drivers/lidar/hesai/driver:hesai_component",
+        "//modules/drivers/lidar/hesai/driver:hesai_component"
     ],
 )
 

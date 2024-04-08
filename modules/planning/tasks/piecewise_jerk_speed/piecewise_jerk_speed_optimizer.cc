@@ -18,7 +18,7 @@
  * @file piecewise_jerk_fallback_speed.cc
  **/
 
-#include "modules/planning/tasks/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
+#include <algorithm>
 
 #include <string>
 #include <utility>
@@ -30,6 +30,7 @@
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
+#include "modules/planning/tasks/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -73,6 +74,13 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
 
   std::array<double, 3> init_s = {0.0, st_graph_data.init_point().v(),
                                   st_graph_data.init_point().a()};
+  const auto& vehicle_state = frame_->vehicle_state();
+  if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
+    init_s[1] = std::max(-init_s[1], 0.0);
+    init_s[2] = -init_s[2];
+    AINFO << "transfer reverse speed" << init_s[0] << "," << init_s[1] << ","
+          << init_s[2];
+  }
   double delta_t = 0.1;
   double total_length = st_graph_data.path_length();
   double total_time = st_graph_data.total_time_by_conf();
@@ -100,8 +108,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
-          s_upper_bound = std::fmin(s_upper_bound,
-                                    s_upper - config_.follow_distance_buffer());
+          s_upper_bound = std::fmin(s_upper_bound, s_upper);
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);

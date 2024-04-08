@@ -29,7 +29,7 @@ namespace hdmap {
 namespace {
 
 // Minimum error in lane segmentation.
-constexpr double kSegmentationEpsilon = 0.2;
+constexpr double kSegmentationEpsilon = 0.5;
 }  // namespace
 
 const std::string &RouteSegments::Id() const { return id_; }

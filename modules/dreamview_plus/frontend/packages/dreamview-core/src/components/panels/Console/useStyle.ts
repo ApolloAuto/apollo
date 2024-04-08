@@ -3,7 +3,7 @@ import { useMakeStyle } from '@dreamview/dreamview-theme';
 export default function useStyle() {
     const hoc = useMakeStyle((theme) => ({
         'panel-console-root': {
-            padding: theme.tokens.padding.speace2,
+            padding: `4px ${theme.tokens.padding.speace2}`,
             height: '100%',
             width: '100%',
         },
@@ -12,15 +12,15 @@ export default function useStyle() {
         },
         'panel-console-monitor': {
             display: 'flex',
-            marginBottom: '10px',
+            marginBottom: theme.tokens.margin.speace,
             '&:last-of-type': {
                 marginBottom: '0',
             },
         },
         'panel-console-monitor-icon': {
             display: 'flex',
-            marginTop: '2px',
-            fontSize: theme.tokens.font.size.large,
+            marginTop: '-1px',
+            fontSize: theme.components.panelConsole.iconFontSize,
         },
         'panel-console-monitor-text': {
             marginLeft: theme.tokens.margin.speace,
@@ -33,13 +33,13 @@ export default function useStyle() {
         },
         'panel-console-monitor-item': {},
         error: {
-            color: theme.tokens.colors.error,
+            color: theme.tokens.colors.error2,
         },
         info: {
-            color: theme.tokens.colors.brand2,
+            color: theme.tokens.colors.brand3,
         },
         warn: {
-            color: theme.tokens.colors.warn,
+            color: theme.tokens.colors.warn2,
         },
     }));
     return hoc();

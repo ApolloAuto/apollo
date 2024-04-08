@@ -28,7 +28,7 @@ apollo_cc_test(
     size = "small",
     srcs = ["static_transform_component_test.cc"],
     deps = [
-        ":static_transform_component_lib",
+        ":DO_NOT_IMPORT_static_transform_component",
         "@com_google_googletest//:gtest_main",
     ],
 )

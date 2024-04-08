@@ -83,6 +83,7 @@ class GnnBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
  protected:
   std::vector<int> row_tag_;
   std::vector<int> col_tag_;
+  std::vector<int> ignore_track_;
 };  // class GnnBipartiteGraphMatcher
 
 }  // namespace lidar

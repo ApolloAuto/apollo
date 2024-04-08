@@ -45,7 +45,7 @@ apollo_component(
     name = "libpointcloud_map_based_roi_component.so",
     srcs = ["pointcloud_map_based_roi_component.cc"],
     hdrs = ["pointcloud_map_based_roi_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         ":apollo_perception_pointcloud_map_based_roi",

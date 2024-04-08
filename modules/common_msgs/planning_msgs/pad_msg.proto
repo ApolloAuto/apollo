@@ -16,6 +16,10 @@ message PadMessage {
     STOP = 4;
     RESUME_CRUISE = 5;
     CLEAR_PLANNING = 6;
+    // Enter mission model
+    ENTER_MISSION = 7;
+    // Exit mission model
+    EXIT_MISSION = 8;
   };
 
   // driving action

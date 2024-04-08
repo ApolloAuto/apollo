@@ -140,7 +140,9 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     signal_debug->set_light_id(traffic_light_overlap.object_id);
     signal_debug->set_light_stop_s(traffic_light_overlap.start_s);
 
-    if (signal_color == perception::TrafficLight::GREEN) {
+    // mayaochang add
+    if (signal_color == perception::TrafficLight::GREEN ||
+        signal_color == perception::TrafficLight::BLACK) {
       continue;
     }
 
@@ -153,7 +155,8 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     // build stop decision
     ADEBUG << "BuildStopDecision: traffic_light["
            << traffic_light_overlap.object_id << "] start_s["
-           << traffic_light_overlap.start_s << "]";
+           << traffic_light_overlap.start_s << "]"
+           << "stop_distance: " << config_.stop_distance();
     std::string virtual_obstacle_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const std::vector<std::string> wait_for_obstacles;

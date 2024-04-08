@@ -500,7 +500,7 @@ def gen_protocols(protocol_conf_file, protocol_dir, protocol_template_dir):
 
             else:
                 print("Unknown protocol_type:%s" % protocol["protocol_type"])
-        gen_build_file(car_type, protocol_dir, protocol_template_dir)
+        # gen_build_file(car_type, protocol_dir, protocol_template_dir)
 
 
 def gen_esd_can_extended(str):
@@ -509,7 +509,7 @@ def gen_esd_can_extended(str):
     """
     int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
-    int_id |= 0x20000000
+    # int_id |= 0x20000000
     str = hex(int_id).replace('0x', '')
     return str
 

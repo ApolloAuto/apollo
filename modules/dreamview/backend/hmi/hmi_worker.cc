@@ -1387,6 +1387,11 @@ bool HMIWorker::LoadRecords() {
     }
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
+    // Skip format that dv cannot parse: record not ending in record
+    int record_suffix_length = 7;
+    if (record_id.length() - index != record_suffix_length) {
+        continue;
+    }
     if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
       // compatible records with dv and dv_plus

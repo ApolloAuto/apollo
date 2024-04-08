@@ -28,6 +28,7 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"
@@ -71,6 +72,10 @@ class LaneFollowMap : public PncMapBase {
    */
   hdmap::LaneInfoConstPtr GetLaneById(const hdmap::Id &id) const override;
 
+  bool GetNearestPointFromRouting(
+      const common::VehicleState &state,
+      apollo::hdmap::LaneWaypoint *waypoint) const override;
+
  private:
   /**
    * @brief Check if the command can be processed by this map.
@@ -97,9 +102,6 @@ class LaneFollowMap : public PncMapBase {
    *   an index in range [0, route_indices.size());
    */
   int GetWaypointIndex(const apollo::hdmap::LaneWaypoint &waypoint) const;
-
-  bool GetNearestPointFromRouting(const common::VehicleState &point,
-                                  apollo::hdmap::LaneWaypoint *waypoint) const;
 
   bool PassageToSegments(routing::Passage passage,
                          apollo::hdmap::RouteSegments *segments) const;

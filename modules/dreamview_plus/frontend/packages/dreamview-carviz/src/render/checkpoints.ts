@@ -7,9 +7,12 @@ export default class Checkpoints {
 
     private meshs;
 
-    constructor(scene) {
+    private colors: any = {};
+
+    constructor(scene, colors?) {
         this.scene = scene;
         this.meshs = [];
+        this.colors = colors?.colorMapping || colorMapping;
     }
 
     dispose() {
@@ -33,7 +36,7 @@ export default class Checkpoints {
     }
 
     private drawCheckpoint(checkpoint) {
-        const color = checkpoint.isMidway ? colorMapping.MIDWAY : colorMapping.END;
+        const color = checkpoint.isMidway ? this.colors.MIDWAY : this.colors.END;
         const points = checkpoint.region;
         const mesh = drawPolygon(points, {
             color,

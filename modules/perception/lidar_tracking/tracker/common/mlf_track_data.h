@@ -147,6 +147,17 @@ class MlfTrackData : public TrackData {
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
 
+  void GetLatestKObjects(size_t k, std::vector<TrackedObjectPtr>* objects);
+
+  void GetLatestKObjects(size_t k,
+    std::vector<TrackedObjectConstPtr>* objects) const;
+
+  void GetObjectsInIntervalByOrder(double time,
+    std::vector<TrackedObjectConstPtr>* objects);
+
+  void GetObjectsInIntervalByOrder(double time,
+    std::vector<TrackedObjectConstPtr>* objects) const;
+
  public:
   typedef std::map<double, TrackedObjectPtr> TimedObjects;
   std::map<std::string, TimedObjects> sensor_history_objects_;

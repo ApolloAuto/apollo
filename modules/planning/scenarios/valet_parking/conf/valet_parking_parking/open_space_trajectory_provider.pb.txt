@@ -17,7 +17,7 @@ open_space_trajectory_optimizer_config {
         grid_a_star_xy_resolution: 0.25
         node_radius: 0.2
         astar_max_search_time: 20
-        desired_result_num: 1000
+        desired_explored_num: 1000
     }
     dual_variable_warm_start_config {
         weight_d: 1.0

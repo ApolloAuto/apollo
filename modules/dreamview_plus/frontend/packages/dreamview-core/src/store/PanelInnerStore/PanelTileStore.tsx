@@ -24,7 +24,7 @@ export function PanelTileProvider(props: React.PropsWithChildren<PanelTileProvid
     const contextValue = useMemo(
         () => ({
             eventEmitter: new EventEmitter(),
-            onBeforeClosePanel: (callback: () => void) => {
+            onBeforeClosePanel: (callback: () => Promise<any>) => {
                 setBeforeCloseFunc(() => callback);
             },
             onClosePanel: () => {
@@ -35,7 +35,11 @@ export function PanelTileProvider(props: React.PropsWithChildren<PanelTileProvid
                         })
                         .catch(() => {
                             console.log('panel closed cancelled');
-                        });
+                        }).finally(
+                            () => {
+                                mosaicActions.remove(path);
+                            },
+                    );
                 } else {
                     mosaicActions.remove(path);
                 }

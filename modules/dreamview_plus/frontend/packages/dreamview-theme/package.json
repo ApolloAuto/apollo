@@ -1,6 +1,6 @@
 {
   "name": "@dreamview/dreamview-theme",
-  "version": "1.0.2",
+  "version": "1.2.1",
   "description": "themes of dreamview",
   "author": "adu-sim",
   "homepage": "",
@@ -10,6 +10,10 @@
     "test": "__tests__"
   },
   "files": [
+    "drak",
+    "light",
+    "tokens",
+    "createStyles.tsx",
     "main.ts"
   ],
   "publishConfig": {
@@ -17,21 +21,20 @@
   },
   "scripts": {
     "test": "node ./__tests__/frontend.test.js",
-    "generate:types": "node -r esm ./scripts/generateType.js",
     "pub": "npm publish"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.0",
-    "@dreamview/log": "1.0.1",
-    "@dreamview/tslint-config-dreamview": "1.0.1",
+    "@dreamview/log": "1.1.4",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@types/react-dom": "^18.2.4",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@dreamview/eslint-config-dreamview": "1.0.1",
-    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@dreamview/eslint-config-dreamview": "1.1.4",
+    "@dreamview/tslint-config-dreamview": "1.1.4",
     "@types/react-dom": "^18.2.4",
     "circular-dependency-plugin": "^5.2.2",
     "esbuild-loader": "^3.0.1",

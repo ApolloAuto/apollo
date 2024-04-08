@@ -21,3 +21,4 @@ RUN bash /opt/apollo/installers/install_contrib_deps.sh
 
 RUN bash /opt/apollo/installers/install_release_deps.sh
 RUN bash /opt/apollo/installers/post_install.sh ${BUILD_STAGE}
+RUN bash /opt/apollo/installers/install_rsdriver.sh

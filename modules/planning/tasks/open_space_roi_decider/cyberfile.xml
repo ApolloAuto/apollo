@@ -11,6 +11,7 @@
     <author>Apollo</author>
     <depend>bazel-extend-tools</depend>
     <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+    <depend type="binary" repo_name="planning-open-space">planning-open-space</depend>
     
     <builder>bazel</builder>
   </package>

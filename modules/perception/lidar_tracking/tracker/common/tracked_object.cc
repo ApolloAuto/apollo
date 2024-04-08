@@ -36,7 +36,8 @@ TrackedObject::TrackedObject(base::ObjectPtr obj_ptr,
 void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
                                  const Eigen::Affine3d& pose,
                                  const Eigen::Vector3d& global_to_local_offset,
-                                 const base::SensorInfo& sensor) {
+                                 const base::SensorInfo& sensor,
+                                 double timestamp) {
   if (obj_ptr) {
     // all state of input obj_ptr will not change except cloud world
     object_ptr = obj_ptr;
@@ -55,6 +56,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     lane_direction = direction;
     size = object_ptr->size.cast<double>();
     type = object_ptr->type;
+    type_probs = object_ptr->type_probs;
     is_background = object_ptr->lidar_supplement.is_background;
 
     base::PointDCloud& cloud_world = (object_ptr->lidar_supplement).cloud_world;
@@ -87,6 +89,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     output_size = size;
 
     sensor_info = sensor;
+    this->timestamp = timestamp;
   }
 }
 
@@ -126,6 +129,7 @@ void TrackedObject::Reset() {
   lane_direction = Eigen::Vector3d::Zero();
   size = Eigen::Vector3d::Zero();
   type = base::ObjectType::UNKNOWN;
+  type_probs.assign(static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.0f);
   is_background = false;
   shape_features.clear();
   shape_features_full.clear();
@@ -165,13 +169,14 @@ void TrackedObject::Reset() {
 
   // sensor info reset
   sensor_info.Reset();
+  timestamp = 0.0;
 }
 
 void TrackedObject::Reset(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
                           const Eigen::Vector3d& global_to_local_offset,
-                          const base::SensorInfo& sensor) {
+                          const base::SensorInfo& sensor, double timestamp) {
   Reset();
-  AttachObject(obj_ptr, pose, global_to_local_offset, sensor);
+  AttachObject(obj_ptr, pose, global_to_local_offset, sensor, timestamp);
 }
 
 void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
@@ -209,7 +214,8 @@ void TrackedObject::ToObject(base::ObjectPtr obj) const {
   // obj size_varuance not calculate in tracker, keep default
   obj->anchor_point = belief_anchor_point;
   obj->type = type;
-  // obj type_probs not calculate in tracker, keep default
+  // obj type_probs calculate in tracker
+  obj->type_probs = type_probs;
   // obj confidence not calculate in tracker, keep default
   obj->track_id = track_id;
   obj->velocity = output_velocity.cast<float>();

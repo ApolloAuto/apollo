@@ -97,7 +97,8 @@ def _install_action(
         rename = {},
         warn_foreign = True,
         py_runfiles = False,
-        py_runfiles_path = None):
+        py_runfiles_path = None,
+        plugin = False):
     """Compute install action for a single file.
 
     This takes a single file artifact and returns the appropriate install
@@ -147,7 +148,17 @@ def _install_action(
                 continue
             else:
                 target_name = i
-    return struct(src = artifact, dst = file_dest, target_name = target_name)
+    package_path = "None"
+    if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
+        package_path = ctx.attr.package_path 
+    if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
+        install_type = ctx.attr.type
+    else:
+        install_type = "NONE" 
+    if plugin:
+        install_type = "neo"
+    return struct(src = artifact, dst = file_dest, 
+        target_name = target_name, package_path = package_path, type = install_type)
 
 #------------------------------------------------------------------------------
 def _install_actions(
@@ -316,15 +327,15 @@ def _install_runtime_actions(ctx, target):
 #------------------------------------------------------------------------------
 # Generate install code for an install action.
 def _install_code(action, ctx):
-    if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
-        if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
+    if hasattr(action, "type") and action.type != "NONE":
+        if hasattr(action, "package_path") and action.package_path != "NONE":
             if action.target_name != None:
                 return "install(%r, %r, %r, %r, %r, %r)" % (
-                    action.src.short_path, action.dst, ctx.attr.type,
-                    ctx.attr.package_path, "export_library", action.target_name)
+                    action.src.short_path, action.dst, action.type,
+                    action.package_path, "export_library", action.target_name)
             else: 
                 return "install(%r, %r, %r, %r)" % (
-                    action.src.short_path, action.dst, ctx.attr.type, ctx.attr.package_path)
+                    action.src.short_path, action.dst, action.type, action.package_path)
         else:
             fail("Dont't run the install target which is not auto generated!")
     else:
@@ -334,8 +345,8 @@ def _install_code(action, ctx):
 # Generate install code for an install_src action.
 def _install_src_code(action, ctx):
     # print(action.src.short_path)
-    if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
-        return "install_src(%r, %r, %r, %r)" % (action.src.short_path, action.dst, action.filter, ctx.attr.type)
+    if hasattr(action, "type") and action.type != "NONE":
+        return "install_src(%r, %r, %r, %r)" % (action.src.short_path, action.dst, action.filter, action.type)
     return "install_src(%r, %r, %r)" % (action.src.short_path, action.dst, action.filter)
 
 #BEGIN rules
@@ -643,7 +654,10 @@ def _install_src_files_impl(ctx):
     actions = []
     for a in _depset_to_list(src_dir):
         for b in _depset_to_list(a.files):
-            actions.append(struct(src = b, dst = dest, filter = filter))
+            if hasattr(ctx.attr, "type"):
+                actions.append(struct(src = b, dst = dest, filter = filter, type = ctx.attr.type))
+            else:
+                actions.append(struct(src = b, dst = dest, filter = filter))
 
     # Collect install actions from dependencies.
     for d in ctx.attr.deps:
@@ -665,9 +679,16 @@ def _install_src_files_impl(ctx):
     )
 
     # Return actions.
-    files = ctx.runfiles(
-        files = [a.src for a in actions],
-    )
+    files = []
+    for a in actions:
+        if "__DO_NOT_INSTALL__" in a.src.short_path:
+            continue
+        else:
+            files.append(a.src)
+    files = ctx.runfiles(files)
+    # files = ctx.runfiles(
+    #     files = [a.src for a in actions],
+    # )
     return [
         InstallInfo(
             install_actions = actions,
@@ -723,7 +744,7 @@ def _install_plugin_so_action(ctx, target):
     rename = dict(ctx.attr.rename)
 
     src = _depset_to_list(target.files)[0]
-    return _install_action(ctx, src, dest, strip_prefix, rename = rename)
+    return _install_action(ctx, src, dest, strip_prefix, rename = rename, plugin = True)
 
 # TODO(liangjinping): merge with _install_action
 def _install_plugin_description_action(ctx, target):

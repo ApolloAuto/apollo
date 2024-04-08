@@ -7,9 +7,9 @@ import {
     IconRefresh,
     IconIcUseRetry,
     IconIcDownloading as IconIcDownload,
+    Popover,
 } from '@dreamview/dreamview-ui';
 import { ENUM_DOWNLOAD_STATUS } from '@dreamview/dreamview-core/src/services/api/types';
-import Popover from '@dreamview/dreamview-core/src/components/CustomPopover';
 import useStyle from './useStyle';
 
 interface IRenderDownLoadStatus {

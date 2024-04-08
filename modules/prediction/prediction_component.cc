@@ -276,6 +276,35 @@ bool PredictionComponent::PredictionEndToEndProc(
   // Publish output
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
   prediction_writer_->Write(prediction_obstacles);
+
+  if (FLAGS_prediction_eval_mode) {
+    for (auto const& prediction_obstacle :
+          prediction_obstacles.prediction_obstacle()) {
+      AINFO << "prediction_eval_log (info): "
+            << std::to_string(prediction_obstacle.timestamp()) << ", "
+            << prediction_obstacle.perception_obstacle().id() << ", "
+            << prediction_obstacle.priority().priority() << ", "
+            << prediction_obstacle.perception_obstacle().type() << ", "
+            << std::to_string(
+              prediction_obstacle.perception_obstacle().position().x())
+            << ", " << std::to_string(
+              prediction_obstacle.perception_obstacle().position().y());
+
+      if (prediction_obstacle.trajectory_size() != 0) {
+        for (auto const& trajectory : prediction_obstacle.trajectory()) {
+          for (auto const& trajectory_point : trajectory.trajectory_point()) {
+            AINFO << "prediction_eval_log (traj): "
+                  << std::to_string(prediction_obstacle.timestamp()) << ", "
+                  << prediction_obstacle.perception_obstacle().id() << ", "
+                  << std::to_string(trajectory_point.path_point().x()) << ", "
+                  << std::to_string(trajectory_point.path_point().y());
+          }
+          break;
+        }
+      }
+    }
+  }
+
   return true;
 }
 

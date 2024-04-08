@@ -92,6 +92,11 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
         std::min(front_static_obstacle_cycle_counter, 0));
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
         std::max(front_static_obstacle_cycle_counter - 1, -10));
+    if (mutable_path_decider_status->front_static_obstacle_cycle_counter() <
+        -2) {
+      std::string id = " ";
+      mutable_path_decider_status->set_front_static_obstacle_id(id);
+    }
   }
   if (!MakeObjectDecision(path_data, blocking_obstacle_id, path_decision)) {
     const std::string msg = "Failed to make decision based on tunnel";

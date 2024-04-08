@@ -19,13 +19,13 @@ filegroup(
 apollo_cc_library(
     name = "apollo_perception_traffic_light_recognition",
     srcs = [
-        "recognition/classify.cc",
-        "recognition/recognition.cc",
+        "recognition/caffe_recognizer/classify.cc",
+        "recognition/caffe_recognizer/recognition.cc",
     ],
     hdrs = [
         "interface/base_traffic_light_recognitor.h",
-        "recognition/classify.h",
-        "recognition/recognition.h",
+        "recognition/caffe_recognizer/classify.h",
+        "recognition/caffe_recognizer/recognition.h",
     ],
     copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
@@ -37,7 +37,7 @@ apollo_cc_library(
         "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/traffic_light_recognition/proto:trafficlights_recognition_component_cc_proto",
-        "//modules/perception/traffic_light_recognition/recognition/proto:model_param_cc_proto",
+        "//modules/perception/traffic_light_recognition/recognition/caffe_recognizer/proto:model_param_cc_proto",
     ],
 )
 

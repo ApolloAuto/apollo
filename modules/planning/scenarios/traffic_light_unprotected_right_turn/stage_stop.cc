@@ -105,7 +105,7 @@ StageResult TrafficLightUnprotectedRightTurnStageStop::Process(
     return FinishStage(true);
   }
 
-  if (!traffic_light_no_right_turn_on_red) {
+  if (traffic_light_no_right_turn_on_red) {
     if (traffic_light_all_stop && !traffic_light_all_green) {
       // check distance pass stop line
       const double distance_adc_pass_stop_line =
@@ -133,6 +133,8 @@ StageResult TrafficLightUnprotectedRightTurnStageStop::Process(
         }
       }
     }
+  } else {
+    return FinishStage(false);
   }
 
   return result.SetStageStatus(StageStatusType::RUNNING);
@@ -145,14 +147,21 @@ bool TrafficLightUnprotectedRightTurnStageStop::
   if (!traffic_light_ptr) {
     return false;
   }
-
+  ADEBUG << "Stop when right turn: Begin to check!";
   const auto& signal = traffic_light_ptr->signal();
   for (int i = 0; i < signal.sign_info_size(); i++) {
     if (signal.sign_info(i).type() == hdmap::SignInfo::NO_RIGHT_TURN_ON_RED) {
+      ADEBUG << "Stop reason when right turn: NO_RIGHT_TURN_ON_RED";
       return true;
     }
   }
-
+  for (auto& subsignal : signal.subsignal()) {
+    if (subsignal.type() == hdmap::Subsignal::ARROW_RIGHT) {
+        ADEBUG << "Stop reason when right turn:: ARROW_RIGHT";
+        return true;
+    }
+  }
+  ADEBUG << "Stop when right turn: no stop";
   return false;
 }
 

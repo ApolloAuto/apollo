@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@//tools:apollo_package.bzl", "apollo_cc_library")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_extra_copts")
 load("@local_config_rocm//rocm:build_defs.bzl", "rocm_extra_copts")
 
@@ -64,17 +65,9 @@ def gpu_default_copts():
 
 def gpu_library(mandatory = True, copts = [], **kwargs):
     if mandatory:
-        cc_library(copts = gpu_default_copts() + copts, linkstatic = True, **kwargs)
-        cc_binary(
-            name = "lib{}.so".format(kwargs["name"]),
-            deps = [":{}".format(kwargs["name"])],
-            linkshared = True,
-            linkstatic = True,
-            visibility = ["//visibility:public"],
-            tags = ["export_library", kwargs["name"]],
-        )
+        apollo_cc_library(copts = gpu_default_copts() + copts, linkstatic = True, **kwargs)
     else:
-        cc_library(copts = gpu_default_copts() + copts, **kwargs)
+        native.cc_library(copts = gpu_default_copts() + copts, **kwargs)
 
 def cuda_library(**kwargs):
     gpu_library(**kwargs)

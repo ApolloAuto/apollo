@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning_base/integration_tests/planning_test_base.h"
+#include "modules/planning/planning_component/integration_tests/planning_test_base.h"
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -164,44 +164,10 @@ void PlanningTestBase::SetUp() {
       << FLAGS_test_planning_config_file;
 
   ACHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
-
-  if (!FLAGS_test_previous_planning_file.empty()) {
-    const auto prev_planning_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
-    ADCTrajectory prev_planning;
-    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
-    planning_->last_publishable_trajectory_.reset(
-        new PublishableTrajectory(prev_planning));
-  }
-  for (int i = 0;
-       i < static_cast<int>(planning_->traffic_decider_.rule_list_.size());
-       i++) {
-    auto rulename = planning_->traffic_decider_.rule_list_[i]->Getname();
-    if (!rule_enabled_.count(rulename))
-      planning_->traffic_decider_.rule_list_.erase(
-          planning_->traffic_decider_.rule_list_.begin() + i);
-  }
 }
 
 void PlanningTestBase::UpdateData() {
   ACHECK(FeedTestData()) << "Failed to feed test data";
-
-  if (!FLAGS_test_previous_planning_file.empty()) {
-    const auto prev_planning_file =
-        FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
-    ADCTrajectory prev_planning;
-    ACHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
-    planning_->last_publishable_trajectory_.reset(
-        new PublishableTrajectory(prev_planning));
-  }
-  for (int i = 0;
-       i < static_cast<int>(planning_->traffic_decider_.rule_list_.size());
-       i++) {
-    auto rulename = planning_->traffic_decider_.rule_list_[i]->Getname();
-    if (!rule_enabled_.count(rulename))
-      planning_->traffic_decider_.rule_list_.erase(
-          planning_->traffic_decider_.rule_list_.begin() + i);
-  }
 }
 
 void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
@@ -303,16 +269,6 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
     }
   }
   return true;
-}
-
-std::shared_ptr<TrafficRule> PlanningTestBase::GetTrafficRuleConfig(
-    const std::string& rule_id) {
-  for (auto& config : planning_->traffic_decider_.rule_list_) {
-    if (config->Getname() == rule_id) {
-      return config;
-    }
-  }
-  return nullptr;
 }
 
 }  // namespace planning

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_split_down</title>
+    <g id="ic_split_down" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="16" height="16"></rect>
+        <path d="M2,15 C1.44771525,15 1,14.5522847 1,14 L1,2 C1,1.44771525 1.44771525,1 2,1 L14,1 C14.5522847,1 15,1.44771525 15,2 L15,14 C15,14.5522847 14.5522847,15 14,15 L2,15 Z M10.151,2 L2,2 L2,14 L10.151,14 L10.151,2 Z M14,2 L11.151,2 L11.151,14 L14,14 L14,2 Z" id="形状结合" fill="#A6B5CC" fill-rule="nonzero" transform="translate(8.000000, 8.000000) rotate(-270.000000) translate(-8.000000, -8.000000) "></path>
+    </g>
+</svg>

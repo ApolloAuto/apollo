@@ -21,27 +21,33 @@ export default function useStyle() {
         },
         'panel-thumbnail': {
             width: '204px',
-            padding: '12px 12px 14px 12px',
+            padding: '0 12px',
             ...theme.util.flex('column'),
             '& .panel-thumbnail-image': {
                 width: '180px',
                 height: '135px',
                 marginBottom: '8px',
                 borderRadius: '6px',
-                backgroundColor: '#181A1F',
+                backgroundColor: theme.tokens.colors.background3,
                 backgroundImage: 'cover',
                 backgroundSize: '180px 135px',
                 backgroundRepeat: 'no-repeat',
             },
             '& .panel-thumbnail-title': {
                 alignSelf: 'flex-start',
-                color: theme.tokens.colors.fontColor2,
+                color: theme.tokens.colors.fontColor6,
                 ...theme.tokens.typography.content,
             },
             '& .panel-thumbnail-description': {
                 alignSelf: 'flex-start',
-                color: theme.tokens.colors.fontColor3,
+                color: theme.tokens.colors.fontColor4,
                 ...theme.tokens.typography.sideText,
+            },
+        },
+
+        'panel-thumbnail-popover': {
+            '& .dreamview-popover-inner': {
+                padding: '0px',
             },
         },
     }));

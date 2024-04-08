@@ -35,15 +35,19 @@ apollo::perception::onboard::TrafficLightRecognComponent
 
 #### Input
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Input channal |
+| ------- | --------------------------------------------------- | -------------------- | ------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Retection |
+
+>Note: The input channel is structure type data. The default trigger channel is `/perception/inner/Retection`. The detailed input channel information is in `modules/perception/traffic_light_recognition/dag/traffic_light_recognition.dag` file. By default, the upstream components of the messages received by the component include `traffic_light_detection`.
 
 #### Output
 
-| Name    | Type                                                | Description          |
-| ------- | --------------------------------------------------- | -------------------- |
-| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+| Name    | Type                                                | Description          | Output channal |
+| ------- | --------------------------------------------------- | -------------------- | -------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message | /perception/inner/Tracking |
+
+>Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/traffic_inner_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/traffic_light_recognition/conf/traffic_light_recognition_config.pb.txt` file.
 
 #### How to Launch
 

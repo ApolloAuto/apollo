@@ -1,0 +1,264 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/common_msgs/control_msgs/control_cmd.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/control/control_component/proto/check_status.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
+
+message ControlDebugInfo {
+  optional apollo.common.Header header = 1;
+  optional SimpleLongitudinalPlusDebug simple_lon_debug = 2;
+  optional SimpleLateralPlusDebug simple_lat_debug = 3;
+  optional SimpleMPCPlusDebug simple_mpc_debug = 4;
+  optional SimpleAntiSlopeDebug simple_anti_slope_debug = 5;
+  optional CleaningSafetyCheckDebug cleaning_safety_check_debug = 6;
+}
+
+message SimpleLongitudinalPlusDebug {
+  optional double station_reference = 1;
+  optional double station_error = 2;
+  optional double station_error_limited = 3;
+  optional double preview_station_error = 4;
+  optional double speed_reference = 5;
+  optional double speed_error = 6;
+  optional double speed_controller_input_limited = 7;
+  optional double preview_speed_reference = 8;
+  optional double preview_speed_error = 9;
+  optional double preview_acceleration_reference = 10;
+  optional double acceleration_cmd_closeloop = 11;
+  optional double acceleration_cmd = 12;
+  optional double acceleration_lookup = 13;
+  optional double speed_lookup = 14;
+  optional double calibration_value = 15;
+  optional double throttle_cmd = 16;
+  optional double brake_cmd = 17;
+  optional bool is_full_stop = 18;
+  optional double slope_offset_compensation = 19;
+  optional double current_station = 20;
+  optional double path_remain = 21;
+  optional int32 pid_saturation_status = 22;
+  optional int32 leadlag_saturation_status = 23;
+  optional double speed_offset = 24;
+  optional double current_speed = 25;
+  optional double acceleration_reference = 26;
+  optional double current_acceleration = 27;
+  optional double acceleration_error = 28;
+  optional double jerk_reference = 29;
+  optional double current_jerk = 30;
+  optional double jerk_error = 31;
+  optional apollo.common.TrajectoryPoint current_matched_point = 32;
+  optional apollo.common.TrajectoryPoint current_reference_point = 33;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 34;
+  optional double acceleration_lookup_limit = 35;
+  optional double vehicle_pitch = 36;
+  optional bool is_epb_brake = 37;
+  optional double current_steer_interval = 38;
+  optional bool is_wait_steer = 39;
+  optional bool is_stop_reason_by_destination = 40;
+  optional bool is_stop_reason_by_prdestrian = 41;
+  optional bool is_full_stop_soft = 42;
+  optional string control_task_name = 43;
+  optional double path_remain_add = 44;
+  optional double max_path_remain_when_stopped = 45;
+  optional bool form_go_to_full_stop = 46;
+  optional bool begin_end_brake = 47;
+  optional double hillup_fullstop_brake_rate = 48;
+}
+
+message SimpleLateralPlusDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 18;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 19;
+
+  optional double ref_heading_rate = 20;
+  optional double heading_rate = 21;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 22;
+  optional double heading_acceleration = 23;
+  optional double heading_error_acceleration = 24;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 25;
+  optional double heading_jerk = 26;
+  optional double heading_error_jerk = 27;
+
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
+  optional double lateral_error_feedback = 28;
+  optional double heading_error_feedback = 29;
+
+  // current planning target point
+  optional apollo.common.TrajectoryPoint current_target_point = 30;
+
+  // Augmented feedback control term in addition to LQR control
+  optional double steer_angle_feedback_augment = 31;
+
+  // Mrac control status and feedback states for steer control
+  optional MracDebug steer_mrac_debug = 32;
+  optional bool steer_mrac_enable_status = 33;
+
+  // lat acc in ENU, in m/s^2
+  optional double lateral_centripetal_acceleration = 34;
+  optional string control_task_name = 35;
+  optional ControlCheckDebug lat_control_check_debug = 36;
+  optional double efai_rate = 37;
+  optional double ed_rate = 38;
+}
+
+message SimpleMPCPlusDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+  optional double station_reference = 18;
+  optional double station_error = 19;
+  optional double speed_reference = 20;
+  optional double speed_error = 21;
+  optional double acceleration_reference = 22;
+  optional bool is_full_stop = 23;
+  optional double station_feedback = 24;
+  optional double speed_feedback = 25;
+  optional double acceleration_cmd_closeloop = 26;
+  optional double acceleration_cmd = 27;
+  optional double acceleration_lookup = 28;
+  optional double speed_lookup = 29;
+  optional double calibration_value = 30;
+  optional double steer_unconstrained_control_diff = 31;
+  optional double steer_angle_feedforward_compensation = 32;
+  repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 35;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 36;
+
+  optional double ref_heading_rate = 37;
+  optional double heading_rate = 38;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 39;
+  optional double heading_acceleration = 40;
+  optional double heading_error_acceleration = 41;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 42;
+  optional double heading_jerk = 43;
+  optional double heading_error_jerk = 44;
+
+  optional double acceleration_feedback = 45;
+  optional double acceleration_error = 46;
+  optional double jerk_reference = 47;
+  optional double jerk_feedback = 48;
+  optional double jerk_error = 49;
+
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
+  optional double lateral_error_feedback = 50;
+  optional double heading_error_feedback = 51;
+  // Augmented feedback control term in addition to MPC control
+  optional double steer_angle_feedback_augment = 52;
+  optional apollo.common.TrajectoryPoint current_matched_point = 53;
+  optional apollo.common.TrajectoryPoint current_reference_point = 54;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 55;
+  optional double preview_station_error = 56;
+  optional double preview_speed_reference = 57;
+  optional double preview_speed_error = 58;
+  optional double preview_acceleration_reference = 59;
+  optional double vehicle_pitch = 60;
+  optional double slope_offset_compensation = 61;
+  optional double path_remain = 62;
+  optional double acceleration_lookup_offset = 63;
+  optional double acceleration_vrf = 64;
+  optional string control_task_name = 65;
+}
+
+message ControlCheckDebug {
+  optional ControlCheckStatus lateral_error_check_result = 1;
+  optional uint32 lateral_error_check_e_count = 2;
+  optional uint32 lateral_error_check_w_count = 3;
+  optional ControlCheckStatus heading_error_check_result = 4;
+  optional uint32 heading_error_check_e_count = 5;
+  optional uint32 heading_error_check_w_count = 6;
+  optional ControlCheckStatus station_error_check_result = 7;
+  optional uint32 station_error_check_e_count = 8;
+  optional uint32 station_error_check_w_count = 9;
+  optional ControlCheckStatus speed_error_check_result = 10;
+  optional uint32 speed_error_check_e_count = 11;
+  optional uint32 speed_error_check_w_count = 12;
+  optional double lateral_error_e = 13;
+  optional double lateral_error_w = 14;
+}
+
+message SimpleAntiSlopeDebug {
+  optional int32 hill_start_window = 1;
+  optional int32 preview_length = 2;
+  optional double quit_hill_start_speed = 3;
+  optional double normal_start_tartget_acc = 4;
+  optional bool in_hill_start_condition = 5;
+  optional bool in_normal_start_condition = 6;
+  optional double hill_start_acc_gain_rate = 7;
+  optional double normal_start_acc_gain_rate = 8;
+  optional bool on_obstacle = 9;
+  optional bool from_else_to_auto = 10;
+  optional bool previous_is_auto = 11;
+  optional double anti_cmd_brake = 12;
+  optional double anti_cmd_throttle = 13;
+  optional bool uphill_too_fast = 14;
+  optional bool only_use_brk_downhill = 15;
+  optional bool erase_brk_in_go = 16;
+  optional bool erase_brk_in_end = 17;
+}
+
+message CleaningSafetyCheckDebug {
+  optional string control_task_name = 1;
+  optional bool is_need_post_command = 2;
+  optional ControlCheckDebug cleaning_control_check_debug = 3;
+  optional apollo.common.TrajectoryPoint current_predicted_end_point = 4;
+  repeated apollo.common.TrajectoryPoint predicted_trajectory_point = 5;
+  optional bool is_predicted_collsion = 6;
+  optional apollo.perception.PerceptionEdgeInfo edge_info = 7;
+  optional double post_process_throttle_cmd = 8;
+  optional double post_process_brake_cmd = 9;
+}

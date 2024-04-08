@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { colorMapping, zOffset } from '../constant/common';
+import { zOffset } from '../constant/common';
 
 export function drawDashedLineFromPoints(points, lineAttr) {
     const {
@@ -66,7 +66,7 @@ export function drawSegmentsFromPoints(points, lineAttr) {
     return mesh;
 }
 
-export function drawLaneMesh(laneType, points) {
+export function drawLaneMesh(laneType, points, colorMapping) {
     let left = null;
     let right = null;
     switch (laneType) {

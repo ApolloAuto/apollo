@@ -38,20 +38,22 @@
 
 namespace apollo {
 namespace perception {
-namespace onboard {
+namespace trafficlight {
 
+using apollo::perception::onboard::TrafficDetectMessage;
+using apollo::perception::onboard::TransformWrapper;
 using apollo::transform::Buffer;
 
 class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
  public:
   /**
    * @brief Construct a new traffic lights perception component object.
-   * 
+   *
    */
   TrafficLightsPerceptionComponent() = default;
   /**
    * @brief Destroy the traffic lights perception component object.
-   * 
+   *
    */
   ~TrafficLightsPerceptionComponent() = default;
 
@@ -62,9 +64,9 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   /**
    * @brief Initialize configuration files, algorithm plug-ins,
             callback functions and create listening channels.
-   * 
-   * @return true 
-   * @return false 
+   *
+   * @return true
+   * @return false
    */
   bool Init() override;
 
@@ -72,7 +74,6 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   int InitConfig();
   int InitAlgorithmPlugin();
   int InitCameraListeners();
-  int InitCameraFrame();
 
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image> image,
                       const std::string& camera_name);
@@ -80,15 +81,15 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   bool QueryPoseAndSignals(const double ts, camera::CarPose* pose,
                            std::vector<apollo::hdmap::Signal>* signals);
 
-  bool VerifyLightsProjection(const double& ts,
-                              const trafficlight::TLPreprocessorOption& option,
-                              const std::string& camera_name,
-                              camera::CameraFrame* image_lights,
-                              TrafficDetectMessage* msg);
+  bool VerifyLightsProjection(
+      const double& ts, const trafficlight::TLPreprocessorOption& option,
+      const std::string& camera_name,
+      std::shared_ptr<camera::TrafficLightFrame> image_lights,
+      std::shared_ptr<TrafficDetectMessage> msg);
 
   bool UpdateCameraSelection(double timestamp,
                              const trafficlight::TLPreprocessorOption& option,
-                             camera::CameraFrame* frame);
+                             std::shared_ptr<camera::TrafficLightFrame> frame);
 
   bool CheckCameraImageStatus(double timestamp, double interval,
                               const std::string& camera_name);
@@ -104,6 +105,8 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
       std::vector<base::TrafficLightPtr>* traffic_lights);
 
  private:
+  std::shared_ptr<camera::DataProvider> GetDataProvider(
+      const std::string& camera_name);
   std::mutex mutex_;
 
   std::shared_ptr<trafficlight::BaseTLPreprocessor> preprocessor_;
@@ -154,13 +157,6 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   bool enable_undistortion_ = false;
   camera::DataProvider::InitOptions data_provider_init_options_;
 
-  // pre-allocated-mem data_provider; camera_id -> data_provider
-  std::map<std::string, std::shared_ptr<camera::DataProvider>>
-      data_providers_map_;
-
-  // image
-  std::shared_ptr<camera::CameraFrame> frame_;
-
   // proc
   ::google::protobuf::RepeatedPtrField<apollo::hdmap::Curve> stoplines_;
 
@@ -170,6 +166,6 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
 
 CYBER_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
 
-}  // namespace onboard
+}  // namespace trafficlight
 }  // namespace perception
 }  // namespace apollo

@@ -80,13 +80,22 @@ class ControlInfo(object):
         self.acceleration_lookup = []
         self.speed_lookup = []
         self.calibration_value = []
-        self.acc_lon = []
+        self.acc_localization = []
+        self.lon_acceleration = []
+
+        self.vehicle_pitch = []
 
         self.throttlecmd = []
         self.canbus_throttlefbk = []
         self.brakecmd = []
         self.canbus_brakefbk = []
         self.gear_location = []
+        self.canbus_parking_brake = []
+        self.parking_brakecmd = []
+
+        self.is_eps_online = []
+        self.is_esp_online = []
+        self.is_vcu_online = []
 
         self.is_full_stop = []
         self.is_full_stop_soft = []
@@ -128,6 +137,10 @@ class ControlInfo(object):
         self.mode_time = []
         self.gear_mode_time = []
 
+        self.total_time_ms = []
+        self.controller_time_ms = []
+        self.total_time_exceeded = []
+
         self.planningavailable = False
 
         self.carx = []
@@ -140,6 +153,7 @@ class ControlInfo(object):
         self.planning_pathv = []
         self.planningx = []
         self.planningy = []
+        self.is_replan = []
         self.i = 0
         self.drivingAction = []
         self.numpoints_sum = []
@@ -165,6 +179,7 @@ class ControlInfo(object):
         self.planningtime.append(entity.header.timestamp_sec)
         self.trajectory_type.append(entity.trajectory_type)
         self.trajectory_gear.append(entity.gear)
+        self.is_replan.append(entity.is_replan)
 
         numpoints = len(entity.trajectory_point)
         self.numpoints_sum.append(numpoints)
@@ -192,6 +207,10 @@ class ControlInfo(object):
         self.canbus_speed.append(entity.speed_mps)
         self.canbustime.append(entity.header.timestamp_sec)
         self.gear_location.append(entity.gear_location)
+        self.canbus_parking_brake.append(entity.parking_brake)
+        self.is_eps_online.append(entity.check_response.is_eps_online)
+        self.is_esp_online.append(entity.check_response.is_esp_online)
+        self.is_vcu_online.append(entity.check_response.is_vcu_online)
 
         if entity.gear_location == 1:
             self.gear_mode_time.append(entity.header.timestamp_sec)
@@ -218,7 +237,7 @@ class ControlInfo(object):
         acc_x = entity.pose.linear_acceleration.x
         acc_y = entity.pose.linear_acceleration.y
         acc = acc_x * math.cos(heading_angle) + acc_y * math.sin(heading_angle)
-        self.acc_lon.append(acc)
+        self.acc_localization.append(acc)
         self.carx.append(entity.pose.position.x)
         self.cary.append(entity.pose.position.y)
         self.cartime.append(entity.header.timestamp_sec)
@@ -230,7 +249,9 @@ class ControlInfo(object):
         self.throttlecmd.append(entity.throttle)
         self.brakecmd.append(entity.brake)
         self.steercmd.append(entity.steering_target)
+        self.parking_brakecmd.append(entity.parking_brake)
         self.controltime.append(entity.header.timestamp_sec)
+        self.total_time_ms.append(entity.latency_stats.total_time_ms)
 
         self.acceleration_lookup.append(
             entity.debug.simple_lon_debug.acceleration_lookup)
@@ -263,12 +284,14 @@ class ControlInfo(object):
         self.speed_offset.append(entity.debug.simple_lon_debug.speed_offset)
         self.speed_controller_input_limited.append(
             entity.debug.simple_lon_debug.speed_controller_input_limited)
-
         self.speed_reference.append(
             entity.debug.simple_lon_debug.speed_reference)
         self.current_speed.append(
             entity.debug.simple_lon_debug.speed_reference -
             entity.debug.simple_lon_debug.speed_error)
+        self.lon_acceleration.append(entity.debug.simple_lon_debug.current_acceleration)
+        self.vehicle_pitch.append(entity.debug.simple_lon_debug.vehicle_pitch)
+
         self.drivingAction.append(entity.pad_msg.action)
         self.curvature.append(entity.debug.simple_lat_debug.curvature * 100.0)
         self.heading_error.append(entity.debug.simple_lat_debug.heading_error)
@@ -408,7 +431,7 @@ class ControlInfo(object):
                           alpha=0.1)
 
     def plot_chassis(self):
-        fig, ax = plt.subplots(2, 1)
+        fig, ax = plt.subplots(1, 2)
         ax[0].get_shared_x_axes().join(ax[0], ax[1])
         ax[0].plot(self.canbustime,
                    self.canbus_throttlefbk,
@@ -418,22 +441,61 @@ class ControlInfo(object):
                    self.canbus_brakefbk,
                    label='Brake Feedback')
         ax[0].plot(self.controltime, self.brakecmd, label='Brake Command')
+        ax[0].plot(self.canbustime,
+                   self.canbus_speed,
+                   label='canbus speed')
+        ax[0].plot(self.canbustime,
+                   self.canbus_speed,
+                   'ro',
+                    markersize=3,
+                    label='canbus speed dot')
+        # ax[0].plot(self.controltime, self.is_full_stop, label='is_full_stop')
+        # ax[0].plot(self.controltime, self.path_remain, label='path_remain')
+        # ax[0].plot(self.canbustime, self.canbus_parking_brake, label='canbus parkingbrake')
+        # ax[0].plot(self.controltime, self.parking_brakecmd, label='parkingbrake cmd')
         ax[0].legend(fontsize='medium')
         ax[0].grid(True)
         ax[0].set_title('Throttle Brake Info')
         ax[0].set_xlabel('Time-s')
 
-        ax[1].plot(self.controltime, self.is_full_stop, label='is_full_stop')
-        ax[1].plot(self.controltime, self.is_full_stop_soft, label='is_full_stop_soft')
-        ax[1].plot(self.controltime,
-                   self.pid_saturation_status,
-                   label='pid_saturation_status')
+        # ax[1].plot(self.controltime, self.is_full_stop_soft, label='is_full_stop_soft')
+        # ax[1].plot(self.controltime,
+        #            self.pid_saturation_status,
+        #            label='pid_saturation_status')
+        # ax[1].plot(self.controltime,
+        #            self.parking_brakecmd,
+        #            'o',
+        #            markersize = 3,
+        #            label='parkingbrake cmd dot')
+        ax[1].plot(self.controltime, self.drivingAction, label='control drivingAction')
         ax[1].plot(self.canbustime,
                    self.canbus_Driving_mode,
                    label='Driving_mode')
-        ax[1].plot(self.controltime, self.drivingAction, label='drivingAction')
-        ax[1].plot(self.controltime, self.path_remain, label='path_remain')
         # ax[1].plot(self.planningtime, self.numpoints_sum,  label='numpoints')
+        ax[1].plot(self.canbustime,
+                   self.is_eps_online,
+                   label='is_eps_online')
+        # ax[1].plot(self.canbustime,
+        #            self.is_eps_online,
+        #            'o',
+        #            markersize = 3,
+        #            label='is_eps_online dot')
+        ax[1].plot(self.canbustime,
+                   self.is_esp_online,
+                   label='is_esp_online')
+        # ax[1].plot(self.canbustime,
+        #            self.is_eps_online,
+        #            'o',
+        #            markersize = 3,
+        #            label='is_eps_online dot')
+        ax[1].plot(self.canbustime,
+                   self.is_eps_online,
+                   label='is_vcu_online')
+        # ax[1].plot(self.canbustime,
+        #            self.is_eps_online,
+        #            'o',
+        #            markersize = 3,
+        #            label='is_eps_online dot')
         ax[1].legend(fontsize='medium')
         ax[1].grid(True)
         ax[1].set_title('Mode Info')
@@ -447,6 +509,65 @@ class ControlInfo(object):
                           fc='0.1',
                           alpha=0.1)
             ax[1].axvspan(self.mode_time[i],
+                          self.mode_time[i + 1],
+                          fc='0.1',
+                          alpha=0.1)
+
+    def plot_full_stop(self):
+        fig, ax = plt.subplots(3,1)
+        ax[0].get_shared_x_axes().join(ax[0], ax[1], ax[2])
+        ax[0].plot(self.controltime, self.path_remain, label='path_remain')
+        ax[0].plot(self.canbustime,
+                   self.canbus_parking_brake,
+                   'o',
+                   markersize = 3,
+                   label='canbus parkingbrake dot')
+        ax[0].plot(self.controltime, self.parking_brakecmd, label='parkingbrake cmd')
+        ax[0].legend(fontsize='medium')
+        ax[0].grid(True)
+        ax[0].set_title('Epb Info')
+
+        ax[1].plot(self.controltime, self.is_full_stop_soft, label='is_full_stop_soft')
+        ax[1].plot(self.controltime,
+                   self.is_full_stop,
+                   'o',
+                   markersize = 3,
+                   label='is_full_stop')
+        ax[1].plot(self.controltime,
+                      self.is_stop_reason_by_destination,
+                      label='is_stop_reason_by_destination')
+        ax[1].plot(self.controltime,
+                      self.is_stop_reason_by_prdestrian,
+                      label='is_stop_reason_by_prdestrian')
+        ax[1].legend(fontsize='medium')
+        ax[1].set_title('Full Stop Info')
+        ax[1].grid(True)
+
+        ax[2].plot(self.canbustime,
+                      self.gear_location,
+                      'o',
+                      markersize = 3,
+                      label='gear_location dot')
+        ax[2].plot(self.planningtime,
+                      self.trajectory_gear,
+                      label='trajectory_gear')
+        ax[2].legend(fontsize='medium')
+        ax[2].grid(True)
+        ax[2].set_title('Gear Info')
+        ax[2].set_xlabel('Time-s')
+
+        if len(self.mode_time) % 2 == 1:
+            self.mode_time.append(self.controltime[-1])
+        for i in range(0, len(self.mode_time), 2):
+            ax[0].axvspan(self.mode_time[i],
+                          self.mode_time[i + 1],
+                          fc='0.1',
+                          alpha=0.1)
+            ax[1].axvspan(self.mode_time[i],
+                          self.mode_time[i + 1],
+                          fc='0.1',
+                          alpha=0.1)
+            ax[2].axvspan(self.mode_time[i],
                           self.mode_time[i + 1],
                           fc='0.1',
                           alpha=0.1)
@@ -472,6 +593,9 @@ class ControlInfo(object):
         ax[0, 0].plot(self.controltime,
                       self.speed_reference,
                       label='speed_reference')
+        ax[0, 0].plot(self.canbustime,
+                      self.canbus_speed,
+                      label='canbus speed')
         ax[0, 0].legend(fontsize='medium')
         ax[0, 0].grid(True)
         ax[0, 0].set_title('Speed Info')
@@ -526,16 +650,23 @@ class ControlInfo(object):
                       self.acceleration_lookup,
                       label='Lookup Acc')
         ax[1, 1].plot(self.controltime, self.acc_close, label='Acc Close')
-        # ax[1, 1].plot(self.controltime,
-        #               self.slope_offset_compensation,
-        #               label='slope_offset_compensation')
+        # ax[1, 1].plot(self.cartime, self.acc_localization, label='Acc localization')
+        # ax[1, 1].plot(self.controltime, self.lon_acceleration, label='Lon acceleration')
+        ax[1, 1].plot(self.controltime,
+                      self.slope_offset_compensation,
+                      label='slope_offset_compensation')
+        ax[1, 1].plot(self.controltime,
+                      self.slope_offset_compensation,
+                      'o',
+                      markersize=1,
+                      label='slope_offset_compensation dot')
         # ax[1, 1].plot(self.controltime,
         #               self.calibration_value,
         #               label='calibration_value')
         # ax[1, 1].plot(self.controltime,
         #               self.station_error,
         #               label='station_error')
-        ax[1, 1].plot(self.controltime, self.speed_error, label='speed_error')
+        # ax[1, 1].plot(self.controltime, self.speed_error, label='speed_error')
         ax[1, 1].legend(fontsize='medium')
         ax[1, 1].grid(True)
         ax[1, 1].set_title('Acc Info')
@@ -545,6 +676,7 @@ class ControlInfo(object):
         ax[1, 2].plot(self.controltime,
                       self.is_full_stop_soft,
                       label='is_full_stop_soft')
+        # ax[1, 2].plot(self.canbustime, self.canbus_parking_brake, label='canbus parkingbrake')
         ax[1, 2].plot(self.canbustime,
                       self.gear_location,
                       label='gear_location')
@@ -563,10 +695,17 @@ class ControlInfo(object):
         #               self.drivingAction,
         #               label='drivingAction')
         # ax[1, 2].plot(self.planningtime, self.numpoints_sum, label='numpoints')
+        ax[1, 2].plot(self.controltime, self.vehicle_pitch, label='vehicle_pitch')
+        ax[1, 2].plot(self.controltime,
+                      self.vehicle_pitch,
+                      'o',
+                      markersize=1,
+                      label='vehicle_pitch dot')
         ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
-        # ax[1, 2].plot(self.planningtime,
-        #               self.trajectory_type,
-        #               label='trajectory_type')
+        ax[1, 2].plot(self.planningtime, self.is_replan, label='planning trajectory is_replan')
+        ax[1, 2].plot(self.planningtime,
+                      self.trajectory_type,
+                      label='trajectory_type')
         ax[1, 2].legend(fontsize='medium')
         ax[1, 2].grid(True)
         ax[1, 2].set_title('Mode Info')
@@ -661,11 +800,13 @@ class ControlInfo(object):
         Plot plot_lateral_all
         """
         print("ploting Lateral Error")
-        fig, ax = plt.subplots(2, 2)
+        fig, ax = plt.subplots(2, 3)
         ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[0, 0])
         ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[0, 1])
+        ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[0, 2])
         ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[1, 0])
         ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[1, 1])
+        ax[0, 0].get_shared_x_axes().join(ax[0, 0], ax[1, 2])
 
         ax[0, 0].plot(self.controltime,
                       self.heading_error,
@@ -728,6 +869,33 @@ class ControlInfo(object):
         ax[1, 1].set_xlabel('Time-s')
         ax[1, 1].set_xlabel('Steering-%')
 
+        ax[0, 2].plot(self.cartime,
+                      self.carx,
+                      label='Pose X')
+        ax[0, 2].plot(self.cartime,
+                      self.carx,
+                      'ro',
+                      markersize=1,
+                      label='Pose X dot')
+        ax[0, 2].legend(fontsize='medium')
+        ax[0, 2].grid(True)
+        ax[0, 2].set_title('Localization Info X')
+        ax[0, 2].set_xlabel('Time')
+
+
+        ax[1, 2].plot(self.cartime,
+                      self.cary,
+                      label='Pose Y')
+        ax[1, 2].plot(self.cartime,
+                      self.cary,
+                      'ro',
+                      markersize=1,
+                      label='Pose X dot')
+        ax[1, 2].legend(fontsize='medium')
+        ax[1, 2].grid(True)
+        ax[1, 2].set_title('Localization Info Y')
+        ax[1, 2].set_xlabel('Time')
+
         if len(self.mode_time) % 2 == 1:
             self.mode_time.append(self.controltime[-1])
         for i in range(0, len(self.mode_time), 2):
@@ -744,6 +912,14 @@ class ControlInfo(object):
                              fc='0.1',
                              alpha=0.1)
             ax[1, 1].axvspan(self.mode_time[i],
+                             self.mode_time[i + 1],
+                             fc='0.1',
+                             alpha=0.1)
+            ax[0, 2].axvspan(self.mode_time[i],
+                             self.mode_time[i + 1],
+                             fc='0.1',
+                             alpha=0.1)
+            ax[1, 2].axvspan(self.mode_time[i],
                              self.mode_time[i + 1],
                              fc='0.1',
                              alpha=0.1)
@@ -1035,7 +1211,7 @@ class ControlInfo(object):
         print(str(len(self.canbus_Driving_mode)) + "-Driving_mode")
         print(str(len(self.trajectory_type)) + "-trajectory_type")
         print(str(len(self.path_remain)) + "-path_remain")
-        print(str(len(self.acc_lon)) + "-acc_lon")
+        print(str(len(self.acc_localization)) + "-acc_localization")
         print(str(len(self.gear_mode_time)) + "-gear_mode_time")
         print(str(len(self.mode_time)) + "-mode_time")
 
@@ -1044,7 +1220,8 @@ def is_record_file(path):
     """Naive check if a path is a record."""
     return path.endswith('.record') or \
                 fnmatch.fnmatch(path, '*.record.?????') or \
-                    fnmatch.fnmatch(path, '*.record.????')
+                    fnmatch.fnmatch(path, '*.record.*') or \
+                        fnmatch.fnmatch(path, '*.record.?????.*')
 
 
 if __name__ == "__main__":
@@ -1055,6 +1232,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     fig, axarr = plt.subplots()
     controlinfo = ControlInfo(axarr)
+    current_dir = sys.path[0]
+    print("current dir is", current_dir)
 
     if args.path:
         dir_path = args.path
@@ -1138,6 +1317,8 @@ if __name__ == "__main__":
     controlinfo.show_lateral()
     controlinfo.show_localization()
     controlinfo.show_longitudinal_all()
+    controlinfo.plot_chassis()
+    controlinfo.plot_full_stop()
     book.close()
 
     fig.canvas.mpl_connect('key_press_event', controlinfo.press)

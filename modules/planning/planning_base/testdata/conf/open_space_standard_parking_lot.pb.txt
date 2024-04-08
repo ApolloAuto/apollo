@@ -76,12 +76,3 @@ distance_approach_config : {
     ipopt_recalc_y : "yes"
   }
 }
-
-trajectory_partition_config : {
-  interpolated_pieces_num : 50
-  initial_gear_check_horizon : 3
-  heading_searching_range : 0.3
-  gear_shift_period_duration : 2.0
-  gear_shift_max_t : 3.0
-  gear_shift_unit_t : 0.02
-}

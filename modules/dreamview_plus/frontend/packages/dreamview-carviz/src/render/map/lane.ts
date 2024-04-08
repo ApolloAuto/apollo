@@ -49,9 +49,12 @@ export default class Lane {
 
     private centerLineBasicMaterialTemplate;
 
+    private colors;
+
     DOTTED_YELLOW;
 
-    constructor(scene, text, option, coordinates) {
+    constructor(scene, text, option, coordinates, colors?) {
+        this.colors = colors?.colorMapping || colorMapping;
         this.scene = scene;
         this.option = option;
         this.coordinates = coordinates;
@@ -68,36 +71,36 @@ export default class Lane {
         this.ymax = -Infinity;
         this.center = new THREE.Vector3(0, 0, 0);
         this.dottedYellowLineDashedMaterialTemplate = new THREE.LineDashedMaterial({
-            color: colorMapping.YELLOW,
+            color: this.colors.YELLOW,
             dashSize: 3,
             gapSize: 3,
             transparent: true,
             opacity: 1,
         });
         this.dottedWhiteLineDashedMaterialTemplate = new THREE.LineDashedMaterial({
-            color: colorMapping.WHITE,
+            color: this.colors.WHITE,
             dashSize: 0.5,
             gapSize: 0.25,
             transparent: true,
             opacity: 0.4,
         });
         this.solidYellowLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: colorMapping.YELLOW,
+            color: this.colors.YELLOW,
             transparent: true,
             opacity: 1,
         });
         this.solidWhiteLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: colorMapping.WHITE,
+            color: this.colors.WHITE,
             opacity: 1,
             transparent: true,
         });
         this.curbLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: colorMapping.CORAL,
+            color: this.colors.CORAL,
             opacity: 1,
             transparent: true,
         });
         this.centerLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: colorMapping.GREEN,
+            color: this.colors.GREEN,
             opacity: 1,
             transparent: true,
         });
@@ -212,7 +215,7 @@ export default class Lane {
             rotationZ = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         }
 
-        const textMesh = this.text.drawText(id, colorMapping.WHITE, position);
+        const textMesh = this.text.drawText(id, this.colors.WHITE, position);
         if (textMesh) {
             textMesh.rotation.z = rotationZ;
             this.laneIdMeshMap[id] = textMesh;

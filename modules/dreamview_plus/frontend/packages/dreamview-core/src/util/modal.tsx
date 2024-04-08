@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Provider as ThemeProvider } from '@dreamview/dreamview-theme';
+import { ThemeProvider } from '@dreamview/dreamview-core/src/store/ThemeProviderStore';
 
 export interface ModalComponentProps {
     destroy: () => void;

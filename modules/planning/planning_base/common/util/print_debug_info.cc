@@ -22,8 +22,12 @@
 #include <vector>
 
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+
 namespace apollo {
 namespace planning {
+
+using apollo::common::math::Vec2d;
 
 void PrintPoints::set_id(std::string id) { id_ = id; }
 void PrintPoints::AddPoint(double x, double y) { points.emplace_back(x, y); }
@@ -78,6 +82,40 @@ void PrintCurves::PrintToLog() {
   for (auto iter = curve_map_.begin(); iter != curve_map_.end(); iter++) {
     iter->second.PrintToLog();
   }
+}
+
+void apollo::planning::PrintBox::AddAdcBox(double x, double y, double heading,
+                                           bool is_rear_axle_point) {
+  const auto& vehicle_param =
+      apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
+  if (is_rear_axle_point) {
+    // rear center
+    double rear_axle_to_center =
+        vehicle_param.front_edge_to_center() - vehicle_param.length() / 2.0;
+    x += rear_axle_to_center * cos(heading);
+    y += rear_axle_to_center * sin(heading);
+  }
+  box_points.push_back(
+      {x, y, heading, vehicle_param.length(), vehicle_param.width()});
+}
+
+void apollo::planning::PrintBox::PrintToLog() {
+  std::stringstream ssm;
+  ssm << "print_" << id_ << ":";
+  for (size_t i = 0; i < box_points.size(); i++) {
+    ssm << "(";
+    for (size_t j = 0; j < box_points[i].size(); j++) {
+      ssm << std::fixed << box_points[i][j];
+      if (j != box_points[i].size() - 1) {
+        ssm << ", ";
+      }
+    }
+    ssm << ")";
+    if (i != box_points.size() - 1) {
+      ssm << ", ";
+    }
+  }
+  AINFO << ssm.str();
 }
 
 }  // namespace planning

@@ -81,7 +81,8 @@ bool FallbackPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   if (!PathBoundsDeciderUtil::ExtendBoundaryByADC(
-          init_sl_state_, config_.extend_buffer(), &path_bound)) {
+          *reference_line_info_, init_sl_state_, config_.extend_buffer(),
+          &path_bound)) {
     AERROR << "Failed to decide a rough boundary based on adc.";
     return false;
   }
@@ -107,7 +108,7 @@ bool FallbackPath::OptimizePath(
     PathOptimizerUtil::CalculateAccBound(path_boundary, reference_line,
                                          &ddl_bounds);
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
-        std::fmax(init_sl_state_.first[1], 1.0));
+        std::fmax(init_sl_state_.first[1], 1e-12));
     std::vector<double> ref_l(path_boundary_size, 0);
     std::vector<double> weight_ref_l(path_boundary_size,
                                      config.path_reference_l_weight());

@@ -29,11 +29,9 @@ namespace fusion {
 
 TEST(DstTypeFusionTest, test_update_with_measurement) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "fusion/dst_type_fusion";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "fusion/dst_type_fusion/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   EXPECT_TRUE(algorithm::SensorManager::Instance()->Init());
 
@@ -119,11 +117,9 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
 
 TEST(DstTypeFusionTest, test_update_without_measurement) {
   FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "fusion/dst_type_fusion";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/"
-      "fusion/dst_type_fusion/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   algorithm::SensorManager *sensor_manager =
       algorithm::SensorManager::Instance();
@@ -136,7 +132,7 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
   bool flag = DstTypeFusion::Init(options);
   EXPECT_TRUE(flag);
   base::SensorInfo radar_front_info;
-  EXPECT_TRUE(sensor_manager->GetSensorInfo("radar", &radar_front_info));
+  EXPECT_TRUE(sensor_manager->GetSensorInfo("radar_front", &radar_front_info));
   SensorPtr radar_front_sensor(new Sensor(radar_front_info));
   // radar front frame
   base::ObjectPtr base_obj(new base::Object());

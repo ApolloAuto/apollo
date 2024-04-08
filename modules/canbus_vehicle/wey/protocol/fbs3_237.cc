@@ -47,9 +47,6 @@ void Fbs3237::Parse(const std::uint8_t* bytes, int32_t length,
       epsconsumedcurrvalue(bytes, length));
   chassis->mutable_fbs3_237()->set_epscurrmod(
       epscurrmod(bytes, length));
-  // Added for response check
-  chassis->mutable_check_response()->set_is_eps_online(
-      eps_streeingmode(bytes, length) == 1);
 }
 
 // config detail: {'description': 'Engine speed', 'offset': 0.0,

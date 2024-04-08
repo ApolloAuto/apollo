@@ -278,7 +278,7 @@ class SimulationWorldService {
     apollo::common::util::DumpMessage(reader->GetLatestObserved());
   }
 
-  void ReadRoutingFromFile(const std::string &routing_response_file);
+  void ReadPlanningCommandFromFile(const std::string &planning_command_file);
 
   template <typename MessageT>
   void UpdateLatency(const std::string &module_name,

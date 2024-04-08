@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/drivers/lidar/compensator/libcompensator_component.so"
+
+    components {
+        class_name : "CompensatorComponent"
+        config {
+          name : "compensator"
+          config_file_path : "/apollo/modules/drivers/lidar/compensator/conf/compensator.pb.txt"
+          readers {channel: "/apollo/sensor/lidar/fusion/PointCloud2"}
+        }
+    }
+}

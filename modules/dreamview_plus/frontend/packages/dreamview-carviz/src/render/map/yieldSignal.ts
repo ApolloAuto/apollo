@@ -22,7 +22,10 @@ export default class YieldSignal {
 
     private coordinates;
 
-    constructor(scene, coordinates) {
+    private colors;
+
+    constructor(scene, coordinates, colors) {
+        this.colors = colors;
         this.yieldSignTemplate = null;
         this.scene = scene;
         this.coordinates = coordinates;
@@ -95,7 +98,7 @@ export default class YieldSignal {
             const stopLine = yieldSign.stopLine;
             if (stopLine) {
                 stopLine.forEach((item) => {
-                    const meshs = drawStopLine(item, this.coordinates);
+                    const meshs = drawStopLine(item, this.coordinates, this.colors?.colorMapping.PURE_WHITE);
                     meshs.forEach((mesh) => {
                         this.yieldLineMeshs[id] = this.yieldLineMeshs[id] || [];
                         this.yieldLineMeshs[id].push(mesh);

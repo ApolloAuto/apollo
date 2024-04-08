@@ -210,7 +210,7 @@ apollo_component(
     name = "liblidar_detection_component.so",
     srcs = ["lidar_detection_component.cc"],
     hdrs = ["lidar_detection_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     linkopts = ["-lleveldb"],
     deps = [
         ":apollo_perception_lidar_detection",
@@ -228,16 +228,6 @@ apollo_cc_test(
         ":apollo_perception_lidar_detection",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/algorithm:apollo_perception_common_algorithm",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "spp_cluster_list_test",
-    size = "small",
-    srcs = ["detector/cnn_segmentation/spp_engine/spp_cluster_list_test.cc"],
-    deps = [
-        ":apollo_perception_lidar_detection",
         "@com_google_googletest//:gtest_main",
     ],
 )

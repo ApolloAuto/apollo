@@ -19,15 +19,15 @@ filegroup(
 apollo_cc_library(
     name = "apollo_perception_traffic_light_detection",
     srcs = [
-        "detection/cropbox.cc",
-        "detection/detection.cc",
-        "detection/select.cc",
+        "algorithm/cropbox.cc",
+        "detector/caffe_detection/detection.cc",
+        "algorithm/select.cc",
         "traffic_light_detection_component.cc",
     ],
     hdrs = [
-        "detection/cropbox.h",
-        "detection/detection.h",
-        "detection/select.h",
+        "algorithm/cropbox.h",
+        "detector/caffe_detection/detection.h",
+        "algorithm/select.h",
         "interface/base_traffic_light_detector.h",
         "traffic_light_detection_component.h",
     ],
@@ -41,7 +41,7 @@ apollo_cc_library(
         "//modules/perception/common/inference:apollo_perception_common_inference",
         "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
-        "//modules/perception/traffic_light_detection/detection/proto:model_param_cc_proto",
+        "//modules/perception/traffic_light_detection/detector/caffe_detection/proto:model_param_cc_proto",
         "//modules/perception/traffic_light_detection/proto:trafficlights_detection_component_cc_proto",
     ],
 )

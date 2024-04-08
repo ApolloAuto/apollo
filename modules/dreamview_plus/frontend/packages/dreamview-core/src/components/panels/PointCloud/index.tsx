@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { Carviz } from '@dreamview/dreamview-carviz/src/index';
 import { IconIcCoverageHover, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import shortUUID from 'short-uuid';
 import { apollo } from '@dreamview/dreamview';
 import { Subscription } from 'rxjs';
 import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import CountedSubject from '@dreamview/dreamview-core/src/util/CountedSubject';
+import useCarViz from '@dreamview/dreamview-core/src/hooks/useCarviz';
+import { FunctionalKey } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
 
 import useStyle from '../VehicleViz/useStyle';
 import ViewMenu from '../VehicleViz/ViewMenu';
@@ -17,7 +17,6 @@ import { usePanelContext } from '../base/store/PanelStore';
 import Panel from '../base/Panel';
 import LayerMenu from './LayerMenu';
 import { getCurrentLayerParams, formatLayerParams, localPointCloudManager } from './LayerMenu/params';
-import { FunctionalKey } from '../../../store/EventHandlersStore';
 
 type ISimulationWorld = apollo.dreamview.ISimulationWorld;
 type IPointCloud = apollo.dreamview.IPointCloud;
@@ -25,12 +24,11 @@ function Cloud() {
     const [showPerception, setShowPerception] = useState(true);
     const [curChannel, setCurChannel] = useState(null);
     const panelContext = usePanelContext();
-    const [uid] = useState(shortUUID.generate);
     const [hmi] = usePickHmiStore();
     const { initSubscription, setKeyDownHandlers, removeKeyDownHandlers } = panelContext;
     const { classes } = useStyle();
     const [currentView, setCurrentView] = useState('D');
-    const [carviz] = useState(() => new Carviz(uid));
+    const [carviz, uid] = useCarViz();
     const { t: tPanels } = useTranslation('panels');
     const [data, setData] = useState<IPointCloud>(null);
     const { metadata, isMainConnected, streamApi } = useWebSocketServices();
@@ -167,10 +165,7 @@ function Cloud() {
             // fix: 解决点云抖动问题临时注释
             [StreamDataNames.SIM_WORLD]: {
                 consumer: (simworldData: ISimulationWorld) => {
-                    // if (simworldData.autoDrivingCar) {
-                    // carviz.updataCoordinates(simworldData.autoDrivingCar);
-                    // }
-                    carviz.updateData(simworldData);
+                    carviz.adc.updateOffset(simworldData.autoDrivingCar, 'adc');
                 },
             },
             [StreamDataNames.POINT_CLOUD]: {
@@ -235,7 +230,7 @@ function Cloud() {
                         content={<ViewMenu carviz={carviz} setCurrentView={setCurrentView} />}
                         trigger='click'
                     >
-                        <span className={classes['viz-btn-item']}>{currentView}</span>
+                        <span className={classes['viz-btn-item']}>{currentView?.charAt(0)}</span>
                     </Popover>
                 </ViewBtn>
             </div>

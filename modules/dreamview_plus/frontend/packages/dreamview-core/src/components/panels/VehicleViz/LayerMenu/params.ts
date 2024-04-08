@@ -263,6 +263,11 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
             currentVisible: false,
             vizKey: 'laneId',
         },
+        egoBoudingBox: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'boudingBox',
+        },
     },
 };
 

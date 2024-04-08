@@ -1,0 +1,181 @@
+mainpage: MAINPAGE_cn.md
+pages:
+  - title: 发版说明
+    pages:
+      - title: 新版说明
+      - title: 历史版本文档
+  - title: 安装指南
+    pages:
+      - title: 源码安装方式
+      - title: 包管理安装方式
+  - title: 应用实践
+    pages:
+      - title: 开发调试教程
+        pages:
+          - title: Dreamview+
+            pages:
+              - title: Dreamview +快速使用
+              - title: Studio 插件安装
+              - title: 播放离线数据包
+              - title: SimControl 仿真模式使用
+          - title: Cyber RT实践
+            pages:
+              - title: Cyber RT入门
+                pages:
+                  - title: Cyber RT 实践之 Hello Apollo
+              - title: Cyber RT通信机制
+                pages:
+                  - title: Cyber通信机制实践之Listener-Talker通信（C++）
+                  - title: Cyber通信机制实践之Listener-Talker通信（python）
+              - title: Cyber RT组件机制
+                pages:
+                  - title: Cyber RT 之 Component 实践
+                  - title: Cyber RT 之 Timer Component 实践
+              - title: Cyber RT调度机制
+                pages:
+                  - title: Cyber调度实践之优先级策略配置
+              - title: 应用Cyber RT开发自动驾驶调试工具
+                pages:
+                  - title: Apollo工具开发之交通灯仿真控制工具制作
+                  - title: Apollo工具开发之路径设置工具制作
+          - title: Apollo感知实践
+            pages:
+              - title: 感知模块综述
+              - title: 基于组件进行开发
+                pages:
+                  - title: 组件开发模式说明
+                  - title: 基于组件进行开发
+              - title: 感知模型部署训练
+                pages:
+                  - title: 点云模型二次开发
+                  - title: 视觉模型二次开发
+              - title: 基于配置参数开发
+                pages:
+                  - title: 激光雷达参数介绍
+                  - title: 激光雷达感知参数开发实践
+              - title: 基于插件进行开发
+                pages:
+                  - title: 插件开发模式说明
+                  - title: 基于插件进行开发
+          - title: Apollo规划实践
+            pages:
+              - title: 规划模块综述
+              - title: 基于命令发布开发
+                pages:
+                  - title: 开发模式说明
+                  - title: Apollo规划之远程启动车辆-命令控制（9.0版）
+              - title: 基于配置参数开发
+                pages:
+                  - title: 开发模式说明
+                  - title: 定速巡航仿真调试（9.0版）
+              - title: 基于插件进行开发
+                pages:
+                  - title: 开发模式说明
+                  - title: 限速区域仿真调试 - 新增traffic rule插件
+          - title: 传感器接入实践
+            pages:
+              - title: 组合惯导接入Apollo
+              - title: 新lidar接入Apollo
+      - title: 车辆集成教程
+        pages:
+          - title: 上车使用教程概览
+          - title: 准备符合Apollo协议的车辆
+            pages:
+              - title: 概览
+              - title: 符合Apollo线控标准的车辆
+              - title: 利用Apollo工具生成CANBUS适配代码
+              - title: 车辆底盘开环验证DBC的方法
+          - title: 循迹搭建
+            pages:
+              - title: 车辆集成
+              - title: Apollo系统安装
+              - title: 惯导设备PP7配置
+              - title: 定位模块配置
+              - title: 车辆控制评测分析云服务的应用
+              - title: 车辆动力学云标定
+              - title: 车辆循迹演示
+          - title: 基于激光雷达的封闭园区自动驾驶搭建
+            pages:
+              - title: 感知设备集成
+              - title: 感知设备标定
+              - title: 虚拟车道线制作
+              - title: 规划适配
+              - title: 感知适配
+              - title: 自动驾驶演示
+          - title: 基于摄像头的封闭园区自动驾驶搭建
+            pages:
+              - title: 感知设备集成
+              - title: 感知设备标定
+              - title: 感知适配
+              - title: 自动驾驶演示
+  - title: 框架设计
+    pages:
+      # - title: 硬件设备
+      #   pages:
+      #     - title: Apollo 硬件开发平台
+      #       url: https://apollo.baidu.com/community/hardware
+      #     - title: Apollo开放车辆认证平台
+      #       url: https://apollo.baidu.com/community/certificate
+      - title: 软件核心
+        pages:
+          - title: CyberRT
+            pages:
+              - title: Cyber RT 通信机制
+              - title: Cyber RT 组件机制
+              - title: Cyber RT 插件机制
+              - title: Cyber RT 调度机制
+          - title: 核心模块
+            type: apollomodules
+            pages:
+              - title: 概述
+                path: docs/框架设计/核心模块/概述.md
+          # - title: 系统与环境
+          - title: 包管理工具
+            pages:
+              - title: 包管理概念
+                path: docs/框架设计/构建及编译/包管理.md
+              - title: 本地工具
+                pages:
+                  - title: aem
+                    path: docs/框架设计/命令行工具/aem.md
+                  - title: buildtool
+                    path: docs/框架设计/命令行工具/buildtool.md
+              - title: 软件包平台
+                url: https://apollo.baidu.com/pkgworkspace/html/index.html
+              - title: 软件包文档
+                path: docs/packages/packages_cn.md
+                pages:
+                  - title: Apollo Core
+                    path: docs/packages/packages_core_cn.md
+                    type: apollopackages
+  - title: 工具使用
+    pages:
+      - title: Dreamview+
+        pages:
+          - title: Dreamview+ 概述
+          - title: Mode Settings
+          - title: Resource Manager
+          - title: Add Panel
+          - title: PNC可视化调试
+            pages:
+              - title: 轨迹绘制
+              - title: 场景仿真
+              - title: 测距
+              - title: 复制全部坐标点信息
+              - title: 自由仿真
+          - title: 实车路测模式
+            pages:
+              - title: 实车自动驾驶
+              - title: 循迹自动驾驶
+      - title: Fuel研发云平台
+        url: https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/Fuel%E7%A0%94%E5%8F%91%E4%BA%91%E5%B9%B3%E5%8F%B0/%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/%E6%A6%82%E8%A7%88
+      - title: 仿真平台
+        url: https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/%E4%BB%BF%E7%9C%9F%E5%B9%B3%E5%8F%B0/%E6%A6%82%E8%A7%88
+  - title: 故障排查
+    pages:
+      - title: 安装编译
+        pages:
+          - title: 安装及编译问题FAQ
+      - title: Dreamview
+        pages:
+          - title: dreamview faq

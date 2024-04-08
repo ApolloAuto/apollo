@@ -17,6 +17,7 @@ apollo_cc_library(
         "lexus_message_manager.h",
         "lexus_vehicle_factory.h",
     ] + glob(["protocol/*.h"]),
+    copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
