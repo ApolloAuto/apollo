@@ -171,7 +171,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
 
     for (const auto &frame : buf) {
       uint8_t len = frame.len;
-      uint32_t uid = frame.id;
+      uint32_t uid = frame.device_id;
       const uint8_t *data = frame.data;
       pt_manager_->Parse(uid, data, len);
       if (enable_log_) {

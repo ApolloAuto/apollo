@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
+#include "modules/canbus_vehicle/lincoln/protocol/voltage.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 
@@ -25,38 +25,31 @@ namespace lincoln {
 using ::apollo::drivers::canbus::Byte;
 
 // public
-const int32_t Brake60::ID = 0x0602;
+const int32_t Voltage::ID = 0x0603;
 
-void Brake60::Parse(const std::uint8_t *bytes, int32_t length,
+void Voltage::Parse(const std::uint8_t *bytes, int32_t length,
                     Lincoln *chassis_detail) const {
-  if (0x2101 != ((bytes[2] << 8) | bytes[1])) {
-    return;
-  }
-  int highbyte = bytes[5] & 0xFF;
-  int lowbyte = bytes[4] & 0xFF;
-  bool isNegative = (highbyte & 0x80) != 0;
-  int value = (highbyte << 8) | lowbyte;
-  if (isNegative) {
-    value = -((~value & 0xFFFF) + 1);
-  }
-  double duty_cycle = value * 0.1;
-  printf("刹车占空比：%.3f\n", duty_cycle);
+  double pot_throt_v = ((bytes[2] << 8) | bytes[3]) / 1000.0;
+  double pot_brake_v = ((bytes[4] << 8) | bytes[5]) / 1000.0;
+
+  printf("[油门]：当前采样电压值为%.3f V, [刹车]：当前采样电压值为%.3f V\n", pot_throt_v, pot_brake_v);
+//   chassis_detail->mutable_brake(pot_brake_v);
+//   chassis_detail->mutable_gas.set_throttle_cmd(pot_throt_v);
 }
 
-uint32_t Brake60::GetPeriod() const {
+uint32_t Voltage::GetPeriod() const {
   static const uint32_t PERIOD = 10 * 1000;
   return PERIOD;
 }
 
-void Brake60::UpdateData(uint8_t *data) {
+void Voltage::UpdateData(uint8_t *data) {
   // set_pedal_p(data, pedal_cmd_);
   // set_boo_cmd_p(data, boo_cmd_);
   // set_enable_p(data, pedal_enable_);
   // set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
   // set_watchdog_counter_p(data, watchdog_counter_);
 
-  int brake = int(pedal_cmd_ * 10);
-  printf("brake: %d\n", brake);
+  int brake = int(pedal_cmd_);
   data[0] = static_cast<unsigned char>(0x23);
   data[1] = static_cast<unsigned char>(0x01);
   data[2] = static_cast<unsigned char>(0x20);
@@ -67,7 +60,7 @@ void Brake60::UpdateData(uint8_t *data) {
   data[7] = static_cast<unsigned char>((brake >> 24) & 0xFF);
 }
 
-void Brake60::Reset() {
+void Voltage::Reset() {
   pedal_cmd_ = 0.0;
   boo_cmd_ = false;
   pedal_enable_ = false;
@@ -76,7 +69,7 @@ void Brake60::Reset() {
   watchdog_counter_ = 0;
 }
 
-Brake60 *Brake60::set_pedal(double pedal) {
+Voltage *Voltage::set_pedal(double pedal) {
   pedal_cmd_ = pedal;
   if (pedal_cmd_ < 1e-3) {
     disable_boo_cmd();
@@ -86,27 +79,27 @@ Brake60 *Brake60::set_pedal(double pedal) {
   return this;
 }
 
-Brake60 *Brake60::enable_boo_cmd() {
+Voltage *Voltage::enable_boo_cmd() {
   boo_cmd_ = true;
   return this;
 }
 
-Brake60 *Brake60::disable_boo_cmd() {
+Voltage *Voltage::disable_boo_cmd() {
   boo_cmd_ = false;
   return this;
 }
 
-Brake60 *Brake60::set_enable() {
+Voltage *Voltage::set_enable() {
   pedal_enable_ = true;
   return this;
 }
 
-Brake60 *Brake60::set_disable() {
+Voltage *Voltage::set_disable() {
   pedal_enable_ = false;
   return this;
 }
 
-void Brake60::set_pedal_p(uint8_t *data, double pedal) {
+void Voltage::set_pedal_p(uint8_t *data, double pedal) {
   // change from [0-100] to [0.00-1.00]
   // and a rough mapping
   pedal /= 100.;
@@ -124,7 +117,7 @@ void Brake60::set_pedal_p(uint8_t *data, double pedal) {
   frame_high.set_value(t, 0, 8);
 }
 
-void Brake60::set_boo_cmd_p(uint8_t *bytes, bool boo_cmd) {
+void Voltage::set_boo_cmd_p(uint8_t *bytes, bool boo_cmd) {
   Byte frame(bytes + 2);
   if (boo_cmd) {
     frame.set_bit_1(0);
@@ -133,7 +126,7 @@ void Brake60::set_boo_cmd_p(uint8_t *bytes, bool boo_cmd) {
   }
 }
 
-void Brake60::set_enable_p(uint8_t *bytes, bool enable) {
+void Voltage::set_enable_p(uint8_t *bytes, bool enable) {
   Byte frame(bytes + 3);
   if (enable) {
     frame.set_bit_1(0);
@@ -142,7 +135,7 @@ void Brake60::set_enable_p(uint8_t *bytes, bool enable) {
   }
 }
 
-void Brake60::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
+void Voltage::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
   Byte frame(bytes + 3);
   if (clear) {
     frame.set_bit_1(1);
@@ -151,7 +144,7 @@ void Brake60::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
   }
 }
 
-void Brake60::set_watchdog_counter_p(uint8_t *data, int32_t count) {
+void Voltage::set_watchdog_counter_p(uint8_t *data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
   frame.set_value(static_cast<uint8_t>(count), 0, 8);

@@ -39,6 +39,7 @@
 #include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
 #include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
+#include "modules/canbus_vehicle/lincoln/protocol/voltage.h"
 #include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 
 /**
@@ -146,6 +147,7 @@ class LincolnController final
   Brake60 *brake_60_ = nullptr;
   Throttle62 *throttle_62_ = nullptr;
   Steering64 *steering_64_ = nullptr;
+  Voltage *voltage_ = nullptr;
   Gear66 *gear_66_ = nullptr;
   Turnsignal68 *turnsignal_68_ = nullptr;
 

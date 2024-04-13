@@ -22,6 +22,7 @@ apollo_cc_library(
         "can_client/hermes_can/bcan.h",
         "can_client/hermes_can/bcan_defs.h",
         "can_client/hermes_can/hermes_can_client.h",
+        "can_client/hermes_can/controlcan.h",
         "can_client/socket/socket_can_client_raw.h",
         "can_comm/can_receiver.h",
         "can_comm/can_sender.h",

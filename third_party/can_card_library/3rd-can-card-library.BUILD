@@ -4,15 +4,16 @@ cc_library(
     name = "hermes_can",
     hdrs = [
         "include/bcan.h",
+        "include/controlcan.h",
     ],
-    srcs = glob(["lib/libbcan.so"]),
+    srcs = glob(["lib/libbcan.so","lib/libcontrolcan.so"]),
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "third_party_Scan_card_library_Shermes_can_Chermes_can",
-    srcs = glob(["lib/libbcan.so"]),
+    srcs = glob(["lib/libbcan.so", "lib/libcontrolcan.so"]),
     hdrs = [
         "include/bcan.h",
     ],

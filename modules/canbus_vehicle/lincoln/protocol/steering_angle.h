@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
- * @file brake_60.h
- * @brief the class of Brake60 (for lincoln vehicle)
+ * @file steering_64.h
+ * @brief the class of SteeringAngle (for lincoln vehicle)
  */
 
 #pragma once
@@ -34,115 +34,113 @@ namespace canbus {
 namespace lincoln {
 
 /**
- * @class Brake60
+ * @class SteeringAngle
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Brake60 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::Lincoln> {
+class SteeringAngle : public ::apollo::drivers::canbus::ProtocolData<
+                          ::apollo::canbus::Lincoln> {
  public:
   static const int32_t ID;
 
   virtual void Parse(const std::uint8_t *bytes, int32_t length,
                      Lincoln *chassis_detail) const;
+
   /**
    * @brief get the data period
    * @return the value of data period
    */
-  uint32_t GetPeriod() const override;
+  virtual uint32_t GetPeriod() const;
 
   /**
    * @brief update the data
    * @param data a pointer to the data to be updated
    */
-  void UpdateData(uint8_t *data) override;
+  virtual void UpdateData(uint8_t *data);
 
   /**
    * @brief reset the private variables
    */
-  void Reset() override;
+  virtual void Reset();
 
   /**
-   * @brief set pedal based on pedal command
+   * @brief set steering request enable to true
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_pedal(double pcmd);
+  SteeringAngle *set_enable();
 
   /**
-   * @brief set pedal_enable_ to true
+   * @brief set steering request disable to true
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_enable();
+  SteeringAngle *set_disable();
 
   /**
-   * @brief set pedal_enable_ to false
+   * @brief set steering angle
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_disable();
+  SteeringAngle *set_steering_angle(double angle);
+
+  /**
+   * @brief set steering angle speed
+   * @return a this pointer to the instance itself
+   */
+  SteeringAngle *set_steering_angle_speed(double angle_speed);
 
  private:
   /**
-   * @brief enable boo command
-   * @return a this pointer to the instance itself
+   * config detail: {'name': 'scmd', 'offset': 0.0, 'precision': 0.1, 'len': 16,
+   * 'f_type': 'value', 'is_signed_var': True, 'physical_range': '[-470|470]',
+   * 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': '"degrees"'}
    */
-  Brake60 *enable_boo_cmd();
-
-  /**
-   * @brief disable boo command
-   * @return a this pointer to the instance itself
-   */
-  Brake60 *disable_boo_cmd();
-
-  /**
-   * config detail: {'name': 'pcmd', 'offset': 0.0, 'precision':
-   * 1.52590218966964e-05, 'len': 16, 'f_type': 'value', 'is_signed_var': False,
-   * 'physical_range': '[0|1]', 'bit': 0, 'type': 'double', 'order': 'intel',
-   * 'physical_unit': '"%"'}
-   */
-  void set_pedal_p(uint8_t *data, double pedal);
-
-  /**
-   * config detail: {'name': 'bcmd', 'offset': 0.0, 'precision': 1.0, 'len': 1,
-   * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
-   * 'bit': 16, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
-   */
-  void set_boo_cmd_p(uint8_t *bytes, bool boo_cmd);
+  void set_steering_angle_p(uint8_t *data, double angle);
 
   /**
    * config detail: {'name': 'en', 'offset': 0.0, 'precision': 1.0, 'len': 1,
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
-   * 'bit': 24, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
+   * 'bit': 16, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
-  void set_enable_p(uint8_t *bytes, bool en);
+  void set_enable_p(uint8_t *bytes, bool enable);
 
   /**
    * config detail: {'name': 'clear', 'offset': 0.0, 'precision': 1.0, 'len': 1,
    * 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
-   * 'bit': 25, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
+   * 'bit': 17, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
   void set_clear_driver_override_flag_p(uint8_t *bytes, bool clear);
 
   /**
    * config detail: {'name': 'ignore', 'offset': 0.0, 'precision': 1.0, 'len':
    * 1, 'f_type': 'valid', 'is_signed_var': False, 'physical_range': '[0|0]',
-   * 'bit': 26, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
+   * 'bit': 18, 'type': 'bool', 'order': 'intel', 'physical_unit': '""'}
    */
   void set_ignore_driver_override_p(uint8_t *bytes, bool ignore);
 
-  /*
+  /**
+   * config detail: {'name': 'svel', 'offset': 0.0, 'precision': 2.0, 'len': 8,
+   * 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|500]',
+   * 'bit': 24, 'type': 'double', 'order': 'intel', 'physical_unit':
+   * '"degrees/s"'}
+   */
+  void set_steering_angle_speed_p(uint8_t *data, double angle_speed);
+
+  /**
    * config detail: {'name': 'count', 'offset': 0.0, 'precision': 1.0, 'len': 8,
    * 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|255]',
    * 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}
    */
   void set_watchdog_counter_p(uint8_t *data, int32_t count);
 
+  void set_disable_audible_warning_p(uint8_t *data, bool disable);
+
  private:
-  double pedal_cmd_ = 0.0;
-  bool boo_cmd_ = false;
-  bool pedal_enable_ = false;
+  double steering_angle_ = 0.0;
+  bool steering_enable_ = false;
   bool clear_driver_override_flag_ = false;
   bool ignore_driver_override_ = false;
-  int32_t watchdog_counter_ = 0.0;
+  double steering_angle_speed_ = 0.0;
+  int32_t watchdog_counter_ = 0;
+  bool disable_audible_warning_ = false;
 };
 
 }  // namespace lincoln

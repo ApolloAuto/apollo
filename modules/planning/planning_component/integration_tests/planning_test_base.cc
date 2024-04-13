@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planning_base/integration_tests/planning_test_base.h"
+#include "modules/planning/planning_component/integration_tests/planning_test_base.h"
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -141,6 +141,8 @@ bool PlanningTestBase::FeedTestData() {
       std::make_shared<LocalizationEstimate>(localization);
   local_view_.traffic_light =
       std::make_shared<TrafficLightDetection>(traffic_light_detection);
+  // local_view_.planning_command =
+  //     std::make_shared<PlanningCommand>(routing_response);
 
   AINFO << "Successfully feed proto files.";
   return true;
@@ -208,11 +210,11 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
                                     bool no_trajectory_point) {
   origin->clear_latency_stats();
   origin->clear_debug();
-  // origin->mutable_header()->clear_radar_timestamp();
-  // origin->mutable_header()->clear_lidar_timestamp();
-  // origin->mutable_header()->clear_timestamp_sec();
-  // origin->mutable_header()->clear_camera_timestamp();
-  // origin->mutable_header()->clear_sequence_num();
+  origin->mutable_header()->clear_radar_timestamp();
+  origin->mutable_header()->clear_lidar_timestamp();
+  origin->mutable_header()->clear_timestamp_sec();
+  origin->mutable_header()->clear_camera_timestamp();
+  origin->mutable_header()->clear_sequence_num();
 
   if (no_trajectory_point) {
     origin->clear_total_path_length();
@@ -229,6 +231,11 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
 
   ADCTrajectory adc_trajectory_pb;
+
+  PlanningCommand planningcommand;
+  local_view_.planning_command =
+      std::make_shared<PlanningCommand>(planningcommand);
+
   planning_->RunOnce(local_view_, &adc_trajectory_pb);
 
   if (!IsValidTrajectory(adc_trajectory_pb)) {
@@ -307,11 +314,11 @@ bool PlanningTestBase::IsValidTrajectory(const ADCTrajectory& trajectory) {
 
 std::shared_ptr<TrafficRule> PlanningTestBase::GetTrafficRuleConfig(
     const std::string& rule_id) {
-  for (auto& config : planning_->traffic_decider_.rule_list_) {
-    if (config->Getname() == rule_id) {
-      return config;
-    }
-  }
+  // for (auto& config : planning_->traffic_decider_.rule_list_) {
+  //   if (config->Getname() == rule_id) {
+  //     return config;
+  //   }
+  // }
   return nullptr;
 }
 

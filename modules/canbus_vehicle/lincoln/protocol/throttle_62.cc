@@ -26,7 +26,23 @@ using ::apollo::drivers::canbus::Byte;
 
 // public
 
-const int32_t Throttle62::ID = 0x62;
+const int32_t Throttle62::ID = 0x0601;
+
+void Throttle62::Parse(const std::uint8_t *bytes, int32_t length,
+                       Lincoln *chassis_detail) const {
+  if (0x2101 != ((bytes[2] << 8) | bytes[1])) {
+    return;
+  }
+  int highbyte = bytes[5] & 0xFF;
+  int lowbyte = bytes[4] & 0xFF;
+  bool isNegative = (highbyte & 0x80) != 0;
+  int value = (highbyte << 8) | lowbyte;
+  if (isNegative) {
+    value = -((~value & 0xFFFF) + 1);
+  }
+  double duty_cycle = value * 0.1;
+  printf("油门占空比：%.3f\n", duty_cycle);
+}
 
 uint32_t Throttle62::GetPeriod() const {
   static const uint32_t PERIOD = 10 * 1000;
@@ -34,11 +50,22 @@ uint32_t Throttle62::GetPeriod() const {
 }
 
 void Throttle62::UpdateData(uint8_t *data) {
-  set_pedal_p(data, pedal_cmd_);
-  set_enable_p(data, pedal_enable_);
-  set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
-  set_ignore_driver_override_p(data, ignore_driver_override_);
-  set_watchdog_counter_p(data, watchdog_counter_);
+  // set_pedal_p(data, pedal_cmd_);
+  // set_enable_p(data, pedal_enable_);
+  // set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
+  // set_ignore_driver_override_p(data, ignore_driver_override_);
+  // set_watchdog_counter_p(data, watchdog_counter_);
+
+  int throtle = int(pedal_cmd_ * 10.0);
+  printf("throtle: %d\n", throtle);
+  data[0] = static_cast<unsigned char>(0x23);
+  data[1] = static_cast<unsigned char>(0x01);
+  data[2] = static_cast<unsigned char>(0x20);
+  data[3] = static_cast<unsigned char>(0x00);
+  data[4] = static_cast<unsigned char>(throtle & 0xFF);
+  data[5] = static_cast<unsigned char>((throtle >> 8) & 0xFF);
+  data[6] = static_cast<unsigned char>((throtle >> 16) & 0xFF);
+  data[7] = static_cast<unsigned char>((throtle >> 24) & 0xFF);
 }
 
 void Throttle62::Reset() {

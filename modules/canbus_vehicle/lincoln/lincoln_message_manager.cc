@@ -30,6 +30,7 @@
 #include "modules/canbus_vehicle/lincoln/protocol/license_7e.h"
 #include "modules/canbus_vehicle/lincoln/protocol/misc_69.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
+#include "modules/canbus_vehicle/lincoln/protocol/steering_angle.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_65.h"
 #include "modules/canbus_vehicle/lincoln/protocol/surround_73.h"
 #include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
@@ -38,6 +39,7 @@
 #include "modules/canbus_vehicle/lincoln/protocol/tirepressure_71.h"
 #include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus_vehicle/lincoln/protocol/version_7f.h"
+#include "modules/canbus_vehicle/lincoln/protocol/voltage.h"
 #include "modules/canbus_vehicle/lincoln/protocol/wheelspeed_6a.h"
 
 namespace apollo {
@@ -49,6 +51,9 @@ LincolnMessageManager::LincolnMessageManager() {
   AddSendProtocolData<Brake60, true>();
   AddSendProtocolData<Throttle62, true>();
   AddSendProtocolData<Steering64, true>();
+  AddSendProtocolData<SteeringAngle, true>();
+  AddSendProtocolData<Voltage, true>();
+
   AddSendProtocolData<Gear66, true>();
   AddSendProtocolData<Turnsignal68, true>();
 

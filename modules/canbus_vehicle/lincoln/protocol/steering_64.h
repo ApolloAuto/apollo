@@ -22,6 +22,7 @@
 #pragma once
 
 #include "modules/canbus_vehicle/lincoln/proto/lincoln.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -41,6 +42,9 @@ class Steering64 : public ::apollo::drivers::canbus::ProtocolData<
                        ::apollo::canbus::Lincoln> {
  public:
   static const int32_t ID;
+
+  virtual void Parse(const std::uint8_t *bytes, int32_t length,
+                     Lincoln *chassis_detail) const;
 
   /**
    * @brief get the data period

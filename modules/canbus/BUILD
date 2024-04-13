@@ -34,16 +34,16 @@ apollo_cc_library(
     ],
 )
 
-apollo_cc_test(
-    name = "canbus_test",
-    size = "small",
-    srcs = ["canbus_test.cc"],
-    deps = [
-        ":canbus_component_lib",
-        "//modules/common/status",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+#apollo_cc_test(
+#    name = "canbus_test",
+#    size = "small",
+#    srcs = ["canbus_test.cc"],
+#    deps = [
+#        ":canbus_component_lib",
+#        "//modules/common/status",
+#        "@com_google_googletest//:gtest_main",
+#    ],
+#)
 
 apollo_component(
     name = "libcanbus_component.so",

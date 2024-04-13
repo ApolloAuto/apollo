@@ -89,25 +89,28 @@ bool CanbusComponent::Init() {
       FLAGS_control_cmd_pending_queue_size;
 
   if (FLAGS_receive_guardian) {
-    guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
-        guardian_cmd_reader_config,
-        [this](const std::shared_ptr<GuardianCommand> &cmd) {
-          ADEBUG << "Received guardian data: run canbus callback.";
-          OnGuardianCommand(*cmd);
-        });
+    // guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
+    //     guardian_cmd_reader_config,
+    //     [this](const std::shared_ptr<GuardianCommand> &cmd) {
+    //       ADEBUG << "Received guardian data: run canbus callback.";
+    //       OnGuardianCommand(*cmd);
+    //     });
   } else {
-    control_command_reader_ = node_->CreateReader<ControlCommand>(
-        control_cmd_reader_config,
-        [this](const std::shared_ptr<ControlCommand> &cmd) {
-          ADEBUG << "Received control data: run canbus callback.";
-          OnControlCommand(*cmd);
-        });
-    chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
-        chassis_cmd_reader_config,
-        [this](const std::shared_ptr<ChassisCommand> &cmd) {
-          ADEBUG << "Received control data: run canbus callback.";
-          OnChassisCommand(*cmd);
-        });
+    // control_command_reader_ = node_->CreateReader<ControlCommand>(
+    //     control_cmd_reader_config,
+    //     [this](const std::shared_ptr<ControlCommand> &cmd) {
+    //       ADEBUG << "Received control data: run canbus callback.";
+    //       OnControlCommand(*cmd);
+    //     });
+    // cyber::Async(OnControlCommand(), this);
+    thread_.reset(new std::thread([this] { OnControlCommand(); }));
+
+    // chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
+    //     chassis_cmd_reader_config,
+    //     [this](const std::shared_ptr<ChassisCommand> &cmd) {
+    //       ADEBUG << "Received control data: run canbus callback.";
+    //       OnChassisCommand(*cmd);
+    //     });
   }
 
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
@@ -147,26 +150,40 @@ bool CanbusComponent::Proc() {
   return true;
 }
 
-void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp = Time::Now().ToMicrosecond();
-  // if command coming too soon, just ignore it.
-  if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
-    ADEBUG << "Control command comes too soon. Ignore.\n Required "
-              "FLAGS_min_cmd_interval["
-           << FLAGS_min_cmd_interval << "], actual time interval["
-           << current_timestamp - last_timestamp_ << "].";
-    return;
+void CanbusComponent::OnControlCommand() {
+  ControlCommand control_command;
+  int count = 0;
+  while (true) {
+    cyber::USleep(100000);
+    int64_t current_timestamp = Time::Now().ToMicrosecond();
+    // if command coming too soon, just ignore it.
+    if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
+      ADEBUG << "Control command comes too soon. Ignore.\n Required "
+                "FLAGS_min_cmd_interval["
+             << FLAGS_min_cmd_interval << "], actual time interval["
+             << current_timestamp - last_timestamp_ << "].";
+      return;
+    }
+
+    last_timestamp_ = current_timestamp;
+    ADEBUG << "Control_sequence_number:"
+           << control_command.header().sequence_num() << ", Time_of_delay:"
+           << current_timestamp -
+                  static_cast<int64_t>(
+                      control_command.header().timestamp_sec() * 1e6)
+           << " micro seconds";
+
+
+    double value = sin(count * 6.28 / 30.0) * 90.0;
+    ADEBUG << "Control command value:" << value;
+
+    control_command.set_throttle(value);
+    control_command.set_brake(value);
+    control_command.set_steering_rate(value);
+
+    vehicle_object_->UpdateCommand(&control_command);
+    count++;
   }
-
-  last_timestamp_ = current_timestamp;
-  ADEBUG << "Control_sequence_number:"
-         << control_command.header().sequence_num() << ", Time_of_delay:"
-         << current_timestamp -
-                static_cast<int64_t>(control_command.header().timestamp_sec() *
-                                     1e6)
-         << " micro seconds";
-
-  vehicle_object_->UpdateCommand(&control_command);
 }
 
 void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
@@ -193,7 +210,7 @@ void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
 
 void CanbusComponent::OnGuardianCommand(
     const GuardianCommand &guardian_command) {
-  OnControlCommand(guardian_command.control_command());
+  // OnControlCommand(guardian_command.control_command());
 }
 
 common::Status CanbusComponent::OnError(const std::string &error_msg) {

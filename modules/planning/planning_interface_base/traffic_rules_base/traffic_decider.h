@@ -52,7 +52,7 @@ class TrafficDecider {
   apollo::common::Status Execute(Frame *frame,
                                  ReferenceLineInfo *reference_line_info);
 
- private:
+ public:
   bool init_ = false;
   void BuildPlanningTarget(ReferenceLineInfo *reference_line_info);
   std::vector<std::shared_ptr<TrafficRule>> rule_list_;

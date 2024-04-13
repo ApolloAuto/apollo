@@ -80,7 +80,7 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
   void Clear() override;
 
   void PublishChassis();
-  void OnControlCommand(const apollo::control::ControlCommand &control_command);
+  void OnControlCommand();
   void OnChassisCommand(
       const apollo::external_command::ChassisCommand &chassis_command);
   void OnGuardianCommand(
@@ -100,6 +100,7 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
   int64_t last_timestamp_ = 0;
   ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;
+  std::unique_ptr<std::thread> thread_;
 };
 
 CYBER_REGISTER_COMPONENT(CanbusComponent)

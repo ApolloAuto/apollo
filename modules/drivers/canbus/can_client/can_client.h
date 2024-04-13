@@ -32,6 +32,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/can_client/hermes_can/controlcan.h"
 
 /**
  * @namespace apollo::drivers::canbus
@@ -41,6 +42,10 @@ namespace apollo {
 namespace drivers {
 namespace canbus {
 
+
+
+
+
 /**
  * @class CanFrame
  * @brief The class which defines the information to send and receive.
@@ -48,6 +53,7 @@ namespace canbus {
 struct CanFrame {
   /// Message id
   uint32_t id;
+  uint32_t device_id;
   /// Message length
   uint8_t len;
   /// Message content
@@ -142,6 +148,10 @@ class CanClient {
         << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);
+
+    
+
+
   }
 
   /**

@@ -16,7 +16,7 @@
 
 /**
  * @file brake_60.h
- * @brief the class of Brake60 (for lincoln vehicle)
+ * @brief the class of Voltage (for lincoln vehicle)
  */
 
 #pragma once
@@ -34,15 +34,14 @@ namespace canbus {
 namespace lincoln {
 
 /**
- * @class Brake60
+ * @class Voltage
  *
  * @brief one of the protocol data of lincoln vehicle
  */
-class Brake60 : public ::apollo::drivers::canbus::ProtocolData<
+class Voltage : public ::apollo::drivers::canbus::ProtocolData<
                     ::apollo::canbus::Lincoln> {
  public:
   static const int32_t ID;
-
   virtual void Parse(const std::uint8_t *bytes, int32_t length,
                      Lincoln *chassis_detail) const;
   /**
@@ -66,32 +65,32 @@ class Brake60 : public ::apollo::drivers::canbus::ProtocolData<
    * @brief set pedal based on pedal command
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_pedal(double pcmd);
+  Voltage *set_pedal(double pcmd);
 
   /**
    * @brief set pedal_enable_ to true
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_enable();
+  Voltage *set_enable();
 
   /**
    * @brief set pedal_enable_ to false
    * @return a this pointer to the instance itself
    */
-  Brake60 *set_disable();
+  Voltage *set_disable();
 
  private:
   /**
    * @brief enable boo command
    * @return a this pointer to the instance itself
    */
-  Brake60 *enable_boo_cmd();
+  Voltage *enable_boo_cmd();
 
   /**
    * @brief disable boo command
    * @return a this pointer to the instance itself
    */
-  Brake60 *disable_boo_cmd();
+  Voltage *disable_boo_cmd();
 
   /**
    * config detail: {'name': 'pcmd', 'offset': 0.0, 'precision':

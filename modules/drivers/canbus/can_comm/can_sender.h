@@ -31,12 +31,13 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cyber/common/macros.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "cyber/time/time.h"
-#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_client/hermes_can/controlcan.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -47,6 +48,28 @@
 namespace apollo {
 namespace drivers {
 namespace canbus {
+
+// /*-----------   发送帧参数  --------------------*/
+// UINT TIME_STAMP = 10;  // 时间标识，仅在接收帧时有意义
+// BYTE TIME_FLAG = 1;    // 是否使用时间标识,仅在接收帧时有意义
+// BYTE TRANSMIT_SEND_TYPE =
+//     1;  //
+//     发送帧类型，0：正常发送，发送失败重发，4秒内未发送则取消；1：单次发送
+// BYTE REMOTE_FLAG = 0;  // 是否是远程帧， 0：数据帧； 1：远程帧
+// BYTE EXTERN_FLAG = 1;  // 是否是扩展帧，0：标准帧(11位ID) 1：扩展帧（29位ID）
+// BYTE DATA_LEN = 8;  // 数据长度
+
+inline void setCANObjStdConfig(BYTE extern_flag, VCI_CAN_OBJ &obj) {
+  obj.TimeStamp = 10;
+  obj.TimeFlag = 1;
+  obj.SendType = 1;
+  obj.RemoteFlag = 0;
+  obj.ExternFlag = extern_flag;
+  obj.DataLen = 8;
+  for (int i = 0; i < 3; ++i) {
+    obj.Reserved[i] = 0;
+  }
+}
 
 /**
  * @class SenderMessage
@@ -103,7 +126,8 @@ class SenderMessage {
    * @brief Get the CAN frame to send.
    * @return The CAN frame to send.
    */
-  struct CanFrame CanFrame();
+  // struct CanFrame CanFrame();
+  VCI_CAN_OBJ CanFrame();
 
   /**
    * @brief Get the message ID.
@@ -129,6 +153,8 @@ class SenderMessage {
   static std::mutex mutex_;
   struct CanFrame can_frame_to_send_;
   struct CanFrame can_frame_to_update_;
+  VCI_CAN_OBJ can_frame_to_send_air_;
+  VCI_CAN_OBJ can_frame_to_update_air_;
 };
 
 /**
@@ -242,6 +268,15 @@ SenderMessage<SensorType>::SenderMessage(
   can_frame_to_update_.id = message_id_;
   can_frame_to_update_.len = static_cast<uint8_t>(len);
 
+  can_frame_to_update_air_.ID = message_id_;
+  can_frame_to_update_air_.DataLen = static_cast<uint8_t>(len);
+  // canIDToj1939(can_frame_to_update_air_.ID);
+  if (message_id_ == 0x0602 || message_id_ == 0x0601) {
+    setCANObjStdConfig(0, can_frame_to_update_air_);
+  } else {
+    setCANObjStdConfig(1, can_frame_to_update_air_);
+  }
+
   period_ = protocol_data_->GetPeriod();
   curr_period_ = period_;
 
@@ -262,10 +297,12 @@ void SenderMessage<SensorType>::Update() {
     AERROR << "Attention: ProtocolData is nullptr!";
     return;
   }
-  protocol_data_->UpdateData(can_frame_to_update_.data);
+  // protocol_data_->UpdateData(can_frame_to_update_.data);
+  protocol_data_->UpdateData(can_frame_to_update_air_.Data);
 
   std::lock_guard<std::mutex> lock(mutex_);
-  can_frame_to_send_ = can_frame_to_update_;
+  // can_frame_to_send_ = can_frame_to_update_;
+  can_frame_to_send_air_ = can_frame_to_update_air_;
 }
 
 template <typename SensorType>
@@ -286,9 +323,10 @@ uint32_t SenderMessage<SensorType>::message_id() const {
 }
 
 template <typename SensorType>
-struct CanFrame SenderMessage<SensorType>::CanFrame() {
+VCI_CAN_OBJ SenderMessage<SensorType>::CanFrame() {
   std::lock_guard<std::mutex> lock(mutex_);
-  return can_frame_to_send_;
+  // return can_frame_to_send_;
+  return can_frame_to_send_air_;
 }
 
 template <typename SensorType>
@@ -326,19 +364,32 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       if (!need_send) {
         continue;
       }
-      std::vector<CanFrame> can_frames;
-      CanFrame can_frame = message.CanFrame();
+      std::vector<VCI_CAN_OBJ> can_frames;
+      VCI_CAN_OBJ can_frame = message.CanFrame();
+      // can_frame.ID = Pot_CanID_Read;
+      // setCANObjStdConfig(0, canSend);
+
       can_frames.push_back(can_frame);
-      if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK) {
-        AERROR << "Send msg failed:" << can_frame.CanFrameString();
+      VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
+      printf("Send Message: CANID:0x%08X ", can_frame.ID);
+      printf("DLC:0x%02X", can_frame.DataLen);  // 帧长度
+      printf(" data:0x");                    // 数据
+      for (int j = 0; j < can_frame.DataLen; ++j) {
+        printf(" %02X", can_frame.Data[j]);
       }
+      printf("\n");
+
+      // if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK)
+      // {
+      //   AERROR << "Send msg failed";
+      // }
       if (enable_log()) {
-        ADEBUG << "send_can_frame#" << can_frame.CanFrameString()
-               << "echo send_can_frame# in chssis_detail.";
-        uint32_t uid = can_frame.id;
-        const uint8_t *data = can_frame.data;
-        uint8_t len = can_frame.len;
-        pt_manager_->Parse(uid, data, len);
+        // ADEBUG << "send_can_frame#" << can_frame.CanFrameString()
+        //        << "echo send_can_frame# in chssis_detail.";
+        // uint32_t uid = can_frame.id;
+        // const uint8_t *data = can_frame.data;
+        // uint8_t len = can_frame.len;
+        // pt_manager_->Parse(uid, data, len);
       }
     }
     delta_period = new_delta_period;

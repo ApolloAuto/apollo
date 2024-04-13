@@ -17,7 +17,7 @@
 #include "cyber/time/clock.h"
 #include "modules/planning/planning_base/common/planning_context.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
-#include "modules/planning/planning_base/integration_tests/planning_test_base.h"
+#include "modules/planning/planning_component/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {

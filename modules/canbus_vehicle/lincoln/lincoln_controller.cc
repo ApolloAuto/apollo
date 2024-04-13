@@ -22,8 +22,10 @@
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
+#include "modules/canbus_vehicle/lincoln/protocol/voltage.h"
 #include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
+#include "modules/canbus_vehicle/lincoln/protocol/steering_angle.h"
 #include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
 #include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/common/kv_db/kv_db.h"
@@ -97,24 +99,44 @@ ErrorCode LincolnController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  gear_66_ = dynamic_cast<Gear66 *>(
-      message_manager_->GetMutableProtocolDataById(Gear66::ID));
-  if (gear_66_ == nullptr) {
-    AERROR << "Gear66 does not exist in the LincolnMessageManager!";
-    return ErrorCode::CANBUS_ERROR;
-  }
-  turnsignal_68_ = dynamic_cast<Turnsignal68 *>(
-      message_manager_->GetMutableProtocolDataById(Turnsignal68::ID));
-  if (turnsignal_68_ == nullptr) {
-    AERROR << "Turnsignal68 does not exist in the LincolnMessageManager!";
+  voltage_ = dynamic_cast<Voltage *>(
+      message_manager_->GetMutableProtocolDataById(Voltage::ID));
+  if (voltage_ == nullptr) {
+    AERROR << "Steering64 does not exist in the LincolnMessageManager!";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  can_sender_->AddMessage(Brake60::ID, brake_60_, false);
-  can_sender_->AddMessage(Throttle62::ID, throttle_62_, false);
-  can_sender_->AddMessage(Steering64::ID, steering_64_, false);
-  can_sender_->AddMessage(Gear66::ID, gear_66_, false);
-  can_sender_->AddMessage(Turnsignal68::ID, turnsignal_68_, false);
+  // gear_66_ = dynamic_cast<Gear66 *>(
+  //     message_manager_->GetMutableProtocolDataById(Gear66::ID));
+  // if (gear_66_ == nullptr) {
+  //   AERROR << "Gear66 does not exist in the LincolnMessageManager!";
+  //   return ErrorCode::CANBUS_ERROR;
+  // }
+  // turnsignal_68_ = dynamic_cast<Turnsignal68 *>(
+  //     message_manager_->GetMutableProtocolDataById(Turnsignal68::ID));
+  // if (turnsignal_68_ == nullptr) {
+  //   AERROR << "Turnsignal68 does not exist in the LincolnMessageManager!";
+  //   return ErrorCode::CANBUS_ERROR;
+  // }
+
+  can_sender_->AddMessage(0x0602, brake_60_, false); // 0x0602
+  can_sender_->AddMessage(0x0601, throttle_62_, false); // 0x0601
+  auto can_id = 0x18FF0D1C;
+  unsigned int priority = (can_id >> 26) & 0x07;
+  unsigned int reserved = (can_id >> 25) & 0x01;
+  unsigned int data_page = (can_id >> 24) & 0x01;
+  unsigned int pf = (can_id >> 16) & 0xFF;
+  unsigned int ge = (can_id >> 8) & 0xFF;
+  unsigned int sa = can_id & 0xFF;
+  unsigned int pgn = ((pf << 8) | ge);
+  can_id = ((priority << 26) | (reserved << 25) | (data_page << 24) |
+            (pgn << 8) | sa);
+  can_sender_->AddMessage(can_id, steering_64_, false);  // 0x0600
+  // can_sender_->AddMessage(Voltage::ID, voltage_, false); // 0x0603
+
+
+  // can_sender_->AddMessage(Gear66::ID, gear_66_, false);
+  // can_sender_->AddMessage(Turnsignal68::ID, turnsignal_68_, false);
 
   // Need to sleep to ensure all messages received
   AINFO << "LincolnController is initialized.";
@@ -129,8 +151,8 @@ bool LincolnController::Start() {
     AERROR << "LincolnController has NOT been initiated.";
     return false;
   }
-  const auto &update_func = [this] { SecurityDogThreadFunc(); };
-  thread_.reset(new std::thread(update_func));
+  // const auto &update_func = [this] { SecurityDogThreadFunc(); };
+  // thread_.reset(new std::thread(update_func));
 
   return true;
 }
@@ -538,22 +560,22 @@ void LincolnController::Gear(Chassis::GearPosition ref_gear_position) {
 // acceleration_spd:60 ~ 100, suggest: 90
 // -> pedal
 void LincolnController::Brake(double pedal) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
-      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
-    AINFO << "The current drive mode does not need to set acceleration.";
-    return;
-  }
+  // if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+  //     driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+  //   AINFO << "The current drive mode does not need to set acceleration.";
+  //   return;
+  // }
   brake_60_->set_pedal(pedal);
 }
 
 // drive with old acceleration
 // gas:0.00~99.99 unit:%
 void LincolnController::Throttle(double pedal) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
-      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
-    AINFO << "The current drive mode does not need to set acceleration.";
-    return;
-  }
+  // if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+  //     driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+  //   AINFO << "The current drive mode does not need to set acceleration.";
+  //   return;
+  // }
   throttle_62_->set_pedal(pedal);
 }
 
@@ -573,15 +595,17 @@ void LincolnController::Acceleration(double acc) {
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:%, left:-, right:+
 void LincolnController::Steer(double angle) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
-      driving_mode() != Chassis::AUTO_STEER_ONLY) {
-    AINFO << "The current driving mode does not need to set steer.";
-    return;
-  }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  // reverse sign
-  steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
+  // if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+  //     driving_mode() != Chassis::AUTO_STEER_ONLY) {
+  //   AINFO << "The current driving mode does not need to set steer.";
+  //   return;
+  // }
+  // const double real_angle =
+  //     vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  // // reverse sign
+  // steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
+  steering_64_->set_steering_angle(angle);
+
 }
 
 // steering with new angle speed

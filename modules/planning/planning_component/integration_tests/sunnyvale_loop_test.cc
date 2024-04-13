@@ -17,7 +17,7 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
-#include "modules/planning/planning_base/integration_tests/planning_test_base.h"
+#include "modules/planning/planning_component/integration_tests/planning_test_base.h"
 
 DECLARE_bool(reckless_change_lane);
 
@@ -42,7 +42,9 @@ class SunnyvaleLoopTest : public PlanningTestBase {
 
     FLAGS_enable_rss_info = false;
 
-    ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
+    apollo::cyber::plugin_manager::PluginManager::Instance()
+        ->LoadInstalledPlugins();
+    // ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   }
 };
 
@@ -158,7 +160,7 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
-  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
+  // ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
   PlanningTestBase::SetUp();
   RUN_GOLDEN_TEST(0);
 }
@@ -212,7 +214,7 @@ TEST_F(SunnyvaleLoopTest, mission_complete) {
  */
 TEST_F(SunnyvaleLoopTest, avoid_change_left) {
   std::string seq_num = "11";
-  FLAGS_reckless_change_lane = true;
+  // FLAGS_reckless_change_lane = true;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
@@ -226,7 +228,7 @@ TEST_F(SunnyvaleLoopTest, avoid_change_left) {
  */
 TEST_F(SunnyvaleLoopTest, qp_path_failure) {
   std::string seq_num = "12";
-  FLAGS_reckless_change_lane = true;
+  // FLAGS_reckless_change_lane = true;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
@@ -252,7 +254,7 @@ TEST_F(SunnyvaleLoopTest, change_lane_failback) {
   }
 
   std::string seq_num = "13";
-  FLAGS_reckless_change_lane = true;
+  // FLAGS_reckless_change_lane = true;
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
