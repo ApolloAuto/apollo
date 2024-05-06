@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/mrac_conf.proto";
+
+message LatBaseLqrControllerConf{
+  optional double ts = 1;  // sample time (dt) 0.01 now, configurable
+  // preview window n, preview time = preview window * ts
+  optional int32 preview_window = 2;
+  optional double cf = 3;
+  optional double cr = 4;  // N/rad
+  optional int32 mass_fl = 5;
+  optional int32 mass_fr = 6;
+  optional int32 mass_rl = 7;
+  optional int32 mass_rr = 8;
+  optional double eps = 9;        // converge threshold for lqr solver
+  repeated double matrix_q = 10;  // matrix_q size = 4 + preview_window
+  // matrix_q size = 4 + preview_window for reverse gear
+  repeated double reverse_matrix_q = 11;
+  optional int32 cutoff_freq = 12;              // cutoff frequency
+  optional int32 mean_filter_window_size = 13;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
+  optional int32 max_iteration = 14;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 15;  // limit aggressive steering
+  optional apollo.control.GainScheduler lat_err_gain_scheduler = 16;
+  optional apollo.control.GainScheduler heading_err_gain_scheduler = 17;
+  optional LeadlagConf reverse_leadlag_conf = 18;
+  optional bool enable_reverse_leadlag_compensation = 19 [default = false];
+  optional bool enable_look_ahead_back_control = 20 [default = false];
+  optional double lookahead_station = 21 [default = 0.0];
+  optional double lookback_station = 22 [default = 0.0];
+  optional MracConf steer_mrac_conf = 23;
+  optional bool enable_steer_mrac_control = 24 [default = false];
+  optional double lookahead_station_high_speed = 25 [default = 0.0];
+  optional double lookback_station_high_speed = 26 [default = 0.0];
+
+  // from gflags and control_conf.proto
+  optional double lock_steer_speed = 27 [default = 0.081];
+  optional bool enable_navigation_mode_error_filter = 28 [default = false];
+  optional bool enable_navigation_mode_position_update = 29 [default = true];
+  optional double query_relative_time = 30 [default = 0.8];
+  optional bool trajectory_transform_to_com_reverse = 31 [default = false];
+  optional bool trajectory_transform_to_com_drive = 32 [default = false];
+  optional bool enable_feedback_augment_on_high_speed = 33 [default = false];
+  optional bool enable_maximum_steer_rate_limit = 34 [default = false];
+  optional bool query_time_nearest_point_only = 35 [default = false];
+
+  optional double switch_speed = 36;  // low/high speed controller switch speed
+  optional double switch_speed_window = 37 [default = 0.0];
+  optional double reverse_feedforward_ratio = 38 [default = 1.0];
+
+  optional bool reverse_use_dynamic_model = 39 [default = false];
+}

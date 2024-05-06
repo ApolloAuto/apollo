@@ -1,5 +1,15 @@
-# Tailored from https://github.com/google/glog/blob/master/BUILD
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-load(":bazel/glog.bzl", "glog_library")
+licenses(["notice"])
 
-glog_library(with_gflags=0)
+package(default_visibility = ["//visibility:public"])
+
+
+cc_library(
+    name = "glog",
+    includes = ["."],
+    linkopts = [
+        "-L/usr/local/lib/",
+        "-lglog",
+    ],
+)

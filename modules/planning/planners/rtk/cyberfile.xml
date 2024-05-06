@@ -1,0 +1,20 @@
+<package format="2">
+  <name>planning-planner-rtk</name>
+  <version>local</version>
+  <description>
+    Rtk planner.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/planning/planners/rtk</src_path>
+
+  <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+  
+</package>

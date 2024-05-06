@@ -1,0 +1,44 @@
+gpu_id: 0
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name : "DarkSCNNLaneDetector"
+      config_path : "perception/lane_detection/data/"
+      config_file : "config_darkSCNN.pb.txt"
+    }
+    camera_name : "front_6mm"
+  }
+  lane_postprocessor_param {
+    name : "DarkSCNNLanePostprocessor"
+    config_path : "perception/lane_detection/data/"
+    config_file : "darkscNN_postprocess_config.pb.txt"
+  }
+}
+
+lane_param {
+  lane_detector_param {
+    plugin_param {
+      name : "DarkSCNNLaneDetector"
+      config_path : "perception/lane_detection/data/"
+      config_file : "config_darkSCNN.pb.txt"
+    }
+    camera_name : "front_12mm"
+  }
+  lane_postprocessor_param {
+    name : "DarkSCNNLanePostprocessor"
+    config_path : "perception/lane_detection/data/"
+    config_file : "darkscNN_postprocess_config.pb.txt"
+  }
+}
+
+calibration_service_param {
+  plugin_param {
+      name : "OnlineCalibrationService"
+  }
+  calibrator_method : "LaneLineCalibrator"
+}
+
+debug_param {
+  lane_out_dir : "/apollo/debug_output/lane/"
+  calibration_out_dir : "/apollo/debug_output/calib/"
+}

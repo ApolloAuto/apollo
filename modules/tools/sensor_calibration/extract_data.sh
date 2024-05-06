@@ -87,9 +87,11 @@ function check_target_dir() {
 # Since pypcd installed via `pip install` only works with python2.7,
 # we can only install it this way
 function _install_pypcd() {
-  git clone https://github.com/DanielPollithy/pypcd
+  git clone https://github.com/dimatura/pypcd
   pushd pypcd >/dev/null
-  sudo make install
+  git fetch origin pull/9/head:python3
+  git checkout python3
+  python3 setup.py install --user
   popd >/dev/null
   sudo rm -rf pypcd
 }
@@ -227,7 +229,12 @@ function main() {
 
   set -e
 
-  local extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"
+  local extract_data_bin="/opt/apollo/neo/packages/tools-dev/latest/sensor_calibration/extract_data"
+  
+  if [[ ! -f "${extract_data_bin}" ]];then
+    extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"
+  fi
+
   if [[ -f "${extract_data_bin}" ]]; then
     "${extract_data_bin}" --config "${TARGET_DIR}/${TASK}.config"
   else

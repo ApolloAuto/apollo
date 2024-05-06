@@ -1,9 +1,14 @@
 import React from 'react';
 import _ from 'lodash';
 
+import RadioItem from 'components/common/RadioItem';
+
 export default class DefaultRoutingInput extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      routingType: 'defaultRouting',
+    };
 
     this.saveDefaultRouting = this.saveDefaultRouting.bind(this);
     this.removeDefaultRouting = this.removeDefaultRouting.bind(this);
@@ -32,7 +37,7 @@ export default class DefaultRoutingInput extends React.Component {
     return (
       <div className="default-routing-input">
         <div>
-          <label className="name-label">Default Routing Name:</label>
+          <label className="name-label">Routing Name:</label>
           <input className="name-input"></input>
         </div>
         <div className="default-routing-input-btn">

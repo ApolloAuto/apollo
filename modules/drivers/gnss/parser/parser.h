@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "google/protobuf/message.h"
 
@@ -28,6 +29,32 @@
 namespace apollo {
 namespace drivers {
 namespace gnss {
+
+// A general pointer to a protobuf message.
+using MessagePtr = ::google::protobuf::Message *;
+enum class MessageType {
+  NONE,
+  GNSS,
+  GNSS_RANGE,
+  IMU,
+  INS,
+  INS_STAT,
+  WHEEL,
+  EPHEMERIDES,
+  OBSERVATION,
+  GPGGA,
+  BDSEPHEMERIDES,
+  RAWIMU,
+  GPSEPHEMERIDES,
+  GLOEPHEMERIDES,
+  BEST_GNSS_POS,
+  HEADING,
+};
+struct MessageInfo {
+  MessageType type;
+  MessagePtr message_ptr;
+};
+using MessageInfoVec = std::vector<MessageInfo>;
 
 // convert gps time (base on Jan 6 1980) to system time (base on Jan 1 1970)
 // notice: Jan 6 1980
@@ -50,10 +77,26 @@ inline T *As(::google::protobuf::Message *message_ptr) {
 // One should use the create_xxx() functions to create a Parser object.
 class Parser {
  public:
-  // A general pointer to a protobuf message.
-  using MessagePtr = ::google::protobuf::Message *;
-  // Return a pointer to a NovAtel parser. The caller should take ownership.
+  // Return a pointer to a parser. The caller should take ownership.
   static Parser *CreateNovatel(const config::Config &config);
+  static Parser *CreateHuaCeText(const config::Config &config);
+  static Parser *CreateAsensing(const config::Config &config);
+  static Parser *CreateBroadGnssText(const config::Config &config);
+
+  static Parser *CreateParser(const config::Config &config) {
+    switch (config.data().format()) {
+      case config::Stream::NOVATEL_BINARY:
+        return Parser::CreateNovatel(config);
+      case config::Stream::HUACE_TEXT:
+        return Parser::CreateHuaCeText(config);
+      case config::Stream::ASENSING_BINARY:
+        return Parser::CreateAsensing(config);
+      case config::Stream::BROADGNSS_TEXT:
+        return Parser::CreateBroadGnssText(config);
+      default:
+        return nullptr;
+    }
+  }
 
   // Return a pointer to rtcm v3 parser. The caller should take ownership.
   static Parser *CreateRtcmV3(bool is_base_station = false);
@@ -71,30 +114,16 @@ class Parser {
   void Update(const std::string &data) {
     Update(reinterpret_cast<const uint8_t *>(data.data()), data.size());
   }
-
-  enum class MessageType {
-    NONE,
-    GNSS,
-    GNSS_RANGE,
-    IMU,
-    INS,
-    INS_STAT,
-    WHEEL,
-    EPHEMERIDES,
-    OBSERVATION,
-    GPGGA,
-    BDSEPHEMERIDES,
-    RAWIMU,
-    GPSEPHEMERIDES,
-    GLOEPHEMERIDES,
-    BEST_GNSS_POS,
-    HEADING,
-  };
-
   // Gets a parsed protobuf message. The caller must consume the message before
   // calling another
   // GetMessage() or Update();
-  virtual MessageType GetMessage(MessagePtr *message_ptr) = 0;
+  virtual MessageType GetMessage(MessagePtr *message_ptr) {
+    return MessageType::NONE;
+  }
+
+  virtual void GetMessages(MessageInfoVec *messages) {}
+
+  virtual bool GetInsStat(MessagePtr *message_ptr) { return false; }
 
  protected:
   Parser() {}

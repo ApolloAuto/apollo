@@ -152,7 +152,7 @@ void Rtcm3Parser::SetObservationTime() {
   observation_.set_gnss_second_s(second);
 }
 
-Parser::MessageType Rtcm3Parser::GetMessage(MessagePtr *message_ptr) {
+MessageType Rtcm3Parser::GetMessage(MessagePtr *message_ptr) {
   if (data_ == nullptr) {
     return MessageType::NONE;
   }

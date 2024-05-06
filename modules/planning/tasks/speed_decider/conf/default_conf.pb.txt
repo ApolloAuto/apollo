@@ -1,0 +1,21 @@
+follow_min_obs_lateral_distance: 2.5
+follow_min_time_sec: 2.0
+stop_follow_distance: 2.0
+follow_distance_scheduler {
+  follow_distance {
+    speed: 0.0
+    slope: 2.0
+  }
+  follow_distance {
+    speed: 2.7
+    slope: 1.0
+  }
+  follow_distance {
+    speed: 5.4
+    slope: 0.75
+  }
+  follow_distance {
+    speed: 8.1
+    slope: 0.5
+  }
+}

@@ -1,8 +1,11 @@
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library")
+
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+apollo_cc_library(
     name = "rtklib",
     srcs = [
         "novatel.c",
@@ -13,3 +16,5 @@ cc_library(
     ],
     hdrs = ["rtklib.h"],
 )
+
+apollo_package()

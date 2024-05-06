@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.perception.camera.app;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message DetectorParam {
+  optional PluginParam plugin_param = 1;
+  optional string camera_name = 2;
+}
+
+message DebugParam {
+  optional string detection_out_dir = 1;
+  optional string tracked_detection_out_dir = 2;
+  optional string track_out_file = 3;
+  optional string detect_feature_dir = 4;
+  optional string lane_out_dir = 5;
+  optional string camera2world_out_file = 6;
+  optional string calibration_out_dir = 7;
+}
+
+message LanePerceptionParam {
+  optional DetectorParam lane_detector_param = 1;
+  optional PluginParam lane_postprocessor_param = 2;
+  optional PluginParam lane_tracker_param = 3;
+  optional int32 gpu_id = 4;
+}
+
+message CalibrationServiceParam {
+  optional string calibrator_method = 2;
+  optional PluginParam plugin_param = 3;
+}
+
+message PerceptionParam {
+  optional int32 gpu_id = 1;
+  repeated LanePerceptionParam lane_param = 2;
+  optional CalibrationServiceParam calibration_service_param = 3;
+  optional DebugParam debug_param = 4;
+}

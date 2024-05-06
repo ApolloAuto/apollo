@@ -23,12 +23,22 @@ import gflags
 import matplotlib.pyplot as plt
 
 import modules.tools.common.proto_utils as proto_utils
-import modules.map.proto.map_pb2 as map_pb2
+import modules.common_msgs.map_msgs.map_pb2 as map_pb2
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import modules.routing.proto.routing_pb2 as routing_pb2
+import modules.common_msgs.routing_msgs.routing_pb2 as routing_pb2
+from pathlib import Path
 
 FLAGS = gflags.FLAGS
 gflags.DEFINE_string('map_dir', 'modules/map/data/demo', 'map directory')
+
+def check_file(file_path, origin_apollo_path):
+    file_wrapper = Path(file_path)
+    if not file_wrapper.exists():
+        file_wrapper = Path(origin_apollo_path)
+    if not file_wrapper.exists():
+        print("Can not find {}, exit".format(str(file_wrapper)))
+        exit(-1)
+    return str(file_wrapper)
 
 
 def get_map_dir(argv):
@@ -37,6 +47,7 @@ def get_map_dir(argv):
         os.path.join(
             os.path.dirname(__file__), '../../common/data',
             'global_flagfile.txt'))
+    flagfile = check_file(flagfile, "/apollo/modules/common/data/global_flagfile.txt")
     sys.argv.insert(2, '--flagfile=' + flagfile)
     argv = FLAGS(sys.argv)
     mapdir = os.path.normpath(
@@ -62,7 +73,7 @@ def get_topodata(map_dir):
 def get_routingdata():
     print('Please wait for loading route response data...')
     log_dir = os.path.normpath(
-        os.path.join(os.path.dirname(__file__), '../../../data/log'))
+        os.path.join('/apollo/data/log'))
     route_data_path = os.path.join(log_dir, 'passage_region_debug.bin')
     print("File: %s" % route_data_path)
     return proto_utils.get_pb_from_text_file(route_data_path, routing_pb2.RoutingResponse())

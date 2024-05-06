@@ -1,0 +1,5 @@
+<library path="modules/planning/scenarios/emergency_stop/libemergency_stop_scenario.so">
+    <class type="apollo::planning::EmergencyStopScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::EmergencyStopStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::EmergencyStopStageStandby" base_class="apollo::planning::Stage"></class>
+</library>

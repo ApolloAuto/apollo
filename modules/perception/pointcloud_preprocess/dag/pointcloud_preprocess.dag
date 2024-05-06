@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/pointcloud_preprocess/libpointcloud_preprocess_component.so"
+  components {
+    class_name : "PointCloudPreprocessComponent"
+    config {
+      name : "PointCloudPreprocess"
+      config_file_path : "/apollo/modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+      }
+    }
+  }
+}

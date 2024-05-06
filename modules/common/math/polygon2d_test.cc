@@ -443,6 +443,18 @@ TEST(Polygon2dTest, Overlap) {
 
   const Polygon2d poly5(
       {{0, 0}, {4, 0}, {4, 2}, {3, 2}, {2, 1}, {1, 2}, {0, 2}});
+  const Polygon2d poly6(
+      {{-3, 2}, {-3, 3}, {0, 3}, {0, 2.5}});
+
+  EXPECT_FALSE(poly5.HasOverlap(poly6));
+  for (size_t i = 0; i < poly6.line_segments().size(); i++) {
+    EXPECT_FALSE(poly5.HasOverlap(poly6.line_segments()[i]))
+        << poly6.line_segments()[i].start().x()
+        << ", " << poly6.line_segments()[i].start().y()
+        << " " << poly6.line_segments()[i].end().x()
+        << ", " << poly6.line_segments()[i].end().y();
+  }
+
   std::vector<LineSegment2d> overlap_line_segments =
       poly5.GetAllOverlaps(LineSegment2d({-10, 1.5}, {10, 1.5}));
   EXPECT_EQ(2, overlap_line_segments.size());

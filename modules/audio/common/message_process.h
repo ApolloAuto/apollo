@@ -22,7 +22,7 @@
 #include "modules/audio/inference/direction_detection.h"
 #include "modules/audio/inference/moving_detection.h"
 #include "modules/audio/inference/siren_detection.h"
-#include "modules/audio/proto/audio.pb.h"
+#include "modules/common_msgs/audio_msgs/audio.pb.h"
 #include "modules/drivers/microphone/proto/audio.pb.h"
 
 namespace apollo {

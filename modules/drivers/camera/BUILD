@@ -1,25 +1,46 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_x86_64")
+load("//tools/platform:build_defs.bzl", "if_x86_64", "if_aarch64", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
 CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
-cc_binary(
+apollo_component(
     name = "libcamera_component.so",
+    srcs = ["camera_component.cc"],
+    hdrs = ["camera_component.h"],
+    copts = CAMERA_COPTS,
     linkopts = [
         "-latomic",
     ],
-    linkshared = True,
-    linkstatic = False,
     deps = [
-        ":camera_component_lib",
-        ":compress_component_lib",
+        ":apollo_camera_util",
+        "//cyber",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "@ffmpeg//:avcodec",
         "@ffmpeg//:avformat",
         "@ffmpeg//:swscale",
+    ],
+)
+
+apollo_component(
+    name = "libcamera_compress_component.so",
+    srcs = ["compress_component.cc"],
+    hdrs = ["compress_component.h"],
+    copts = CAMERA_COPTS,
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/drivers/camera/proto:config_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
+        "@opencv//:core",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
     ],
 )
 
@@ -32,53 +53,8 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    data = [
-      ":runtime_data",
-    ],
-    targets = [
-      ":libcamera_component.so",
-    ],
-    deps = [
-        "//cyber:install",
-    ],
-)
-
-cc_library(
-    name = "camera_component_lib",
-    srcs = ["camera_component.cc"],
-    hdrs = ["camera_component.h"],
-    copts = CAMERA_COPTS,
-    deps = [
-        ":camera",
-        "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
-    ],
-)
-
-cc_library(
-    name = "compress_component_lib",
-    srcs = ["compress_component.cc"],
-    hdrs = ["compress_component.h"],
-    copts = CAMERA_COPTS,
-    deps = [
-        "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/camera/proto:config_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
-        "@opencv//:core",
-        "@opencv//:highgui",
-        "@opencv//:imgcodecs",
-        "@opencv//:imgproc",
-    ],
-)
-
-cc_library(
-    name = "camera",
+apollo_cc_library(
+    name = "apollo_camera_util",
     srcs = select(
         {
             "@platforms//cpu:x86_64": [
@@ -104,6 +80,7 @@ cc_library(
         no_match_error = "Please Build with an ARM or Linux x86_64 platform",
     ),
     deps = [
+        "@boost",
         "//cyber",
         "//modules/drivers/camera/proto:config_cc_proto",
         "@ffmpeg//:avcodec",
@@ -112,4 +89,5 @@ cc_library(
     ),
 )
 
+apollo_package()
 cpplint()

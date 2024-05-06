@@ -1,0 +1,90 @@
+{
+  "row": 2,
+  "col": 2,
+  "subplot": [
+    {
+      "title": "xy",
+      "x_label": "x",
+      "y_label": "y",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "title": "s-theta",
+      "x_label": "s",
+      "y_label": "theta",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "title": "s-kappa",
+      "x_label": "s",
+      "y_label": "kappa",
+      "row": 1,
+      "col": 0
+    }
+  ],
+  "line": [
+    {
+      "label": ".*roi_boundary",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "warm_path_box1",
+      "type": "box",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "rs_point",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "vehicle_end_box",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "vehicle_start_box",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "warm_path",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "iter_smoothed_s-kappa",
+      "marker": "*-",
+      "subplot": "s-kappa"
+    },
+    {
+      "label": "iter_warm_s-kappa",
+      "marker": "*-",
+      "subplot": "s-kappa"
+    },
+    {
+      "label": "iter_smoothed_s-theta",
+      "marker": "*-",
+      "subplot": "s-theta"
+    },
+    {
+      "label": "iter_warm_s-theta",
+      "marker": "*-",
+      "subplot": "s-theta"
+    },
+    {
+      "label": "iter_warm_xy",
+      "marker": "*-",
+      "subplot": "xy"
+    },
+    {
+      "label": "iter_smoothed_xy",
+      "marker": "*-",
+      "subplot": "xy"
+    }
+  ]
+}

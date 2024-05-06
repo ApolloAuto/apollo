@@ -21,7 +21,7 @@
 DEFINE_double(double_precision, 1e-6, "precision of double");
 
 // prediction trajectory and dynamic model
-DEFINE_double(prediction_trajectory_time_length, 8.0,
+DEFINE_double(prediction_trajectory_time_length, 6.0,
               "Time length of predicted trajectory (in seconds)");
 DEFINE_double(prediction_trajectory_time_resolution, 0.1,
               "Time resolution of predicted trajectory (in seconds");
@@ -31,6 +31,8 @@ DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
 DEFINE_bool(enable_tracking_adaptation, false,
             "If enable prediction tracking adaptation");
+DEFINE_bool(free_move_predict_with_accelerate, false,
+              "If freemove predict with accelerate");
 
 DEFINE_double(vehicle_max_linear_acc, 4.0,
               "Upper bound of vehicle linear acceleration");
@@ -290,6 +292,10 @@ DEFINE_double(distance_to_slow_down_at_stop_sign, 80.0,
 // Evaluator
 DEFINE_double(time_to_center_if_not_reach, 10.0,
               "Default value of time to lane center of not reach.");
+DEFINE_uint32(affine_pool_size, 80,
+              "The number of cv mat pool size.");
+DEFINE_uint32(warm_up_times, 10,
+              "The number of torch model warm up times.");
 DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,

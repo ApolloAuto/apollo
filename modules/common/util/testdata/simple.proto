@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 package apollo.common.util.test;
 

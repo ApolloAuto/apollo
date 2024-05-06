@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.control;
+
+enum ControlCheckStatus {
+  NONE = 0;
+  WARNING = 1;
+  ERROR = 2;
+}

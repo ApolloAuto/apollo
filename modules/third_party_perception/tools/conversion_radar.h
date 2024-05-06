@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/delphi_esr.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/delphi_esr.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
 /**

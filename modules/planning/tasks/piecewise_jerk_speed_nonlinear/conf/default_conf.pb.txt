@@ -1,0 +1,10 @@
+acc_weight: 2.0
+jerk_weight: 3.0
+lat_acc_weight: 1000.0
+s_potential_weight: 0.05
+ref_v_weight: 5.0
+ref_s_weight: 100.0
+soft_s_bound_weight: 1e6
+use_warm_start: true
+use_smoothed_dp_guide_line: true
+use_soft_bound_in_nonlinear_speed_opt: false

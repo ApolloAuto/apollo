@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/speed_bounds_decider/libspeed_bounds_decider.so">
+    <class type="apollo::planning::SpeedBoundsDecider" base_class="apollo::planning::Task"></class>
+</library>

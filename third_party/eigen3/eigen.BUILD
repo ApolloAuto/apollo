@@ -31,6 +31,7 @@ EIGEN_FILES = [
     "Eigen/**",
     "unsupported/Eigen/CXX11/**",
     "unsupported/Eigen/FFT",
+    "unsupported/Eigen/**",
     "unsupported/Eigen/KroneckerProduct",
     "unsupported/Eigen/src/FFT/**",
     "unsupported/Eigen/src/KroneckerProduct/**",

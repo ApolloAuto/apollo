@@ -26,7 +26,7 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction

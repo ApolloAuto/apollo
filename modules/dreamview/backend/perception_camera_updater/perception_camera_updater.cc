@@ -18,12 +18,16 @@
 
 #include <limits>
 #include <string>
+#include <vector>
+
+#include "opencv2/opencv.hpp"
+
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/dreamview/proto/camera_update.pb.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/proto/geometry.pb.h"
-#include "opencv2/opencv.hpp"
-
 namespace apollo {
 namespace dreamview {
 
@@ -66,7 +70,11 @@ PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler *websocket)
   InitReaders();
 }
 
-void PerceptionCameraUpdater::Start() { enabled_ = true; }
+void PerceptionCameraUpdater::Start(DvCallback callback_api) {
+  callback_api_ = callback_api;
+  enabled_ = true;
+  camera_update_.set_k_image_scale(kImageScale);
+}
 
 void PerceptionCameraUpdater::Stop() {
   if (enabled_) {
@@ -153,7 +161,7 @@ void PerceptionCameraUpdater::GetLocalization2CameraTF(
   ConvertMatrixToArray(localization2camera_mat, localization2camera_tf);
 }
 
-void PerceptionCameraUpdater::OnImage(
+void PerceptionCameraUpdater::OnCompressedImage(
     const std::shared_ptr<CompressedImage> &compressed_image) {
   if (!enabled_ ||
       compressed_image->format() == "h265" /* skip video format */) {
@@ -193,6 +201,33 @@ void PerceptionCameraUpdater::OnImage(
   camera_update_.set_image_aspect_ratio(static_cast<double>(width) / height);
 }
 
+void PerceptionCameraUpdater::OnImage(
+    const std::shared_ptr<apollo::drivers::Image> &image) {
+  if (!enabled_) {
+    return;
+  }
+  cv::Mat mat(image->height(), image->width(), CV_8UC3,
+              const_cast<char *>(image->data().data()), image->step());
+  cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
+  cv::resize(mat, mat,
+             cv::Size(static_cast<int>(image->width() * kImageScale),
+                      static_cast<int>(image->height() * kImageScale)),
+             0, 0, cv::INTER_LINEAR);
+  cv::imencode(".jpg", mat, image_buffer_, std::vector<int>());
+  double next_image_timestamp;
+  if (image->has_measurement_time()) {
+    next_image_timestamp = image->measurement_time();
+  } else {
+    next_image_timestamp = image->header().timestamp_sec();
+  }
+  std::lock_guard<std::mutex> lock(image_mutex_);
+  if (next_image_timestamp < current_image_timestamp_) {
+    localization_queue_.clear();
+  }
+  current_image_timestamp_ = next_image_timestamp;
+  camera_update_.set_image(&(image_buffer_[0]), image_buffer_.size());
+}
+
 void PerceptionCameraUpdater::OnLocalization(
     const std::shared_ptr<LocalizationEstimate> &localization) {
   if (!enabled_) {
@@ -203,26 +238,39 @@ void PerceptionCameraUpdater::OnLocalization(
   localization_queue_.push_back(localization);
 }
 
-void PerceptionCameraUpdater::InitReaders() {
-  node_->CreateReader<CompressedImage>(
-      FLAGS_image_short_topic,
-      [this](const std::shared_ptr<CompressedImage> &image) {
-        OnImage(image);
-      });
+void PerceptionCameraUpdater::OnObstacles(
+    const std::shared_ptr<apollo::perception::PerceptionObstacles> &obstacles) {
+  if (channels_.size() == 0) return;
+  perception_obstacle_enable_ = true;
+  std::lock_guard<std::mutex> lock(obstacle_mutex_);
+  bbox2ds.clear();
+  obstacle_id.clear();
+  obstacle_sub_type.clear();
+  for (const auto &obstacle : obstacles->perception_obstacle()) {
+    bbox2ds.push_back(obstacle.bbox2d());
+    obstacle_id.push_back(obstacle.id());
+    obstacle_sub_type.push_back(obstacle.sub_type());
+  }
+}
 
+void PerceptionCameraUpdater::InitReaders() {
   node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &localization) {
         OnLocalization(localization);
       });
+  node_->CreateReader<apollo::perception::PerceptionObstacles>(
+      FLAGS_perception_obstacle_topic,
+      [this](const std::shared_ptr<apollo::perception::PerceptionObstacles>
+                 &obstacles) { OnObstacles(obstacles); });
 }
 
 void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
   {
-    std::lock(image_mutex_, localization_mutex_);
+    std::lock(image_mutex_, localization_mutex_, obstacle_mutex_);
     std::lock_guard<std::mutex> lock1(image_mutex_, std::adopt_lock);
     std::lock_guard<std::mutex> lock2(localization_mutex_, std::adopt_lock);
-
+    std::lock_guard<std::mutex> lock3(obstacle_mutex_, std::adopt_lock);
     std::vector<double> localization;
     GetImageLocalization(&localization);
     *camera_update_.mutable_localization() = {localization.begin(),
@@ -233,9 +281,52 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
         localization2camera_tf.begin(), localization2camera_tf.end()};
     // Concurrently modify protobuf msg can cause ByteSizeConsistencyError
     // when serializing, so we need lock.
+    if (perception_obstacle_enable_) {
+      *camera_update_.mutable_bbox2d() = {bbox2ds.begin(), bbox2ds.end()};
+      *camera_update_.mutable_obstacles_id() = {obstacle_id.begin(),
+                                                obstacle_id.end()};
+      *camera_update_.mutable_obstacles_sub_type() = {obstacle_sub_type.begin(),
+                                                      obstacle_sub_type.end()};
+    }
     camera_update_.SerializeToString(camera_update);
   }
 }
-
+void PerceptionCameraUpdater::GetChannelMsg(
+    std::vector<std::string> *channels) {
+  enabled_ = true;
+  auto channelManager =
+      apollo::cyber::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
+  std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
+  channelManager->GetWriters(&role_attr_vec);
+  for (auto &role_attr : role_attr_vec) {
+    std::string messageType;
+    messageType = role_attr.message_type();
+    int index = messageType.rfind("drivers.Image");
+    if (index != -1) {
+      channels->push_back(role_attr.channel_name());
+    }
+  }
+  channels_.clear();
+  channels_ = {channels->begin(), channels->end()};
+}
+bool PerceptionCameraUpdater::ChangeChannel(std::string channel) {
+  if (curr_channel_name != "") node_->DeleteReader(curr_channel_name);
+  perception_camera_reader_.reset();
+  perception_camera_reader_ = node_->CreateReader<drivers::Image>(
+      channel,
+      [this](const std::shared_ptr<drivers::Image> &image) { OnImage(image); });
+  if (perception_camera_reader_ == nullptr) {
+    return false;
+  }
+  curr_channel_name = channel;
+  bool update_res = false;
+  update_res = callback_api_(channel);
+  if (!update_res) {
+    AERROR << "update current camera channel fail";
+    return false;
+  }
+  return true;
+}
 }  // namespace dreamview
 }  // namespace apollo

@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/task_manager/libtask_manager_component.so"
+    module_library : "modules/task_manager/libtask_manager_component.so"
     components {
         class_name : "TaskManagerComponent"
         config {

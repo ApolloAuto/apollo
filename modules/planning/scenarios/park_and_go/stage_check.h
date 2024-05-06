@@ -16,53 +16,34 @@
 
 #pragma once
 
-#include <memory>
-
-#include "cyber/common/log.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/common.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-#include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/util/util.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "cyber/plugin_manager/plugin_manager.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
+class Frame;
+}
+}  // namespace apollo
 
-struct ParkAndGoContext;
+namespace apollo {
+namespace planning {
 
 class ParkAndGoStageCheck : public Stage {
  public:
-  ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config,
-                      const std::shared_ptr<DependencyInjector>& injector)
-      : Stage(config, injector) {}
-
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  ParkAndGoContext* GetContext() {
-    return Stage::GetContextAs<ParkAndGoContext>();
-  }
-
-  Stage::StageStatus FinishStage(const bool success);
+  StageResult Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
  private:
+  StageResult FinishStage(const bool success);
+
   bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-  void ADCInitStatus();
 
- private:
-  ScenarioParkAndGoConfig scenario_config_;
+  void ADCInitStatus();
 };
 
-}  // namespace park_and_go
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::ParkAndGoStageCheck,
+                                     Stage)
+
 }  // namespace planning
 }  // namespace apollo

@@ -1,17 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    targets = [
-        ":cyber_monitor",
-    ],
-)
 
-cc_binary(
+apollo_cc_binary(
     name = "cyber_monitor",
     srcs = [
         "cyber_topology_message.cc",
@@ -21,68 +14,19 @@ cc_binary(
         "main.cc",
         "renderable_message.cc",
         "screen.cc",
+        "cyber_topology_message.h",
+        "general_channel_message.h",
+        "general_message.h",
+        "general_message_base.h",
+        "renderable_message.h",
+        "screen.h",
     ],
     linkopts = ["-pthread"],
     deps = [
-        ":cyber_topology_message",
-        ":general_channel_message",
-        ":screen",
-        "//cyber:init",
-        "//cyber/service_discovery:topology_manager",
+        "//cyber",
         "@ncurses5",
     ],
 )
 
-cc_library(
-    name = "cyber_topology_message",
-    hdrs = ["cyber_topology_message.h"],
-    deps = [
-        ":renderable_message",
-    ],
-)
-
-cc_library(
-    name = "general_channel_message",
-    hdrs = ["general_channel_message.h"],
-    deps = [
-        ":general_message",
-        ":general_message_base",
-        ":screen",
-        "//cyber",
-        "//cyber/message:raw_message",
-        "//cyber/record:record_message",
-    ],
-)
-
-cc_library(
-    name = "general_message",
-    hdrs = ["general_message.h"],
-    deps = [
-        ":general_message_base",
-        "//cyber",
-        "//cyber/message:raw_message",
-    ],
-)
-
-cc_library(
-    name = "general_message_base",
-    hdrs = ["general_message_base.h"],
-    deps = [
-        ":renderable_message",
-    ],
-)
-
-cc_library(
-    name = "renderable_message",
-    hdrs = ["renderable_message.h"],
-    deps = [
-        ":screen",
-    ],
-)
-
-cc_library(
-    name = "screen",
-    hdrs = ["screen.h"],
-)
-
+apollo_package()
 cpplint()

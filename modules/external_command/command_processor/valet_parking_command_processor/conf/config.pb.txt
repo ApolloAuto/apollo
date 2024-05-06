@@ -1,0 +1,3 @@
+input_command_name: "/apollo/external_command/valet_parking"
+output_command_name: "/apollo/planning/command"
+input_command_status_name: "/apollo/planning/command_status"

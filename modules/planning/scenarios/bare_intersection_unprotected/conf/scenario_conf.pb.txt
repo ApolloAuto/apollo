@@ -1,0 +1,4 @@
+  start_bare_intersection_scenario_distance: 25.0
+  enable_explicit_stop: false
+  approach_cruise_speed: 6.7056  # 15 mph
+  stop_distance: 0.5

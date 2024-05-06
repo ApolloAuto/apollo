@@ -197,7 +197,7 @@ void Compensator::MotionCompensation(
   for (auto& point : msg->point()) {
     float x_scalar = point.x();
     if (std::isnan(x_scalar)) {
-      AERROR << "nan point do not need motion compensation";
+      // AERROR << "nan point do not need motion compensation";
       continue;
     }
     float y_scalar = point.y();

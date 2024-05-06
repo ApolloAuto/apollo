@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/pointcloud_ground_detection/libpointcloud_ground_detection_component.so"
+  components {
+    class_name : "PointCloudGroundDetectComponent"
+    config {
+      name : "PointCloudGroundDetect"
+      config_file_path : "/apollo/modules/perception/pointcloud_ground_detection/conf/pointcloud_ground_detection_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/pointcloud_map_based_roi"
+      }
+    }
+  }
+}

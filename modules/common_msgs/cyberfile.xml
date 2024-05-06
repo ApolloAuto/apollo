@@ -1,0 +1,27 @@
+<package format="2">
+  <name>common-msgs</name>
+  <version>local</version>
+  <description>
+    This module contains code that is not specific to any module but is useful for the functioning of Apollo.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/common_msgs</src_path>
+
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf</depend>
+
+</package>

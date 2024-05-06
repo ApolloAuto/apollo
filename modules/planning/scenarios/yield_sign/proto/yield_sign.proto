@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_interface_base/scenario_base/proto/creep_stage.proto";
+
+message ScenarioYieldSignConfig {
+  // Only when the distance between the vehicle and yield sign is smaller than
+  // this value, "YieldSignScenario" can be entered
+  optional double start_yield_sign_scenario_distance = 1
+      [default = 10.0];                                         // meter
+  // Only when the distance between the vehicle and yield sign is smaller than
+  // this value, "YieldSignStageApproach" stage can be finished
+  optional double max_valid_stop_distance = 2 [default = 4.5];  // meter
+  // Only when the vehicle has creeped for the time more than this value, 
+  // "YieldSignStageCreep" stage can be finished
+  optional float creep_timeout_sec = 3 [default = 10.0];        // sec
+  optional CreepStageConfig creep_stage_config = 4;
+}

@@ -1,0 +1,11 @@
+<cyber>
+    <module>
+        <name>dreamview_plus</name>
+        <dag_conf></dag_conf>
+        <type>binary</type>
+        <process_name>
+            dreamview_plus --flagfile=/apollo/modules/dreamview_plus/conf/dreamview.conf
+        </process_name>
+        <exception_handler>respawn</exception_handler>
+    </module>
+</cyber>

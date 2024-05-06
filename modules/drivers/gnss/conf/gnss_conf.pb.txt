@@ -1,9 +1,26 @@
 data {
+    # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT
     format: NOVATEL_BINARY
+
+    # protocol optional: serial, tcp, udp, ntrip, can_card_parameter
     serial {
-        device: "/dev/novatel0"
+        device: "/dev/ttyACM0"
         baud_rate: 115200
     }
+
+    # tcp, udp: e.g.
+    #tcp {
+    #    address: "192.168.10.100"
+    #    port: 9904
+    #}
+
+    # can_card_parameter: e.g.
+    #can_card_parameter {
+    #    brand: SOCKET_CAN_RAW
+    #    type: PCI_CARD
+    #    channel_id: CHANNEL_ID_ZERO
+    #    interface: NATIVE
+    #}
 }
 
 #rtk_from {
@@ -22,7 +39,7 @@ data {
 rtk_to {
     format: NOVATEL_BINARY
     serial {
-        device: "/dev/novatel1"
+        device: "/dev/ttyACM1"
         baud_rate: 115200
     }
 }
@@ -30,14 +47,14 @@ rtk_to {
 command {
     format: NOVATEL_BINARY
     serial {
-        device: "/dev/novatel2"
+        device: "/dev/ttyACM2"
         baud_rate: 115200
     }
 }
 
 rtk_solution_type: RTK_RECEIVER_SOLUTION
 imu_type: ADIS16488
-proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
 tf {
     frame_id: "world"

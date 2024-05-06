@@ -41,6 +41,7 @@
 #include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
 #endif
+
 #include "modules/drivers/camera/usb_cam.h"
 
 #define __STDC_CONSTANT_MACROS
@@ -95,6 +96,7 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
   frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
   // now max fps 30, we use an appox time 0.9 to drop image.
   frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
+
 
   return true;
 }
@@ -226,7 +228,8 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
   }
 }
 
-bool UsbCam::poll(const CameraImagePtr& raw_image) {
+bool UsbCam::poll(const CameraImagePtr& raw_image, 
+                  const CameraImagePtr& sensor_raw_image) {
   raw_image->is_new = 0;
   // free memory in this struct desturctor
   memset(raw_image->image, 0, raw_image->image_size * sizeof(char));
@@ -258,7 +261,7 @@ bool UsbCam::poll(const CameraImagePtr& raw_image) {
     reconnect();
   }
 
-  int get_new_image = read_frame(raw_image);
+  int get_new_image = read_frame(raw_image, sensor_raw_image);
 
   if (!get_new_image) {
     return false;
@@ -768,10 +771,15 @@ bool UsbCam::stop_capturing(void) {
   return true;
 }
 
-bool UsbCam::read_frame(CameraImagePtr raw_image) {
+bool UsbCam::read_frame(CameraImagePtr raw_image, 
+                        CameraImagePtr sensor_raw_image) {
   struct v4l2_buffer buf;
   unsigned int i = 0;
   int len = 0;
+
+  timeval sample_ts_monotonic;
+  timespec current_ts_monotonic;
+  uint64_t sample_ts_monotonic_ns, current_ts_monotonic_ns, diff_ns, sample_in_systme_time_ns;
 
   switch (config_->io_method()) {
     case IO_METHOD_READ:
@@ -796,7 +804,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       }
 
       process_image(buffers_[0].start, len, raw_image);
-
+      if(sensor_raw_image->image != nullptr) {
+        memcpy(sensor_raw_image->image, buffers_[0].start, len);
+      }
       break;
 
     case IO_METHOD_MMAP:
@@ -822,12 +832,23 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             return false;
         }
       }
-
       assert(buf.index < n_buffers_);
       len = buf.bytesused;
-      raw_image->tv_sec = static_cast<int>(buf.timestamp.tv_sec);
-      raw_image->tv_usec = static_cast<int>(buf.timestamp.tv_usec);
-
+      if(!config_->hardware_trigger()){
+        sample_ts_monotonic.tv_sec = static_cast<int>(buf.timestamp.tv_sec);
+        sample_ts_monotonic.tv_usec = static_cast<int>(buf.timestamp.tv_usec);
+        clock_gettime(CLOCK_MONOTONIC,&current_ts_monotonic);
+        sample_ts_monotonic_ns = static_cast<uint64_t>(sample_ts_monotonic.tv_sec*(1000000000)) + static_cast<uint64_t>(sample_ts_monotonic.tv_usec*(1000));
+        current_ts_monotonic_ns = static_cast<uint64_t>(current_ts_monotonic.tv_sec*(1000000000)) + static_cast<uint64_t>(current_ts_monotonic.tv_nsec);
+        diff_ns = static_cast<uint64_t>(current_ts_monotonic_ns - sample_ts_monotonic_ns);
+        sample_in_systme_time_ns = static_cast<uint64_t>(cyber::Time::Now().ToNanosecond() - diff_ns);
+        raw_image->tv_sec = static_cast<int>((sample_in_systme_time_ns)/1000000000);
+        raw_image->tv_usec = static_cast<int>(((sample_in_systme_time_ns)%1000000000)/1000);
+      }
+      else{
+        raw_image->tv_sec = static_cast<int>(buf.timestamp.tv_sec);
+        raw_image->tv_usec = static_cast<int>(buf.timestamp.tv_usec);
+      }
       {
         cyber::Time image_time(raw_image->tv_sec, 1000 * raw_image->tv_usec);
         uint64_t camera_timestamp = image_time.ToNanosecond();
@@ -868,6 +889,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
                << ", dev: " << config_->camera_dev();
       } else {
         process_image(buffers_[buf.index].start, len, raw_image);
+        if(sensor_raw_image->image != nullptr) {
+          memcpy(sensor_raw_image->image, buffers_[buf.index].start, len);
+        }
       }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
@@ -910,6 +934,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       assert(i < n_buffers_);
       len = buf.bytesused;
       process_image(reinterpret_cast<void*>(buf.m.userptr), len, raw_image);
+      if(sensor_raw_image->image != nullptr) {
+        memcpy(sensor_raw_image->image, reinterpret_cast<void*>(buf.m.userptr), len);
+      }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
         AERROR << "VIDIOC_QBUF";
@@ -947,13 +974,13 @@ bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
     if (config_->output_type() == YUYV) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {
-#ifdef __aarch64__
+#ifndef __aarch64__
+      yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
+                   dest->width * dest->height);
+#else
       convert_yuv_to_rgb_buffer((unsigned char*)src,
                                 (unsigned char*)dest->image, dest->width,
                                 dest->height);
-#else
-      yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
-                   dest->width * dest->height);
 #endif
     } else {
       AERROR << "unsupported output format:" << config_->output_type();
@@ -1067,12 +1094,6 @@ bool UsbCam::wait_for_device() {
   return true;
 }
 
-void UsbCam::reconnect() {
-  stop_capturing();
-  uninit_device();
-  close_device();
-}
-
 #ifdef __aarch64__
 int UsbCam::convert_yuv_to_rgb_pixel(int y, int u, int v) {
   unsigned int pixel32 = 0;
@@ -1127,6 +1148,12 @@ int UsbCam::convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
   return 0;
 }
 #endif
+
+void UsbCam::reconnect() {
+  stop_capturing();
+  uninit_device();
+  close_device();
+}
 
 }  // namespace camera
 }  // namespace drivers

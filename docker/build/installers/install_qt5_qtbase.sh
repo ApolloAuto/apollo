@@ -18,7 +18,8 @@
 # Fail on first error.
 set -e
 
-BUILD_TYPE="${1:-download}"
+BUILD_TYPE="${1:-download}"; shift
+LSB_RELEASE="${1:-18.04}"; shift
 
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
@@ -29,6 +30,10 @@ MAJOR_VERSION="${VERSION%.*}"
 QT5_PREFIX="/usr/local/qt5"
 
 if [[ "${BUILD_TYPE}" == "download" ]]; then
+    if [[ "$LSB_RELEASE" == "20.04" ]]; then
+        error "download method only support build bionic image"
+        return -1
+    fi
     PKG_NAME="Qt-${VERSION}-linux-arm64.bin.tar.gz"
     CHECKSUM="9361d04678610fe5fddebbbf9bab38d75690d691f3d88f1f2d3eb96a07364945"
     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
@@ -64,11 +69,15 @@ else
         libxcb-xinerama0-dev \
         libxcb-xkb-dev \
         libxkbcommon-dev \
-        libxkbcommon-x11-dev
+        libxkbcommon-x11-dev \
+        libx11-* \
+        libx11* \
+        libxcb-* \
+        libxcb* \
 
     PKG_NAME="qtbase-everywhere-src-${VERSION}.tar.xz"
     CHECKSUM="331dafdd0f3e8623b51bd0da2266e7e7c53aa8e9dc28a8eb6f0b22609c5d337e"
-    DOWNLOAD_LINK="https://download.qt.io/official_releases/qt/${MAJOR_VERSION}/${VERSION}/submodules/${PKG_NAME}"
+    DOWNLOAD_LINK="http://master.qt.io/archive/qt/${MAJOR_VERSION}/${VERSION}/submodules/${PKG_NAME}"
     download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
     tar xJf ${PKG_NAME}
@@ -84,7 +93,7 @@ else
         popd
 
         ./configure         \
-                -verbose    \
+                -xcb \
                 -prefix $QT5_PREFIX                       \
                 -sysconfdir /etc/xdg                      \
                 -platform linux-g++                       \

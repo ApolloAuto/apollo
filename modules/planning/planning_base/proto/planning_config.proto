@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message TopicConfig {
+  optional string chassis_topic = 1;
+  optional string hmi_status_topic = 2;
+  optional string localization_topic = 3;
+  optional string planning_pad_topic = 4;
+  optional string planning_trajectory_topic = 5;
+  optional string prediction_topic = 6;
+  optional string relative_map_topic = 7;
+  optional string routing_request_topic = 8;
+  optional string routing_response_topic = 9;
+  optional string story_telling_topic = 10;
+  optional string traffic_light_detection_topic = 11;
+  optional string planning_learning_data_topic = 12;
+  optional string planning_command_topic = 13;
+}
+
+// Config of reference line provider.
+message ReferenceLineConfig {
+  repeated string pnc_map_class = 2;
+}
+
+message PlanningConfig {
+  enum PlanningLearningMode {
+    NO_LEARNING = 0;
+    E2E = 1;
+    HYBRID = 2;
+    RL_TEST = 3;
+    E2E_TEST = 4;
+    HYBRID_TEST = 5;
+  }
+
+  optional TopicConfig topic_config = 1;
+  optional PlanningLearningMode learning_mode = 2;
+  optional ReferenceLineConfig reference_line_config = 3;
+  optional string planner = 4;
+}

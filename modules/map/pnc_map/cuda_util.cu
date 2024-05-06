@@ -18,7 +18,6 @@
 
 #include "cyber/common/log.h"
 
-#include <cuda_runtime_api.h>
 
 namespace apollo {
 namespace pnc_map {

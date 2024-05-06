@@ -1,40 +1,56 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "py_files",
+    name = "readme",
     srcs = glob([
-        "*.py",
+        "README.md",
     ]),
 )
 
-py_binary(
+apollo_py_binary(
     name = "rtk_player",
     srcs = ["rtk_player.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/control/proto:pad_msg_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
+        "//modules/common_msgs/basic_msgs:drive_state_py_pb2",
+        "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
+        "//modules/common_msgs/control_msgs:control_pad_msg_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
         "//modules/tools/common:logger",
         "//modules/tools/common:proto_utils",
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "rtk_recorder",
     srcs = ["rtk_recorder.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
         "//modules/tools/common:logger",
         "//modules/tools/common:proto_utils",
     ],
 )
+
+# install(
+#     name = "install",
+#     data = [":readme"],
+#     data_dest = "tools/record_play",
+#     py_dest = "tools/record_play",
+#     targets = [
+#         ":rtk_player",
+#         ":rtk_recorder"
+#     ],
+# )
+
+apollo_package()

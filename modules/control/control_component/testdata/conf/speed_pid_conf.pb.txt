@@ -1,0 +1,7 @@
+integrator_enable: true
+integrator_saturation_level: 0.3
+output_saturation_level: 3.0
+kp: 1.5
+ki: 0.5
+kd: 0.0
+kaw: 1.0

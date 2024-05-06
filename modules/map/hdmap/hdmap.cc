@@ -139,6 +139,15 @@ int HDMap::GetPNCJunctions(
   return impl_.GetPNCJunctions(point, distance, pnc_junctions);
 }
 
+int HDMap::GetNearestLaneWithDistance(const apollo::common::PointENU& point,
+                                      const double distance,
+                                      LaneInfoConstPtr* nearest_lane,
+                                      double* nearest_s,
+                                      double* nearest_l) const {
+  return impl_.GetNearestLaneWithDistance(point, distance, nearest_lane,
+                                          nearest_s, nearest_l);
+}
+
 int HDMap::GetNearestLane(const common::PointENU& point,
                           LaneInfoConstPtr* nearest_lane, double* nearest_s,
                           double* nearest_l) const {
@@ -215,6 +224,10 @@ int HDMap::GetForwardNearestRSUs(const apollo::common::PointENU& point,
   return impl_.GetForwardNearestRSUs(point, distance,
                     central_heading,
                     max_heading_difference, rsus);
+}
+
+bool HDMap::GetMapHeader(Header* map_header) const {
+  return impl_.GetMapHeader(map_header);
 }
 
 }  // namespace hdmap

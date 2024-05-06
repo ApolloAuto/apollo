@@ -24,7 +24,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 
 namespace apollo {
 namespace drivers {

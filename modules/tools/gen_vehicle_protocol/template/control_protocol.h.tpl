@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2023 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,27 @@
 
 #pragma once
 
+#include "modules/canbus_vehicle/%(car_type_lower)s/proto/%(car_type_lower)s.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/canbus/proto/chassis_detail.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace %(car_type_lower)s {
 
 class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                    ::apollo::canbus::%(car_type_cap)s> {
  public:
   static const int32_t ID;
 
   %(classname)s();
 
   uint32_t GetPeriod() const override;
+
+  void Parse(const std::uint8_t* bytes, int32_t length,
+                     %(car_type_cap)s* chassis) const override;
+
+  void UpdateData_Heartbeat(uint8_t* data) override;
 
   void UpdateData(uint8_t* data) override;
 
@@ -39,6 +45,7 @@ class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
 %(declare_private_func_list)s
+%(declare_private_parse_func_list)s
 
  private:
 %(declare_private_var_list)s

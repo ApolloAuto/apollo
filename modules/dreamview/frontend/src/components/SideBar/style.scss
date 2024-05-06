@@ -1,0 +1,28 @@
+.point_cloud_channel_select {
+  position: relative;
+  z-index: 200;
+
+  select {
+    position: relative;
+    z-index: 200;
+    background: transparent;
+    border: none;
+    appearance: none;
+    text-align: right;
+    width: 200px;
+    padding-right: 50px;
+  }
+
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 50%;
+    right: 0%;
+    transform: translateY(-50%);
+    border-style: solid;
+    border-width: 10px 5px 0 5px;
+    border-color: #ffffff transparent transparent transparent;
+  }
+}

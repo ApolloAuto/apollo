@@ -1,13 +1,6 @@
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
-
-install(
-    name = "install",
-    data = [
-        ":calibrated_vehicles",
-    ],
-)
 
 filegroup(
     name = "calibrated_vehicles",
@@ -15,3 +8,4 @@ filegroup(
         "data/**",
     ]),
 )
+apollo_package()

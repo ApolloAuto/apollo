@@ -1,15 +1,35 @@
 import React from 'react';
 
 import Selector from 'components/Header/Selector';
+import ScenarioSetSelector from 'components/Header/ScenarioSetSelector';
 import WS from 'store/websocket';
+import { inject, observer } from 'mobx-react';
+import { toJS } from 'mobx';
 
+@inject('store') @observer
 export default class HMISelectors extends React.Component {
   render() {
+
     const {
+      dockerImage,
       modes, currentMode,
       maps, currentMap,
       vehicles, currentVehicle,
-    } = this.props;
+      isCoDriver,
+      isMute,
+    } = this.props.store.hmi;
+
+    const enableSimControl = this.props.store.options.enableSimControl;
+
+    const {
+      scenarioSet,
+      currentScenarioSetId,
+      currentScenarioId
+    } = this.props.store.studioConnector;
+
+    const currentScenarioSet = scenarioSet.find(
+      scenarioSetItem => scenarioSetItem.scenarioSetId === currentScenarioSetId
+    ) || {};
 
     return (
             <React.Fragment>
@@ -37,6 +57,27 @@ export default class HMISelectors extends React.Component {
                       WS.changeMap(event.target.value);
                     }}
                 />
+              {
+                (enableSimControl
+                  && currentScenarioSet.scenarios
+                  && currentScenarioSet.scenarios.length > 0)
+                && (
+                  <ScenarioSetSelector
+                    name='scenarioSet'
+                    options={
+                      currentScenarioSet
+                        .scenarios
+                        .map(scenario => ({
+                          value: scenario.scenarioId,
+                          label: scenario.scenarioName,
+                        }))
+                    }
+                    currentOption={currentScenarioId || ''}
+                    onChange={(event) => {
+                      WS.changeScenario(event.target.value);
+                    }}
+                  />)
+              }
             </React.Fragment>
     );
   }

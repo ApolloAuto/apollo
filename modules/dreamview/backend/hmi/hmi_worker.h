@@ -17,21 +17,30 @@
 #pragma once
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-#include "modules/audio/proto/audio_event.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/proto/drive_event.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "modules/dreamview/proto/hmi_config.pb.h"
-#include "modules/dreamview/proto/hmi_mode.pb.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "nlohmann/json.hpp"
+#include "google/protobuf/util/json_util.h"
+
+#include "modules/common_msgs/audio_msgs/audio_event.pb.h"
+#include "modules/common_msgs/basic_msgs/drive_event.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/external_command_msgs/action_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+#include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
+#include "modules/common_msgs/simulation_msgs/scenario.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_config.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_mode.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"
@@ -46,9 +55,11 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
+  using DvCallback = std::function<nlohmann::json(
+      const std::string& function_name, const nlohmann::json& param_json)>;
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
-  void Start();
+  void Start(DvCallback callback_api);
   void Stop();
 
   // HMI action trigger.
@@ -84,33 +95,90 @@ class HMIWorker {
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
-  // Load HMIConfig and HMIMode.
-  static HMIConfig LoadConfig();
-  static HMIMode LoadMode(const std::string& mode_config_path);
+  bool UpdateScenarioSetToStatus(const std::string& scenario_set_id,
+                                 const std::string& scenario_set_name);
+  bool UpdateScenarioSet(const std::string& scenario_set_id,
+                         const std::string& scenario_set_name,
+                         ScenarioSet* new_scenario_set);
+  bool UpdateDynamicModelToStatus(const std::string& dynamic_model_name);
+  void UpdateComponentStatus();
+  // bool UpdateRecordToStatus(const std::string& record_id,
+  //                     const std::string& record_status);
+  bool LoadRecords();
+  bool ReloadVehicles();
+  void GetScenarioSetPath(const std::string& scenario_set_id,
+                          std::string* scenario_set_path);
+  void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
+  void UpdatePointCloudChannelToStatus(const std::string& channel_name);
 
  private:
   void InitReadersAndWriters();
   void InitStatus();
   void StatusUpdateThreadLoop();
+  // get command result
+  std::string GetCommandRes(const std::string& cmd);
 
   // Start / reset current mode.
   void SetupMode() const;
   void ResetMode() const;
+  bool ResetSimObstacle(const std::string& scenario_id);
 
   // Change current mode, launch, map, vehicle and driving mode.
   void ChangeMode(const std::string& mode_name);
-  void ChangeMap(const std::string& map_name);
+  bool ChangeMap(const std::string& map_name,
+                 bool restart_dynamic_model = true);
   void ChangeVehicle(const std::string& vehicle_name);
+  void ChangeScenarioSet(const std::string& scenario_set_id);
+  void ChangeRecord(const std::string& record_id);
+  void ChangeDynamicModel(const std::string& dynamic_model_name);
+  void ChangeScenario(const std::string& scenario_id);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
+
+  bool LoadScenarios();
+
+  bool LoadDynamicModels();
+
+  void DeleteScenarioSet(const std::string& scenario_set_id);
+  void DeleteRecord(const std::string& record_id);
+  void DeleteDynamicModel(const std::string& dynamic_model_name);
+
+  void GetScenarioResourcePath(std::string* scenario_resource_path);
+  void GetRecordPath(std::string* record_path);
+
+  bool RePlayRecord(const std::string& record_id);
 
   // Start / stop a module.
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
+  bool StopModuleByCommand(const std::string& stop_command) const;
+  void StopRecordPlay();
 
   void ResetComponentStatusTimer();
-  void UpdateComponentStatus();
 
-  const HMIConfig config_;
+  /**
+   * @brief load the mode which is self defined by vehicles.
+   * @param mode_config_path: the mode config path
+   * @param current_vehicle_path: current selected vehicle conf absolute path.
+   * @param self_defined_mode: the pointer to store vehicle defined mode config.
+   * @return If vehicle has self-defined mode conf and load it successfully.
+   */
+  bool LoadVehicleDefinedMode(const std::string& mode_config_path,
+                              const std::string& current_vehicle_path,
+                              HMIMode* self_defined_mode);
+
+  /**
+   * @brief merge the mode's modules and monitored components
+   * to current_mode_.
+   * @param mode The mode to be merged.
+   */
+  void MergeToCurrentMode(HMIMode* mode);
+  /**
+   * @brief update the current_mode_'s modules and monitored components
+   * to  hmi status.
+   */
+  void UpdateModeModulesAndMonitoredComponents();
+
+  HMIConfig config_;
 
   // HMI status maintenance.
   HMIStatus status_;
@@ -131,10 +199,18 @@ class HMIWorker {
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
-  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
+  std::shared_ptr<
+      apollo::cyber::Client<apollo::external_command::ActionCommand,
+                            apollo::external_command::CommandStatus>>
+      action_command_client_;
+  std::shared_ptr<
+      apollo::cyber::Client<apollo::external_command::LaneFollowCommand,
+                            apollo::external_command::CommandStatus>>
+      lane_follow_command_client_;
   std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
+  DvCallback callback_api_;
 };
 
 }  // namespace dreamview

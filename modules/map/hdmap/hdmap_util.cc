@@ -19,7 +19,6 @@ limitations under the License.
 
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
 namespace hdmap {
@@ -167,6 +166,14 @@ bool HDMapUtil::ReloadMaps() {
     sim_map_ = CreateMap(SimMapFile());
   }
   return base_map_ != nullptr && sim_map_ != nullptr;
+}
+
+bool HDMapUtil::ReloadBaseMap() {
+  {
+    std::lock_guard<std::mutex> lock(base_map_mutex_);
+    base_map_ = CreateMap(BaseMapFile());
+  }
+  return base_map_ != nullptr;
 }
 
 }  // namespace hdmap

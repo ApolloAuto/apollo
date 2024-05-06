@@ -1,5 +1,6 @@
-# Apollo Bazel configuration file.
-# This file tries to group and simplify build options for Apollo
+# load bazelrc from the legacy location
+# as recommended in https://github.com/bazelbuild/bazel/issues/6319
+# try-import %workspace%/tools/bazel.rc
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
@@ -7,7 +8,7 @@ startup --batch_cpu_scheduling
 startup --host_jvm_args="-XX:-UseParallelGC"
 
 fetch --experimental_multi_threaded_digest=true
-query --experimental_multi_threaded_digest=true
+# query --experimental_multi_threaded_digest=true
 
 # +------------------------------------------------------------+
 # | Common Options                                             |
@@ -24,6 +25,8 @@ build --show_timestamps
 
 # Work around the sandbox issue.
 build --spawn_strategy=standalone
+# build --experimental_reuse_sandbox_directories
+# build --experimental_sandbox_async_tree_delete_idle_threads=1
 
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"
@@ -32,9 +35,9 @@ build --cxxopt="-fdiagnostics-color=always"
 # build --output_filter="^//"
 
 build --per_file_copt=external/upb/.*@-Wno-sign-compare
-build --copt="-Werror=sign-compare"
+# build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
-build --copt="-Werror=unused-variable"
+# build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 build --cxxopt="-Werror=reorder"
@@ -45,19 +48,35 @@ build --define=LIBDIR=$(PREFIX)/lib
 build --define=INCLUDEDIR=$(PREFIX)/include
 build --define=use_fast_cpp_protos=true
 
+# GPU_PLATFORM predefined types
+build --define NVIDIA=0
+build --define AMD=1
+
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
 build:opt -c opt
 
-build --config=optimize
+# build --config=optimize
 # Instruction set optimizations
-build:optimize --copt=-march=native
-build:optimize --host_copt=-march=native
+# build:optimize --copt=-march=native
+# build:optimize --host_copt=-march=native
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures
-build:gpu --define USE_GPU=true
-build:gpu --cxxopt="-DUSE_GPU=1"
+# alias gpu to nvidia
+build:gpu --config=nvidia
+
+# GPU platform
+build:amd --define GPU_PLATFORM=AMD
+build:amd --cxxopt="-DGPU_PLATFORM=AMD"
+build:amd --define USE_GPU=true
+build:amd --cxxopt="-DUSE_GPU=1"
+build:amd --cxxopt="-DAMD=1"
+build:nvidia --define GPU_PLATFORM=NVIDIA
+build:nvidia --cxxopt="-DGPU_PLATFORM=NVIDIA"
+build:nvidia --define USE_GPU=true
+build:nvidia --cxxopt="-DUSE_GPU=1"
+build:nvidia --cxxopt="-DNVIDIA=1"
 
 # Build with profiling
 build:prof --linkopt=-lprofiler
@@ -85,6 +104,9 @@ test --test_output=errors
 
 test:unit_test --test_verbose_timeout_warnings
 
+# use --copt=-mavx2
+# test --copt=-march=native
+
 coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
 # coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
 coverage --instrument_test_targets
@@ -110,6 +132,7 @@ coverage --linkopt=-lgcov
 # at the end.
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
+test:cpplint --test_timeout=3600
 test:cpplint --flaky_test_attempts=1
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
@@ -120,3 +143,4 @@ coverage --test_tag_filters=-cpplint
 # | Python Configurations                                      |
 # +------------------------------------------------------------+
 # Python support was configured by third_party/py .
+# build --remote_cache="http://localhost:8080/

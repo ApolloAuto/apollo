@@ -29,7 +29,7 @@
 #endif
 
 #include "modules/drivers/lidar/proto/velodyne_config.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/transform/buffer.h"

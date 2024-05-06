@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+#include "modules/map/hdmap/adapter/xml_parser/coordinate_convert_tool.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace {

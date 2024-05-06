@@ -1,0 +1,78 @@
+info {
+  name: "smoke_torch"
+  version: ""
+  dataset: "kitti"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: Obstacle
+
+  proto_file {
+    file: "smoke_libtorch_model.pth"
+    # size:
+    # sha256: ""
+  }
+  weight_file {
+    file: "smoke_libtorch_model.pth"
+    # size:
+    # sha256: ""
+  }
+  inputs {
+    name: "data"
+    shape: 1
+    shape: 640
+    shape: 960
+    shape: 3
+  }
+  inputs {
+    name: "K"
+    shape: 1
+    shape: 3
+    shape: 3
+  }
+  inputs {
+    name: "ratio"
+    shape: 1
+    shape: 2
+  }
+  outputs {
+    name: "loc_pred"
+    shape: 1
+    shape: 1
+    shape: 50
+    shape: 14
+  }
+  outputs {
+    name: "conv3_3"
+    shape: 1
+    shape: 64
+    shape: 160
+    shape: 240
+  }
+}
+resize {
+  width: 960
+  height: 640
+  fx: 0
+  fy: 0
+}
+normalize {
+  mean: 0
+  mean: 0
+  mean: 0
+  std: 0.229
+  std: 0.224
+  std: 0.225
+}
+offset_ratio {
+  x: 0.0
+  y: 0.0
+}
+confidence_threshold: 0.5
+min_dims {
+  min_2d_height: 0.015625
+  min_3d_height: 0.1
+  min_3d_width: 0
+  min_3d_length: 0
+}
+ori_cycle: 1
+border_ratio: 0.01

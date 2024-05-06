@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/drive_state.proto";
+import "modules/common_msgs/control_msgs/input_debug.proto";
+import "modules/control/control_component/proto/local_view.proto";
+
+message Preprocessor {
+  optional apollo.common.Header header = 1;
+  optional LocalView local_view = 2;
+  optional apollo.common.EngageAdvice engage_advice = 4;
+  optional InputDebug input_debug = 5;
+  optional bool received_pad_msg = 6 [default = false];
+  optional bool estop = 7 [default = false];
+  optional string estop_reason = 8;
+}

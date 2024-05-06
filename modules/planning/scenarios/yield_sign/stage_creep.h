@@ -21,40 +21,57 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/stage.h"
+#include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/planning/planning_interface_base/scenario_base/base_stage_creep.h"
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace yield_sign {
 
 struct YieldSignContext;
+class CreepDecider;
 
-class YieldSignStageCreep : public Stage {
+class YieldSignStageCreep : public BaseStageCreep {
  public:
-  YieldSignStageCreep(const ScenarioConfig::StageConfig& config,
-                      const std::shared_ptr<DependencyInjector>& injector)
-      : Stage(config, injector) {}
+  bool Init(const StagePipeline& config,
+            const std::shared_ptr<DependencyInjector>& injector,
+            const std::string& config_dir, void* context) override;
+
+  StageResult Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
  private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
+  /**
+   * @brief Get the config of creep stage from ScenarioContext, to be overwrited
+   * by the sub classes.
+   *
+   * @return config of creep stage
+   */
+  const CreepStageConfig& GetCreepStageConfig() const override;
 
-  YieldSignContext* GetContext() {
-    return Stage::GetContextAs<YieldSignContext>();
-  }
+  /**
+   * @brief Get the overlap id of stage and the stop line distance according to
+   * the frame and reference line information.
+   *
+   * @param frame current frame information
+   * @param reference_line_info current reference line information
+   * @param overlap_end_s end distance mapped to reference line of the overlap
+   * @param overlap_id overlap id of current stage
+   * @return return true if find a valid overlap
+   */
+  bool GetOverlapStopInfo(Frame* frame, ReferenceLineInfo* reference_line_info,
+                          double* overlap_end_s,
+                          std::string* overlap_id) const override;
 
- private:
-  Stage::StageStatus FinishStage();
+  StageResult FinishStage();
 
- private:
   ScenarioYieldSignConfig scenario_config_;
 };
 
-}  // namespace yield_sign
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::YieldSignStageCreep,
+                                     Stage)
+
 }  // namespace planning
 }  // namespace apollo

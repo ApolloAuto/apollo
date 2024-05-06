@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message CreepStageConfig {
+  // min boundary t to ignore obstacles while creeping
+  optional double min_boundary_t = 1 [default = 6.0];  // second
+  // tolerance min_t & min_s to ignore obstacles which are moving
+  // on same direction of ADC while creeping
+  optional double ignore_max_st_min_t = 2 [default = 0.1];   // second
+  optional double ignore_min_st_min_s = 3 [default = 15.0];  // meter
+}

@@ -29,9 +29,9 @@ import simplejson
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
-from modules.common.proto.geometry_pb2 import Point3D
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
+from modules.common_msgs.basic_msgs.geometry_pb2 import Point3D
+from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import PerceptionObstacle
+from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import PerceptionObstacles
 
 
 _s_seq_num = 0
@@ -231,7 +231,7 @@ def linear_project_perception(description, prev_perception):
                 get_point(trace[i - 1], trace[i], ratio))
             perception.theta = math.atan2(trace[i][1] - trace[i - 1][1],
                                           trace[i][0] - trace[i - 1][0])
-
+            perception.velocity.CopyFrom(get_velocity(perception.theta, description["speed"]))
             perception.ClearField("polygon_point")
             perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
                                                              perception.length, perception.width))
@@ -272,9 +272,9 @@ def perception_publisher(perception_channel, files, period):
     node = cyber.Node("perception")
     writer = node.create_writer(perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period)  # 10Hz
+    sleep_time = float(period)  # 10Hz
     global _s_delta_t
-    _s_delta_t = period
+    _s_delta_t = sleep_time
     perception = None
     while not cyber.is_shutdown():
         perception = generate_perception(perception_description, perception)

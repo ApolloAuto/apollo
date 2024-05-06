@@ -1,6 +1,6 @@
 # -*- python -*-
 # Adapted from RobotLocomotion/drake:tools/install/install.bzl
-load("//tools:common.bzl", "dirname", "join_paths", "output_path")
+load("//tools:common.bzl", "dirname", "join_paths", "output_path", "remove_prefix")
 
 InstallInfo = provider()
 
@@ -55,7 +55,13 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
         dest = join_paths("third_party", owner.workspace_name, owner.package, input_file.basename)
     else:
         dest = join_paths(owner.package, input_file.basename)
+
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
+    # Possibly remove prefixes.
+    for p in strip_prefix:
+        dest = remove_prefix(dest, p)
+        if dest != None:
+            return dest
     return dest
 
 #------------------------------------------------------------------------------
@@ -89,7 +95,10 @@ def _install_action(
         dests,
         strip_prefixes = [],
         rename = {},
-        warn_foreign = True):
+        warn_foreign = True,
+        py_runfiles = False,
+        py_runfiles_path = None,
+        plugin = False):
     """Compute install action for a single file.
 
     This takes a single file artifact and returns the appropriate install
@@ -103,7 +112,8 @@ def _install_action(
 
     dest_replacements = (
         ("@WORKSPACE@", _workspace(ctx)),
-        ("@PACKAGE@", ctx.label.package),
+        ("@PACKAGE@", ctx.label.package.replace("/", "-")),
+        ("@PACKAGE_PATH@", ctx.label.package),
     )
     for old, new in dest_replacements:
         if old in dest:
@@ -116,14 +126,39 @@ def _install_action(
         )
     else:
         strip_prefix = strip_prefixes
-
-    file_dest = join_paths(
-        dest,
-        _output_path(ctx, artifact, strip_prefix, warn_foreign),
-    )
+    if py_runfiles:
+        file_dest = join_paths(
+            dest,
+            py_runfiles_path,
+        )
+    else:
+        if "@" not in dest:     
+            file_dest = join_paths(
+                dest,
+                _output_path(ctx, artifact, strip_prefix, warn_foreign),
+            )
+        else:
+            file_dest = dest
     file_dest = _rename(file_dest, rename)
 
-    return struct(src = artifact, dst = file_dest)
+    target_name = None
+    if hasattr(ctx.attr, "tags") and len(ctx.attr.tags) >= 2 and "export_library" in ctx.attr.tags:
+        for i in ctx.attr.tags:
+            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library":
+                continue
+            else:
+                target_name = i
+    package_path = "None"
+    if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
+        package_path = ctx.attr.package_path 
+    if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
+        install_type = ctx.attr.type
+    else:
+        install_type = "NONE" 
+    if plugin:
+        install_type = "neo"
+    return struct(src = artifact, dst = file_dest, 
+        target_name = target_name, package_path = package_path, type = install_type)
 
 #------------------------------------------------------------------------------
 def _install_actions(
@@ -189,13 +224,14 @@ def _install_actions(
 # Compute install actions for a cc_library or cc_binary.
 def _install_cc_actions(ctx, target):
     # Compute actions for target artifacts.
+    # we don't need static libraries
     dests = {
-        "a": ctx.attr.archive_dest,
+        #"a": ctx.attr.archive_dest,
         "so": ctx.attr.library_dest,
         None: ctx.attr.runtime_dest,
     }
     strip_prefixes = {
-        "a": ctx.attr.archive_strip_prefix,
+        #"a": ctx.attr.archive_strip_prefix,
         "so": ctx.attr.library_strip_prefix,
         None: ctx.attr.runtime_strip_prefix,
     }
@@ -213,14 +249,15 @@ def _install_cc_actions(ctx, target):
         if not f.is_source and target.label != f.owner
     ]
 
-    if len(mangled_solibs):
-        actions += _install_actions(
-            ctx,
-            [struct(files = mangled_solibs)],
-            ctx.attr.mangled_library_dest,
-            strip_prefixes = ctx.attr.mangled_library_strip_prefix,
-            rename = ctx.attr.rename,
-        )
+    # we don't need these shared libraries
+    # if len(mangled_solibs):
+    #     actions += _install_actions(
+    #         ctx,
+    #         [struct(files = mangled_solibs)],
+    #         ctx.attr.mangled_library_dest,
+    #         strip_prefixes = ctx.attr.mangled_library_strip_prefix,
+    #         rename = ctx.attr.rename,
+    #     )
 
     # Compute actions for guessed resource files.
     if ctx.attr.guess_data != "NONE":
@@ -246,13 +283,35 @@ def _install_cc_actions(ctx, target):
 # Compute install actions for a py_library or py_binary.
 # TODO(jamiesnape): Install native shared libraries that the target may use.
 def _install_py_actions(ctx, target):
-    return _install_actions(
+    actions = _install_actions(
         ctx,
         [target],
         ctx.attr.py_dest,
         ctx.attr.py_strip_prefix,
         rename = ctx.attr.rename,
     )
+
+    runfile_actions = []
+    runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
+    runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
+
+    for f in _depset_to_list(target.default_runfiles.files):
+        runfile_actions.append(
+            _install_action(
+                ctx,
+                f,
+                runfiles_dest,
+                ctx.attr.py_strip_prefix,
+                ctx.attr.rename,
+                True,
+                True,
+                join_paths("%s" % ctx.workspace_name, f.short_path),
+            ),
+        )
+
+    actions += runfile_actions
+
+    return actions
 
 #------------------------------------------------------------------------------
 # Compute install actions for a script or an executable.
@@ -267,10 +326,76 @@ def _install_runtime_actions(ctx, target):
 
 #------------------------------------------------------------------------------
 # Generate install code for an install action.
-def _install_code(action):
-    return "install(%r, %r)" % (action.src.short_path, action.dst)
+def _install_code(action, ctx):
+    if hasattr(action, "type") and action.type != "NONE":
+        if hasattr(action, "package_path") and action.package_path != "NONE":
+            if action.target_name != None:
+                return "install(%r, %r, %r, %r, %r, %r)" % (
+                    action.src.short_path, action.dst, action.type,
+                    action.package_path, "export_library", action.target_name)
+            else: 
+                return "install(%r, %r, %r, %r)" % (
+                    action.src.short_path, action.dst, action.type, action.package_path)
+        else:
+            fail("Dont't run the install target which is not auto generated!")
+    else:
+        return "install(%r, %r)" % (action.src.short_path, action.dst) 
+
+#------------------------------------------------------------------------------
+# Generate install code for an install_src action.
+def _install_src_code(action, ctx):
+    # print(action.src.short_path)
+    if hasattr(action, "type") and action.type != "NONE":
+        return "install_src(%r, %r, %r, %r)" % (action.src.short_path, action.dst, action.filter, action.type)
+    return "install_src(%r, %r, %r)" % (action.src.short_path, action.dst, action.filter)
 
 #BEGIN rules
+
+def _generate_install_script_action(actions, ctx):
+    """create install script
+    """
+
+    # Generate code for install actions.
+    script_actions = []
+    installed_files = {}
+
+    for a in actions:
+        if not hasattr(a, "src"):
+            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
+
+        src = a.src
+        if a.dst not in installed_files:
+            if hasattr(a, "plugin"):
+                script_actions.append(_install_plugin_description_code(a))
+            else:
+                script_actions.append(_install_code(a, ctx))
+            installed_files[a.dst] = src
+        elif src != installed_files[a.dst]:
+            orig = installed_files[a.dst]
+
+            # Note(storypku):
+            # Workaround for detected conflict betwen
+            # <generated file external/local_config_cuda/cuda/cuda/lib/libcudart.so.11.0> and
+            # <generated file _solib_local/_U@local_Uconfig_Ucuda_S_Scuda_Ccudart___Uexternal_Slocal_Uconfig_Ucuda_Scuda_Scuda_Slib/libcudart.so.11.0>
+            # They share the same external workspace_root ("external/local_config_cuda") and package ("cuda")
+            if src.basename != orig.basename or \
+               src.owner.workspace_root != orig.owner.workspace_root or \
+               src.owner.package != orig.owner.package:
+                fail("Warning: Install conflict detected:\n" +
+                     "\n  src1 = " + repr(orig) +
+                     "\n  src2 = " + repr(src) +
+                     "\n  dst = " + repr(a.dst))
+
+    # Generate install script.
+    # TODO(mwoehlke-kitware): Figure out a better way to generate this and run
+    # it via Python than `#!/usr/bin/env python3`?
+    ctx.actions.expand_template(
+        template = ctx.executable.install_script_template,
+        output = ctx.outputs.executable,
+        substitutions = {"<<actions>>": "\n    ".join(script_actions)},
+    )
+
+    return installed_files
 
 #------------------------------------------------------------------------------
 # Generate information to install "stuff". "Stuff" can be library or binary
@@ -313,46 +438,13 @@ def _install_impl(ctx):
             # Executable scripts copied from source directory.
             actions += _install_runtime_actions(ctx, t)
 
-    # Generate code for install actions.
-    script_actions = []
-    installed_files = {}
-
-    for a in actions:
-        if not hasattr(a, "src"):
-            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
-        src = a.src
-        if a.dst not in installed_files:
-            script_actions.append(_install_code(a))
-            installed_files[a.dst] = src
-        elif src != installed_files[a.dst]:
-            orig = installed_files[a.dst]
-
-            # Note(storypku):
-            # Workaround for detected conflict betwen
-            # <generated file external/local_config_cuda/cuda/cuda/lib/libcudart.so.11.0> and
-            # <generated file _solib_local/_U@local_Uconfig_Ucuda_S_Scuda_Ccudart___Uexternal_Slocal_Uconfig_Ucuda_Scuda_Scuda_Slib/libcudart.so.11.0>
-            # They share the same external workspace_root ("external/local_config_cuda") and package ("cuda")
-            if src.basename != orig.basename or \
-               src.owner.workspace_root != orig.owner.workspace_root or \
-               src.owner.package != orig.owner.package:
-                fail("Warning: Install conflict detected:\n" +
-                     "\n  src1 = " + repr(orig) +
-                     "\n  src2 = " + repr(src) +
-                     "\n  dst = " + repr(a.dst))
-
-    # Generate install script.
-    # TODO(mwoehlke-kitware): Figure out a better way to generate this and run
-    # it via Python than `#!/usr/bin/env python3`?
-    ctx.actions.expand_template(
-        template = ctx.executable.install_script_template,
-        output = ctx.outputs.executable,
-        substitutions = {"<<actions>>": "\n    ".join(script_actions)},
-    )
-
     # Return actions.
     files = ctx.runfiles(
         files = [a.src for a in actions],
     )
+
+    installed_files = _generate_install_script_action(actions, ctx)
+
     return [
         InstallInfo(
             install_actions = actions,
@@ -379,7 +471,7 @@ _install_rule = rule(
         "targets": attr.label_list(),
         "archive_dest": attr.string(default = "lib"),
         "archive_strip_prefix": attr.string_list(),
-        "library_dest": attr.string(default = "@PACKAGE@"),
+        "library_dest": attr.string(default = "@PACKAGE@/lib"),
         "library_strip_prefix": attr.string_list(),
         "mangled_library_dest": attr.string(default = "lib"),
         "mangled_library_strip_prefix": attr.string_list(),
@@ -394,6 +486,8 @@ _install_rule = rule(
             cfg = "target",
             default = Label("//tools/install:install.py.in"),
         ),
+        "type": attr.string(default = "NONE"),
+        "package_path": attr.string(default = "NONE"),
     },
     executable = True,
     implementation = _install_impl,
@@ -402,7 +496,7 @@ _install_rule = rule(
 def install(tags = [], **kwargs):
     # (The documentation for this function is immediately below.)
     _install_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 
@@ -499,6 +593,8 @@ _install_files_rule = rule(
         "files": attr.label_list(allow_files = True),
         "rename": attr.string_dict(),
         "strip_prefix": attr.string_list(),
+        "type": attr.string(default = "NONE"),
+        "package_path": attr.string(default = "NONE"),
     },
     implementation = _install_files_impl,
 )
@@ -506,7 +602,7 @@ _install_files_rule = rule(
 def install_files(tags = [], **kwargs):
     # (The documentation for this function is immediately below.)
     _install_files_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 
@@ -546,5 +642,197 @@ Args:
     rename: Mapping of install paths to alternate file names, used to rename
       files upon installation.
 """
+
+#------------------------------------------------------------------------------
+# Generate information to install files to specified destination.
+def _install_src_files_impl(ctx):
+    # Get path components.
+    dest = ctx.attr.dest
+    src_dir = ctx.attr.src_dir
+    filter = ctx.attr.filter
+
+    actions = []
+    for a in _depset_to_list(src_dir):
+        for b in _depset_to_list(a.files):
+            if hasattr(ctx.attr, "type"):
+                actions.append(struct(src = b, dst = dest, filter = filter, type = ctx.attr.type))
+            else:
+                actions.append(struct(src = b, dst = dest, filter = filter))
+
+    # Collect install actions from dependencies.
+    for d in ctx.attr.deps:
+        actions += d[InstallInfo].install_actions
+
+    script_actions = []
+    for a in actions:
+        if not hasattr(a, "src"):
+            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
+
+        if hasattr(a, "filter"):
+            script_actions.append(_install_src_code(a, ctx))
+
+    # Generate install script.
+    ctx.actions.expand_template(
+        template = ctx.executable.install_script_template,
+        output = ctx.outputs.executable,
+        substitutions = {"<<actions>>": "\n    ".join(script_actions)},
+    )
+
+    # Return actions.
+    files = []
+    for a in actions:
+        if "__DO_NOT_INSTALL__" in a.src.short_path:
+            continue
+        else:
+            files.append(a.src)
+    files = ctx.runfiles(files)
+    # files = ctx.runfiles(
+    #     files = [a.src for a in actions],
+    # )
+    return [
+        InstallInfo(
+            install_actions = actions,
+            rename = {},
+        ),
+        DefaultInfo(runfiles = files),
+    ]
+
+_install_src_files_rule = rule(
+    # Update buildifier-tables.json when this changes.
+    attrs = {
+        "deps": attr.label_list(providers = [InstallInfo]),
+        "dest": attr.string(),
+        "src_dir": attr.label_list(allow_files = True),
+        "filter": attr.string(),
+        "install_script_template": attr.label(
+            allow_files = True,
+            executable = True,
+            cfg = "target",
+            default = Label("//tools/install:install_source.py.in"),
+        ),
+        "type": attr.string(default = "NONE"),
+    },
+    executable = True,
+    implementation = _install_src_files_impl,
+)
+
+def install_src_files(tags = [], **kwargs):
+    # (The documentation for this function is immediately below.)
+    _install_src_files_rule(
+        tags = tags,
+        **kwargs
+    )
+
+#------------------------------------------------------------------------------
+# Generate install plugin description code for an install_plugin action.
+def _install_plugin_description_code(action):
+    plugin_name = "__".join([
+        action.plugin.label.package.replace("/", "__"),
+        action.plugin.label.name,
+    ])
+    return "install_plugin_description(%r, %r, %r)" % (
+        plugin_name,
+        action.src.short_path,
+        action.dst,
+    )
+
+#------------------------------------------------------------------------------
+# Compute install actions for plugin library(.so)
+def _install_plugin_so_action(ctx, target):
+    dest = ctx.attr.plugin_dest
+    strip_prefix = ctx.attr.plugin_strip_prefix
+    rename = dict(ctx.attr.rename)
+
+    src = _depset_to_list(target.files)[0]
+    return _install_action(ctx, src, dest, strip_prefix, rename = rename, plugin = True)
+
+# TODO(liangjinping): merge with _install_action
+def _install_plugin_description_action(ctx, target):
+    dest = ctx.attr.description_dest
+    strip_prefix = ctx.attr.description_strip_prefix
+    rename = dict(ctx.attr.rename)
+
+    dest_replacements = (
+        ("@WORKSPACE@", _workspace(ctx)),
+        ("@PACKAGE@", ctx.label.package.replace("/", "-")),
+        ("@PACKAGE_PATH@", ctx.label.package),
+    )
+    for old, new in dest_replacements:
+        if old in dest:
+            dest = dest.replace(old, new)
+
+    src = _depset_to_list(target.files)[0]
+    dst = join_paths(dest, _output_path(ctx, src, strip_prefix))
+    dst = _rename(dst, rename)
+
+    # add plugin tag for different rule
+    return struct(src = src, dst = dst, plugin = ctx.attr.plugin)
+
+def _install_plugin_impl(ctx):
+    # Get path components.
+    rename = dict(ctx.attr.rename)
+
+    actions = []
+
+    actions += _install_actions(
+        ctx,
+        ctx.attr.data,
+        ctx.attr.data_dest,
+        strip_prefixes = ctx.attr.data_strip_prefix,
+        rename = rename,
+    )
+
+    # plugin library install action
+    actions.append(_install_plugin_so_action(ctx, ctx.attr.plugin))
+
+    # plugin description install action
+    actions.append(_install_plugin_description_action(ctx, ctx.attr.description))
+
+    files = ctx.runfiles(
+        files = [a.src for a in actions],
+    )
+
+    installed_files = _generate_install_script_action(actions, ctx)
+
+    # return actions for cascading with install rule
+    return [
+        InstallInfo(
+            install_actions = actions,
+            rename = rename,
+            installed_files = installed_files,
+        ),
+        DefaultInfo(runfiles = files),
+    ]
+
+_install_plugin_rule = rule(
+    attrs = {
+        "plugin": attr.label(allow_files = True),
+        # TODO(liangjinping): install plugin to fixed path or support path register
+        "plugin_dest": attr.string(default = "lib/@PACKAGE_PATH@"),
+        "plugin_strip_prefix": attr.string_list(),
+        "plugin_name": attr.string(),
+        "description": attr.label(allow_files = True),
+        "description_dest": attr.string(default = "share/@PACKAGE_PATH@"),
+        "description_strip_prefix": attr.string_list(),
+        "data": attr.label_list(allow_files = True),
+        "data_dest": attr.string(default = "share/@PACKAGE_PATH@"),
+        "data_strip_prefix": attr.string_list(),
+        "rename": attr.string_dict(),
+        "install_script_template": attr.label(
+            allow_files = True,
+            executable = True,
+            cfg = "target",
+            default = Label("//tools/install:install.py.in"),
+        ),
+    },
+    executable = True,
+    implementation = _install_plugin_impl,
+)
+
+def install_plugin(tags = [], **kwargs):
+    _install_plugin_rule(
+        tags = tags,
+        **kwargs
+    )
 
 #END rules

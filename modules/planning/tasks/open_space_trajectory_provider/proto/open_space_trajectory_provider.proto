@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+import "modules/planning/planning_open_space/proto/planner_open_space_config.proto";
+package apollo.planning;
+
+message OpenSpaceTrajectoryProviderConfig {
+  // TODO(Jinyun) Move PlannerOpenSpaceConfig to
+  // OpenSpaceTrajectoryOptimizerConfig
+  optional OpenSpaceTrajectoryOptimizerConfig
+      open_space_trajectory_optimizer_config = 1;
+  // estimated time for open space planner planning period
+  optional double open_space_planning_period = 2 [default = 4.0];
+  // Enable thread in open space planner for trajectory publish.
+  optional bool enable_open_space_planner_thread = 3 [default = true];
+  // preserved points number in trajectory stitching for open space trajectory
+  optional double open_space_trajectory_stitching_preserved_length = 4 [default = inf];
+  // (unit: meter/sec^2) for open space stand still at destination
+  optional double open_space_standstill_acceleration = 5 [default = 0.0];
+  optional double open_space_straight_trajectory_length = 6 [default = 0.0];
+}
+
+message OpenSpaceTrajectoryOptimizerConfig {
+  enum TrajectorySmoother {
+    ITERATIVE_ANCHORING_SMOOTHER = 0;
+    DISTANCE_APPROACH = 1;
+    USE_WARM_START = 2;
+  }
+  // Distance approach trajectory smoothing configs
+  optional float delta_t = 4 [default = 0.5];
+  optional double near_destination_threshold = 5 [default = 0.001];
+  // (TODO:(QiL) tmp message during refactoring, deprecate when all tuning done.
+  optional PlannerOpenSpaceConfig planner_open_space_config = 6;
+}

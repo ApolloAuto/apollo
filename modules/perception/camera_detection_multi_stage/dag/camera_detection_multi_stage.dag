@@ -1,0 +1,14 @@
+module_config {
+    module_library : "modules/perception/camera_detection_multi_stage/libcamera_detection_multi_stage_component_camera.so"
+
+    components {
+      class_name : "CameraDetectionMultiStageComponent"
+      config {
+        name : "CameraDetectionMultiStageComponent"
+        config_file_path : "/apollo/modules/perception/camera_detection_multi_stage/conf/camera_detection_multi_stage_config.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/front_6mm/image"
+        }
+      }
+    }
+}

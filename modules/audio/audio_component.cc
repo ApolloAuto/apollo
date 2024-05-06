@@ -16,7 +16,7 @@
 
 #include "modules/audio/audio_component.h"
 #include "modules/audio/proto/audio_conf.pb.h"
-#include "modules/common/proto/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {

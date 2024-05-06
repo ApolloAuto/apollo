@@ -1,0 +1,29 @@
+<package format="2">
+  <name>3rd-qt5</name>
+  <version>local</version>
+  <description>
+    Apollo packaged qt5 Lib.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <depend>libtinyxml2-dev</depend>
+  <depend lib_names="glog" repo_name="com_github_google_glog">3rd-glog</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="opencv" lib_names="core,highgui,imgproc,imgcodecs">3rd-opencv</depend>
+  <depend so_names="numa">libnuma-dev</depend>
+  <depend>3rd-mkl</depend>
+  <depend expose="False">3rd-pcl</depend>
+  <depend repo_name="osqp">3rd-osqp</depend>
+  <depend repo_name="proj">3rd-proj</depend>
+  <depend>3rd-magma</depend>
+  <depend type="binary" repo_name="tf2" lib_names="tf2">3rd-tf2</depend>
+
+  <type>third-wrapper</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/qt5</src_path>
+
+</package>

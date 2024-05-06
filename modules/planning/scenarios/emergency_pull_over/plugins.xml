@@ -1,0 +1,6 @@
+<library path="modules/planning/scenarios/emergency_pull_over/libemergency_pull_over_scenario.so">
+    <class type="apollo::planning::EmergencyPullOverScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::EmergencyPullOverStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::EmergencyPullOverStageSlowDown" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::EmergencyPullOverStageStandby" base_class="apollo::planning::Stage"></class>
+</library>

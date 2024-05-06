@@ -1,0 +1,4 @@
+model_type: CNN
+cpu_model_file: "/apollo/modules/planning/planning_base/learning_based/data/model/cpu_test_model_cnn.pt"
+gpu_model_file: "/apollo/modules/planning/planning_base/learning_based/data/model/gpu_test_model_cnn.pt"
+use_cuda: true

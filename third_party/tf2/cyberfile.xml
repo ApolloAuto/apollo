@@ -1,0 +1,21 @@
+<package format="2">
+  <name>3rd-tf2</name>
+  <version>local</version>
+  <description>
+    Apollo packaged tf2 Lib.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-gpus</depend>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/tf2</src_path>
+
+</package>

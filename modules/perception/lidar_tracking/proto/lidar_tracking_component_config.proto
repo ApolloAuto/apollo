@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message LidarTrackingComponentConfig {
+  optional string output_channel_name = 1;
+  optional perception.PluginParam multi_target_tracker_param = 2;
+  optional perception.PluginParam fusion_classifier_param = 3;
+}

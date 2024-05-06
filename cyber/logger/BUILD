@@ -1,19 +1,30 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "logger",
-    srcs = ["logger.cc"],
-    hdrs = ["logger.h"],
+apollo_cc_library(
+    name = "cyber_logger",
+    srcs = [
+        "async_logger.cc",
+        "log_file_object.cc",
+        "logger_util.cc",
+        "logger.cc",
+    ],
+    hdrs = [
+        "async_logger.h",
+        "log_file_object.h",
+        "logger.h",
+        "logger_util.h",
+    ],
     deps = [
-        "//cyber/common",
-        "//cyber/logger:log_file_object",
+        "//cyber:cyber_binary",
+        "//cyber/common:cyber_common",
+        "//cyber/base:cyber_base",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "logger_test",
     size = "small",
     srcs = ["logger_test.cc"],
@@ -21,20 +32,10 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "async_logger",
-    srcs = ["async_logger.cc"],
-    hdrs = ["async_logger.h"],
-    deps = [
-        "//cyber/base:macros",
-        "//cyber/common",
-        "//cyber/logger:log_file_object",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "async_logger_test",
     size = "small",
     srcs = ["async_logger_test.cc"],
@@ -42,20 +43,10 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "log_file_object",
-    srcs = ["log_file_object.cc"],
-    hdrs = ["log_file_object.h"],
-    deps = [
-        "//cyber:binary",
-        "//cyber/common:log",
-        "//cyber/logger:logger_util",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "log_file_object_test",
     size = "small",
     srcs = ["log_file_object_test.cc"],
@@ -63,18 +54,10 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "logger_util",
-    srcs = ["logger_util.cc"],
-    hdrs = ["logger_util.h"],
-    deps = [
-        "//cyber/common:global_data",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "logger_util_test",
     size = "small",
     srcs = ["logger_util_test.cc"],
@@ -82,6 +65,8 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
+apollo_package()
 cpplint()

@@ -31,10 +31,11 @@ from gflags import FLAGS
 
 from modules.tools.common.logger import Logger
 import modules.tools.common.proto_utils as proto_utils
-from modules.canbus.proto import chassis_pb2
-from modules.common.configs.proto import vehicle_config_pb2
-from modules.localization.proto import localization_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.config_msgs import vehicle_config_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
 
+APOLLO_ROOT = "/apollo"
 
 class RtkRecord(object):
     """
@@ -192,7 +193,7 @@ def main(argv):
         os.makedirs(log_dir)
 
     Logger.config(
-        log_file=log_dir + "rtk_recorder.log",
+        log_file=os.path.join(APOLLO_ROOT, 'data/log/rtk_recorder.log'),
         use_stdout=True,
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "rtk_recorder.log"))
@@ -211,8 +212,29 @@ def main(argv):
     while not cyber.is_shutdown():
         time.sleep(0.002)
 
+def rename(new_record_name):
+    record_path = '/apollo/data/log/'
+    new_record_file = record_path + new_record_name + ".csv"
+    if os.path.exists(new_record_file):
+        print(f"The directory '{new_record_file}' already exist.")
+        exit(-1)
+    os.rename(record_path + "garage.csv", new_record_file)
+
+def delete():
+    record_file = '/apollo/data/log/garage.csv'
+    if not os.path.exists(record_file):
+        print(f"The directory '{record_file}' not exist.")
+        exit(-1)
+    os.remove(record_file)
 
 if __name__ == '__main__':
-    cyber.init()
-    main(sys.argv)
-    cyber.shutdown()
+    operation = ['rename', 'delete']
+    if len(sys.argv) > 1 and sys.argv[1] in operation:
+        if sys.argv[1] == operation[0]:
+            rename(sys.argv[2])
+        elif sys.argv[1] == operation[1]:
+            delete()
+    else:
+        cyber.init()
+        main(sys.argv)
+        cyber.shutdown()

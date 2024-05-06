@@ -19,7 +19,7 @@ limitations under the License.
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
 
 /**
  * A map tool to transform opendrive map to pb map

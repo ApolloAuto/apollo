@@ -1,0 +1,70 @@
+syntax = "proto2";
+
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/pid_conf.proto";
+
+package apollo.control;
+
+message FilterConf {
+  optional int32 cutoff_freq = 1;
+}
+
+message MPCControllerConf{
+  optional double ts = 1;      // sample time (dt) 0.01 sec, configurable
+  optional double cf = 2;      // corner stiffness front: N/rad
+  optional double cr = 3;      // corner stiffness rear: N/rad
+  optional int32 mass_fl = 4;  // mass forward left
+  optional int32 mass_fr = 5;  // mass forward right
+  optional int32 mass_rl = 6;  // mass rear left
+  optional int32 mass_rr = 7;  // mass rear right
+  optional double eps = 8;     // converge threshold
+
+  // output variable (control state) weight matrix
+  // (lateral_error, lateral_error_rate, heading_error, heading_error_rate,
+  //  station_error, speed_error)
+  repeated double matrix_q = 9;
+
+  // manipulated variable weight matrix
+  // (steer, acceleration)
+  repeated double matrix_r = 10;
+
+  optional int32 cutoff_freq = 11;              // cutoff frequency
+  optional int32 mean_filter_window_size = 12;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
+  optional int32 max_iteration = 13;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 14;  // limit aggressive steering
+  optional double standstill_acceleration = 15;
+  optional double brake_minimum_action = 16;
+  optional double throttle_minimum_action = 17;
+  optional apollo.control.GainScheduler lat_err_gain_scheduler = 18;
+  optional apollo.control.GainScheduler heading_err_gain_scheduler = 19;
+  optional apollo.control.GainScheduler steer_weight_gain_scheduler = 20;
+  optional apollo.control.GainScheduler feedforwardterm_gain_scheduler = 21;
+  optional bool enable_mpc_feedforward_compensation = 23 [default = false];
+  optional double unconstrained_control_diff_limit = 24;
+  optional bool use_lqr_curvature_feedforward = 25;
+  optional bool use_preview = 26;
+  optional PidConf acc_lookup_pid_conf = 27;
+  optional bool use_lookup_acc_pid = 28;
+  optional bool use_pitch_angle_filter = 29;
+  optional bool enable_look_ahead_back_control = 30 [default = false];
+  optional double switch_speed = 31;
+  optional LeadlagConf reverse_leadlag_conf = 32;
+  // low/high speed switch transition-window
+  optional double switch_speed_window = 33 [default = 0.0];
+  optional int32 preview_window = 34;
+  optional double lookahead_station = 35 [default = 0.0];
+  optional double lookback_station = 36 [default = 0.0];
+  optional double lookahead_station_high_speed = 37 [default = 0.0];
+  optional double lookback_station_high_speed = 38 [default = 0.0];
+  optional bool enable_reverse_leadlag_compensation = 39 [default = false];
+  optional FilterConf pitch_angle_filter_conf = 40;
+  optional bool enable_feedback_augment_on_high_speed = 41 [default = false];
+  optional bool trajectory_transform_to_com_reverse = 42 [default = false];
+  optional bool trajectory_transform_to_com_drive = 43 [default = false];
+  optional bool enable_slope_offset = 44 [default = false];
+  optional bool use_preview_reference_check = 45 [default = false];
+  optional bool use_kinematic_model = 46;
+  optional bool enable_navigation_mode_error_filter = 47 [default = false];
+}

@@ -19,3 +19,4 @@ message ChatterBenchmark {
   optional uint64 seq = 2;
   optional string content = 3;
 }
+

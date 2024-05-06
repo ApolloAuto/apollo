@@ -22,9 +22,9 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common/configs/config_gflags.h"
 
 namespace apollo {
 namespace common {
@@ -37,7 +37,7 @@ class VehicleStateProviderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string localization_file =
-        "modules/localization/testdata/3_localization_result_1.pb.txt";
+        "modules/common/vehicle_state/testdata/3_localization_result_1.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_file, &localization_));
     chassis_.set_speed_mps(3.0);
     chassis_.set_gear_location(canbus::Chassis::GEAR_DRIVE);

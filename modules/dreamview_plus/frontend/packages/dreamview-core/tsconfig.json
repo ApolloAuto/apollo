@@ -1,0 +1,19 @@
+{
+    "extends": "../tslint-config-dreamview/index.json",
+    "compilerOptions": {
+        "jsx": "react",
+        "typeRoots": [
+            "src/@types",
+            "node_modules/@types"
+        ]
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "src/@types/**.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/node_modules"
+    ]
+}

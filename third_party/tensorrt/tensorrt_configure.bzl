@@ -10,10 +10,10 @@ load(
     "//third_party/gpus:cuda_configure.bzl",
     "find_cuda_config",
     "lib_name",
-    "make_copy_files_rule",
 )
 load(
     "//tools/platform:common.bzl",
+    "make_copy_files_rule",
     "config_repo_label",
     "get_cpu_value",
     "get_host_environ",
@@ -64,7 +64,12 @@ def _tpl(repository_ctx, tpl, substitutions):
 
 def _create_dummy_repository(repository_ctx):
     """Create a dummy TensorRT repository."""
-    _tpl(repository_ctx, "build_defs.bzl", {"%{if_tensorrt}": "if_false"})
+    _tpl(
+        repository_ctx, "build_defs.bzl", {
+            "%{if_tensorrt}": "if_false",
+            "%{_TF_TENSORRT_VERSION}": repository_ctx.os.environ["TENSORRT_VERSION"]
+        }
+    )
     _tpl(repository_ctx, "BUILD", {
         "%{copy_rules}": "",
         "\":tensorrt_include\"": "",
@@ -126,7 +131,10 @@ def _create_local_tensorrt_repository(repository_ctx):
     repository_ctx.template(
         "build_defs.bzl",
         tpl_paths["build_defs.bzl"],
-        {"%{if_tensorrt}": "if_true"},
+        {
+            "%{if_tensorrt}": "if_true",
+            "%{_TF_TENSORRT_VERSION}": repository_ctx.os.environ["TENSORRT_VERSION"]
+        },
     )
 
     # Set up BUILD file.

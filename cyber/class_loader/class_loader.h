@@ -100,8 +100,8 @@ void ClassLoader::OnClassObjDeleter(Base* obj) {
     return;
   }
 
-  std::lock_guard<std::mutex> lck(classobj_ref_count_mutex_);
   delete obj;
+  std::lock_guard<std::mutex> lck(classobj_ref_count_mutex_);
   --classobj_ref_count_;
 }
 

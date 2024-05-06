@@ -18,8 +18,8 @@
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/routing/proto/routing.pb.h"
 
 DEFINE_bool(enable_remove_lane_id, true,
             "True to remove lane id in routing request");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<apollo::cyber::Node> node(
       apollo::cyber::CreateNode("routing_tester"));
   auto writer = node->CreateWriter<apollo::routing::RoutingRequest>(
-      FLAGS_routing_request_topic);
+      "/apollo/raw_routing_request");
 
   Rate rate(1.0);
   while (apollo::cyber::OK()) {

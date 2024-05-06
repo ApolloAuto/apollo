@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/ic_stop_playing</title>
+    <defs>
+        <linearGradient x1="-4.4408921e-14%" y1="74.0334487%" x2="100%" y2="50%" id="linearGradient-1">
+            <stop stop-color="#515C6F" offset="0%"></stop>
+            <stop stop-color="#282F3C" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="icon/ic_stop_playing" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+        <path d="M12.5934538,8.58992605 L16.778732,15.2139146 C17.0737341,15.6808109 16.9343864,16.2984516 16.4674901,16.5934538 C16.3076386,16.6944538 16.1224274,16.7480632 15.9333414,16.7480632 L7.56278502,16.7480632 C7.01050027,16.7480632 6.56278502,16.300348 6.56278502,15.7480632 C6.56278502,15.5589772 6.61639444,15.3737661 6.71739447,15.2139146 L10.9026727,8.58992605 C11.1976748,8.12302974 11.8153156,7.983682 12.2822119,8.27868416 C12.4077878,8.35802759 12.5141104,8.46435018 12.5934538,8.58992605 Z" id="三角形" fill="url(#linearGradient-1)" fill-rule="nonzero" transform="translate(11.748063, 12.000000) rotate(-270.000000) translate(-11.748063, -12.000000) "></path>
+    </g>
+</svg>

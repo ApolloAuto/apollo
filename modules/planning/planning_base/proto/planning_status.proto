@@ -1,0 +1,200 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/external_command_msgs/lane_follow_command.proto";
+/*
+  This file defines the data types that represents the internal state of the
+  planning module.
+  It will not be refreshed in each planning cycle.
+*/
+
+
+message ChangeLaneStatus {
+  enum Status {
+    IN_CHANGE_LANE = 1;        // during change lane state
+    CHANGE_LANE_FAILED = 2;    // change lane failed
+    CHANGE_LANE_FINISHED = 3;  // change lane finished
+  }
+  optional Status status = 1;
+  // the id of the route segment that the vehicle is driving on
+  optional string path_id = 2;
+  // the time stamp when the state started.
+  optional double timestamp = 3;
+}
+
+message CreepDeciderStatus {
+  // Counter for creep clearance
+  optional uint32 creep_clear_counter = 1;
+}
+
+message StopTime {
+  // Obstacle id stopping the vehicle
+  optional string obstacle_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  optional double stop_timestamp_sec = 2;
+}
+
+message CrosswalkStatus {
+  // Id of crosswalk
+  optional string crosswalk_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  repeated StopTime stop_time = 2;
+  // Crosswalks already passed or finished
+  repeated string finished_crosswalk = 3;
+}
+
+message DestinationStatus {
+  // If vehicle has passed destination
+  optional bool has_passed_destination = 1 [default = false];
+}
+
+message EmergencyStopStatus {
+  // Stop fence point for emergency stop
+  optional apollo.common.PointENU stop_fence_point = 1;
+}
+
+message OpenSpaceStatus {
+  // History of partitioned trajectories index
+  repeated string partitioned_trajectories_index_history = 1;
+  // If position has been initialized.
+  optional bool position_init = 2 [default = false];
+}
+
+message ParkAndGoStatus {
+  // Initial position of vehicle
+  optional apollo.common.PointENU adc_init_position = 1;
+  // Initial heading of vehicle
+  optional double adc_init_heading = 2;
+  // If current stage is "ParkAndGoStageCheck"
+  optional bool in_check_stage = 3;
+  // Mapped point on reference line near intial position of vehicle, which is
+  // used as end pose of openspace algorithm.
+  optional apollo.common.PointENU adc_adjust_end_pose = 4;
+}
+
+message PathDeciderStatus {
+  // Cycle counter of front static obstacle's existance
+  optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
+  // If vehicle is in lane borrow scenario
+  optional bool is_in_path_lane_borrow_scenario = 2 [default = false];
+  // Blocking obstacle id in front of the vehicle
+  optional string front_static_obstacle_id = 3 [default = ""];
+  // If vehicle left borrow
+  optional bool left_borrow = 4 [default = false];
+  // If vehicle right borrow
+  optional bool right_borrow = 5 [default = false];
+}
+
+message PullOverStatus {
+  enum PullOverType {
+    PULL_OVER = 1;            // pull-over upon destination arrival
+    EMERGENCY_PULL_OVER = 2;  // emergency pull-over
+  }
+  // Current pullover type
+  optional PullOverType pull_over_type = 1;
+  // Indicate if current path is pull over path
+  optional bool plan_pull_over_path = 2 [default = false];
+  // Position of pull over
+  optional apollo.common.PointENU position = 3;
+  // Heading of pull over
+  optional double theta = 4;
+  // Front length for pull over region
+  optional double length_front = 5;
+  // Back length for pull over region
+  optional double length_back = 6;
+  // Left width for pull over region
+  optional double width_left = 7;
+  // Right width for pull over region
+  optional double width_right = 8;
+}
+
+message ReroutingStatus {
+  // Time of last rerouting
+  optional double last_rerouting_time = 1;
+  // If rerouting need to be done
+  optional bool need_rerouting = 2 [default = false];
+  // Last received planning command
+  optional apollo.external_command.LaneFollowCommand lane_follow_command=4;
+}
+
+message SpeedDeciderStatus {
+  // Time of stopping at pedestrian
+  repeated StopTime pedestrian_stop_time = 1;
+}
+
+message ScenarioStatus {
+  // Current scenario type
+  optional string scenario_type = 1;
+  // Current stage type
+  optional string stage_type = 2;
+}
+
+message StopSignStatus {
+  // Id of current stop sign overlap 
+  optional string current_stop_sign_overlap_id = 1;
+  // Id of just finished stop sign overlap
+  optional string done_stop_sign_overlap_id = 2;
+  // Obstacles which the vehicle should stop for
+  repeated string wait_for_obstacle_id = 3;
+}
+
+message TrafficLightStatus {
+  // Overlap id of current traffic light
+  repeated string current_traffic_light_overlap_id = 1;
+  // Overlap id of traffic light which is already done
+  repeated string done_traffic_light_overlap_id = 2;
+}
+
+message YieldSignStatus {
+  // Overlap id of current yield sign
+  repeated string current_yield_sign_overlap_id = 1;
+  // Overlap id of current yield sign which is already passed
+  repeated string done_yield_sign_overlap_id = 2;
+  // Obstacles which the vehicle should stop for
+  repeated string wait_for_obstacle_id = 3;
+}
+
+message LaneFollowStatus {
+  // Is lane follow ok
+  optional bool lane_follow_block = 1 [default = false];
+  // Blocking obstacle id in front of the vehicle
+  optional string block_obstacle_id = 2 [default = ""];
+  // Last block time
+  optional double last_block_timestamp = 3 [default = 0];
+  // Duration of block
+  optional double block_duration = 4 [default = 0];
+}
+
+message LaneBorrowStatus {
+  // Is lane borrow ok
+  optional bool lane_borrow_block = 1 [default = false];
+  // Blocking obstacle id in front of the vehicle
+  optional string block_obstacle_id = 2 [default = ""];
+  // Last block time
+  optional double last_block_timestamp = 3 [default = 0];
+  // Duration of block
+  optional double block_duration = 4 [default = 0];
+}
+
+// note: please keep this one as minimal as possible. do NOT pollute it.
+message PlanningStatus {
+  optional ChangeLaneStatus change_lane = 2;
+  optional CreepDeciderStatus creep_decider = 3;
+  optional CrosswalkStatus crosswalk = 4;
+  optional DestinationStatus destination = 5;
+  optional EmergencyStopStatus emergency_stop = 6;
+  optional OpenSpaceStatus open_space = 7;
+  optional ParkAndGoStatus park_and_go = 8;
+  optional PathDeciderStatus path_decider = 9;
+  optional PullOverStatus pull_over = 10;
+  optional ReroutingStatus rerouting = 11;
+  optional ScenarioStatus scenario = 12;
+  optional SpeedDeciderStatus speed_decider = 13;
+  optional StopSignStatus stop_sign = 14;
+  optional TrafficLightStatus traffic_light = 15;
+  optional YieldSignStatus yield_sign = 16;
+  optional LaneFollowStatus lane_follow = 17;
+  optional LaneBorrowStatus lane_borrow = 18;
+}

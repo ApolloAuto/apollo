@@ -1,0 +1,18 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum DrivingAction {
+  START = 1;
+  RESET = 2;
+  VIN_REQ = 3;
+};
+
+message PadMessage {
+  // control mode, set mode according to low level definition
+  optional apollo.common.Header header = 1;
+
+  // action in the driving_mode
+  optional DrivingAction action = 2;
+}

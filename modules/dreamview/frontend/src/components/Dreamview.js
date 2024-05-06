@@ -8,6 +8,8 @@ import ToolView from 'components/Layouts/ToolView';
 import MonitorPanel from 'components/Layouts/MonitorPanel';
 import SideBar from 'components/SideBar';
 
+import ApplicationGuideModal from 'components/ApplicationGuideModal';
+
 import HOTKEYS_CONFIG from 'store/config/hotkeys.yml';
 import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from 'store/websocket';
 
@@ -38,12 +40,13 @@ export default class Dreamview extends React.Component {
     const optionName = HOTKEYS_CONFIG[event.key];
     if (!optionName || options.showDataRecorder
       || options.showDefaultRoutingInput || options.showCycleNumberInput
-    || options.showFuelClient) {
+      || options.showFuelClient) {
       return;
     }
 
     event.preventDefault();
     if (optionName === 'cameraAngle') {
+      // press 'v' to switch camera angle
       options.rotateCameraAngle();
     } else if (
       !options.isSideBarButtonDisabled(optionName, enableHMIButtonsOnly, hmi.inNavigationMode)
@@ -72,6 +75,7 @@ export default class Dreamview extends React.Component {
 
   render() {
     const { dimension, options, hmi } = this.props.store;
+    const { currentVehicleType } = hmi;
 
     return (
             <div>
@@ -97,6 +101,10 @@ export default class Dreamview extends React.Component {
                         />
                     </SplitPane>
                 </div>
+              {
+                // When the current vehicle is dkit series, the safety pop-up is displayed
+                (currentVehicleType > 0 && currentVehicleType <= 7) &&
+                <ApplicationGuideModal />}
             </div>
     );
   }

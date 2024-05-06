@@ -8,7 +8,6 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
-    dag_files: "/apollo/modules/routing/dag/routing.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"
   }

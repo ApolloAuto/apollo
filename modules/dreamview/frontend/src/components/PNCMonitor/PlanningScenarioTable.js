@@ -6,8 +6,8 @@ class PlanningScenarioItem extends React.Component {
   render() {
     const { scenario } = this.props;
 
-    const type = scenario.scenarioType;
-    const stage = scenario.stageType ? scenario.stageType.replace(`${type}_`, '') : '-';
+    const type = scenario.scenarioPluginType;
+    const stage = scenario.stagePluginType ? scenario.stagePluginType.replace(`${type}_`, '') : '-';
 
     return (
             <tr className="monitor-table-item">

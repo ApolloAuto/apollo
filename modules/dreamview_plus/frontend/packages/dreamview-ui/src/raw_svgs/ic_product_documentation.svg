@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_product_documentation</title>
+    <g id="ic_product_documentation" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M14.0666667,0.5 C14.5821324,0.5 15,0.94771525 15,1.5 L15,14.5 C15,15.0522847 14.5821324,15.5 14.0666667,15.5 L1.93333333,15.5 C1.41786757,15.5 1,15.0522847 1,14.5 L1,1.5 C1,0.94771525 1.41786757,0.5 1.93333333,0.5 L14.0666667,0.5 Z M14.0666667,1.5 L1.93333333,1.5 L1.93333333,14.5 L14.0666667,14.5 L14.0666667,1.5 Z" id="矩形" fill="#A6B5CC" fill-rule="nonzero"></path>
+        <rect id="矩形" fill="#A6B5CC" fill-rule="nonzero" x="3" y="5.13116608" width="8.6023105" height="1"></rect>
+        <rect id="矩形备份" fill="#A6B5CC" fill-rule="nonzero" x="3" y="8.37777798" width="6.09247333" height="1"></rect>
+    </g>
+</svg>

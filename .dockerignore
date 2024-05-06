@@ -1,0 +1,5 @@
+/.cache
+/bazel-apollo
+/bazel-bin
+/bazel-out
+/bazel-testlogs

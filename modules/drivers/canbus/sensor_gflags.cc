@@ -33,3 +33,6 @@ DEFINE_string(sensor_node_name, "", "Sensor node name.");
 // esd can extended frame gflags
 DEFINE_bool(esd_can_extended_frame, false,
             "check esd can exdended frame enabled or not");
+
+DEFINE_bool(enable_can_err_check, false,
+            "check the can id err mask");

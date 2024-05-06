@@ -1,0 +1,27 @@
+# Clean interval in seconds
+clean_interval_in_secs: 60
+strategies:
+  - name: record cleaner
+    # Clean dir list.
+    dirs: 
+      - /apollo/data/record
+      - /apollo/data/bag
+    # File name search by regex, if not set, clean all file by fule.
+    patterns: 
+      - .*\.record\.
+    # Auto clean expired files
+    expired_time_in_hours: 168 # 7 days
+    # Force clean by used space, If the usage threshold is reached, trigger force clean.
+    usage_threshold_in_gb: 500
+  - name: log cleaner
+    dirs: 
+      - /apollo/data/log
+    expired_time_in_hours: 72 # 3 days
+    usage_threshold_in_gb: 100
+  - name: core files cleaner
+    dirs: 
+      - /apollo/data/core
+    patterns:
+      - .*\.core
+    expired_time_in_hours: 72 # 3 days
+    usage_threshold_in_gb: 50

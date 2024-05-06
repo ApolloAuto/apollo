@@ -1,6 +1,7 @@
 import STORE from 'store';
 import RENDERER from 'renderer';
 import Worker from 'utils/webworker.js';
+import { safeParseJSON } from 'utils/JSON';
 
 export default class PointCloudWebSocketEndpoint {
   constructor(serverAddr) {
@@ -41,6 +42,7 @@ export default class PointCloudWebSocketEndpoint {
         RENDERER.updatePointCloud(event.data);
       }
     };
+    return this;
   }
 
   requestPointCloud() {
@@ -65,5 +67,37 @@ export default class PointCloudWebSocketEndpoint {
     if (STORE.options.showPointCloud === false) {
       RENDERER.updatePointCloud({ num: [] });
     }
+  }
+
+  getPointCloudChannel() {
+    return new Promise(
+      (resolve, reject) => {
+        this.websocket.send(JSON.stringify({
+          type: 'GetPointCloudChannel',
+        }));
+        this.websocket.addEventListener('message', (event) => {
+          if (event.data instanceof ArrayBuffer) {
+            return;
+          }
+          const message = safeParseJSON(event.data);
+          if (message?.data?.name === 'GetPointCloudChannelListSuccess') {
+            if (message?.data?.info?.channel) {
+              resolve(message?.data?.info?.channel);
+            } else {
+              reject(message?.data.info);
+            }
+          } else if (message?.data?.name === 'GetPointCloudChannelListFail') {
+            reject(message?.data.info);
+          }
+        });
+      }
+    );
+  };
+
+  changePointCloudChannel(channel) {
+    this.websocket.send(JSON.stringify({
+      type: 'ChangePointCloudChannel',
+      data: channel,
+    }));
   }
 }

@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/external_command_msgs/geometry.proto";
+
+message FreeSpaceCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // Pose of the parking spot.
+  required Pose parking_spot_pose = 3;
+  // Region where openspace trajectory will be searched. Junction containing
+  // "non_drivable_roi" should be contained by "drivable_roi"
+  // polygon points should be clockwise if outer polygon can drive. 
+  // otherwise polygon points should be counter-clockwise if inner polygon can drive
+  repeated RoiPolygon non_drivable_roi = 4;
+  required RoiPolygon drivable_roi = 5;
+  // Expected speed when executing this command. If "target_speed" > maximum
+  // speed of the vehicle, use maximum speed of the vehicle instead. If it is
+  // not given, the default target speed of system will be used.
+  optional double target_speed = 6;
+}

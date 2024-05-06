@@ -96,6 +96,13 @@ std::pair<double, double> Cartesian2Polar(double x, double y) {
   return std::make_pair(r, theta);
 }
 
+double check_negative(double input_data) {
+  if (std::signbit(input_data)) {
+    input_data = -input_data;
+  }
+  return input_data;
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo

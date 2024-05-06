@@ -1,0 +1,129 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/monitor_msgs/system_status.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+
+
+message ScenarioInfo {
+  optional string scenario_id = 1;
+  optional string scenario_name = 2;
+  optional string map_name = 3;
+  optional apollo.common.Point2D start_point = 4;
+  optional apollo.common.Point2D end_point = 5;
+}
+
+message ScenarioSet {
+  // id is key
+  optional string scenario_set_name = 1;
+  repeated ScenarioInfo scenarios = 2;
+}
+
+enum PlayRecordStatus{
+  // action:play continue
+  RUNNING = 0;
+  // action: pause
+  PAUSED = 1;
+  // action: default kill
+  CLOSED = 2;
+}
+
+message RecordStatus{
+  optional string current_record_id = 1 [default = ""];
+  optional PlayRecordStatus play_record_status = 2 [default = CLOSED];
+  optional double curr_time_s = 4 [default = 0];
+}
+
+enum HMIModeOperation {
+  // None
+  None = 0;
+  // 仿真调试
+  SIM_DEBUG = 1;
+  // 自由仿真
+  Sim_Control = 2;
+  // 实车自动驾驶
+  Auto_Drive=3;
+  // 循迹
+  TRACE=4;
+  // 场景仿真
+  Scenario_Sim = 5;
+  // 播包
+  Record = 6;
+  // 循迹
+  Waypoint_Follow=7;
+}
+
+enum LoadRecordStatus {
+  NOT_LOAD = 1;
+  LOADING = 2;
+  LOADED = 3;
+}
+
+message LoadRecordInfo{
+  optional LoadRecordStatus load_record_status = 1 [default = NOT_LOAD];
+  optional double total_time_s = 2 [default = 0];
+  optional string record_file_path = 3 [default = ""];
+  // Compatible with dv download scenario use plugin,only dv use it.
+  optional int32 download_status = 4 [default = 0];
+}
+
+message HMIStatus {
+  optional apollo.common.Header header = 1;
+
+  repeated string modes = 2;
+  optional string current_mode = 3;
+
+  repeated string maps = 4;
+  optional string current_map = 5;
+
+  repeated string vehicles = 6;
+  optional string current_vehicle = 7;
+
+  // {module_name: is_running_or_not}
+  map<string, bool> modules = 8;
+  // {component_name: status}
+  map<string, apollo.monitor.ComponentStatus> monitored_components = 9;
+
+  optional string docker_image = 10;
+  optional int32 utm_zone_id = 11;  // FLAGS_local_utm_zone_id
+
+  // Message which will be read aloud to drivers and passengers through
+  // Dreamview.
+  optional string passenger_msg = 12;
+  // {component_name: status}
+  map<string, apollo.monitor.ComponentStatus> other_components = 13;
+  map<string, ScenarioSet> scenario_set = 15;
+  optional string current_scenario_set_id = 16 [default = ""];
+  optional string current_scenario_id = 17 [default = ""];
+  repeated string dynamic_models = 18;
+  optional string current_dynamic_model = 19;
+  // for dreamview(1.0 version)
+  optional string current_record_id = 20 [default = ""];
+  // for dv1.0: map value no used,is also equals to empty object
+  // for dv2.0: map value equals to loadrecordinfo object which includes
+  // record total time(s),load record status and record file path
+  map<string, LoadRecordInfo> records = 21;
+  optional sint32 current_vehicle_type = 22;
+  optional string current_camera_sensor_channel = 23;
+  optional string current_point_cloud_channel = 24;
+
+  // dv2.0: add operation concept
+  // operations is related to hmiMode
+  repeated HMIModeOperation operations = 25;
+  optional HMIModeOperation current_operation = 26;
+  optional string current_layout = 27;
+  optional RecordStatus current_record_status = 28;
+  // Mark global component status.
+  map<string, apollo.monitor.Component> global_components = 29;
+  // Mark the expected number of modules to be opened
+  optional uint32 expected_modules = 30 [default = 0];
+
+  // {module_name: Used to identify whether the user clicks on the module}
+  map<string, bool> modules_lock = 31;
+  // Used to identify whether the backend triggers automatic shutdown.
+  optional bool backend_shutdown = 32 [default = false];
+  repeated string rtk_records = 33;
+  optional string current_rtk_record_id = 34 [default = ""];
+}

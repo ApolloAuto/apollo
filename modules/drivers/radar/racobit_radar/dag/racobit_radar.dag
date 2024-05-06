@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/radar/racobit_radar/libracobit_radar_canbus_component.so"
+    module_library : "modules/drivers/radar/racobit_radar/libracobit_radar_canbus_component.so"
     components {
         class_name : "RacobitRadarCanbusComponent"
         config {

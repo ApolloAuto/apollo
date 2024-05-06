@@ -1,0 +1,136 @@
+stage: {
+  name: "EMERGENCY_PULL_OVER_SLOW_DOWN"
+  type: "EmergencyPullOverStageSlowDown"
+  enabled: true
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+
+stage: {
+  name: "EMERGENCY_PULL_OVER_APPROACH"
+  type: "EmergencyPullOverStageApproach"
+  enabled: true
+  task {
+    name: "PULL_OVER_PATH"
+    type: "PullOverPath"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+stage: {
+  name: "EMERGENCY_PULL_OVER_STANDBY"
+  type: "EmergencyPullOverStageStandby"
+  enabled: true
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}

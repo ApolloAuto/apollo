@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/radar4d_detection/libradar4d_detection.so"
+  components {
+    class_name: "Radar4dDetectionComponent"
+    config {
+      name: "Radar4dDetection"
+      config_file_path: "/apollo/modules/perception/radar4d_detection/conf/radar4d_component_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/apollo/sensor/oculii/PointCloud2"
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "modules/external_command/old_routing_adapter/libold_routing_adapter.so"
+
+    components {
+      class_name : "OldRoutingAdapter"
+      config {
+        name : "old_routing_adapter"
+        config_file_path : "/apollo/modules/external_command/old_routing_adapter/conf/config.pb.txt"
+        flag_file_path: "/apollo/modules/common/data/global_flagfile.txt"
+      }
+    }
+}

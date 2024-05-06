@@ -1,0 +1,19 @@
+<package format="2">
+  <name>3rd-gpus</name>
+  <version>local</version>
+  <description>
+    Apollo packaged 3rd-gpu Libs.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <depend expose="False">3rd-bazel-skylib</depend>
+
+  <type>third-wrapper</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/gpus</src_path>
+
+</package>

@@ -1,0 +1,23 @@
+camera_names: "front_6mm,front_12mm"
+input_camera_channel_names : "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/front_12mm/image"
+timestamp_offset : 0.0
+detection_param {
+  name: "LaneCameraPerception"
+  config_path: "perception/lane_detection/data/"
+  config_file: "lane.pb.txt"
+}
+frame_capacity : 20
+image_channel_num : 3
+enable_undistortion : false
+enable_visualization : false
+output_lanes_channel_name : "/perception/lanes"
+default_camera_pitch : 0.0
+default_camera_height : 1.5
+lane_calibration_working_sensor_name : "front_6mm"
+calibrator_method : "LaneLineCalibrator"
+calib_service_name : "OnlineCalibrationService"
+run_calib_service : true
+ts_diff : 0.1
+visual_debug_folder : "/apollo/debug_output"
+visual_camera : "front_6mm"
+write_visual_img : false

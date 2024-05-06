@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// ReferenceLineEndConfig
+
+message ReferenceLineEndConfig {
+  // Safty stop distance from reference line end.
+  optional double stop_distance = 1 [default = 0.5];  // meter
+  // If ego-vehicle is within a distance of "min_reference_line_remain_length"
+  // with the reference line end, a stop obstacle will be built at the reference
+  // line end to stop ego-vehicle.
+  optional double min_reference_line_remain_length = 2 [default = 50.0];
+}

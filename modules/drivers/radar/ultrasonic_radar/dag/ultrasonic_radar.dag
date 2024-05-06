@@ -1,5 +1,5 @@
 module_config {
-    module_library: "/apollo/bazel-bin/modules/drivers/radar/ultrasonic_radar/libultrasonic_radar_canbus_component.so"
+    module_library: "modules/drivers/radar/ultrasonic_radar/libultrasonic_radar_canbus_component.so"
     components {
         class_name: "UltrasonicRadarCanbusComponent"
         config {

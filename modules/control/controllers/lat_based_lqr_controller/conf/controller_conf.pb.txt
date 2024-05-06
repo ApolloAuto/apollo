@@ -1,0 +1,104 @@
+ts: 0.01
+preview_window: 0
+cf: 155494.663
+cr: 155494.663
+mass_fl: 520
+mass_fr: 520
+mass_rl: 520
+mass_rr: 520
+eps: 0.01
+matrix_q: 0.05
+matrix_q: 0.0
+matrix_q: 1.0
+matrix_q: 0.0
+reverse_matrix_q: 0.05
+reverse_matrix_q: 0.0
+reverse_matrix_q: 1.0
+reverse_matrix_q: 0.0
+cutoff_freq: 10
+mean_filter_window_size: 10
+max_iteration: 150
+max_lateral_acceleration: 5.0
+enable_reverse_leadlag_compensation: true
+enable_steer_mrac_control: false
+enable_look_ahead_back_control: true
+lookahead_station: 1.4224
+lookback_station: 2.8448
+lookahead_station_high_speed: 1.4224
+lookback_station_high_speed: 2.8448
+switch_speed: 2.0
+switch_speed_window: 0.0
+query_relative_time: 0.8
+enable_navigation_mode_position_update: true
+trajectory_transform_to_com_reverse: true
+trajectory_transform_to_com_drive: true
+enable_feedback_augment_on_high_speed: false
+enable_maximum_steer_rate_limit: false
+lock_steer_speed: -0.081
+query_time_nearest_point_only: false
+enable_navigation_mode_error_filter: false
+reverse_feedforward_ratio: 1.4
+reverse_use_dynamic_model: false
+lat_err_gain_scheduler {
+  scheduler {
+    speed: 4.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 8.0
+    ratio: 0.6
+  }
+  scheduler {
+    speed: 12.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.1
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.05
+  }
+}
+heading_err_gain_scheduler {
+  scheduler {
+    speed: 4.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 8.0
+    ratio: 0.6
+  }
+  scheduler {
+    speed: 12.0
+    ratio: 0.4
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.1
+  }
+}
+reverse_leadlag_conf {
+  innerstate_saturation_level: 3000
+  alpha: 1.0
+  beta: 1.0
+  tau: 0.0
+}
+steer_mrac_conf {
+  mrac_model_order: 1
+  reference_time_constant: 0.09
+  reference_natural_frequency: 10
+  reference_damping_ratio: 0.9
+  adaption_state_gain: 0.0001
+  adaption_desired_gain: 0.0001
+  adaption_nonlinear_gain: 0.0001
+  adaption_matrix_p: 1.0
+  mrac_saturation_level: 1.0
+  anti_windup_compensation_gain: 0.0001
+  clamping_time_constant: 0.08
+}

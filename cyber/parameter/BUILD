@@ -1,19 +1,31 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "parameter",
-    srcs = ["parameter.cc"],
-    hdrs = ["parameter.h"],
+apollo_cc_library(
+    name = "cyber_parameter",
+    srcs = [
+        "parameter.cc",
+        "parameter_client.cc",
+        "parameter_server.cc",
+    ],
+    hdrs = [
+        "parameter.h",
+        "parameter_client.h",
+        "parameter_server.h",
+        "parameter_service_names.h",
+    ],
     deps = [
-        "//cyber/message:protobuf_factory",
+        "//cyber/message:cyber_message",
         "//cyber/proto:parameter_cc_proto",
+        "//cyber/node:cyber_node",
+        "//cyber/service:cyber_service",
+        "@fastrtps",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "parameter_test",
     size = "small",
     srcs = ["parameter_test.cc"],
@@ -21,22 +33,10 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "parameter_client",
-    srcs = ["parameter_client.cc"],
-    hdrs = ["parameter_client.h"],
-    deps = [
-        ":parameter",
-        ":parameter_service_names",
-        "//cyber/node",
-        "//cyber/service:client",
-        "@fastrtps",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "parameter_client_test",
     size = "small",
     srcs = ["parameter_client_test.cc"],
@@ -44,22 +44,10 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "parameter_server",
-    srcs = ["parameter_server.cc"],
-    hdrs = ["parameter_server.h"],
-    deps = [
-        ":parameter",
-        ":parameter_service_names",
-        "//cyber/node",
-        "//cyber/service",
-        "@fastrtps",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "parameter_server_test",
     size = "small",
     srcs = ["parameter_server_test.cc"],
@@ -67,11 +55,8 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
-cc_library(
-    name = "parameter_service_names",
-    hdrs = ["parameter_service_names.h"],
-)
-
+apollo_package()
 cpplint()

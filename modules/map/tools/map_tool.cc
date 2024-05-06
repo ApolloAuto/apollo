@@ -20,7 +20,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
 
 DEFINE_double(x_offset, 587318.4866268333, "x offset");
 DEFINE_double(y_offset, 4141146.110116891, "y offset");

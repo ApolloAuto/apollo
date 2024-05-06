@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_pull_down_expansion</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="ic_pull_down_expansion" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="矩形" fill="#D8D8D8" opacity="0" xlink:href="#path-1"></use>
+        <path d="M8.3904344,6.48804301 L11.350122,10.1876525 C11.5226268,10.4032834 11.4876661,10.7179296 11.2720351,10.8904344 C11.1833786,10.9613596 11.0732233,11 10.9596876,11 L5.04031242,11 C4.76417005,11 4.54031242,10.7761424 4.54031242,10.5 C4.54031242,10.3864643 4.5789528,10.276309 4.64987802,10.1876525 L7.6095656,6.48804301 C7.78207037,6.27241204 8.09671656,6.23745135 8.31234752,6.40995612 C8.34117988,6.43302201 8.36736852,6.45921065 8.3904344,6.48804301 Z" id="矩形" fill="#A6B5CC" fill-rule="nonzero" mask="url(#mask-2)" transform="translate(8.000000, 8.500000) scale(1, -1) translate(-8.000000, -8.500000) "></path>
+    </g>
+</svg>

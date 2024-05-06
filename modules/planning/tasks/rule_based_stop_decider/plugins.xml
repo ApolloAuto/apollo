@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/rule_based_stop_decider/librule_based_stop_decider.so">
+    <class type="apollo::planning::RuleBasedStopDecider" base_class="apollo::planning::Task"></class>
+</library>

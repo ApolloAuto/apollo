@@ -1,0 +1,20 @@
+<package format="2">
+  <name>3rd-rtklib</name>
+  <version>local</version>
+  <description>
+    Apollo packaged cancard Lib.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/rtklib</src_path>
+
+</package>

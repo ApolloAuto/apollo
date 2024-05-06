@@ -23,7 +23,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map_geometry.pb.h"
+#include "modules/common_msgs/map_msgs/map_geometry.pb.h"
 
 DEFINE_bool(xy_to_sl, false, "calculate xy to sl");
 DEFINE_bool(sl_to_xy, false, "calculate sl to xy");

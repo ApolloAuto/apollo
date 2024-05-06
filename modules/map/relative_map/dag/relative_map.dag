@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/map/relative_map/librelative_map_component.so"
+    module_library : "modules/map/librelative_map_component.so"
     timer_components {
         class_name : "RelativeMapComponent"
         config {

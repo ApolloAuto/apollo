@@ -28,13 +28,13 @@
 #include <mutex>
 #include <string>
 
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/v2x/proto/v2x_obstacles.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
+#include "modules/common_msgs/v2x_msgs/v2x_traffic_light.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/v2x/common/v2x_proxy_gflags.h"

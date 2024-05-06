@@ -26,6 +26,7 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/evaluator/warm_up/warm_up.h"
 
 namespace apollo {
 namespace prediction {
@@ -415,6 +416,9 @@ bool VectornetEvaluator::ExtractObstaclesHistory(
   std::vector<std::pair<double, double>> pos_history(20, {0.0, 0.0});
   for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    if (!obstacle) {
+      continue;
+    }
     int target_id = obstacle_ptr->id();
     if (id == target_id) {
       continue;
@@ -480,11 +484,8 @@ void VectornetEvaluator::LoadModel() {
        std::move(vector_data.to(device_)), std::move(vector_mask.to(device_)),
        std::move(polyline_mask.to(device_)), std::move(rand_mask.to(device_)),
        std::move(polyline_id.to(device_))}));
-  // Run one inference to avoid very slow first inference later
-  torch_default_output_tensor_ =
-      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
-  torch_default_output_tensor_ =
-      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  // warm up to avoid very slow first inference later
+  WarmUp(torch_inputs, &torch_vehicle_model_, &torch_default_output_tensor_);
 }
 
 }  // namespace prediction

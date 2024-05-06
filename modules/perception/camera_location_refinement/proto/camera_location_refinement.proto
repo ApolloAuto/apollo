@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+import "modules/perception/common/proto/plugin_param.proto";
+
+message CameraLocationRefinement {
+  optional string camera_name = 1 [default = "front_6mm"];
+  optional PostprocessorParam postprocessor_param = 2;
+  optional CalibrationServiceParam calibration_service_param = 3;
+  optional RefinementChannel channel = 4;
+}
+
+message RefinementChannel {
+  repeated string input_camera_channel_name = 1;
+  optional string output_obstacles_channel_name = 2;
+}
+
+message PostprocessorParam {
+  optional perception.PluginParam plugin_param = 1;
+}
+
+message CalibrationServiceParam {
+  optional string calibrator_method = 2;
+  optional perception.PluginParam plugin_param = 3;
+}

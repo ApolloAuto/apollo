@@ -1,0 +1,16 @@
+<cyber>
+    <desc>Apollo lidar 3d object detection</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>lidar</name>
+        <dag_conf>/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag</dag_conf>
+        <process_name>lidar</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

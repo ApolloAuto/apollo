@@ -1,0 +1,41 @@
+# point pillars params
+
+info {
+  name: "point_pillars_torch"
+  version: ""
+  dataset: "waymo"
+  task_type: Detection3D
+  sensor_type: Lidar
+  framework: PyTorch
+
+  weight_file {
+    file: "pointpillars.zip"
+  }
+}
+
+preprocess {
+  gpu_id: 0
+  normalizing_factor: 255
+  num_point_feature: 5
+  enable_ground_removal: false
+  ground_removal_height: -1.5
+  enable_downsample_beams: false
+  downsample_beams_factor: 4
+  enable_downsample_pointcloud: false
+  downsample_voxel_size_x: 0.01
+  downsample_voxel_size_y: 0.01
+  downsample_voxel_size_z: 0.01
+  enable_fuse_frames: false
+  num_fuse_frames: 5
+  fuse_time_interval: 0.5
+  enable_shuffle_points: false
+  max_num_points: 2147483647
+  reproduce_result_mode: false
+  enable_roi_outside_removal: false
+}
+
+postprocess {
+  score_threshold: 0.5
+  nms_overlap_threshold: 0.5
+  num_output_box_feature: 7
+}

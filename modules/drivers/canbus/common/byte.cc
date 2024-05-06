@@ -50,7 +50,7 @@ std::string Byte::byte_to_hex(const uint32_t value) {
   uint8_t high;
   uint8_t low;
   std::string result = "";
-  if (FLAGS_esd_can_extended_frame && value >= 65536) {
+  if (value > 0xFF) {
     high = static_cast<uint8_t>((value >> 24) & 0xFF);
     low = static_cast<uint8_t>((value >> 16) & 0xFF);
     result += byte_to_hex(high);

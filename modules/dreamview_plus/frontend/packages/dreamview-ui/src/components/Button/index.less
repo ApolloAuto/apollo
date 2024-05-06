@@ -1,0 +1,150 @@
+.dreamview-btn {
+    outline: none;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    text-align: center;
+    background-image: none;
+    background-color: deepskyblue;
+    color: rgba(0, 0, 0, 0.88);
+    cursor: pointer;
+    font-weight: 400;
+    border: 1px solid transparent;
+    padding: 4px 15px;
+    border-radius: 8px;
+    height: 32px; 
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    user-select: none;
+    touch-action: manipulation;
+    line-height: 1.5;
+}
+
+.dreamview-btn-primary {
+    color: #fff;
+    background-color: #3288FA;
+    box-shadow: 0 2px 0 rgb(5 145 255 / 10%);
+
+    &:hover {
+        background-color: #579FF1;
+    }
+
+    &:active {
+        background-color: #1252C0;
+    }
+
+    &.dreamview-btn-dangerous {
+        background-color: #ff4d4f;
+    }
+}
+
+.dreamview-btn-large {
+    font-size: 16px;
+    height: 40px;
+    padding: 6px 15px;
+    border-radius: 8px;
+}
+
+.dreamview-btn-small {
+    font-size: 14px;
+    height: 24px;
+    padding: 0px 7px;
+    border-radius: 4px;
+}
+
+.dreamview-btn-default {
+    color: #fff;
+    background-color: #282B36;
+    border: 1px solid rgba(124,136,153,1);
+    box-shadow: 0 2px 0 rgb(0 0 0 / 2%);
+
+    &:hover {
+        color: #297DEC;
+        border-color: #519aff;
+        border: 1px solid rgba(41,125,236,1);
+    }
+
+    &:active {
+        color: #1252C0;
+        border: 1px solid rgba(18,82,192,1);
+    }
+
+    &.dreamview-btn-dangerous {
+        color: #ff4d4f;
+        border-color: #ff4d4f;
+    }
+}
+
+.dreamview-btn-dashed {
+    background-color: #ffffff;
+    border-color: #d9d9d9;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 2%);
+    border-style: dashed;
+
+    &:hover {
+        color: #519aff;
+        border-color: #519aff;
+    }
+
+    &.dreamview-btn-dangerous {
+        color: #ff4d4f;
+        border-color: #ff4d4f;
+    }
+}
+
+.dreamview-btn-circle {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    border-radius: 50%;
+}
+
+.dreamview-btn-round {
+    border-radius: 40px;
+    padding-inline-start: 20px;
+    padding-inline-end: 20px;
+}
+
+.dreamview-btn-disabled {
+    cursor: not-allowed;
+    border: none;
+    color: #515761;
+    background: #383D47;
+    box-shadow: none;
+
+    &:hover{
+        background: #383D47;
+    }
+}
+
+.dreamview-btn-link {
+    background-color: transparent;
+    color: #1677ff;
+    text-decoration: none;
+    vertical-align: middle;
+
+    &:hover {
+        color: #519aff;
+    }
+
+    &.dreamview-btn-dangerous {
+        color: #ff4d4f;
+    }
+}
+
+.dreamview-btn-text {
+    background-color: transparent;
+    border: 1px solid transparent;
+
+    &:hover {
+        background-color: #d9d9d9;
+    }
+
+    &.dreamview-btn-dangerous {
+        color: #ff4d4f;
+    }
+
+    &.dreamview-btn-dangerous:hover {
+        background-color: #f8dddd;
+    }
+}

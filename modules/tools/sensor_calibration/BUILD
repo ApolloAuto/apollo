@@ -1,18 +1,36 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
+
+# install(
+#     name = "install",
+#     data = ["runtime_files"],
+#     data_dest = "tools/sensor_calibration",
+#     py_dest = "tools/sensor_calibration",
+#     targets = [
+#         ":extract_data",
+#         ":extract_static_data",
+#         ":ins_stat_publisher",
+#         ":odom_publisher",
+#         ":sanity_check",
+#     ],
+#     deps = ["//modules/tools/sensor_calibration/config:install"]
+
+# )
 
 filegroup(
     name = "runtime_files",
     srcs = glob([
-        "config/**",
+        #"config/**",
         "template/**",
         "*.py",
         "*.sh",
     ]),
 )
 
-py_library(
+apollo_py_library(
     name = "configuration_yaml_generator",
     srcs = ["configuration_yaml_generator.py"],
     deps = [
@@ -21,15 +39,15 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "data_file_object",
     srcs = ["data_file_object.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_data",
     srcs = ["extract_data.py"],
-    data = [":config"],
+    data = [":runtime_files"],
     deps = [
         ":configuration_yaml_generator",
         ":extract_static_data",
@@ -44,10 +62,10 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_static_data",
     srcs = ["extract_static_data.py"],
-    data = [":config"],
+    data = [":runtime_files"],
     deps = [
         ":configuration_yaml_generator",
         ":data_file_object",
@@ -57,44 +75,46 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "ins_stat_publisher",
     srcs = ["ins_stat_publisher.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/drivers/gnss/proto:ins_py_pb2",
+        "//modules/common_msgs/sensor_msgs:ins_py_pb2",
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "odom_publisher",
     srcs = ["odom_publisher.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/localization/proto:gps_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/localization_msgs:gps_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "sensor_msg_extractor",
     srcs = ["sensor_msg_extractor.py"],
     deps = [
         ":data_file_object",
-        "//modules/drivers/proto:conti_radar_py_pb2",
-        "//modules/drivers/proto:pointcloud_py_pb2",
-        "//modules/drivers/proto:sensor_image_py_pb2",
-        "//modules/localization/proto:gps_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/sensor_msgs:conti_radar_py_pb2",
+        "//modules/common_msgs/sensor_msgs:pointcloud_py_pb2",
+        "//modules/common_msgs/sensor_msgs:sensor_image_py_pb2",
+        "//modules/common_msgs/localization_msgs:gps_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "sanity_check",
     srcs = ["sanity_check.py"],
     deps = [
         "//modules/tools/common:file_utils",
     ],
 )
+
+apollo_package()

@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// DestinationConfig
+
+message DestinationConfig {
+  // Safty stop distance from destination line.
+  optional double stop_distance = 1 [default = 0.5];  // meter
+}

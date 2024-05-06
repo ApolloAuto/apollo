@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: velodyne64
+child_frame_id: camera
+transform:
+  translation:
+    x: 0.2729034437321922
+    y: -0.0019692658108458787
+    z: -0.07228589741510176
+  rotation:
+    x: -0.4979955117640312
+    y: 0.4945671785688755
+    z: -0.5016337644403602
+    w: 0.5057344585043578

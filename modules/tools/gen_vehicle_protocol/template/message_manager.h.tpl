@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2023 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file %(car_type_lower)s_message_manager.h
+ * @brief the class of %(car_type_cap)sMessageManager
+ */
+
 #pragma once
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/proto/%(car_type_lower)s.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -26,7 +31,7 @@ namespace %(car_type_namespace)s {
 using ::apollo::drivers::canbus::MessageManager;
 
 class %(car_type_cap)sMessageManager
-	: public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::%(car_type_cap)s> {
  public:
   %(car_type_cap)sMessageManager();
   virtual ~%(car_type_cap)sMessageManager();
@@ -35,5 +40,3 @@ class %(car_type_cap)sMessageManager
 }  // namespace %(car_type_namespace)s
 }  // namespace canbus
 }  // namespace apollo
-
-

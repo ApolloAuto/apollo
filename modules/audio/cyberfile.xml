@@ -1,0 +1,38 @@
+<package format="2">
+  <name>audio</name>
+  <version>local</version>
+  <description>
+  The Audio module detect the siren sound coming from the active emergency vehicle.
+  It detects and output siren on/off status, moving status and the relative position of the siren.
+  When active emergency vehicles detected, you can also see active alerts on Dreamview.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/audio</src_path>
+
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="drivers-microphone" lib_names="drivers-microphone">drivers-microphone</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
+  <depend repo_name="fftw3">3rd-fftw3</depend>
+  <depend repo_name="com_github_jbeder_yaml_cpp" lib_names="yaml-cpp">3rd-yaml-cpp</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="libtorch_gpu" lib_names="libtorch_gpu">3rd-libtorch-gpu</depend>
+  <depend>3rd-mkl</depend>
+
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+
+</package>

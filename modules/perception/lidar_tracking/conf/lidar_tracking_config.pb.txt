@@ -1,0 +1,11 @@
+output_channel_name: "/perception/inner/PrefusedObjects"
+multi_target_tracker_param {
+  name: "MlfEngine"
+  config_path: "perception/lidar_tracking/data/tracking"
+  config_file: "mlf_engine.pb.txt"
+}
+# fusion_classifier_param {
+#   name: "FusedClassifier"
+#   config_path: "perception/lidar_tracking/data/fused_classifier"
+#   config_file: "fused_classifier.pb.txt"
+# }

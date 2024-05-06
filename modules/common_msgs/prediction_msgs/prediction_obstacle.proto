@@ -1,0 +1,80 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/common_msgs/basic_msgs/error_code.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+import "modules/common_msgs/prediction_msgs/scenario.proto";
+import "modules/common_msgs/prediction_msgs/feature.proto";
+
+// estimated obstacle intent
+message ObstacleIntent {
+  enum Type {
+    UNKNOWN = 0;
+    STOP = 1;
+    STATIONARY = 2;
+    MOVING = 3;
+    CHANGE_LANE = 4;
+    LOW_ACCELERATION = 5;
+    HIGH_ACCELERATION = 6;
+    LOW_DECELERATION = 7;
+    HIGH_DECELERATION = 8;
+  }
+  optional Type type = 1 [default = UNKNOWN];
+}
+
+// self driving car intent
+message Intent {
+  enum Type {
+    UNKNOWN = 0;
+    STOP = 1;
+    CRUISE = 2;
+    CHANGE_LANE = 3;
+  }
+  optional Type type = 1 [default = UNKNOWN];
+}
+
+message PredictionObstacle {
+  optional apollo.perception.PerceptionObstacle perception_obstacle = 1;
+  optional double timestamp = 2;  // GPS time in seconds
+  // the length of the time for this prediction (e.g. 10s)
+  optional double predicted_period = 3;
+  // can have multiple trajectories per obstacle
+  repeated Trajectory trajectory = 4;
+
+  // estimated obstacle intent
+  optional ObstacleIntent intent = 5;
+
+  optional ObstaclePriority priority = 6;
+
+  optional ObstacleInteractiveTag interactive_tag = 9;
+
+  optional bool is_static = 7 [default = false];
+
+  // Feature history latest -> earliest sequence
+  repeated Feature feature = 8;
+}
+
+message PredictionObstacles {
+  // timestamp is included in header
+  optional apollo.common.Header header = 1;
+
+  // make prediction for multiple obstacles
+  repeated PredictionObstacle prediction_obstacle = 2;
+
+  // perception error code
+  optional apollo.common.ErrorCode perception_error_code = 3;
+
+  // start timestamp
+  optional double start_timestamp = 4;
+
+  // end timestamp
+  optional double end_timestamp = 5;
+
+  // self driving car intent
+  optional Intent intent = 6;
+
+  // Scenario
+  optional Scenario scenario = 7;
+}

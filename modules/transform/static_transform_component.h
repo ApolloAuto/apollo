@@ -22,7 +22,7 @@
 
 #include "cyber/component/component.h"
 #include "modules/transform/proto/static_transform_conf.pb.h"
-#include "modules/transform/proto/transform.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 
 namespace apollo {
 namespace transform {

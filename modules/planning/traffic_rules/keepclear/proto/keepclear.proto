@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// KeepClearConfig
+
+message KeepClearConfig {
+  // Flag if "keep-clear-zone" function is enabled.
+  optional bool enable_keep_clear_zone = 1 [default = true];
+  // Flag if junction is checked at the same time.
+  optional bool enable_junction = 2 [default = true];
+  // If the front edge of ego-vehicle has passed "keep-clear-zone" over
+  // "min_pass_s_distance", it can be considered as having passed
+  // "keep-clear-zone".
+  optional double min_pass_s_distance = 3 [default = 2.0];  // meter
+  // tolerance distance to align pnc_junction boundary with stop_line of traffic
+  // sign(s).
+  // If the distance between the start position of the traffic sign and the pnc
+  // junction < "align_with_traffic_sign_tolerance", take the start position of
+  // the traffic sign as that of the pnc junction.
+  optional double align_with_traffic_sign_tolerance = 4
+      [default = 4.5];  // meter
+}

@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/tools/image_decompress/libimage_decompress.so"
+    module_library : "modules/drivers/tools/image_decompress/libimage_decompress.so"
 
     components {
       class_name : "ImageDecompressComponent"

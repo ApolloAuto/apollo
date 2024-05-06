@@ -1,0 +1,40 @@
+syntax = "proto2";
+package apollo.perception;
+
+message SensorMeta {
+  enum SensorType {
+    UNKNOWN_SENSOR_TYPE = -1;
+    VELODYNE_128 = 0;
+    VELODYNE_64 = 1;
+    VELODYNE_32 = 2;
+    VELODYNE_16 = 3;
+    LDLIDAR_4 = 4;
+    LDLIDAR_1 = 5;
+    SHORT_RANGE_RADAR = 6;
+    LONG_RANGE_RADAR = 7;
+    MONOCULAR_CAMERA = 8;
+    STEREO_CAMERA = 9;
+    ULTRASONIC = 10;
+  }
+
+  enum SensorOrientation {
+    FRONT = 0;
+    LEFT_FORWARD = 1;
+    LEFT = 2;
+    LEFT_BACKWARD = 3;
+    REAR = 4;
+    RIGHT_BACKWARD = 5;
+    RIGHT = 6;
+    RIGHT_FORWARD = 7;
+    PANORAMIC = 8;
+  }
+
+  optional string name = 1;
+  optional SensorType type = 2;
+  optional SensorOrientation orientation = 3;
+  optional bool is_main_sensor = 4;
+}
+
+message MultiSensorMeta {
+  repeated SensorMeta sensor_meta = 1;
+}

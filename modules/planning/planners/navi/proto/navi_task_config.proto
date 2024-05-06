@@ -1,0 +1,70 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+enum NaviTaskType {
+    NAVI_OBSTACLE_DECIDER = 3;
+    NAVI_PATH_DECIDER = 4;
+    NAVI_SPEED_DECIDER = 5;
+};
+
+//////////////////////////////////
+// Navi
+
+message NaviObstacleDeciderConfig {
+  optional double min_nudge_distance = 1 [default = 0.2];
+  optional double max_nudge_distance = 2 [default = 1.2];
+  optional double max_allow_nudge_speed = 3 [default = 16.667];
+  optional double safe_distance = 4 [default = 0.2];
+  optional double nudge_allow_tolerance = 5 [default = 0.05];
+  optional uint32 cycles_number = 6 [default = 3];
+  optional double judge_dis_coeff = 7 [default = 2.0];
+  optional double basis_dis_value = 8 [default = 30.0];
+  optional double lateral_velocity_value = 9 [default = 0.5];
+  optional double speed_decider_detect_range = 10 [default = 1.0];
+  optional uint32 max_keep_nudge_cycles = 11 [default = 100];
+}
+
+message NaviPathDeciderConfig {
+  optional double min_path_length = 1 [default = 5];
+  optional uint32 min_look_forward_time = 2 [default = 2];
+  optional double max_keep_lane_distance = 3 [default = 0.8];
+  optional double max_keep_lane_shift_y = 4 [default = 20.0];
+  optional double min_keep_lane_offset = 5 [default = 15.0];
+  optional double keep_lane_shift_compensation = 6 [default = 0.01];
+  optional MoveDestLaneConfigTable move_dest_lane_config_talbe = 7;
+  optional double move_dest_lane_compensation = 8 [default = 0.35];
+  optional double max_kappa_threshold = 9 [default = 0.0];
+  optional double kappa_move_dest_lane_compensation = 10 [default = 0.0];
+  optional uint32 start_plan_point_from = 11 [default = 0];
+}
+
+message MoveDestLaneConfigTable {
+  repeated ShiftConfig lateral_shift = 1;
+}
+
+message ShiftConfig {
+  optional double max_speed = 1 [default = 4.16];
+  optional double max_move_dest_lane_shift_y = 3 [default = 0.4];
+}
+
+message NaviSpeedDeciderConfig {
+  optional double preferred_accel = 1 [default = 2.0];
+  optional double preferred_decel = 2 [default = 2.0];
+  optional double preferred_jerk = 3 [default = 2.0];
+  optional double max_accel = 4 [default = 4.0];
+  optional double max_decel = 5 [default = 5.0];
+  optional double obstacle_buffer = 6 [default = 0.5];
+  optional double safe_distance_base = 7 [default = 2.0];
+  optional double safe_distance_ratio = 8 [default = 1.0];
+  optional double following_accel_ratio = 9 [default = 0.5];
+  optional double soft_centric_accel_limit = 10 [default = 1.2];
+  optional double hard_centric_accel_limit = 11 [default = 1.5];
+  optional double hard_speed_limit = 12 [default = 100.0];
+  optional double hard_accel_limit = 13 [default = 10.0];
+  optional bool enable_safe_path = 14 [default = true];
+  optional bool enable_planning_start_point = 15 [default = true];
+  optional bool enable_accel_auto_compensation = 16 [default = true];
+  optional double kappa_preview = 17 [default = 0.0];
+  optional double kappa_threshold = 18 [default = 0.0];
+}

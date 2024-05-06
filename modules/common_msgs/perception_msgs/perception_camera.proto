@@ -1,0 +1,113 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+
+enum CameraErrorCode {
+  ERROR_NONE = 0;
+  ERROR_UNKNOWN = 1;
+}
+
+enum LaneLineType {
+  WHITE_DASHED = 0;
+  WHITE_SOLID = 1;
+  YELLOW_DASHED = 2;
+  YELLOW_SOLID = 3;
+}
+
+enum LaneLinePositionType {
+  BOLLARD_LEFT = -5;
+  FOURTH_LEFT = -4;
+  THIRD_LEFT = -3;
+  ADJACENT_LEFT = -2;  //!< lane marking on the left side next to ego lane
+  EGO_LEFT = -1;       //!< left lane marking of the ego lane
+  EGO_RIGHT = 1;       //!< right lane marking of the ego lane
+  ADJACENT_RIGHT = 2;  //!< lane marking on the right side next to ego lane
+  THIRD_RIGHT = 3;
+  FOURTH_RIGHT = 4;
+  BOLLARD_RIGHT = 5;
+  OTHER = 6;    //!< other types of lane
+  UNKNOWN = 7;  //!< background
+}
+
+enum LaneLineUseType {
+  REAL = 0;
+  VIRTUAL = 1;
+}
+
+message LaneLineCubicCurve {
+  optional float longitude_min = 1;
+  optional float longitude_max = 2;
+  optional float a = 3;
+  optional float b = 4;
+  optional float c = 5;
+  optional float d = 6;
+}
+
+message EndPoints {
+  optional apollo.common.Point2D start = 1;
+  optional apollo.common.Point2D end = 2;
+}
+
+message CameraLaneLine {
+  optional LaneLineType type = 1;
+  optional LaneLinePositionType pos_type = 2;
+  // @brief camera coordinate system
+  optional LaneLineCubicCurve curve_camera_coord = 3;
+  // @brief image coordinate system
+  optional LaneLineCubicCurve curve_image_coord = 4;
+  // @brief curve camera point set
+  repeated apollo.common.Point3D curve_camera_point_set = 5;
+  // @brief curve image point set
+  repeated apollo.common.Point2D curve_image_point_set = 6;
+
+  // @brief image end point set
+  repeated EndPoints image_end_point_set = 7;
+  // @brief track id
+  optional int32 track_id = 8;
+  // @brief confidence for lane line
+  optional float confidence = 9;
+
+  optional LaneLineUseType use_type = 10;
+}
+
+message CameraCalibrator {
+  optional float pitch_angle = 1;
+  optional float camera_height = 2;
+}
+
+message CameraObstacle {
+  optional PerceptionObstacle obstacle = 1;  // PerceptionObstacle
+
+  // 2D information
+  enum CameraType {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behaviour.
+    BICYCLE = 4;     // bike, motor bike
+    VEHICLE = 5;     // Passenger car or truck.
+  };
+
+  optional CameraType type = 21;   // obstacle type
+  repeated float type_probs = 22;  // obstacle type
+  optional apollo.common.Point2D upper_left =
+      23;  // upper left corner of 2D bbox
+  optional apollo.common.Point2D lower_right =
+      24;  // lower right corner of 2D bbox
+  repeated apollo.common.Point2D key_points = 25;  // 2D key points
+  repeated string debug_message = 26;              // debug message
+}
+
+//
+message CameraDebug {
+  optional apollo.common.Header header = 1;  // header
+  optional string source_topic = 2;          // which topic to get the frame
+  optional CameraErrorCode error_code = 3 [default = ERROR_NONE];  // error code
+  optional CameraCalibrator camera_calibrator = 4;
+  repeated CameraLaneLine camera_laneline = 5;
+  repeated CameraObstacle camera_obstacle = 6;  // an array of obstacles
+}

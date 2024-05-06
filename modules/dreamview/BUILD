@@ -1,6 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools/platform:build_defs.bzl", "copts_if_teleop")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,7 +11,7 @@ filegroup(
     srcs = glob(["frontend/dist/**/*"]),
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "dreamview",
     srcs = ["main.cc"],
     copts = DREAMVIEW_COPTS + copts_if_teleop(),
@@ -20,7 +19,8 @@ cc_binary(
         ":frontend",
     ],
     deps = [
-        "//modules/dreamview/backend",
+        "//cyber",
+        "//modules/dreamview/backend:apollo_dreamview_backend",
     ],
 )
 
@@ -34,26 +34,6 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    data = [
-        ":dreamview_conf",
-        ":frontend",
-    ],
-    targets = ["dreamview"],
-    deps = [
-        ":pb_dreamview",
-        "//cyber:install",
-    ],
-)
-
-install_files(
-    name = "pb_dreamview",
-    dest = "modules/dreamview",
-    files = [
-        "//modules/dreamview/proto:chart_py_pb2",
-        "//modules/dreamview/proto:preprocess_table_py_pb2",
-    ],
-)
+apollo_package()
 
 cpplint()

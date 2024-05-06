@@ -1,0 +1,430 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+// Coolhigh vehicle starts from here
+message Throttle_command_110 {
+// Control Message
+  enum Throttle_pedal_en_ctrlType {
+    THROTTLE_PEDAL_EN_CTRL_DISABLE = 0;
+    THROTTLE_PEDAL_EN_CTRL_ENABLE = 1;
+  }
+  // throttle pedal enable bit(Command) [] [0|1]
+  optional Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl = 1;
+  // Percentage of throttle pedal(Command) [%] [0|100]
+  optional int32 throttle_pedal_cmd = 2;
+}
+
+message Brake_command_111 {
+// Control Message
+  enum Brake_pedal_en_ctrlType {
+    BRAKE_PEDAL_EN_CTRL_DISABLE = 0;
+    BRAKE_PEDAL_EN_CTRL_ENABLE = 1;
+  }
+  // brake pedal enable bit(Command) [] [0|1]
+  optional Brake_pedal_en_ctrlType brake_pedal_en_ctrl = 1;
+  // Percentage of brake pedal(Command) [%] [0|100]
+  optional int32 brake_pedal_cmd = 2;
+}
+
+message Steer_command_112 {
+// Control Message
+  enum Steer_angle_en_ctrlType {
+    STEER_ANGLE_EN_CTRL_DISABLE = 0;
+    STEER_ANGLE_EN_CTRL_ENABLE = 1;
+  }
+  // steering angle enable bit(Command) [] [0|1]
+  optional Steer_angle_en_ctrlType steer_angle_en_ctrl = 1;
+  // Current steering angle(Command) [radian] [-0.524|0.524]
+  optional double steer_angle_cmd = 2;
+}
+
+message Turnsignal_command_113 {
+// Control Message
+  enum Low_beam_cmdType {
+    LOW_BEAM_CMD_OFF = 0;
+    LOW_BEAM_CMD_ON = 1;
+  }
+  enum Turn_signal_cmdType {
+    TURN_SIGNAL_CMD_NONE = 0;
+    TURN_SIGNAL_CMD_LEFT = 1;
+    TURN_SIGNAL_CMD_RIGHT = 2;
+    TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS = 3;
+  }
+  // Lighting control(Command) [] [0|3]
+  optional Turn_signal_cmdType turn_signal_cmd = 1;
+  // Lighting control(Command) [] [0|1]
+  optional Low_beam_cmdType low_beam_cmd = 2;
+}
+
+message Gear_command_114 {
+// Control Message
+  enum Gear_cmdType {
+    GEAR_CMD_PARK = 1;
+    GEAR_CMD_REVERSE = 2;
+    GEAR_CMD_NEUTRAL = 3;
+    GEAR_CMD_DRIVE = 4;
+  }
+  // PRND control(Command) [] [1|4]
+  optional Gear_cmdType gear_cmd = 1;
+}
+
+message Control_command_115 {
+  // Control Message
+  enum Ctrl_cmdType {
+    CTRL_CMD_OUT_OF_CONTROL = 0;
+    CTRL_CMD_UNDER_CONTROL = 1;
+  }
+  // Take control(Command) [] [0|1]
+  optional Ctrl_cmdType ctrl_cmd = 1;
+}
+
+message Vehicle_mode_command_116 {
+// Control Message
+  enum Vin_req_cmdType {
+    VIN_REQ_CMD_VIN_REQ_DISABLE = 0;
+    VIN_REQ_CMD_VIN_REQ_ENABLE = 1;
+  }
+  // Request VIN(Command) [] [0|1]
+  optional Vin_req_cmdType vin_req_cmd = 1;
+}
+
+message Throttle_status__510 {
+// Report Message
+  enum Throttle_pedal_en_stsType {
+    THROTTLE_PEDAL_EN_STS_DISABLE = 0;
+    THROTTLE_PEDAL_EN_STS_ENABLE = 1;
+    THROTTLE_PEDAL_EN_STS_TAKEOVER = 2;
+  }
+  enum Drive_motor_errType {
+    DRIVE_MOTOR_ERR_NOERR = 0;
+    DRIVE_MOTOR_ERR_DRV_MOTOR_ERR = 1;
+  }
+  enum Battery_bms_errType {
+    BATTERY_BMS_ERR_NOERR = 0;
+    BATTERY_BMS_ERR_BATTERY_ERR = 1;
+  }
+  // throttle pedal enable bit(Status) [] [0|2]
+  optional Throttle_pedal_en_stsType throttle_pedal_en_sts = 1;
+  // Percentage of throttle pedal(Status) [%] [0|100]
+  optional int32 throttle_pedal_sts = 2;
+  // [] [0|1]
+  optional Drive_motor_errType drive_motor_err = 3;
+  // [] [0|1]
+  optional Battery_bms_errType battery_bms_err = 4;
+}
+
+message Brake_status__511 {
+// Report Message
+  enum Overspd_envType {
+    OVERSPD_ENV_NOENV = 0;
+    OVERSPD_ENV_OVERSPEED_ENV = 1;
+  }
+  enum Brake_pedal_en_stsType {
+    BRAKE_PEDAL_EN_STS_DISABLE = 0;
+    BRAKE_PEDAL_EN_STS_ENABLE = 1;
+    BRAKE_PEDAL_EN_STS_TAKEOVER = 2;
+  }
+  enum Brake_errType {
+    BRAKE_ERR_NOERR = 0;
+    BRAKE_ERR_BRAKE_SYSTEM_ERR = 1;
+  }
+  enum Emergency_btn_envType {
+    EMERGENCY_BTN_ENV_NOENV = 0;
+    EMERGENCY_BTN_ENV_EMERGENCY_BUTTON_ENV = 1;
+  }
+  enum Front_bump_envType {
+    FRONT_BUMP_ENV_NOENV = 0;
+    FRONT_BUMP_ENV_FRONT_BUMPER_ENV = 1;
+  }
+  enum Back_bump_envType {
+    BACK_BUMP_ENV_NOENV = 0;
+    BACK_BUMP_ENV_BACK_BUMPER_ENV = 1;
+  }
+  enum Brake_light_actualType {
+    BRAKE_LIGHT_ACTUAL_BRAKELIGHT_OFF = 0;
+    BRAKE_LIGHT_ACTUAL_BRAKELIGHT_ON = 1;
+  }
+
+  // brake pedal enable bit(Status) [] [0|2]
+  optional Brake_pedal_en_stsType brake_pedal_en_sts = 1;
+  // Percentage of brake pedal(Status) [%] [0|100]
+  optional int32 brake_pedal_sts = 2;
+  // [] [0|1]
+  optional Brake_errType brake_err = 3;
+  // [] [0|1]
+  optional Emergency_btn_envType emergency_btn_env = 4;
+  // [] [0|1]
+  optional Front_bump_envType front_bump_env = 5;
+  // [] [0|1]
+  optional Back_bump_envType back_bump_env = 6;
+  // [] [0|1]
+  optional Overspd_envType overspd_env = 7;
+  // [] [0|1]
+  optional Brake_light_actualType brake_light_actual = 8;
+}
+
+message Steer_status__512 {
+// Report Message
+  enum Steer_angle_en_stsType {
+    STEER_ANGLE_EN_STS_DISABLE = 0;
+    STEER_ANGLE_EN_STS_ENABLE = 1;
+    STEER_ANGLE_EN_STS_TAKEOVER = 2;
+  }
+  enum Steer_errType {
+    STEER_ERR_NOERR = 0;
+    STEER_ERR_STEER_MOTOR_ERR = 1;
+  }
+  enum Sensor_errType {
+    SENSOR_ERR_NOERR = 0;
+    SENSOR_ERR_STEER_SENSOR_ERR = 1;
+  }
+  // steering angle enable bit(Status) [] [0|2]
+  optional Steer_angle_en_stsType steer_angle_en_sts = 1;
+  // Current steering angle(Status) [radian] [-0.524|0.524]
+  optional double steer_angle_sts = 2;
+  // [] [0|1]
+  optional Steer_errType steer_err = 3;
+  // [] [0|1]
+  optional Sensor_errType sensor_err = 4;
+}
+
+message Turnsignal_status__513 {
+// Report Message
+  enum Low_beam_stsType {
+    LOW_BEAM_STS_ON = 0;
+    LOW_BEAM_STS_OFF = 1;
+  }
+  enum Turn_signal_stsType {
+    TURN_SIGNAL_STS_NONE = 0;
+    TURN_SIGNAL_STS_LEFT = 1;
+    TURN_SIGNAL_STS_RIGHT = 2;
+    TURN_SIGNAL_STS_HAZARD_WARNING_LAMPSTS_ON = 3;
+  }
+  // Lighting control(Status) [] [0|3]
+  optional Turn_signal_stsType turn_signal_sts = 1;
+  // Lighting control(Status) [] [0|1]
+  optional Low_beam_stsType low_beam_sts = 2;
+}
+
+message Gear_status_514 {
+// Report Message
+  enum Gear_stsType {
+    GEAR_STS_PARK = 1;
+    GEAR_STS_REVERSE = 2;
+    GEAR_STS_NEUTRAL = 3;
+    GEAR_STS_DRIVE = 4;
+  }
+  // PRND control(Status) [] [1|4]
+  optional Gear_stsType gear_sts = 1;
+}
+
+message Ecu_status_1_515 {
+// Report Message
+  enum Ctrl_stsType {
+    CTRL_STS_OUT_OF_CONTROL = 0;
+    CTRL_STS_UNDER_CONTROL = 1;
+  }
+  enum Chassis_mcu_errType {
+    CHASSIS_MCU_ERR_NORMAL = 0;
+    CHASSIS_MCU_ERR_ERROR = 1;
+  }
+  enum Chassis_mcu_canType {
+    CHASSIS_MCU_CAN_NORMAL = 0;
+    CHASSIS_MCU_CAN_ERROR = 1;
+  }
+  enum Chassis_hw_lostType {
+    CHASSIS_HW_LOST_NORMAL = 0;
+    CHASSIS_HW_LOST_ERROR = 1;
+  }
+  enum Chassis_eps_errType {
+    CHASSIS_EPS_ERR_NORMAL = 0;
+    CHASSIS_EPS_ERR_ERROR = 1;
+  }
+  enum Chassis_eps_canType {
+    CHASSIS_EPS_CAN_NORMAL = 0;
+    CHASSIS_EPS_CAN_ERROR = 1;
+  }
+  enum Chassis_ehb_errType {
+    CHASSIS_EHB_ERR_NORMAL = 0;
+    CHASSIS_EHB_ERR_ERROR = 1;
+  }
+  enum Chassis_ehb_canType {
+    CHASSIS_EHB_CAN_NORMAL = 0;
+    CHASSIS_EHB_CAN_ERROR = 1;
+  }
+  enum Chassis_bms_canType {
+    CHASSIS_BMS_CAN_NORMAL = 0;
+    CHASSIS_BMS_CAN_ERROR = 1;
+  }
+  enum Chassis_ads_errType {
+    CHASSIS_ADS_ERR_NORMAL = 0;
+    CHASSIS_ADS_ERR_ADS_CAN_LOST = 1;
+    CHASSIS_ADS_ERR_ADS_CAN_RECOVERY = 2;
+  }
+  // Current speed (Steering status) [m/s] [-327.68|327.67]
+  optional double speed = 1;
+  // Current acceleration (Steering status) [m/s^2] [0|0]
+  optional double acc_speed = 2;
+  // Current Auto-mode state (Chassis status) [] [0|1]
+  optional Ctrl_stsType ctrl_sts = 3;
+  // Current chassis state (Chassis status) [] [0|255]
+  optional int32 chassis_sts = 4;
+  // Chassis error code (Chassis status) [] [0|65535]
+  optional int32 chassis_err = 5;
+  // [] [0|1]
+  optional Chassis_mcu_errType chassis_mcu_err = 6;
+  // [] [0|1]
+  optional Chassis_mcu_canType chassis_mcu_can = 7;
+  // [] [0|1]
+  optional Chassis_hw_lostType chassis_hw_lost = 8;
+  // [] [0|1]
+  optional Chassis_eps_errType chassis_eps_err = 9;
+  // [] [0|1]
+  optional Chassis_eps_canType chassis_eps_can = 10;
+  // [] [0|1]
+  optional Chassis_ehb_errType chassis_ehb_err = 11;
+  // [] [0|1]
+  optional Chassis_ehb_canType chassis_ehb_can = 12;
+  // [] [0|1]
+  optional Chassis_bms_canType chassis_bms_can = 13;
+  // Chassis error code (Chassis status) [] [0|2]
+  optional Chassis_ads_errType chassis_ads_err = 14;
+}
+
+message Ecu_status_2_516 {
+// Report Message
+  // Percentage of battery remaining (BMS status) [%] [0|100]
+  optional int32 battery_soc = 1;
+  // Battery full capacity (BMS status) [Ah] [0|100]
+  optional int32 battery_capacity = 2;
+  // Current battery voltage (BMS status) [V] [0|80]
+  optional double battery_voltage = 3;
+  // Current battery current (BMS status) [A] [-60|60]
+  optional double battery_current = 4;
+  // Current battery temperature (BMS status) [℃] [-40|110]
+  optional int32 battery_temperature = 5;
+  // Battery Low Soc Warn [] [0|1]
+  optional bool is_battery_soc_low = 6;
+}
+
+message Ecu_status_3_517 {
+// Report Message
+  // Ultrasonic detection distance 1 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_1 = 1;
+  // Ultrasonic detection distance 2 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_2 = 2;
+  // Ultrasonic detection distance 3 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_3 = 3;
+  // Ultrasonic detection distance 4 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_4 = 4;
+  // Ultrasonic detection distance 5 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_5 = 5;
+  // Ultrasonic detection distance 6 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_6 = 6;
+  // Ultrasonic detection distance 7 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_7 = 7;
+  // Ultrasonic detection distance 8 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_8 = 8;
+}
+
+message Ecu_status_4_518 {
+// Report Message
+  // Ultrasonic detection distance 9 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_9 = 1;
+  // Ultrasonic detection distance 10 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_10 = 2;
+  // Ultrasonic detection distance 11 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_11 = 3;
+  // Ultrasonic detection distance 12 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_12 = 4;
+  // Ultrasonic detection distance 13 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_13 = 5;
+  // Ultrasonic detection distance 14 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_14 = 6;
+  // Ultrasonic detection distance 15 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_15 = 7;
+  // Ultrasonic detection distance 16 (Ultrasound status) [cm] [0|500]
+  optional double ultrasound_dist_16 = 8;
+}
+
+message Vin_resp1_51b {
+// Report Message
+  // VIN Response [] [0|255] to char
+  optional string vin08 = 1;
+  // VIN Response [] [0|255] to char
+  optional string vin07 = 2;
+  // VIN Response [] [0|255] to char
+  optional string vin06 = 3;
+  // VIN Response [] [0|255] to char
+  optional string vin05 = 4;
+  // VIN Response [] [0|255] to char
+  optional string vin04 = 5;
+  // VIN Response [] [0|255] to char
+  optional string vin03 = 6;
+  // VIN Response [] [0|255] to char
+  optional string vin02 = 7;
+  // VIN Response [] [0|255] to char
+  optional string vin01 = 8;
+}
+
+message Vin_resp2_51c {
+// Report Message
+  // VIN Response [] [0|0] to char
+  optional string vin16 = 1;
+  // VIN Response [] [0|0] to char
+  optional string vin15 = 2;
+  // VIN Response [] [0|0] to char
+  optional string vin14 = 3;
+  // VIN Response [] [0|0] to char
+  optional string vin13 = 4;
+  // VIN Response [] [0|0] to char
+  optional string vin12 = 5;
+  // VIN Response [] [0|0] to char
+  optional string vin11 = 6;
+  // VIN Response [] [0|0] to char
+  optional string vin10 = 7;
+  // VIN Response [] [0|0] to char
+  optional string vin09 = 8;
+}
+
+message Vin_resp3_51d {
+// Report Message
+  // VIN Response [] [0|0] to char
+  optional string vin17 = 1;
+}
+
+message Wheelspeed_report_51e {
+// Report Message
+  // wheel speed rear right [m/s] [-327.68|327.67]
+  optional double rr = 1;
+  // wheel speed rear left [m/s] [-327.68|327.67]
+  optional double rl = 2;
+  // wheel speed front right [m/s] [-327.68|327.67]
+  optional double fr = 3;
+  // wheel speed front left [m/s] [-327.68|327.67]
+  optional double fl = 4;
+}
+
+message Ch {
+  optional Throttle_command_110 throttle_command_110 = 1; // control message
+  optional Brake_command_111 brake_command_111 = 2; // control message
+  optional Steer_command_112 steer_command_112 = 3; // control message
+  optional Turnsignal_command_113 turnsignal_command_113 = 4; // control message
+  optional Gear_command_114 gear_command_114 = 5; // control message
+  optional Control_command_115 control_command_115 = 6 [deprecated = true]; // control message
+  optional Throttle_status__510 throttle_status__510 = 7; // report message
+  optional Brake_status__511 brake_status__511 = 8; // report message
+  optional Steer_status__512 steer_status__512 = 9; // report message
+  optional Turnsignal_status__513 turnsignal_status__513 = 10; // report message
+  optional Gear_status_514 gear_status_514 = 11; // report message
+  optional Ecu_status_1_515 ecu_status_1_515 = 12; // report message
+  optional Ecu_status_2_516 ecu_status_2_516 = 13; // report message
+  optional Ecu_status_3_517 ecu_status_3_517 = 14; // report message
+  optional Ecu_status_4_518 ecu_status_4_518 = 15; // report message
+  optional Vehicle_mode_command_116 vehicle_mode_command_116 = 16; // control message
+  optional Vin_resp1_51b vin_resp1_51b = 17; // report message
+  optional Vin_resp2_51c vin_resp2_51c = 18; // report message
+  optional Vin_resp3_51d vin_resp3_51d = 19; // report message
+  optional Wheelspeed_report_51e wheelspeed_report_51e = 20; // report message
+}

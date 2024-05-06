@@ -16,6 +16,8 @@
 
 #include "cyber/tools/cyber_recorder/recorder.h"
 
+#include <algorithm>
+
 #include "cyber/record/header_builder.h"
 
 namespace apollo {
@@ -53,6 +55,28 @@ bool Recorder::Start() {
       return false;
     }
   }
+
+  auto get_patterns_func = [](const std::vector<std::string>& channels,
+                              std::vector<std::regex>* channel_patterns) {
+    for (const auto& channel_name : channels) {
+      try {
+        std::string name = "";
+        /* replace escape character: \ to \\ */
+        for (auto& c : channel_name) {
+          if (c != '\\') {
+            name += c;
+          } else {
+            name += "\\";
+          }
+        }
+        channel_patterns->emplace_back(name);
+      } catch (std::regex_error& e) {
+        // ignored if channel name is not a regex string.
+      }
+    }
+  };
+  get_patterns_func(white_channels_, &white_channel_patterns_);
+  get_patterns_func(black_channels_, &black_channel_patterns_);
 
   writer_.reset(new RecordWriter(header_));
   if (!writer_->Open(output_)) {
@@ -124,30 +148,46 @@ void Recorder::FindNewChannel(const RoleAttributes& role_attr) {
     AWARN << "Change message not has a proto desc or has an empty one.";
     return;
   }
+
+  if (channel_reader_map_.find(role_attr.channel_name()) !=
+      channel_reader_map_.end()) {
+    return;
+  }
+
+  auto channel_match_func = [&role_attr](
+                                const std::vector<std::string> channels,
+                                std::vector<std::regex>& patterns) -> bool {
+    if (std::find(channels.begin(), channels.end(), role_attr.channel_name()) !=
+        channels.end()) {
+      return true;
+    }
+    for (const auto& pattern : patterns) {
+      if (std::regex_match(role_attr.channel_name(), pattern)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // white channel matching
   if (!all_channels_ &&
-      std::find(white_channels_.begin(), white_channels_.end(),
-                role_attr.channel_name()) == white_channels_.end()) {
+      !channel_match_func(white_channels_, white_channel_patterns_)) {
     ADEBUG << "New channel '" << role_attr.channel_name()
            << "' was found, but not in record list.";
     return;
   }
-
-  if (std::find(black_channels_.begin(), black_channels_.end(),
-      role_attr.channel_name()) != black_channels_.end()) {
+  // black channel matching
+  if (channel_match_func(black_channels_, black_channel_patterns_)) {
     ADEBUG << "New channel '" << role_attr.channel_name()
            << "' was found, but it appears in the blacklist.";
     return;
   }
 
-  if (channel_reader_map_.find(role_attr.channel_name()) ==
-      channel_reader_map_.end()) {
-    if (!writer_->WriteChannel(role_attr.channel_name(),
-                               role_attr.message_type(),
-                               role_attr.proto_desc())) {
-      AERROR << "write channel fail, channel:" << role_attr.channel_name();
-    }
-    InitReaderImpl(role_attr.channel_name(), role_attr.message_type());
+  if (!writer_->WriteChannel(role_attr.channel_name(), role_attr.message_type(),
+                             role_attr.proto_desc())) {
+    AERROR << "write channel fail, channel:" << role_attr.channel_name();
   }
+  InitReaderImpl(role_attr.channel_name(), role_attr.message_type());
 }
 
 bool Recorder::InitReadersImpl() {

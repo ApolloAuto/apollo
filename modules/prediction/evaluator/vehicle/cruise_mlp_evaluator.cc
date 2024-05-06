@@ -28,6 +28,7 @@
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/warm_up/warm_up.h"
 
 namespace apollo {
 namespace prediction {
@@ -445,9 +446,11 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
   } else {
     Obstacle* forward_obs_ptr =
         obstacles_container->GetObstacle(forward_obstacle.id());
-    const Feature& feature = forward_obs_ptr->latest_feature();
-    feature_values->push_back(feature.length());
-    feature_values->push_back(feature.speed());
+    if (forward_obs_ptr) {
+      const Feature& feature = forward_obs_ptr->latest_feature();
+      feature_values->push_back(feature.length());
+      feature_values->push_back(feature.speed());
+    }
   }
 
   // Set feature values for backward obstacle
@@ -459,9 +462,11 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
   } else {
     Obstacle* backward_obs_ptr =
         obstacles_container->GetObstacle(backward_obstacle.id());
-    const Feature& feature = backward_obs_ptr->latest_feature();
-    feature_values->push_back(feature.length());
-    feature_values->push_back(feature.speed());
+    if (backward_obs_ptr) {
+      const Feature& feature = backward_obs_ptr->latest_feature();
+      feature_values->push_back(feature.length());
+      feature_values->push_back(feature.speed());
+    }
   }
 }
 
@@ -538,6 +543,15 @@ void CruiseMLPEvaluator::LoadModels() {
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);
   torch_cutin_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device_);
+  std::vector<torch::jit::IValue> torch_inputs;
+  int input_dim = static_cast<int>(
+      OBSTACLE_FEATURE_SIZE + SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
+  torch::Tensor torch_input = torch::randn({1, input_dim});
+  torch_inputs.push_back(
+    std::move(torch_input.to(device_)));
+  // Warm up to avoid very slow first inference later
+  WarmUp(torch_inputs, &torch_go_model_, nullptr);
+  WarmUp(torch_inputs, &torch_cutin_model_, nullptr);
 }
 
 void CruiseMLPEvaluator::ModelInference(

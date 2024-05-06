@@ -1,0 +1,56 @@
+/******************************************************************************
+ * Copyright 2023 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+/**
+ * @file
+ */
+
+#pragma once
+#include <string>
+#include <functional>
+#include <mutex>
+#include <unordered_map>
+
+#include "CivetServer.h"
+
+/**
+ * @namespace apollo::dreamview
+ * @brief apollo::dreamview
+ */
+namespace apollo {
+namespace dreamview {
+
+/**
+ * @class ProtoHandler
+ *
+ * @brief The ProtoHandler, built on top of CivetHandler, transfer the proto
+ * file by http for frontend to parse message.
+ */
+class ProtoHandler : public CivetHandler {
+ public:
+  ProtoHandler() {}
+
+  bool handleGet(CivetServer *server, struct mg_connection *conn);
+  std::string GenerateETag(const std::string &content);
+
+ private:
+  bool FindProtoPath(const std::string file_relative_path, std::string* file_abs_path);
+  std::unordered_map<std::string, std::string> content_cache_;
+  std::mutex cache_mutex_;
+};
+
+}  // namespace dreamview
+}  // namespace apollo

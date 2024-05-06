@@ -1,0 +1,17 @@
+<package format="2">
+  <name>3rd-adolc</name>
+  <version>local</version>
+  <description>
+    Apollo packaged adolc Lib.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>third-binary</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/adolc</src_path>
+
+</package>

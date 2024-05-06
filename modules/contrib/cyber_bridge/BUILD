@@ -1,75 +1,38 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package", "apollo_cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    targets = [
-      ":cyber_bridge",
-    ],
-    runtime_dest = "modules/contrib/cyber_bridge",
-    deps = [
-        "//cyber:install",
-    ],
-)
-
-cc_binary(
+apollo_cc_binary(
     name = "cyber_bridge",
     srcs = ["bridge.cc"],
     deps = [
-        ":bridge_server",
+        ":contrib_cyber_bridge",
         "@boost",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
 
-cc_library(
-    name = "bridge_server",
-    srcs = ["server.cc"],
-    hdrs = ["server.h"],
-    deps = [
-        ":bridge_client",
+apollo_cc_library(
+    name = "contrib_cyber_bridge",
+    srcs = [
+        "client.cc",
+        "clients.cc",
+        "node.cc",
+        "server.cc",
     ],
-)
-
-cc_library(
-    name = "bridge_client",
-    srcs = ["client.cc"],
-    deps = [
-        ":bridge_clients",
-        ":bridge_node",
-        "@boost",
+    hdrs = [
+        "client.h",
+        "clients.h",
+        "node.h",
+        "server.h",
     ],
-)
-
-cc_library(
-    name = "bridge_clients",
-    srcs = ["clients.cc"],
-    hdrs = ["clients.h"],
-    deps = [
-        ":bridge_client_header",
-        "@boost",
-    ],
-)
-
-cc_library(
-    name = "bridge_node",
-    srcs = ["node.cc"],
-    hdrs = ["node.h"],
-    deps = [
-        ":bridge_client_header",
-    ],
-)
-
-cc_library(
-    name = "bridge_client_header",
-    hdrs = ["client.h"],
     deps = [
         "//cyber",
         "@boost",
     ],
 )
+
+apollo_package()
 
 cpplint()

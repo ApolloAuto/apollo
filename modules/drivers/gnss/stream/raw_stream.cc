@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/gnss/stream/raw_stream.h"
+
 #include <cmath>
 #include <ctime>
 #include <memory>
@@ -22,11 +24,11 @@
 
 #include "absl/strings/str_cat.h"
 
+#include "modules/drivers/gnss/proto/config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
-#include "modules/drivers/gnss/stream/raw_stream.h"
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
@@ -132,6 +134,24 @@ Stream *create_stream(const config::Stream &sd) {
           sd.ntrip().address(), static_cast<uint16_t>(sd.ntrip().port()),
           sd.ntrip().mount_point(), sd.ntrip().user(), sd.ntrip().password(),
           sd.ntrip().timeout_s());
+    case config::Stream::kCanCardParameter:
+      if (!sd.can_card_parameter().has_brand()) {
+        AERROR << "can_card_parameter def has no brand field.";
+        return nullptr;
+      }
+      if (!sd.can_card_parameter().has_type()) {
+        AERROR << "can_card_parameter def has no type field.";
+        return nullptr;
+      }
+      if (!sd.can_card_parameter().has_channel_id()) {
+        AERROR << "can_card_parameter def has no channel_id field.";
+        return nullptr;
+      }
+      if (!sd.can_card_parameter().has_channel_id()) {
+        AERROR << "can_card_parameter def has no channel_id field.";
+        return nullptr;
+      }
+      return Stream::create_can(sd.can_card_parameter());
     default:
       return nullptr;
   }

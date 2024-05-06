@@ -26,6 +26,7 @@ export default class Options {
         'showMenu',
         'showRouteEditingBar',
         'showDataRecorder',
+        'showProfile',
       ];
       this.secondarySideBarOptions = ['showPOI'];
 
@@ -62,7 +63,8 @@ export default class Options {
                || this.showModuleController
                || this.showMenu
                || this.showPOI
-               || this.showDataRecorder;
+               || this.showDataRecorder
+               || this.showProfile;
     }
 
     @computed get showGeo() {
@@ -142,9 +144,12 @@ export default class Options {
         return false;
       }
 
-      if (option === 'showTasks'
-            || option === 'showModuleController'
-      ) {
+      // enable the side bar button as follows.
+      if ([
+        'showTasks',
+        'showModuleController',
+        'showProfile'
+      ].includes(option)) {
         return false;
       } if (option === 'showRouteEditingBar') {
         return enableHMIButtonsOnly || inNavigationMode;
@@ -159,7 +164,8 @@ export default class Options {
         const cameraData = MENU_DATA.find((data) => data.id === 'camera');
 
         this.cameraAngleNames = Object.values(cameraData.data);
-        const shouldFilterCameraView = _.get(PARAMETERS, 'cameraAngle.hasCameraView', true);
+        // Default screen shielding shortcut key v switch cameraView
+        const shouldFilterCameraView = _.get(PARAMETERS, 'cameraAngle.hasCameraView', false);
         if (shouldFilterCameraView) {
           this.cameraAngleNames = this.cameraAngleNames.filter((name) => name !== 'CameraView');
         }

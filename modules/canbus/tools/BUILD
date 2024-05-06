@@ -1,34 +1,33 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+apollo_cc_binary(
     name = "canbus_tester",
     srcs = ["canbus_tester.cc"],
     deps = [
         "//cyber",
-        "//modules/canbus:canbus_component_lib",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus:apollo_canbus",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "teleop",
     srcs = ["teleop.cc"],
     deps = [
         "//cyber",
-        "//modules/canbus/common:canbus_common",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/canbus:apollo_canbus",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/util:message_util",
-        "//modules/control/proto:control_cmd_cc_proto",
-        "@com_github_gflags_gflags//:gflags",
+        "//modules/common/util:util_tool",
     ],
 )
 
+apollo_package()
 cpplint()

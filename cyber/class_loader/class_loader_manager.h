@@ -47,6 +47,14 @@ class ClassLoaderManager {
   template <typename Base>
   std::vector<std::string> GetValidClassNames();
 
+  /**
+   * @brief get pathof  library that class belongs to
+   * @param class_name derived class
+   * @return path of library that containing the derived class
+   */
+  template <typename Base>
+  std::string GetClassValidLibrary(const std::string& class_name);
+
  private:
   ClassLoader* GetClassLoaderByLibPath(const std::string& library_path);
   std::vector<ClassLoader*> GetAllValidClassLoaders();
@@ -100,6 +108,19 @@ std::vector<std::string> ClassLoaderManager::GetValidClassNames() {
                          class_loaders.end());
   }
   return valid_classes;
+}
+
+template <typename Base>
+std::string ClassLoaderManager::GetClassValidLibrary(
+    const std::string& class_name) {
+  for (auto& lib_class_loader : libpath_loader_map_) {
+    if (lib_class_loader.second != nullptr) {
+      if (lib_class_loader.second->IsClassValid<Base>(class_name)) {
+        return lib_class_loader.first;
+      }
+    }
+  }
+  return "";
 }
 
 }  // namespace class_loader

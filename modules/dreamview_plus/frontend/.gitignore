@@ -1,0 +1,17 @@
+node_modules/
+yarn-error.log
+yarn.lock
+yarn-lock.json
+dist_offline/
+
+lerna-debug.log
+
+packages/dreamview-ui/storybook-static
+storybook-static/
+
+# web端构建
+.web_build/
+
+# 录制文件
+recordings/
+recordings.zip

@@ -1,0 +1,161 @@
+#----------------------------------------------------------------------------------------------------
+#c16
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+
+    components {
+      class_name : "LslidarDriverComponent"
+      config {
+        name : "lslidar_driver_c16"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar16_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+
+    components {
+      class_name : "LslidarConvertComponent"
+      config {
+        name : "lslidar_convert_c16"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar16_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lslidar16/Scan"}
+      }
+    }
+}
+
+#module_config {
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    components {
+#      class_name : "CompensatorComponent"
+#      config {
+#        name : "lslidar16_compensator_c16"
+#        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar16_compensator.pb.txt"
+#        readers {channel: "/apollo/sensor/lslidar16/PointCloud2"}
+#      }
+#    }
+#}
+
+#----------------------------------------------------------------------------------------------------
+#c32
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+
+    components {
+      class_name : "LslidarDriverComponent"
+      config {
+        name : "lslidar_driver_c32"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar32_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+
+    components {
+      class_name : "LslidarConvertComponent"
+      config {
+        name : "lslidar_convert_c32"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar32_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lslidar32/Scan"}
+      }
+    }
+}
+
+#module_config {
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    components {
+#      class_name : "CompensatorComponent"
+#      config {
+#        name : "lslidar32_compensator_c32"
+#        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar32_compensator.pb.txt"
+#        readers {channel: "/apollo/sensor/lslidar32/PointCloud2"}
+#      }
+#    }
+#}
+
+
+#----------------------------------------------------------------------------------------------------
+#ch64w
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+
+    components {
+      class_name : "LslidarDriverComponent"
+      config {
+        name : "lslidar_driver_ch64w"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH64w_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+
+    components {
+      class_name : "LslidarConvertComponent"
+      config {
+        name : "lslidar_convert_ch64w"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH64w_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lslidarCH64w/Scan"}
+      }
+    }
+}
+
+#module_config {
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    components {
+#      class_name : "CompensatorComponent"
+#      config {
+#        name : "lslidarCH64w_compensator_ch64w"
+#        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH64w_compensator.pb.txt"
+#        readers {channel: "/apollo/sensor/lslidarCH64w/PointCloud2"}
+#      }
+#    }
+#}
+
+#----------------------------------------------------------------------------------------------------
+#ch128x1
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+
+    components {
+      class_name : "LslidarDriverComponent"
+      config {
+        name : "lslidar_driver_ch128x1"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH128X1_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+
+    components {
+      class_name : "LslidarConvertComponent"
+      config {
+        name : "lslidar_convert_ch128x1"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH128X1_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lslidarCH64w/Scan"}
+      }
+    }
+}
+
+#module_config {
+#    module_library : "modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+#    components {
+#      class_name : "CompensatorComponent"
+#      config {
+#        name : "lslidarCH64w_compensator_ch128x1"
+#        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH128X1_compensator.pb.txt"
+#        readers {channel: "/apollo/sensor/lslidarCH64w/PointCloud2"}
+#      }
+#    }
+#}
+
+
+
+
+

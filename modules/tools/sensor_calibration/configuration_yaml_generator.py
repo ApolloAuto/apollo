@@ -44,8 +44,7 @@ class ConfigYaml(object):
 
     def load_sample_yaml_file(self, task_name, sample_file=None):
         if sample_file is None:
-            sample_file = os.path.join(os.path.dirname(__file__),
-                                       'config', task_name + '_sample_config.yaml')
+            sample_file = os.path.join(ROOT_DIR, 'config', task_name + '_sample_config.yaml')
         try:
             with open(sample_file, 'r') as f:
                 data = yaml.safe_load(f)
@@ -71,7 +70,7 @@ class ConfigYaml(object):
 
     def _generate_camera_init_param_yaml(self, root_path, in_data):
         init_param_folder = os.path.join(
-            os.path.dirname(__file__), 'config/init_params')
+            ROOT_DIR, 'config/init_params')
         out_param_folder = os.path.join(root_path, 'init_params')
         if os.path.exists(out_param_folder):
             print('folder: %s exists' % out_param_folder)

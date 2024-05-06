@@ -24,8 +24,7 @@
 #include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/tools/cyber_recorder/recorder.h"
-
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
+#include "modules/common_msgs/monitor_msgs/smart_recorder_status.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
 #include "modules/data/tools/smart_recorder/record_processor.h"
 
@@ -53,13 +52,17 @@ class RealtimeRecordProcessor : public RecordProcessor {
   void RestoreMessage(const uint64_t message_time);
   void PublishStatus(const RecordingState state,
                      const std::string& message) const;
+  void ProcessRestoreRecord(const std::string& record_path);
+  double GetDuration(const std::string& record_file);
 
   std::shared_ptr<cyber::record::Recorder> recorder_ = nullptr;
   std::shared_ptr<cyber::Node> smart_recorder_node_ = nullptr;
   std::shared_ptr<cyber::Writer<SmartRecorderStatus>> recorder_status_writer_ =
       nullptr;
+  std::vector<std::string> record_files_;
   std::string default_output_filename_;
   std::string restore_path_;
+  uint32_t reused_record_num_ = 0;
   uint64_t restore_reader_time_ = 0;
   double max_backward_time_ = 30.0;
   double min_restore_chunk_ = 5.0;

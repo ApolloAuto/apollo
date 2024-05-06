@@ -1,0 +1,23 @@
+use_lidar: true
+use_radar: true
+use_camera: true
+tracker_param {
+  name: "PbfTracker"
+  config_path: "perception/multi_sensor_fusion/data"
+  config_file: "pbf_tracker.pb.txt"
+}
+data_association_param {
+  name: "HMTrackersObjectsAssociation"
+}
+gatekeeper_param {
+  name: "PbfGatekeeper"
+  config_path: "perception/multi_sensor_fusion/data"
+  config_file: "pbf_gatekeeper.pb.txt"
+}
+prohibition_sensors: "radar_front"
+
+max_lidar_invisible_period: 0.25
+max_radar_invisible_period: 0.50
+max_camera_invisible_period: 0.75
+
+max_cached_frame_num: 50

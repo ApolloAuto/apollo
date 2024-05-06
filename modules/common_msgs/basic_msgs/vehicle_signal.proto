@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.common;
+
+message VehicleSignal {
+  enum TurnSignal {
+    TURN_NONE = 0;
+    TURN_LEFT = 1;
+    TURN_RIGHT = 2;
+    TURN_HAZARD_WARNING = 3;
+  };
+  optional TurnSignal turn_signal = 1;
+  // lights enable command
+  optional bool high_beam = 2;
+  optional bool low_beam = 3;
+  optional bool horn = 4;
+  optional bool emergency_light = 5;
+}

@@ -1,0 +1,10 @@
+total_time: 7.0
+boundary_buffer: 0.25
+max_centric_acceleration_limit: 0.8
+point_extension: 0.0
+lowest_speed: 0.1
+static_obs_nudge_speed_ratio: 0.6
+dynamic_obs_nudge_speed_ratio: 0.8
+enable_nudge_slowdown: true
+lane_change_obstacle_nudge_l_buffer: 0.3
+max_trajectory_len: 1000.0

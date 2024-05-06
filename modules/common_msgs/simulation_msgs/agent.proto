@@ -1,0 +1,77 @@
+syntax = "proto2";
+
+package apollo.simulation;
+
+message AgentConfig {
+  optional int32 id = 1;
+  optional string description = 2;
+  optional double width = 3 [default = 2.0];
+  optional double length = 4 [default = 5.0];
+  optional double height = 5 [default = 1.8];
+  enum Type {
+    VEHICLE = 0;
+    BICYCLE = 1;
+    PEDESTRIAN = 2;
+    UNKNOWN_UNMOVABLE = 3;
+    UNKNOWN_MOVABLE = 4;
+    BIG_TRUCK = 5;
+  }
+  optional Type type = 6;
+
+  optional double appear_time = 7 [deprecated = true];
+  optional double disappear_time = 8 [deprecated = true];
+
+  message TrackedPoint {
+    optional double x = 1;
+    optional double y = 2;
+    optional double heading = 3;
+    optional double speed = 4;
+    optional double acceleration = 5;
+  }
+  repeated TrackedPoint tracked_point = 9;
+
+  // Static, lane follow and tracked objects.
+  enum MotionType {
+    STATIC = 0;
+    LANE_FOLLOW = 1;  // not implemented
+    TRACKED = 2;
+  }
+  optional MotionType motiontype = 10;
+  optional double distance = 11;
+
+  optional TrackedPoint start_position = 12;
+  optional TrackedPoint end_position = 14;
+  optional string start_lane = 15;
+  optional string end_lane = 16;
+
+  enum TriggerType {
+    DISTANCE = 0;
+    TIME = 1;
+  }
+  optional TriggerType trigger_type = 20;
+  optional double start_distance =
+      13;  // Start when distance from adc < start_distance
+  optional double start_time = 21 [default = 0.0];
+
+  // Whether the agent avoids rear-end collision
+  optional bool avoid_rear_end_collision = 17 [default = true];
+  optional double rear_end_collision_distance = 18
+      [default = 3.0, deprecated = true];
+
+  // When an obstacle approaches the adc at a certain distance,
+  // it needs to decelerate.
+  message NearCar {
+    optional double distance = 1 [default = 20];
+    optional double acceleration = 2 [default = -2];
+    optional bool is_same_lane = 3 [default = false];
+    optional bool only_include_behind = 4 [default = true];
+  }
+  optional NearCar near_car = 19;
+
+  // Need to decelerate when an obstacle meets the crosswalk
+  message NearCrosswalk {
+    optional double distance = 1 [default = 15];
+    optional double acceleration = 2 [default = -1];
+  }
+  optional NearCrosswalk near_crosswalk = 22;
+}

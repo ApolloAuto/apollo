@@ -9,6 +9,64 @@ topic_conf {
   prediction_topic: "/apollo/prediction"
   storytelling_topic: "/apollo/storytelling"
 }
+evaluator_model_conf {
+  model {
+    evaluator_type: SEMANTIC_LSTM_EVALUATOR
+    obstacle_type: PEDESTRIAN
+    backend: GPU
+    priority: 10
+    type: "SemanticLstmPedestrianGpuTorch"
+  }
+  model {
+    evaluator_type: SEMANTIC_LSTM_EVALUATOR
+    obstacle_type: VEHICLE
+    backend: GPU
+    priority: 10
+    type: "SemanticLstmVehicleGpuTorch"
+  }
+  model {
+    evaluator_type: SEMANTIC_LSTM_EVALUATOR
+    obstacle_type: PEDESTRIAN
+    backend: CPU
+    priority: 10
+    type: "SemanticLstmPedestrianCpuTorch"
+  }
+  model {
+    evaluator_type: SEMANTIC_LSTM_EVALUATOR
+    obstacle_type: VEHICLE
+    backend: CPU
+    priority: 10
+    type: "SemanticLstmVehicleCpuTorch"
+  }
+  model {
+    evaluator_type: MULTI_AGENT_EVALUATOR
+    obstacle_type: PEDESTRIAN
+    backend: GPU
+    priority: 10
+    type: "MultiAgentPedestrianGpuTorch"
+  }
+  model {
+    evaluator_type: MULTI_AGENT_EVALUATOR
+    obstacle_type: PEDESTRIAN
+    backend: CPU
+    priority: 10
+    type: "MultiAgentPedestrianCpuTorch"
+  }
+  model {
+    evaluator_type: MULTI_AGENT_EVALUATOR
+    obstacle_type: VEHICLE
+    backend: GPU
+    priority: 10
+    type: "MultiAgentVehicleGpuTorch"
+  }
+  model {
+    evaluator_type: MULTI_AGENT_EVALUATOR
+    obstacle_type: VEHICLE
+    backend: CPU
+    priority: 10
+    type: "MultiAgentVehicleCpuTorch"
+  }
+}
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE

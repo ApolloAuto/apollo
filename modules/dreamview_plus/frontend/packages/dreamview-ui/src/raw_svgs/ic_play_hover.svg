@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_play_hover</title>
+    <g id="ic_play_hover" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+        <path d="M8.5,4 C9.05228475,4 9.5,4.44771525 9.5,5 L9.5,19 C9.5,19.5522847 9.05228475,20 8.5,20 L6.5,20 C5.94771525,20 5.5,19.5522847 5.5,19 L5.5,5 C5.5,4.44771525 5.94771525,4 6.5,4 L8.5,4 Z M17.5,4 C18.0522847,4 18.5,4.44771525 18.5,5 L18.5,19 C18.5,19.5522847 18.0522847,20 17.5,20 L15.5,20 C14.9477153,20 14.5,19.5522847 14.5,19 L14.5,5 C14.5,4.44771525 14.9477153,4 15.5,4 L17.5,4 Z" id="形状结合" fill="#FFFFFF"></path>
+    </g>
+</svg>

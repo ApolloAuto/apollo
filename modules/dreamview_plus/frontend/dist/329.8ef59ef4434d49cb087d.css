@@ -1,0 +1,24 @@
+@-webkit-keyframes blink {
+  0%,
+  100% {
+    color: transparent;
+  }
+  50% {
+    color: #3288FA;
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    color: transparent;
+  }
+  50% {
+    color: #3288FA;
+  }
+}
+.turn-signal {
+  -webkit-animation: blink 1s linear infinite;
+          animation: blink 1s linear infinite;
+  /* 闪烁动画 */
+}
+

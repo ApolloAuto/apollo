@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: novatel
+child_frame_id: LIDAR_TOP
+transform:
+  translation:
+    x: 0.0
+    y: 0.943713
+    z: 1.84023
+  rotation:
+    x: -0.010659393428818213
+    y: -0.006470581610637464
+    z: 0.7077450199242479
+    w: 0.7063579090502037

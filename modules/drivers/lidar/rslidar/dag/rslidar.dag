@@ -1,0 +1,10 @@
+module_config {
+    module_library : "modules/drivers/lidar/rslidar/librslidar_component.so"
+    components {
+        class_name : "RslidarComponent"
+        config {
+          name : "RSHELIOS_Driver"
+          config_file_path : "/apollo/modules/drivers/lidar/rslidar/conf/rslidar.pb.txt"
+        }
+    }
+}

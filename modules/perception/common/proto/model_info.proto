@@ -1,0 +1,65 @@
+syntax = "proto2";
+
+package apollo.perception.common;
+
+// model info
+enum TaskType {
+  CustomTask = 0;
+  Detection3D = 1;
+}
+
+enum SensorType {
+  CustomSensor = 0;
+  Camera = 1;
+  Lidar = 2;
+  Radar = 3;
+  MultiModal = 4;
+}
+
+enum Framework {
+  CustomFramework = 0;
+  TensorRT = 1;
+  PaddlePaddle = 2;
+  PyTorch = 3;
+  TensorFlow = 4;
+  Obstacle = 5;
+  Caffe = 6;
+  Onnx = 7;
+}
+
+message ModelInfo {
+  reserved 8 to 19, 26 to 39;
+
+  optional string name = 1;
+  optional string version = 2;
+  optional string dataset = 3;
+  optional TaskType task_type = 4;
+  optional SensorType sensor_type = 5;
+  optional Framework framework = 6;
+  optional string infer_plugin = 7;
+  // files
+  optional ModelFile proto_file = 20;
+  optional ModelFile weight_file = 21;
+  optional ModelFile anchors_file = 22;
+  optional ModelFile types_file = 23;
+  optional ModelFile expand_file = 24;
+  optional ModelFile calibration_file = 25;
+  // input and output
+  repeated ModelBlob inputs = 40;
+  repeated ModelBlob outputs = 41;
+  // class names
+  repeated string class_names = 42;
+}
+
+// model files
+message ModelFile {
+  optional string file = 1;
+  optional uint64 size = 2;
+  optional string sha256 = 3;
+}
+
+// network
+message ModelBlob {
+  optional string name = 1;
+  repeated uint32 shape = 2;
+}

@@ -16,29 +16,46 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+APOLLO_ROOT_DIR="${TOP_DIR}"
 APOLLO_IN_DOCKER=false
-
 # If inside docker container
 if [ -f /.dockerenv ]; then
   APOLLO_IN_DOCKER=true
   APOLLO_ROOT_DIR="/apollo"
 fi
 
+export APOLLO_CONFIG_HOME="${APOLLO_CONFIG_HOME:=$HOME/.apollo}"
 export APOLLO_ROOT_DIR="${APOLLO_ROOT_DIR}"
 export APOLLO_IN_DOCKER="${APOLLO_IN_DOCKER}"
 export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
+export APOLLO_DAG_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin"
+export APOLLO_CONF_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_FLAG_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_LAUNCH_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_MODEL_PATH="${APOLLO_ROOT_DIR}/modules/perception/data/models"
+
+export APOLLO_DISTRIBUTION_VERSION=9.0
+export APOLLO_DISTRIBUTION_HOME="/apollo"
+export APOLLO_PLUGIN_INDEX_PATH="${APOLLO_DISTRIBUTION_HOME}/share/cyber_plugin_index"
+export APOLLO_PLUGIN_SEARCH_IN_BAZEL_OUTPUT=1
+export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_PLUGIN_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin:${APOLLO_DISTRIBUTION_HOME}/lib"
+
 export TAB="    " # 4 spaces
 
-source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
+export GPU_SETUP_COMPLETED
+
+source ${TOP_DIR}/scripts/common.bashrc
 
 : ${VERBOSE:=yes}
 
 BOLD='\033[1m'
 RED='\033[0;31m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34;48m'
 GREEN='\033[32m'
 WHITE='\033[34m'
 YELLOW='\033[33m'
@@ -89,25 +106,65 @@ function fail() {
 
 function determine_gpu_use_target() {
   local arch="$(uname -m)"
+  local gpu_platform="UNKNOWN"
   local use_gpu=0
-
-  if [[ "${arch}" == "aarch64" ]]; then
-    if lsmod | grep -q nvgpu; then
-      if ldconfig -p | grep -q cudart; then
+  local nv=0
+  local amd=0
+  local need_cuda=0
+  local need_rocm=0
+  if [[ -f "/.cross-platform" ]]; then
+    # cross platform building, force to use gpu mode
+    use_gpu=1
+  else
+    if [[ "${arch}" == "aarch64" ]]; then
+      if lsmod | grep -q nvgpu; then
+        if ldconfig -p | grep -q cudart; then
+          use_gpu=1
+          need_cuda=1
+          gpu_platform="NVIDIA"
+        fi
+      fi
+    else ## x86_64 mode
+      # Check the existence of nvidia-smi and rocm-smi
+      if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+        nv=1
+        info ${YELLOW}"No nvidia-smi found."${NO_COLOR}
+      elif [[ -z "$(nvidia-smi)" ]]; then
+        nv=2
+        info ${YELLOW}"No NVIDIA GPU device found."${NO_COLOR}
+      fi
+      if [[ ! -x "$(command -v rocm-smi)" ]]; then
+        amd=1
+        info ${YELLOW}"No rocm-smi found."${NO_COLOR}
+      elif [[ -z "$(rocm-smi)" ]]; then
+        amd=2
+        info ${YELLOW}"No AMD GPU device found."${NO_COLOR}
+      fi
+      if (($nv == 0)); then
         use_gpu=1
+        need_cuda=1
+        gpu_platform="NVIDIA"
+        info ${GREEN}"NVIDIA GPU device found."${NO_COLOR}
+      elif (($amd == 0)); then
+        use_gpu=1
+        need_rocm=1
+        gpu_platform="AMD"
+      else
+        gpu_platform="UNKNOWN"
+        warning ${YELLOW}"No any GPU device found."${NO_COLOR}
+      fi
+      if (($amd == 0)); then
+        info ${GREEN}"AMD GPU device found."${NO_COLOR}
+      fi
+      if (($nv == 0)) && (($amd == 0)); then
+        info ${GREEN}"NVIDIA GPU device is chosen for the build."${NO_COLOR}
       fi
     fi
-  else ## x86_64 mode
-    # Check the existence of nvidia-smi
-    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-      warning "nvidia-smi not found. CPU will be used."
-    elif [[ -z "$(nvidia-smi)" ]]; then
-      warning "No GPU device found. CPU will be used."
-    else
-      use_gpu=1
-    fi
   fi
+  export TF_NEED_CUDA="${need_cuda}"
+  export TF_NEED_ROCM="${need_rocm}"
   export USE_GPU_TARGET="${use_gpu}"
+  export GPU_PLATFORM="${gpu_platform}"
 }
 
 function file_ext() {
@@ -219,8 +276,8 @@ function run() {
     "${@}" || exit $?
   else
     local errfile="${APOLLO_ROOT_DIR}/.errors.log"
-    echo "${@}" >"${errfile}"
-    if ! "${@}" >>"${errfile}" 2>&1; then
+    echo "${@}" > "${errfile}"
+    if ! "${@}" >> "${errfile}" 2>&1; then
       local exitcode=$?
       cat "${errfile}" 1>&2
       exit $exitcode
@@ -230,21 +287,21 @@ function run() {
 
 #commit_id=$(git log -1 --pretty=%H)
 function git_sha1() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
-    git rev-parse --short HEAD 2>/dev/null || true
+    git rev-parse --short HEAD 2> /dev/null || true
   fi
 }
 
 function git_date() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git log -1 --pretty=%ai | cut -d " " -f 1 || true
   fi
 }
 
 function git_branch() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git rev-parse --abbrev-ref HEAD
   else
@@ -263,31 +320,34 @@ function optarg_check_for_opt() {
   local opt="$1"
   local optarg="$2"
   if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
-      error "Missing parameter for ${opt}. Exiting..."
-      exit 3
+    error "Missing parameter for ${opt}. Exiting..."
+    exit 3
   fi
 }
 
 function setup_gpu_support() {
-  if [ -e /usr/local/cuda/ ]; then
-    pathprepend /usr/local/cuda/bin
-  fi
-
-  determine_gpu_use_target
-
-  # TODO(infra): revisit this for CPU builds on GPU capable machines
-  local dev="cpu"
-  if [ "${USE_GPU_TARGET}" -gt 0 ]; then
-    dev="gpu"
-  fi
-
-  local torch_path="/usr/local/libtorch_${dev}/lib"
-  if [ -d "${torch_path}" ]; then
-    # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
-    pathprepend ${torch_path} LD_LIBRARY_PATH
+  if [ -z "${GPU_SETUP_COMPLETED}" ]; then
+    GPU_SETUP_COMPLETED=1
+    if [ -e /usr/local/cuda/ ]; then
+      pathprepend /usr/local/cuda/bin
+    fi
+    determine_gpu_use_target
+    local dev="cpu"
+    if [ "${USE_GPU_TARGET}" -gt 0 ]; then
+      dev="gpu"
+    fi
+    local torch_path="/usr/local/libtorch_${dev}/lib"
+    if [ -d "${torch_path}" ]; then
+      # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
+      pathprepend ${torch_path} LD_LIBRARY_PATH
+    fi
   fi
 }
 
-if ${APOLLO_IN_DOCKER} ; then
-    setup_gpu_support
+if ${APOLLO_IN_DOCKER}; then
+  setup_gpu_support
+
+  # add dreamview path
+  pathprepend ${APOLLO_ROOT_DIR}/bazel-bin/modules/dreamview
+  pathprepend ${APOLLO_ROOT_DIR}/bazel-bin/modules/dreamview_plus
 fi

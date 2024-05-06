@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package apollo.perception.camera.yolo;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional common.Normalize normalize = 3;
+  optional float offset_ratio = 4 [default = 0.288889];
+  optional float cropped_ratio = 5 [default = 0.711111];
+  optional int32 resized_width = 6 [default = 1440];
+  optional int32 aligned_pixel = 7 [default = 32];
+  optional float confidence_threshold = 8;
+  optional float light_vis_conf_threshold = 9;
+  optional float light_swt_conf_threshold = 10;
+
+  optional MinDims min_dims = 14;
+  optional int32 ori_cycle = 15;
+  optional bool per_cls_reg = 16;
+
+  optional bool with_box3d = 17;
+  optional bool with_frbox = 18;
+  optional bool with_lights = 19;
+  optional bool with_ratios = 20;
+  optional int32 num_areas = 21;
+  optional float border_ratio = 22;
+  optional NMSParam nms_param = 23;
+}
+
+message MinDims {
+  optional float min_2d_height = 1;
+  optional float min_3d_height = 2;
+  optional float min_3d_width = 3;
+  optional float min_3d_length = 4;
+}
+
+message NMSParam {
+  optional string type = 1 [default = "NormalNMS"];
+  optional float threshold = 2 [default = 0.4];
+  optional float sigma = 3 [default = 0.4];
+  optional float inter_cls_conf_thresh = 4 [default = 0.1];
+  optional float inter_cls_nms_thresh = 5 [default = 1.0];
+}

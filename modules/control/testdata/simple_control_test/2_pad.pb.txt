@@ -1,2 +1,0 @@
-driving_mode: COMPLETE_MANUAL
-action: RESET

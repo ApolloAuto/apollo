@@ -22,8 +22,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/gnss/util/macros.h"
 
 namespace apollo {
@@ -51,6 +52,8 @@ class Stream {
                               const std::string &user,
                               const std::string &passwd,
                               uint32_t timeout_s = 30);
+  static Stream *create_can(
+      const apollo::drivers::canbus::CANCardParameter &parameter);
 
   virtual ~Stream() {}
 

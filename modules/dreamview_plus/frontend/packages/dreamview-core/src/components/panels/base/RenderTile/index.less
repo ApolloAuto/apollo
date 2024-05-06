@@ -1,0 +1,16 @@
+.panel-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid transparent;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+    z-index: 99;
+}
+
+.panel-selected.panel-container::before {
+    border: 1px solid #3288FA;
+}

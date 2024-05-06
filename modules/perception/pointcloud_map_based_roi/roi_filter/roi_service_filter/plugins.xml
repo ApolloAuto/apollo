@@ -1,0 +1,3 @@
+<library path="modules/perception/pointcloud_map_based_roi/roi_filter/roi_service_filter/libroi_service_filter.so">
+    <class type="apollo::perception::lidar::ROIServiceFilter" base_class="apollo::perception::lidar::BaseROIFilter"></class>
+</library>

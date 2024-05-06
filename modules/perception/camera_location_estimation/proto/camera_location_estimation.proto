@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message CameraLocationEstimation {
+  optional perception.PluginParam plugin_param = 1;
+  optional EstimationChannel channel = 2;
+}
+
+message EstimationChannel {
+  repeated string input_camera_channel_name = 1;
+  optional string output_obstacles_channel_name = 2;
+}

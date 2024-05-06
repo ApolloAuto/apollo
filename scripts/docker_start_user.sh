@@ -27,6 +27,9 @@ function _create_user_account() {
   adduser --disabled-password --force-badname --gecos '' \
     "${user_name}" --uid "${uid}" --gid "${gid}" # 2>/dev/null
 
+  # copy init scripts manually
+  cp /etc/skel/.* $(getent passwd ${user_name} | cut -d: -f6)/
+
   usermod -aG sudo "${user_name}"
   usermod -aG video "${user_name}"
 }
@@ -80,6 +83,10 @@ function grant_device_permissions() {
   # setup audio device
   [ -e /dev/snd ] && usermod -a -G audio "$1"
 
+  # setup compute device
+  [ -e /dev/kfd ] && ! getent group render && \
+      echo "render:x:$(stat -c %g /dev/kfd):$1" >> /etc/group
+  getent group render && usermod -a -G render $1
   true
 }
 
@@ -87,6 +94,7 @@ function setup_apollo_directories() {
   local apollo_dir="/opt/apollo"
   [[ -d "${apollo_dir}" ]] || mkdir -p "${apollo_dir}"
   # chown -R "${uid}:${gid}" "${apollo_dir}"
+  chmod a+rw /opt /opt/apollo
 }
 
 # FIXME(infra): This will change core pattern on the host also,

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>深色logo_34x34</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="34" height="34" rx="8"></rect>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="导航" transform="translate(-585.000000, -7676.000000)">
+            <g id="4" transform="translate(570.000000, 7613.000000)">
+                <g id="导航/垂直导航/浅色/菜单收起" transform="translate(0.000000, 52.000000)">
+                    <g id="深色logo_34x34" transform="translate(15.000000, 11.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="矩形" fill="#055FE7" fill-rule="nonzero" opacity="0" xlink:href="#path-1"></use>
+                        <path d="M17,22.9994878 C13.6871558,22.9994878 10.9992317,20.3141247 10.9992317,16.9987194 C10.9992317,13.6858753 13.6871558,10.9992317 17,10.9992317 C20.3141247,10.9992317 23.0007683,13.6858753 23.0007683,16.9987194 C23.0007683,20.3141247 20.3141247,22.9994878 17,22.9994878 M17,7 C11.4781662,7 7,11.4768856 7,16.9987194 C7,22.5218338 11.4781662,27 17,27 C19.2512486,27 21.3283391,26.2547061 23.0007683,24.9997439 L23.0007683,27 L27,27 L27,16.9987194 C27,11.4768856 22.5231144,7 17,7" id="Fill-3" fill="#FFFFFF" mask="url(#mask-2)"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

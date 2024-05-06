@@ -1,5 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/platform:build_defs.bzl", "if_esd_can")
+# load("//tools:apollo_package.bzl", "apollo_package")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -10,3 +12,5 @@ cc_library(
     hdrs = if_esd_can(["include/ntcan.h"]),
     include_prefix = "esd_can",
 )
+
+# apollo_package()

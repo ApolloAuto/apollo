@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message ReusePathConfig {
+  optional bool enable_reuse_path_in_lane_follow = 1;
+  optional uint32 short_path_threshold = 2 [default = 60];
+}

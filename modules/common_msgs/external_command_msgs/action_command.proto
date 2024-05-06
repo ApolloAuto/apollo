@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum ActionCommandType {
+  // Follow the current lane.
+  FOLLOW = 1;
+  // Change to the laft lane.
+  CHANGE_LEFT = 2;
+  // Change to the right lane.
+  CHANGE_RIGHT = 3;
+  // Pull over and stop driving.
+  PULL_OVER = 4;
+  // Stop driving smoothly in emergency case.
+  STOP = 5;
+  // Start driving after paused.
+  START = 6;
+  // Clear the input planning command to cancel planning.
+  CLEAR_PLANNING = 7;
+  // Switch to manual drive mode.
+  SWITCH_TO_MANUAL = 50;
+  // Switch to auto drive mode.
+  SWITCH_TO_AUTO = 51;
+  // Varify vin code of vehicle.
+  VIN_REQ = 52;
+  // Enter mission model
+  ENTER_MISSION = 53;
+  // Exit mission model
+  EXIT_MISSION = 54;
+}
+
+message ActionCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // The action command.
+  required ActionCommandType command = 3;
+}

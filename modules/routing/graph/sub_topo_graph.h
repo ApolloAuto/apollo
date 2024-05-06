@@ -29,7 +29,7 @@ namespace routing {
 class SubTopoGraph {
  public:
   SubTopoGraph(const std::unordered_map<const TopoNode*,
-               std::vector<NodeSRange>>& black_map);
+                                        std::vector<NodeSRange>>& black_map);
   ~SubTopoGraph();
 
   // edge: A -> B         not sub edge

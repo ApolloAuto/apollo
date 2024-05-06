@@ -23,45 +23,42 @@
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/util.h"
-#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/planning_context.h"
+#include "modules/planning/planning_base/common/util/util.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace yield_sign {
 
 using apollo::common::TrajectoryPoint;
 using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
-Stage::StageStatus YieldSignStageApproach::Process(
+StageResult YieldSignStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
+  auto scenario_context = GetContextAs<YieldSignContext>();
+  scenario_config_.CopyFrom(scenario_context->scenario_config);
 
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
+  StageResult result = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (result.HasError()) {
     AERROR << "YieldSignStageApproach planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  if (GetContext()->current_yield_sign_overlap_ids.empty()) {
+  if (scenario_context->current_yield_sign_overlap_ids.empty()) {
     return FinishScenario();
   }
 
   for (const auto& yield_sign_overlap_id :
-       GetContext()->current_yield_sign_overlap_ids) {
+       scenario_context->current_yield_sign_overlap_ids) {
     // get overlap along reference line
     PathOverlap* current_yield_sign_overlap =
-        scenario::util::GetOverlapOnReferenceLine(
-            reference_line_info, yield_sign_overlap_id,
-            ReferenceLineInfo::YIELD_SIGN);
+        reference_line_info.GetOverlapOnReferenceLine(
+            yield_sign_overlap_id, ReferenceLineInfo::YIELD_SIGN);
     if (!current_yield_sign_overlap) {
       continue;
     }
@@ -145,29 +142,27 @@ Stage::StageStatus YieldSignStageApproach::Process(
     }
   }
 
-  return Stage::RUNNING;
+  return result.SetStageStatus(StageStatusType::RUNNING);
 }
 
-Stage::StageStatus YieldSignStageApproach::FinishStage() {
+StageResult YieldSignStageApproach::FinishStage() {
   // update PlanningContext
   auto* yield_sign_status = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_yield_sign();
-
   yield_sign_status->mutable_done_yield_sign_overlap_id()->Clear();
+  auto scenario_context = GetContextAs<YieldSignContext>();
   for (const auto& yield_sign_overlap_id :
-       GetContext()->current_yield_sign_overlap_ids) {
+       scenario_context->current_yield_sign_overlap_ids) {
     yield_sign_status->add_done_yield_sign_overlap_id(yield_sign_overlap_id);
   }
   yield_sign_status->clear_wait_for_obstacle_id();
 
-  GetContext()->creep_start_time = Clock::NowInSeconds();
+  scenario_context->creep_start_time = Clock::NowInSeconds();
 
-  next_stage_ = ScenarioConfig::YIELD_SIGN_CREEP;
-  return Stage::FINISHED;
+  next_stage_ = "YIELD_SIGN_CREEP";
+  return StageResult(StageStatusType::FINISHED);
 }
 
-}  // namespace yield_sign
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

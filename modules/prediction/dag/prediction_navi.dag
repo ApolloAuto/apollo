@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/prediction/libprediction_component.so"
+    module_library : "modules/prediction/libprediction_component.so"
     components {
         class_name : "PredictionComponent"
         config {

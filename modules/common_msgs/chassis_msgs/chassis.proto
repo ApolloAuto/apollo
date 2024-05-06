@@ -1,0 +1,259 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+import "google/protobuf/any.proto";
+import "modules/common_msgs/basic_msgs/drive_state.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/vehicle_id.proto";
+import "modules/common_msgs/basic_msgs/vehicle_signal.proto";
+
+
+// next id :31
+message Chassis {
+  enum DrivingMode {
+    COMPLETE_MANUAL = 0;  // human drive
+    COMPLETE_AUTO_DRIVE = 1;
+    AUTO_STEER_ONLY = 2;  // only steer
+    AUTO_SPEED_ONLY = 3;  // include throttle and brake
+
+    // security mode when manual intervention happens, only response status
+    EMERGENCY_MODE = 4;
+  }
+
+  enum ErrorCode {
+    NO_ERROR = 0;
+
+    CMD_NOT_IN_PERIOD = 1;  // control cmd not in period
+
+    // car chassis report error, like steer, brake, throttle, gear fault
+    CHASSIS_ERROR = 2;
+
+    // classify the types of the car chassis errors
+    CHASSIS_ERROR_ON_STEER = 6;
+    CHASSIS_ERROR_ON_BRAKE = 7;
+    CHASSIS_ERROR_ON_THROTTLE = 8;
+    CHASSIS_ERROR_ON_GEAR = 9;
+
+    MANUAL_INTERVENTION = 3;  // human manual intervention
+
+    // receive car chassis can frame not in period
+    CHASSIS_CAN_NOT_IN_PERIOD = 4;
+
+    UNKNOWN_ERROR = 5;
+  }
+
+  enum GearPosition {
+    GEAR_NEUTRAL = 0;
+    GEAR_DRIVE = 1;
+    GEAR_REVERSE = 2;
+    GEAR_PARKING = 3;
+    GEAR_LOW = 4;
+    GEAR_INVALID = 5;
+    GEAR_NONE = 6;
+  }
+
+  enum BumperEvent {
+    BUMPER_INVALID = 0;
+    BUMPER_NORMAL = 1;
+    BUMPER_PRESSED = 2;
+  }
+
+  optional bool engine_started = 3;
+
+  // Engine speed in RPM.
+  optional float engine_rpm = 4 [default = nan];
+
+  // Vehicle Speed in meters per second.
+  optional float speed_mps = 5 [default = nan];
+
+  // Vehicle odometer in meters.
+  optional float odometer_m = 6 [default = nan];
+
+  // Fuel range in meters.
+  optional int32 fuel_range_m = 7;
+
+  // Real throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage = 8 [default = nan];
+
+  // Real brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage = 9 [default = nan];
+
+  // Real steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage = 11 [default = nan];
+
+  // Applied steering torque in [Nm].
+  optional float steering_torque_nm = 12 [default = nan];
+
+  // Parking brake status.
+  optional bool parking_brake = 13;
+
+  // Light signals.
+  optional bool high_beam_signal = 14 [deprecated = true];
+  optional bool low_beam_signal = 15 [deprecated = true];
+  optional bool left_turn_signal = 16 [deprecated = true];
+  optional bool right_turn_signal = 17 [deprecated = true];
+  optional bool horn = 18 [deprecated = true];
+
+  optional bool wiper = 19;
+  optional bool disengage_status = 20 [deprecated = true];
+  optional DrivingMode driving_mode = 21 [default = COMPLETE_MANUAL];
+  optional ErrorCode error_code = 22 [default = NO_ERROR];
+  optional GearPosition gear_location = 23;
+
+  // timestamp for steering module
+  optional double steering_timestamp = 24;  // In seconds, with 1e-6 accuracy
+
+  // chassis also needs it own sending timestamp
+  optional apollo.common.Header header = 25;
+
+  optional int32 chassis_error_mask = 26 [default = 0];
+
+  optional apollo.common.VehicleSignal signal = 27;
+
+  // Only available for Lincoln now
+  optional ChassisGPS chassis_gps = 28;
+
+  optional apollo.common.EngageAdvice engage_advice = 29;
+
+  optional WheelSpeed wheel_speed = 30;
+
+  optional Surround surround = 31;
+
+  // Vehicle registration information
+  optional License license = 32 [deprecated = true];
+
+  // Real gear location.
+  // optional int32 gear_location = 10 [deprecated = true]; deprecated use enum
+  // replace this [id 23]
+
+  optional apollo.common.VehicleID vehicle_id = 33;
+
+  optional int32 battery_soc_percentage = 34 [default = -1];
+
+  // Real send throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage_cmd = 35 [default = nan];
+
+  // Real send brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage_cmd = 36 [default = nan];
+
+  // Real send steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage_cmd = 37 [default = nan];
+
+  optional BumperEvent front_bumper_event = 38;
+
+  optional BumperEvent back_bumper_event = 39;
+
+  optional CheckResponse check_response = 40;
+
+  // Custom chassis operation command defined by user for extensibility.
+  optional google.protobuf.Any custom_status = 41;
+}
+
+message ChassisGPS {
+  optional double latitude = 1;
+  optional double longitude = 2;
+  optional bool gps_valid = 3;
+
+  optional int32 year = 4;
+  optional int32 month = 5;
+  optional int32 day = 6;
+  optional int32 hours = 7;
+  optional int32 minutes = 8;
+  optional int32 seconds = 9;
+  optional double compass_direction = 10;
+  optional double pdop = 11;
+  optional bool is_gps_fault = 12;
+  optional bool is_inferred = 13;
+
+  optional double altitude = 14;
+  optional double heading = 15;
+  optional double hdop = 16;
+  optional double vdop = 17;
+  optional GpsQuality quality = 18;
+  optional int32 num_satellites = 19;
+  optional double gps_speed = 20;
+}
+
+enum GpsQuality {
+  FIX_NO = 0;
+  FIX_2D = 1;
+  FIX_3D = 2;
+  FIX_INVALID = 3;
+}
+
+message WheelSpeed {
+  enum WheelSpeedType {
+    FORWARD = 0;
+    BACKWARD = 1;
+    STANDSTILL = 2;
+    INVALID = 3;
+  }
+  optional bool is_wheel_spd_rr_valid = 1 [default = false];
+  optional WheelSpeedType wheel_direction_rr = 2 [default = INVALID];
+  optional double wheel_spd_rr = 3 [default = 0.0];
+  optional bool is_wheel_spd_rl_valid = 4 [default = false];
+  optional WheelSpeedType wheel_direction_rl = 5 [default = INVALID];
+  optional double wheel_spd_rl = 6 [default = 0.0];
+  optional bool is_wheel_spd_fr_valid = 7 [default = false];
+  optional WheelSpeedType wheel_direction_fr = 8 [default = INVALID];
+  optional double wheel_spd_fr = 9 [default = 0.0];
+  optional bool is_wheel_spd_fl_valid = 10 [default = false];
+  optional WheelSpeedType wheel_direction_fl = 11 [default = INVALID];
+  optional double wheel_spd_fl = 12 [default = 0.0];
+}
+
+message Sonar {
+  optional double range = 1;                       // Meter
+  optional apollo.common.Point3D translation = 2;  // Meter
+  optional apollo.common.Quaternion rotation = 3;
+}
+
+message Surround {
+  optional bool cross_traffic_alert_left = 1;
+  optional bool cross_traffic_alert_left_enabled = 2;
+  optional bool blind_spot_left_alert = 3;
+  optional bool blind_spot_left_alert_enabled = 4;
+  optional bool cross_traffic_alert_right = 5;
+  optional bool cross_traffic_alert_right_enabled = 6;
+  optional bool blind_spot_right_alert = 7;
+  optional bool blind_spot_right_alert_enabled = 8;
+  optional double sonar00 = 9;
+  optional double sonar01 = 10;
+  optional double sonar02 = 11;
+  optional double sonar03 = 12;
+  optional double sonar04 = 13;
+  optional double sonar05 = 14;
+  optional double sonar06 = 15;
+  optional double sonar07 = 16;
+  optional double sonar08 = 17;
+  optional double sonar09 = 18;
+  optional double sonar10 = 19;
+  optional double sonar11 = 20;
+  optional bool sonar_enabled = 21;
+  optional bool sonar_fault = 22;
+  repeated double sonar_range = 23;
+  repeated Sonar sonar = 24;
+}
+
+message License {
+  optional string vin = 1 [deprecated = true];
+}
+
+// CheckResponseSignal
+message CheckResponse {
+  optional bool is_eps_online = 1 [default = false];
+  optional bool is_epb_online = 2 [default = false];
+  optional bool is_esp_online = 3 [default = false];
+  optional bool is_vtog_online = 4 [default = false];
+  optional bool is_scu_online = 5 [default = false];
+  optional bool is_switch_online = 6 [default = false];
+  optional bool is_vcu_online = 7 [default = false];
+}

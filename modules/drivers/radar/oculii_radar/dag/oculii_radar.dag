@@ -1,0 +1,10 @@
+module_config {
+    module_library : "modules/drivers/radar/oculii_radar/liboculii_radar_component.so"
+    components {
+      class_name : "OculiiRadarComponent"
+      config {
+        name : "oculii_radar_conf"
+        config_file_path : "/apollo/modules/drivers/radar/oculii_radar/conf/oculii_radar_conf.pb.txt"
+      }
+    }
+}

@@ -33,13 +33,13 @@ import scipy.signal as signal
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 from modules.tools.common.logger import Logger
-from modules.canbus.proto import chassis_pb2
-from modules.common.configs.proto import vehicle_config_pb2
-from modules.common.proto import drive_state_pb2
-from modules.common.proto import pnc_point_pb2
-from modules.control.proto import pad_msg_pb2
-from modules.localization.proto import localization_pb2
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.config_msgs import vehicle_config_pb2
+from modules.common_msgs.basic_msgs import drive_state_pb2
+from modules.common_msgs.basic_msgs import pnc_point_pb2
+from modules.common_msgs.control_msgs import pad_msg_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 import modules.tools.common.proto_utils as proto_utils
 
 # TODO(all): hard-coded path temporarily. Better approach needed.
@@ -246,7 +246,7 @@ class RtkPlayer(object):
                 "trajectory start point: [%s], gear is [%s]" % (self.start, self.data['gear'][self.start]))
 
             self.end = self.next_gear_switch_time(self.start, len(self.data))
-            self.logger.debug("len of data: ", len(self.data))
+            self.logger.debug("len of data: %d", len(self.data))
             self.logger.debug("trajectory end point: [%s], gear is [%s]" %
                               (self.end, self.data['gear'][self.end]))
 
@@ -335,13 +335,18 @@ def main():
     parser = argparse.ArgumentParser(
         description='Generate Planning Trajectory from Data File')
     parser.add_argument(
+        '-f',
+        '--file',
+        help=' files name ',
+        default='garage')
+    parser.add_argument(
         '-s',
         '--speedmulti',
         help='Speed multiplier in percentage (Default is 100) ',
         type=float,
         default='100')
     parser.add_argument(
-        '-c', '--complete', help='Generate complete path (t/F)', default='F')
+        '-c', '--complete', help='Generate complete path (t/F)', default='t')
     parser.add_argument(
         '-r',
         '--replan',
@@ -356,7 +361,8 @@ def main():
         use_stdout=True,
         log_level=logging.DEBUG)
 
-    record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
+    # record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
+    record_file = os.path.join(APOLLO_ROOT, 'data/log/' + args['file'] + '.csv')
 
     player = RtkPlayer(record_file, node, args['speedmulti'],
                        args['complete'].lower(), args['replan'].lower())

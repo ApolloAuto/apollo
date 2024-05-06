@@ -31,10 +31,39 @@ bool CameraComponent::Init() {
   camera_device_.reset(new UsbCam());
   camera_device_->init(camera_config_);
   raw_image_.reset(new CameraImage);
+  raw_image_for_compress_.reset(new CameraImage);
 
   raw_image_->width = camera_config_->width();
   raw_image_->height = camera_config_->height();
   raw_image_->bytes_per_pixel = camera_config_->bytes_per_pixel();
+
+  raw_image_for_compress_->width = camera_config_->width();
+  raw_image_for_compress_->height = camera_config_->height();
+  raw_image_for_compress_->bytes_per_pixel = camera_config_->bytes_per_pixel();
+
+  if (camera_config_->pixel_format() == "yuyv" ||
+      camera_config_->pixel_format() == "uyvy" ||
+      camera_config_->pixel_format() == "yuvmono10") {
+    raw_image_for_compress_->image_size =
+      raw_image_for_compress_->width * raw_image_for_compress_->height * 2;
+  } else if (camera_config_->pixel_format() == "mjpeg") {
+    AINFO << "Disable sensor raw camera output with format mjpeg";
+    raw_image_for_compress_->image_size = 0;
+  } else if (camera_config_->pixel_format() == "rgb24") {
+    raw_image_for_compress_->image_size =
+        raw_image_for_compress_->width * raw_image_for_compress_->height * 3;
+  } else {
+    AERROR << "Wrong pixel fromat:" << camera_config_->pixel_format()
+          << ",must be yuyv | uyvy | mjpeg | yuvmono10 | rgb24";
+    return false;
+  }
+
+  if (raw_image_for_compress_->image_size == 0) {
+    raw_image_for_compress_->image = nullptr;
+  } else {
+    raw_image_for_compress_->image = reinterpret_cast<char*>(
+      calloc(raw_image_for_compress_->image_size, sizeof(char)));
+  }
 
   device_wait_ = camera_config_->device_wait_ms();
   spin_rate_ = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
@@ -74,9 +103,19 @@ bool CameraComponent::Init() {
     }
 
     pb_image_buffer_.push_back(pb_image);
+
+    auto raw_image = std::make_shared<Image>();
+    raw_image->mutable_header()->set_frame_id(camera_config_->frame_id());
+    raw_image->set_width(raw_image_for_compress_->width);
+    raw_image->set_height(raw_image_for_compress_->height);
+    raw_image->mutable_data()->reserve(raw_image_for_compress_->image_size);
+    raw_image->set_encoding(camera_config_->pixel_format());
+
+    raw_image_buffer_.push_back(raw_image);
   }
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
+  raw_writer_ = node_->CreateWriter<Image>(camera_config_->raw_channel_name());
   async_result_ = cyber::Async(&CameraComponent::run, this);
   return true;
 }
@@ -90,7 +129,7 @@ void CameraComponent::run() {
       continue;
     }
 
-    if (!camera_device_->poll(raw_image_)) {
+    if (!camera_device_->poll(raw_image_, raw_image_for_compress_)) {
       AERROR << "camera device poll failed";
       continue;
     }
@@ -99,12 +138,21 @@ void CameraComponent::run() {
     if (index_ >= buffer_size_) {
       index_ = 0;
     }
-    auto pb_image = pb_image_buffer_.at(index_++);
-    pb_image->mutable_header()->set_timestamp_sec(
-        cyber::Time::Now().ToSecond());
-    pb_image->set_measurement_time(image_time.ToSecond());
+    auto pb_image = pb_image_buffer_.at(index_);
+    auto header_time = cyber::Time::Now().ToSecond();
+    auto measurement_time = image_time.ToSecond();
+    pb_image->mutable_header()->set_timestamp_sec(header_time);
+    pb_image->set_measurement_time(measurement_time);
     pb_image->set_data(raw_image_->image, raw_image_->image_size);
     writer_->Write(pb_image);
+
+    auto raw_image_for_compress = raw_image_buffer_.at(index_++);
+    raw_image_for_compress->mutable_header()->set_timestamp_sec(
+        header_time);
+    raw_image_for_compress->set_measurement_time(measurement_time);
+    raw_image_for_compress->set_data(raw_image_for_compress_->image,
+                                      raw_image_for_compress_->image_size);
+    raw_writer_->Write(raw_image_for_compress);
 
     cyber::SleepFor(std::chrono::microseconds(spin_rate_));
   }
@@ -113,6 +161,7 @@ void CameraComponent::run() {
 CameraComponent::~CameraComponent() {
   if (running_.load()) {
     running_.exchange(false);
+    free(raw_image_->image);
     async_result_.wait();
   }
 }

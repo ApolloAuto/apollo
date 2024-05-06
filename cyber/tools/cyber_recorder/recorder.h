@@ -19,15 +19,17 @@
 
 #include <memory>
 #include <mutex>
+#include <regex>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/proto/record.pb.h"
+#include "cyber/proto/topology_change.pb.h"
+
 #include "cyber/base/signal.h"
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/proto/record.pb.h"
-#include "cyber/proto/topology_change.pb.h"
 #include "cyber/record/record_writer.h"
 
 using apollo::cyber::Node;
@@ -67,7 +69,9 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   std::string output_;
   bool all_channels_ = true;
   std::vector<std::string> white_channels_;
+  std::vector<std::regex> white_channel_patterns_;
   std::vector<std::string> black_channels_;
+  std::vector<std::regex> black_channel_patterns_;
   proto::Header header_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;

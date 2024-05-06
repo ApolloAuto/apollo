@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// STBoundsDeciderConfig
+
+message STBoundsDeciderConfig {
+  optional double total_time = 1 [default = 7.0];
+}

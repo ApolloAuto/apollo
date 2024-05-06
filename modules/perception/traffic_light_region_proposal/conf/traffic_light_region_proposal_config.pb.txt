@@ -1,0 +1,17 @@
+tl_tf2_frame_id : "world"
+tl_tf2_child_frame_id : "novatel"
+tf2_timeout_second : 0.01
+camera_names : "front_6mm,front_12mm"
+camera_channel_names : "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/front_12mm/image"
+tl_image_timestamp_offset : 0.0
+max_process_image_fps : 8
+query_tf_interval_seconds : 0.3
+valid_hdmap_interval : 1.5
+image_sys_ts_diff_threshold : 0.5
+sync_interval_seconds : 0.5
+default_image_border_size : 100
+plugin_param {
+  name: "TLPreprocessor"
+}
+gpu_id : 0
+proposal_output_channel_name:"/perception/inner/Detection"

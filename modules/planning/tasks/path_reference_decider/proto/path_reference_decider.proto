@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// PathReferenceDeciderConfig
+
+message PathReferenceDeciderConfig {
+  optional uint32 min_path_reference_length = 1 [default = 20];
+  // learning model s weight
+  optional double weight_x_ref_path_reference = 2;
+  // skipping using learning model output as path reference in side pass
+  optional bool skip_path_reference_in_side_pass = 3 [default = false];
+  // skipping using learning model output as path reference in change lane
+  optional bool skip_path_reference_in_change_lane = 4 [default = true];
+}

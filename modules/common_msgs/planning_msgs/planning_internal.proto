@@ -1,0 +1,269 @@
+syntax = "proto2";
+
+package apollo.planning_internal;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/dreamview_msgs/chart.proto";
+import "modules/common_msgs/localization_msgs/localization.proto";
+import "modules/common_msgs/perception_msgs/traffic_light_detection.proto";
+import "modules/common_msgs/planning_msgs/decision.proto";
+import "modules/common_msgs/planning_msgs/navigation.proto";
+import "modules/common_msgs/planning_msgs/sl_boundary.proto";
+import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
+
+message Debug {
+  optional PlanningData planning_data = 2;
+}
+
+message SpeedPlan {
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint speed_point = 2;
+}
+
+message StGraphBoundaryDebug {
+  enum StBoundaryType {
+    ST_BOUNDARY_TYPE_UNKNOWN = 1;
+    ST_BOUNDARY_TYPE_STOP = 2;
+    ST_BOUNDARY_TYPE_FOLLOW = 3;
+    ST_BOUNDARY_TYPE_YIELD = 4;
+    ST_BOUNDARY_TYPE_OVERTAKE = 5;
+    ST_BOUNDARY_TYPE_KEEP_CLEAR = 6;
+    ST_BOUNDARY_TYPE_DRIVABLE_REGION = 7;
+  }
+  optional string name = 1;
+  repeated apollo.common.SpeedPoint point = 2;
+  optional StBoundaryType type = 3;
+}
+
+message SLFrameDebug {
+  optional string name = 1;
+  repeated double sampled_s = 2;
+  repeated double static_obstacle_lower_bound = 3;
+  repeated double dynamic_obstacle_lower_bound = 4;
+  repeated double static_obstacle_upper_bound = 5;
+  repeated double dynamic_obstacle_upper_bound = 6;
+  repeated double map_lower_bound = 7;
+  repeated double map_upper_bound = 8;
+  repeated apollo.common.SLPoint sl_path = 9;
+  repeated double aggregated_boundary_s = 10;
+  repeated double aggregated_boundary_low = 11;
+  repeated double aggregated_boundary_high = 12;
+}
+
+message STGraphDebug {
+  message STGraphSpeedConstraint {
+    repeated double t = 1;
+    repeated double lower_bound = 2;
+    repeated double upper_bound = 3;
+  }
+  message STGraphKernelCuiseRef {
+    repeated double t = 1;
+    repeated double cruise_line_s = 2;
+  }
+  message STGraphKernelFollowRef {
+    repeated double t = 1;
+    repeated double follow_line_s = 2;
+  }
+
+  optional string name = 1;
+  repeated StGraphBoundaryDebug boundary = 2;
+  repeated apollo.common.SpeedPoint speed_limit = 3;
+  repeated apollo.common.SpeedPoint speed_profile = 4;
+  optional STGraphSpeedConstraint speed_constraint = 5;
+  optional STGraphKernelCuiseRef kernel_cruise_ref = 6;
+  optional STGraphKernelFollowRef kernel_follow_ref = 7;
+}
+
+message SignalLightDebug {
+  message SignalDebug {
+    optional string light_id = 1;
+    optional apollo.perception.TrafficLight.Color color = 2;
+    optional double light_stop_s = 3;
+    optional double adc_stop_deceleration = 4;
+    optional bool is_stop_wall_created = 5;
+  }
+  optional double adc_speed = 1;
+  optional double adc_front_s = 2;
+  repeated SignalDebug signal = 3;
+}
+
+message DecisionTag {
+  optional string decider_tag = 1;
+  optional apollo.planning.ObjectDecisionType decision = 2;
+}
+
+message ObstacleDebug {
+  optional string id = 1;
+  optional apollo.planning.SLBoundary sl_boundary = 2;
+  repeated DecisionTag decision_tag = 3;
+  repeated double vertices_x_coords = 4;
+  repeated double vertices_y_coords = 5;
+}
+
+message ReferenceLineDebug {
+  optional string id = 1;
+  optional double length = 2;
+  optional double cost = 3;
+  optional bool is_change_lane_path = 4;
+  optional bool is_drivable = 5;
+  optional bool is_protected = 6;
+  optional bool is_offroad = 7;
+  optional double minimum_boundary = 8;
+  optional double average_kappa = 9 [deprecated = true];
+  optional double average_dkappa = 10 [deprecated = true];
+  optional double kappa_rms = 11;
+  optional double dkappa_rms = 12;
+  optional double kappa_max_abs = 13;
+  optional double dkappa_max_abs = 14;
+  optional double average_offset = 15;
+}
+
+message SampleLayerDebug {
+  repeated apollo.common.SLPoint sl_point = 1;
+}
+
+message DpPolyGraphDebug {
+  repeated SampleLayerDebug sample_layer = 1;
+  repeated apollo.common.SLPoint min_cost_point = 2;
+}
+
+message ScenarioDebug {
+  // "scenario_type" is deprecated because scenario is designed as plugin and 
+  // "scenario_plugin_type" will be used instead.
+  optional int32 scenario_type = 1 [deprecated=true];
+  // "stage_type" is deprecated because scenario is designed as plugin and 
+  // "stage_plugin_type" will be used instead.
+  optional int32 stage_type = 2 [deprecated=true];
+  optional string msg = 3;
+  optional string scenario_plugin_type = 4;
+  optional string stage_plugin_type = 5;
+}
+
+message Trajectories {
+  repeated apollo.common.Trajectory trajectory = 1;
+}
+
+message OpenSpaceDebug {
+  optional apollo.planning_internal.Trajectories trajectories = 1;
+  optional apollo.common.VehicleMotion warm_start_trajectory = 2;
+  optional apollo.common.VehicleMotion smoothed_trajectory = 3;
+  repeated double warm_start_dual_lambda = 4;
+  repeated double warm_start_dual_miu = 5;
+  repeated double optimized_dual_lambda = 6;
+  repeated double optimized_dual_miu = 7;
+  repeated double xy_boundary = 8;
+  repeated apollo.planning_internal.ObstacleDebug obstacles = 9;
+  optional apollo.common.TrajectoryPoint roi_shift_point = 10;
+  optional apollo.common.TrajectoryPoint end_point = 11;
+  optional apollo.planning_internal.Trajectories partitioned_trajectories = 12;
+  optional apollo.planning_internal.Trajectories chosen_trajectory = 13;
+  optional bool is_fallback_trajectory = 14;
+  optional apollo.planning_internal.Trajectories fallback_trajectory = 15;
+  optional apollo.common.TrajectoryPoint trajectory_stitching_point = 16;
+  optional apollo.common.TrajectoryPoint future_collision_point = 17;
+  optional double time_latency = 18 [default = 0.0];  // ms
+  optional apollo.common.PointENU origin_point = 19;  // meter
+  optional double origin_heading_rad = 20;
+}
+
+message SmootherDebug {
+  enum SmootherType {
+    SMOOTHER_NONE = 1;
+    SMOOTHER_CLOSE_STOP = 2;
+  }
+  optional bool is_smoothed = 1;
+
+  optional SmootherType type = 2 [default = SMOOTHER_NONE];
+  optional string reason = 3;
+}
+
+message PullOverDebug {
+  optional apollo.common.PointENU position = 1;
+  optional double theta = 2;
+  optional double length_front = 3;
+  optional double length_back = 4;
+  optional double width_left = 5;
+  optional double width_right = 6;
+}
+
+// next ID: 30
+message PlanningData {
+  // input
+  optional apollo.localization.LocalizationEstimate adc_position = 7;
+  optional apollo.canbus.Chassis chassis = 8;
+  optional apollo.routing.RoutingResponse routing = 9;
+  optional apollo.common.TrajectoryPoint init_point = 10;
+
+  repeated apollo.common.Path path = 6;
+
+  repeated SpeedPlan speed_plan = 13;
+  repeated STGraphDebug st_graph = 14;
+  repeated SLFrameDebug sl_frame = 15;
+
+  optional apollo.common.Header prediction_header = 16;
+  optional SignalLightDebug signal_light = 17;
+
+  repeated ObstacleDebug obstacle = 18;
+  repeated ReferenceLineDebug reference_line = 19;
+  optional DpPolyGraphDebug dp_poly_graph = 20;
+  optional LatticeStTraining lattice_st_image = 21;
+  optional apollo.relative_map.MapMsg relative_map = 22;
+  optional AutoTuningTrainingData auto_tuning_training_data = 23;
+  optional double front_clear_distance = 24;
+  repeated apollo.dreamview.Chart chart = 25;
+  optional ScenarioDebug scenario = 26;
+  optional OpenSpaceDebug open_space = 27;
+  optional SmootherDebug smoother = 28;
+  optional PullOverDebug pull_over = 29;
+  optional HybridModelDebug hybrid_model = 30;
+}
+
+message LatticeStPixel {
+  optional int32 s = 1;
+  optional int32 t = 2;
+  optional uint32 r = 3;
+  optional uint32 g = 4;
+  optional uint32 b = 5;
+}
+
+message LatticeStTraining {
+  repeated LatticeStPixel pixel = 1;
+  optional double timestamp = 2;
+  optional string annotation = 3;
+  optional uint32 num_s_grids = 4;
+  optional uint32 num_t_grids = 5;
+  optional double s_resolution = 6;
+  optional double t_resolution = 7;
+}
+
+message CostComponents {
+  repeated double cost_component = 1;
+}
+
+message AutoTuningTrainingData {
+  optional CostComponents teacher_component = 1;
+  optional CostComponents student_component = 2;
+}
+
+message CloudReferenceLineRequest {
+  repeated apollo.routing.LaneSegment lane_segment = 1;
+}
+
+message CloudReferenceLineRoutingRequest {
+  optional apollo.routing.RoutingResponse routing = 1;
+}
+
+message CloudReferenceLineResponse {
+  repeated apollo.common.Path segment = 1;
+}
+
+message HybridModelDebug {
+  optional bool using_learning_model_output = 1 [default = false];
+  optional double learning_model_output_usage_ratio = 2;
+  optional string learning_model_output_fail_reason = 3;
+  optional apollo.common.Path evaluated_path_reference = 4;
+}

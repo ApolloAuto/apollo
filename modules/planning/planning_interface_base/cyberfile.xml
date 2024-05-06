@@ -1,0 +1,20 @@
+<package format="2">
+  <name>planning-interface-base</name>
+  <version>local</version>
+  <description>
+    Compared with previous versions, Apollo 7.0 adds a  new dead end scenario, adds the "three-point turn",  increases vehicle driving in and out ability, and expands the operation boundary of the urban road network. The "three-point turn" function is based on the open space planner framework and includes the following parts: scene conversion of dead ends, construction of open space ROI, and "three-point turn" trajectory planning.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/planning/planning_interface_base</src_path>
+
+  <depend type="binary" repo_name="planning-base">planning-base</depend>
+  
+</package>

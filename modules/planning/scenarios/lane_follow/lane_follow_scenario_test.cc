@@ -20,15 +20,13 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
+#include "gtest/gtest.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace lane_follow {
 
 class LaneFollowScenarioTest : public ::testing::Test {
  public:
@@ -39,19 +37,11 @@ class LaneFollowScenarioTest : public ::testing::Test {
 };
 
 TEST_F(LaneFollowScenarioTest, Init) {
-  FLAGS_scenario_lane_follow_config_file =
-      "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_lane_follow_config_file, &config));
-  ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(new LaneFollowScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
+  scenario_.reset(new LaneFollowScenario());
+  scenario_->Init(injector, "LANE_FOLLOW");
+  EXPECT_EQ(scenario_->Name(), "LANE_FOLLOW");
 }
 
-}  // namespace lane_follow
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

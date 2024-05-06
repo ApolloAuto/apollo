@@ -20,12 +20,12 @@ set -e
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
 
-if ldconfig -p | grep -q magma ; then
-    warning "Magma already installed, re-installation skipped."
-    exit 0
-fi
+# if ldconfig -p | grep -q magma ; then
+#     warning "Magma already installed, re-installation skipped."
+#     exit 0
+# fi
 
-: ${INSTALL_MODE:=download}
+: ${INSTALL_MODE:=build}
 # : ${APOLLO_DIST:=stable} # re-enable this if differentiation is needed.
 
 GPU_ARCHS=

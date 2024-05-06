@@ -1,0 +1,6 @@
+input_command_name: "/apollo/external_command/action"
+output_command_name: "/apollo/planning/pad"
+output_command_name: "/apollo/control/pad"
+input_command_status_name: "/apollo/canbus/chassis"
+input_command_status_name: "/apollo/planning"
+input_command_status_name: "/apollo/planning/command_status"

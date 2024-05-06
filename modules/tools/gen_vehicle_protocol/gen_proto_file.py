@@ -99,8 +99,17 @@ def update_detail_pb(car_type):
         for l in lines:
             pb_fp.write(l)
 
+def gen_checkresponse(pb_fp):
+    pb_fp.write("\n// CheckResponseSignal\nmessage CheckResponseSignal {\n\
+  optional bool is_eps_online = 1 [default = false];\n\
+  optional bool is_epb_online = 2 [default = false];\n\
+  optional bool is_esp_online = 3 [default = false];\n\
+  optional bool is_vtog_online = 4 [default = false];\n\
+  optional bool is_scu_online = 5 [default = false];\n\
+  optional bool is_switch_online = 6 [default = false];\n\
+  optional bool is_vcu_online = 7 [default = false];\n}\n")
 
-def gen_proto_file(config_file, work_dir):
+def gen_proto_file(config_file, work_dir, template_dir):
     """
         config_file: the config file is generated with dbc
         work_dir: the protobuf file will be output
@@ -117,6 +126,8 @@ def gen_proto_file(config_file, work_dir):
             for pid in protocols:
                 p = protocols[pid]
                 write_single_protocol_vars(pb_fp, p)
+            # gen_checkresponse(pb_fp)
+            # pb_fp.write("\n// CheckResponseSignal\nmessage CheckResponseSignal {\n}\n")
             pb_fp.write("\nmessage %s {\n" % car_type.capitalize())
 
             pb_var_seq = 1
@@ -130,9 +141,30 @@ def gen_proto_file(config_file, work_dir):
                     pb_fp.write(" // report message")
                 pb_fp.write("\n")
                 pb_var_seq = pb_var_seq + 1
+            # pb_fp.write("optional CheckResponseSignal check_response = 100;\n")
             pb_fp.write("}\n")
-
+            gen_build_file(car_type, work_dir, template_dir)
             # update_detail_pb(car_type)
+
+def get_tpl_fmt(tpl_file):
+    """
+        get fmt from tpl_file
+    """
+    with open(tpl_file, 'r') as tpl:
+        fmt = tpl.readlines()
+    fmt = "".join(fmt)
+    return fmt
+
+def gen_build_file(car_type, work_dir, template_dir):
+    """
+        doc string:
+    """
+    build_tpl_file = template_dir + "proto_BUILD.tpl"
+    fmt = get_tpl_fmt(build_tpl_file)
+    with open(work_dir + "BUILD", "w") as build_fp:
+        fmt_var = {}
+        fmt_var["car_type_lower"] = car_type.lower()
+        build_fp.write(fmt % fmt_var)
 
 
 if __name__ == "__main__":
@@ -142,6 +174,8 @@ if __name__ == "__main__":
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
+    car_type = conf["car_type"]
 
-    work_dir = conf["output_dir"] + "proto/"
-    gen_proto_file(protocol_conf, work_dir)
+    work_dir = conf["output_dir"] + "vehicle/" + car_type.lower() + "/" + "proto/"
+    template_dir = sys.path[0] + "/template/"
+    gen_proto_file(protocol_conf, work_dir, template_dir)

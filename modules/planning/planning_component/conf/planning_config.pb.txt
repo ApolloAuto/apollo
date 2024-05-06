@@ -1,0 +1,20 @@
+topic_config {
+  chassis_topic: "/apollo/canbus/chassis"
+  hmi_status_topic: "/apollo/hmi/status"
+  localization_topic: "/apollo/localization/pose"
+  planning_pad_topic: "/apollo/planning/pad"
+  planning_trajectory_topic: "/apollo/planning"
+  prediction_topic: "/apollo/prediction"
+  relative_map_topic: "/apollo/relative_map"
+  routing_request_topic: "/apollo/external_command/lane_follow"
+  routing_response_topic: "/apollo/routing_response"
+  planning_command_topic: "/apollo/planning/command"
+  story_telling_topic: "/apollo/storytelling"
+  traffic_light_detection_topic: "/apollo/perception/traffic_light"
+  planning_learning_data_topic: "/apollo/planning/learning_data"
+}
+# NO_LEARNING / E2E / HYBRID / RL_TEST / E2E_TEST / HYBRID_TEST
+learning_mode: NO_LEARNING
+reference_line_config {
+  pnc_map_class: "apollo::planning::LaneFollowMap"
+}

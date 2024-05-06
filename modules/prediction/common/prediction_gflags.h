@@ -26,6 +26,7 @@ DECLARE_double(prediction_trajectory_time_resolution);
 DECLARE_double(min_prediction_trajectory_spatial_length);
 DECLARE_bool(enable_trajectory_validation_check);
 DECLARE_bool(enable_tracking_adaptation);
+DECLARE_bool(free_move_predict_with_accelerate);
 
 DECLARE_double(vehicle_max_linear_acc);
 DECLARE_double(vehicle_min_linear_acc);
@@ -153,6 +154,8 @@ DECLARE_double(distance_to_slow_down_at_stop_sign);
 
 // Evaluator
 DECLARE_double(time_to_center_if_not_reach);
+DECLARE_uint32(warm_up_times);
+DECLARE_uint32(affine_pool_size);
 DECLARE_double(default_s_if_no_obstacle_in_lane_sequence);
 DECLARE_double(default_l_if_no_obstacle_in_lane_sequence);
 DECLARE_bool(enable_semantic_map);

@@ -1,0 +1,1 @@
+model_path: "/apollo/modules/prediction/evaluator/model_manager/model/multi_agent_vehicle_torch_gpu/data/multi_agent_vehicle_gpu_model.pt"

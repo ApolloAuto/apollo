@@ -1,0 +1,9 @@
+fusion_param {
+  name: "ProbabilisticFusion"
+  config_path: "perception/multi_sensor_fusion/data"
+  config_file: "probabilistic_fusion.pb.txt"
+}
+object_in_roi_check: true
+radius_for_roi_object_check: 120
+output_obstacles_channel_name: "/apollo/perception/obstacles"
+output_viz_fused_content_channel_name: "/perception/inner/visualization/FusedObjects"

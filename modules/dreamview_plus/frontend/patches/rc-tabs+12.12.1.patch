@@ -1,0 +1,28 @@
+diff --git a/node_modules/rc-tabs/es/hooks/useTouchMove.js b/node_modules/rc-tabs/es/hooks/useTouchMove.js
+index 1c3b17c..9676120 100644
+--- a/node_modules/rc-tabs/es/hooks/useTouchMove.js
++++ b/node_modules/rc-tabs/es/hooks/useTouchMove.js
+@@ -133,17 +133,19 @@ export default function useTouchMove(ref, onOffset) {
+       touchEventsRef.current.onWheel(e);
+     }
+     document.addEventListener('touchmove', onProxyTouchMove, {
+-      passive: false
++      passive: true
+     });
+     document.addEventListener('touchend', onProxyTouchEnd, {
+-      passive: false
++      passive: true
+     });
+ 
+     // No need to clean up since element removed
+     ref.current.addEventListener('touchstart', onProxyTouchStart, {
+-      passive: false
++      passive: true
++    });
++    ref.current.addEventListener('wheel', onProxyWheel, {
++      passive: true
+     });
+-    ref.current.addEventListener('wheel', onProxyWheel);
+     return function () {
+       document.removeEventListener('touchmove', onProxyTouchMove);
+       document.removeEventListener('touchend', onProxyTouchEnd);

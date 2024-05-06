@@ -29,6 +29,9 @@
 #include <fstream>
 #include <string>
 
+#include "google/protobuf/util/json_util.h"
+#include "nlohmann/json.hpp"
+
 namespace apollo {
 namespace cyber {
 namespace common {
@@ -108,6 +111,10 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
 
 bool GetProtoFromFile(const std::string &file_name,
                       google::protobuf::Message *message) {
+  if (!PathExists(file_name)) {
+    AERROR << "File [" << file_name << "] does not exist! ";
+    return false;
+  }
   // Try the binary parser first if it's much likely a binary proto.
   static const std::string kBinExt = ".bin";
   if (std::equal(kBinExt.rbegin(), kBinExt.rend(), file_name.rbegin())) {
@@ -117,6 +124,24 @@ bool GetProtoFromFile(const std::string &file_name,
 
   return GetProtoFromASCIIFile(file_name, message) ||
          GetProtoFromBinaryFile(file_name, message);
+}
+
+bool GetProtoFromJsonFile(const std::string &file_name,
+                          google::protobuf::Message *message) {
+  using google::protobuf::util::JsonParseOptions;
+  using google::protobuf::util::JsonStringToMessage;
+  std::ifstream ifs(file_name);
+  if (!ifs.is_open()) {
+    AERROR << "Failed to open file " << file_name;
+    return false;
+  }
+  nlohmann::json Json;
+  ifs >> Json;
+  ifs.close();
+  JsonParseOptions options;
+  options.ignore_unknown_fields = true;
+  google::protobuf::util::Status dump_status;
+  return (JsonStringToMessage(Json.dump(), message, options).ok());
 }
 
 bool GetContent(const std::string &file_name, std::string *content) {
@@ -150,6 +175,13 @@ std::string GetAbsolutePath(const std::string &prefix,
 bool PathExists(const std::string &path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
+}
+
+bool PathIsAbsolute(const std::string &path) {
+  if (path.empty()) {
+    return false;
+  }
+  return path.front() == '/';
 }
 
 bool DirectoryExists(const std::string &directory_path) {
@@ -305,6 +337,47 @@ std::vector<std::string> ListSubPaths(const std::string &directory_path,
   return result;
 }
 
+size_t FindPathByPattern(const std::string &base_path, const std::string &patt,
+                         const unsigned char d_type, const bool recursive,
+                         std::vector<std::string> *result_list) {
+  DIR *directory = opendir(base_path.c_str());
+  size_t result_cnt = 0;
+  if (directory == nullptr) {
+    AWARN << "cannot open directory " << base_path;
+    return result_cnt;
+  }
+  struct dirent *entry;
+  for (entry = readdir(directory); entry != nullptr;
+       entry = readdir(directory)) {
+    std::string entry_path = base_path + "/" + std::string(entry->d_name);
+    // skip `.` and `..`
+    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+      // TODO(liangjinping): support regex or glob or other pattern mode
+      if ((patt == "" || strcmp(entry->d_name, patt.c_str()) == 0) &&
+          entry->d_type == d_type) {
+        // found
+        result_list->emplace_back(entry_path);
+        ++result_cnt;
+      }
+      if (recursive && (entry->d_type == DT_DIR)) {
+        result_cnt +=
+            FindPathByPattern(entry_path, patt, d_type, recursive, result_list);
+      }
+    }
+  }
+  closedir(directory);
+  return result_cnt;
+}
+
+std::string GetDirName(const std::string &path) {
+  std::string::size_type end = path.rfind('/');
+  if (end == std::string::npos) {
+    // not found, return current dir
+    return ".";
+  }
+  return path.substr(0, end);
+}
+
 std::string GetFileName(const std::string &path, const bool remove_extension) {
   std::string::size_type start = path.rfind('/');
   if (start == std::string::npos) {
@@ -324,6 +397,58 @@ std::string GetFileName(const std::string &path, const bool remove_extension) {
   }
   const auto len = (end != std::string::npos) ? end - start : end;
   return path.substr(start, len);
+}
+
+bool GetFilePathWithEnv(const std::string &path, const std::string &env_var,
+                        std::string *file_path) {
+  if (path.empty()) {
+    return false;
+  }
+  if (PathIsAbsolute(path)) {
+    // an absolute path
+    *file_path = path;
+    return PathExists(path);
+  }
+
+  bool relative_path_exists = false;
+  if (PathExists(path)) {
+    // relative path exists
+    *file_path = path;
+    relative_path_exists = true;
+  }
+  if (path.front() == '.') {
+    // relative path but not exist.
+    return relative_path_exists;
+  }
+
+  const char *var = std::getenv(env_var.c_str());
+  if (var == nullptr) {
+    AWARN << "GetFilePathWithEnv: env " << env_var << " not found.";
+    return relative_path_exists;
+  }
+  std::string env_path = std::string(var);
+
+  // search by environment variable
+  size_t begin = 0;
+  size_t index;
+  do {
+    index = env_path.find(':', begin);
+    auto p = env_path.substr(begin, index - begin);
+    if (p.empty()) {
+      continue;
+    }
+    if (p.back() != '/') {
+      p += '/' + path;
+    } else {
+      p += path;
+    }
+    if (PathExists(p)) {
+      *file_path = p;
+      return true;
+    }
+    begin = index + 1;
+  } while (index != std::string::npos);
+  return relative_path_exists;
 }
 
 std::string GetCurrentPath() {

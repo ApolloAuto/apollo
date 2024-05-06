@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_ranging</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="ic_ranging" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="16" height="16"></rect>
+        <g id="ic_自定义测试">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="矩形" fill="#055FE7" opacity="0" xlink:href="#path-1"></use>
+        </g>
+        <g id="测距_0">
+            <rect id="矩形" fill="#000000" fill-rule="nonzero" opacity="0" x="0" y="0" width="16" height="16"></rect>
+            <g id="编组" transform="translate(8.070772, 8.000000) rotate(-45.000000) translate(-8.070772, -8.000000) translate(4.320772, 0.704727)">
+                <rect id="矩形" stroke="#A6B5CC" x="0.5" y="0.5" width="6.5" height="13.5905464" rx="0.5"></rect>
+                <g id="编组-2" transform="translate(0.766626, 2.395273)" fill="#A6B5CC">
+                    <rect id="矩形" x="0" y="0" width="3" height="1"></rect>
+                    <rect id="矩形备份" x="0" y="2.2" width="3" height="1"></rect>
+                    <rect id="矩形备份-3" x="0" y="4.4" width="3" height="1"></rect>
+                    <rect id="矩形备份-2" x="0" y="6.6" width="3" height="1"></rect>
+                    <rect id="矩形备份-4" x="0" y="8.8" width="3" height="1"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

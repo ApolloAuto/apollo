@@ -63,6 +63,10 @@ void PlayTaskConsumer::Stop() {
     consume_th_->join();
     consume_th_ = nullptr;
   }
+  // reset value for next use consumer
+  base_msg_play_time_ns_ = 0;
+  base_msg_real_time_ns_ = 0;
+  last_played_msg_real_time_ns_ = 0;
 }
 
 void PlayTaskConsumer::ThreadFunc() {

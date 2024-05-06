@@ -24,9 +24,9 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/perception/base/object_supplement.h"
-#include "modules/perception/base/object_types.h"
-#include "modules/perception/base/sensor_meta.h"
+#include "modules/perception/common/base/object_supplement.h"
+#include "modules/perception/common/base/object_types.h"
+#include "modules/perception/common/base/sensor_meta.h"
 
 namespace apollo {
 namespace v2x {

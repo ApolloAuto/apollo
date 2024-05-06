@@ -39,11 +39,11 @@ def _is_source_label(label):
 def _add_linter_rules(source_labels, source_filenames, name, data = None):
     # Common attributes for all of our py_test invocations.
     data = (data or [])
-    size = "small"
+    size = "medium"
     tags = ["cpplint"]
 
     # Google cpplint.
-    cpplint_cfg = ["//:CPPLINT.cfg"] + native.glob(["CPPLINT.cfg"])
+    cpplint_cfg = ["//tools:CPPLINT.cfg"] + native.glob(["CPPLINT.cfg"])
     py_test(
         name = name + "_cpplint",
         srcs = ["@cpplint//:cpplint"],

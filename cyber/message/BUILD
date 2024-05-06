@@ -1,14 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "message_header",
-    hdrs = ["message_header.h"],
-)
-
-cc_test(
+apollo_cc_test(
     name = "message_header_test",
     size = "small",
     srcs = ["message_header_test.cc"],
@@ -18,19 +13,28 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "message_traits",
-    hdrs = ["message_traits.h"],
+apollo_cc_library(
+    name = "cyber_message",
+    hdrs = [
+        "message_header.h",
+        "message_traits.h",
+        "protobuf_factory.h",
+        "protobuf_traits.h",
+        "py_message.h",
+        "py_message_traits.h",
+        "raw_message.h",
+        "raw_message_traits.h",
+    ],
+    srcs = [
+        "protobuf_factory.cc",
+    ],
     deps = [
-        ":message_header",
-        ":protobuf_traits",
-        ":py_message_traits",
-        ":raw_message_traits",
-        "//cyber/base:macros",
+        "//cyber/common:cyber_common",
+        "//cyber/proto:proto_desc_cc_proto",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "message_traits_test",
     size = "small",
     srcs = ["message_traits_test.cc"],
@@ -41,51 +45,7 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "protobuf_factory",
-    srcs = ["protobuf_factory.cc"],
-    hdrs = ["protobuf_factory.h"],
-    deps = [
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "//cyber/proto:proto_desc_cc_proto",
-    ],
-)
-
-cc_library(
-    name = "protobuf_traits",
-    hdrs = ["protobuf_traits.h"],
-    deps = [
-        ":protobuf_factory",
-    ],
-)
-
-cc_library(
-    name = "py_message",
-    hdrs = ["py_message.h"],
-    deps = [
-        ":protobuf_factory",
-    ],
-)
-
-cc_library(
-    name = "py_message_traits",
-    hdrs = ["py_message_traits.h"],
-    deps = [
-        ":protobuf_factory",
-        ":py_message",
-    ],
-)
-
-cc_library(
-    name = "raw_message",
-    hdrs = ["raw_message.h"],
-    deps = [
-        ":protobuf_factory",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "raw_message_test",
     size = "small",
     srcs = ["raw_message_test.cc"],
@@ -95,7 +55,7 @@ cc_test(
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "protobuf_factory_test",
     size = "small",
     srcs = ["protobuf_factory_test.cc"],
@@ -106,13 +66,5 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "raw_message_traits",
-    hdrs = ["raw_message_traits.h"],
-    deps = [
-        ":protobuf_factory",
-        ":raw_message",
-    ],
-)
-
+apollo_package()
 cpplint()

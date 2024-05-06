@@ -1,0 +1,4 @@
+enable_keep_clear_zone: true
+enable_junction: true
+min_pass_s_distance: 2.0
+align_with_traffic_sign_tolerance: 4.5

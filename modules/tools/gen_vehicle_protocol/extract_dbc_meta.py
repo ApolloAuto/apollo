@@ -23,7 +23,8 @@ import sys
 import yaml
 
 
-MAX_CAN_ID = 4096000000  # 2048
+MAX_CAN_ID = 4096000000  # include can extended ID
+STANDARD_CAN_ID = 2048
 
 
 def extract_var_info(items):
@@ -61,6 +62,12 @@ def extract_var_info(items):
 
     return car_var
 
+def extract_description_info(items):
+    car_var = {}
+    car_var["description"] = items[4][:-1]
+    print("var description is", car_var["description"])
+
+
 
 def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                      sender):
@@ -83,11 +90,22 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
             line_num = line_num + 1
             if len(items) == 5 and items[0] == "BO_":
                 p_name = items[2][:-1].lower()
+                # print ("p_name is ", p_name)
                 protocol = {}
                 if int(items[1]) > MAX_CAN_ID:
                     continue
                 protocol["id"] = "%x" % int(items[1])
+                if int(items[1]) > STANDARD_CAN_ID:
+                    protocol["id"] = gen_can_id_extended(protocol["id"])
                 protocol["name"] = "%s_%s" % (p_name, protocol["id"])
+                if "throttle" in protocol["name"]:
+                    protocol["protocol_category"] = "throttle"
+                if "brake" in protocol["name"]:
+                    protocol["protocol_category"] = "brake"
+                if "steer" in protocol["name"]:
+                    protocol["protocol_category"] = "steer"
+                if "gear" in protocol["name"]:
+                    protocol["protocol_category"] = "gear"
                 protocol["sender"] = items[4]
                 if protocol["id"] in black_list:
                     continue
@@ -115,14 +133,27 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 protocol_id = "%x" % int(items[2])
                 if int(items[2]) > MAX_CAN_ID:
                     continue
+                if int(items[2]) > STANDARD_CAN_ID:
+                    protocol_id = gen_can_id_extended(protocol_id)
                 for var in protocols[protocol_id]["vars"]:
+                    # print("var is", var)
                     if var["name"] == items[3]:
                         var["description"] = items[4][:-1]
+                        # print("var description is ", var["description"])
+                        if "enable" in var["description"]:
+                            var["signal_type"] = "enable"
+                        if "command" in var["description"]:
+                            var["signal_type"] = "command"
+                        if "speed" in var["description"]:
+                            var["signal_type"] = "speed"
+                        # extract_description_info(items)
 
             if len(items) > 2 and items[0] == "VAL_":
                 protocol_id = "%x" % int(items[1])
                 if int(items[1]) > MAX_CAN_ID:
                     continue
+                if int(items[1]) > STANDARD_CAN_ID:
+                    protocol_id = gen_can_id_extended(protocol_id)
                 for var in protocols[protocol_id]["vars"]:
                     if var["name"] == items[2]:
                         var["type"] = "enum"
@@ -159,6 +190,15 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         print("Control protocols: %d" % control_protocol_num)
         print("Report protocols: %d" % report_protocol_num)
         return True
+
+def gen_can_id_extended(str):
+    """
+        id string:
+    """
+    int_id = int(str, 16)
+    int_id &= 0x1FFFFFFF
+    str = hex(int_id).replace('0x', '')
+    return str
 
 
 if __name__ == "__main__":

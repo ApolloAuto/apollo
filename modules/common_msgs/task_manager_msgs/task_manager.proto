@@ -1,0 +1,45 @@
+syntax = "proto2";
+
+package apollo.task_manager;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/external_command_msgs/lane_follow_command.proto";
+
+enum TaskType {
+  CYCLE_ROUTING = 0;
+  PARKING_ROUTING = 1;
+  PARK_GO_ROUTING = 2;
+}
+
+enum JunctionType {
+  UNKNOWN = 0;
+  IN_ROAD = 1;
+  CROSS_ROAD = 2;
+  FORK_ROAD = 3;
+  MAIN_SIDE = 4;
+}
+
+message CycleRoutingTask {
+  optional int32 cycle_num = 1;
+  optional apollo.external_command.LaneFollowCommand lane_follow_command = 2;
+}
+
+message ParkingRoutingTask {
+  optional double lane_width = 1;
+  optional apollo.routing.RoutingRequest routing_request = 2;
+}
+
+message ParkGoRoutingTask {
+  optional int32 park_time = 1;  // sec
+  optional apollo.routing.RoutingRequest routing_request = 2;
+}
+
+message Task {
+  optional apollo.common.Header header = 1;
+  optional string task_name = 2;
+  optional TaskType task_type = 3;
+  optional CycleRoutingTask cycle_routing_task = 4;
+  optional ParkingRoutingTask parking_routing_task = 5;
+  optional ParkGoRoutingTask park_go_routing_task = 6;
+}

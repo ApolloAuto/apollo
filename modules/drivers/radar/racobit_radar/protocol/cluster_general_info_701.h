@@ -17,7 +17,7 @@
 #pragma once
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/racobit_radar.pb.h"
 
 namespace apollo {
 namespace drivers {

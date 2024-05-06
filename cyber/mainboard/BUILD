@@ -1,10 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+apollo_cc_binary(
     name = "mainboard",
     srcs = [
         "mainboard.cc",
@@ -14,16 +13,12 @@ cc_binary(
         "module_controller.h",
     ],
     linkopts = ["-pthread"],
-    linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
+        "//cyber/plugin_manager:cyber_plugin_manager",
         "//cyber/proto:dag_conf_cc_proto",
     ],
 )
 
-install(
-    name = "install",
-    targets = [":mainboard"],
-)
-
+apollo_package()
 cpplint()

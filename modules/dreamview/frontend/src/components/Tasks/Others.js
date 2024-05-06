@@ -2,7 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 
 import CheckboxItem from 'components/common/CheckboxItem';
-import WS from 'store/websocket';
+import WS, {CAMERA_WS} from 'store/websocket';
 
 @inject('store') @observer
 export default class Others extends React.Component {
@@ -80,6 +80,10 @@ export default class Others extends React.Component {
                         extraClasses="others-checkbox"
                         onClick={() => {
                           WS.toggleSimControl(!options.enableSimControl);
+                          if (!options.enableSimControl) {
+                            WS.getDymaticModelList();
+                            WS.switchToDefaultDynamicModel();
+                          }
                           this.props.store.handleOptionToggle('enableSimControl');
                         }}
                     />
@@ -91,6 +95,17 @@ export default class Others extends React.Component {
                         extraClasses="others-checkbox"
                         onClick={() => {
                           this.props.store.handleOptionToggle('showVideo');
+                          CAMERA_WS
+                            .getCameraChannel().then((channels) => {
+                              if (Array.isArray(channels) && channels.length > 0) {
+                                if (hmi.currentCameraSensorChannel !== '') {
+                                  // CAMERA_WS.changeCameraChannel(hmi.currentCameraSensorChannel)
+                                  //   .startCamera();
+                                }
+                              } else {
+                                alert('No camera channel found!');
+                              }
+                            });
                         }}
                     />
                 </div>

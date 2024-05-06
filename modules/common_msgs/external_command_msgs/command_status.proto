@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum CommandStatusType {
+  // Command is being executed without error.
+  RUNNING = 1;
+  // Command is finished.
+  FINISHED = 2;
+  // Command's execution has error.
+  ERROR = 3;
+  // Cannot get the status of command.
+  UNKNOWN = 4;
+}
+
+message CommandStatusRequest {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+}
+
+message CommandStatus {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // The status of command execution.
+  required CommandStatusType status = 3;
+  // The message for the status.
+  optional string message = 4;
+}

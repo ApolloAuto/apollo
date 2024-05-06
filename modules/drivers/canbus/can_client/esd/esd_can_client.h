@@ -26,10 +26,10 @@
 
 #include "esd_can/include/ntcan.h"
 #include "gflags/gflags.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 
 /**
  * @namespace apollo::drivers::canbus::can

@@ -1,53 +1,37 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "timer",
-    srcs = ["timer.cc"],
-    hdrs = ["timer.h"],
+apollo_cc_library(
+    name = "cyber_timer",
+    srcs = [
+        "timer.cc",
+        "timing_wheel.cc",
+    ],
+    hdrs = [
+        "timer.h",
+        "timer_task.h",
+        "timer_bucket.h",
+        "timing_wheel.h"
+    ],
     deps = [
-        ":timing_wheel",
-        "//cyber/common:global_data",
+        "//cyber/common:cyber_common",
+        "//cyber/task:cyber_task",
+        "//cyber/time:cyber_time",
     ],
 )
 
-cc_library(
-    name = "timer_task",
-    hdrs = ["timer_task.h"],
-)
-
-cc_library(
-    name = "timer_bucket",
-    hdrs = ["timer_bucket.h"],
-    deps = [
-        ":timer_task",
-    ],
-)
-
-cc_library(
-    name = "timing_wheel",
-    srcs = ["timing_wheel.cc"],
-    hdrs = ["timing_wheel.h"],
-    deps = [
-        ":timer_bucket",
-        "//cyber/task",
-        "//cyber/time",
-        "//cyber/time:duration",
-        "//cyber/time:rate",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "timer_test",
     size = "small",
     srcs = ["timer_test.cc"],
     deps = [
-        "//cyber:cyber_core",
-        "//cyber:init",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
+apollo_package()
 cpplint()

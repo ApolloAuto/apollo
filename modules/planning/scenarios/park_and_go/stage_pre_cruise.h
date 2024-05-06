@@ -18,37 +18,23 @@
 
 #include <memory>
 
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-#include "modules/planning/scenarios/stage.h"
+#include "cyber/plugin_manager/plugin_manager.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
-
-struct ParkAndGoContext;
 
 class ParkAndGoStagePreCruise : public Stage {
  public:
-  ParkAndGoStagePreCruise(const ScenarioConfig::StageConfig& config,
-                          const std::shared_ptr<DependencyInjector>& injector)
-      : Stage(config, injector) {}
-
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  ParkAndGoContext* GetContext() {
-    return Stage::GetContextAs<ParkAndGoContext>();
-  }
-
-  Stage::StageStatus FinishStage();
+  StageResult Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
  private:
-  ScenarioParkAndGoConfig scenario_config_;
+  StageResult FinishStage();
 };
 
-}  // namespace park_and_go
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::ParkAndGoStagePreCruise,
+                                     Stage)
+
 }  // namespace planning
 }  // namespace apollo

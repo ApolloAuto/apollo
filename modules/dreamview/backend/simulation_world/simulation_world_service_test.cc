@@ -56,13 +56,15 @@ class SimulationWorldServiceTest : public ::testing::Test {
     FLAGS_routing_response_file =
         "modules/dreamview/backend/testdata/routing.pb.txt";
     apollo::common::VehicleConfigHelper::Init();
+    apollo::cyber::Init("dreamview");
     sim_world_service_.reset(new SimulationWorldService(map_service_.get()));
   }
 
  protected:
   SimulationWorldServiceTest() {
     FLAGS_map_dir = "modules/dreamview/backend/testdata";
-    FLAGS_base_map_filename = "garage.bin";
+    // demo
+    FLAGS_base_map_filename = "base_map.txt";
     FLAGS_sim_world_with_routing_path = true;
     map_service_.reset(new MapService(false));
   }
@@ -477,24 +479,17 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
 
   BlockerManager::Instance()->Observe();
   sim_world_service_->UpdateWithLatestObserved(
-      sim_world_service_->routing_response_reader_.get());
+      sim_world_service_->planning_command_reader_.get());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);
   EXPECT_EQ(1, world.route_path_size());
 
-  double points[23][2] = {
-      {-1826.41, -3027.52}, {-1839.88, -3023.9},  {-1851.95, -3020.71},
-      {-1857.06, -3018.62}, {-1858.04, -3017.94}, {-1859.56, -3016.51},
-      {-1860.48, -3014.95}, {-1861.12, -3013.2},  {-1861.62, -3010.06},
-      {-1861.29, -3005.88}, {-1859.8, -2999.36},  {-1855.8, -2984.56},
-      {-1851.39, -2968.23}, {-1844.32, -2943.14}, {-1842.9, -2939.22},
-      {-1841.74, -2937.09}, {-1839.35, -2934.03}, {-1837.76, -2932.88},
-      {-1835.53, -2931.86}, {-1833.36, -2931.52}, {-1831.33, -2931.67},
-      {-1827.05, -2932.6},  {-1809.64, -2937.85}};
+  double points[2][2] = {{586392.84, 4140673.01},
+                         {586376.61, 4140677.16}};
 
   const auto& path = world.route_path(0);
-  EXPECT_EQ(23, path.point_size());
+  EXPECT_EQ(2, path.point_size());
   for (int i = 0; i < path.point_size(); ++i) {
     EXPECT_NEAR(path.point(i).x(), points[i][0], kEpsilon);
     EXPECT_NEAR(path.point(i).y(), points[i][1], kEpsilon);

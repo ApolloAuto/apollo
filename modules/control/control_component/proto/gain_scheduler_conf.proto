@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message GainScheduler {
+  repeated GainSchedulerInfo scheduler = 1;
+  repeated GainSlopeSchedulerInfo pitch_scheduler = 2;
+}
+
+message GainSchedulerInfo {
+  optional double speed = 1;  // m/s
+  optional double ratio = 2;
+}
+
+message GainSlopeSchedulerInfo {
+  optional double pitch = 1;  // deg
+  optional double ratio = 2;
+}

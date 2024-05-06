@@ -1,0 +1,46 @@
+.camera_view_channel_select {
+  flex: 0 0 auto;
+  position: relative;
+  margin: 5px;
+  border: 1px solid #383838;
+
+  select {
+    position: relative;
+    z-index: 200;
+    appearance: none;
+    text-align: left;
+    width: 200px;
+    display: block;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    outline: none;
+    cursor: pointer;
+    padding-right: 10px;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 30px;
+    height: 100%;
+    border-left: 1px solid #383838;
+
+    background: #181818;
+    pointer-events: none;
+  }
+
+  .arrow:before {
+    position: absolute;
+    top: 55%;
+    right: 7px;
+    margin-top: -5px;
+    border-top: 8px solid #666666;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+
+    content: '';
+    pointer-events: none;
+  }
+}

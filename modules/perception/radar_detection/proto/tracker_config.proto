@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.radar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message TrackerConfig {
+  optional double tracking_time_window = 1 [default = 0.06];
+  optional perception.PluginParam matcher_param = 2;
+  optional string chosen_filter = 3;
+  optional double tracked_times_threshold = 4;
+  optional bool use_filter = 5;
+}

@@ -10,7 +10,23 @@ cyber_modules {
 cyber_modules {
   key: "Perception"
   value: {
-    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
+    dag_files: "/apollo/modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag"
+    dag_files: "/apollo/modules/prediction/dag/prediction_navi.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag"
+    dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_front.dag"
+    dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_front.dag"
+    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_front.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_rear.dag"
+    dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_rear.dag"
+    dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_rear.dag"
+    dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_rear.dag"
+    dag_files: "/apollo/modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag"
+    dag_files: "/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag"
+    dag_files: "/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag"
+    dag_files: "/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag"
+    dag_files: "/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag"
+    dag_files: "/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag"
+    dag_files: "/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag"
   }
 }
 cyber_modules {
@@ -46,7 +62,8 @@ cyber_modules {
 cyber_modules {
   key: "Planning"
   value: {
-    dag_files: "/apollo/modules/planning/dag/planning_navi.dag"
+    dag_files: "/apollo/modules/planning/planning_component/dag/planning.dag"
+    dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
   }
 }
 cyber_modules {
@@ -59,7 +76,7 @@ cyber_modules {
 cyber_modules {
   key: "Control"
   value: {
-    dag_files: "/apollo/modules/control/dag/control.dag"
+    dag_files: "/apollo/modules/control/control_component/dag/control.dag"
   }
 }
 cyber_modules {

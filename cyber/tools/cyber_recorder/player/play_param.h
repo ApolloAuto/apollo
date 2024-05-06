@@ -31,13 +31,16 @@ struct PlayParam {
   bool is_loop_playback = false;
   double play_rate = 1.0;
   uint64_t begin_time_ns = 0;
+  uint64_t base_begin_time_ns = 0;
   uint64_t end_time_ns = std::numeric_limits<uint64_t>::max();
-  uint64_t start_time_s = 0;
+  double start_time_s = 0;
   uint64_t delay_time_s = 0;
   uint32_t preload_time_s = 3;
   std::set<std::string> files_to_play;
   std::set<std::string> channels_to_play;
   std::set<std::string> black_channels;
+  // for dreamview_plus play record;use record_id to check source
+  std::string record_id = "";
 };
 
 }  // namespace record

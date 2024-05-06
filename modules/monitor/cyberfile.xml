@@ -1,0 +1,29 @@
+<package format="2">
+  <name>monitor</name>
+  <version>local</version>
+  <description>
+    This module contains system level software such as code to check hardware status
+    and monitor system health.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="drivers-canbus" lib_names="drivers-canbus">drivers-canbus</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog</depend>
+  <depend type="binary" repo_name="dreamview" lib_names="dreamview">dreamview</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf</depend>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/monitor</src_path>
+
+</package>

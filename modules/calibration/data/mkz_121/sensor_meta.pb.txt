@@ -1,0 +1,24 @@
+sensor_meta {
+    name: "velodyne64"
+    type: VELODYNE_64
+    orientation: PANORAMIC
+    is_main_sensor: true
+}
+
+sensor_meta {
+    name: "front_6mm"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "front_12mm"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
+
+sensor_meta {
+    name: "radar_front"
+    type: LONG_RANGE_RADAR
+    orientation: FRONT
+}

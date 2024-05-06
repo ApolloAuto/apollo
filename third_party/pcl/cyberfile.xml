@@ -1,0 +1,27 @@
+<package format="2">
+  <name>3rd-pcl</name>
+  <version>local</version>
+  <description>
+    Apollo packaged 3rd-pcl Lib.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <depend>libusb-1.0-0</depend>
+  <depend>libopenni0</depend>
+  <depend>libfreetype6</depend>
+  <depend>libtiff5</depend>
+  <depend>libdouble-conversion1</depend>
+  <depend>libpcap0.8</depend>
+  <depend>libqhull7</depend>
+  <depend>libflann-dev</depend>
+  <depend expose="False">3rd-vtk</depend>
+
+  <type>third-wrapper</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/pcl</src_path>
+
+</package>

@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/common_msgs/routing_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/error_code.proto";
+import "modules/common_msgs/routing_msgs/poi.proto";
+
+message RoutingRequest {
+  optional apollo.common.Header header = 1;
+  // at least two points. The first is start point, the end is final point.
+  // The routing must go through each point in waypoint.
+  repeated apollo.routing.LaneWaypoint waypoint = 2;
+  repeated apollo.routing.LaneSegment blacklisted_lane = 3;
+  repeated string blacklisted_road = 4;
+  optional bool broadcast = 5 [default = true];
+  optional apollo.routing.ParkingInfo parking_info = 6 [deprecated = true];
+  // If the start pose is set as the first point of "way_point".
+  optional bool is_start_pose_set = 7 [default = false];
+}
+
+message RoutingResponse {
+  optional apollo.common.Header header = 1;
+  repeated apollo.routing.RoadSegment road = 2;
+  optional apollo.routing.Measurement measurement = 3;
+  optional RoutingRequest routing_request = 4;
+
+  // the map version which is used to build road graph
+  optional bytes map_version = 5;
+  optional apollo.common.StatusPb status = 6;
+}

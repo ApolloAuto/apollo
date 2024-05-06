@@ -97,6 +97,8 @@ options:
     default: false
   showDataRecorder:
     default: false
+  showProfile:
+    default: false
 
   # task panel options
   showPNCMonitor:
@@ -275,4 +277,4 @@ debug:
   autoMonitorMessage: false
   performanceMonitor: false
 server:
-  port: 8888
+  port: 8899

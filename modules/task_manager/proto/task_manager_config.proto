@@ -3,8 +3,8 @@ syntax = "proto2";
 package apollo.task_manager;
 
 message TopicConfig {
-  optional string routing_request_topic = 1;
-  optional string routing_response_topic = 2;
+  optional string lane_follow_command_topic = 1;
+  optional string planning_command_topic = 2;
   optional string localization_pose_topic = 3;
   optional string planning_topic = 4;
 }

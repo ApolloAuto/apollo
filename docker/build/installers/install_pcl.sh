@@ -71,6 +71,11 @@ apt_get_update_and_install \
     libpcap-dev \
     libqhull-dev
 
+if [[ -d "/usr/include/boost" ]]; then
+    rm -rf /usr/include/boost
+    cp -r /opt/apollo/sysroot/include/boost /usr/include/boost
+fi
+
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,
 # and libglew-dev have a dependency over libglew2.0
@@ -94,7 +99,8 @@ tar xzf ${PKG_NAME}
 #  -DCMAKE_SKIP_RPATH=ON \
 
 pushd pcl-pcl-${VERSION}/
-    patch -p1 < ${CURR_DIR}/pcl-sse-fix-${VERSION}.patch
+    # disable sse patch for avoiding eigen core dump
+    # patch -p1 < ${CURR_DIR}/pcl-sse-fix-${VERSION}.patch
     mkdir build && cd build
     cmake .. \
         "${GPU_OPTIONS}" \

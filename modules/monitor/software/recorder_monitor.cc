@@ -17,9 +17,9 @@
 #include "modules/monitor/software/recorder_monitor.h"
 
 #include "cyber/common/log.h"
+#include "modules/common_msgs/monitor_msgs/smart_recorder_status.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 

@@ -1,0 +1,24 @@
+<package format="2">
+  <name>perception-data-params</name>
+  <version>local</version>
+  <description>
+    The params of perception data.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/data/params</src_path>
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+
+</package>

@@ -1,0 +1,43 @@
+diff --git a/node_modules/three.meshline/src/THREE.MeshLine.js b/node_modules/three.meshline/src/THREE.MeshLine.js
+index b347092..35d69b3 100755
+--- a/node_modules/three.meshline/src/THREE.MeshLine.js
++++ b/node_modules/three.meshline/src/THREE.MeshLine.js
+@@ -1,11 +1,5 @@
+-;(function() {
+-  'use strict'
++import * as THREE from 'three'
+ 
+-  var root = this
+-
+-  var has_require = typeof require !== 'undefined'
+-
+-  var THREE = root.THREE || (has_require && require('three'))
+   if (!THREE) throw new Error('MeshLine requires three.js')
+ 
+   class MeshLine extends THREE.BufferGeometry {
+@@ -695,20 +689,8 @@
+     return this
+   }
+ 
+-  if (typeof exports !== 'undefined') {
+-    if (typeof module !== 'undefined' && module.exports) {
+-      exports = module.exports = {
+-        MeshLine: MeshLine,
+-        MeshLineMaterial: MeshLineMaterial,
+-        MeshLineRaycast: MeshLineRaycast,
+-      }
+-    }
+-    exports.MeshLine = MeshLine
+-    exports.MeshLineMaterial = MeshLineMaterial
+-    exports.MeshLineRaycast = MeshLineRaycast
+-  } else {
+-    root.MeshLine = MeshLine
+-    root.MeshLineMaterial = MeshLineMaterial
+-    root.MeshLineRaycast = MeshLineRaycast
+-  }
+-}.call(this))
++export {
++    MeshLine,
++   MeshLineMaterial,
++   MeshLineRaycast,
++}

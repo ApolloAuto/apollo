@@ -1,0 +1,12 @@
+<!--this file list the modules which will be loaded dynamicly and
+    their process name to be running in -->
+<cyber>
+    <desc>motion service</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>motion_service</name>
+        <dag_conf>/apollo/modules/perception/motion_service/dag/motion_service.dag</dag_conf>
+        <process_name>motion_service</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

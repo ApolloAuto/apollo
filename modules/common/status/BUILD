@@ -1,19 +1,21 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+)
 
-cc_library(
+apollo_cc_library(
     name = "status",
     hdrs = ["status.h"],
     deps = [
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/util:future",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "@com_google_protobuf//:protobuf",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "status_test",
     size = "small",
     srcs = ["status_test.cc"],
@@ -22,5 +24,7 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+apollo_package()
 
 cpplint()

@@ -20,12 +20,12 @@
 #include <string>
 
 #include "Eigen/Geometry"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/localization/ndt/localization_pose_buffer.h"
 #include "modules/localization/ndt/ndt_locator/lidar_locator_ndt.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/transform/buffer.h"
 
 namespace apollo {
@@ -133,7 +133,8 @@ class NDTLocalization {
   double error_ndt_score_ = 2.0;
   bool is_service_started_ = false;
 
-  std::list<TimeStampPose> odometry_buffer_;
+  std::list<TimeStampPose, Eigen::aligned_allocator<TimeStampPose>>
+    odometry_buffer_;
   std::mutex odometry_buffer_mutex_;
   unsigned int odometry_buffer_size_ = 0;
   const unsigned int max_odometry_buffer_size_ = 100;

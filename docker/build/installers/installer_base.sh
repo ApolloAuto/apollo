@@ -37,7 +37,7 @@ export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 if [[ "$(uname -m)" == "x86_64" ]]; then
     export SUPPORTED_NVIDIA_SMS="5.2 6.0 6.1 7.0 7.5 8.0 8.6"
 else # AArch64
-    export SUPPORTED_NVIDIA_SMS="5.3 6.2 7.2"
+    export SUPPORTED_NVIDIA_SMS="5.3 6.2 7.2 8.7"
 fi
 
 function py3_version() {
@@ -48,7 +48,7 @@ function py3_version() {
 }
 
 function pip3_install() {
-    python3 -m pip install --timeout 30 --no-cache-dir $@
+    python3 -m pip install --timeout 30 --no-cache-dir -i https://mirror.baidu.com/pypi/simple/ $@
 }
 
 function apt_get_update_and_install() {
@@ -192,5 +192,34 @@ function download_if_not_cached {
         ok "Successfully cloned git repo: $url"
     else
         error "Unknown schema for package \"$pkg_name\", url=\"$url\""
+    fi
+}
+
+USE_AMD_GPU=0
+USE_NVIDIA_GPU=0
+
+function determine_gpu_use_host() {
+    if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+        if lsmod | grep -q "^nvgpu"; then
+            USE_NVIDIA_GPU=1
+        fi
+    elif [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+            warning "No nvidia-smi found."
+        elif [[ -z "$(nvidia-smi)" ]]; then
+            warning "No NVIDIA GPU device found."
+        else
+            USE_NVIDIA_GPU=1
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+            warning "No rocm-smi found."
+        elif [[ -z "$(rocm-smi)" ]]; then
+            warning "No AMD GPU device found."
+        else
+            USE_AMD_GPU=1
+        fi
+    else
+        error "Unsupported CPU architecture: ${HOST_ARCH}"
+        exit 1
     fi
 }

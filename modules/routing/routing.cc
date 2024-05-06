@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/routing/routing.h"
+
 #include <limits>
 #include <unordered_map>
 
-#include "modules/routing/routing.h"
-
 #include "modules/common/util/point_factory.h"
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/routing/common/routing_gflags.h"
 
 namespace apollo {
@@ -27,7 +28,6 @@ namespace routing {
 
 using apollo::common::ErrorCode;
 using apollo::common::PointENU;
-using apollo::hdmap::ParkingSpaceInfoConstPtr;
 
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
@@ -56,12 +56,12 @@ apollo::common::Status Routing::Start() {
   return apollo::common::Status::OK();
 }
 
-std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
-    const RoutingRequest& routing_request) {
-  std::vector<RoutingRequest> fixed_requests;
+std::vector<routing::RoutingRequest> Routing::FillLaneInfoIfMissing(
+    const routing::RoutingRequest& routing_request) {
+  std::vector<routing::RoutingRequest> fixed_requests;
   std::unordered_map<int, std::vector<LaneWaypoint>>
       additional_lane_waypoint_map;
-  RoutingRequest fixed_request(routing_request);
+  routing::RoutingRequest fixed_request(routing_request);
   for (int i = 0; i < routing_request.waypoint_size(); ++i) {
     LaneWaypoint lane_waypoint(routing_request.waypoint(i));
     if (lane_waypoint.has_id()) {
@@ -111,7 +111,7 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
     for (size_t i = 0; i < cur_size; ++i) {
       // use index to iterate while keeping push_back
       for (const auto& lane_waypoint : m.second) {
-        RoutingRequest new_request(fixed_requests[i]);
+        routing::RoutingRequest new_request(fixed_requests[i]);
         auto waypoint_info = new_request.mutable_waypoint(m.first);
         waypoint_info->set_id(lane_waypoint.id());
         waypoint_info->set_s(lane_waypoint.s());
@@ -126,55 +126,20 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
   return fixed_requests;
 }
 
-bool Routing::GetParkingID(const PointENU& parking_point,
-                           std::string* parking_space_id) {
-  // search current parking space id associated with parking point.
-  constexpr double kDistance = 0.01;  // meter
-  std::vector<ParkingSpaceInfoConstPtr> parking_spaces;
-  if (hdmap_->GetParkingSpaces(parking_point, kDistance, &parking_spaces) ==
-      0) {
-    *parking_space_id = parking_spaces.front()->id().id();
+bool Routing::Process(
+    const std::shared_ptr<routing::RoutingRequest>& routing_request,
+    routing::RoutingResponse* const routing_response) {
+  if (nullptr == routing_request) {
+    AWARN << "Routing request is empty!";
     return true;
   }
-  return false;
-}
-
-bool Routing::FillParkingID(RoutingResponse* routing_response) {
-  const auto& routing_request = routing_response->routing_request();
-  const bool has_parking_info = routing_request.has_parking_info();
-  const bool has_parking_id =
-      has_parking_info && routing_request.parking_info().has_parking_space_id();
-  // return early when has parking_id
-  if (has_parking_id) {
-    return true;
-  }
-  // set parking space ID when
-  //  has parking info && has parking point && NOT has parking space id && get
-  //  ID successfully
-  if (has_parking_info && routing_request.parking_info().has_parking_point()) {
-    const PointENU parking_point =
-        routing_request.parking_info().parking_point();
-    std::string parking_space_id;
-    if (GetParkingID(parking_point, &parking_space_id)) {
-      routing_response->mutable_routing_request()
-          ->mutable_parking_info()
-          ->set_parking_space_id(parking_space_id);
-      return true;
-    }
-  }
-  ADEBUG << "Failed to fill parking ID";
-  return false;
-}
-
-bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
-                      RoutingResponse* const routing_response) {
   CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
 
   const auto& fixed_requests = FillLaneInfoIfMissing(*routing_request);
   double min_routing_length = std::numeric_limits<double>::max();
   for (const auto& fixed_request : fixed_requests) {
-    RoutingResponse routing_response_temp;
+    routing::RoutingResponse routing_response_temp;
     if (navigator_ptr_->SearchRoute(fixed_request, &routing_response_temp)) {
       const double routing_length =
           routing_response_temp.measurement().distance();
@@ -183,7 +148,6 @@ bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
         min_routing_length = routing_length;
       }
     }
-    FillParkingID(routing_response);
   }
   if (min_routing_length < std::numeric_limits<double>::max()) {
     monitor_logger_buffer_.INFO("Routing success!");

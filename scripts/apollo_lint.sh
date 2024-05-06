@@ -21,6 +21,7 @@ set -e
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 # shellcheck source=./apollo.bashrc
 source "${TOP_DIR}/scripts/apollo.bashrc"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 : ${STAGE:=dev}
 
@@ -39,7 +40,7 @@ function run_cpp_lint() {
     cpp_dirs="${cpp_dirs} modules"
   fi
   for prey in $(find ${cpp_dirs} -name BUILD \
-    | xargs grep -l -E 'cc_library|cc_test|cc_binary|cuda_library' \
+    | xargs grep -l -E 'cc_library|cc_test|cc_binary|gpu_library' \
     | xargs grep -L 'cpplint()'); do
     warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' "${prey}"
@@ -152,6 +153,9 @@ function parse_cmdline_args() {
 }
 
 function main() {
+  # site_restore
+  [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE" 
+  # env_prepare
   parse_cmdline_args "$@"
   if [[ "${CPP_LINT_FLAG}" -eq 1 ]]; then
     run_cpp_lint

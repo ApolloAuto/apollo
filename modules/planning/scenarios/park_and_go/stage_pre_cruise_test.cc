@@ -20,37 +20,33 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_pre_cruise.h"
 
+#include "gtest/gtest.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/park_and_go/context.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 class ParkAndGoStagePreCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_PRE_CRUISE);
+    config_.set_name("PARK_AND_GO_PRE_CRUISE");
     injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  StagePipeline config_;
   std::shared_ptr<DependencyInjector> injector_;
+  ParkAndGoContext context_;
 };
 
 TEST_F(ParkAndGoStagePreCruiseTest, Init) {
-  ParkAndGoStagePreCruise park_and_go_stage_pre_cruise(config_, injector_);
-  EXPECT_EQ(
-      park_and_go_stage_pre_cruise.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_PRE_CRUISE));
+  ParkAndGoStagePreCruise park_and_go_stage_pre_cruise;
+  park_and_go_stage_pre_cruise.Init(config_, injector_,
+                                    "scenarios/park_and_go/conf", &context_);
+  EXPECT_EQ(park_and_go_stage_pre_cruise.Name(), ("PARK_AND_GO_PRE_CRUISE"));
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

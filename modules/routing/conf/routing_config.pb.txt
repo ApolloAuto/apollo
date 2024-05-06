@@ -5,6 +5,6 @@ uturn_penalty: 100.0
 change_penalty: 500.0
 base_changing_length: 50.0
 topic_config {
-  routing_response_topic: "/apollo/routing_response"
-  routing_response_history_topic: "/apollo/routing_response_history"
+  routing_response_topic: "/apollo/raw_routing_response"
+  routing_response_history_topic: "/apollo/raw_rrouting_response_history"
 }

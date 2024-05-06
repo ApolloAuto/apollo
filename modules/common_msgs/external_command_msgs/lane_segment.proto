@@ -1,0 +1,13 @@
+
+syntax = "proto2";
+
+package apollo.external_command;
+
+message LaneSegment {
+  // lane id which this LaneSegment belongs to.
+  optional string id = 1;
+  // Start s of this LaneSegment on the lane.
+  optional double start_s = 2;
+  // End s of this LaneSegment on the lane.
+  optional double end_s = 3;
+}

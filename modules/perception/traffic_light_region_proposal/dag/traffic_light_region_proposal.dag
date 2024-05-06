@@ -1,0 +1,12 @@
+module_config {
+  module_library : "modules/perception/traffic_light_region_proposal/libtraffic_component_proposal.so"
+
+  components {
+    class_name : "TrafficLightsPerceptionComponent"
+    config {
+      name: "TrafficLightsPerceptionComponent"
+      config_file_path: "/apollo/modules/perception/traffic_light_region_proposal/conf/traffic_light_region_proposal_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+    }
+  }
+}

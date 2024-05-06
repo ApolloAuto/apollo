@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <string>
 
-#include "modules/transform/proto/transform.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 
 namespace apollo {
 namespace transform {

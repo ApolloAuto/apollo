@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+message Point {
+  // x coordinate.
+  required double x = 1;
+  // y coordinate.
+  required double y = 2;
+}
+
+message Pose {
+  // x coordinate.
+  required double x = 1;
+  // y coordinate.
+  required double y = 2;
+  // Rotation around z axis in Cartesian coordinate system.
+  optional double heading = 3;
+}
+
+// Region of interest in form of polygon.
+// If the points of polygon is in anticlockwise, ROI is drivable area; otherwise if
+// they are in clockwise, ROI is prohibited driving area.
+message RoiPolygon {
+  repeated Point point = 1;
+}

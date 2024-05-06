@@ -26,9 +26,14 @@ import sys
 # init vars
 CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
-wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '../internal'))
-sys.path.append(wrapper_lib_path)
+APOLLO_DISTRIBUTION_HOME = os.environ.get(
+    'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
+
+if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo'):
+    wrapper_lib_path = os.path.join(
+        APOLLO_DISTRIBUTION_HOME, "lib", "cyber/python/internal")
+
+    sys.path.append(wrapper_lib_path)
 
 _CYBER_PARAM = importlib.import_module('_cyber_parameter_wrapper')
 

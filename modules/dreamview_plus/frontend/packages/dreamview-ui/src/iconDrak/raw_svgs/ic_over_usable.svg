@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_over_usable</title>
+    <g id="ic_over_usable" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="24" height="24"></rect>
+        <g id="编组备份" transform="translate(1.000000, 1.000000)">
+            <path d="M8.5,6.5 L13.5,6.5 C14.8333329,6.5 15.5,7.16666593 15.5,8.5 L15.5,13.5 C15.5,14.8333329 14.8333341,15.5 13.5,15.5 L8.5,15.5 C7.1666671,15.5 6.5,14.8333341 6.5,13.5 L6.5,8.5 C6.5,7.1666671 7.16666593,6.5 8.5,6.5 Z" id="路径" fill="#F75660"></path>
+            <circle id="椭圆形备份" stroke="#F75660" cx="11" cy="11" r="10.5"></circle>
+        </g>
+    </g>
+</svg>

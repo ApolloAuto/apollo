@@ -1,0 +1,13 @@
+<!--this file list the modules which will be loaded dynamicly and
+    their process name to be running in -->
+<cyber>
+    <desc>cyber modules list config</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>msg_adapter</name>
+        <dag_conf>/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag</dag_conf>
+        <!-- if not set, use default process -->
+        <process_name>msg_adapter</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

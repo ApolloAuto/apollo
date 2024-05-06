@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+import "modules/common_msgs/dreamview_msgs/simulation_world.proto";
+
+message Obstacles {
+    repeated Object obstacle = 1;
+    optional Object auto_driving_car = 2;
+    map<string, SensorMeasurements> sensor_measurements = 3;
+}

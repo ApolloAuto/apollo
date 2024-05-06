@@ -1,0 +1,35 @@
+syntax = "proto2";
+
+package apollo.perception.camera.tracking_feature;
+
+message FeatureParam {
+  optional int32 feat_stride = 1 [default = 32];
+  repeated ExtractorParam extractor = 2;
+  optional string remap_model = 3;
+  optional string feat_blob_name = 4;
+  repeated int32 feat_blob_shape = 5;
+}
+
+message ExtractorParam {
+  enum FeatureType { ROIPooling = 0; }
+  optional string feat_blob = 1;
+  optional FeatureType feat_type = 2 [default = ROIPooling];
+  optional ROIPoolingParam roi_pooling_param = 3;
+  optional PSROIPoolingParam ps_roi_pooling_param = 4;
+}
+
+message ROIPoolingParam {
+  optional int32 pooled_h = 1 [default = 3];
+  optional int32 pooled_w = 2 [default = 3];
+  optional bool use_floor = 3 [default = false];
+}
+
+message PSROIPoolingParam {
+  optional int32 heat_map_a = 1 [default = 16];
+  optional int32 output_dim = 2 [default = 10];
+  optional int32 group_height = 3 [default = 7];
+  optional int32 group_width = 4 [default = 7];
+  optional int32 pooled_height = 5 [default = 7];
+  optional int32 pooled_width = 6 [default = 7];
+  optional int32 sample_per_part = 7 [default = 4];
+}

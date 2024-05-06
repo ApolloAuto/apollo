@@ -2,13 +2,13 @@ import { action, computed, observable } from 'mobx';
 import 'styles/playback-controls';
 
 export default class Playback {
-    FPS = 10; // frames per sec
+  FPS = 10; // frames per sec
 
-    msPerFrame = 100;
+  msPerFrame = 100;
 
-    recordId = null;
+  recordId = null;
 
-    mapId = null;
+  mapId = null;
 
     // real frame number starts from 1
     @observable numFrames = 0;

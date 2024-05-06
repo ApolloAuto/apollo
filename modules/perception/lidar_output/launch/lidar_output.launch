@@ -1,0 +1,10 @@
+<cyber>
+    <desc>Apollo lidar output</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>lidar_output</name>
+        <dag_conf>/apollo/modules/perception/lidar_output/dag/lidar_output.dag</dag_conf>
+        <process_name>lidar_output</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

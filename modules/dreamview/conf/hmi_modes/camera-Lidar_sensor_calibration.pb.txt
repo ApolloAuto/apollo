@@ -84,9 +84,6 @@ monitored_components {
       command_keywords: "mainboard"
       command_keywords: "/apollo/modules/drivers/lidar/dag/lidar.dag"
     }
-    channel {
-      name: "/apollo/sensor/lidar16/PointCloud2"
-    }
   }
 }
 monitored_components {

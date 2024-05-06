@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message WebsocketInfo {
+  // Use websocket_name to correspond to websocket,
+  // which is convenient for SocketManager to find websocket
+  optional string websocket_name = 1;
+  // websocket_pipe is used to create websocket and send data
+  optional string websocket_pipe = 2;
+}
+
+message ChannelInfo {
+  optional string channel_name = 1;
+  optional string proto_path = 2;
+  optional string msg_type = 3;
+}
+
+message DataHandlerInfo {
+  optional string data_name = 1;
+  // proto file location
+  optional string proto_path = 2;
+  // The message type of proto,eg:apollo.dreamview.SimulationWorld
+  optional string msg_type = 3;
+  optional WebsocketInfo websocket_info = 4;
+  // camera point_cloud may exists data source comes from multiplay channels
+  optional bool different_for_channels = 5 [default = false];
+  repeated ChannelInfo channels = 6;
+}
+
+message DataHandlerConf {
+  map<string, DataHandlerInfo> data_handler_info = 1;
+}
+
+message StreamData{
+  optional string type = 1;
+  optional string action = 2;
+  optional string data_name = 3;
+  optional string channel_name = 4;
+  optional bytes data = 5;
+}

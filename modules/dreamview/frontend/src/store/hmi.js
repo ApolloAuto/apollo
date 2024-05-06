@@ -11,6 +11,11 @@ const TELEOP_MODE = Object.freeze({
 });
 
 export default class HMI {
+
+  constructor(studioConnector) {
+    this.studioConnector = studioConnector;
+  }
+
   modes = [];
 
   @observable currentMode = 'none';
@@ -93,6 +98,33 @@ export default class HMI {
 
   @observable counter = 0;
 
+  @observable dynamicModels = [];
+
+  @observable currentDynamicModel = '';
+
+  @observable records = {};
+
+  @observable currentRecordId = '';
+
+  /**
+   *  // 0: 未设置
+   *  // 1: DKIT_LITE
+   *  // 2: DKIT_STANDARD
+   *  // 3: DKIT_ADVANCED_NE_S
+   *  // 4: DKIT_ADVANCED_SNE_R
+   *  // 5: DKIT_LITE_S
+   *  // 6: DKIT_STANDARD_S
+   *  // 7: DKIT_CHALLENGE
+   * @type {number}
+   */
+  @observable currentVehicleType = 0;
+
+  // current camera channel
+  @observable currentCameraSensorChannel = '';
+
+  // current point cloud channel
+  @observable currentPointCloudChannel = '';
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -174,7 +206,6 @@ export default class HMI {
     if (newStatus.monitoredComponents) {
       const newKeyList = JSON.stringify(
         Object.keys(newStatus.monitoredComponents).sort(),
-
       );
       const curKeyList = JSON.stringify(this.componentStatus.keys().sort());
       if (newKeyList !== curKeyList) {
@@ -219,6 +250,29 @@ export default class HMI {
 
     if (typeof newStatus.passengerMsg === 'string') {
       UTTERANCE.speakRepeatedly(newStatus.passengerMsg);
+    }
+
+    if (newStatus.dynamicModels) {
+      this.dynamicModels = newStatus.dynamicModels;
+    }
+
+    if (newStatus.currentDynamicModel) {
+      this.currentDynamicModel = newStatus.currentDynamicModel;
+    }
+
+    this.records = newStatus.records;
+    this.currentRecordId = newStatus.currentRecordId;
+
+    if (newStatus.currentVehicleType) {
+      this.currentVehicleType = newStatus.currentVehicleType;
+    }
+
+    if (newStatus.currentCameraSensorChannel) {
+      this.currentCameraSensorChannel = newStatus.currentCameraSensorChannel;
+    }
+
+    if (newStatus.currentPointCloudChannel) {
+      this.currentPointCloudChannel = newStatus.currentPointCloudChannel;
     }
   }
 

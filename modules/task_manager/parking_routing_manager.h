@@ -20,11 +20,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
+#include "modules/task_manager/proto/task_manager_config.pb.h"
+
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
-#include "modules/task_manager/proto/task_manager_config.pb.h"
 
 namespace apollo {
 namespace task_manager {
@@ -36,22 +37,10 @@ class ParkingRoutingManager {
    * @brief module initialization function
    * @return initialization status
    */
-  common::Status Init(const task_manager::ParkingRoutingTask&
-                      parking_routing_task);
+  common::Status Init(
+      const task_manager::ParkingRoutingTask& parking_routing_task);
 
-  /**
-   * @brief check if the size of vehicle is smaller than size of parking space
-   * @return false/true
-   */
-  bool SizeVerification(const task_manager::ParkingRoutingTask&
-                        parking_routing_task);
-
-  /**
-   * @brief check if the width of vehicle is smaller than width of road
-   * @return false/true
-  */
-  bool RoadWidthVerification(const task_manager::ParkingRoutingTask&
-                             parking_routing_task);
+  bool ConstructParkingRoutingRequest(ParkingRoutingTask* parking_routing_task);
 
   /**
    * @brief destructor

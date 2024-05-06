@@ -1,0 +1,10 @@
+plugins {
+    name: "ROIBoundaryFilter"
+    config_path: "perception/lidar_detection_filter/data"
+    config_file: "roi_boundary_filter.pb.txt"
+}
+plugins {
+    name: "StrategyFilter"
+    config_path: "perception/lidar_detection_filter/data"
+    config_file: "strategy_filter.pb.txt"
+}

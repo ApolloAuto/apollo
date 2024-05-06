@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/microphone/libmicrophone_component.so"
+    module_library : "modules/drivers/microphone/libmicrophone_component.so"
     components {
         class_name : "MicrophoneComponent"
         config {

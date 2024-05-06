@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_interface_base/scenario_base/proto/creep_stage.proto";
+
+message ScenarioStopSignUnprotectedConfig {
+  // Only when the distance of vehicle and start point of the stop sign is 
+  // smaller than this value, "StopSignUnprotectedScenario" can be enter
+  optional double start_stop_sign_scenario_distance = 1
+      [default = 5.0];  // meter
+  // If the obstacle vehicle is in front of stop sign and within the distance of
+  // this value, it should be watched carefully before self-ego cruise cross the
+  // stop sign overlap
+  optional double watch_vehicle_max_valid_stop_distance = 2
+      [default = 5.0];                                          // meter
+  // Distance to check if vehicle reaches the pre-stop point of openspace in 
+  // "PullOverStageRetryApproachParking" stage
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  // Only when the vehicle has stopped more than this value, 
+  // "StopSignUnprotectedStageStop" can be finished
+  optional float stop_duration_sec = 4 [default = 1.0];         // sec
+  // If vehicle stops more than this value, "StopSignUnprotectedStageStop" can
+  // be finished right now
+  optional float stop_timeout_sec = 5 [default = 8.0];          // sec
+  // Only when the vehicle has creeped more than this value, 
+  // "StopSignUnprotectedStageCreep" can be finished
+  optional float creep_timeout_sec = 6 [default = 10.0];        // sec
+  optional CreepStageConfig creep_stage_config = 7;
+}

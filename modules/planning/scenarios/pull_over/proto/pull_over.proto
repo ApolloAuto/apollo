@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioPullOverConfig {
+  // Maximum distance to the destination to start pull over
+  optional double start_pull_over_scenario_distance = 1
+      [default = 50.0];                                                // meter
+  // Minimum distance to destination to stop pull over
+  optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
+  // If distance of vehicle and destination is smaller than this value, cannot 
+  // enter pull over scenario 
+  optional double max_distance_stop_search = 3 [default = 25.0];  // meter
+  // Only when distance of vehicle and pull over position is smaller than this 
+  // value, pull over can be considered as finished
+  optional double max_s_error_to_end_point = 4 [default = 0.2];
+  // Only when lateral error of vehicle to pull over position is smaller than  
+  // this value, pull over can be considered as finished
+  optional double max_l_error_to_end_point = 5 [default = 0.5];
+  // Only when heading error of vehicle to pull over position is smaller than  
+  // this value in "PullOverStageRetryParking" stage, the stage can be 
+  // considered as finished
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
+   // Only when distance error of vehicle to pull over position is smaller than  
+  // this value in "PullOverStageRetryParking" stage, the stage can be 
+  // considered as finished
+  optional double max_distance_error_to_end_point = 7 [default = 0.2];
+  // If vehicle has passed pull over point by "pass_destination_threshold", its 
+  // state of pull over should be "PASS_DESTINATION"
+  optional double pass_destination_threshold = 8 [default = 10.0];
+  // Only when distance of vehicle to pull over position is smaller than  
+  // this value in "PullOverStageRetryApproachParking" stage, the stage can be 
+  // considered as finished
+  optional double max_valid_stop_distance = 9 [default = 1.0];
+  // Stop distance for modifying the stop position of openspace parking
+  optional double s_distance_to_stop_for_open_space_parking = 10
+      [default = 7.0];
+}

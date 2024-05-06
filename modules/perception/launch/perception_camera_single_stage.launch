@@ -1,0 +1,12 @@
+<cyber>
+    <desc>Apollo camera 2d object detection</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>camera</name>
+        <dag_conf>/apollo/modules/perception/camera_detection_single_stage/dag/camera_detection_single_stage.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/camera_tracking/dag/camera_tracking.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag</dag_conf>
+        <process_name>camera</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

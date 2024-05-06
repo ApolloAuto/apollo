@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.drivers.gnss.config;
 
+import "modules/common_msgs/drivers_msgs/can_card_parameter.proto";
+
 message Stream {
   enum Format {
     UNKNOWN = 0;
@@ -12,8 +14,17 @@ message Stream {
     NOVATEL_TEXT = 10;
     NOVATEL_BINARY = 11;
 
+    HUACE_TEXT = 12;
+    HUACE_CAN = 13;
+
+    ASENSING_TEXT = 14;
+    ASENSING_BINARY = 15;
+
     UBLOX_TEXT = 20;
     UBLOX_BINARY = 21;
+
+    BROADGNSS_TEXT = 30;
+    BROADGNSS_BINARY = 31;
   }
   optional Format format = 1;
 
@@ -48,8 +59,9 @@ message Stream {
     Tcp tcp = 3;
     Udp udp = 4;
     Ntrip ntrip = 5;
+    apollo.drivers.canbus.CANCardParameter can_card_parameter = 6;
   }
-  optional bool push_location = 6;
+  optional bool push_location = 7;
 }
 
 // Device-specific configuration.

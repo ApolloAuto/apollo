@@ -1,0 +1,19 @@
+camera_name: "CAM_BACK"
+timestamp_offset: 0.0
+plugin_param {
+  name: "BEVObstacleDetector"
+  config_path: "perception/camera_detection_bev/data"
+  config_file: "petr.pb.txt"
+}
+enable_undistortion: false
+gpu_id: 0
+channel {
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_FRONT/image"
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_FRONT_RIGHT/image"
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_FRONT_LEFT/image"
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_BACK/image"
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_BACK_LEFT/image"
+  input_camera_channel_name: "/apollo/sensor/camera/CAM_BACK_RIGHT/image"
+  output_obstacles_channel_name: "/apollo/perception/obstacles"
+}
+frame_id: "LIDAR_TOP"

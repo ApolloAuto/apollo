@@ -21,8 +21,8 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
-#include "cyber/common/log.h"
 
+#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
 
@@ -62,6 +62,23 @@ Box2d::Box2d(const Vec2d &center, const double heading, const double length,
       sin_heading_(sin(heading)) {
   CHECK_GT(length_, -kMathEpsilon);
   CHECK_GT(width_, -kMathEpsilon);
+  InitCorners();
+}
+
+Box2d::Box2d(const Vec2d &point, double heading, double front_length,
+             double back_length, double width)
+    : length_(front_length + back_length),
+      width_(width),
+      half_length_(length_ / 2.0),
+      half_width_(width / 2.0),
+      heading_(heading),
+      cos_heading_(cos(heading)),
+      sin_heading_(sin(heading)) {
+  CHECK_GT(length_, -kMathEpsilon);
+  CHECK_GT(width_, -kMathEpsilon);
+  double delta_length = (front_length - back_length) / 2.0;
+  center_ = Vec2d(point.x() + cos_heading_ * delta_length,
+                  point.y() + sin_heading_ * delta_length);
   InitCorners();
 }
 
@@ -127,7 +144,7 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   *corners = corners_;
 }
 
-std::vector<Vec2d> Box2d::GetAllCorners() const { return corners_; }
+const std::vector<Vec2d> &Box2d::GetAllCorners() const { return corners_; }
 
 bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
@@ -174,7 +191,54 @@ bool Box2d::HasOverlap(const LineSegment2d &line_segment) const {
       std::fmin(line_segment.start().y(), line_segment.end().y()) > max_y()) {
     return false;
   }
-  return DistanceTo(line_segment) <= kMathEpsilon;
+  // Construct coordinate system with origin point as left_bottom corner of
+  // Box2d, y axis along direction of heading.
+  Vec2d x_axis(sin_heading_, -cos_heading_);
+  Vec2d y_axis(cos_heading_, sin_heading_);
+  // corners_[2] is the left bottom point of the box.
+  Vec2d start_v = line_segment.start() - corners_[2];
+  // "start_point" is the start point of "line_segment" mapped in the new
+  // coordinate system.
+  Vec2d start_point(start_v.InnerProd(x_axis), start_v.InnerProd(y_axis));
+  // Check if "start_point" is inside the box.
+  if (is_inside_rectangle(start_point)) {
+    return true;
+  }
+  // Check if "end_point" is inside the box.
+  Vec2d end_v = line_segment.end() - corners_[2];
+  Vec2d end_point(end_v.InnerProd(x_axis), end_v.InnerProd(y_axis));
+  if (is_inside_rectangle(end_point)) {
+    return true;
+  }
+  // Exclude the case when the 2 points of "line_segment" are at the same side
+  // of rectangle.
+  if ((start_point.x() < 0.0) && (end_point.x() < 0.0)) {
+    return false;
+  }
+  if ((start_point.y() < 0.0) && (end_point.y() < 0.0)) {
+    return false;
+  }
+  if ((start_point.x() > width_) && (end_point.x() > width_)) {
+    return false;
+  }
+  if ((start_point.y() > length_) && (end_point.y() > length_)) {
+    return false;
+  }
+  // Check if "line_segment" intersects with box.
+  Vec2d line_direction = line_segment.end() - line_segment.start();
+  Vec2d normal_vec(line_direction.y(), -line_direction.x());
+  Vec2d p1 = center_ - line_segment.start();
+  Vec2d diagonal_vec = center_ - corners_[0];
+  // if project_p1 < projection of diagonal, "line_segment" intersects with box.
+  double project_p1 = fabs(p1.InnerProd(normal_vec));
+  if (fabs(diagonal_vec.InnerProd(normal_vec)) >= project_p1) {
+    return true;
+  }
+  diagonal_vec = center_ - corners_[1];
+  if (fabs(diagonal_vec.InnerProd(normal_vec)) >= project_p1) {
+    return true;
+  }
+  return false;
 }
 
 double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
@@ -328,7 +392,15 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
 
 void Box2d::Shift(const Vec2d &shift_vec) {
   center_ += shift_vec;
-  InitCorners();
+  for (size_t i = 0; i < 4; ++i) {
+    corners_[i] += shift_vec;
+  }
+  for (auto &corner : corners_) {
+    max_x_ = std::fmax(corner.x(), max_x_);
+    min_x_ = std::fmin(corner.x(), min_x_);
+    max_y_ = std::fmax(corner.y(), max_y_);
+    min_y_ = std::fmin(corner.y(), min_y_);
+  }
 }
 
 void Box2d::LongitudinalExtend(const double extension_length) {

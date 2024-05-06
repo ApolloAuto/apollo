@@ -1,0 +1,48 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+
+message LaneWaypoint {
+  optional string id = 1;
+  optional double s = 2;
+  optional apollo.common.PointENU pose = 3;
+  // When the developer selects a point on the dreamview route editing
+  // the direction can be specified by dragging the mouse
+  // dreamview calculates the heading based on this to support construct lane way point with heading
+  optional double heading = 4;
+}
+
+message LaneSegment {
+  optional string id = 1;
+  optional double start_s = 2;
+  optional double end_s = 3;
+}
+
+enum DeadEndRoutingType {
+  ROUTING_OTHER = 0;
+  ROUTING_IN = 1;
+  ROUTING_OUT = 2;
+}
+
+message Measurement {
+  optional double distance = 1;
+}
+
+enum ChangeLaneType {
+  FORWARD = 0;
+  LEFT = 1;
+  RIGHT = 2;
+};
+
+message Passage {
+  repeated LaneSegment segment = 1;
+  optional bool can_exit = 2;
+  optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
+}
+
+message RoadSegment {
+  optional string id = 1;
+  repeated Passage passage = 2;
+}

@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.perception.camera.denseline;
+
+message DenselineParam {
+  optional ModelParam model_param = 1;
+  optional NetworkParam net_param = 2;
+  optional int32 gpu_id = 3;
+  optional string camera_name = 4;
+}
+
+message ModelParam {
+  optional string model_name = 1 [default = "denseline"];
+  optional string proto_file = 2 [default = "caffe.pt"];
+  optional string weight_file = 3 [default = "caffe.model"];
+  optional float resize_scale = 4 [default = 1.0];
+  optional uint32 input_offset_y = 5 [default = 0];
+  optional uint32 input_offset_x = 6 [default = 0];
+  optional uint32 crop_height = 7 [default = 512];
+  optional uint32 crop_width = 8 [default = 512];
+  optional uint32 mean_b = 9 [default = 95];
+  optional uint32 mean_g = 10 [default = 99];
+  optional uint32 mean_r = 11 [default = 96];
+  optional bool is_bgr = 12 [default = true];
+  optional string model_type = 13 [default = "RTNet"];
+}
+
+message NetworkParam {
+  optional string in_blob = 1 [default = "data"];
+  optional string out_blob = 2 [default = "conv_out"];
+  repeated string internal_blob_int8 = 3;
+}

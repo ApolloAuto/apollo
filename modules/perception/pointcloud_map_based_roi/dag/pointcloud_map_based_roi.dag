@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/pointcloud_map_based_roi/libpointcloud_map_based_roi_component.so"
+  components {
+    class_name : "PointCloudMapROIComponent"
+    config {
+      name : "PointCloudMapROI"
+      config_file_path : "/apollo/modules/perception/pointcloud_map_based_roi/conf/pointcloud_map_based_roi_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/pointcloud_preprocess"
+      }
+    }
+  }
+}

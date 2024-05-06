@@ -24,7 +24,7 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import google.protobuf.text_format as text_format
 
-from modules.prediction.proto import feature_pb2
+from modules.common_msgs.prediction_msgs import feature_pb2
 from modules.prediction.proto import offline_features_pb2
 
 

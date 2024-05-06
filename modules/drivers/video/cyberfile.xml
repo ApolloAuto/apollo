@@ -1,0 +1,46 @@
+<package format="2">
+  <name>drivers-video</name>
+  <version>local</version>
+  <description>
+    Apollo drivers module.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend type="binary" repo_name="transform" lib_names="transform">transform</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="proj">3rd-proj</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_github_jbeder_yaml_cpp" lib_names="yaml-cpp">3rd-yaml-cpp</depend>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend repo_name="opencv" lib_names="core,highgui,imgproc,imgcodecs">3rd-opencv</depend>
+  <depend repo_name="can_card_library" lib_names="hermes_can" type="binary">3rd-can-card-library</depend>
+  <depend repo_name="camera_library_dev" lib_names="smartereye" type="binary">3rd-camera-library</depend>
+  <depend repo_name="3rd-rtklib" lib_names="3rd-rtklib" type="binary">3rd-rtklib</depend>
+  <depend repo_name="portaudio">3rd-portaudio</depend>
+  <depend repo_name="ffmpeg" lib_names="avcodec,avformat,swscale,avutil">3rd-ffmpeg</depend>
+  <depend repo_name="adv_plat" lib_names="adv_plat">3rd-adv-plat</depend>
+
+  <depend expose="False">3rd-pcl</depend>
+  <depend>libpcap-dev</depend>
+
+  <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/drivers/video</src_path>
+
+</package>

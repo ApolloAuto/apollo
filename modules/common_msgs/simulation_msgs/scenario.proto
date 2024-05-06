@@ -1,0 +1,128 @@
+syntax = "proto2";
+
+package apollo.simulation;
+
+import "modules/common_msgs/simulation_msgs/agent.proto";
+import "modules/common_msgs/simulation_msgs/grading_metric.proto";
+
+import "modules/common_msgs/perception_msgs/traffic_light_detection.proto";
+import "modules/common_msgs/planning_msgs/pad_msg.proto";
+import "modules/common_msgs/routing_msgs/routing.proto";
+
+message FuzzingConfig {}
+
+message DriveActionConfig {
+  optional apollo.planning.PadMessage.DrivingAction drive_action = 1 [default = NONE];
+  optional double trigger_time = 2 [default = 0.0];
+}
+
+message Scenario {
+  optional string name = 1;
+  optional string description = 2;
+
+  message Point {
+    optional double x = 1;
+    optional double y = 2;
+    optional double heading = 3;
+    // TODO: add lane-id and ratio.
+  }
+  // Only use in WorldSim.
+  optional Point start = 3;
+  optional Point end = 4;
+  optional Point parking_point = 5;
+
+  // Only use in LogSim
+  repeated string origin_log_file_path = 6;
+  optional double log_file_start_time = 7;
+  optional double log_file_end_time = 8;
+
+  // This is used if 1) the logsim bag does not contain one.
+  // 2) the worldsim has different start pose for routing and ego car.
+  optional apollo.routing.RoutingRequest routing_request = 9;
+
+  // map dir, only used in offline env
+  optional string map_dir = 10;
+
+  // metric specific to the scenario.
+  optional GradingConfig grade_config = 11;
+
+  // agent type
+  repeated AgentConfig agent = 12;
+  // a sequence of driving actions
+  repeated DriveActionConfig drive_action_config = 13;
+  optional FuzzingConfig fuzzing_config = 14;
+
+  // Only use in WorldSim. Max time before stop running the scenario.
+  optional int32 simulator_time = 15;
+
+  // Initial velocity and acceleration of the main vehicle
+  optional double start_velocity = 16 [default = 0.0];
+  optional double start_acceleration = 17 [default = 0.0];
+
+  // file path to its base metric config
+  optional string base_grade_config_file = 18;
+
+  // Traffic light detection distance.
+  optional double detect_distance = 19 [default = 120.0];
+
+  enum DefaultLightBehavior {
+    ALWAYS_GREEN = 0;
+    CYCLICAL = 1;  // Traffic lights change by red -> green -> yellow cycles.
+  }
+  optional DefaultLightBehavior default_light_behavior = 20
+      [default = ALWAYS_GREEN];
+  optional double red_time = 21 [default = 15.0];
+  optional double green_time = 22 [default = 13.0];
+  optional double yellow_time = 23 [default = 3.0];
+
+  message TL {
+    optional string id = 1;
+    message Location {
+      optional double x = 1;
+      optional double y = 2;
+      optional double z = 3;
+    }
+    optional Location location = 2;
+
+    enum TriggerType {
+      NA = 0;  // The traffic light will stay in initial_state.
+      DISTANCE = 1;
+      TIME = 2;
+    }
+    optional TriggerType trigger_type = 3 [default = NA];
+    // Trigger Distance or Trigger Time
+    optional double trigger_value = 4 [default = 30.0];
+
+    message State {
+      optional apollo.perception.TrafficLight.Color color = 1 [default = GREEN];
+      optional bool blink = 2 [default = false];
+      optional double keep_time = 3 [default = 10.0];
+    }
+    optional State initial_state = 5;
+    repeated State state_group = 6;
+  }
+  // The overriden traffic lights behavior
+  repeated TL traffic_lights = 24;
+
+  // The scenario should be run in one of the modes.
+  enum Mode {
+    WORLDSIM = 0;
+    LOGSIM = 1;
+    LOGSIM_CONTROL = 2;
+    LOGSIM_PERCEPTION = 3;
+  }
+  optional Mode mode = 25 [default = WORLDSIM];
+
+  repeated string select_default_metric = 26;
+  repeated string deselect_default_metric = 27;
+
+  // The backtrack time to start running perfect_control once a disengage is
+  // detected.
+  optional double backtrack_time = 28 [default = 1.0];
+
+  // Only use in LogSim
+  optional string vehicle = 29;
+
+  // Only use in worldsim for special scenario conf use multi agent server
+  optional bool traffic_flow = 30 [default = false];
+}

@@ -28,9 +28,9 @@ import time
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3.record import RecordReader
-from modules.canbus.proto import chassis_pb2
-from modules.canbus.proto.chassis_pb2 import Chassis
-from modules.localization.proto import localization_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.chassis_msgs.chassis_pb2 import Chassis
+from modules.common_msgs.localization_msgs import localization_pb2
 
 BUMP_TIME_THRESHOLD = 3
 ACCELERATE_TIME_THRESHOLD = 1

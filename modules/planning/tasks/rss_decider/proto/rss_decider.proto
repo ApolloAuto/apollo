@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// RssDeciderConfig
+
+message RssDeciderConfig {
+  // trigger rss fallback
+  optional bool enable_rss_fallback = 1 [default = false];
+  // (unit: meter) for max front obstacle distance.
+  optional double rss_max_front_obstacle_distance = 2 [default = 3000.0];
+}

@@ -16,9 +16,10 @@
 
 #include "modules/canbus/canbus_component.h"
 
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/common/file.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -26,7 +27,9 @@
 using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
 using apollo::cyber::Time;
+using apollo::cyber::class_loader::ClassLoader;
 using apollo::drivers::canbus::CanClientFactory;
+using apollo::external_command::ChassisCommand;
 using apollo::guardian::GuardianCommand;
 
 namespace apollo {
@@ -43,66 +46,32 @@ bool CanbusComponent::Init() {
     AERROR << "Unable to load canbus conf file: " << ConfigFilePath();
     return false;
   }
-
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
-  // Init can client
-  auto can_factory = CanClientFactory::Instance();
-  can_factory->RegisterCanClients();
-  can_client_ = can_factory->CreateCANClient(canbus_conf_.can_card_parameter());
-  if (!can_client_) {
-    AERROR << "Failed to create can client.";
+  if (!apollo::cyber::common::PathExists(FLAGS_load_vehicle_library)) {
+    AERROR << FLAGS_load_vehicle_library << " No such vehicle library";
     return false;
   }
-  AINFO << "Can client is successfully created.";
+  AINFO << "Load the vehicle factory library: " << FLAGS_load_vehicle_library;
 
-  VehicleFactory vehicle_factory;
-  vehicle_factory.RegisterVehicleFactory();
-  auto vehicle_object =
-      vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
+  ClassLoader loader(FLAGS_load_vehicle_library);
+  auto vehicle_object = loader.CreateClassObj<AbstractVehicleFactory>(
+      FLAGS_load_vehicle_class_name);
   if (!vehicle_object) {
-    AERROR << "Failed to create vehicle:";
+    AERROR << "Failed to create the vehicle factory: "
+           << FLAGS_load_vehicle_class_name;
     return false;
   }
+  AINFO << "Successfully create vehicle factory: "
+        << FLAGS_load_vehicle_class_name;
 
-  message_manager_ = vehicle_object->CreateMessageManager();
-  if (message_manager_ == nullptr) {
-    AERROR << "Failed to create message manager.";
+  vehicle_object_ = vehicle_object;
+  if (!vehicle_object_->Init(&canbus_conf_)) {
+    AERROR << "Fail to init vehicle factory.";
     return false;
   }
-  AINFO << "Message manager is successfully created.";
-
-  if (can_receiver_.Init(can_client_.get(), message_manager_.get(),
-                         canbus_conf_.enable_receiver_log()) != ErrorCode::OK) {
-    AERROR << "Failed to init can receiver.";
-    return false;
-  }
-  AINFO << "The can receiver is successfully initialized.";
-
-  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) !=
-      ErrorCode::OK) {
-    AERROR << "Failed to init can sender.";
-    return false;
-  }
-  AINFO << "The can sender is successfully initialized.";
-
-  vehicle_controller_ = vehicle_object->CreateVehicleController();
-  if (vehicle_controller_ == nullptr) {
-    AERROR << "Failed to create vehicle controller.";
-    return false;
-  }
-  AINFO << "The vehicle controller is successfully created.";
-
-  if (vehicle_controller_->Init(canbus_conf_.vehicle_parameter(), &can_sender_,
-                                message_manager_.get()) != ErrorCode::OK) {
-    AERROR << "Failed to init vehicle controller.";
-    return false;
-  }
-
-  AINFO << "The vehicle controller is successfully"
-        << " initialized with canbus conf as : "
-        << canbus_conf_.vehicle_parameter().ShortDebugString();
+  AINFO << "Vehicle factory is successfully initialized.";
 
   cyber::ReaderConfig guardian_cmd_reader_config;
   guardian_cmd_reader_config.channel_name = FLAGS_guardian_topic;
@@ -112,6 +81,11 @@ bool CanbusComponent::Init() {
   cyber::ReaderConfig control_cmd_reader_config;
   control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
   control_cmd_reader_config.pending_queue_size =
+      FLAGS_control_cmd_pending_queue_size;
+
+  cyber::ReaderConfig chassis_cmd_reader_config;
+  chassis_cmd_reader_config.channel_name = FLAGS_chassis_command_topic;
+  chassis_cmd_reader_config.pending_queue_size =
       FLAGS_control_cmd_pending_queue_size;
 
   if (FLAGS_receive_guardian) {
@@ -128,38 +102,24 @@ bool CanbusComponent::Init() {
           ADEBUG << "Received control data: run canbus callback.";
           OnControlCommand(*cmd);
         });
+    chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
+        chassis_cmd_reader_config,
+        [this](const std::shared_ptr<ChassisCommand> &cmd) {
+          ADEBUG << "Received control data: run canbus callback.";
+          OnChassisCommand(*cmd);
+        });
   }
 
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 
-  chassis_detail_writer_ =
-      node_->CreateWriter<ChassisDetail>(FLAGS_chassis_detail_topic);
-
-  // 1. init and start the can card hardware
-  if (can_client_->Start() != ErrorCode::OK) {
-    AERROR << "Failed to start can client";
+  if (!vehicle_object_->Start()) {
+    AERROR << "Fail to start canclient, cansender, canreceiver, canclient, "
+              "vehicle controller.";
+    Clear();
     return false;
   }
-  AINFO << "Can client is started.";
-
-  // 2. start receive first then send
-  if (can_receiver_.Start() != ErrorCode::OK) {
-    AERROR << "Failed to start can receiver.";
-    return false;
-  }
-  AINFO << "Can receiver is started.";
-
-  // 3. start send
-  if (can_sender_.Start() != ErrorCode::OK) {
-    AERROR << "Failed to start can sender.";
-    return false;
-  }
-
-  // 4. start controller
-  if (!vehicle_controller_->Start()) {
-    AERROR << "Failed to start vehicle controller.";
-    return false;
-  }
+  AINFO << "Start canclient cansender, canreceiver, canclient, vehicle "
+           "controller successfully.";
 
   monitor_logger_buffer_.INFO("Canbus is started.");
 
@@ -167,32 +127,23 @@ bool CanbusComponent::Init() {
 }
 
 void CanbusComponent::Clear() {
-  can_sender_.Stop();
-  can_receiver_.Stop();
-  can_client_->Stop();
-  vehicle_controller_->Stop();
+  vehicle_object_->Stop();
   AINFO << "Cleanup Canbus component";
 }
 
 void CanbusComponent::PublishChassis() {
-  Chassis chassis = vehicle_controller_->chassis();
+  Chassis chassis = vehicle_object_->publish_chassis();
   common::util::FillHeader(node_->Name(), &chassis);
   chassis_writer_->Write(chassis);
   ADEBUG << chassis.ShortDebugString();
 }
 
-void CanbusComponent::PublishChassisDetail() {
-  ChassisDetail chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
-  chassis_detail_writer_->Write(chassis_detail);
-}
-
 bool CanbusComponent::Proc() {
   PublishChassis();
   if (FLAGS_enable_chassis_detail_pub) {
-    PublishChassisDetail();
+    vehicle_object_->PublishChassisDetail();
   }
+  vehicle_object_->UpdateHeartbeat();
   return true;
 }
 
@@ -215,12 +166,29 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
                                      1e6)
          << " micro seconds";
 
-  if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
-    AERROR << "Failed to process callback function OnControlCommand because "
-              "vehicle_controller_->Update error.";
+  vehicle_object_->UpdateCommand(&control_command);
+}
+
+void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
+  int64_t current_timestamp = Time::Now().ToMicrosecond();
+  // if command coming too soon, just ignore it.
+  if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
+    ADEBUG << "Control command comes too soon. Ignore.\n Required "
+              "FLAGS_min_cmd_interval["
+           << FLAGS_min_cmd_interval << "], actual time interval["
+           << current_timestamp - last_timestamp_ << "].";
     return;
   }
-  can_sender_.Update();
+
+  last_timestamp_ = current_timestamp;
+  ADEBUG << "Control_sequence_number:"
+         << chassis_command.header().sequence_num() << ", Time_of_delay:"
+         << current_timestamp -
+                static_cast<int64_t>(chassis_command.header().timestamp_sec() *
+                                     1e6)
+         << " micro seconds";
+
+  vehicle_object_->UpdateCommand(&chassis_command);
 }
 
 void CanbusComponent::OnGuardianCommand(

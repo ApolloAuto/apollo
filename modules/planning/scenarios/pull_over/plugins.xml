@@ -1,0 +1,6 @@
+<library path="modules/planning/scenarios/pull_over/libpull_over_scenario.so">
+    <class type="apollo::planning::PullOverScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::PullOverStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::PullOverStageRetryApproachParking" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::PullOverStageRetryParking" base_class="apollo::planning::Stage"></class>
+</library>

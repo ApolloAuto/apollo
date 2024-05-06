@@ -1,0 +1,106 @@
+/* overrides for doxygen default styles and doxygen-awesome-css styles */
+html {
+  --side-nav-arrow-opacity: 0.9;
+  --side-nav-arrow-hover-opacity: 0.9;
+}
+
+#nav-sync {
+  display: none;
+}
+
+/*
+.contents table td img {
+  max-width: inherit;
+}
+*/
+
+div.contents,
+div.header .title,
+div.header .summary {
+  max-width: 90%;
+}
+
+.contents table {
+  padding: 1px;
+  border-collapse: collapse;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.contents tbody {
+  display: inline-block;
+  max-width: 100%;
+  border: none;
+  margin: var(--spacing-medium) 0;
+  box-shadow: 0 0 0 1px var(--separator-color);
+  border-radius: var(--border-radius-small);
+}
+.contents tbody tr {
+  border-bottom: 1px solid var(--separator-color);
+}
+.contents table th {
+  border: 1px solid var(--separator-color);
+  padding: var(--spacing-small) var(--spacing-medium);
+}
+.contents tr:first-child th {
+  border-top: none;
+}
+.contents th:first-child,
+.contents td:first-child {
+  border-left: none;
+}
+.contents th:last-child,
+.contents td:last-child {
+  border-right: none;
+}
+.contents tr:last-child td {
+  border-bottom: none;
+}
+.contents tr:last-child {
+  border-bottom: none;
+}
+.contents table td {
+  border: 1px solid var(--separator-color);
+  padding: var(--spacing-small) var(--spacing-medium);
+}
+
+.contents tbody tr:nth-child(odd) {
+  background-color: #eff4ff;
+}
+.contents tbody tr:nth-child(even) {
+  background-color: #f0fff0;
+}
+.contents tbody tr:first-child {
+  background-color: #f1f1f1;
+}
+
+/* image-preview plugin */
+.image-preview-modal {
+  display: none;
+  z-index: 10000;
+}
+
+.image-preview-modal-container {
+  margin: auto;
+  padding-top: 5%;
+  width: 50%;
+  height: 80%;
+  z-index: 10000;
+}
+
+.image-preview-modal-image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  padding: 10px;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 2px 6px rgb(0, 0, 0, 0.2), 0 10px 20px rgb(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid white;
+  background: white;
+}
+.contents img:hover {
+  cursor: zoom-in;
+}

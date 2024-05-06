@@ -1,0 +1,2 @@
+start_traffic_light_scenario_distance: 5.0
+max_valid_stop_distance: 2.0

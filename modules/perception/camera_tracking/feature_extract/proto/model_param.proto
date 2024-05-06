@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.camera.tracking_feature;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional float offset_ratio = 3 [default = 0.288889];
+}

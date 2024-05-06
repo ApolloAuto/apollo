@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message StrategyFilterConfig {
+  optional bool is_merge_inclusive = 1 [default = true];
+  optional float expand_bbox_dist = 2 [default = 0.2];
+  optional bool allow_fore_merge = 3 [default = true];
+}

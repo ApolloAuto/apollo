@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioBareIntersectionUnprotectedConfig {
+  optional double start_bare_intersection_scenario_distance = 1
+      [default = 25.0];  // meter
+  // explicit stop while waiting
+  optional bool enable_explicit_stop = 2 [default = false];
+  // The cruise speed desired when approaching the intersection
+  optional double approach_cruise_speed = 3 [default = 6.7056];  // m/s (15 mph)
+  // Distance of stopping point to the start point of intersection
+  optional double stop_distance = 4 [default = 0.5];             // meter
+}

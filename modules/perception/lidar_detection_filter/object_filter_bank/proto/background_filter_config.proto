@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message BackgroundFilterConfig {
+  optional double outside_roi_filter_distance = 1 [default = 0.0];
+}

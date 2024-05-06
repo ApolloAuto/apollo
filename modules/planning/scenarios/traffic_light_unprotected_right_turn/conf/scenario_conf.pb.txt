@@ -1,0 +1,12 @@
+start_traffic_light_scenario_distance: 5.0
+enable_right_turn_on_red: false
+max_valid_stop_distance: 2.0
+min_pass_s_distance: 3.0
+red_light_right_turn_stop_duration_sec: 3.0
+creep_timeout_sec: 10.0
+max_adc_speed_before_creep: 3.0
+creep_stage_config {
+    min_boundary_t: 6.0
+    ignore_max_st_min_t: 0.1
+    ignore_min_st_min_s: 15.0
+}

@@ -1,0 +1,28 @@
+<package format="2">
+  <name>third-party-perception</name>
+  <version>local</version>
+  <description>
+    In Apollo 2.5, the third_party_perception module incorporates third-party sensors like Mobileye and Conti/Delphi Radar
+    output with simple fusion and creates a similar perception output produced as obstacle/lane detection information as defined in
+    [Perception Obstacles Interface](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/proto/perception_obstacle.proto).
+    This module was only intend to serve for the Prediction/Planning/Control algorithm in real vehicle before perception modules fully ready before 2.5. We recommend using 'modules/perception' instead for your own test purpose after Apollo 2.5 officially released.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/third_party_perception</src_path>
+
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend>bazel-extend-tools</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+
+</package>

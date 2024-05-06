@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+
+message LidarConfigBase {
+  enum SourceType {
+    ONLINE_LIDAR = 0;
+    RAW_PACKET = 1;
+  }
+  required string scan_channel = 1;
+  required string point_cloud_channel = 2;
+  required string frame_id = 3;
+  required SourceType source_type = 4;
+  optional int32 buffer_size = 5 [default = 10];
+
+}

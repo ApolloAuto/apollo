@@ -1,0 +1,78 @@
+delta_t : 0.5
+near_destination_threshold : 0.05
+
+roi_config : {
+  roi_longitudinal_range_start : 15.0
+  roi_longitudinal_range_end : 15.0
+  parking_start_range : 12.0
+  parking_inwards : false
+}
+
+warm_start_config : {
+  xy_grid_resolution : 0.3
+  phi_grid_resolution : 0.1
+  next_node_num : 10
+  step_size : 0.5
+  traj_forward_penalty : 1.0
+  traj_back_penalty : 1.0
+  traj_gear_switch_penalty : 10.0
+  traj_steer_penalty : 0.0
+  traj_steer_change_penalty : 0.0
+  grid_a_star_xy_resolution : 1.0
+  node_radius : 0.5
+}
+
+dual_variable_warm_start_config : {
+  weight_d : 1.0
+  ipopt_config : {
+    ipopt_print_level : 0
+    mumps_mem_percent : 6000
+    mumps_pivtol : 1e-6
+    ipopt_max_iter : 100
+    ipopt_tol : 1e-5
+    ipopt_acceptable_constr_viol_tol : 1e-1
+    ipopt_min_hessian_perturbation : 1e-12
+    ipopt_jacobian_regularization_value : 1e-7
+    ipopt_print_timing_statistics : "yes"
+    ipopt_alpha_for_y : "min"
+    ipopt_recalc_y : "yes"
+  }
+  qp_format: OSQP
+  min_safety_distance: 0.0
+}
+
+distance_approach_config : {
+  weight_steer : 0.0
+  weight_a : 0.0
+  weight_steer_rate : 0.02
+  weight_a_rate : 0.02
+  weight_x : 1.0
+  weight_y : 1.0
+  weight_phi : 2.0
+  weight_v : 0.0
+  weight_steer_stitching : 0.02
+  weight_a_stitching : 0.02
+  weight_first_order_time : 8.0
+  weight_second_order_time : 16.0
+  min_safety_distance : 0.0
+  max_speed_forward : 2.0
+  max_speed_reverse : 1.0
+  max_acceleration_forward : 2.0
+  max_acceleration_reverse : 1.0
+  min_time_sample_scaling : 0.8
+  max_time_sample_scaling : 1.2
+  use_fix_time : false
+  ipopt_config : {
+    ipopt_print_level : 0
+    mumps_mem_percent : 6000
+    mumps_pivtol : 1e-6
+    ipopt_max_iter : 1000
+    ipopt_tol : 1e-4
+    ipopt_acceptable_constr_viol_tol : 1e-1
+    ipopt_min_hessian_perturbation : 1e-12
+    ipopt_jacobian_regularization_value : 1e-7
+    ipopt_print_timing_statistics : "yes"
+    ipopt_alpha_for_y : "min"
+    ipopt_recalc_y : "yes"
+  }
+}

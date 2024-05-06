@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
+
+enum ParkingSpaceType {
+  VERTICAL_PLOT = 0;
+  PARALLEL_PARKING = 1;
+}
+
+message ParkingInfo {
+  optional string parking_space_id = 1;
+  optional apollo.common.PointENU parking_point = 2;
+  optional ParkingSpaceType parking_space_type = 3;
+  // The four corner points are in order.
+  optional apollo.hdmap.Polygon corner_point = 4;
+}
+
+message Landmark {
+  optional string name = 1;
+  repeated LaneWaypoint waypoint = 2;
+  optional string parking_space_id = 3 [deprecated = true];
+  optional apollo.routing.ParkingInfo parking_info = 4;
+  optional int32 cycle_number = 5;
+}
+
+message POI {
+  repeated Landmark landmark = 1;
+}

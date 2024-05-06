@@ -1,46 +1,49 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "py_files",
-    srcs = glob([
-        "*.py",
-    ]),
-)
+# filegroup(
+#     name = "py_files",
+#     srcs = glob([
+#         "*.py",
+#     ]),
+# )
 
-py_library(
+apollo_py_library(
     name = "logger",
     srcs = ["logger.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "message_manager",
     srcs = ["message_manager.py"],
     deps = [
         ":proto_utils",
-        "//modules/audio/proto:audio_event_py_pb2",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:drive_event_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
-        "//modules/guardian/proto:guardian_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/map/relative_map/proto:navigation_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
-        "//modules/planning/proto:planning_internal_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
-        "//modules/prediction/proto:prediction_obstacle_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
+        "//modules/common_msgs/audio_msgs:audio_event_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/basic_msgs:drive_event_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
+        "//modules/common_msgs/guardian_msgs:guardian_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
+        "//modules/common_msgs/planning_msgs:navigation_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_internal_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "proto_utils",
     srcs = ["proto_utils.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "file_utils",
     srcs = ["file_utils.py"],
 )
+
+apollo_package()

@@ -26,7 +26,7 @@
 #include "cyber/time/time.h"
 
 #include "modules/common/util/lru_cache.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 namespace apollo {

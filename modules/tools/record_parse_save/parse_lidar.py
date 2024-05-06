@@ -31,7 +31,7 @@ import sys
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import record
-from modules.drivers.proto.pointcloud_pb2 import PointCloud
+from modules.common_msgs.sensor_msgs.pointcloud_pb2 import PointCloud
 
 
 def parse_data(channelname, msg, out_folder):

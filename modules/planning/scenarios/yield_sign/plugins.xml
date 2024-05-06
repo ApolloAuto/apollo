@@ -1,0 +1,5 @@
+<library path="modules/planning/scenarios/yield_sign/libyield_sign_scenario.so">
+    <class type="apollo::planning::YieldSignScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::YieldSignStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::YieldSignStageCreep" base_class="apollo::planning::Stage"></class>
+</library>

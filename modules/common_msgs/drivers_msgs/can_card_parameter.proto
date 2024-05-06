@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+package apollo.drivers.canbus;
+
+message CANCardParameter {
+  enum CANCardBrand {
+    FAKE_CAN = 0;
+    ESD_CAN = 1;
+    SOCKET_CAN_RAW = 2;
+    HERMES_CAN = 3;
+  }
+
+  enum CANCardType {
+    PCI_CARD = 0;
+    USB_CARD = 1;
+  }
+
+  enum CANChannelId {
+    CHANNEL_ID_ZERO = 0;
+    CHANNEL_ID_ONE = 1;
+    CHANNEL_ID_TWO = 2;
+    CHANNEL_ID_THREE = 3;
+    CHANNEL_ID_FOUR = 4;
+    CHANNEL_ID_FIVE = 5;
+    CHANNEL_ID_SIX = 6;
+    CHANNEL_ID_SEVEN = 7;
+  }
+
+  enum CANInterface {
+    NATIVE = 0;
+    VIRTUAL = 1;
+    SLCAN = 2;
+  }
+
+  enum HERMES_BAUDRATE {
+    BCAN_BAUDRATE_1M = 0;
+    BCAN_BAUDRATE_500K = 1;
+    BCAN_BAUDRATE_250K = 2;
+    BCAN_BAUDRATE_150K = 3;
+    BCAN_BAUDRATE_NUM = 4;
+  }
+
+  // CAN卡驱动类型配置 | 根据所用的CAN卡硬件型号或驱动类型配置
+  optional CANCardBrand brand = 1;
+  // CAN卡硬件接口类型配置 | 根据所用的CAN卡硬件接口类型或驱动类型配置
+  optional CANCardType type = 2;
+  // CAN卡端口号配置 | 根据所连接的CAN卡端口号配置
+  optional CANChannelId channel_id = 3;
+  // CAN卡软件接口配置 | 默认配置为NATIVE
+  optional CANInterface interface = 4;
+  // CAN卡端口数量配置 | 默认数量为4，最多支持8个，默认可不配置
+  optional uint32 num_ports = 5 [default = 4];
+  // HERMES CAN卡波特率配置 | 只针对选择HERMES CAN卡时设置波特率，默认不配置
+  optional HERMES_BAUDRATE hermes_baudrate = 6 [default = BCAN_BAUDRATE_500K];
+}

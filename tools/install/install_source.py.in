@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+"""
+Installation script generated from a Bazel `install` target.
+"""
+
+import argparse
+import collections
+import filecmp
+import time
+import itertools
+import os
+import re
+import shutil
+import stat
+import sys
+from subprocess import check_output, check_call, Popen, PIPE
+import xml.etree.ElementTree as ET
+
+prefix = None
+pkg_name = None
+# dbg = False
+# gpu = False
+# dev = True
+
+# Stores result of `--list` argument.
+list_only = False
+
+deprecated_package_prefix = "packages"
+
+src_install_dirs_dict = {}
+remove_path = []
+
+def progressbar(it, length, prefix="", out=sys.stdout,):
+    """get the progressbar output of procedure"""
+    count = length
+    start = time.time()
+    try:
+        size = int(os.get_terminal_size().columns / 4)
+    except:
+        size = 5
+    def show(j):
+        if count == 0:
+            return
+        x = int(size * j / count)
+        remaining = ((time.time() - start) / j) * (count - j)
+        
+        mins, sec = divmod(remaining, 60)
+        time_str = f"{int(mins):02}:{sec:05.2f}"
+        
+        print(f"  {prefix}[{'#'*x}{('.'*(size-x))}] {j}/{count} Est wait {time_str}",
+            end='\r', file=out, flush=True)
+        
+    for i, item in enumerate(it):
+        yield item
+        show(i + 1)
+    # clear last line
+    try:
+        print(" " * os.get_terminal_size().columns, end="\r")
+    except:
+        pass
+
+def is_relative_link(filepath):
+    """Find if a file is a relative link.
+
+    Bazel paths are assumed to always be absolute. If path is not absolute,
+    the file is a link we want to keep.
+
+    If the given `filepath` is not a link, the function returns `None`. If the
+    given `filepath` is a link, the result will depend if the link is absolute
+    or relative. The function is called recursively. If the result is not a
+    link, `None` is returned. If the link is relative, the relative link is
+    returned.
+    """
+    if os.path.islink(filepath):
+        link = os.readlink(filepath)
+        if not os.path.isabs(link):
+            return link
+        else:
+            return is_relative_link(link)
+    else:
+        return filepath
+
+def process_cmd(cmd, queue):
+    """Execute shell command in concurrency"""
+    pwd = check_output("echo $PWD", shell=True).decode("utf-8")
+    output = check_output(cmd, shell=True).decode("utf-8")
+    return queue.put(output)
+
+def shell_cmd(cmd, alert_on_failure=False):
+    """Execute shell command and return (ret-code, stdout, stderr)."""
+    # print("SHELL > {}".format(cmd))
+    proc = Popen(cmd, shell=True, close_fds=True, stdout=PIPE, stderr=PIPE)
+    ret = proc.wait()
+    stdout = proc.stdout.read().decode('utf-8') if proc.stdout else None
+    stderr = proc.stderr.read().decode('utf-8') if proc.stderr else None
+    if alert_on_failure and stderr and ret != 0:
+        sys.stderr.write('{}\n'.format(stderr))
+    return (ret, stdout, stderr)
+
+
+# def get_pkg_real_name(name, dev=False, dbg=False, gpu=False):
+#     """Get real package name by install parameters"""
+#     new_name = name
+#     if dev:
+#         new_name += "-dev"
+#     return new_name
+
+
+def rename_package_name(dest):
+    """Get packages name from file install destination."""
+    # if not dev and not dbg and not gpu:
+    #     return dest
+    if dest.startswith("lib/"):
+        return dest
+    curr_pkg_name = dest.split("/")[0]
+    # new_pkg_name = get_pkg_real_name(curr_pkg_name, dev, dbg, gpu)
+
+    # Local build package version is fiexed `local`
+    pkg_name_with_ver = curr_pkg_name + "/local"
+
+    return dest.replace(curr_pkg_name, pkg_name_with_ver, 1)
+
+def get_module_name_from_cyberfile(cyberfile_path):
+    if not os.path.exists(cyberfile_path):
+        return None
+    cyberfile = ET.parse(cyberfile_path)
+    root = cyberfile.getroot()
+    src_path = root.find("src_path")
+    if src_path is None:
+        return None
+    pkg_type = root.find("type")
+    if pkg_type is None:
+        return None
+    if pkg_type.text == "module" or pkg_type.text == "module-wrapper":
+        return src_path.text.replace("//", "", 1).replace("/", "\/")
+    return None
+
+
+def replace_config(pkg_module_dict, prefix, config_file):
+    """
+    e.g.
+    1. /apollo/bazel-bin/modules/planning/libplanning_component.so ==> /opt/apollo/neo/packages/planning-dev/latest/lib/libplanning_component.so
+    # 2. /apollo/modules/planning/conf/planning_config_navi.pb.txt ==> /opt/apollo/neo/packages/planning-dev/latest/conf/planning_config_navi.pb.txt
+    # 3. /apollo/modules/planning/dag/planning.dag ==> /opt/apollo/neo/packages/planning-dev/local/dag/planning.dag
+    """
+    for pkg_name, module_name in pkg_module_dict.items():
+        shell_cmd(
+            "sed -i 's/\/apollo\/bazel-bin\/{}\//{}{}\/latest\/lib\//g' {}".format(
+                module_name,
+                prefix.replace("/", "\/") if prefix.endswith("/") else prefix.replace("/", "\/") + "\/",
+                pkg_name,
+                config_file
+            )
+        )
+        #shell_cmd("sed -i 's/\/apollo\/{}\//{}{}\/local\//g' {}".format(module_name, prefix.replace("/", "\/"), pkg_name, config_file))
+
+def replace_config_dir(full_c_d, prefix, pkg_module_dict):
+    if not os.path.exists(full_c_d):
+        return
+    for c in os.listdir(full_c_d):
+        c_f = full_c_d + "/" + c
+        if os.path.isdir(c_f):
+            replace_config_dir(c_f, prefix, pkg_module_dict)
+        elif c_f.endswith(".dag"):
+            replace_config(pkg_module_dict, prefix, c_f)
+        else:
+            continue
+
+def fix_configs_in_pkg():
+    conf_dirs = [
+        "local",
+        # "/local/launch",
+        # "/local/conf"
+    ]
+    pkg_module_dict = {}
+    for d in os.listdir(prefix):
+        pkg_name = d.replace("/", "\/")
+        module_name = get_module_name_from_cyberfile(os.path.join(prefix, d, "local/cyberfile.xml"))
+        if module_name is None:
+            continue
+        pkg_module_dict[pkg_name] = module_name
+
+    for d in os.listdir(prefix):
+        for c_d in conf_dirs:
+            full_c_d = os.path.join(prefix, d, c_d)
+            replace_config_dir(full_c_d, prefix, pkg_module_dict)
+
+
+
+def install_src(src, dst, file_filter, action_type=None):
+    if list_only:
+        return
+    deprecated_flag = False
+    if action_type is None:
+        deprecated_flag = True
+        # deprecated package install logic
+        dst = rename_package_name(dst)
+
+    if not os.path.exists(src) and "__DO_NOT_INSTALL__" in src:
+        remove_path.append(os.path.join(prefix, dst))
+        return
+
+    if not os.path.isdir(src):
+        sys.stderr.write("install_src only support dir, {} is not dir.".format(dst))
+        sys.exit(-1)
+
+    if deprecated_flag:
+        dst_full = os.path.join(prefix, deprecated_package_prefix, dst)
+        if not os.path.exists(dst_full):
+            os.makedirs(dst_full)
+        shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
+            .format(src, file_filter, dst_full))
+    else:
+        global src_install_dirs_dict
+        dst_full = os.path.join(prefix, dst)
+        if file_filter not in src_install_dirs_dict:
+            src_install_dirs_dict[file_filter] = {}
+        src_install_dirs_dict[file_filter][src] = {"dst": dst_full, "pwd": os.getcwd()}
+
+def install_src_file():
+    global src_install_dirs_dict
+
+    for file_filter in src_install_dirs_dict:
+        common_prefix = os.path.commonprefix([src_dir for src_dir in src_install_dirs_dict[file_filter]])
+        if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
+            print("[INFO] can not calculate common prefix, install all", file=sys.stderr)
+            pwd = os.getcwd() 
+            for i in progressbar(src_install_dirs_dict[file_filter], 
+                    len(src_install_dirs_dict[file_filter]), "Install Package Source Code:"):
+                dst_full = src_install_dirs_dict[file_filter][i]["dst"]
+                if not os.path.exists(dst_full):
+                    os.makedirs(dst_full)
+                if file_filter == "*.h":
+                    # prevent header of proto being deleted
+                    shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                        .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))
+                else:
+                    shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                        .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))   
+        else:  
+            pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
+            dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
+            if not os.path.exists(dst_full):
+                os.makedirs(dst_full)
+            if file_filter == "*.h":
+                # prevent header of proto being deleted
+                shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                    .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
+            else:
+                shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                    .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
+
+    for i in remove_path:
+        for root, _, files in os.walk(i):
+            if root != i and os.path.exists(os.path.join(root, "BUILD")):
+                continue
+            for f in files:
+                f = os.path.join(root, f)
+                shell_cmd(f"rm -rf {f}")
+
+
+def main(args):
+    global prefix
+    global pkg_name
+    global list_only
+    # global dbg
+    # global gpu
+    # global dev
+
+    # Set up options.
+    parser = argparse.ArgumentParser()
+    parser.add_argument('prefix', type=str, help='Install prefix')
+
+    parser.add_argument('--pkg_name', type=str, default=None,
+                                    help='Install target package name.')
+    parser.add_argument(
+        '--list', action='store_true', default=False,
+        help='print the list of installed files; do not install anything')
+    # parser.add_argument('--dbg', action='store_true', default=False,
+    #                             help='debug package with debugging symbols.')
+    # parser.add_argument('--gpu', action='store_true', default=False,
+    #                         help='build with gpu.')
+    # parser.add_argument('--dev', action='store_true', default=True,
+    #                         help='dev package with headers.')
+    args = parser.parse_args(args)
+
+    list_only = args.list
+
+    # Get install prefix.
+    prefix = args.prefix
+
+    pkg_name = args.pkg_name
+    # dbg = args.dbg
+    # gpu = args.gpu
+    # dev = True
+
+    # Transform install prefix if DESTDIR is set.
+    # https://www.gnu.org/prep/standards/html_node/DESTDIR.html
+    destdir = os.environ.get('DESTDIR')
+    if destdir:
+        prefix = destdir + prefix
+
+    # Because Bazel executes us in a strange working directory and not the
+    # working directory of the user's shell, enforce that the install
+    # location is an absolute path so that the user is not surprised.
+    if not os.path.isabs(prefix):
+        parser.error("Install prefix must be an absolute path (got '{}')\n".format(prefix))
+
+    # Execute the install actions.
+    <<actions>>
+
+    install_src_file()
+
+    # Fix config path
+    # fix_configs_in_pkg()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

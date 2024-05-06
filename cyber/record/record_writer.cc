@@ -20,11 +20,13 @@
 #include <iostream>
 
 #include "cyber/common/log.h"
+#include "cyber/common/time_conversion.h"
 
 namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::common::UnixSecondsToString;
 using proto::Channel;
 using proto::SingleMessage;
 
@@ -39,9 +41,10 @@ bool RecordWriter::Open(const std::string& file) {
   file_index_ = 0;
   sstream_.str(std::string());
   sstream_.clear();
-  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++;
+  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++ << ".";
   if (header_.segment_interval() > 0 || header_.segment_raw_size() > 0) {
-    path_ = file_ + sstream_.str();
+    path_ = file_ + sstream_.str() +
+            UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S");
   } else {
     path_ = file_;
   }
@@ -75,8 +78,9 @@ bool RecordWriter::SplitOutfile() {
   }
   sstream_.str(std::string());
   sstream_.clear();
-  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++;
-  path_ = file_ + sstream_.str();
+  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++ << ".";
+  path_ = file_ + sstream_.str() +
+          UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S");
   segment_raw_size_ = 0;
   segment_begin_time_ = 0;
   if (!file_writer_->Open(path_)) {

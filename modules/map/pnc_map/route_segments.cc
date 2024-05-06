@@ -29,7 +29,7 @@ namespace hdmap {
 namespace {
 
 // Minimum error in lane segmentation.
-constexpr double kSegmentationEpsilon = 0.2;
+constexpr double kSegmentationEpsilon = 0.5;
 }  // namespace
 
 const std::string &RouteSegments::Id() const { return id_; }
@@ -274,6 +274,40 @@ bool RouteSegments::GetProjection(const common::math::Vec2d &point,
     double lane_s = 0.0;
     double lane_l = 0.0;
     if (!iter->lane->GetProjection(point, &lane_s, &lane_l)) {
+      AERROR << "Failed to get projection from point " << point.DebugString()
+             << " on lane " << iter->lane->id().id();
+      return false;
+    }
+    if (lane_s < iter->start_s - kSegmentationEpsilon ||
+        lane_s > iter->end_s + kSegmentationEpsilon) {
+      continue;
+    }
+    if (std::fabs(lane_l) < min_l) {
+      has_projection = true;
+      lane_s = std::max(iter->start_s, lane_s);
+      lane_s = std::min(iter->end_s, lane_s);
+      min_l = std::fabs(lane_l);
+      sl_point->set_l(lane_l);
+      sl_point->set_s(lane_s - iter->start_s + accumulated_s);
+      waypoint->lane = iter->lane;
+      waypoint->s = lane_s;
+    }
+  }
+  return has_projection;
+}
+
+bool RouteSegments::GetProjection(const common::math::Vec2d &point,
+                                  const double heading,
+                                  common::SLPoint *sl_point,
+                                  LaneWaypoint *waypoint) const {
+  double min_l = std::numeric_limits<double>::infinity();
+  double accumulated_s = 0.0;
+  bool has_projection = false;
+  for (auto iter = begin(); iter != end();
+       accumulated_s += (iter->end_s - iter->start_s), ++iter) {
+    double lane_s = 0.0;
+    double lane_l = 0.0;
+    if (!iter->lane->GetProjection(point, heading, &lane_s, &lane_l)) {
       AERROR << "Failed to get projection from point " << point.DebugString()
              << " on lane " << iter->lane->id().id();
       return false;

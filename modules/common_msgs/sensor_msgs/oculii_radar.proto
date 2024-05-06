@@ -1,0 +1,60 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/error_code.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message OculiiRawPointcloud {
+    optional float range = 1;
+    optional float doppler = 2;
+    optional float azimuth = 3;
+    optional float elevation = 4;
+    optional float power = 5;
+}
+
+message OculiiPointXYZIV {
+  optional float x = 1 [default = nan];
+  optional float y = 2 [default = nan];
+  optional float z = 3 [default = nan];
+  optional float intensity = 4 [default = 0];
+  optional float velocity = 5 [default = 0];
+}
+
+message OculiiTrackTarget {
+    enum ObstacleClass {
+        UNKNOWN = 0;
+        PEDESTRIAN = 1;
+        BICYCLE = 2;
+        VEHICLE = 3;
+        TRUCK = 4;
+        BACKGROUND = 5;
+    }
+    optional int64 id = 1;
+    optional float x_pos = 2;
+    optional float y_pos = 3;
+    optional float z_pos = 4;
+    optional float x_dot = 5;
+    optional float y_dot = 6;
+    optional float z_dot = 7;
+    optional int32 confidence = 8;
+    optional ObstacleClass track_class = 9;
+}
+
+message OculiiPointCloud {
+    optional apollo.common.Header header = 1;
+    optional string frame_id = 2;
+    optional bool is_dense = 3;
+    repeated OculiiPointXYZIV point = 4;
+    optional double measurement_time = 5;
+    optional int32 width = 6;
+    optional int32 height = 7;
+    optional int64 packet_id = 8;
+    optional float ego_speed = 9;
+    optional float ego_angle = 10;
+    optional int32 detection_size = 11;
+    optional int32 track_size = 12;
+    repeated OculiiRawPointcloud raw_pointclouds = 13;
+    repeated OculiiTrackTarget tracks = 14;
+}
+

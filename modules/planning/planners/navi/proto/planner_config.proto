@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planners/navi/proto/navi_task_config.proto";
+
+message PlannerNaviConfig {
+  repeated NaviTaskType task = 1;
+  optional NaviPathDeciderConfig navi_path_decider_config = 2;
+  optional NaviSpeedDeciderConfig navi_speed_decider_config = 3;
+  optional NaviObstacleDeciderConfig navi_obstacle_decider_config = 4;
+}

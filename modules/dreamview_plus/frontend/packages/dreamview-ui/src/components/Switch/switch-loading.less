@@ -1,0 +1,116 @@
+.dreamview-switch-loading {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.88);
+    font-size: 14px;
+    line-height: 16px;
+    list-style: none;
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+    position: relative;
+    display: inline-block;
+    min-width: 33px;
+    height: 16px;
+    vertical-align: middle;
+    background: #343C4D;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+
+    &.dreamview-switch-loading.dreamview-switch-loading-checked {
+        background: #3288FA;
+
+        .dreamview-switch-loading-inner {
+            // padding-inline-start: 9px;
+            // padding-inline-end: 24px;
+
+            .dreamview-switch-loading-inner-checked {
+                margin-inline-start: 0;
+                margin-inline-end: 0;
+            }
+
+            .dreamview-switch-loading-inner-unchecked {
+                margin-inline-start: calc(100% - 22px + 48px);
+                margin-inline-end: calc(-100% + 22px - 48px);
+            }
+        }
+
+        .dreamview-switch-loading-handle {
+            inset-inline-start: calc(100% - 14px);
+        }
+
+        .dreamview-switch-loading-handle::before {
+            background-color: #fff;
+        }
+    }
+
+    .dreamview-switch-loading-handle {
+        position: absolute;
+        top: 2px;
+        inset-inline-start: 2px;
+        width: 12px;
+        height: 12px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dreamview-switch-loading-handle::before {
+        position: absolute;
+        top: 0;
+        inset-inline-end: 0;
+        bottom: 0;
+        inset-inline-start: 0;
+        background-color: #BDC3CD;
+        border-radius: 3px;
+        box-shadow: 0 2px 4px 0 rgb(0 35 11 / 20%);
+        transition: all 0.2s ease-in-out;
+        content: "";
+    }
+
+    .dreamview-switch-loading-inner {
+        display: block;
+        overflow: hidden;
+        border-radius: 100px;
+        height: 100%;
+        transition: padding-inline-start 0.2s ease-in-out,padding-inline-end 0.2s ease-in-out;
+
+        .dreamview-switch-loading-inner-checked {
+            display: block;
+            color: #fff;
+            font-size: 12px;
+            transition: margin-inline-start 0.2s ease-in-out,margin-inline-end 0.2s ease-in-out;
+            pointer-events: none;
+            margin-inline-start: calc(-100% + 22px - 48px);
+            margin-inline-end: calc(100% - 22px + 48px);
+            padding-right: 13px;
+
+        }
+
+        .dreamview-switch-loading-inner-unchecked {
+            display: block;
+            color: #fff;
+            font-size: 12px;
+            transition: margin-inline-start 0.2s ease-in-out,margin-inline-end 0.2s ease-in-out;
+            pointer-events: none;
+            margin-top: -16px;
+            margin-inline-start: 0;
+            margin-inline-end: 0;
+            padding-left: 14px;
+        }
+    }
+
+    &.dreamview-switch-loading-disabled, &.dreamview-switch-loading-loading {
+        cursor: not-allowed;
+        opacity: 0.65;
+
+        .dreamview-switch-loading-handle::before {
+            display: none;
+        }
+    }
+
+    .dreamview-switch-loading-loading-icon {
+        color: #BDC3CD;
+        font-size: 12px;
+    }
+}

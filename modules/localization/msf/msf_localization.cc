@@ -24,7 +24,6 @@
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/msf_localization_component.h"
 
@@ -94,6 +93,9 @@ void MSFLocalization::InitParams() {
   imu_vehicle_quat_.y() = FLAGS_imu_vehicle_qy;
   imu_vehicle_quat_.z() = FLAGS_imu_vehicle_qz;
   imu_vehicle_quat_.w() = FLAGS_imu_vehicle_qw;
+  imu_vehicle_translation_[0] = 0.0;
+  imu_vehicle_translation_[1] = 0.0;
+  imu_vehicle_translation_[2] = 0.0;
   // try to load imu vehicle quat from file
   if (FLAGS_if_vehicle_imu_from_file) {
     double qx = 0.0;
@@ -102,7 +104,8 @@ void MSFLocalization::InitParams() {
     double qw = 0.0;
 
     AINFO << "Vehile imu file: " << FLAGS_vehicle_imu_file;
-    if (LoadImuVehicleExtrinsic(FLAGS_vehicle_imu_file, &qx, &qy, &qz, &qw)) {
+    if (LoadImuVehicleExtrinsic(FLAGS_vehicle_imu_file, &qx, &qy, &qz, &qw,
+                                &imu_vehicle_translation_)) {
       imu_vehicle_quat_.x() = qx;
       imu_vehicle_quat_.y() = qy;
       imu_vehicle_quat_.z() = qz;
@@ -344,6 +347,14 @@ void MSFLocalization::CompensateImuVehicleExtrinsic(
   eulerangles->set_x(euler_angle.pitch());
   eulerangles->set_y(euler_angle.roll());
   eulerangles->set_z(euler_angle.yaw());
+
+  // Compensate the translation between imu and vehicle center.
+  apollo::common::PointENU *position = posepb_loc->mutable_position();
+  Eigen::Vector3d compensated_position =
+      quat_vehicle_world.toRotationMatrix() * imu_vehicle_translation_;
+  position->set_x(position->x() + compensated_position[0]);
+  position->set_y(position->y() + compensated_position[1]);
+  position->set_z(position->z() + compensated_position[2]);
 }
 
 bool MSFLocalization::LoadGnssAntennaExtrinsic(
@@ -373,21 +384,29 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
 
 bool MSFLocalization::LoadImuVehicleExtrinsic(const std::string &file_path,
                                               double *quat_qx, double *quat_qy,
-                                              double *quat_qz,
-                                              double *quat_qw) {
+                                              double *quat_qz, double *quat_qw,
+                                              Eigen::Vector3d *translation) {
+  for (size_t i = 0; i < 3; ++i) {
+    (*translation)[i] = 0.0;
+  }
   if (!cyber::common::PathExists(file_path)) {
     return false;
   }
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["transform"]) {
+    if (config["transform"]["rotation"]) {
+      *quat_qx = config["transform"]["rotation"]["x"].as<double>();
+      *quat_qy = config["transform"]["rotation"]["y"].as<double>();
+      *quat_qz = config["transform"]["rotation"]["z"].as<double>();
+      *quat_qw = config["transform"]["rotation"]["w"].as<double>();
+    } else {
+      return false;
+    }
     if (config["transform"]["translation"]) {
-      if (config["transform"]["rotation"]) {
-        *quat_qx = config["transform"]["rotation"]["x"].as<double>();
-        *quat_qy = config["transform"]["rotation"]["y"].as<double>();
-        *quat_qz = config["transform"]["rotation"]["z"].as<double>();
-        *quat_qw = config["transform"]["rotation"]["w"].as<double>();
-        return true;
-      }
+      (*translation)[0] = config["transform"]["translation"]["x"].as<double>();
+      (*translation)[1] = config["transform"]["translation"]["y"].as<double>();
+      (*translation)[2] = config["transform"]["translation"]["z"].as<double>();
+      return true;
     }
   }
   return false;

@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// CrosswalkConfig
+
+message CrosswalkConfig {
+  // Safty stop distance from stop line of crosswalk.
+  optional double stop_distance = 1 [default = 1.0];  // meter
+  // If it is safe for obstacle collision and the stop deceleration calculted
+  // to stop in front of crosswalk stop line is too big(>
+  // max_stop_deceleration), ignore the deceleration to keep comfortable driving
+  // feeling.
+  optional double max_stop_deceleration = 2 [default = 4.0];
+  // If the front edge of ego-vehicle has passed the crosswalk stop line over
+  // "min_pass_s_distance", it can be considered as passed the crosswalk.
+  optional double min_pass_s_distance = 3 [default = 1.0];  // meter
+  // expand crosswalk by "expand_s_distance" for pedestrian/bicycle detection.
+  optional double expand_s_distance = 5 [default = 2.0];  // meter
+  // If obstacle is not far enough(lateral distance < "stop_strict_l_distance"),
+  // it should be taken care and ego-vehicle may stop in front of it.
+  optional double stop_strict_l_distance = 6 [default = 4.0];  // meter
+  // If obstacle is far enough(lateral distance > "stop_loose_l_distance"), it
+  // can be ignored and ego-vehicle has no need to stop in front of it.
+  optional double stop_loose_l_distance = 7 [default = 5.0];  // meter
+  // ego-vehicle can move on and ignore the bicycles/pedestrians if
+  // bicycles/pedestrians remain static longer than "stop_timeout".
+  optional double stop_timeout = 8 [default = 10.0];  // second
+
+  optional double start_watch_timer_distance = 9 [default=40.0];
+}

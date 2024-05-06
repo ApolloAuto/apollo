@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_amplification</title>
+    <g id="ic_amplification" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="16" height="16"></rect>
+        <path d="M8.5,1.5 C8.77614237,1.5 9,1.72385763 9,2 L9,6.999 L14,7 C14.2761424,7 14.5,7.22385763 14.5,7.5 L14.5,8.5 C14.5,8.77614237 14.2761424,9 14,9 L8.999,8.999 L9,14 C9,14.2761424 8.77614237,14.5 8.5,14.5 L7.5,14.5 C7.22385763,14.5 7,14.2761424 7,14 L6.999,8.999 L2,9 C1.72385763,9 1.5,8.77614237 1.5,8.5 L1.5,7.5 C1.5,7.22385763 1.72385763,7 2,7 L7,6.999 L7,2 C7,1.72385763 7.22385763,1.5 7.5,1.5 L8.5,1.5 Z" id="形状结合" fill="#A6B5CC" fill-rule="nonzero"></path>
+    </g>
+</svg>

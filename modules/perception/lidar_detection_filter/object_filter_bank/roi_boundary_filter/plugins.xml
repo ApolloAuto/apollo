@@ -1,0 +1,3 @@
+<library path="modules/perception/lidar_detection_filter/object_filter_bank/roi_boundary_filter/libroi_boundary_filter.so">
+    <class type="apollo::perception::lidar::ROIBoundaryFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>

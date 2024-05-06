@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/external_command_msgs/geometry.proto";
+
+// PathBoundary with left and right boundary.
+message PathBoundary {
+  // Left boundary of the path, each boundary point mapped to the path point.
+  repeated Point left_boundary = 1;
+  // Right boundary of the path, each boundary point mapped to the path point.
+  repeated Point right_boundary = 2;
+}
+
+// Path boundary generated with the distance from center to left and right
+// boundary given.
+message BoundaryWithWidth {
+  // Distance from the path center to left boundary.
+  required double left_path_width = 1;
+  // Distance from the path center to right boundary.
+  required double right_path_width = 2;
+}
+
+message PathFollowCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // Path point to be followed, a valid path should contain >= 2 points. No lane
+  // on the map is followed for this command.
+  repeated Point way_point = 3;
+  oneof boundary {
+    // PathBoundary with left and right boundary.
+    PathBoundary path_boundary = 4;
+    // Path boundary generated with the distance from center to left and right
+    // boundary given.
+    BoundaryWithWidth boundary_with_width = 5;
+  }
+  // Expected speed when executing this command. If "target_speed" > maximum
+  // speed of the vehicle, use maximum speed of the vehicle instead. If it is
+  // not given, the default target speed of system will be used.
+  optional double target_speed = 6;
+}

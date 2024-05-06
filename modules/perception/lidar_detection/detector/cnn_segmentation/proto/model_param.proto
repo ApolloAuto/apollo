@@ -1,0 +1,45 @@
+syntax = "proto2";
+
+package apollo.perception.lidar.cnnseg;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional FeatureParam feature_param = 2;
+  optional bool do_classification = 3 [default = true];
+  optional bool do_heading = 4 [default = true];
+  optional common.PointCloudPreProcess preprocess = 5;
+  optional SppEngineConfig engine_config = 6;
+
+  // for method SppEngine
+  optional string ground_detector = 7
+      [default = "SpatioTemporalGroundDetector"];
+  optional string roi_filter = 8 [default = "HdmapROIFilter"];
+  optional bool remove_ground_points = 9 [default = false];
+
+  // for both clustering methods
+  optional float objectness_thresh = 10 [default = 0.5];
+  optional float confidence_thresh = 11 [default = 0.1];
+  optional float height_thresh = 12 [default = 0.5];
+  optional uint32 min_pts_num = 13 [default = 3];
+  optional float confidence_range = 14 [default = 60];
+  optional bool fill_recall_with_segmentor = 15 [default = true];
+}
+
+message FeatureParam {
+  optional float point_cloud_range = 1 [default = 60.0];
+  optional uint32 width = 2 [default = 512];
+  optional uint32 height = 3 [default = 512];
+
+  optional float min_height = 4 [default = -5.0];
+  optional float max_height = 5 [default = 5.0];
+
+  optional bool use_intensity_feature = 6 [default = true];
+  optional bool use_constant_feature = 7 [default = true];
+}
+
+message SppEngineConfig {
+  optional float height_gap = 1 [default = 0.5];
+}

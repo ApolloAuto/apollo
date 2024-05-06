@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message PbfTrackerConfig {
+  optional perception.PluginParam type_fusion_param = 1;
+  optional perception.PluginParam motion_fusion_param = 2;
+  optional perception.PluginParam shape_fusion_param = 3;
+  optional perception.PluginParam existence_fusion_param = 4;
+}

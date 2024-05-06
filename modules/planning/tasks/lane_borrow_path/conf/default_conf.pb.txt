@@ -1,0 +1,11 @@
+is_allow_lane_borrowing: true
+lane_borrow_max_speed: 5.0
+long_term_blocking_obstacle_cycle_threshold: 3
+path_optimizer_config {
+  l_weight: 1.0
+  dl_weight: 20.0
+  ddl_weight: 1000.0
+  dddl_weight: 50000.0
+  path_reference_l_weight: 100.0
+  lateral_derivative_bound_default: 2.0
+}

@@ -1,0 +1,504 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+import "modules/common_msgs/basic_msgs/vehicle_id.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+
+message Lincoln {
+  enum Type {
+    QIRUI_EQ_15 = 0;
+    CHANGAN_RUICHENG = 1;
+  }
+  optional Type car_type = 1;                          // car type
+  optional BasicInfo basic = 2;                        // basic info
+  optional Safety safety = 3;                          // safety
+  optional Gear gear = 4;                              // gear
+  optional Ems ems = 5;                                // engine manager system
+  optional Esp esp = 6;                                // Electronic Stability Program
+  optional Gas gas = 7;                                // gas pedal
+  optional Epb epb = 8;                                // Electronic parking brake
+  optional Brake brake = 9;                            // brake pedal
+  optional Deceleration deceleration = 10;             // deceleration
+  optional VehicleSpd vehicle_spd = 11;                // vehicle speed
+  optional Eps eps = 12;                               // Electronic Power Steering
+  optional Light light = 13;                           // Light
+  optional Battery battery = 14;                       // Battery info
+  optional CheckResponseSignal check_response = 15;
+  optional Surround surround = 17;                     // Surround information
+  // Reserve fields for other vehicles
+  optional apollo.common.VehicleID vehicle_id = 101;
+}
+
+// CheckResponseSignal
+message CheckResponseSignal {
+  optional bool is_eps_online = 1 [default = false];     // byd:0x34C qirui:0x505
+  optional bool is_epb_online = 2 [default = false];     // byd:0x218
+  optional bool is_esp_online = 3 [default = false];     // byd:0x122 qirui:0x451
+  optional bool is_vtog_online = 4 [default = false];    // byd:0x242
+  optional bool is_scu_online = 5 [default = false];     // byd:0x35C
+  optional bool is_switch_online = 6 [default = false];  // byd:0x133
+  optional bool is_vcu_online = 7 [default = false];     //  qirui:0x400
+}
+
+// Battery
+message Battery {
+  optional double battery_percent = 1;  // unit:%, battery percentage left
+  // lincoln fuellevel 72
+  optional double fuel_level = 2;
+}
+
+// light
+message Light {
+  enum TurnLightType {
+    TURN_LIGHT_OFF = 0;
+    TURN_LEFT_ON = 1;
+    TURN_RIGHT_ON = 2;
+    TURN_LIGHT_ON = 3;
+  }
+  enum BeamLampType {
+    BEAM_OFF = 0;
+    HIGH_BEAM_ON = 1;
+    LOW_BEAM_ON = 2;
+  }
+  enum LincolnLampType {
+    BEAM_NULL = 0;
+    BEAM_FLASH_TO_PASS = 1;
+    BEAM_HIGH = 2;
+    BEAM_INVALID = 3;
+  }
+  enum LincolnWiperType {
+    WIPER_OFF = 0;
+    WIPER_AUTO_OFF = 1;
+    WIPER_OFF_MOVING = 2;
+    WIPER_MANUAL_OFF = 3;
+    WIPER_MANUAL_ON = 4;
+    WIPER_MANUAL_LOW = 5;
+    WIPER_MANUAL_HIGH = 6;
+    WIPER_MIST_FLICK = 7;
+    WIPER_WASH = 8;
+    WIPER_AUTO_LOW = 9;
+    WIPER_AUTO_HIGH = 10;
+    WIPER_COURTESY_WIPE = 11;
+    WIPER_AUTO_ADJUST = 12;
+    WIPER_RESERVED = 13;
+    WIPER_STALLED = 14;
+    WIPER_NO_DATA = 15;
+  }
+  enum LincolnAmbientType {
+    AMBIENT_DARK = 0;
+    AMBIENT_LIGHT = 1;
+    AMBIENT_TWILIGHT = 2;
+    AMBIENT_TUNNEL_ON = 3;
+    AMBIENT_TUNNEL_OFF = 4;
+    AMBIENT_INVALID = 5;
+    AMBIENT_NO_DATA = 7;
+  }
+
+  optional TurnLightType turn_light_type = 1;
+  optional BeamLampType beam_lamp_type = 2;
+  optional bool is_brake_lamp_on = 3;
+  // byd switch 133
+  optional bool is_auto_light = 4;
+  optional int32 wiper_gear = 5;
+  optional int32 lotion_gear = 6;
+  optional bool is_horn_on = 7;
+
+  // lincoln misc 69
+  optional LincolnLampType lincoln_lamp_type = 8;
+  optional LincolnWiperType lincoln_wiper = 9;
+  optional LincolnAmbientType lincoln_ambient = 10;
+}
+
+// Electrical Power Steering
+message Eps {
+  enum Type {
+    NOT_AVAILABLE = 0;
+    READY = 1;
+    ACTIVE = 2;
+    INVALID = 3;
+  }
+  // changan: eps 2a0
+  optional bool is_eps_fail = 1;
+  // eps 2a0
+  optional Type eps_control_state = 2;       // for changan to control steering
+  optional double eps_driver_hand_torq = 3;  // unit:Nm
+
+  optional bool is_steering_angle_valid = 4;
+  optional double steering_angle = 5;      // unit:degree
+  optional double steering_angle_spd = 6;  // unit:degree/s
+
+  // byd sas 11f
+  optional bool is_trimming_status = 7;
+  optional bool is_calibration_status = 8;
+  optional bool is_failure_status = 9;
+  optional int32 allow_enter_autonomous_mode = 10;
+  optional int32 current_driving_mode = 11;
+
+  // lincoln steering 65
+  optional double steering_angle_cmd = 12;
+  optional double vehicle_speed = 13;
+  optional double epas_torque = 14;
+  optional bool steering_enabled = 15;
+  optional bool driver_override = 16;
+  optional bool driver_activity = 17;
+  optional bool watchdog_fault = 18;
+  optional bool channel_1_fault = 19;
+  optional bool channel_2_fault = 20;
+  optional bool calibration_fault = 21;
+  optional bool connector_fault = 22;
+
+  optional double timestamp_65 = 23;
+
+  // lincoln version 7f
+  optional int32 major_version = 24;
+  optional int32 minor_version = 25;
+  optional int32 build_number = 26;
+}
+
+message VehicleSpd {
+  // esp 277
+  optional bool is_vehicle_standstill = 1;
+  // esp 218
+  optional bool is_vehicle_spd_valid = 2;
+  optional double vehicle_spd = 3 [default = 0];  // unit:m/s
+  // esp 208
+  optional bool is_wheel_spd_rr_valid = 4;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rr = 5;
+  optional double wheel_spd_rr = 6;
+  optional bool is_wheel_spd_rl_valid = 7;
+  optional WheelSpeed.WheelSpeedType wheel_direction_rl = 8;
+  optional double wheel_spd_rl = 9;
+  optional bool is_wheel_spd_fr_valid = 10;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fr = 11;
+  optional double wheel_spd_fr = 12;
+  optional bool is_wheel_spd_fl_valid = 13;
+  optional WheelSpeed.WheelSpeedType wheel_direction_fl = 14;
+  optional double wheel_spd_fl = 15;
+
+  // byd esp 222
+  optional bool is_yaw_rate_valid = 16;
+  optional double yaw_rate = 17;
+  optional double yaw_rate_offset = 18;
+
+  // byd esp 223
+  optional bool is_ax_valid = 19;
+  optional double ax = 20;
+  optional double ax_offset = 21;
+  optional bool is_ay_valid = 22;
+  optional double ay = 23;
+  optional double ay_offset = 24;
+
+  // lincoln accel 6b
+  optional double lat_acc = 25;
+  optional double long_acc = 26;
+  optional double vert_acc = 27;
+
+  // lincoln gyro 6c
+  optional double roll_rate = 28;
+
+  // lincoln brakeinfo 74
+  optional double acc_est = 29;
+
+  // lincoln wheelspeed 6a
+  optional double timestamp_sec = 30;
+}
+
+message Deceleration {
+  // esp 277
+  optional bool is_deceleration_available =
+      1;  // for changan to send deceleration value
+  optional bool is_deceleration_active =
+      2;  // for changan to send deceleration value
+
+  optional double deceleration = 3 [default = 0];
+
+  optional double is_evb_fail = 4;
+  optional double evb_pressure = 5 [default = 0];  // mpa, 0~25.5
+
+  optional double brake_pressure = 6 [default = 0];
+  optional double brake_pressure_spd = 7 [default = 0];
+}
+
+message Brake {
+  enum HSAStatusType {
+    HSA_INACTIVE = 0;
+    HSA_FINDING_GRADIENT = 1;
+    HSA_ACTIVE_PRESSED = 2;
+    HSA_ACTIVE_RELEASED = 3;
+    HSA_FAST_RELEASE = 4;
+    HSA_SLOW_RELEASE = 5;
+    HSA_FAILED = 6;
+    HSA_UNDEFINED = 7;
+  }
+  enum HSAModeType {
+    HSA_OFF = 0;
+    HSA_AUTO = 1;
+    HSA_MANUAL = 2;
+    HSA_MODE_UNDEFINED = 3;
+  }
+  // ems 255
+  optional bool is_brake_pedal_pressed = 1
+      [default = false];  // only manual brake
+  // esp 277
+  optional bool is_brake_force_exist =
+      2;  // no matter auto mode brake or manual brake
+  optional bool is_brake_over_heat = 3;
+
+  optional bool is_hand_brake_on = 4;  // hand brake
+  optional double brake_pedal_position = 5;
+
+  // byd vtog 342
+  optional bool is_brake_valid = 6;
+
+  // lincoln brake 61
+  optional double brake_input = 7;
+  optional double brake_cmd = 8;
+  optional double brake_output = 9;
+  optional bool boo_input = 10;
+  optional bool boo_cmd = 11;
+  optional bool boo_output = 12;
+  optional bool watchdog_applying_brakes = 13;
+  optional int32 watchdog_source = 14;
+  optional bool brake_enabled = 15;
+  optional bool driver_override = 16;
+  optional bool driver_activity = 17;
+  optional bool watchdog_fault = 18;
+  optional bool channel_1_fault = 19;
+  optional bool channel_2_fault = 20;
+  optional bool boo_fault = 21;
+  optional bool connector_fault = 22;
+
+  // lincoln brakeinfo 74
+  optional double brake_torque_req = 23;
+  optional HSAStatusType hsa_status = 24;
+  optional double brake_torque_act = 25;
+  optional HSAModeType hsa_mode = 26;
+  optional double wheel_torque_act = 27;
+
+  // lincoln version 7f
+  optional int32 major_version = 28;
+  optional int32 minor_version = 29;
+  optional int32 build_number = 30;
+}
+
+// Electrical Parking Brake
+message Epb {
+  enum PBrakeType {
+    PBRAKE_OFF = 0;
+    PBRAKE_TRANSITION = 1;
+    PBRAKE_ON = 2;
+    PBRAKE_FAULT = 3;
+  }
+  // epb 256
+  optional bool is_epb_error = 1;
+  optional bool is_epb_released = 2;
+
+  // byd epb 218
+  optional int32 epb_status = 3;
+
+  // lincoln brakeinfo 74
+  optional PBrakeType parking_brake_status = 4;
+}
+
+message Gas {
+  // ems 255
+  optional bool is_gas_pedal_error = 1;
+  // ems 26a
+  optional bool is_gas_pedal_pressed_more = 2;           // more than auto mode gas torq
+  optional double gas_pedal_position = 3 [default = 0];  // manual gas
+  // byd vtog 342
+  optional bool is_gas_valid = 4 [default = false];
+
+  // lincoln throttle 63
+  optional double throttle_input = 5;
+  optional double throttle_cmd = 6;
+  optional double throttle_output = 7;
+  optional int32 watchdog_source = 8;
+  optional bool throttle_enabled = 9;
+  optional bool driver_override = 10;
+  optional bool driver_activity = 11;
+  optional bool watchdog_fault = 12;
+  optional bool channel_1_fault = 13;
+  optional bool channel_2_fault = 14;
+  optional bool connector_fault = 15;
+
+  // lincoln throttleinfo 75
+  optional double accelerator_pedal = 16;
+  optional double accelerator_pedal_rate = 17;
+
+  // lincoln version 7f
+  optional int32 major_version = 18;
+  optional int32 minor_version = 19;
+  optional int32 build_number = 20;
+}
+
+// Electronic Stability Program
+message Esp {
+  // esp 277
+  optional bool is_esp_acc_error = 1;  // for changan to control car
+
+  // esp 218
+  optional bool is_esp_on = 2;
+  optional bool is_esp_active = 3;
+  optional bool is_abs_error = 4;
+  optional bool is_abs_active = 5;
+  optional bool is_tcsvdc_fail = 6;
+
+  // lincoln brakeinfo 74
+  optional bool is_abs_enabled = 7;
+  optional bool is_stab_active = 8;
+  optional bool is_stab_enabled = 9;
+  optional bool is_trac_active = 10;
+  optional bool is_trac_enabled = 11;
+}
+
+// Engine Manager System
+message Ems {
+  enum Type {
+    STOP = 0;
+    CRANK = 1;
+    RUNNING = 2;
+    INVALID = 3;
+  }
+  // ems 26a
+  optional bool is_engine_acc_available = 1;     // for changan to control car
+  optional bool is_engine_acc_error = 2;         // for changan to control car
+
+  // ems 265
+  optional Type engine_state = 3;
+  optional double max_engine_torq_percent = 4;   // for engine torq control, unit:%
+  optional double min_engine_torq_percent = 5;   // for engine torq control, unit:%
+  optional int32 base_engine_torq_constant = 6;  // for engine torq control, unit:Nm
+
+  // ems 255
+  optional bool is_engine_speed_error = 7;
+  optional double engine_speed = 8;
+
+  // byd vtog 241
+  optional int32 engine_torque = 9;
+  // byd vtog 242
+  optional bool is_over_engine_torque = 10;
+
+  // lincoln mkz throttleinfo 75
+  optional double engine_rpm = 11;
+}
+
+message Gear {
+  // tcu 268
+  optional bool is_shift_position_valid = 1;
+  // chanan: tcu 268
+  optional Chassis.GearPosition gear_state = 2;
+  // lincoln gear 67
+  optional bool driver_override = 3;
+  optional Chassis.GearPosition gear_cmd = 4;
+  optional bool canbus_fault = 5;
+}
+
+
+message Safety {
+  // ip 270
+  optional bool is_driver_car_door_close = 1;
+  // sas 50
+  optional bool is_driver_buckled = 2;
+
+  // byd sws 4a8
+  optional int32 emergency_button = 3;
+
+  // qirui:403
+  // when car chassis error, like system fault, or warning report
+  optional bool has_error = 4 [default = false];
+  optional bool is_motor_invertor_fault = 5;
+  optional bool is_system_fault = 6;
+  optional bool is_power_battery_fault = 7;
+  optional bool is_motor_invertor_over_temperature = 8;
+  optional bool is_small_battery_charge_discharge_fault = 9;
+  optional int32 driving_mode = 10;
+
+  // lincoln misc 69
+  optional bool is_passenger_door_open = 11;
+  optional bool is_rearleft_door_open = 12;
+  optional bool is_rearright_door_open = 13;
+  optional bool is_hood_open = 14;
+  optional bool is_trunk_open = 15;
+  optional bool is_passenger_detected = 16;
+  optional bool is_passenger_airbag_enabled = 17;
+  optional bool is_passenger_buckled = 18;
+
+  // lincoln tirepressure 71
+  optional int32 front_left_tire_press = 19;
+  optional int32 front_right_tire_press = 20;
+  optional int32 rear_left_tire_press = 21;
+  optional int32 rear_right_tire_press = 22;
+  optional DrivingMode car_driving_mode = 23;
+}
+
+enum DrivingMode {
+  COMPLETE_MANUAL = 0;  // human drive
+  COMPLETE_AUTO_DRIVE = 1;
+  AUTO_STEER_ONLY = 2;  // only steer
+  AUTO_SPEED_ONLY = 3;  // include throttle and brake
+
+  // security mode when manual intervention happens, only response status
+  EMERGENCY_MODE = 4;
+}
+
+message BasicInfo {
+  enum Type {
+    OFF = 0;
+    ACC = 1;
+    ON = 2;
+    START = 3;
+    INVALID = 4;
+  }
+
+  optional bool is_auto_mode = 1;
+  optional Type power_state = 2;
+  optional bool is_air_bag_deployed = 3;
+  optional double odo_meter = 4;  // odo meter, unit:km
+  optional double drive_range =
+      5;  // the meter left when drive continuously, unit:km
+  optional bool is_system_error = 6;
+  optional bool is_human_interrupt = 7;  // human interrupt
+
+  // lincoln misc 69
+  optional bool acc_on_button = 8;  // acc on button pressed
+  optional bool acc_off_button = 9;
+  optional bool acc_res_button = 10;
+  optional bool acc_cancel_button = 11;
+  optional bool acc_on_off_button = 12;
+  optional bool acc_res_cancel_button = 13;
+  optional bool acc_inc_spd_button = 14;
+  optional bool acc_dec_spd_button = 15;
+  optional bool acc_inc_gap_button = 16;
+  optional bool acc_dec_gap_button = 17;
+  optional bool lka_button = 18;
+  optional bool canbus_fault = 19;
+
+  // lincoln gps 6d
+  optional double latitude = 20;
+  optional double longitude = 21;
+  optional bool gps_valid = 22;
+
+  // lincoln gps 6e
+  optional int32 year = 23;
+  optional int32 month = 24;
+  optional int32 day = 25;
+  optional int32 hours = 26;
+  optional int32 minutes = 27;
+  optional int32 seconds = 28;
+  optional double compass_direction = 29;
+  optional double pdop = 30;
+  optional bool is_gps_fault = 31;
+  optional bool is_inferred = 32;
+
+  // lincoln gps 6f
+  optional double altitude = 33;
+  optional double heading = 34;
+  optional double hdop = 35;
+  optional double vdop = 36;
+  optional GpsQuality quality = 37;
+  optional int32 num_satellites = 38;
+  optional double gps_speed = 39;
+}

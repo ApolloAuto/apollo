@@ -651,6 +651,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane = feature->lane();
   }
   double min_heading_diff = std::numeric_limits<double>::infinity();
+  clusters_ptr_->ClearObstacle();
   for (std::shared_ptr<const LaneInfo> current_lane : current_lanes) {
     if (current_lane == nullptr) {
       continue;

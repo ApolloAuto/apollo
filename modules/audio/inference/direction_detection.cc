@@ -15,16 +15,23 @@
  *****************************************************************************/
 
 #include "modules/audio/inference/direction_detection.h"
+
 #include "yaml-cpp/yaml.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
+
+#if __has_include("torch/version.h")
+#include "torch/version.h"
+#endif
 
 namespace apollo {
 namespace audio {
 
+using apollo::common::math::NormalizeAngle;
 using torch::indexing::None;
 using torch::indexing::Slice;
-using apollo::common::math::NormalizeAngle;
 
 DirectionDetection::DirectionDetection() {}
 
@@ -134,13 +141,30 @@ double DirectionDetection::GccPhat(const torch::Tensor& sig,
             n = n_sig + n_refsig;
   torch::Tensor psig = at::constant_pad_nd(sig, {0, n_refsig}, 0);
   torch::Tensor prefsig = at::constant_pad_nd(refsig, {0, n_sig}, 0);
+#if TORCH_VERSION_MINOR <= 7
   psig = at::rfft(psig, 1, false, true);
   prefsig = at::rfft(prefsig, 1, false, true);
+#else
+  auto psig_complex = at::fft_rfft(psig, c10::nullopt, -1, c10::nullopt);
+  psig = at::stack({torch::real(psig_complex), torch::imag(psig_complex)}, -1);
+
+  auto prefsig_complex = at::fft_rfft(prefsig, c10::nullopt, -1, c10::nullopt);
+  prefsig = at::stack(
+      {torch::real(prefsig_complex), torch::imag(prefsig_complex)}, -1);
+#endif
 
   ConjugateTensor(&prefsig);
   torch::Tensor r = ComplexMultiply(psig, prefsig);
+#if TORCH_VERSION_MINOR <= 7
   torch::Tensor cc =
       at::irfft(r / ComplexAbsolute(r), 1, false, true, {interp * n});
+#else
+  auto irfft_input_transpose = at::transpose(r / ComplexAbsolute(r), 0, 1);
+  auto irfft_complex =
+      torch::complex(irfft_input_transpose[0], irfft_input_transpose[1]);
+  torch::Tensor cc =
+      torch::real(torch::fft::irfft(irfft_complex, n, -1, c10::nullopt));
+#endif
   int max_shift = static_cast<int>(interp * n / 2);
   if (max_tau != 0)
     max_shift = std::min(static_cast<int>(interp * fs * max_tau), max_shift);

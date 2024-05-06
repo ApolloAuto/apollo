@@ -245,6 +245,15 @@ void ResourceMonitor::RunOnce(const double current_time) {
                    components->at(name).mutable_resource_status());
     }
   }
+  auto* global_components = manager->GetStatus()->mutable_global_components();
+  for (const auto& iter : mode.global_components()) {
+    const std::string& name = iter.first;
+    const auto& config = iter.second;
+    if (config.has_resource()) {
+      UpdateStatus(config.resource(),
+                   global_components->at(name).mutable_resource_status());
+    }
+  }
 }
 
 void ResourceMonitor::UpdateStatus(

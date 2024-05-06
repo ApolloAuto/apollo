@@ -1,0 +1,11 @@
+{
+  "extends": "../../tslint-config-dreamview/index.json",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules"
+  ]
+}

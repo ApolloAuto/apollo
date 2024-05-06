@@ -29,6 +29,7 @@ DECLARE_string(sim_map_filename);
 DECLARE_string(routing_map_filename);
 DECLARE_string(end_way_point_filename);
 DECLARE_string(default_routing_filename);
+DECLARE_string(park_go_routing_filename);
 DECLARE_string(speed_control_filename);
 
 DECLARE_double(look_forward_time_sec);
@@ -52,3 +53,6 @@ DECLARE_bool(reverse_heading_vehicle_state);
 DECLARE_bool(state_transform_to_com_reverse);
 DECLARE_bool(state_transform_to_com_drive);
 DECLARE_bool(multithread_run);
+
+// localizaiton
+DECLARE_bool(enable_map_reference_unify);

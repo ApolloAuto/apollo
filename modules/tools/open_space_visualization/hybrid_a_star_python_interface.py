@@ -16,17 +16,26 @@
 # limitations under the License.
 ###############################################################################
 
+import os
 import math
-
+import ctypes
+from  ctypes import  POINTER
 from ctypes import c_bool
 from ctypes import c_double
 from ctypes import c_int
 from ctypes import c_ushort
 from ctypes import c_void_p
+from ctypes import cdll
 
 
-lib = cdll.LoadLibrary(
-    '/apollo/bazel-bin/modules/planning/open_space/tools/hybrid_a_star_wrapper_lib.so')
+APOLLO_DISTRIBUTION_HOME = os.environ.get(
+    'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
+if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo'):
+    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/lib/modules/planning/planning_open_space/hybrid_a_star_wrapper_lib.so"
+else:
+    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/bazel-bin/modules/planning/planning_open_space/hybrid_a_star_wrapper_lib.so"  
+
+lib = cdll.LoadLibrary(lib_path)
 
 lib.CreatePlannerPtr.argtypes = []
 lib.CreatePlannerPtr.restype = c_void_p

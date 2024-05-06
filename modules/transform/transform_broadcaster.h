@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "modules/transform/proto/transform.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 
 namespace apollo {
 namespace transform {

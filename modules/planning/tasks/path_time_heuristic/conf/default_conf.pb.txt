@@ -1,0 +1,65 @@
+default_speed_config {
+    unit_t: 1.0
+    dense_dimension_s: 101
+    dense_unit_s: 0.1
+    sparse_unit_s: 1.0
+    speed_weight: 0.0
+    accel_weight: 10.0
+    jerk_weight: 10.0
+    obstacle_weight: 1.0
+    reference_weight: 0.0
+    go_down_buffer: 5.0
+    go_up_buffer: 5.0
+
+    default_obstacle_cost: 1e4
+
+    default_speed_cost: 1.0e3
+    exceed_speed_penalty: 1.0e3
+    low_speed_penalty: 10.0
+    reference_speed_penalty: 10.0
+    keep_clear_low_speed_penalty: 10.0
+    accel_penalty: 1.0
+    decel_penalty: 1.0
+
+    positive_jerk_coeff: 1.0
+    negative_jerk_coeff: 1.0
+
+    max_acceleration: 2.0
+    max_deceleration: -4.0
+    spatial_potential_penalty: 1.0e2
+    enable_multi_thread_in_dp_st_graph: false
+    enable_dp_reference_speed: true
+}
+lane_change_speed_config {
+    unit_t: 1.0
+    dense_dimension_s: 21
+    dense_unit_s: 0.25
+    sparse_unit_s: 1.0
+    speed_weight: 0.0
+    accel_weight: 10.0
+    jerk_weight: 10.0
+    obstacle_weight: 1.0
+    reference_weight: 0.0
+    go_down_buffer: 5.0
+    go_up_buffer: 5.0
+
+    default_obstacle_cost: 1e4
+
+    default_speed_cost: 1.0e3
+    exceed_speed_penalty: 1.0e3
+    low_speed_penalty: 10.0
+    reference_speed_penalty: 10.0
+    keep_clear_low_speed_penalty: 10.0
+    accel_penalty: 1.0
+    decel_penalty: 1.0
+
+    positive_jerk_coeff: 1.0
+    negative_jerk_coeff: 1.0
+
+    max_acceleration: 2.0
+    max_deceleration: -2.5
+    spatial_potential_penalty: 1.0e5
+    is_lane_changing: true
+    enable_multi_thread_in_dp_st_graph: false
+    enable_dp_reference_speed: true
+}

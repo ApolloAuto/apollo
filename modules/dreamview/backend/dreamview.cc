@@ -22,6 +22,20 @@
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/common/sim_control_manager/sim_control_manager.h"
+namespace {
+std::map<std::string, int> plugin_function_map = {
+    {"UpdateScenarioSetToStatus", 0},
+    {"UpdateRecordToStatus", 1},
+    {"UpdateDynamicModelToStatus", 2},
+    {"UpdateVehicleToStatus", 3}};
+std::map<std::string, int> hmi_function_map = {
+    {"SimControlRestart", 0},  {"MapServiceReloadMap", 1},
+    {"LoadDynamicModels", 2},  {"ChangeDynamicModel", 3},
+    {"DeleteDynamicModel", 4}, {"AddDynamicModel", 5},
+    {"RestartDynamicModel", 6},
+};
+}  // namespace
 
 namespace apollo {
 namespace dreamview {
@@ -76,25 +90,28 @@ Status Dreamview::Init() {
   map_ws_.reset(new WebSocketHandler("Map"));
   point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
   camera_ws_.reset(new WebSocketHandler("Camera"));
+  plugin_ws_.reset(new WebSocketHandler("Plugin"));
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  sim_control_.reset(new SimControl(map_service_.get()));
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
 
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
+  plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
-      map_service_.get(), perception_camera_updater_.get(),
+      websocket_.get(), map_ws_.get(), camera_ws_.get(),
+      plugin_ws_.get(), map_service_.get(),
+      perception_camera_updater_.get(), plugin_manager_.get(),
       FLAGS_routing_from_file));
   point_cloud_updater_.reset(
       new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
-  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addWebSocketHandler("/camera", *camera_ws_);
+  server_->addWebSocketHandler("/plugin", *plugin_ws_);
   server_->addHandler("/image", *image_);
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
@@ -106,9 +123,23 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
-  point_cloud_updater_->Start();
-  hmi_->Start();
-  perception_camera_updater_->Start();
+  point_cloud_updater_->Start([this](const std::string& param_string) -> bool {
+    return PointCloudCallback(param_string);
+  });
+  hmi_->Start([this](const std::string& function_name,
+                     const nlohmann::json& param_json) -> nlohmann::json {
+    nlohmann::json ret = HMICallbackSimControl(function_name, param_json);
+    ADEBUG << "ret: " << ret.dump();
+    return ret;
+  });
+  perception_camera_updater_->Start(
+      [this](const std::string& param_string) -> bool {
+        return PerceptionCameraCallback(param_string);
+      });
+  plugin_manager_->Start([this](const std::string& function_name,
+                                const nlohmann::json& param_json) -> bool {
+    return PluginCallbackHMI(function_name, param_json);
+  });
 #if WITH_TELEOP == 1
   teleop_->Start();
 #endif
@@ -117,11 +148,155 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  sim_control_->Stop();
+  SimControlManager::Instance()->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();
+  plugin_manager_->Stop();
 }
 
+nlohmann::json Dreamview::HMICallbackSimControl(
+    const std::string& function_name, const nlohmann::json& param_json) {
+  nlohmann::json callback_res = {};
+  callback_res["result"] = false;
+  if (hmi_function_map.find(function_name) == hmi_function_map.end()) {
+    AERROR << "Donnot support this callback";
+    return callback_res;
+  }
+  switch (hmi_function_map[function_name]) {
+    case 0: {
+      // 解析结果
+      if (param_json.contains("x") && param_json.contains("y")) {
+        const double x = param_json["x"];
+        const double y = param_json["y"];
+        SimControlManager::Instance()->Restart(x, y);
+        callback_res["result"] = true;
+      }
+    } break;
+    case 1: {
+      map_service_->ReloadMap(true);
+      callback_res["result"] = true;
+      break;
+    }
+    case 2: {
+      // loadDynamicModels
+      if (SimControlManager::Instance()->IsEnabled()) {
+        nlohmann::json load_res =
+            SimControlManager::Instance()->LoadDynamicModels();
+        callback_res["loaded_dynamic_models"] =
+            load_res["loaded_dynamic_models"];
+        callback_res["result"] = true;
+      } else {
+        AERROR << "Sim control is not enabled!";
+      }
+      break;
+    }
+    case 3: {
+      // 解析结果
+      if (param_json.contains("dynamic_model_name") &&
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] =
+            SimControlManager::Instance()->ChangeDynamicModel(
+                param_json["dynamic_model_name"]);
+      } else {
+        AERROR << "Sim control is not enabled or missing dynamic model name "
+                  "param!";
+      }
+      break;
+    }
+    case 4: {
+      // 解析结果
+      if (param_json.contains("dynamic_model_name") &&
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] =
+            SimControlManager::Instance()->DeleteDynamicModel(
+                param_json["dynamic_model_name"]);
+      } else {
+        AERROR << "Sim control is not enabled or missing dynamic model name "
+                  "param!";
+      }
+      break;
+    }
+    case 5: {
+      // addDynamicModel
+      if (param_json.contains("dynamic_model_name") &&
+          SimControlManager::Instance()->IsEnabled()) {
+        callback_res["result"] = SimControlManager::Instance()->AddDynamicModel(
+            param_json["dynamic_model_name"]);
+      } else {
+        AERROR << "Sim control is not enabled or missing dynamic model name "
+                  "param!";
+      }
+      break;
+    }
+    case 6: {
+      // restart dynamic model
+      map_service_->ReloadMap(true);
+      SimControlManager::Instance()->Restart();
+      callback_res["result"] = true;
+      break;
+    }
+    default:
+      break;
+  }
+  return callback_res;
+}
+
+bool Dreamview::PluginCallbackHMI(const std::string& function_name,
+                                  const nlohmann::json& param_json) {
+  bool callback_res;
+  if (plugin_function_map.find(function_name) == plugin_function_map.end()) {
+    AERROR << "Donnot support this callback";
+    return false;
+  }
+  switch (plugin_function_map[function_name]) {
+    case 0: {
+      // 解析结果
+      if (param_json.contains("data") &&
+          param_json["data"].contains("scenario_set_id") &&
+          param_json["data"].contains("scenario_set_name")) {
+        const std::string scenario_set_id =
+            param_json["data"]["scenario_set_id"];
+        const std::string scenario_set_name =
+            param_json["data"]["scenario_set_name"];
+        if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
+          callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
+                                                         scenario_set_name);
+        }
+      }
+    } break;
+    case 1: {
+      callback_res = hmi_->UpdateRecordToStatus();
+    } break;
+    case 2: {
+      if (param_json.contains("data") &&
+          param_json["data"].contains("dynamic_model_name")) {
+        const std::string dynamic_model_name =
+            param_json["data"]["dynamic_model_name"];
+        if (!dynamic_model_name.empty()) {
+          callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
+        }
+      }
+    } break;
+    case 3: {
+      callback_res = hmi_->UpdateVehicleToStatus();
+    }
+    default:
+      break;
+  }
+  return callback_res;
+}
+
+bool Dreamview::PerceptionCameraCallback(const std::string& param_string) {
+  bool callback_res = false;
+  callback_res = hmi_->UpdateCameraChannelToStatus(param_string);
+  return callback_res;
+}
+
+bool Dreamview::PointCloudCallback(const std::string& param_string) {
+  bool callback_res = false;
+  callback_res = hmi_->UpdatePointChannelToStatus(param_string);
+  return callback_res;
+}
 }  // namespace dreamview
 }  // namespace apollo

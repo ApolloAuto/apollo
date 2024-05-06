@@ -1,0 +1,11 @@
+start_stop_sign_scenario_distance: 4.0
+watch_vehicle_max_valid_stop_distance: 5.0
+max_valid_stop_distance: 2.0
+stop_duration_sec: 1.0
+stop_timeout_sec: 8.0
+creep_timeout_sec: 10.0
+creep_stage_config {
+    min_boundary_t: 6.0
+    ignore_max_st_min_t: 0.1
+    ignore_min_st_min_s: 15.0
+}

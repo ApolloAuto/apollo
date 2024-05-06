@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_base/proto/plugin_declare_info.proto";
+
+message TrafficRulesPipeline {
+    // The contained trafficrule list of the trafficrule pipeline.
+    repeated PluginDeclareInfo rule = 1;
+}

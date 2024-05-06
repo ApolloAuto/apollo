@@ -1,0 +1,7 @@
+<library path="modules/planning/scenarios/park_and_go/libpark_and_go_scenario.so">
+    <class type="apollo::planning::ParkAndGoScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::ParkAndGoStageAdjust" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::ParkAndGoStageCheck" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::ParkAndGoStageCruise" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::ParkAndGoStagePreCruise" base_class="apollo::planning::Stage"></class>
+</library>

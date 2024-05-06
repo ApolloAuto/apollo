@@ -1,0 +1,5 @@
+<library path="modules/planning/scenarios/bare_intersection_unprotected/libbare_intersection_unprotected_scenario.so">
+    <class type="apollo::planning::BareIntersectionUnprotectedScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::BareIntersectionUnprotectedStageApproach" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::BareIntersectionUnprotectedStageIntersectionCruise" base_class="apollo::planning::Stage"></class>
+</library>

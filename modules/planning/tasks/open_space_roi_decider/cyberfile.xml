@@ -1,0 +1,17 @@
+<package>
+    <name>planning-task-open-space-roi-decider</name>
+    <version>local</version>
+    <description>
+     planning-task-open-space-roi-decider
+    </description>
+    <maintainer email="apollo-support">apollo-support@baidu.com</maintainer>
+    <type>module</type>
+    <src_path>//modules/planning/tasks/open_space_roi_decider</src_path>
+    <license>Apache License 2.0</license>
+    <author>Apollo</author>
+    <depend>bazel-extend-tools</depend>
+    <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+    <depend type="binary" repo_name="planning-open-space">planning-open-space</depend>
+    
+    <builder>bazel</builder>
+  </package>

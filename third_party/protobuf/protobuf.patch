@@ -1,0 +1,68 @@
+--- BUILD
++++ BUILD
+@@ -200,16 +200,32 @@ 
+     includes = ["src/"],
+     linkopts = LINK_OPTS,
+     visibility = ["//visibility:public"],
++    alwayslink = True,
+ )
+ 
+ PROTOBUF_DEPS = select({
+     ":msvc": [],
+     "//conditions:default": ZLIB_DEPS,
+ })
+-
+ cc_library(
+     name = "protobuf",
+     srcs = [
++        "libprotobuf.so"
++    ],
++    hdrs = glob([
++        "src/**/*.h",
++        "src/**/*.inc",
++    ]),
++    copts = COPTS,
++    includes = ["src/"],
++    linkopts = LINK_OPTS,
++    visibility = ["//visibility:public"],
++    deps = [":protobuf_lite"] + PROTOBUF_DEPS,
++)
++
++cc_binary(
++    name = "libprotobuf.so",
++    srcs = glob([
+         # AUTOGEN(protobuf_srcs)
+         "src/google/protobuf/any.cc",
+         "src/google/protobuf/any.pb.cc",
+@@ -263,8 +279,6 @@
+         "src/google/protobuf/util/type_resolver_util.cc",
+         "src/google/protobuf/wire_format.cc",
+         "src/google/protobuf/wrappers.pb.cc",
+-    ],
+-    hdrs = glob([
+         "src/**/*.h",
+         "src/**/*.inc",
+     ]),
+@@ -273,6 +287,7 @@
+     linkopts = LINK_OPTS,
+     visibility = ["//visibility:public"],
+     deps = [":protobuf_lite"] + PROTOBUF_DEPS,
++    linkshared = True,
+ )
+ 
+ # This provides just the header files for use in projects that need to build
+@@ -288,6 +303,14 @@
+     includes = ["src/"],
+     visibility = ["//visibility:public"],
+ )
++filegroup(
++    name = "protobuf_hdrs",
++    srcs = glob([
++        "src/**/*.h",
++        "src/**/*.inc",
++    ]),
++    visibility = ["//visibility:public"],
++)
+ 
+ # Map of all well known protos.
+ # name => (include path, imports)

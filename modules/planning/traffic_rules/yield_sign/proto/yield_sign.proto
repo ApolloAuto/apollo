@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// YieldSignConfig
+
+message YieldSignConfig {
+  // Flag if processing of yield sign is enabled.
+  optional bool enabled = 1 [default = true];
+  // Safty stop distance(m) to the stop line of the yield sign.
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}

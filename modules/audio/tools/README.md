@@ -13,6 +13,6 @@ By default, there are 6 audio channels, so 6 files will be generated -- one for 
 
 ### Other References
 
-* Hardware Specification -- [Respeaker](../../../docs/specs/Microphone/Re_Speaker_USB_Mic_Array_Guide.md)
+* Hardware Specification -- [Respeaker](../../../docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Microphone/Re_Speaker_USB_Mic_Array_Guide.md)
 * Driver Configuration -- [Microphone](../../drivers/microphone/README.md)
 

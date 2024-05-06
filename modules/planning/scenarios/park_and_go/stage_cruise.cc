@@ -17,29 +17,23 @@
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/common.h"
-#include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/planning_context.h"
+#include "modules/planning/planning_base/common/util/common.h"
+#include "modules/planning/scenarios/park_and_go/context.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus ParkAndGoStageCruise::Process(
+StageResult ParkAndGoStageCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Cruise";
   CHECK_NOTNULL(frame);
 
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
-
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
+  StageResult result = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (result.HasError()) {
     AERROR << "ParkAndGoStageCruise planning error";
   }
 
@@ -53,12 +47,10 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
   if (status == CRUISE_COMPLETE) {
     return FinishStage();
   }
-  return Stage::RUNNING;
+  return result.SetStageStatus(StageStatusType::RUNNING);
 }
 
-Stage::StageStatus ParkAndGoStageCruise::FinishStage() {
-  return FinishScenario();
-}
+StageResult ParkAndGoStageCruise::FinishStage() { return FinishScenario(); }
 
 ParkAndGoStageCruise::ParkAndGoStatus
 ParkAndGoStageCruise::CheckADCParkAndGoCruiseCompleted(
@@ -98,7 +90,5 @@ ParkAndGoStageCruise::CheckADCParkAndGoCruiseCompleted(
   return CRUISING;
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -1,0 +1,47 @@
+<package format="2">
+  <name>prediction</name>
+  <version>local</version>
+  <description>
+    The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
+    Prediction receives obstacle data along with basic perception information including positions, headings, velocities,
+    accelerations, and then generates predicted trajectories with probabilities for those obstacles.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
+  <depend repo_name="opencv" lib_names="core,highgui,imgproc,imgcodecs">3rd-opencv</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend repo_name="com_github_jbeder_yaml_cpp" lib_names="yaml-cpp">3rd-yaml-cpp</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map</depend>
+  <depend type="binary" repo_name="transform" lib_names="transform">transform</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend so_names="numa">libnuma-dev</depend>
+  <depend repo_name="libtorch_gpu" lib_names="libtorch_gpu" condition="gpu">3rd-libtorch-gpu</depend>
+  <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu" condition="not gpu">3rd-libtorch-cpu</depend>
+  <depend>3rd-mkl</depend>
+
+  <depend expose="False">3rd-pcl</depend>
+  <depend repo_name="npp">3rd-npp</depend>
+
+
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend expose="False">3rd-gpus</depend>
+
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/prediction</src_path>
+
+</package>

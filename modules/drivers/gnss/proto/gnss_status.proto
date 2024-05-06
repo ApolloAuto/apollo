@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.drivers.gnss;
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 message StreamStatus {
   optional apollo.common.Header header = 1;

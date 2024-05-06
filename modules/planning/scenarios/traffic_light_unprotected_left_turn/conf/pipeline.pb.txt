@@ -1,0 +1,147 @@
+stage: {
+  name: "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH"
+  type: "TrafficLightUnprotectedLeftTurnStageApproach"
+  enabled: true
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "ST_BOUNDS_DECIDER"
+    type: "STBoundsDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+stage: {
+  name: "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP"
+  type: "TrafficLightUnprotectedLeftTurnStageCreep"
+  enabled: true
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "ST_BOUNDS_DECIDER"
+    type: "STBoundsDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+stage: {
+  name: "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE"
+  type: "TrafficLightUnprotectedLeftTurnStageIntersectionCruise"
+  enabled: true
+    task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "ST_BOUNDS_DECIDER"
+    type: "STBoundsDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}

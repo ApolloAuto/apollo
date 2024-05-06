@@ -158,7 +158,19 @@ bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
   }
 
   cursor = total_buf + header_size;
+  if (header.GetFramePos() > header.GetMsgSize()) {
+    return false;
+  }
   char *buf = proto_buf->GetBuf(header.GetFramePos());
+  // check cursor size
+  if (header.GetFrameSize() < 0 ||
+    header.GetFrameSize() > (total_recv - header_size)) {
+    return false;
+  }
+  // check buf size
+  if (header.GetFrameSize() > (header.GetMsgSize() - header.GetFramePos())) {
+    return false;
+  }
   memcpy(buf, cursor, header.GetFrameSize());
   proto_buf->UpdateStatus(header.GetIndex());
   if (proto_buf->IsReadyDiserialize()) {

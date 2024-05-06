@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/drivers/lidar/fusion/libfusion_component.so"
+
+    components {
+      class_name : "PriSecFusionComponent"
+      config {
+        name : "lidar_fusion"
+        config_file_path : "/apollo/modules/drivers/lidar/fusion/conf/fusion_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lidar/back/PointCloud2"}
+      }
+    }
+}

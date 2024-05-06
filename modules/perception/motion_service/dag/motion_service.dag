@@ -1,0 +1,11 @@
+module_config {
+  module_library : "modules/perception/motion_service/libmotion_service_component.so"
+
+ components {
+    class_name : "MotionServiceComponent"
+    config {
+      name: "MotionServiceComponent"
+      config_file_path: "/apollo/modules/perception/motion_service/conf/motion_service_config.pb.txt"
+    }
+  }
+}

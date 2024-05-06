@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioEmergencyPullOverConfig {
+  // Maximum stop deceleration at slow down stage
+  optional double max_stop_deceleration = 1 [default = 3.0];
+  // Expected slow down time at slow down stage
+  optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
+  // Expected slow down speed at slow down stage
+  optional double target_slow_down_speed = 3 [default = 2.5];       // m/s
+  // Distance of stopping point to the pull over point
+  optional double stop_distance = 4 [default = 1.5];                // meter
+}

@@ -1,0 +1,77 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+message KeyValueInt {
+  optional string name = 1;
+  optional int32 value = 2;
+}
+
+message KeyValueString {
+  optional string name = 1;
+  optional bytes value = 2;
+}
+
+message KeyValueDouble {
+  optional string name = 1;
+  optional double value = 2;
+}
+
+message KeyValueFloat {
+  optional string name = 1;
+  optional float value = 2;
+}
+
+message KeyValueBool {
+  optional string name = 1;
+  optional bool value = 2;
+}
+
+message KeyValueArrayInt {
+  optional string name = 1;
+  repeated int32 values = 2;
+}
+
+message KeyValueArrayString {
+  optional string name = 1;
+  repeated bytes values = 2;
+}
+
+message KeyValueArrayDouble {
+  optional string name = 1;
+  repeated double values = 2;
+}
+
+message KeyValueArrayFloat {
+  optional string name = 1;
+  repeated float values = 2;
+}
+
+message KeyValueArrayBool {
+  optional string name = 1;
+  repeated bool values = 2;
+}
+
+message ModelConfigProto {
+  optional string name = 1;
+  optional string version = 2;
+
+  repeated KeyValueInt integer_params = 3;
+  repeated KeyValueString string_params = 4;
+  repeated KeyValueDouble double_params = 5;
+  repeated KeyValueFloat float_params = 6;
+  repeated KeyValueBool bool_params = 7;
+  repeated KeyValueArrayInt array_integer_params = 8;
+  repeated KeyValueArrayString array_string_params = 9;
+  repeated KeyValueArrayDouble array_double_params = 10;
+  repeated KeyValueArrayFloat array_float_params = 11;
+  repeated KeyValueArrayBool array_bool_params = 12;
+}
+
+message MultiModelConfigProto {
+  repeated ModelConfigProto model_configs = 1;
+}
+
+message ModelConfigFileListProto {
+  repeated string model_config_path = 1;
+}

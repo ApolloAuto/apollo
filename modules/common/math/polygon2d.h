@@ -26,7 +26,6 @@
 
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::common::math
@@ -304,6 +303,10 @@ class Polygon2d {
    * @return The polygon after expansion.
    */
   Polygon2d ExpandByDistance(const double distance) const;
+
+  Polygon2d PolygonExpandByDistance(const double distance) const;
+
+  void CalculateVertices(const Vec2d &shift_vec);
 
   /**
    * @brief Get a string containing essential information about the polygon

@@ -28,7 +28,8 @@ namespace {
 
 using apollo::common::ErrorCode;
 
-bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
+bool ShowRequestInfo(const routing::RoutingRequest& request,
+                     const TopoGraph* graph) {
   for (const auto& wp : request.waypoint()) {
     const auto* node = graph->GetNode(wp.id());
     if (node == nullptr) {
@@ -54,7 +55,8 @@ bool ShowRequestInfo(const RoutingRequest& request, const TopoGraph* graph) {
   return true;
 }
 
-bool GetWayNodes(const RoutingRequest& request, const TopoGraph* graph,
+bool GetWayNodes(const routing::RoutingRequest& request,
+                 const TopoGraph* graph,
                  std::vector<const TopoNode*>* const way_nodes,
                  std::vector<double>* const way_s) {
   for (const auto& point : request.waypoint()) {
@@ -117,7 +119,8 @@ bool Navigator::IsReady() const { return is_ready_; }
 
 void Navigator::Clear() { topo_range_manager_.Clear(); }
 
-bool Navigator::Init(const RoutingRequest& request, const TopoGraph* graph,
+bool Navigator::Init(const routing::RoutingRequest& request,
+                     const TopoGraph* graph,
                      std::vector<const TopoNode*>* const way_nodes,
                      std::vector<double>* const way_s) {
   Clear();
@@ -200,8 +203,8 @@ bool Navigator::SearchRouteByStrategy(
   return true;
 }
 
-bool Navigator::SearchRoute(const RoutingRequest& request,
-                            RoutingResponse* const response) {
+bool Navigator::SearchRoute(const routing::RoutingRequest& request,
+                            routing::RoutingResponse* const response) {
   if (!ShowRequestInfo(request, graph_.get())) {
     SetErrorCode(ErrorCode::ROUTING_ERROR_REQUEST,
                  "Error encountered when reading request point!",

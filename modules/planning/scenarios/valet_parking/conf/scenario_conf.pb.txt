@@ -1,0 +1,2 @@
+parking_spot_range_to_start: 20.0
+max_valid_stop_distance: 1.0

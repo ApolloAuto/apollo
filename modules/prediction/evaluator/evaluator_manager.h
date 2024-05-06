@@ -78,6 +78,10 @@ class EvaluatorManager {
   void EvaluateObstacle(Obstacle* obstacle,
                         ObstaclesContainer* obstacles_container);
 
+  void EvaluateMultiObstacle(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container);
+
  private:
   void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container,
                                  size_t max_num_frame);
@@ -135,6 +139,9 @@ class EvaluatorManager {
 
   ObstacleConf::EvaluatorType interaction_evaluator_ =
       ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR;
+
+  ObstacleConf::EvaluatorType multi_agent_evaluator_ =
+      ObstacleConf::MULTI_AGENT_EVALUATOR;
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
 

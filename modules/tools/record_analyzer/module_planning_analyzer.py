@@ -33,7 +33,7 @@ from modules.tools.record_analyzer.metrics.latency import Latency
 from modules.tools.record_analyzer.metrics.lat_acceleration import LatAcceleration
 from modules.tools.record_analyzer.metrics.lon_acceleration import LonAcceleration
 from modules.tools.record_analyzer.metrics.reference_line import ReferenceLine
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 from shapely.geometry import LineString, Point
 
 

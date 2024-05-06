@@ -1,0 +1,40 @@
+info {
+  name: "tl_detection_caffe"
+  version: "2021-01-15"
+  dataset: "KITTI"
+  task_type: CustomTask
+  sensor_type: Camera
+  framework: TensorRT
+
+  proto_file {
+    file: "deploy.prototxt"
+  }
+  weight_file {
+    file: "baidu_iter_140000.caffemodel"
+  }
+  inputs {
+    name: "img"
+    shape: 1
+    shape: 270
+    shape: 270
+    shape: 3
+  }
+  inputs {
+    name: "im_info"
+    shape: 1
+    shape: 1
+    shape: 6
+    shape: 1
+  }
+  outputs {
+    name: "bboxes"
+  }
+}
+min_crop_size: 270
+crop_method: 0
+mean_r: 122.7717
+mean_g: 115.9465
+mean_b: 102.9801
+is_bgr:true
+crop_scale: 2.5
+max_batch_size: 1  # only support 1 so far

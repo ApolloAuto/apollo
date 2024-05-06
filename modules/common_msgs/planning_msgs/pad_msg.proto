@@ -1,0 +1,27 @@
+syntax = "proto2";
+package apollo.planning;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+
+message PadMessage {
+  optional apollo.common.Header header = 1;
+
+  enum DrivingAction {
+    NONE = 100;
+    FOLLOW = 0;
+    CHANGE_LEFT = 1;
+    CHANGE_RIGHT = 2;
+    PULL_OVER = 3;
+    STOP = 4;
+    RESUME_CRUISE = 5;
+    CLEAR_PLANNING = 6;
+    // Enter mission model
+    ENTER_MISSION = 7;
+    // Exit mission model
+    EXIT_MISSION = 8;
+  };
+
+  // driving action
+  optional DrivingAction action = 2;
+}

@@ -1,0 +1,3 @@
+roi_type: PARK_AND_GO
+perception_obstacle_buffer: 0.5
+end_pose_s_distance: 5.0

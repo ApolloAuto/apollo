@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
+#include "modules/dreamview/backend/common/util/hmi_util.h"
 
 #include "gtest/gtest.h"
 
@@ -22,10 +23,11 @@ namespace apollo {
 namespace dreamview {
 
 TEST(HMIWorker, LoadConfigAndMode) {
-  const HMIConfig config = HMIWorker::LoadConfig();
+  const HMIConfig config =
+      util::HMIUtil::LoadConfig(FLAGS_dv_hmi_modes_config_path);
   for (const auto& iter : config.modes()) {
     const std::string& mode_conf_file = iter.second;
-    const HMIMode& mode = HMIWorker::LoadMode(mode_conf_file);
+    const HMIMode& mode = util::HMIUtil::LoadMode(mode_conf_file);
     EXPECT_FALSE(mode.modules().empty())
         << "No HMI module loaded from " << mode_conf_file;
   }

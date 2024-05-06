@@ -68,35 +68,35 @@ int RadarState201::radar_power(const std::uint8_t* bytes,
   return ret;
 }
 
-OutputType RadarState201::output_type(const std::uint8_t* bytes,
-                                      int32_t length) const {
+RacobitRadarState_201::OutputType RadarState201::output_type(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 5);
   uint32_t x = t0.get_byte(2, 2);
 
   switch (x) {
     case 0x0:
-      return OUTPUT_TYPE_NONE;
+      return RacobitRadarState_201::OUTPUT_TYPE_NONE;
     case 0x1:
-      return OUTPUT_TYPE_OBJECTS;
+      return RacobitRadarState_201::OUTPUT_TYPE_OBJECTS;
     case 0x2:
-      return OUTPUT_TYPE_CLUSTERS;
+      return RacobitRadarState_201::OUTPUT_TYPE_CLUSTERS;
     default:
-      return OUTPUT_TYPE_ERROR;
+      return RacobitRadarState_201::OUTPUT_TYPE_ERROR;
   }
 }
 
-RcsThreshold RadarState201::rcs_threshold(const std::uint8_t* bytes,
-                                          int32_t length) const {
+RacobitRadarState_201::RcsThreshold RadarState201::rcs_threshold(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 7);
   uint32_t x = t0.get_byte(2, 3);
 
   switch (x) {
     case 0x0:
-      return RCS_THRESHOLD_STANDARD;
+      return RacobitRadarState_201::RCS_THRESHOLD_STANDARD;
     case 0x1:
-      return RCS_THRESHOLD_HIGH_SENSITIVITY;
+      return RacobitRadarState_201::RCS_THRESHOLD_HIGH_SENSITIVITY;
     default:
-      return RCS_THRESHOLD_ERROR;
+      return RacobitRadarState_201::RCS_THRESHOLD_ERROR;
   }
 }
 

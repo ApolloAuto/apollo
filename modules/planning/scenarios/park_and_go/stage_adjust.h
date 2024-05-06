@@ -16,40 +16,27 @@
 
 #pragma once
 
-#include <memory>
-
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-#include "modules/planning/scenarios/stage.h"
+#include "cyber/plugin_manager/plugin_manager.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 struct ParkAndGoContext;
 
 class ParkAndGoStageAdjust : public Stage {
  public:
-  ParkAndGoStageAdjust(const ScenarioConfig::StageConfig& config,
-                       const std::shared_ptr<DependencyInjector>& injector)
-      : Stage(config, injector) {}
-
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  ParkAndGoContext* GetContext() {
-    return Stage::GetContextAs<ParkAndGoContext>();
-  }
-
-  Stage::StageStatus FinishStage();
+  StageResult Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
  private:
+  StageResult FinishStage();
+
   void ResetInitPostion();
-  ScenarioParkAndGoConfig scenario_config_;
 };
 
-}  // namespace park_and_go
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::ParkAndGoStageAdjust,
+                                     Stage)
+
 }  // namespace planning
 }  // namespace apollo

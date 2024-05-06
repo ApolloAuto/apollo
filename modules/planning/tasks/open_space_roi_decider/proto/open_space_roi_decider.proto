@@ -1,0 +1,54 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+// OpenSpaceRoiDeciderConfig
+
+message OpenSpaceRoiDeciderConfig {
+  // roi scenario definitions
+  enum RoiType {
+    NOT_DEFINED = 0;
+    PARKING = 1;
+    PULL_OVER = 2;
+    PARK_AND_GO = 3;
+    NARROW_STREET_U_TURN = 4;
+    DEAD_END = 5;
+  }
+  optional RoiType roi_type = 1;
+  // longitudinal range of parking roi start
+  optional double roi_longitudinal_range_start = 2 [default = 10.0];
+  // longitudinal range of parking roi end
+  optional double roi_longitudinal_range_end = 3 [default = 10.0];
+  // parking spot range detection threshold
+  optional double parking_start_range = 4 [default = 7.0];
+  // Parking orientation for reverse parking
+  optional bool parking_inwards = 5 [default = false];
+  // enable the open space planner to take perception obstacles into consideration
+  optional bool enable_perception_obstacles = 6;
+  // buffer distance from vehicle's edge to parking spot end line
+  optional double parking_depth_buffer = 7 [default = 0.1];
+  // min angle difference to stitch a new segment in roi representation
+  optional double roi_line_segment_min_angle = 8 [default = 0.3];
+  optional double roi_line_segment_length = 9 [default = 1.0];
+  // roi line segment length when getting road boundary from map
+  optional double roi_line_segment_length_from_map = 10 [default = 10.0];
+  // relative distance threshold to filter out ignored obstacle
+  optional double perception_obstacle_filtering_distance = 11
+      [default = 1000.0];
+  // buffer distance for perception obstacle
+  optional double perception_obstacle_buffer = 12;
+  // tolerance limit for road_bound_width abnormal changes
+  optional double curb_heading_tangent_change_upper_limit = 13 [default = 1.0];
+  // end pose s distance to current vehicle
+  optional double end_pose_s_distance = 14 [default = 10.0];
+  // end pose x to parallel parking
+  optional double parallel_park_end_x_buffer = 15 [default = 0.2];
+  // extend right spot width size
+  optional double extend_right_x_buffer = 16 [default = 0.0];
+  // extend left spot width size
+  optional double extend_left_x_buffer = 17 [default = 0.0];
+  // get road boundary from HD map
+  optional bool use_road_boundary_from_map = 18 [default = false];
+  // expand polygon of obstacle 
+  optional bool expand_polygon_of_obstacle_by_distance = 19 [default = false];
+}

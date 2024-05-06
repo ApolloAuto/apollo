@@ -1,0 +1,2 @@
+  max_stop_deceleration: 6.0
+  stop_distance: 1.0

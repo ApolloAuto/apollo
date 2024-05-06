@@ -18,10 +18,11 @@
 
 #include <limits>
 
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
+
 #include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/string_util.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
 namespace apollo {
 namespace localization {
@@ -211,10 +212,12 @@ void RTKLocalization::FillLocalizationStatusMsg(
 
   auto pos_type = static_cast<drivers::gnss::SolutionType>(status.pos_type());
   switch (pos_type) {
+    case drivers::gnss::SolutionType::NARROW_INT:
     case drivers::gnss::SolutionType::INS_RTKFIXED:
       localization_status->set_fusion_status(MeasureState::OK);
       localization_status->set_state_message("");
       break;
+    case drivers::gnss::SolutionType::NARROW_FLOAT:
     case drivers::gnss::SolutionType::INS_RTKFLOAT:
       localization_status->set_fusion_status(MeasureState::WARNNING);
       localization_status->set_state_message(

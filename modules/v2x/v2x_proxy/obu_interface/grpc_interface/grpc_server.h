@@ -27,11 +27,11 @@
 
 #include <grpc++/grpc++.h>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_service_obu_to_car.grpc.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
+#include "modules/common_msgs/v2x_msgs/v2x_traffic_light.pb.h"
 
 #include "cyber/cyber.h"
 

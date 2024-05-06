@@ -60,6 +60,13 @@ void PlayTaskBuffer::PopFront() {
   }
 }
 
+void PlayTaskBuffer::Clear() {
+  std::lock_guard<std::mutex> lck(mutex_);
+  while (!tasks_.empty()) {
+    tasks_.erase(tasks_.begin());
+  }
+}
+
 }  // namespace record
 }  // namespace cyber
 }  // namespace apollo

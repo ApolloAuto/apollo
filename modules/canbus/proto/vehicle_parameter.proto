@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.canbus;
 
-import "modules/canbus/proto/chassis.proto";
-import "modules/common/configs/proto/vehicle_config.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/config_msgs/vehicle_config.proto";
 
 message VehicleParameter {
   optional apollo.common.VehicleBrand brand = 1;

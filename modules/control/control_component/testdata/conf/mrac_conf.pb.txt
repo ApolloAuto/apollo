@@ -1,0 +1,10 @@
+mrac_model_order: 1
+reference_time_constant: 0.01
+reference_natural_frequency: 10
+reference_damping_ratio: 0.9
+adaption_state_gain: 1.0
+adaption_desired_gain: 1.0
+adaption_nonlinear_gain: 1.0
+adaption_matrix_p: 1.0
+mrac_saturation_level: 1.0
+anti_windup_compensation_gain: 0.0

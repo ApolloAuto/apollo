@@ -8,6 +8,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "boost",
     includes = ["."],
+    hdrs = glob(["**/*"]),
     linkopts = [
         "-L/opt/apollo/sysroot/lib",
         "-lboost_filesystem",

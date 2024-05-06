@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight;
+
+import "modules/perception/common/proto/model_info.proto";
+
+message ClassifyParam {
+  optional common.ModelInfo info = 1;
+  optional float classify_threshold = 2;
+  optional int32 classify_resize_width = 3;
+  optional int32 classify_resize_height = 4;
+  optional float scale = 5;
+  optional float mean_b = 6 [default = 95];
+  optional float mean_g = 7 [default = 99];
+  optional float mean_r = 8 [default = 96];
+  optional bool is_bgr = 9 [default = true];
+}
+
+message TrafficLightRecognitionConfig {
+  optional ClassifyParam vertical_model = 1;
+  optional ClassifyParam quadrate_model = 2;
+  optional ClassifyParam horizontal_model = 3;
+}

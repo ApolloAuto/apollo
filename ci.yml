@@ -1,0 +1,25 @@
+Global:
+  version: 2.0
+
+Default:
+  profile: [change]
+
+Profiles:
+  - profile:
+    name: change
+    mode: AGENT
+    environment:
+      cluster: DECK_CENTOS7U5_K3
+    build:
+      command: bash scripts/apollo_ci.sh build
+    artifacts:
+      release: true
+  - profile:
+    name: merge
+    mode: AGENT
+    environment:
+      cluster: DECK_CENTOS7U5_K3
+    build:
+      command: bash scripts/apollo_ci.sh build
+    artifacts:
+      release: true

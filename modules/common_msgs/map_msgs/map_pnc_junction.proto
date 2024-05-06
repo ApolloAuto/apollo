@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_id.proto";
+
+message Passage {
+  optional Id id = 1;
+
+  repeated Id signal_id = 2;
+  repeated Id yield_id = 3;
+  repeated Id stop_sign_id = 4;
+  repeated Id lane_id = 5;
+
+  enum Type {
+    UNKNOWN = 0;
+    ENTRANCE = 1;
+    EXIT = 2;
+  };
+  optional Type type = 6;
+};
+
+message PassageGroup {
+  optional Id id = 1;
+
+  repeated Passage passage = 2;
+};
+
+message PNCJunction {
+  optional Id id = 1;
+
+  optional Polygon polygon = 2;
+
+  repeated Id overlap_id = 3;
+
+  repeated PassageGroup passage_group = 4;
+}

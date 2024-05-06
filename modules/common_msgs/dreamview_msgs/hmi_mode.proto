@@ -1,0 +1,130 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+// This proto defines a mode showing in Dreamview, including how you will
+// display them and monitor their status.
+
+import "modules/common_msgs/dreamview_msgs/hmi_status.proto";
+
+// For ProcessMonitor.
+message ProcessMonitorConfig {
+  repeated string command_keywords = 1;
+}
+
+// For ModuleMonitor
+message ModuleMonitorConfig {
+  repeated string node_name = 1;
+}
+
+// For ChannelMonitor.
+message ChannelMonitorConfig {
+  optional string name = 1;
+  optional double delay_fatal = 2 [default = 3.0];  // In seconds.
+
+  // The fields will be checked to make sure they are existing
+  // Specify in the format of "a.b.c"
+  repeated string mandatory_fields = 3;
+
+  // Minimum and maximum frequency allowed for this channel
+  optional double min_frequency_allowed = 4 [default = 0.0];
+  optional double max_frequency_allowed = 5 [default = 1000.0];
+}
+
+// For ResourceMonitor.
+message ResourceMonitorConfig {
+  message DiskSpace {
+    // Path to monitor space. Support wildcards like ? and *.
+    // If the path does't exist, raise UNKNWON which will be ignored.
+    optional string path = 1;
+    optional int32 insufficient_space_warning = 2;  // In GB.
+    optional int32 insufficient_space_error = 3;
+  }
+
+  message CPUUsage {
+    optional float high_cpu_usage_warning = 1;
+    optional float high_cpu_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall CPU
+    // usage
+    optional string process_dag_path = 3;
+  }
+
+  message MemoryUsage {
+    optional int32 high_memory_usage_warning = 1;
+    optional int32 high_memory_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall
+    // memory usage
+    optional string process_dag_path = 3;
+  }
+
+  message DiskLoad {
+    optional int32 high_disk_load_warning = 1;
+    optional int32 high_disk_load_error = 2;
+    // Disk device name, such as sda, sdb and etc
+    optional string device_name = 3;
+  }
+
+  repeated DiskSpace disk_spaces = 1;
+  repeated CPUUsage cpu_usages = 2;
+  repeated MemoryUsage memory_usages = 3;
+  repeated DiskLoad disk_load_usages = 4;
+}
+
+// A monitored component will be listed on HMI which only shows its status but
+// user cannot operate.
+// The whole config will generate SystemStatus.components[i].summary by Monitor
+// module, which is generally the most severe one of process, channel or
+// resource status.
+message MonitoredComponent {
+  // Generate SystemStatus.components[i].process_status.
+  // OK if the process is running.
+  // FATAL if the process is down.
+  optional ProcessMonitorConfig process = 1;
+
+  // Generate SystemStatus.components[i].channel_status.
+  // OK if delay is not notable.
+  // FATAL if delay is larger than fatal_delay.
+  optional ChannelMonitorConfig channel = 2;
+
+  // Generate SystemStatus.components[i].resource_status.
+  // OK if all requirements are met.
+  // WARN/ERROR/FATAL if any requirement is below expectation.
+  optional ResourceMonitorConfig resource = 3;
+
+  // Whether to trigger safe-mode if the component is down.
+  optional bool required_for_safety = 4 [default = true];
+
+  // Generate SystemStatus.components[i].module_status.
+  // OK if the module is running.
+  // FATAL if the module is down.
+  optional ModuleMonitorConfig module = 5;
+}
+
+// A module which can be started and stopped by HMI.
+message Module {
+  optional string start_command = 1;
+  optional string stop_command = 2;
+
+  // We use the config in ProcessMonitor to check if the module is running.
+  optional ProcessMonitorConfig process_monitor_config = 3;
+  // Whether to trigger safe-mode if the module is down.
+  optional bool required_for_safety = 4 [default = true];
+}
+
+// A CyberModule will be translated to a regular Module upon loading.
+message CyberModule {
+  repeated string dag_files = 1;
+  optional bool required_for_safety = 2 [default = true];
+  optional string process_group = 3;
+}
+
+message HMIMode {
+  map<string, CyberModule> cyber_modules = 1;
+  map<string, Module> modules = 2;
+  map<string, MonitoredComponent> monitored_components = 3;
+  map<string, ProcessMonitorConfig> other_components = 4;
+  repeated HMIModeOperation operations = 5;
+  optional HMIModeOperation default_operation = 6;
+  optional string layout = 7;
+  map<string, MonitoredComponent> global_components = 8;
+}

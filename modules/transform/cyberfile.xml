@@ -1,0 +1,26 @@
+<package format="2">
+  <name>transform</name>
+  <version>local</version>
+  <description>
+    Apollo transform module.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_github_jbeder_yaml_cpp" lib_names="yaml-cpp">3rd-yaml-cpp</depend>
+  <depend type="binary" repo_name="tf2" lib_names="tf2">3rd-tf2</depend>
+
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/transform</src_path>
+
+</package>

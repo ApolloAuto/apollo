@@ -27,19 +27,19 @@ limitations under the License.
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/proto/map.pb.h"
-#include "modules/map/proto/map_clear_area.pb.h"
-#include "modules/map/proto/map_crosswalk.pb.h"
-#include "modules/map/proto/map_geometry.pb.h"
-#include "modules/map/proto/map_junction.pb.h"
-#include "modules/map/proto/map_lane.pb.h"
-#include "modules/map/proto/map_overlap.pb.h"
-#include "modules/map/proto/map_parking_space.pb.h"
-#include "modules/map/proto/map_pnc_junction.pb.h"
-#include "modules/map/proto/map_signal.pb.h"
-#include "modules/map/proto/map_speed_bump.pb.h"
-#include "modules/map/proto/map_stop_sign.pb.h"
-#include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
+#include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
+#include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
+#include "modules/common_msgs/map_msgs/map_geometry.pb.h"
+#include "modules/common_msgs/map_msgs/map_junction.pb.h"
+#include "modules/common_msgs/map_msgs/map_lane.pb.h"
+#include "modules/common_msgs/map_msgs/map_overlap.pb.h"
+#include "modules/common_msgs/map_msgs/map_parking_space.pb.h"
+#include "modules/common_msgs/map_msgs/map_pnc_junction.pb.h"
+#include "modules/common_msgs/map_msgs/map_signal.pb.h"
+#include "modules/common_msgs/map_msgs/map_speed_bump.pb.h"
+#include "modules/common_msgs/map_msgs/map_stop_sign.pb.h"
+#include "modules/common_msgs/map_msgs/map_yield_sign.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -214,6 +214,20 @@ class HDMapImpl {
       std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
 
   /**
+   * @brief get nearest lane from target point with search radius,
+   * @param point the target point
+   * @param distance the search radius
+   * @param nearest_lane the nearest lane that match search conditions
+   * @param nearest_s the offset from lane start point along lane center line
+   * @param nearest_l the lateral offset from lane center line
+   * @return 0:success, otherwise, failed.
+   */
+  int GetNearestLaneWithDistance(const apollo::common::PointENU& point,
+                                 const double distance,
+                                 LaneInfoConstPtr* nearest_lane,
+                                 double* nearest_s, double* nearest_l) const;
+
+  /**
    * @brief get nearest lane from target point,
    * @param point the target point
    * @param nearest_lane the nearest lane that match search conditions
@@ -344,6 +358,8 @@ class HDMapImpl {
                     double max_heading_difference,
                     std::vector<RSUInfoConstPtr>* rsus) const;
 
+  bool GetMapHeader(Header* map_header) const;
+
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,
                std::vector<LaneInfoConstPtr>* lanes) const;
@@ -382,6 +398,10 @@ class HDMapImpl {
                           std::vector<LaneInfoConstPtr>* lanes) const;
   int GetRoads(const apollo::common::math::Vec2d& point, double distance,
                std::vector<RoadInfoConstPtr>* roads) const;
+  int GetNearestLaneWithDistance(const apollo::common::math::Vec2d& point,
+                                 const double distance,
+                                 LaneInfoConstPtr* nearest_lane,
+                                 double* nearest_s, double* nearest_l) const;
 
   template <class Table, class BoxTable, class KDTree>
   static void BuildSegmentKDTree(

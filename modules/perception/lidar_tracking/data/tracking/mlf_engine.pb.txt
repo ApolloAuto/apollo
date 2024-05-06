@@ -1,0 +1,7 @@
+use_histogram_for_match: true
+histogram_bin_size: 10
+output_predict_objects: false
+reserved_invisible_time: 0.3
+use_frame_timestamp: true
+set_static_outside_hdmap: true
+print_debug_log: false

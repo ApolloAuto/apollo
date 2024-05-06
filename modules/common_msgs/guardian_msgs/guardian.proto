@@ -1,0 +1,10 @@
+syntax = "proto2";
+package apollo.guardian;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/control_msgs/control_cmd.proto";
+
+message GuardianCommand {
+  optional apollo.common.Header header = 1;
+  optional apollo.control.ControlCommand control_command = 2;
+}

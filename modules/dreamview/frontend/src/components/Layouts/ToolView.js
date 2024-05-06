@@ -5,6 +5,7 @@ import DataRecorder from 'components/DataRecorder';
 import ModuleController from 'components/ModuleController';
 import Menu from 'components/SideBar/Menu';
 import DefaultRouting from 'components/DefaultRouting';
+import DataProfile from 'components/DataProfile';
 import Tasks from 'components/Tasks';
 
 @inject('store') @observer
@@ -31,6 +32,11 @@ export default class ToolView extends React.Component {
                         newDisengagementReminder={newDisengagementReminder}
                     />
                 )}
+              {options.showProfile && (
+                <DataProfile
+                  newDisengagementReminder={newDisengagementReminder}
+                />
+              )}
             </div>
     );
   }

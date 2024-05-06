@@ -16,7 +16,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "cyber/init.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"

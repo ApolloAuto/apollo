@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package modules.teleop.daemon;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message DaemonRpt {
+  optional apollo.common.Header header = 1;
+  repeated string services = 2;
+}

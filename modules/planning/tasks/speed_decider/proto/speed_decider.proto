@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// SpeedDeciderConfig
+
+message SpeedDeciderConfig {
+  // obstacle min lateral distance to follow
+  optional double follow_min_obs_lateral_distance = 1 [default = 2.5];
+  // min follow time in st region before considering a valid follow, this is 
+  // to differentiate a moving obstacle cross adc's current lane and move to a
+  // different direction
+  optional double follow_min_time_sec = 2 [default = 2.0];
+  optional bool is_stop_for_pedestrain = 3 [default = false];
+  optional double keep_clear_last_point_speed = 4 [default = 0.8];
+  optional double overtake_time_buffer = 5 [default = 3.0];
+  optional double overtake_min_distance = 6 [default = 10.0];
+  optional double yield_distance_buffer = 7 [default = 5.0];
+  optional double stop_follow_distance = 8 [default = 2.0];
+  optional FollowDistanceSchedulerInfo follow_distance_scheduler = 9;
+}
+
+message FollowDistanceSchedulerInfo {
+  repeated FollowDistance follow_distance = 1;
+}
+
+message FollowDistance {
+  optional double speed = 1;  // m/s
+  optional double slope = 2; //
+}

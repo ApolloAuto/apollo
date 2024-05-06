@@ -1,0 +1,223 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/vehicle_signal.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
+
+message TargetLane {
+  // lane id
+  optional string id = 1;
+  optional double start_s = 2;      // in meters
+  optional double end_s = 3;        // in meters
+  optional double speed_limit = 4;  // in m/s
+}
+
+message ObjectIgnore {}
+
+enum StopReasonCode {
+  STOP_REASON_HEAD_VEHICLE = 1;
+  STOP_REASON_DESTINATION = 2;
+  STOP_REASON_PEDESTRIAN = 3;
+  STOP_REASON_OBSTACLE = 4;
+  STOP_REASON_PREPARKING = 5;
+  STOP_REASON_SIGNAL = 100;  // only for red signal
+  STOP_REASON_STOP_SIGN = 101;
+  STOP_REASON_YIELD_SIGN = 102;
+  STOP_REASON_CLEAR_ZONE = 103;
+  STOP_REASON_CROSSWALK = 104;
+  STOP_REASON_CREEPER = 105;
+  STOP_REASON_REFERENCE_END = 106;  // end of the reference_line
+  STOP_REASON_YELLOW_SIGNAL = 107;  // yellow signal
+  STOP_REASON_PULL_OVER = 108;      // pull over
+  STOP_REASON_SIDEPASS_SAFETY = 109;
+  STOP_REASON_PRE_OPEN_SPACE_STOP = 200;
+  STOP_REASON_LANE_CHANGE_URGENCY = 201;
+  STOP_REASON_EMERGENCY = 202;
+}
+
+message ObjectStop {
+  optional StopReasonCode reason_code = 1;
+  optional double distance_s = 2;  // in meters
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point = 3;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 4;
+  repeated string wait_for_obstacle = 5;
+}
+
+// dodge the obstacle in lateral direction when driving
+message ObjectNudge {
+  enum Type {
+    LEFT_NUDGE = 1;   // drive from the left side to nudge a static obstacle
+    RIGHT_NUDGE = 2;  // drive from the right side to nudge a static obstacle
+    DYNAMIC_LEFT_NUDGE = 3;   // drive from the left side to nudge a dynamic obstacle
+    DYNAMIC_RIGHT_NUDGE = 4;  // drive from the right side to nudge a dynamic obstacle
+  };
+  optional Type type = 1;
+  // minimum lateral distance in meters. positive if type = LEFT_NUDGE
+  // negative if type = RIGHT_NUDGE
+  optional double distance_l = 2;
+}
+
+message ObjectYield {
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
+  optional apollo.common.PointENU fence_point = 2;
+  optional double fence_heading = 3;
+  optional double time_buffer = 4;  // minimum time buffer required after the
+                                    // obstacle reaches the intersect point.
+}
+
+message ObjectFollow {
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
+  optional apollo.common.PointENU fence_point = 2;
+  optional double fence_heading = 3;
+}
+
+message ObjectOvertake {
+  optional double distance_s = 1;  // minimum longitudinal distance in meters
+  optional apollo.common.PointENU fence_point = 2;
+  optional double fence_heading = 3;
+  optional double time_buffer = 4;  // minimum time buffer required before the
+                                    // obstacle reaches the intersect point.
+}
+
+message ObjectSidePass {
+  enum Type {
+    LEFT = 1;
+    RIGHT = 2;
+  };
+  optional Type type = 1;
+}
+
+// unified object decision while estop
+message ObjectAvoid {}
+
+message ObjectStatus {
+  optional ObjectMotionType motion_type = 1;
+  optional ObjectDecisionType decision_type = 2;
+}
+
+message ObjectStatic {}
+
+message ObjectDynamic {}
+
+message ObjectMotionType {
+  oneof motion_tag {
+    ObjectStatic static = 1;
+    ObjectDynamic dynamic = 2;
+  }
+}
+
+message ObjectDecisionType {
+  oneof object_tag {
+    ObjectIgnore ignore = 1;
+    ObjectStop stop = 2;
+    ObjectFollow follow = 3;
+    ObjectYield yield = 4;
+    ObjectOvertake overtake = 5;
+    ObjectNudge nudge = 6;
+    ObjectAvoid avoid = 7;
+    ObjectSidePass side_pass = 8;
+  }
+}
+
+message ObjectDecision {
+  optional string id = 1;
+  optional int32 perception_id = 2;
+  repeated ObjectDecisionType object_decision = 3;
+}
+
+message ObjectDecisions {
+  repeated ObjectDecision decision = 1;
+}
+
+message MainStop {
+  optional StopReasonCode reason_code = 1;
+  optional string reason = 2;
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point = 3;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 4;
+  optional apollo.routing.ChangeLaneType change_lane_type = 5;
+}
+
+message EmergencyStopHardBrake {}
+
+message EmergencyStopCruiseToStop {}
+
+message MainEmergencyStop {
+  // Unexpected event happened, human driver is required to take over
+  enum ReasonCode {
+    ESTOP_REASON_INTERNAL_ERR = 1;
+    ESTOP_REASON_COLLISION = 2;
+    ESTOP_REASON_ST_FIND_PATH = 3;
+    ESTOP_REASON_ST_MAKE_DECISION = 4;
+    ESTOP_REASON_SENSOR_ERROR = 5;
+  }
+  optional ReasonCode reason_code = 1;
+  optional string reason = 2;
+  oneof task {
+    EmergencyStopHardBrake hard_brake = 3;         // hard brake
+    EmergencyStopCruiseToStop cruise_to_stop = 4;  // cruise to stop
+  }
+}
+
+message MainCruise {
+  // cruise current lane
+  optional apollo.routing.ChangeLaneType change_lane_type = 1;
+}
+
+// This message is deprecated
+message MainChangeLane {
+  enum Type {
+    LEFT = 1;
+    RIGHT = 2;
+  };
+  optional Type type = 1;
+  repeated TargetLane default_lane = 2;
+  optional MainStop default_lane_stop = 3;
+  optional MainStop target_lane_stop = 4;
+}
+
+message MainMissionComplete {
+  // arrived at routing destination
+  // When stopped, the front center of vehicle should be at this point.
+  optional apollo.common.PointENU stop_point = 1;
+  // When stopped, the heading of the vehicle should be stop_heading.
+  optional double stop_heading = 2;
+}
+
+message MainNotReady {
+  // decision system is not ready.
+  // e.g. wait for routing data.
+  optional string reason = 1;
+}
+
+message MainParking {
+  enum ParkingStatus {
+    // TODO(QiL): implement and expand to more enums
+    IN_PARKING = 1;
+  }
+  optional ParkingStatus status = 1;
+}
+
+message MainDecision {
+  oneof task {
+    MainCruise cruise = 1;
+    MainStop stop = 2;
+    MainEmergencyStop estop = 3;
+    MainChangeLane change_lane = 4 [deprecated = true];
+    MainMissionComplete mission_complete = 6;
+    MainNotReady not_ready = 7;
+    MainParking parking = 8;
+  }
+  repeated TargetLane target_lane = 5 [deprecated = true];
+}
+
+message DecisionResult {
+  optional MainDecision main_decision = 1;
+  optional ObjectDecisions object_decision = 2;
+  optional apollo.common.VehicleSignal vehicle_signal = 3;
+}

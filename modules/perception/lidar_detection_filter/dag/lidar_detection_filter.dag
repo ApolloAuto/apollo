@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/lidar_detection_filter/liblidar_detection_filter_component.so"
+  components {
+    class_name : "LidarDetectionFilterComponent"
+    config {
+      name : "LidarDetectionFilter"
+      config_file_path : "/apollo/modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/detection"
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/stop_sign/libstop_sign.so">
+    <class type="apollo::planning::StopSign" base_class="apollo::planning::TrafficRule"></class>
+</library>
