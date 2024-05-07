@@ -174,6 +174,15 @@ void EnbroadParse::GetMessages(MessageInfoVec *messages)
       }
     }
 }
+double normalizeAngleTo180(double angle) {
+    while (angle > 180.0) {
+        angle -= 360.0;
+    }
+    while (angle <= -180.0) {
+        angle += 360.0;
+    }
+    return angle;
+}
 
 bool EnbroadParse::check_sum() {
 	char checksum=0;
@@ -201,8 +210,12 @@ bool EnbroadParse::check_sum() {
 }
 
 bool EnbroadParse::PrepareMessage() {	
+  static long long sumframe=0;
+  static long long badframe=0;
+  sumframe++;
   if (!check_sum()) {
-    AWARN << "check sum failed. bad frame ratio";
+    badframe++;
+    AERROR << "check sum failed. bad frame ratio"<<double(badframe)/double(sumframe);
     return false;
   }
   
@@ -214,31 +227,57 @@ bool EnbroadParse::PrepareMessage() {
   message_id = header->message_id;
   message_length = header->message_length;
   switch (message_id) {
-    case enbroad::BIN_NAV_DATA:
-      if (message_length != sizeof(enbroad::NAV_DATA_TypeDef)) {
-        AWARN << "Incorrect message_length";
-        break;
-      }
-      if(!HandleNavData(reinterpret_cast<enbroad::NAV_DATA_TypeDef*>(message)))
-      {
-      		AWARN << "HandleNavData fail";
-			return false;
-      }
-      break;
+	case enbroad::BIN_NAV_DATA:
+		if (message_length != sizeof(enbroad::NAV_DATA_TypeDef)) 
+			{
+			AWARN << "Incorrect message_length";
+			break;
+		}
+		if(!HandleNavData(reinterpret_cast<enbroad::NAV_DATA_TypeDef*>(message)))
+		{
+			AWARN << "HandleNavData fail";
+				return false;
+		} 
 
-    case enbroad::BIN_SINS_DATA:
+		break;
+	case enbroad::BIN_SINS_DATA:
+		if (message_length != sizeof(enbroad::NAV_SINS_TypeDef)) 
+		{
+			AWARN << "Incorrect message_length";
+			break;
+		}
+		if(!HandleSINSData(reinterpret_cast<enbroad::NAV_SINS_TypeDef*>(message)))
+		{
+			AWARN << "HandleSINSData fail";
+			return false;
+		}
 		break;
 	case enbroad::BIN_IMU_DATA:
+		if (message_length != sizeof(enbroad::NAV_IMU_TypeDef)) 
+		{
+			AWARN << "Incorrect message_length";
+			break;
+		}
+		if(!HandleIMUData(reinterpret_cast<enbroad::NAV_IMU_TypeDef*>(message)))
+		{
+			AWARN << "HandleIMUData fail";
+			return false;
+		}
 		break;
 	case enbroad::BIN_GNSS_DATA:
+		if (message_length != sizeof(enbroad::NAV_GNSS_TypeDef)) 
+		{
+			AWARN << "Incorrect message_length";
+			break;
+		}
 		if(!HandleGNSSData(reinterpret_cast<enbroad::NAV_GNSS_TypeDef*>(message)))
 		{
 			return false;
 		}
 		break;	
-    default:
-      return false;
-      break;
+    	default:
+      		return false;
+      		break;
   }
 
   return true;
@@ -246,14 +285,137 @@ bool EnbroadParse::PrepareMessage() {
 
 bool EnbroadParse::HandleSINSData(const enbroad::NAV_SINS_TypeDef* pSinsData)
 {
+	float imu_measurement_span = 1.0f / 100.0f;
+	double seconds = pSinsData->gps_week * SECONDS_PER_WEEK + pSinsData->gpssecond * 1e-3;
+	/*********************************ins_****************************************************/
+	ins_.set_measurement_time(seconds);
+	ins_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
+	ins_.mutable_euler_angles()->set_x(pSinsData->roll* DEG_TO_RAD);
+	ins_.mutable_euler_angles()->set_y(pSinsData->pitch* DEG_TO_RAD);
+	//enbroad 北偏西为正，此处北偏东为正
+	ins_.mutable_euler_angles()->set_z(azimuth_deg_to_yaw_rad(normalizeAngleTo180(-pSinsData->heading)));
+	ins_.mutable_position()->set_lon(pSinsData->longitude);
+	ins_.mutable_position()->set_lat(pSinsData->latitude);
+	ins_.mutable_position()->set_height(pSinsData->altitude);
+	ins_.mutable_linear_velocity()->set_x(pSinsData->ve);
+	ins_.mutable_linear_velocity()->set_y(pSinsData->vn);
+	ins_.mutable_linear_velocity()->set_z(pSinsData->vu);
+	if(enbroad::E_NAV_STATUS_IN_NAV ==pSinsData->navStatus)
+	{
+		ins_.set_type(Ins::GOOD);
+	}
+	else if(enbroad::E_NAV_STATUS_SYSTEM_STANDARD ==pSinsData->navStatus)
+	{
+		ins_.set_type(Ins::CONVERGING);
+	}
+	else
+	{
+		ins_.set_type(Ins::INVALID);
+	}
+	/*********************************bestpos_****************************************************/
+	bestpos_.set_measurement_time(seconds);
+	bestpos_.set_longitude(pSinsData->longitude);
+	bestpos_.set_latitude(pSinsData->latitude);
+	bestpos_.set_height_msl(pSinsData->altitude);
+	//bestpos_.set_undulation(0.0);//undulation = height_wgs84 - height_msl
+	bestpos_.set_datum_id(static_cast<apollo::drivers::gnss::DatumId>(enbroad::DatumId::WGS84));//datum id number.WGS84
+	//标准差填写组合导航的
+	bestpos_.set_latitude_std_dev(pSinsData->xigema_lat);
+	bestpos_.set_longitude_std_dev(pSinsData->xigema_lon);
+	bestpos_.set_height_std_dev(pSinsData->xigema_alt);
+	/*********************************ins_stat_****************************************************/
+	ins_stat_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
+	//ins位置类型，融合GPS则INS_RTKFIXED，融合wheel为INS_RTKFLOAT,融合motion为SINGLE，无需为NONE
+	if(enbroad::E_FUNSION_GPS ==pSinsData->fusion)
+	{
+	  	ins_stat_.set_pos_type(SolutionType::INS_RTKFIXED);
+	  	bestpos_.set_sol_type(SolutionType::INS_RTKFIXED);
+	}
+	else
+	{
+	  	ins_stat_.set_pos_type(SolutionType::NONE);
+	  	bestpos_.set_sol_type(SolutionType::NONE);
+	}
+
+	if(enbroad::E_NAV_STATUS_IN_NAV ==pSinsData->navStatus)
+	{
+		ins_stat_.set_ins_status(SolutionStatus::SOL_COMPUTED);
+	  	bestpos_.set_sol_status(SolutionStatus::SOL_COMPUTED);
+	}
+	else if(enbroad::E_NAV_STATUS_SYSTEM_STANDARD ==pSinsData->navStatus)
+	{
+		ins_stat_.set_ins_status(SolutionStatus::COLD_START);
+	  	bestpos_.set_sol_status(SolutionStatus::COLD_START);
+	}
+	else
+	{
+		ins_stat_.set_ins_status(SolutionStatus::INSUFFICIENT_OBS);
+	  	bestpos_.set_sol_status(SolutionStatus::INSUFFICIENT_OBS);
+	}
+  
 	return true;
 }
 bool EnbroadParse::HandleIMUData(const enbroad::NAV_IMU_TypeDef* pImuData)
 {
+	float imu_measurement_span = 1.0f / 100.0f;
+	double seconds = pImuData->gps_week * SECONDS_PER_WEEK + pImuData->gpssecond * 1e-3;	
+	 /*********************************imu_****************************************************/
+	imu_.set_measurement_time(seconds);
+	imu_.set_measurement_span(imu_measurement_span);
+	imu_.mutable_linear_acceleration()->set_x(pImuData->accX);
+	imu_.mutable_linear_acceleration()->set_y(pImuData->accY);	
+	imu_.mutable_linear_acceleration()->set_z(pImuData->accZ);
+	imu_.mutable_angular_velocity()->set_x(pImuData->gyroX);
+	imu_.mutable_angular_velocity()->set_y(pImuData->gyroY);
+	imu_.mutable_angular_velocity()->set_z(pImuData->gyroZ);
+	
 	return true;
 }
 bool EnbroadParse::HandleGNSSData(const enbroad::NAV_GNSS_TypeDef* pGnssData)
 {
+	//填充bestpos中有关gnss数据及heading所有数据
+	double seconds = pGnssData->gps_week * SECONDS_PER_WEEK + pGnssData->gpssecond * 1e-3;	
+	//bestpos_.set_base_station_id("0");//base station id
+	bestpos_.set_solution_age(pGnssData->age);//solution age (sec)
+	bestpos_.set_num_sats_tracked(pGnssData->satsNum);//number of satellites tracked
+	bestpos_.set_num_sats_in_solution(pGnssData->satsNum);//number of satellites used in solution
+	bestpos_.set_num_sats_in_solution(pGnssData->satsNum);//number of L1/E1/B1 satellites used in solution
+	bestpos_.set_num_sats_multi(pGnssData->satsNum);//number of multi-frequency satellites used in solution
+    //bestpos_.set_galileo_beidou_used_mask(0);
+	//bestpos_.set_gps_glonass_used_mask(0);
+	/*********************************heading_****************************************************/
+	heading_.set_measurement_time(seconds);
+	//gnss航向
+	heading_.set_heading(pGnssData->heading);
+	heading_.set_baseline_length(pGnssData->baseline);
+	heading_.set_reserved(0);
+	//heading_.set_heading_std_dev(0.0);
+	//heading_.set_pitch_std_dev(0.0);
+	//heading_.set_station_id("0");
+	heading_.set_satellite_tracked_number(pGnssData->satsNum);//number of satellites tracked
+	heading_.set_satellite_soulution_number(pGnssData->satsNum);//number of satellites used in solution
+	heading_.set_satellite_number_obs(pGnssData->satsNum);//number of L1/E1/B1 satellites used in solution
+	heading_.set_satellite_number_multi(pGnssData->satsNum);//number of multi-frequency satellites used in solution
+	//heading_.set_solution_source(0);
+	//heading_.set_extended_solution_status(0);
+	//heading_.set_galileo_beidou_sig_mask(0);
+	//heading_.set_gps_glonass_sig_mask(0);
+	if(enbroad::E_GPS_RTK_FIXED == pGnssData->headingStatus)
+	{
+	  heading_.set_position_type(SolutionType::INS_RTKFIXED);
+	}
+	else if(enbroad::E_GPS_RTK_FLOAT == pGnssData->headingStatus)
+	{
+	  heading_.set_position_type(SolutionType::INS_RTKFLOAT);
+	}
+	else if(enbroad::E_GPS_RTK_SPP == pGnssData->headingStatus || enbroad::E_GPS_RTK_DGPS == pGnssData->headingStatus)
+	{
+	  heading_.set_position_type(SolutionType::SINGLE);
+	}
+	else
+	{
+	  heading_.set_position_type(SolutionType::NONE);
+	}
 	return true;
 }
 bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData)
@@ -276,7 +438,7 @@ bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData)
 	ins_.mutable_euler_angles()->set_x(double(pNavData->roll*Coder_Angle_Scale/Coder_Sensor_Scale* DEG_TO_RAD));
 	ins_.mutable_euler_angles()->set_y(double(pNavData->pitch*Coder_Angle_Scale/Coder_Sensor_Scale* DEG_TO_RAD));
 	//enbroad 北偏西为正，此处北偏东为正
-	ins_.mutable_euler_angles()->set_z(azimuth_deg_to_yaw_rad(-double(pNavData->head*Coder_Angle_Scale/Coder_Sensor_Scale)));
+	ins_.mutable_euler_angles()->set_z(azimuth_deg_to_yaw_rad(normalizeAngleTo180(-pNavData->head*Coder_Angle_Scale/Coder_Sensor_Scale)));
 	ins_.mutable_position()->set_lon(double(pNavData->lon/Coder_Pos_Scale));
 	ins_.mutable_position()->set_lat(double(pNavData->lat/Coder_Pos_Scale));
 	ins_.mutable_position()->set_height(double(pNavData->alt/1000.0));
@@ -350,8 +512,8 @@ bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData)
 	heading_.set_measurement_time(seconds);
 	heading_.set_pitch(double(pNavData->pitch*Coder_Angle_Scale/Coder_Sensor_Scale));
 	//enbroad 北偏西为正，此处北偏东为正
-	heading_.set_heading(double(-pNavData->head*Coder_Angle_Scale/Coder_Sensor_Scale));
-	
+	heading_.set_heading(normalizeAngleTo180(-pNavData->head*Coder_Angle_Scale/Coder_Sensor_Scale));
+	//AERROR << "heading_.set_heading: " << normalizeAngleTo180(-pNavData->head*Coder_Angle_Scale/Coder_Sensor_Scale);
 	heading_.set_baseline_length(baseline);
 	heading_.set_reserved(0);
 	heading_.set_heading_std_dev(0.0);
@@ -379,7 +541,7 @@ bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData)
 	{
 	  ins_stat_.set_pos_type(SolutionType::INS_RTKFLOAT);
 	  bestpos_.set_sol_type(SolutionType::INS_RTKFLOAT);
-	  heading_.set_position_type(SolutionType::INS_RTKFIXED);
+	  heading_.set_position_type(SolutionType::INS_RTKFLOAT);
 	}
 	else if(enbroad::E_GPS_RTK_SPP == rtkStatus || enbroad::E_GPS_RTK_DGPS == rtkStatus)
 	{
@@ -405,13 +567,13 @@ bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData)
 	{
 	  ins_stat_.set_ins_status(SolutionStatus::COLD_START);
 	  bestpos_.set_sol_status(SolutionStatus::COLD_START);
-	  heading_.set_solution_status(SolutionStatus::SOL_COMPUTED);
+	  heading_.set_solution_status(SolutionStatus::COLD_START);
 	}
 	else
 	{
 	  ins_stat_.set_ins_status(SolutionStatus::INSUFFICIENT_OBS);
 	  bestpos_.set_sol_status(SolutionStatus::INSUFFICIENT_OBS);
-	  heading_.set_solution_status(SolutionStatus::SOL_COMPUTED);
+	  heading_.set_solution_status(SolutionStatus::INSUFFICIENT_OBS);
 	}
 
 
