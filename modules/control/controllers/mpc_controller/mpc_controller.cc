@@ -401,26 +401,10 @@ Status MPCController::ComputeControlCommand(
 
   FeedforwardUpdate(debug);
 
-  // Add gain scheduler for higher speed steering
-  if (FLAGS_enable_gain_scheduler) {
-    matrix_q_updated_(0, 0) =
-        matrix_q_(0, 0) *
-        lat_err_interpolation_->Interpolate(vehicle_state->linear_velocity());
-    matrix_q_updated_(2, 2) =
-        matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
-                              vehicle_state->linear_velocity());
-    steer_angle_feedforwardterm_updated_ =
-        steer_angle_feedforwardterm_ *
-        feedforwardterm_interpolation_->Interpolate(
-            vehicle_state->linear_velocity());
-    matrix_r_updated_(0, 0) =
-        matrix_r_(0, 0) * steer_weight_interpolation_->Interpolate(
-                              vehicle_state->linear_velocity());
-  } else {
+  
     matrix_q_updated_ = matrix_q_;
     matrix_r_updated_ = matrix_r_;
     steer_angle_feedforwardterm_updated_ = steer_angle_feedforwardterm_;
-  }
 
   debug->add_matrix_q_updated(matrix_q_updated_(0, 0));
   debug->add_matrix_q_updated(matrix_q_updated_(1, 1));
@@ -485,62 +469,19 @@ Status MPCController::ComputeControlCommand(
 
   steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
   acc_feedback = control[0](1, 0);
-  for (int i = 0; i < basic_state_size_; ++i) {
-    unconstrained_control += control_gain[0](0, i) * matrix_state_(i, 0);
-  }
-  unconstrained_control += addition_gain[0](0, 0) * v * debug->curvature();
-  if (enable_mpc_feedforward_compensation_) {
-    unconstrained_control_diff =
-        Wheel2SteerPct(control[0](0, 0) - unconstrained_control);
-    if (fabs(unconstrained_control_diff) <= unconstrained_control_diff_limit_) {
-      steer_angle_ff_compensation =
-          Wheel2SteerPct(debug->curvature() *
-                         (control_gain[0](0, 2) *
-                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                          addition_gain[0](0, 0) * v));
-    } else {
-      control_gain_truncation_ratio = control[0](0, 0) / unconstrained_control;
-      steer_angle_ff_compensation =
-          Wheel2SteerPct(debug->curvature() *
-                         (control_gain[0](0, 2) *
-                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                          addition_gain[0](0, 0) * v) *
-                         control_gain_truncation_ratio);
-    }
-    if (std::isnan(steer_angle_ff_compensation)) {
-      ADEBUG << "steer_angle_ff_compensation is nan";
-      steer_angle_ff_compensation = 0.0;
-    }
-  } else {
-    steer_angle_ff_compensation = 0.0;
-  }
+  // for (int i = 0; i < basic_state_size_; ++i) {
+  //   unconstrained_control += control_gain[0](0, i) * matrix_state_(i, 0);
+  // }
+  // unconstrained_control += addition_gain[0](0, 0) * v * debug->curvature();
 
   double mpc_end_timestamp = Clock::NowInSeconds();
 
   ADEBUG << "MPC core algorithm: calculation time is: "
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
-  if (enable_leadlag_) {
-    if (control_conf_.enable_feedback_augment_on_high_speed() ||
-        std::fabs(vehicle_state->linear_velocity()) < low_speed_bound_) {
-      steer_angle_feedback_augment =
-          leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
-          steer_ratio_ / steer_single_direction_max_degree_ * 100;
-      if (std::fabs(vehicle_state->linear_velocity()) >
-          low_speed_bound_ - low_speed_window_) {
-        // Within the low-high speed transition window, linerly interplolate the
-        // augment control gain for "soft" control switch
-        steer_angle_feedback_augment = common::math::lerp(
-            steer_angle_feedback_augment, low_speed_bound_ - low_speed_window_,
-            0.0, low_speed_bound_, std::fabs(vehicle_state->linear_velocity()));
-      }
-    }
-  }
-
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
   double steer_angle =
-      steer_angle_feedback + steer_angle_feedforwardterm_updated_ +
-      steer_angle_ff_compensation + steer_angle_feedback_augment;
+      steer_angle_feedback + steer_angle_feedforwardterm_updated_;
 
   if (FLAGS_set_steer_limit) {
     const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
@@ -563,64 +504,11 @@ Status MPCController::ComputeControlCommand(
 
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 
-  double vehicle_pitch = 0.0;
-  if (use_pitch_angle_filter_) {
-    vehicle_pitch =
-        digital_filter_pitch_angle_.Filter(injector_->vehicle_state()->pitch());
-  } else {
-    vehicle_pitch = injector_->vehicle_state()->pitch();
-  }
-
-  if (std::isnan(vehicle_pitch)) {
-    AINFO << "pitch angle is nan.";
-    vehicle_pitch = 0;
-  }
-  debug->set_vehicle_pitch(vehicle_pitch);
-
-  double slope_offset_compensation = GRA_ACC * std::sin(vehicle_pitch);
-  if (std::isnan(slope_offset_compensation)) {
-    slope_offset_compensation = 0;
-  }
-  debug->set_slope_offset_compensation(slope_offset_compensation);
-
   double acceleration_cmd =
-      acc_feedback + debug->acceleration_reference() +
-      control_conf_.enable_slope_offset() * debug->slope_offset_compensation();
+      acc_feedback + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
   GetPathRemain(planning_published_trajectory, debug);
-  // TODO(Yu): study the necessity of path_remain and add it to MPC if needed
-  // At near-stop stage, replace the brake control command with the standstill
-  // acceleration if the former is even softer than the latter
-  if ((planning_published_trajectory->trajectory_type() ==
-       apollo::planning::ADCTrajectory::NORMAL) ||
-      (planning_published_trajectory->trajectory_type() ==
-       apollo::planning::ADCTrajectory::SPEED_FALLBACK) ||
-      (planning_published_trajectory->trajectory_type() ==
-       apollo::planning::ADCTrajectory::UNKNOWN)) {
-    if (control_conf_.use_preview_reference_check() &&
-        (std::fabs(debug->preview_acceleration_reference()) <=
-         FLAGS_max_acceleration_when_stopped) &&
-        std::fabs(debug->preview_speed_reference()) <=
-            vehicle_param_.max_abs_speed_when_stopped()) {
-      debug->set_is_full_stop(true);
-      ADEBUG << "Into full stop within preview acc and reference speed, "
-             << "is_full_stop is " << debug->is_full_stop();
-    }
-    if (std::abs(debug->path_remain()) < FLAGS_max_acceleration_when_stopped) {
-      debug->set_is_full_stop(true);
-      ADEBUG << "Into full stop within path remain, "
-             << "is_full_stop is " << debug->is_full_stop();
-    }
-  }
-
-  if (debug->is_full_stop()) {
-    acceleration_cmd =
-        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
-            ? std::max(acceleration_cmd, standstill_acceleration_)
-            : std::min(acceleration_cmd, standstill_acceleration_);
-    Reset();
-  }
 
   debug->set_acceleration_cmd(acceleration_cmd);
 
@@ -680,14 +568,13 @@ Status MPCController::ComputeControlCommand(
   cmd->set_acceleration(acceleration_cmd);
 
   debug->set_heading(vehicle_state->heading());
-  debug->set_steering_position(chassis->steering_percentage());
+  // debug->set_steering_position(chassis->steering_percentage());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
-  debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
-  debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
+  // debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
+  // debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
   debug->set_steer_angle_feedback(steer_angle_feedback);
-  debug->set_steering_position(chassis->steering_percentage());
-  debug->set_steer_angle_feedback_augment(steer_angle_feedback_augment);
+  // debug->set_steering_position(chassis->steering_percentage());
 
   if (std::fabs(vehicle_state->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
@@ -697,7 +584,6 @@ Status MPCController::ComputeControlCommand(
     cmd->set_gear_location(chassis->gear_location());
   }
 
-  ProcessLogs(debug, chassis);
   return Status::OK();
 }
 

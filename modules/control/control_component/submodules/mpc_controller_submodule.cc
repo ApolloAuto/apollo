@@ -51,7 +51,7 @@ bool MPCControllerSubmodule::Init() {
   mpc_controller_ = PluginManager::Instance()->CreateInstance<ControlTask>(
       "apollo::control::MPCController");
 
-  if (!mpc_controller_->Init(injector_).ok()) {
+    if (!mpc_controller_->Init(injector_).ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init MPC controller failed! Stopping...");
     return false;

@@ -55,13 +55,16 @@ bool ControlComponent::Init() {
 
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
-  if (!FLAGS_use_control_submodules &&
-      !control_task_agent_.Init(injector_, control_pipeline_).ok()) {
-    // set controller
-    ADEBUG << "original control";
-    monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
-    return false;
-  }
+  // if (!FLAGS_is_control_ut_test_mode) {
+    if (!FLAGS_use_control_submodules &&
+        !control_task_agent_.Init(injector_, control_pipeline_).ok()) {
+      // set controller
+      ADEBUG << "original control";
+      monitor_logger_buffer_.ERROR(
+          "Control init controller failed! Stopping...");
+      return false;
+    }
+  // }
 
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
@@ -182,90 +185,90 @@ Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
   Status status = CheckInput(&local_view_);
   // check data
-  if (!status.ok()) {
-    AERROR_EVERY(100) << "Control input data failed: "
-                      << status.error_message();
-    control_command->mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    control_command->mutable_engage_advice()->set_reason(
-        status.error_message());
-    estop_ = true;
-    estop_reason_ = status.error_message();
-  } else {
-    estop_ = false;
-    Status status_ts = CheckTimestamp(local_view_);
-    if (!status_ts.ok()) {
-      AERROR << "Input messages timeout";
-      // Clear trajectory data to make control stop if no data received again
-      // next cycle.
-      // keep the history trajectory for control compute.
-      // latest_trajectory_.Clear();
-      estop_ = true;
-      status = status_ts;
-      if (local_view_.chassis().driving_mode() !=
-          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
-        control_command->mutable_engage_advice()->set_advice(
-            apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-        control_command->mutable_engage_advice()->set_reason(
-            status.error_message());
-      }
-    } else {
-      control_command->mutable_engage_advice()->set_advice(
-          apollo::common::EngageAdvice::READY_TO_ENGAGE);
-      estop_ = false;
-    }
-  }
+  // if (!status.ok()) {
+  //   AERROR_EVERY(100) << "Control input data failed: "
+  //                     << status.error_message();
+  //   control_command->mutable_engage_advice()->set_advice(
+  //       apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+  //   control_command->mutable_engage_advice()->set_reason(
+  //       status.error_message());
+  //   estop_ = true;
+  //   estop_reason_ = status.error_message();
+  // } else {
+  //   estop_ = false;
+  //   Status status_ts = CheckTimestamp(local_view_);
+  //   if (!status_ts.ok()) {
+  //     AERROR << "Input messages timeout";
+  //     // Clear trajectory data to make control stop if no data received again
+  //     // next cycle.
+  //     // keep the history trajectory for control compute.
+  //     // latest_trajectory_.Clear();
+  //     estop_ = true;
+  //     status = status_ts;
+  //     if (local_view_.chassis().driving_mode() !=
+  //         apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+  //       control_command->mutable_engage_advice()->set_advice(
+  //           apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+  //       control_command->mutable_engage_advice()->set_reason(
+  //           status.error_message());
+  //     }
+  //   } else {
+  //     control_command->mutable_engage_advice()->set_advice(
+  //         apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  //     estop_ = false;
+  //   }
+  // }
 
   // check estop
-  estop_ = FLAGS_enable_persistent_estop
-               ? estop_ || local_view_.trajectory().estop().is_estop()
-               : local_view_.trajectory().estop().is_estop();
+  // estop_ = FLAGS_enable_persistent_estop
+  //              ? estop_ || local_view_.trajectory().estop().is_estop()
+  //              : local_view_.trajectory().estop().is_estop();
 
-  if (local_view_.trajectory().estop().is_estop()) {
-    estop_ = true;
-    estop_reason_ = "estop from planning : ";
-    estop_reason_ += local_view_.trajectory().estop().reason();
-  }
+  // if (local_view_.trajectory().estop().is_estop()) {
+  //   estop_ = true;
+  //   estop_reason_ = "estop from planning : ";
+  //   estop_reason_ += local_view_.trajectory().estop().reason();
+  // }
 
-  if (local_view_.trajectory().trajectory_point().empty()) {
-    AWARN_EVERY(100) << "planning has no trajectory point. ";
-    estop_ = true;
-    estop_reason_ = "estop for empty planning trajectory, planning headers: " +
-                    local_view_.trajectory().header().ShortDebugString();
-  }
+  // if (local_view_.trajectory().trajectory_point().empty()) {
+  //   AWARN_EVERY(100) << "planning has no trajectory point. ";
+  //   estop_ = true;
+  //   estop_reason_ = "estop for empty planning trajectory, planning headers: " +
+  //                   local_view_.trajectory().header().ShortDebugString();
+  // }
 
-  if (FLAGS_enable_gear_drive_negative_speed_protection) {
-    const double kEpsilon = 0.001;
-    auto first_trajectory_point = local_view_.trajectory().trajectory_point(0);
-    if (local_view_.chassis().gear_location() == Chassis::GEAR_DRIVE &&
-        first_trajectory_point.v() < -1 * kEpsilon) {
-      estop_ = true;
-      estop_reason_ = "estop for negative speed when gear_drive";
-    }
-  }
+  // if (FLAGS_enable_gear_drive_negative_speed_protection) {
+  //   const double kEpsilon = 0.001;
+  //   auto first_trajectory_point = local_view_.trajectory().trajectory_point(0);
+  //   if (local_view_.chassis().gear_location() == Chassis::GEAR_DRIVE &&
+  //       first_trajectory_point.v() < -1 * kEpsilon) {
+  //     estop_ = true;
+  //     estop_reason_ = "estop for negative speed when gear_drive";
+  //   }
+  // }
 
-  if (!estop_) {
-    if (local_view_.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
-      control_task_agent_.Reset();
-      AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
-    }
+  // if (!estop_) {
+  //   if (local_view_.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
+  //     control_task_agent_.Reset();
+  //     AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
+  //   }
 
-    auto debug = control_command->mutable_debug()->mutable_input_debug();
-    debug->mutable_localization_header()->CopyFrom(
-        local_view_.localization().header());
-    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis().header());
-    debug->mutable_trajectory_header()->CopyFrom(
-        local_view_.trajectory().header());
+  //   auto debug = control_command->mutable_debug()->mutable_input_debug();
+  //   debug->mutable_localization_header()->CopyFrom(
+  //       local_view_.localization().header());
+  //   debug->mutable_canbus_header()->CopyFrom(local_view_.chassis().header());
+  //   debug->mutable_trajectory_header()->CopyFrom(
+  //       local_view_.trajectory().header());
 
-    if (local_view_.trajectory().is_replan()) {
-      latest_replan_trajectory_header_ = local_view_.trajectory().header();
-    }
+  //   if (local_view_.trajectory().is_replan()) {
+  //     latest_replan_trajectory_header_ = local_view_.trajectory().header();
+  //   }
 
-    if (latest_replan_trajectory_header_.has_sequence_num()) {
-      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
-          latest_replan_trajectory_header_);
-    }
-  }
+  //   if (latest_replan_trajectory_header_.has_sequence_num()) {
+  //     debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+  //         latest_replan_trajectory_header_);
+  //   }
+  // }
 
   if (!local_view_.trajectory().trajectory_point().empty()) {
     // controller agent
@@ -290,19 +293,22 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   // if planning set estop, then no control process triggered
-  if (estop_) {
-    AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
-    // set Estop command
-    control_command->set_speed(0);
-    control_command->set_throttle(0);
-    control_command->set_brake(FLAGS_soft_estop_brake);
-    control_command->set_gear_location(Chassis::GEAR_DRIVE);
-  }
+  // if (estop_) {
+  //   AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
+  //   // set Estop command
+  //   control_command->set_speed(0);
+  //   control_command->set_throttle(0);
+  //   control_command->set_brake(FLAGS_soft_estop_brake);
+  //   control_command->set_gear_location(Chassis::GEAR_DRIVE);
+  //   previous_steering_command_ =
+  //       injector_->previous_control_command_mutable()->steering_target();
+  //   control_command->set_steering_target(previous_steering_command_);
+  // }
   // check signal
-  if (local_view_.trajectory().decision().has_vehicle_signal()) {
-    control_command->mutable_signal()->CopyFrom(
-        local_view_.trajectory().decision().vehicle_signal());
-  }
+  // if (local_view_.trajectory().decision().has_vehicle_signal()) {
+  //   control_command->mutable_signal()->CopyFrom(
+  //       local_view_.trajectory().decision().vehicle_signal());
+  // }
   return status;
 }
 
@@ -313,6 +319,7 @@ bool ControlComponent::Proc() {
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
   if (chassis_msg == nullptr) {
     AERROR << "Chassis msg is not ready!";
+    // injector_->set_control_process(false);
     return false;
   }
   OnChassis(chassis_msg);
@@ -337,12 +344,13 @@ bool ControlComponent::Proc() {
     ADEBUG << "Planning command status msg is \n"
            << planning_command_status_.ShortDebugString();
   }
-  injector_->Set_planning_command_status(planning_command_status_);
+  // injector_->set_planning_command_status(planning_command_status_);
 
   localization_reader_->Observe();
   const auto &localization_msg = localization_reader_->GetLatestObserved();
   if (localization_msg == nullptr) {
     AERROR << "localization msg is not ready!";
+    // injector_->set_control_process(false);
     return false;
   }
   OnLocalization(localization_msg);
@@ -365,43 +373,46 @@ bool ControlComponent::Proc() {
   }
 
   // use control submodules
-  if (FLAGS_use_control_submodules) {
-    local_view_.mutable_header()->set_lidar_timestamp(
-        local_view_.trajectory().header().lidar_timestamp());
-    local_view_.mutable_header()->set_camera_timestamp(
-        local_view_.trajectory().header().camera_timestamp());
-    local_view_.mutable_header()->set_radar_timestamp(
-        local_view_.trajectory().header().radar_timestamp());
-    common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
+  // if (FLAGS_use_control_submodules) {
+  //   local_view_.mutable_header()->set_lidar_timestamp(
+  //       local_view_.trajectory().header().lidar_timestamp());
+  //   local_view_.mutable_header()->set_camera_timestamp(
+  //       local_view_.trajectory().header().camera_timestamp());
+  //   local_view_.mutable_header()->set_radar_timestamp(
+  //       local_view_.trajectory().header().radar_timestamp());
+  //   common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
 
-    const auto end_time = Clock::Now();
+  //   const auto end_time = Clock::Now();
 
-    // measure latency
-    static apollo::common::LatencyRecorder latency_recorder(
-        FLAGS_control_local_view_topic);
-    latency_recorder.AppendLatencyRecord(
-        local_view_.trajectory().header().lidar_timestamp(), start_time,
-        end_time);
+  //   // measure latency
+  //   static apollo::common::LatencyRecorder latency_recorder(
+  //       FLAGS_control_local_view_topic);
+  //   latency_recorder.AppendLatencyRecord(
+  //       local_view_.trajectory().header().lidar_timestamp(), start_time,
+  //       end_time);
 
-    local_view_writer_->Write(local_view_);
-    return true;
-  }
+  //   local_view_writer_->Write(local_view_);
+  //   return true;
+  // }
 
-  if (pad_msg != nullptr) {
-    ADEBUG << "pad_msg: " << pad_msg_.ShortDebugString();
-    if (pad_msg_.action() == DrivingAction::RESET) {
-      AINFO << "Control received RESET action!";
-      estop_ = false;
-      estop_reason_.clear();
-    }
-    pad_received_ = true;
-  }
+  // if (pad_msg != nullptr) {
+  //   ADEBUG << "pad_msg: " << pad_msg_.ShortDebugString();
+  //   if (pad_msg_.action() == DrivingAction::RESET) {
+  //     AINFO << "Control received RESET action!";
+  //     estop_ = false;
+  //     estop_reason_.clear();
+  //   }
+  //   pad_received_ = true;
+  // }
 
-  if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
-      (start_time - init_time_).ToSecond() > FLAGS_control_test_duration) {
-    AERROR << "Control finished testing. exit";
-    return false;
-  }
+  // if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
+  //     (start_time - init_time_).ToSecond() > FLAGS_control_test_duration) {
+  //   AERROR << "Control finished testing. exit";
+  //   injector_->set_control_process(false);
+  //   return false;
+  // }
+
+  // injector_->set_control_process(true);
 
   ControlCommand control_command;
 
@@ -472,6 +483,9 @@ bool ControlComponent::Proc() {
 
   // save current control command
   injector_->Set_pervious_control_command(&control_command);
+  // injector_->previous_control_command_mutable()->CopyFrom(control_command);
+  // injector_->previous_control_debug_mutable()->CopyFrom(
+  //     injector_->control_debug_info());
 
   control_cmd_writer_->Write(control_command);
   return true;
