@@ -53,16 +53,16 @@ The following set of documentation describes Apollo 3.0:
 
   - **Vehicle**:
 
-    - [Industrial PC (IPC)](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/IPC/Nuvo-6108GC_Installation_Guide.md)
-    - [Global Positioning System (GPS)](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README.md)
-    - [Inertial Measurement Unit (IMU)](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README.md)
+    - [Industrial PC (IPC)](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/IPC/Nuvo-6108GC_Installation_Guide.md)
+    - [Global Positioning System (GPS)](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README.md)
+    - [Inertial Measurement Unit (IMU)](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README.md)
     - Controller Area Network (CAN) card
     - GPS Antenna
     - GPS Receiver
-    - [Light Detection and Ranging System (LiDAR)](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/README.md)
-    - [Camera](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Camera/README.md)
-    - [Radar](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Radar/README.md)
-    - [Apollo Sensor Unit (ASU)](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
+    - [Light Detection and Ranging System (LiDAR)](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/README.md)
+    - [Camera](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Camera/README.md)
+    - [Radar](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Radar/README.md)
+    - [Apollo Sensor Unit (ASU)](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide.md)
     - Apollo Extension Unit (AXU)
 
   - **Software**: Refer to the
@@ -91,7 +91,7 @@ The key hardware components to install include:
   - Navtech NV-GI120
 - Light Detection and Ranging System (LiDAR) ─ You can select one of the
   following options, please note Apollo master uses VLS-128 LiDAR:
-  - [Velodyne VLS-128](../../../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installationLidar/VLS_128_Installation_Guide.md)
+  - [Velodyne VLS-128](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installationLidar/VLS_128_Installation_Guide.md)
   - Velodyne HDL-64E S3
   - Velodyne Puck series
   - Innovusion LiDAR

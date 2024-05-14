@@ -4,7 +4,7 @@ This guide is mainly used to explain how to use map collection in Apollo 2.5.
 
 ## Hardware and Software Requirement
 1. Please refer to
-[Apollo 2.5 Hardware and System Installation Guide](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
+[Apollo 2.5 Hardware and System Installation Guide](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
 for the steps to install the hardware components.
 
 2. Please refer to
