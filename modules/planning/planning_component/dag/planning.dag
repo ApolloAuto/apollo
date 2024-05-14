@@ -9,9 +9,6 @@ module_config {
       flag_file_path:  "/apollo/modules/planning/planning_component/conf/planning.conf"
       readers: [
         {
-          channel: "/apollo/prediction"
-        },
-        {
           channel: "/apollo/canbus/chassis"
           qos_profile: {
               depth : 15

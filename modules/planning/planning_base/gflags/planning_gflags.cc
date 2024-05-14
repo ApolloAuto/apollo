@@ -42,7 +42,7 @@ DEFINE_string(smoother_config_filename,
               "The configuration file for qp_spline smoother");
 
 DEFINE_string(rtk_trajectory_filename,
-              "modules/planning/planning_base/data/garage.csv",
+              "/apollo/modules/tools/map_gen/traj_demo.txt",
               "Loop rate for planning node");
 
 DEFINE_uint64(rtk_trajectory_forward, 800,
@@ -336,9 +336,9 @@ DEFINE_bool(
 
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
-
+DEFINE_double(path_bounds_horizon, 100, "path bounds horizon");
 DEFINE_bool(export_chart, false, "export chart in planning");
-DEFINE_bool(enable_record_debug, true,
+DEFINE_bool(enable_record_debug, false,
             "True to enable record debug info in chart format");
 DEFINE_bool(enable_print_curve, false,
             "True to enable print curve info into log");
@@ -436,3 +436,9 @@ DEFINE_double(
 DEFINE_double(
     referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
     "max angle difference between the backward reference line and ego heading");
+
+// Nudge decisider
+DEFINE_bool(enable_nudge_decider, true, "Enable use nudge decider");
+
+// Edge follow buffer
+DEFINE_double(edge_follow_buffer, 0.3, "the edge follow buffer");

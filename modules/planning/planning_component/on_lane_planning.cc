@@ -109,10 +109,10 @@ std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "planning config error: " + config_.DebugString());
+                  "planning config error: " + config.DebugString());
   }
 
-  PlanningBase::Init(config_);
+  PlanningBase::Init(config);
 
   // clear planning history
   injector_->history()->Clear();
@@ -184,6 +184,11 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    PrintCurves ref_print_curve;
+    for (const auto& p : ref_line.reference_points()) {
+      ref_print_curve.AddPoint("ref_line", p.x(), p.y());
+    }
+    ref_print_curve.PrintToLog();
   }
   for (auto& seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
@@ -192,6 +197,14 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+
+    PrintCurves segment_print_curve;
+    for (auto& lane_segment : seg) {
+      for (const auto& pt : lane_segment.lane->points()) {
+        segment_print_curve.AddPoint("segment_line", pt.x(), pt.y());
+      }
+    }
+    segment_print_curve.PrintToLog();
   }
 
   auto status = frame_->Init(
@@ -312,64 +325,78 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
-  if (status.ok()) {
-    injector_->ego_info()->CalculateFrontObstacleClearDistance(
-        frame_->obstacles());
-  }
+  // status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+  // if (status.ok()) {
+  //   injector_->ego_info()->CalculateFrontObstacleClearDistance(
+  //       frame_->obstacles());
+  // }
 
-  if (FLAGS_enable_record_debug) {
-    frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
-  }
-  ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
-      Clock::NowInSeconds() - start_timestamp);
+  // if (FLAGS_enable_record_debug) {
+  //   frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
+  // }
+  // ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
+  //     Clock::NowInSeconds() - start_timestamp);
 
-  if (!status.ok()) {
-    AERROR << status.ToString();
-    if (FLAGS_publish_estop) {
-      // "estop" signal check in function "Control::ProduceControlCommand()"
-      // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
-      // we should add more information to ensure the estop being triggered.
-      ADCTrajectory estop_trajectory;
-      EStop* estop = estop_trajectory.mutable_estop();
-      estop->set_is_estop(true);
-      estop->set_reason(status.error_message());
-      status.Save(estop_trajectory.mutable_header()->mutable_status());
-      ptr_trajectory_pb->CopyFrom(estop_trajectory);
-    } else {
-      ptr_trajectory_pb->mutable_decision()
-          ->mutable_main_decision()
-          ->mutable_not_ready()
-          ->set_reason(status.ToString());
-      status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
-      GenerateStopTrajectory(ptr_trajectory_pb);
-    }
-    // TODO(all): integrate reverse gear
-    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
-    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
-    const uint32_t n = frame_->SequenceNum();
-    injector_->frame_history()->Add(n, std::move(frame_));
-    return;
-  }
+  // if (!status.ok()) {
+  //   AERROR << status.ToString();
+  //   if (FLAGS_publish_estop) {
+  //     // "estop" signal check in function "Control::ProduceControlCommand()"
+  //     // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
+  //     // we should add more information to ensure the estop being triggered.
+  //     ADCTrajectory estop_trajectory;
+  //     EStop* estop = estop_trajectory.mutable_estop();
+  //     estop->set_is_estop(true);
+  //     estop->set_reason(status.error_message());
+  //     status.Save(estop_trajectory.mutable_header()->mutable_status());
+  //     ptr_trajectory_pb->CopyFrom(estop_trajectory);
+  //   } else {
+  //     ptr_trajectory_pb->mutable_decision()
+  //         ->mutable_main_decision()
+  //         ->mutable_not_ready()
+  //         ->set_reason(status.ToString());
+  //     status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+  //     GenerateStopTrajectory(ptr_trajectory_pb);
+  //   }
+  //   // TODO(all): integrate reverse gear
+  //   ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+  //   FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+  //   frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
+  //   const uint32_t n = frame_->SequenceNum();
+  //   injector_->frame_history()->Add(n, std::move(frame_));
+  //   return;
+  // }
 
-  for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
-    auto traffic_status =
-        traffic_decider_.Execute(frame_.get(), &ref_line_info);
-    if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
-      ref_line_info.SetDrivable(false);
-      AWARN << "Reference line " << ref_line_info.Lanes().Id()
-            << " traffic decider failed";
-    }
-  }
+  // for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
+  //   auto traffic_status =
+  //       traffic_decider_.Execute(frame_.get(), &ref_line_info);
+  //   if (!traffic_status.ok() || !ref_line_info.IsDrivable()) {
+  //     ref_line_info.SetDrivable(false);
+  //     AWARN << "Reference line " << ref_line_info.Lanes().Id()
+  //           << " traffic decider failed";
+  //   }
+  // }
 
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
-  PrintCurves print_curve;
+
+  // print trajxy
+  PrintCurves trajectory_print_curve;
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
-    print_curve.AddPoint("trajxy", p.path_point().x(), p.path_point().y());
+    trajectory_print_curve.AddPoint("trajxy", p.path_point().x(),
+                                    p.path_point().y());
   }
-  print_curve.PrintToLog();
+  trajectory_print_curve.PrintToLog();
+
+  // print obstacle polygon
+  for (const auto& obstacle : frame_->obstacles()) {
+    //obstacle->PrintPolygonCurve();
+  }
+  // print ego box
+  //PrintBox print_box("ego_box");
+  // print_box.AddAdcBox(vehicle_state.x(), vehicle_state.y(),
+  //                     vehicle_state.heading(), true);
+  //print_box.PrintToLog();
+
   const auto end_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
@@ -411,8 +438,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
                                1000.0);
     ref_line_task->set_name("ReferenceLineProvider");
-    // TODO(all): integrate reverse gear
-    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
@@ -423,9 +449,16 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
   }
 
-  const uint32_t n = frame_->SequenceNum();
-  AINFO << "Planning end frame sequence id = [" << n << "]";
-  injector_->frame_history()->Add(n, std::move(frame_));
+  const auto end_planning_perf_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+  const auto plnning_perf_ms =
+      (end_planning_perf_timestamp - start_system_timestamp) * 1000;
+  AINFO << "Planning Perf: planning name [" << Name() << "], "
+        << plnning_perf_ms << " ms.";
+  AINFO << "Planning end frame sequence id = [" << frame_num << "]";
+  injector_->frame_history()->Add(frame_num, std::move(frame_));
 }
 
 void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
@@ -995,63 +1028,63 @@ void OnLanePlanning::AddPartitionedTrajectory(
   }
 
   // Draw trajectory stitching point (line with only one point)
-  auto* stitching_line = chart->add_line();
-  stitching_line->set_label("TrajectoryStitchingPoint");
-  auto* trajectory_stitching_point = stitching_line->add_point();
-  trajectory_stitching_point->set_x(
-      open_space_debug.trajectory_stitching_point().path_point().x());
-  trajectory_stitching_point->set_y(
-      open_space_debug.trajectory_stitching_point().path_point().y());
-  // Set chartJS's dataset properties
-  auto* stitching_properties = stitching_line->mutable_properties();
-  (*stitching_properties)["borderWidth"] = "3";
-  (*stitching_properties)["pointRadius"] = "5";
-  (*stitching_properties)["lineTension"] = "0";
-  (*stitching_properties)["fill"] = "true";
-  (*stitching_properties)["showLine"] = "true";
+  // auto* stitching_line = chart->add_line();
+  // stitching_line->set_label("TrajectoryStitchingPoint");
+  // auto* trajectory_stitching_point = stitching_line->add_point();
+  // trajectory_stitching_point->set_x(
+  //     open_space_debug.trajectory_stitching_point().path_point().x());
+  // trajectory_stitching_point->set_y(
+  //     open_space_debug.trajectory_stitching_point().path_point().y());
+  // // Set chartJS's dataset properties
+  // auto* stitching_properties = stitching_line->mutable_properties();
+  // (*stitching_properties)["borderWidth"] = "3";
+  // (*stitching_properties)["pointRadius"] = "5";
+  // (*stitching_properties)["lineTension"] = "0";
+  // (*stitching_properties)["fill"] = "true";
+  // (*stitching_properties)["showLine"] = "true";
 
   // Draw fallback trajectory compared with the partitioned and potential
   // collision_point (line with only one point)
-  if (open_space_debug.is_fallback_trajectory()) {
-    auto* collision_line = chart->add_line();
-    collision_line->set_label("FutureCollisionPoint");
-    auto* future_collision_point = collision_line->add_point();
-    future_collision_point->set_x(
-        open_space_debug.future_collision_point().path_point().x());
-    future_collision_point->set_y(
-        open_space_debug.future_collision_point().path_point().y());
-    // Set chartJS's dataset properties
-    auto* collision_properties = collision_line->mutable_properties();
-    (*collision_properties)["borderWidth"] = "3";
-    (*collision_properties)["pointRadius"] = "8";
-    (*collision_properties)["lineTension"] = "0";
-    (*collision_properties)["fill"] = "true";
-    (*stitching_properties)["showLine"] = "true";
-    (*stitching_properties)["pointStyle"] = "cross";
+  // if (open_space_debug.is_fallback_trajectory()) {
+  //   auto* collision_line = chart->add_line();
+  //   collision_line->set_label("FutureCollisionPoint");
+  //   auto* future_collision_point = collision_line->add_point();
+  //   future_collision_point->set_x(
+  //       open_space_debug.future_collision_point().path_point().x());
+  //   future_collision_point->set_y(
+  //       open_space_debug.future_collision_point().path_point().y());
+  //   // Set chartJS's dataset properties
+  //   auto* collision_properties = collision_line->mutable_properties();
+  //   (*collision_properties)["borderWidth"] = "3";
+  //   (*collision_properties)["pointRadius"] = "8";
+  //   (*collision_properties)["lineTension"] = "0";
+  //   (*collision_properties)["fill"] = "true";
+  // (*stitching_properties)["showLine"] = "true";
+  // (*stitching_properties)["pointStyle"] = "cross";
 
-    const auto& fallback_trajectories =
-        open_space_debug.fallback_trajectory().trajectory();
-    if (fallback_trajectories.empty() ||
-        fallback_trajectories[0].trajectory_point().empty()) {
-      return;
-    }
-    const auto& fallback_trajectory = fallback_trajectories[0];
-    // has to define chart boundary first
-    auto* fallback_line = chart->add_line();
-    fallback_line->set_label("Fallback");
-    for (const auto& point : fallback_trajectory.trajectory_point()) {
-      auto* point_debug = fallback_line->add_point();
-      point_debug->set_x(point.path_point().x());
-      point_debug->set_y(point.path_point().y());
-    }
-    // Set chartJS's dataset properties
-    auto* fallback_properties = fallback_line->mutable_properties();
-    (*fallback_properties)["borderWidth"] = "3";
-    (*fallback_properties)["pointRadius"] = "2";
-    (*fallback_properties)["lineTension"] = "0";
-    (*fallback_properties)["fill"] = "false";
-    (*fallback_properties)["showLine"] = "true";
-  }
+  // const auto& fallback_trajectories =
+  //     open_space_debug.fallback_trajectory().trajectory();
+  // if (fallback_trajectories.empty() ||
+  //     fallback_trajectories[0].trajectory_point().empty()) {
+  //   return;
+  // }
+  // const auto& fallback_trajectory = fallback_trajectories[0];
+  // // has to define chart boundary first
+  // auto* fallback_line = chart->add_line();
+  // fallback_line->set_label("Fallback");
+  // for (const auto& point : fallback_trajectory.trajectory_point()) {
+  //   auto* point_debug = fallback_line->add_point();
+  //   point_debug->set_x(point.path_point().x());
+  //   point_debug->set_y(point.path_point().y());
+  // }
+  // // Set chartJS's dataset properties
+  // auto* fallback_properties = fallback_line->mutable_properties();
+  // (*fallback_properties)["borderWidth"] = "3";
+  // (*fallback_properties)["pointRadius"] = "2";
+  // (*fallback_properties)["lineTension"] = "0";
+  // (*fallback_properties)["fill"] = "false";
+  // (*fallback_properties)["showLine"] = "true";
+  // }
 }
 
 void OnLanePlanning::AddStitchSpeedProfile(

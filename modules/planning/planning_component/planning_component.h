@@ -41,7 +41,7 @@ namespace apollo {
 namespace planning {
 
 class PlanningComponent final
-    : public cyber::Component<prediction::PredictionObstacles, canbus::Chassis,
+    : public cyber::Component<canbus::Chassis,
                               localization::LocalizationEstimate> {
  public:
   PlanningComponent() = default;
@@ -51,9 +51,7 @@ class PlanningComponent final
  public:
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<prediction::PredictionObstacles>&
-                prediction_obstacles,
-            const std::shared_ptr<canbus::Chassis>& chassis,
+  bool Proc(const std::shared_ptr<canbus::Chassis>& chassis,
             const std::shared_ptr<localization::LocalizationEstimate>&
                 localization_estimate) override;
 

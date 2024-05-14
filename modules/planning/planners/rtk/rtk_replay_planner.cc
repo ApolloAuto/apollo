@@ -22,6 +22,7 @@
 #include "absl/strings/str_split.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 
@@ -44,34 +45,47 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
                               Frame* frame,
                               ADCTrajectory* ptr_computed_trajectory) {
   auto status = Status::OK();
-  bool has_plan = false;
-  auto it = std::find_if(
-      frame->mutable_reference_line_info()->begin(),
-      frame->mutable_reference_line_info()->end(),
-      [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
-  if (it != frame->mutable_reference_line_info()->end()) {
-    status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan =
-        (it->IsDrivable() && it->IsChangeLanePath() &&
-         it->trajectory().GetSpatialLength() > FLAGS_change_lane_min_length);
-    if (!has_plan) {
-      AERROR << "Fail to plan for lane change.";
-    }
-  }
+  // bool has_plan = false;
+  // auto it = std::find_if(
+  //     frame->mutable_reference_line_info()->begin(),
+  //     frame->mutable_reference_line_info()->end(),
+  //     [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
+  // if (it != frame->mutable_reference_line_info()->end()) {
+  //   status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
+  //   has_plan =
+  //       (it->IsDrivable() && it->IsChangeLanePath() &&
+  //        it->trajectory().GetSpatialLength() > FLAGS_change_lane_min_length);
+  //   if (!has_plan) {
+  //     AERROR << "Fail to plan for lane change.";
+  //   }
+  // }
 
-  if (!has_plan || !FLAGS_prioritize_change_lane) {
-    for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        continue;
-      }
-      status = PlanOnReferenceLine(planning_start_point, frame,
-                                   &reference_line_info);
-      if (status != Status::OK()) {
-        AERROR << "planner failed to make a driving plan for: "
-               << reference_line_info.Lanes().Id();
-      }
-    }
-  }
+  // if (!has_plan || !FLAGS_prioritize_change_lane) {
+  //   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+  //     if (reference_line_info.IsChangeLanePath()) {
+  //       continue;
+  //     }
+  //     ReferenceLineInfo reference_line_info;
+  //     status = PlanOnReferenceLine(planning_start_point, frame,
+  //                                  &reference_line_info);
+  //     if (status != Status::OK()) {
+  //       AERROR << "planner failed to make a driving plan for: "
+  //              << reference_line_info.Lanes().Id();
+  //     }
+  //   }
+  // }
+
+  ReferenceLineInfo reference_line_info;
+  status =
+      PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+  std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
+  const double start_timestamp = apollo::cyber::Clock::NowInSeconds();
+  last_publishable_trajectory_.reset(new PublishableTrajectory(
+      start_timestamp, reference_line_info.trajectory()));
+
+  last_publishable_trajectory_->PopulateTrajectoryProtobuf(
+      ptr_computed_trajectory);
+
   return status;
 }
 
@@ -104,9 +118,12 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
 
   // reset relative time
   double zero_time = complete_rtk_trajectory_[matched_index].relative_time();
+  double zero_s = complete_rtk_trajectory_[matched_index].path_point().s();
   for (auto& trajectory_point : trajectory_points) {
     trajectory_point.set_relative_time(trajectory_point.relative_time() -
                                        zero_time);
+    trajectory_point.mutable_path_point()->set_s(
+        trajectory_point.path_point().s() - zero_s);
   }
 
   // check if the trajectory has enough points;

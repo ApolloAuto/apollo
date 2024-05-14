@@ -40,11 +40,11 @@ using apollo::storytelling::Stories;
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
 
-  if (FLAGS_use_navigation_mode) {
+  // if (FLAGS_use_navigation_mode) {
     planning_base_ = std::make_unique<NaviPlanning>(injector_);
-  } else {
-    planning_base_ = std::make_unique<OnLanePlanning>(injector_);
-  }
+  // } else {
+  //   planning_base_ = std::make_unique<OnLanePlanning>(injector_);
+  // }
 
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
@@ -117,11 +117,11 @@ bool PlanningComponent::Init() {
 }
 
 bool PlanningComponent::Proc(
-    const std::shared_ptr<prediction::PredictionObstacles>&
-        prediction_obstacles,
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
+  const std::shared_ptr<prediction::PredictionObstacles>&
+        prediction_obstacles = std::make_shared<prediction::PredictionObstacles>();
   ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
@@ -164,10 +164,10 @@ bool PlanningComponent::Proc(
     local_view_.stories = std::make_shared<Stories>(stories_);
   }
 
-  if (!CheckInput()) {
-    AINFO << "Input check failed";
-    return false;
-  }
+  // if (!CheckInput()) {
+  //   AINFO << "Input check failed";
+  //   return false;
+  // }
 
   if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     // data process for online training
@@ -218,13 +218,18 @@ bool PlanningComponent::Proc(
   if (nullptr != local_view_.planning_command) {
     command_status.set_command_id(local_view_.planning_command->command_id());
   }
+
+  ADCTrajectory::TrajectoryType current_trajectory_type =
+      adc_trajectory_pb.trajectory_type();
   if (adc_trajectory_pb.header().status().error_code() !=
       common::ErrorCode::OK) {
     command_status.set_status(external_command::CommandStatusType::ERROR);
     command_status.set_message(adc_trajectory_pb.header().status().msg());
-  } else if (planning_base_->IsPlanningFinished()) {
+  } else if (planning_base_->IsPlanningFinished(current_trajectory_type)) {
+    AINFO << "Set the external_command: FINISHED";
     command_status.set_status(external_command::CommandStatusType::FINISHED);
   } else {
+    AINFO << "Set the external_command: RUNNING";
     command_status.set_status(external_command::CommandStatusType::RUNNING);
   }
   command_status_writer_->Write(command_status);

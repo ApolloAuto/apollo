@@ -477,64 +477,64 @@ Status NaviPlanning::Plan(
   auto status =
       planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
-  ExportReferenceLineDebug(ptr_debug);
+  // ExportReferenceLineDebug(ptr_debug);
 
-  const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
-  if (!best_ref_info) {
-    const std::string msg = "planner failed to make a driving plan";
-    AERROR << msg;
-    if (last_publishable_trajectory_) {
-      last_publishable_trajectory_->Clear();
-    }
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-  ptr_debug->MergeFrom(best_ref_info->debug());
-  trajectory_pb->mutable_latency_stats()->MergeFrom(
-      best_ref_info->latency_stats());
+  // const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+  // if (!best_ref_info) {
+  //   const std::string msg = "planner failed to make a driving plan";
+  //   AERROR << msg;
+  //   if (last_publishable_trajectory_) {
+  //     last_publishable_trajectory_->Clear();
+  //   }
+  //   return Status(ErrorCode::PLANNING_ERROR, msg);
+  // }
+  // ptr_debug->MergeFrom(best_ref_info->debug());
+  // trajectory_pb->mutable_latency_stats()->MergeFrom(
+  //     best_ref_info->latency_stats());
   // set right of way status
-  trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
-  for (const auto& id : best_ref_info->TargetLaneId()) {
-    trajectory_pb->add_lane_id()->CopyFrom(id);
-  }
+  // trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
+  // for (const auto& id : best_ref_info->TargetLaneId()) {
+  //   trajectory_pb->add_lane_id()->CopyFrom(id);
+  // }
 
-  best_ref_info->ExportDecision(trajectory_pb->mutable_decision(),
-                                injector_->planning_context());
+  // best_ref_info->ExportDecision(trajectory_pb->mutable_decision(),
+  //                               injector_->planning_context());
 
   // Add debug information.
-  if (FLAGS_enable_record_debug) {
-    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
-    reference_line->set_name("planning_reference_line");
-    const auto& reference_points =
-        best_ref_info->reference_line().reference_points();
-    double s = 0.0;
-    double prev_x = 0.0;
-    double prev_y = 0.0;
-    bool empty_path = true;
-    for (const auto& reference_point : reference_points) {
-      auto* path_point = reference_line->add_path_point();
-      path_point->set_x(reference_point.x());
-      path_point->set_y(reference_point.y());
-      path_point->set_theta(reference_point.heading());
-      path_point->set_kappa(reference_point.kappa());
-      path_point->set_dkappa(reference_point.dkappa());
-      if (empty_path) {
-        path_point->set_s(0.0);
-        empty_path = false;
-      } else {
-        double dx = reference_point.x() - prev_x;
-        double dy = reference_point.y() - prev_y;
-        s += std::hypot(dx, dy);
-        path_point->set_s(s);
-      }
-      prev_x = reference_point.x();
-      prev_y = reference_point.y();
-    }
-  }
+  // if (FLAGS_enable_record_debug) {
+  //   auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
+  //   reference_line->set_name("planning_reference_line");
+  //   const auto& reference_points =
+  //       best_ref_info->reference_line().reference_points();
+  //   double s = 0.0;
+  //   double prev_x = 0.0;
+  //   double prev_y = 0.0;
+  //   bool empty_path = true;
+  //   for (const auto& reference_point : reference_points) {
+  //     auto* path_point = reference_line->add_path_point();
+  //     path_point->set_x(reference_point.x());
+  //     path_point->set_y(reference_point.y());
+  //     path_point->set_theta(reference_point.heading());
+  //     path_point->set_kappa(reference_point.kappa());
+  //     path_point->set_dkappa(reference_point.dkappa());
+  //     if (empty_path) {
+  //       path_point->set_s(0.0);
+  //       empty_path = false;
+  //     } else {
+  //       double dx = reference_point.x() - prev_x;
+  //       double dy = reference_point.y() - prev_y;
+  //       s += std::hypot(dx, dy);
+  //       path_point->set_s(s);
+  //     }
+  //     prev_x = reference_point.x();
+  //     prev_y = reference_point.y();
+  //   }
+  // }
 
-  last_publishable_trajectory_.reset(new PublishableTrajectory(
-      current_time_stamp, best_ref_info->trajectory()));
+  // last_publishable_trajectory_.reset(new PublishableTrajectory(
+  //     current_time_stamp, best_ref_info->trajectory()));
 
-  ADEBUG << "current_time_stamp: " << current_time_stamp;
+  // ADEBUG << "current_time_stamp: " << current_time_stamp;
 
   // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
@@ -548,19 +548,19 @@ Status NaviPlanning::Plan(
   }
   **/
 
-  for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
-    if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
-        FLAGS_trajectory_time_high_density_period) {
-      break;
-    }
-    ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
-                  .ShortDebugString();
-  }
+  // for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
+  //   if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
+  //       FLAGS_trajectory_time_high_density_period) {
+  //     break;
+  //   }
+  //   ADEBUG << last_publishable_trajectory_->TrajectoryPointAt(i)
+  //                 .ShortDebugString();
+  // }
 
-  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+  // last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 
-  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice(),
-                                    injector_->planning_context());
+  // best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice(),
+  //                                   injector_->planning_context());
 
   return status;
 }

@@ -47,33 +47,53 @@ Status PlanningBase::Init(const PlanningConfig& config) {
   return Status::OK();
 }
 
-bool PlanningBase::IsPlanningFinished() const {
-  const auto frame = injector_->frame_history()->Latest();
-  if (nullptr == frame || frame->reference_line_info().empty() ||
-      nullptr == local_view_.planning_command) {
-    return true;
-  }
-  const auto& reference_line_info = frame->reference_line_info().front();
-  // Check if the ReferenceLineInfo is the last passage.
-  const auto& reference_points =
-      reference_line_info.reference_line().reference_points();
-  if (reference_points.empty()) {
-    return true;
-  }
-  const auto& last_reference_point = reference_points.back();
-  const std::vector<hdmap::LaneWaypoint>& lane_way_points =
-      last_reference_point.lane_waypoints();
-  if (lane_way_points.empty()) {
-    return true;
-  }
-  // Get the end lane way point.
-  if (nullptr == frame->local_view().end_lane_way_point) {
-    return true;
-  }
-  return injector_->planning_context()
-      ->planning_status()
-      .destination()
-      .has_passed_destination();
+bool PlanningBase::IsPlanningFinished(
+    const ADCTrajectory::TrajectoryType& current_trajectory_type) const {
+  // const auto frame = injector_->frame_history()->Latest();
+  // if (current_trajectory_type == apollo::planning::ADCTrajectory::OPEN_SPACE) {
+  //   AINFO << "Current trajectory type is: OPEN SPACE";
+    // if (frame->open_space_info().openspace_planning_finish()) {
+    //   AINFO << "OPEN SPACE: planning finished";
+    //   return true;
+    // } else {
+    //   AINFO << "OPEN SPACE: planning not finished";
+    //   return false;
+    // }
+  // } else {
+  //   // const auto frame = injector_->frame_history()->Latest();
+  // if (nullptr == frame || frame->reference_line_info().empty() ||
+  //     nullptr == local_view_.planning_command) {
+  //     AINFO << "Current reference point is empty;";
+  //   return true;
+  // }
+  // const auto& reference_line_info = frame->reference_line_info().front();
+  // // Check if the ReferenceLineInfo is the last passage.
+  // const auto& reference_points =
+  //     reference_line_info.reference_line().reference_points();
+  // if (reference_points.empty()) {
+  //     AINFO << "Current reference points is empty;";
+  //   return true;
+  // }
+  // const auto& last_reference_point = reference_points.back();
+  // const std::vector<hdmap::LaneWaypoint>& lane_way_points =
+  //     last_reference_point.lane_waypoints();
+  // if (lane_way_points.empty()) {
+  //     AINFO << "Last reference point is empty;";
+  //   return true;
+  // }
+  // // Get the end lane way point.
+  // if (nullptr == frame->local_view().end_lane_way_point) {
+  //     AINFO << "Current end lane way is empty;";
+  //   return true;
+  // }
+  //   bool is_has_passed_destination = injector_->planning_context()
+  //     ->planning_status()
+  //     .destination()
+  //     .has_passed_destination();
+  //   AINFO << "Current passed destination:" << is_has_passed_destination;
+  //   return is_has_passed_destination;
+  // }
+  return true;
 }
 
 void PlanningBase::FillPlanningPb(const double timestamp,
@@ -93,7 +113,7 @@ void PlanningBase::FillPlanningPb(const double timestamp,
 
 void PlanningBase::LoadPlanner() {
   // Use PublicRoadPlanner as default Planner
-  std::string planner_name = "apollo::planning::PublicRoadPlanner";
+  std::string planner_name = "apollo::planning::RTKReplayPlanner";
   if ("" != config_.planner()) {
     planner_name = config_.planner();
     planner_name = ConfigUtil::GetFullPlanningClassName(planner_name);

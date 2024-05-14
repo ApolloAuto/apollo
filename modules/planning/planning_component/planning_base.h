@@ -80,9 +80,10 @@ class PlanningBase {
    *
    * @return True if vehicle reaches the end point.
    */
-  bool IsPlanningFinished() const;
+  bool IsPlanningFinished(
+      const ADCTrajectory::TrajectoryType& current_trajectory_type) const;
 
- public:
+ protected:
   virtual void FillPlanningPb(const double timestamp,
                               ADCTrajectory* const trajectory_pb);
 
@@ -98,8 +99,6 @@ class PlanningBase {
   TrafficDecider traffic_decider_;
   std::unique_ptr<Frame> frame_;
   std::shared_ptr<Planner> planner_;
-
- public:
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   std::shared_ptr<DependencyInjector> injector_;
 };
