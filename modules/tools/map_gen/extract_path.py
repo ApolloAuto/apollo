@@ -27,6 +27,9 @@ See the gflags for more optional args.
 """
 
 import sys
+sys.path.append("/apollo/")
+sys.path.append("/apollo/bazel-bin/")
+import math
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3.record import RecordReader
 from modules.common_msgs.localization_msgs import localization_pb2
@@ -38,6 +41,11 @@ if len(sys.argv) < 3:
 filename = sys.argv[1]
 fbags = sys.argv[2:]
 
+first_flag = True
+lastx = 0
+lasty = 0
+s = 0.0
+
 with open(filename, 'w') as f:
     for fbag in fbags:
         reader = RecordReader(fbag)
@@ -47,5 +55,28 @@ with open(filename, 'w') as f:
                 localization.ParseFromString(msg.message)
                 x = localization.pose.position.x
                 y = localization.pose.position.y
-                f.write(str(x) + "," + str(y) + "\n")
+                z = localization.pose.position.z
+                
+                if first_flag:
+                    first_flag = False
+                    lastx = x
+                    lasty = y
+                vx = localization.pose.linear_velocity.x
+                vy = localization.pose.linear_velocity.y
+                vz = localization.pose.linear_velocity.z
+                v = math.sqrt(vx**2 + vy**2 + vz**2)
+                ax = localization.pose.linear_acceleration.x
+                ay = localization.pose.linear_acceleration.y
+                az = localization.pose.linear_acceleration.z
+                a = math.sqrt(ax**2 + ay**2 + az**2)
+                heading = localization.pose.heading
+                time = localization.measurement_time
+                
+                s += math.sqrt((x - lastx)**2 + (y - lasty)**2)
+                
+                lastx = x
+                lasty = y
+                
+                print(x, y)
+                f.write(str(x) + ", "  + str(y) + ", " + str(z) + ", " + str(v) + ", " + str(a) + ", " + str(0.0) + ", " + str(0.0) + ", " + str(time) + ", " + str(heading) + ", " + str(1) + ", " + str(s) + ", " + str(0.0) + ", " + str(0.0) + ", " + str(0.0) + "\n")
 print("File written to: %s" % filename)

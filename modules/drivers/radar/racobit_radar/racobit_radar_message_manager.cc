@@ -125,7 +125,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
       SenderMessage<RacobitRadar> sender_message(RadarConfig200::ID,
                                                  &radar_config_);
       sender_message.Update();
-      can_client_->SendSingleFrame({sender_message.CanFrame()});
+      // can_client_->SendSingleFrame({sender_message.CanFrame()});
     }
   }
 

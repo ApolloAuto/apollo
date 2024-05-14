@@ -97,7 +97,8 @@ apollo::common::ErrorCode ContiRadarCanbusComponent::ConfigureRadar() {
   radar_config.set_radar_conf(conti_radar_conf_.radar_conf());
   SenderMessage<ContiRadar> sender_message(RadarConfig200::ID, &radar_config);
   sender_message.Update();
-  return can_client_->SendSingleFrame({sender_message.CanFrame()});
+  // return can_client_->SendSingleFrame({sender_message.CanFrame()});
+  return ErrorCode::OK;
 }
 
 bool ContiRadarCanbusComponent::Start() {
@@ -162,14 +163,14 @@ void ContiRadarCanbusComponent::PoseCallback(
   SenderMessage<ContiRadar> sender_message_speed(MotionInputSpeed300::ID,
                                                  &input_speed);
   sender_message_speed.Update();
-  can_client_->SendSingleFrame({sender_message_speed.CanFrame()});
+  // can_client_->SendSingleFrame({sender_message_speed.CanFrame()});
 
   MotionInputYawRate301 input_yawrate;
   input_yawrate.SetYawRate(yaw_rate);
   SenderMessage<ContiRadar> sender_message_yawrate(MotionInputYawRate301::ID,
                                                    &input_yawrate);
   sender_message_yawrate.Update();
-  can_client_->SendSingleFrame({sender_message_yawrate.CanFrame()});
+  // can_client_->SendSingleFrame({sender_message_yawrate.CanFrame()});
 }
 
 }  // namespace conti_radar

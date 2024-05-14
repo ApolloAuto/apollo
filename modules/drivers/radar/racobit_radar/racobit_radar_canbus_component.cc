@@ -104,7 +104,8 @@ apollo::common::ErrorCode RacobitRadarCanbusComponent::ConfigureRadar() {
   radar_config.set_radar_conf(racobit_radar_conf_.radar_conf());
   SenderMessage<RacobitRadar> sender_message(RadarConfig200::ID, &radar_config);
   sender_message.Update();
-  return can_client_->SendSingleFrame({sender_message.CanFrame()});
+  // return can_client_->SendSingleFrame({sender_message.CanFrame()});
+  return ErrorCode::CANBUS_ERROR;
 }
 
 RacobitRadarCanbusComponent::~RacobitRadarCanbusComponent() {
