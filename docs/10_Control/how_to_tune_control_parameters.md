@@ -96,7 +96,7 @@ lat_controller_conf {
 ### Longitudinal Controller Tuning
 The longitudinal controller is composed of Cascaded PID controllers that include one station controller and a high/low speed controller with different gains for different speeds.  Apollo manages tuning in open loop and closed loop by:
 
-- OpenLoop: Calibration table generation. Please refer to [how_to_update_vehicle_calibration.md](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E6%A0%87%E5%AE%9A/how_to_update_vehicle_calibration.md) for detailed steps.
+- OpenLoop: Calibration table generation. Please refer to [how_to_update_vehicle_calibration.md](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E6%A0%87%E5%AE%9A/how_to_update_vehicle_calibration.md) for detailed steps.
 - Closeloop: Based on the order of High Speed Controller -> Low Speed Controller -> Station Controller.
 
 #### High/Low Speed Controller Tuning
