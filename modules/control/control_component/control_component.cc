@@ -415,6 +415,7 @@ bool ControlComponent::Proc() {
   // injector_->set_control_process(true);
 
   ControlCommand control_command;
+  local_view_.mutable_chassis()->set_driving_mode(apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE);
 
   Status status;
   if (local_view_.chassis().driving_mode() ==

@@ -64,12 +64,12 @@ with open(filename, 'w') as f:
                 vx = localization.pose.linear_velocity.x
                 vy = localization.pose.linear_velocity.y
                 vz = localization.pose.linear_velocity.z
-                v = math.sqrt(vx**2 + vy**2 + vz**2)
+                v = math.sqrt(vx**2 + vy**2)
                 ax = localization.pose.linear_acceleration.x
                 ay = localization.pose.linear_acceleration.y
                 az = localization.pose.linear_acceleration.z
-                a = math.sqrt(ax**2 + ay**2 + az**2)
-                heading = localization.pose.heading
+                a = math.sqrt(ax**2 + ay**2)
+                heading = localization.pose.heading # + 90.0 / 180.0 * 3.14159265358979323846
                 time = localization.measurement_time
                 
                 s += math.sqrt((x - lastx)**2 + (y - lasty)**2)

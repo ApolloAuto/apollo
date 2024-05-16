@@ -341,6 +341,14 @@ Status MPCController::ComputeControlCommand(
     ControlCommand *cmd) {
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(planning_published_trajectory));
+
+  // localization::LocalizationEstimate localization_tmp = *localization;
+  // localization_tmp.mutable_pose()->mutable_position()->set_x(localization->pose().position().x() + 5.0);
+  // localization_tmp.mutable_pose()->mutable_position()->set_y(localization->pose().position().y() + 5.0);
+  // // localization_tmp.mutable_pose()->set_heading(localization->pose().heading() + 10.0);
+
+  // injector_->vehicle_state()->Update(localization_tmp, *chassis);
+
   auto vehicle_state = injector_->vehicle_state();
 
   // Transform the coordinate of the planning trajectory from the center of the
