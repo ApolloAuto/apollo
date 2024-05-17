@@ -29,6 +29,7 @@
 // #include "modules/drivers/canbus/can_client/hermes_can/controlcan.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
+
 /**
  * @namespace apollo::drivers::canbus::can
  * @brief apollo::drivers::canbus::can
@@ -107,12 +108,14 @@ class HermesCanClient : public CanClient {
    */
   void SetInited(bool init);
 
+
  private:
   bool is_init_ = false;
   bcan_hdl_t dev_handler_;
   CANCardParameter::CANChannelId port_;
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
   bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
+
 };
 
 }  // namespace can

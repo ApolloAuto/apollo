@@ -41,19 +41,14 @@
 namespace apollo {
 namespace drivers {
 namespace canbus {
-
-
-
-
-
 /**
  * @class CanFrame
  * @brief The class which defines the information to send and receive.
  */
 struct CanFrame {
   /// Message id
-  uint32_t id;
-  uint32_t device_id;
+  uint32_t id = 0;
+  uint32_t device_id = 0;
   /// Message length
   uint8_t len;
   /// Message content
@@ -148,10 +143,6 @@ class CanClient {
         << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);
-
-    
-
-
   }
 
   /**

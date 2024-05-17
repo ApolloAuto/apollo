@@ -151,10 +151,11 @@ ErrorCode HermesCanClient::Start() {
   // open device
   if (VCI_OpenDevice(VCI_USBCAN2, 0, 0) != 1) {
     AERROR << "Open device error";
+    printf("打开设备失败\n");
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
+  printf("打开设备成功\n");
   AINFO << "Open device success, channel id: " << port_;
-
   // init
   VCI_INIT_CONFIG init_config;
   init_config.AccCode = ACC_CODE;
@@ -165,32 +166,28 @@ ErrorCode HermesCanClient::Start() {
   init_config.Mode = MODE;
   if (VCI_InitCAN(VCI_USBCAN2, 0, 0, &init_config) != 1) {
     AERROR << ">> Init CAN1 Error!";
+     printf("初始化设备失败\n");
     VCI_CloseDevice(0, 0);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
+  printf("初始化设备成功\n");
   AERROR << ">> Init CAN1 Success!";
 
   // 2. start receive
   if (VCI_StartCAN(VCI_USBCAN2, 0, 0) != 1) {
     AERROR << ">> Start CAN1 error!";
+     printf("开启CAN失败\n");
     VCI_CloseDevice(0, 0);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
+
+
+  printf("开启CAN成功\n");
   AERROR << ">> Start CAN1 Success!";
 
   // set pos frequency
   VCI_CAN_OBJ canSend;
 
-  canSend.ID = Pot_CanID_SetParam;
-  setCANObjStdConfig(0, canSend);
-  canSend.Data[0] = static_cast<BYTE>(0xB3);
-  canSend.Data[1] = static_cast<BYTE>((10 >> 8) & 0xFF);
-  canSend.Data[2] = static_cast<BYTE>(10 & 0xFF);
-  for (int i = 3; i < DATA_LEN; ++i) {
-    canSend.Data[i] = static_cast<BYTE>(0x00);
-  }
-
-  VCI_Transmit(VCI_USBCAN2, 0, 0, &canSend, 1);
   // set steer speed&frequency
   Set_Debug_or_Normal_Mode(2, 0x88, 0, canSend);
   VCI_Transmit(VCI_USBCAN2, 0, 0, &canSend, 1);
@@ -306,14 +303,7 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     } else {
       AERROR << "unknown type";
     }
-    printf("Recive Message: CANID:0x%08X ", cf.device_id);
-    printf("DLC:0x%02X", rec[i].DataLen);  // 帧长度
-    printf(" data:0x");                    // 数据
-    for (int j = 0; j < rec[i].DataLen; ++j) {
-      printf(" %02X", rec[i].Data[j]);
-    }
-    printf("\n");
-
+    
     // CanFrame cf;
     cf.id = rec[i].ID;
     cf.len = rec[i].DataLen;

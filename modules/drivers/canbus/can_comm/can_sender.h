@@ -226,6 +226,7 @@ class CanSender {
 
   FRIEND_TEST(CanSenderTest, OneRunCase);
 
+ bool send_ =false;
  private:
   void PowerSendThreadFunc();
 
@@ -353,9 +354,9 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
+    if(!send_){continue;}
     tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
     new_delta_period = INIT_PERIOD;
-
     for (auto &message : send_messages_) {
       bool need_send = NeedSend(message, delta_period);
       message.UpdateCurrPeriod(delta_period);
@@ -364,21 +365,14 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       if (!need_send) {
         continue;
       }
-      std::vector<VCI_CAN_OBJ> can_frames;
+      //std::vector<VCI_CAN_OBJ> can_frames;
       VCI_CAN_OBJ can_frame = message.CanFrame();
       // can_frame.ID = Pot_CanID_Read;
       // setCANObjStdConfig(0, canSend);
-
-      can_frames.push_back(can_frame);
+      
+      //can_frames.push_back(can_frame);
       VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
-      printf("Send Message: CANID:0x%08X ", can_frame.ID);
-      printf("DLC:0x%02X", can_frame.DataLen);  // 帧长度
-      printf(" data:0x");                    // 数据
-      for (int j = 0; j < can_frame.DataLen; ++j) {
-        printf(" %02X", can_frame.Data[j]);
-      }
-      printf("\n");
-
+      
       // if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK)
       // {
       //   AERROR << "Send msg failed";
@@ -392,6 +386,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         // pt_manager_->Parse(uid, data, len);
       }
     }
+    send_ = false;
     delta_period = new_delta_period;
     tm_end = cyber::Time::Now().ToNanosecond() / 1e3;
     sleep_interval = delta_period - (tm_end - tm_start);
