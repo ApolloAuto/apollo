@@ -42,6 +42,48 @@
  */
 namespace apollo {
 namespace control {
+struct PIDParam {
+    PIDParam(double kp,double ki, double kd, double inter, 
+      double output, bool is_steer):kp_(kp), ki_(ki), kd_(kd), 
+      integrator_limit_level_(inter), output_limit_level_(output), 
+      is_steer_(is_steer){}
+    double kp_;
+    double ki_;
+    double kd_;
+    double integrator_limit_level_;
+    double output_limit_level_;
+    bool is_steer_;
+};
+
+class PidControl {
+protected:
+    bool first_hit_ = true;
+    double kp_ = 0.0;
+    double ki_ = 0.0;
+    double kd_ = 0.0;
+    double integral_        = 0.0;
+    double previous_error_  = 0.0;
+    double previous_output_ = 0.0;
+    double integrator_limit_level_= 0.0;
+    double output_limit_level_ = 0.0;
+    bool is_steer_ = true;  
+    // std::chrono::high_resolution_clock::time_point
+    //     last_time_point_;
+public:
+     ~PidControl() = default;
+    void SetPIDParam(const PIDParam &pidparam);
+    void Init(const PIDParam &pidparam);
+    void Reset();
+    double ComputePID(const double error, double dt, const double min);
+    void SetP(double p) { kp_ += p;}
+    void SetI(double i) {ki_ += i;}
+    void SetD(double d) {kd_ += d;}
+    double GetP() {return kp_;}
+    double GetI() {return ki_;}
+    double GetD() {return kd_;}
+};
+
+
 
 /**
  * @class Control
@@ -86,6 +128,13 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   void ResetAndProduceZeroControlCommand(ControlCommand *control_command);
   void GetVehiclePitchAngle(ControlCommand *control_command);
 
+
+
+  void CheckJoy();
+  void OnKeyBoard(double &cur_brake_v, double &cur_thro_v, 
+  double &cur_steer_angle, ControlCommand &control_command);
+  void set_terminal_echo(bool enabled);
+
  private:
   apollo::cyber::Time init_time_;
 
@@ -129,6 +178,26 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   LocalView local_view_;
 
   std::shared_ptr<DependencyInjector> injector_;
+
+
+  PidControl steer_pidcontrol_;  //方向盘PID控制
+  PidControl throttle_pidcontrol_; //油门PID控制
+  PidControl brake_pidcontrol_; //刹车PID控制
+  std::unique_ptr<std::thread> thread_;
+  double steer_target_value_ = 0.0; //方向盘目标转角
+  double brake_target_value_ = 2.5; //刹车目标电压值
+  double thro_target_value_ = 1.5; //油门目标电压值
+  bool is_steer_control_ = false; //是否收到转向命令
+  double wheel_angle_ = 0.0; //车轮目标转角，与方向盘目标转角为1:18
+  bool key_up_    = false;
+  bool key_down_  = false;
+  bool key_left_  = false;
+  bool key_right_ = false;
+  bool key_shift_ = false;
+  bool key_p_     = false;
+  bool is_first = true;
+  std::mutex key_mutex_;
+  bool is_switch = true;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)
