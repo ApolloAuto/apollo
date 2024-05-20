@@ -248,7 +248,7 @@ void ControlComponent::set_terminal_echo(bool enabled) {
 }
 
 void ControlComponent::CheckJoy() {
-    const char* inputDevPath = "/dev/input/event3";  
+    const char* inputDevPath = "/dev/input/event7";  
     int inputDev;
     
     struct input_event lastInputEvent;
@@ -373,7 +373,10 @@ void ControlComponent::OnKeyBoard(double &cur_brake_v, double &cur_thro_v,
     is_steer_control_ = false;
   }
   error = steer_target_value_ - cur_steer_angle;
-  output = steer_pidcontrol_.ComputePID(error, 0.1, 3.0)*40.0;
+  if (abs(error) >  0.001) {
+    printf("normal\n");
+  } 
+  output = steer_pidcontrol_.ComputePID(error, 0.1, 3.0);
   printf("方向盘目标差值:%.3f\n", error);
   printf("方向盘目标转角：%.3f;  当前转角：%.3f; 输出：%.2f\n", steer_target_value_, cur_steer_angle, output);
   control_command.set_steering_rate(output);
