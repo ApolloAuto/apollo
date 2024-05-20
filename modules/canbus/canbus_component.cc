@@ -24,6 +24,7 @@
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 
+
 using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
 using apollo::cyber::Time;
@@ -96,14 +97,14 @@ bool CanbusComponent::Init() {
     //       OnGuardianCommand(*cmd);
     //     });
   } else {
-    // control_command_reader_ = node_->CreateReader<ControlCommand>(
-    //     control_cmd_reader_config,
-    //     [this](const std::shared_ptr<ControlCommand> &cmd) {
-    //       ADEBUG << "Received control data: run canbus callback.";
-    //       OnControlCommand(*cmd);
-    //     });
+    control_command_reader_ = node_->CreateReader<ControlCommand>(
+        control_cmd_reader_config,
+        [this](const std::shared_ptr<ControlCommand> &cmd) {
+          ADEBUG << "Received control data: run canbus callback.";
+          OnControlCommand(*cmd);
+        });
     // cyber::Async(OnControlCommand(), this);
-    thread_.reset(new std::thread([this] { OnControlCommand(); }));
+    //thread_.reset(new std::thread([this] { OnControlCommand(); }));
 
     // chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
     //     chassis_cmd_reader_config,
@@ -129,6 +130,7 @@ bool CanbusComponent::Init() {
   return true;
 }
 
+
 void CanbusComponent::Clear() {
   vehicle_object_->Stop();
   AINFO << "Cleanup Canbus component";
@@ -150,11 +152,11 @@ bool CanbusComponent::Proc() {
   return true;
 }
 
-void CanbusComponent::OnControlCommand() {
-  ControlCommand control_command;
-  int count = 0;
-  while (true) {
-    cyber::USleep(100000);
+void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
+  //ControlCommand control_command;
+  // int count = 0;
+  // while (true) {
+  //   cyber::USleep(100000);
     int64_t current_timestamp = Time::Now().ToMicrosecond();
     // if command coming too soon, just ignore it.
     if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
@@ -174,16 +176,15 @@ void CanbusComponent::OnControlCommand() {
            << " micro seconds";
 
 
-    double value = sin(count * 6.28 / 30.0) * 90.0;
-    ADEBUG << "Control command value:" << value;
+    // double value = sin(count * 6.28 / 30.0) * 90.0;
+    // ADEBUG << "Control command value:" << value;
 
-    control_command.set_throttle(value);
-    control_command.set_brake(value);
-    control_command.set_steering_rate(value);
-
+    // control_command.set_throttle(value);
+    // control_command.set_brake(value);
+    // control_command.set_steering_rate(value);
     vehicle_object_->UpdateCommand(&control_command);
-    count++;
-  }
+  //   count++;
+  // }
 }
 
 void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
