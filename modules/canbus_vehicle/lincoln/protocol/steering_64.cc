@@ -29,8 +29,10 @@ const int32_t Steering64::ID = 0x0600;
 void Steering64::Parse(const std::uint8_t *bytes, int32_t length,
                        Lincoln *chassis_detail) const {
   auto speed = static_cast<int16_t>(((bytes[4] << 8) | bytes[5]));
-  chassis_detail->mutable_eps()->set_steering_angle_spd(speed / 100.0);
-  printf("方向盘角速度： %d\n", speed);
+  speed = speed /100.0;
+  chassis_detail->mutable_eps()->set_steering_angle_spd(speed);
+  printf(">>>>>>>>方向盘角速度： %d\n", speed);
+  
 }
 
 uint32_t Steering64::GetPeriod() const {
@@ -49,9 +51,8 @@ void Steering64::UpdateData(uint8_t *data) {
   // set_watchdog_counter_p(data, watchdog_counter_);
   // set_disable_audible_warning_p(data, disable_audible_warning_);
 
-  int speed = steering_angle_ * 100;
-  printf("steering_angle_speed: %d\n", speed);
-
+  int speed = steering_angle_speed_ * 100;
+  printf("*******steering_angle_speed_: %d\n", speed);
   for (int i = 0; i < 8; ++i) {
     if (2 == i) {
       data[i] = static_cast<unsigned char>((speed >> 8) & 0xFF);

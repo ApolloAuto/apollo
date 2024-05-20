@@ -133,7 +133,9 @@ void LincolnVehicleFactory::UpdateCommand(
               "vehicle_controller_->Update error.";
     return;
   }
+  
   can_sender_.Update();
+  can_sender_.send_ = true;
 }
 
 void LincolnVehicleFactory::UpdateCommand(

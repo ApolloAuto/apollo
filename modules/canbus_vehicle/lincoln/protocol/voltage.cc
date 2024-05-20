@@ -29,12 +29,12 @@ const int32_t Voltage::ID = 0x0603;
 
 void Voltage::Parse(const std::uint8_t *bytes, int32_t length,
                     Lincoln *chassis_detail) const {
-  double pot_throt_v = ((bytes[2] << 8) | bytes[3]) / 1000.0;
-  double pot_brake_v = ((bytes[4] << 8) | bytes[5]) / 1000.0;
+  double pot_throt_v = static_cast<double>((bytes[2] << 8) | bytes[3]) / 1000;
+  double pot_brake_v = static_cast<double>((bytes[4] << 8) | bytes[5]) / 1000;
 
-  printf("[油门]：当前采样电压值为%.3f V, [刹车]：当前采样电压值为%.3f V\n", pot_throt_v, pot_brake_v);
-//   chassis_detail->mutable_brake(pot_brake_v);
-//   chassis_detail->mutable_gas.set_throttle_cmd(pot_throt_v);
+  //printf("[油门]：当前采样电压值为%lf V, [刹车]：当前采样电压值为%lf V\n", pot_throt_v, pot_brake_v);
+  chassis_detail->mutable_gas()->set_throttle_cmd(pot_throt_v);
+  chassis_detail->mutable_brake()->set_brake_cmd(pot_brake_v);
 }
 
 uint32_t Voltage::GetPeriod() const {

@@ -41,7 +41,9 @@ void Throttle62::Parse(const std::uint8_t *bytes, int32_t length,
     value = -((~value & 0xFFFF) + 1);
   }
   double duty_cycle = value * 0.1;
-  printf("油门占空比：%.3f\n", duty_cycle);
+  printf(">>>>>>>>油门：%.3f\n", duty_cycle);
+  chassis_detail->mutable_gas()->set_throttle_output(duty_cycle);
+
 }
 
 uint32_t Throttle62::GetPeriod() const {
@@ -57,7 +59,7 @@ void Throttle62::UpdateData(uint8_t *data) {
   // set_watchdog_counter_p(data, watchdog_counter_);
 
   int throtle = int(pedal_cmd_ * 10.0);
-  printf("throtle: %d\n", throtle);
+  printf("*******throttle: %d\n", throtle);
   data[0] = static_cast<unsigned char>(0x23);
   data[1] = static_cast<unsigned char>(0x01);
   data[2] = static_cast<unsigned char>(0x20);

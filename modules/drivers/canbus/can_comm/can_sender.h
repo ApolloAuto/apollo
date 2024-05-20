@@ -226,7 +226,8 @@ class CanSender {
 
   FRIEND_TEST(CanSenderTest, OneRunCase);
 
- bool send_ =false;
+  bool send_ = false;
+
  private:
   void PowerSendThreadFunc();
 
@@ -347,32 +348,34 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   int32_t delta_period = INIT_PERIOD;
   int32_t new_delta_period = INIT_PERIOD;
 
-  int64_t tm_start = 0;
+  // int64_t tm_start = 0;
   int64_t tm_end = 0;
   int64_t sleep_interval = 0;
 
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    if(!send_){continue;}
-    tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
-    new_delta_period = INIT_PERIOD;
+    if (!send_) {
+      continue;
+    }
+    // tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
+    // new_delta_period = INIT_PERIOD;
     for (auto &message : send_messages_) {
-      bool need_send = NeedSend(message, delta_period);
-      message.UpdateCurrPeriod(delta_period);
-      new_delta_period = std::min(new_delta_period, message.curr_period());
+      // bool need_send = NeedSend(message, delta_period);
+      // message.UpdateCurrPeriod(delta_period);
+      // new_delta_period = std::min(new_delta_period, message.curr_period());
 
-      if (!need_send) {
-        continue;
-      }
-      //std::vector<VCI_CAN_OBJ> can_frames;
+      // if (!need_send) {
+      //   continue;
+      // }
+      // std::vector<VCI_CAN_OBJ> can_frames;
       VCI_CAN_OBJ can_frame = message.CanFrame();
       // can_frame.ID = Pot_CanID_Read;
       // setCANObjStdConfig(0, canSend);
-      
-      //can_frames.push_back(can_frame);
+
+      // can_frames.push_back(can_frame);
       VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
-      
+
       // if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK)
       // {
       //   AERROR << "Send msg failed";
@@ -387,17 +390,20 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       }
     }
     send_ = false;
-    delta_period = new_delta_period;
-    tm_end = cyber::Time::Now().ToNanosecond() / 1e3;
-    sleep_interval = delta_period - (tm_end - tm_start);
+    // delta_period = new_delta_period;
+    tm_end = cyber::Time::Now().ToNanosecond() / 1e6;
 
-    if (sleep_interval > 0) {
-      std::this_thread::sleep_for(std::chrono::microseconds(sleep_interval));
-    } else {
-      // do not sleep
-      AWARN << "Too much time for calculation: " << tm_end - tm_start
-            << "us is more than minimum period: " << delta_period << "us";
-    }
+    // AWARN << "Too much time for calculation: " << tm_end - tm_start  << "us";
+    printf("~~~~~~~~~~~~~~~~~VCI_Transmit time: %lld \n", tm_end);
+    std::this_thread::sleep_for(std::chrono::microseconds(10));
+
+    // if (sleep_interval > 0) {
+    //   std::this_thread::sleep_for(std::chrono::microseconds(sleep_interval));
+    // } else {
+    //   // do not sleep
+    //   AWARN << "Too much time for calculation: " << tm_end - tm_start
+    //         << "us is more than minimum period: " << delta_period << "us";
+    // }
   }
   AINFO << "Can client sender thread stopped!";
 }

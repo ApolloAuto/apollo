@@ -151,8 +151,8 @@ bool LincolnController::Start() {
     AERROR << "LincolnController has NOT been initiated.";
     return false;
   }
-  // const auto &update_func = [this] { SecurityDogThreadFunc(); };
-  // thread_.reset(new std::thread(update_func));
+  const auto &update_func = [this] { SecurityDogThreadFunc(); };
+  thread_.reset(new std::thread(update_func));
 
   return true;
 }
@@ -249,12 +249,24 @@ Chassis LincolnController::chassis() {
   } else {
     chassis_.set_throttle_percentage(0);
   }
+  if (chassis_detail.has_gas() && chassis_detail.gas().has_throttle_cmd()) {
+    chassis_.set_throttle_percentage_cmd(
+        static_cast<float>(chassis_detail.gas().throttle_cmd()));
+  } else {
+    chassis_.set_throttle_percentage_cmd(0);
+  }
   // 9
   if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_output()) {
     chassis_.set_brake_percentage(
         static_cast<float>(chassis_detail.brake().brake_output()));
   } else {
     chassis_.set_brake_percentage(0);
+  }
+  if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_cmd()) {
+    chassis_.set_brake_percentage_cmd(
+        static_cast<float>(chassis_detail.brake().brake_cmd()));
+  } else {
+    chassis_.set_brake_percentage_cmd(0);
   }
   // 23, previously 10
   if (chassis_detail.has_gear() && chassis_detail.gear().has_gear_state()) {
@@ -264,12 +276,14 @@ Chassis LincolnController::chassis() {
   }
   // 11
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
-    chassis_.set_steering_percentage(
-        static_cast<float>(chassis_detail.eps().steering_angle() * 100.0 /
-                           vehicle_params_.max_steer_angle() * M_PI / 180.0));
+    //chassis_.set_steering_percentage(
+        // static_cast<float>(chassis_detail.eps().steering_angle() * 100.0 /
+        //                    vehicle_params_.max_steer_angle() * M_PI / 180.0));
+        chassis_.set_steering_percentage(static_cast<float>(chassis_detail.eps().steering_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
+  //chassis_.set_steering_percentage(static_cast<float>(chassis_detail.eps().steering_angle()));
   // 12
   if (chassis_detail.has_eps() && chassis_detail.eps().has_epas_torque()) {
     chassis_.set_steering_torque_nm(
@@ -604,7 +618,7 @@ void LincolnController::Steer(double angle) {
   //     vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   // // reverse sign
   // steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
-  steering_64_->set_steering_angle(angle);
+  steering_64_->set_steering_angle_speed(angle);
 
 }
 

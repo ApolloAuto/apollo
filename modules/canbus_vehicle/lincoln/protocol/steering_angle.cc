@@ -38,6 +38,7 @@ void SteeringAngle::Parse(const std::uint8_t *bytes, int32_t length,
   combined_hex_ss << std::setw(2) << std::setfill('0') << std::hex << number3;
   combined_hex_ss << std::setw(2) << std::setfill('0') << std::hex << number4;
   std::stringstream ss2;
+  double angle = 0.0;
   ss2 << std::hex << combined_hex_ss.str();
   unsigned int combined_dec;
   ss2 >> combined_dec;
@@ -46,10 +47,10 @@ void SteeringAngle::Parse(const std::uint8_t *bytes, int32_t length,
     decimal -= (1 << (combined_hex_ss.str().size() * 4));
   }
 
-  double angle = (decimal % 14400) * (360.0 / 14400.0);
-
+  angle = static_cast<double>(decimal * (360.0 / 14400.0));
+  
   chassis_detail->mutable_eps()->set_steering_angle(angle);
-  printf("方向盘角度：: %d\n", angle);
+  printf(">>>>>>>>方向盘角度: %.2f\n", angle);
 }
 
 uint32_t SteeringAngle::GetPeriod() const {
@@ -68,7 +69,7 @@ void SteeringAngle::UpdateData(uint8_t *data) {
   // set_watchdog_counter_p(data, watchdog_counter_);
   // set_disable_audible_warning_p(data, disable_audible_warning_);
 
-  int speed = steering_angle_ * 100;
+  int speed = steering_angle_speed_ * 100;
 
   for (int i = 0; i < 8; ++i) {
     if (2 == i) {
