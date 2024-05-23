@@ -18,7 +18,6 @@
 // refer to ENS's
 // documents for details about these messages.
 
-
 #pragma once
 
 #include <cstdint>
@@ -31,69 +30,59 @@ namespace drivers {
 namespace gnss {
 namespace enbroad {
 
-//融合定位状态
-enum EFUSHIONSTATUS
-{
-	E_FUNSION_NONE=0,						//无效融合
-	E_FUNSION_GPS=1,						//GPS融合
-	E_FUNSION_WHEEL=2,						//用wheel融合
-	E_FUNSION_MOTION=3,						//运动模型约束
-	E_FUNSION_TOTAL=4,
+enum EFUSHIONSTATUS {
+  E_FUNSION_NONE = 0,
+  E_FUNSION_GPS = 1,
+  E_FUNSION_WHEEL = 2,
+  E_FUNSION_MOTION = 3,
+  E_FUNSION_TOTAL = 4,
 };
 
-enum ENAVSTANDARDFLAGSTATUS
-{
-	E_NAV_STANDARD_NO_PROCCSS=0,			//0:未标定完成 
-	E_NAV_STANDARD_PROCCSSING=1,			//1：标定中
-	E_NAV_STANDARD_PROCCSSED=2,				//2：标定完成
-	E_NAV_STANDARD_TOTAL=3,					//总共状态数目
+enum ENAVSTANDARDFLAGSTATUS {
+  E_NAV_STANDARD_NO_PROCCSS = 0,
+  E_NAV_STANDARD_PROCCSSING = 1,
+  E_NAV_STANDARD_PROCCSSED = 2,
+  E_NAV_STANDARD_TOTAL = 3,
 };
 
-enum ENAVSTATUS
-{
-    E_NAV_STATUS_START =0,       	        //开始导航加载导航参数
-    E_NAV_STATUS_ROUTH_ALIGN=1,		    	//SINS初对准
-    E_NAV_STATUS_SINS_KF_INITIAL=2,      	//SINS、KF初始化
-    E_NAV_STATUS_SYSTEM_STANDARD=3,      	//系统标定
-    E_NAV_STATUS_IN_NAV=4,                 	//正常导航
-    E_NAV_STATUS_STOP=5,                   	//停止导航
-    E_NAV_STATUS_TOTAL=6,					//总共状态数目
+enum ENAVSTATUS {
+  E_NAV_STATUS_START = 0,
+  E_NAV_STATUS_ROUTH_ALIGN = 1,
+  E_NAV_STATUS_SINS_KF_INITIAL = 2,
+  E_NAV_STATUS_SYSTEM_STANDARD = 3,
+  E_NAV_STATUS_IN_NAV = 4,
+  E_NAV_STATUS_STOP = 5,
+  E_NAV_STATUS_TOTAL = 6,
 };
 
-//rtk状态
-enum EGPSRTKSTATUS
-{
-    E_GPS_RTK_INVALID=0, 						//0: 无定位
-	E_GPS_RTK_SPP=1,							//1：单点定位  		
-    E_GPS_RTK_DGPS=2,							//2：差分解
-    E_GPS_RTK_FIXED=4,							//4：RTK固定解
-    E_GPS_RTK_FLOAT=5,							//5：RTK浮动解
-    E_GPS_RTK_TOTAL=6,
-    
+enum EGPSRTKSTATUS {
+  E_GPS_RTK_INVALID = 0,
+  E_GPS_RTK_SPP = 1,
+  E_GPS_RTK_DGPS = 2,
+  E_GPS_RTK_FIXED = 4,
+  E_GPS_RTK_FLOAT = 5,
+  E_GPS_RTK_TOTAL = 6,
 };
 
-enum EPOLLDATATYPE 
-{
-    E_POLL_DEV_TEMP =0,       				
-    E_POLL_GNSS_STATE=20,  					
-    E_POLL_IMU_STATE=40,						
-    E_POLL_CAN_STATE=60,						
-    E_POLL_INS_STATE=80,					
-    E_POLL_GNSS2_STATE=100,  				
-    E_POLL_DATA_TOTAL=120,
+enum EPOLLDATATYPE {
+  E_POLL_DEV_TEMP = 0,
+  E_POLL_GNSS_STATE = 20,
+  E_POLL_IMU_STATE = 40,
+  E_POLL_CAN_STATE = 60,
+  E_POLL_INS_STATE = 80,
+  E_POLL_GNSS2_STATE = 100,
+  E_POLL_DATA_TOTAL = 120,
 };
-	
 
 enum MessageId : uint16_t {
-  BIN_NAV_DATA 	= 0x01AA,
+  BIN_NAV_DATA = 0x01AA,
   BIN_SINS_DATA = 0x02AA,
-  BIN_IMU_DATA 	= 0x03AA,
+  BIN_IMU_DATA = 0x03AA,
   BIN_GNSS_DATA = 0x04AA,
 };
 
 // Every binary message has 32-bit CRC performed on all data including the
 // header.
-//constexpr uint16_t CRC_LENGTH = 4;
 
 #pragma pack(push, 1)  // Turn off struct padding.
 
@@ -102,35 +91,30 @@ enum class DatumId : uint32_t {
   WGS84 = 61,
 };
 
-
-//帧头
 enum SyncHeadByte : uint8_t {
   SYNC_HEAD_0 = 0xA5,
   SYNC_HEAD_1 = 0x5A,
   SYNC_HEAD_2 = 0x5A,
 };
-//帧尾
+
 enum SyncTailByte : uint8_t {
   SYNC_TAIL_0 = 0xA5,
   SYNC_Tail_1 = 0x5A,
   SYNC_Tail_2 = 0x5A,
 };
 
-//Frame Head
-struct  FrameHeader{
-  SyncHeadByte 	sync_head[3];//sync Head
-  uint8_t 		src_id;//src id
-  uint8_t 		dst_id;//dst id
-  MessageId 	message_id;//message id
-  uint8_t 		rsp;  //RSP
-  uint16_t		SN;	  //session NO.
-  uint16_t		reserved;//RESERVED		
-  uint16_t		message_length;  // Message length
+struct FrameHeader {
+  SyncHeadByte sync_head[3];
+  uint8_t src_id;
+  uint8_t dst_id;
+  MessageId message_id;
+  uint8_t rsp;
+  uint16_t SN;
+  uint16_t reserved;
+  uint16_t message_length;
 };
-
-static_assert(sizeof(FrameHeader) == 14, "Incorrect size of FrameHeader");
-struct  NAV_DATA_TypeDef{
-
+static_assert(sizeof(FrameHeader) == 14, "Incorrect FrameHeader");
+struct NAV_DATA_TypeDef {
   uint32_t gps_week;       // GPS Week number.
   uint32_t gps_millisecs;  // Milliseconds of week.
   int16_t pitch;
@@ -145,103 +129,90 @@ struct  NAV_DATA_TypeDef{
   int16_t magnetX;
   int16_t magnetY;
   int16_t magentZ;
-  long long lat;
-  long long lon;
-  int32_t  alt;
-  int16_t	ve;
-  int16_t	vn;
-  int16_t	vu;
-  uint8_t	poll_type;
-  int16_t	poll_frame1;
-  int16_t	poll_frame2;
-  int16_t	poll_frame3;
+  int64_t lat;
+  int64_t lon;
+  int32_t alt;
+  int16_t ve;
+  int16_t vn;
+  int16_t vu;
+  uint8_t poll_type;
+  int16_t poll_frame1;
+  int16_t poll_frame2;
+  int16_t poll_frame3;
 };
-static_assert(sizeof(NAV_DATA_TypeDef) == 65, "Incorrect size of NAV_DATA_TypeDef");
+static_assert(sizeof(NAV_DATA_TypeDef) == 65, "Incorrect NAV_DATA_TypeDef");
 
-struct  NAV_SINS_TypeDef{
-
-  uint32_t 	gps_week;       	// GPS Week number.
-  uint32_t 	gpssecond;  		// Milliseconds of week.
-  uint8_t 	navStatus;			//0:START;1:ROUTH_ALIGN;2:SINS_KF_INITIAL;3:SYSTEM_STANDARD;4:IN_NAV;5:stop
-  uint8_t 	fusion;				//0:valid;1:gps;2:wheel;3:motion
-  float		pitch;				//unit degree
-  float 	roll;				//unit degree
-  float		heading;			//unit degree
-  float		ve; 				//East velocity, unit m/s
-  float		vn;					//North velocity,unit m/s
-  float		vu;					//up velocity,unit m/s
-  double	latitude;			//unit degree
-  double	longitude;			//unit degree
-  float		altitude;			//unit m
-  float	    xigema_ve;			//East velocity std unit m/s	
-  float	    xigema_vn;			//North velocity std unit m/s
-  float	    xigema_vu;			//up velocity std unit m/s
-  float     xigema_lat;			//North pos std unit m
-  float 	xigema_lon;			//East pos std unit m
-  float		xigema_alt;			//up pos std unit m
-  float		xigema_pitch;		//pitch std unit degree
-  float		xigema_roll;		//roll std unit degree
-  float		xigema_head;		//heading std unit degree
+struct NAV_SINS_TypeDef {
+  uint32_t gps_week;   // GPS Week number.
+  uint32_t gpssecond;  // Milliseconds of week.
+  uint8_t navStatus;
+  uint8_t fusion;  // 0:valid;1:gps;2:wheel;3:motion
+  float pitch;
+  float roll;          // unit degree
+  float heading;       // unit degree
+  float ve;            // East velocity, unit m/s
+  float vn;            // North velocity,unit m/s
+  float vu;            // up velocity,unit m/s
+  double latitude;     // unit degree
+  double longitude;    // unit degree
+  float altitude;      // unit m
+  float xigema_ve;     // East velocity std unit m/s
+  float xigema_vn;     // North velocity std unit m/s
+  float xigema_vu;     // up velocity std unit m/s
+  float xigema_lat;    // North pos std unit m
+  float xigema_lon;    // East pos std unit m
+  float xigema_alt;    // up pos std unit m
+  float xigema_pitch;  // pitch std unit degree
+  float xigema_roll;   // roll std unit degree
+  float xigema_head;   // heading std unit degree
 };
-static_assert(sizeof(NAV_SINS_TypeDef) == 90, "Incorrect size of NAV_SINS_TypeDef");
+static_assert(sizeof(NAV_SINS_TypeDef) == 90, "Incorrect NAV_SINS_TypeDef");
 
-struct	NAV_IMU_TypeDef{
-
-  uint32_t	gps_week;	   		// GPS Week number.
-  uint32_t	gpssecond;  		// Milliseconds of week.
-  float		sensorTemp;			//unit degree   
- 
-  uint8_t 	gyroFlag;			//gyro state,0:abnormal,1:normal
-  double  	gyroX;				//unit degree/s
-  double  	gyroY;				//unit degree/s
-  double  	gyroZ;				//unit degree/s
-
-  uint8_t 	accFlag;			//acc state,0:abnormal,1:normal
-  double  	accX;				//unit m/s2
-  double  	accY;				//unit m/s2
-  double  	accZ;				//unit m/s2
-
-  uint8_t 	magnetFlag;			//magnet state,0:abnormal,1:normal
-  double  	magnetX;			//unit mGauss
-  double  	magnetY;			//unit mGauss
-  double  	magnetZ;			//unit mGauss
+struct NAV_IMU_TypeDef {
+  uint32_t gps_week;   // GPS Week number.
+  uint32_t gpssecond;  // Milliseconds of week.
+  float sensorTemp;    // unit degree
+  uint8_t gyroFlag;    // gyro state,0:abnormal,1:normal
+  double gyroX;        // unit degree/s
+  double gyroY;        // unit degree/s
+  double gyroZ;        // unit degree/s
+  uint8_t accFlag;     // acc state,0:abnormal,1:normal
+  double accX;         // unit m/s2
+  double accY;         // unit m/s2
+  double accZ;         // unit m/s2
+  uint8_t magnetFlag;  // magnet state,0:abnormal,1:normal
+  double magnetX;      // unit mGauss
+  double magnetY;      // unit mGauss
+  double magnetZ;      // unit mGauss
 };
-static_assert(sizeof(NAV_IMU_TypeDef) == 87, "Incorrect size of NAV_IMU_TypeDef");
+static_assert(sizeof(NAV_IMU_TypeDef) == 87, "Incorrect NAV_IMU_TypeDef");
 
-struct	NAV_GNSS_TypeDef{
-
-  uint32_t 	gps_week;	   		// GPS Week number.
-  uint32_t 	gpssecond;  		// Milliseconds of week.
-  uint8_t	satsNum;			//num of sats
-  float		age;				//	
-  
-  uint8_t 	rtkStatus; 			//0:invalid;1:SPP;2:DGPS;4:FIXED;5:FLOAT
-  double  	latitude;			//unit degree
-  double  	longitude;			//unit degree
-  float  	altitude;			//unit m
-
-  uint8_t 	headingStatus;		//0:invalid;4:FIXED;5:FLOAT
-  float		baseline;			//unit m
-  float		heading;			//unit degree
-
-  uint8_t 	velStatus;			//0:normal
-  float		ve; 				//East velocity, unit m/s
-  float		vn;					//North velocity,unit m/s
-  float		vu;					//up velocity,unit m/s
-
-  float	    xigema_ve;			//East velocity std unit m/s	
-  float	    xigema_vn;			//North velocity std unit m/s
-  float	    xigema_vu;			//up velocity std unit m/s
-  float     xigema_lat;			//North pos std unit m
-  float 	xigema_lon;			//East pos std unit m
-  float		xigema_alt;			//up pos std unit m
-
+struct NAV_GNSS_TypeDef {
+  uint32_t gps_week;   // GPS Week number.
+  uint32_t gpssecond;  // Milliseconds of week.
+  uint8_t satsNum;     // num of sats
+  float age;
+  uint8_t rtkStatus;      // 0:invalid;1:SPP;2:DGPS;4:FIXED;5:FLOAT
+  double latitude;        // unit degree
+  double longitude;       // unit degree
+  float altitude;         // unit m
+  uint8_t headingStatus;  // 0:invalid;4:FIXED;5:FLOAT
+  float baseline;         // unit m
+  float heading;          // unit degree
+  uint8_t velStatus;      // 0:normal
+  float ve;               // East velocity, unit m/s
+  float vn;               // North velocity,unit m/s
+  float vu;               // up velocity,unit m/s
+  float xigema_ve;        // East velocity std unit m/s
+  float xigema_vn;        // North velocity std unit m/s
+  float xigema_vu;        // up velocity std unit m/s
+  float xigema_lat;       // North pos std unit m
+  float xigema_lon;       // East pos std unit m
+  float xigema_alt;       // up pos std unit m
 };
-static_assert(sizeof(NAV_GNSS_TypeDef) == 80, "Incorrect size of NAV_GNSS_TypeDef");
-
+static_assert(sizeof(NAV_GNSS_TypeDef) == 80, "Incorrect NAV_GNSS_TypeDef");
 
 #pragma pack(pop)
-
 
 }  // namespace enbroad
 }  // namespace gnss
