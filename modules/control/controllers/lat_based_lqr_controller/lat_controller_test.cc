@@ -52,7 +52,8 @@ class LatControllerTest : public ::testing::Test, LatController {
                             SimpleLateralDebug *debug,
                             const canbus::Chassis *chassis) {
     LatController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
-                                        linear_a, trajectory_analyzer, debug, chassis);
+                                        linear_a, trajectory_analyzer, debug,
+                                        chassis);
   }
 
  protected:
@@ -105,7 +106,8 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
   ComputeLateralErrors(
       vehicle_state->x(), vehicle_state->y(), vehicle_state->heading(),
       vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
-      vehicle_state->linear_acceleration(), trajectory_analyzer, debug, &chassis_pb);
+      vehicle_state->linear_acceleration(), trajectory_analyzer, debug,
+      &chassis_pb);
 
   double theta_error_expected = -0.03549;
   double theta_error_dot_expected = 0.0044552856731;
