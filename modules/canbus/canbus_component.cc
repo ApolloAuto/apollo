@@ -153,10 +153,7 @@ bool CanbusComponent::Proc() {
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  //ControlCommand control_command;
-  // int count = 0;
-  // while (true) {
-  //   cyber::USleep(100000);
+
     int64_t current_timestamp = Time::Now().ToMicrosecond();
     // if command coming too soon, just ignore it.
     if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
@@ -175,16 +172,8 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
                       control_command.header().timestamp_sec() * 1e6)
            << " micro seconds";
 
-
-    // double value = sin(count * 6.28 / 30.0) * 90.0;
-    // ADEBUG << "Control command value:" << value;
-
-    // control_command.set_throttle(value);
-    // control_command.set_brake(value);
-    // control_command.set_steering_rate(value);
     vehicle_object_->UpdateCommand(&control_command);
-  //   count++;
-  // }
+
 }
 
 void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
