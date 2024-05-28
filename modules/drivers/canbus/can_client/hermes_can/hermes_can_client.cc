@@ -205,6 +205,7 @@ ErrorCode HermesCanClient::Start() {
   // set pos frequency
   VCI_CAN_OBJ canSend;
 
+  
   // set steer speed&frequency
   Set_Debug_or_Normal_Mode(2, 0x88, 0, canSend);
   //VCI_Transmit(VCI_USBCAN2, 0, 0, &canSend, 1);
@@ -293,21 +294,30 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   // int32_t ret = bcan_recv(dev_handler_, _recv_frames, *frame_num);
 
   VCI_CAN_OBJ rec[*frame_num];  // 接收缓存
+  int32_t ret = 0;
   {
     std::unique_lock<std::mutex> lock(mutex_can1_);
-  int32_t ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec, *frame_num, 1000);
+    ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec, *frame_num, 1000);
+  }
+
+  int32_t ret_can2 = 0;
+  VCI_CAN_OBJ rec_can2[*frame_num];
+  {
+    std::unique_lock<std::mutex> lock(mutex_can2_);
+    ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_can2, *frame_num, 1000);
+  }
 
   // don't log timeout
   if (ret == RX_TIMEOUT) {
     *frame_num = 0;
     return ErrorCode::OK;
   }
-  // if (ret < 0) {
-  //   int ret_rece_error = bcan_get_status(dev_handler_);
-  //   AERROR << "receive message failed, error code:" << ret
-  //          << "receive error:" << ret_rece_error;
-  //   return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
-  // }
+  if (ret < 0) {
+    //int ret_rece_error = bcan_get_status(dev_handler_);
+    AERROR << "receive message failed, error code:" << ret;
+           //<< "receive error:" << ret_rece_error;
+    return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
+  }
   *frame_num = ret;
 
   // is ret num is equal *frame_num?
@@ -330,28 +340,28 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     memcpy(cf.data, rec[i].Data, cf.len);
     frames->push_back(cf);
   }
+  
+  if (ret_can2 < 0) {
+    AERROR << "receive message failed, error code:" << ret;
+    return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
-
-  {
-    std::unique_lock<std::mutex> lock(mutex_can2_);
-    VCI_CAN_OBJ rec_can2[*frame_num];
-    int32_t ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_can2, 10, 1000);
-    for (int i = 0; i < ret_can2; ++i) {
-      CanFrame cf;
-      if (rec_can2[i].ID == PGN65294_CanID)
-      {
-        cf.device_id = 0x0600;
-      } else if (rec_can2[i].ID == PGN65296_CanID) {
-        cf.device_id = 0x0605;
-      }else {
-        AERROR << "unknown type";
-      }
-      cf.id = rec_can2[i].ID;
-      cf.len = rec_can2[i].DataLen;
-      memcpy(cf.data, rec_can2[i].Data, cf.len);
-      frames->push_back(cf);
+  *frame_num += ret_can2;
+  for (int i = 0; i < ret_can2; ++i) {
+    CanFrame cf;
+    if (rec_can2[i].ID == PGN65294_CanID)
+    {
+      cf.device_id = 0x0600;
+    } else if (rec_can2[i].ID == PGN65296_CanID) {
+      cf.device_id = 0x0605;
+    }else {
+      AERROR << "unknown type";
     }
+    cf.id = rec_can2[i].ID;
+    cf.len = rec_can2[i].DataLen;
+    memcpy(cf.data, rec_can2[i].Data, cf.len);
+    frames->push_back(cf);
   }
+  
   return ErrorCode::OK;
 }
 
