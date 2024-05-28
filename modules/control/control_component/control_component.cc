@@ -833,7 +833,6 @@ bool ControlComponent::Proc() {
 
       printf("[自动]>>>方向盘 输出: %.3lf\n", output);
       printf("[自动]>>>方向盘 目标角度: %.3lf, 当前角度：%.3lf\n", steer_target_value_, cur_steer_angle);
-      printf("[自动]>>>方向盘 缩放比例: %.3lf; 补偿量: %.2lf\n", scale, add_num);
 
 
       printf("[自动]>>>加速度 %.3lf\n", control_command.acceleration());
