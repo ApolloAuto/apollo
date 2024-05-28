@@ -154,7 +154,7 @@ ErrorCode HermesCanClient::Start() {
     printf("打开设备失败\n");
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
-  printf("打开设备成功\n");
+  printf("打开设备1成功\n");
   AINFO << "Open device success, channel id: " << port_;
   // init
   VCI_INIT_CONFIG init_config;
@@ -166,23 +166,40 @@ ErrorCode HermesCanClient::Start() {
   init_config.Mode = MODE;
   if (VCI_InitCAN(VCI_USBCAN2, 0, 0, &init_config) != 1) {
     AERROR << ">> Init CAN1 Error!";
-     printf("初始化设备失败\n");
+     printf("初始化CAN1失败\n");
     VCI_CloseDevice(0, 0);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
-  printf("初始化设备成功\n");
+  printf("初始化CAN1成功\n");
   AERROR << ">> Init CAN1 Success!";
 
   // 2. start receive
   if (VCI_StartCAN(VCI_USBCAN2, 0, 0) != 1) {
     AERROR << ">> Start CAN1 error!";
-     printf("开启CAN失败\n");
+     printf("开启CAN1失败\n");
     VCI_CloseDevice(0, 0);
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
+  printf("开启CAN1成功\n");
+  AERROR << ">> Start CAN1 Success!";
+  
+  if (VCI_InitCAN(VCI_USBCAN2, 0, 1, &init_config) != 1) {
+    AERROR << ">> Init CAN2 Error!";
+     printf("初始化CAN2失败\n");
+    VCI_CloseDevice(0, 0);
+    return ErrorCode::CAN_CLIENT_ERROR_BASE;
+  }
+  printf("初始化CAN2成功\n");
+  AERROR << ">> Init CAN1 Success!";
 
-
-  printf("开启CAN成功\n");
+  // 2. start receive
+  if (VCI_StartCAN(VCI_USBCAN2, 0, 1) != 1) {
+    AERROR << ">> Start CAN2 error!";
+     printf("开启CAN2失败\n");
+    VCI_CloseDevice(0, 0);
+    return ErrorCode::CAN_CLIENT_ERROR_BASE;
+  }
+  printf("开启CAN2成功\n");
   AERROR << ">> Start CAN1 Success!";
 
   // set pos frequency
@@ -190,7 +207,8 @@ ErrorCode HermesCanClient::Start() {
 
   // set steer speed&frequency
   Set_Debug_or_Normal_Mode(2, 0x88, 0, canSend);
-  VCI_Transmit(VCI_USBCAN2, 0, 0, &canSend, 1);
+  //VCI_Transmit(VCI_USBCAN2, 0, 0, &canSend, 1);
+  VCI_Transmit(VCI_USBCAN2, 0, 1, &canSend, 1);
 
   // set pwm mode
   setMotorCtrlType(0, 0, canSend);  // throttle
@@ -231,11 +249,12 @@ apollo::common::ErrorCode HermesCanClient::Send(
     AERROR << "Hermes can client is not init! Please init first!";
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
-  //    if (*frame_num > MAX_CAN_SEND_FRAME_LEN || *frame_num < 0) {
-  //       AERROR << "send can frame num not in range[0, "
-  //         << MAX_CAN_SEND_FRAME_LEN << "], frame_num:" << *frame_num;
-  //       return ErrorCode::CAN_CLIENT_ERROR_FRAME_NUM;
-  //    }
+  if (*frame_num > MAX_CAN_SEND_FRAME_LEN || *frame_num < 0) {
+    AERROR << "send can frame num not in range[0, "
+      << MAX_CAN_SEND_FRAME_LEN << "], frame_num:" << *frame_num;
+    return ErrorCode::CAN_CLIENT_ERROR_FRAME_NUM;
+  }
+  
   for (int i = 0; i < *frame_num; ++i) {
     _send_frames[i].bcan_msg_id = frames[i].id;
     _send_frames[i].bcan_msg_datalen = frames[i].len;
@@ -245,6 +264,7 @@ apollo::common::ErrorCode HermesCanClient::Send(
   // Synchronous transmission of CAN messages
   int32_t send_num = *frame_num;
   int32_t ret = bcan_send(dev_handler_, _send_frames, send_num);
+  
   if (ret < 0) {
     int ret_send_error = bcan_get_status(dev_handler_);
     AERROR << "send message failed, error code: " << ret
@@ -271,7 +291,10 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   }
 
   // int32_t ret = bcan_recv(dev_handler_, _recv_frames, *frame_num);
+
   VCI_CAN_OBJ rec[*frame_num];  // 接收缓存
+  {
+    std::unique_lock<std::mutex> lock(mutex_can1_);
   int32_t ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec, *frame_num, 1000);
 
   // don't log timeout
@@ -290,20 +313,15 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   // is ret num is equal *frame_num?
   for (int i = 0; i < *frame_num; ++i) {
     CanFrame cf;
-    if (rec[i].ID == PGN65294_CanID) {  // steer speed
-      cf.device_id = 0x0600;
-    } else if (rec[i].ID == Feedback_CanID_1) {  // throtle
+    if (rec[i].ID == Feedback_CanID_1) {  // throtle
       cf.device_id = 0x0601;
     } else if (rec[i].ID == Feedback_CanID_2) {  // brake
       cf.device_id = 0x0602;
     } else if (rec[i].ID == 0x302) {  // brake&throtole volt
       cf.device_id = 0x0603;
-    } else if (rec[i].ID == PGN65296_CanID) {  // steer angle
-      cf.device_id = 0x0605;
     } else {
       AERROR << "unknown type";
     }
-    
     // CanFrame cf;
     cf.id = rec[i].ID;
     cf.len = rec[i].DataLen;
@@ -312,9 +330,31 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     memcpy(cf.data, rec[i].Data, cf.len);
     frames->push_back(cf);
   }
+  }
 
+  {
+    std::unique_lock<std::mutex> lock(mutex_can2_);
+    VCI_CAN_OBJ rec_can2[*frame_num];
+    int32_t ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_can2, 10, 1000);
+    for (int i = 0; i < ret_can2; ++i) {
+      CanFrame cf;
+      if (rec_can2[i].ID == PGN65294_CanID)
+      {
+        cf.device_id = 0x0600;
+      } else if (rec_can2[i].ID == PGN65296_CanID) {
+        cf.device_id = 0x0605;
+      }else {
+        AERROR << "unknown type";
+      }
+      cf.id = rec_can2[i].ID;
+      cf.len = rec_can2[i].DataLen;
+      memcpy(cf.data, rec_can2[i].Data, cf.len);
+      frames->push_back(cf);
+    }
+  }
   return ErrorCode::OK;
 }
+
 
 std::string HermesCanClient::GetErrorString(int32_t ntstatus) { return ""; }
 

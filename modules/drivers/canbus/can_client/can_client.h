@@ -161,6 +161,10 @@ class CanClient {
    */
   virtual std::string GetErrorString(const int32_t status) = 0;
 
+  //zhxf add 20240524
+  std::mutex mutex_can1_;
+  std::mutex mutex_can2_;
+
  protected:
   /// The CAN client is started.
   bool is_started_ = false;

@@ -196,8 +196,11 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   bool key_shift_ = false;
   bool key_p_     = false;
   bool is_first = true;
-  std::mutex key_mutex_;
   bool is_switch = true;
+
+  double scale = 14.95;
+  //double scale = 16.68;
+  //double scale = 17.25;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)

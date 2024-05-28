@@ -368,14 +368,26 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       // if (!need_send) {
       //   continue;
       // }
-      // std::vector<VCI_CAN_OBJ> can_frames;
+
+      //std::vector<VCI_CAN_OBJ> can_frames;
       VCI_CAN_OBJ can_frame = message.CanFrame();
-      // can_frame.ID = Pot_CanID_Read;
-      // setCANObjStdConfig(0, canSend);
+      uint32_t ret = 0;
+
+      if (can_frame.ID == PGN65293_CanID) {
+         std::unique_lock<std::mutex> lock(can_client_->mutex_can1_);
+         ret = VCI_Transmit(VCI_USBCAN2, 0, 1, &can_frame, 1);
+      } else {
+        // can_frames.push_back(can_frame);
+        std::unique_lock<std::mutex> lock(can_client_->mutex_can2_);
+        ret = VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
+      }
+
+      if (ret != 1) {
+        AERROR << "Send msg failed";  
+        printf("发送数据失败\n");
+      }
 
       // can_frames.push_back(can_frame);
-      VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
-
       // if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK)
       // {
       //   AERROR << "Send msg failed";
@@ -395,7 +407,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
 
     // AWARN << "Too much time for calculation: " << tm_end - tm_start  << "us";
     printf("~~~~~~~~~~~~~~~~~VCI_Transmit time: %lld \n", tm_end);
-    std::this_thread::sleep_for(std::chrono::microseconds(10));
+    // std::this_thread::sleep_for(std::chrono::microseconds(10));
 
     // if (sleep_interval > 0) {
     //   std::this_thread::sleep_for(std::chrono::microseconds(sleep_interval));
