@@ -58,6 +58,7 @@ namespace canbus {
 // BYTE REMOTE_FLAG = 0;  // 是否是远程帧， 0：数据帧； 1：远程帧
 // BYTE EXTERN_FLAG = 1;  // 是否是扩展帧，0：标准帧(11位ID) 1：扩展帧（29位ID）
 // BYTE DATA_LEN = 8;  // 数据长度
+#define PGN65293_CanID  0x18FF0D1C//方向盘电动控制,ECU--->EW1
 
 inline void setCANObjStdConfig(BYTE extern_flag, VCI_CAN_OBJ &obj) {
   obj.TimeStamp = 10;
