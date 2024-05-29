@@ -36,7 +36,7 @@ export CYBER_IP=127.0.0.1
 export GLOG_log_dir="${APOLLO_ROOT_DIR}/data/log"
 export GLOG_alsologtostderr=1
 export GLOG_colorlogtostderr=1
-export GLOG_minloglevel=0
+export GLOG_minloglevel=3
 
 export sysmo_start=0
 

@@ -6,7 +6,7 @@ module_config {
         config {
             name: "control"
             flag_file_path: "/apollo/modules/control/control_component/conf/control.conf"
-            interval: 100
+            interval: 10
         }
     }
 }

@@ -293,18 +293,11 @@ apollo::common::ErrorCode HermesCanClient::Receive(
 
   // int32_t ret = bcan_recv(dev_handler_, _recv_frames, *frame_num);
 
-  VCI_CAN_OBJ rec[*frame_num];  // 接收缓存
+  //VCI_CAN_OBJ rec[*frame_num];  // 接收缓存
   int32_t ret = 0;
   {
     std::unique_lock<std::mutex> lock(mutex_can1_);
-    ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec, *frame_num, 1000);
-  }
-
-  int32_t ret_can2 = 0;
-  VCI_CAN_OBJ rec_can2[*frame_num];
-  {
-    std::unique_lock<std::mutex> lock(mutex_can2_);
-    ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_can2, *frame_num, 1000);
+    ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec_frames_, *frame_num, 1000);
   }
 
   // don't log timeout
@@ -318,50 +311,56 @@ apollo::common::ErrorCode HermesCanClient::Receive(
            //<< "receive error:" << ret_rece_error;
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
-  *frame_num = ret;
+  //*frame_num = ret;
 
   // is ret num is equal *frame_num?
-  for (int i = 0; i < *frame_num; ++i) {
+  for (int i = 0; i < ret; ++i) {
     CanFrame cf;
-    if (rec[i].ID == Feedback_CanID_1) {  // throtle
+    if (rec_frames_[i].ID == Feedback_CanID_1) {  // throtle
       cf.device_id = 0x0601;
-    } else if (rec[i].ID == Feedback_CanID_2) {  // brake
+    } else if (rec_frames_[i].ID == Feedback_CanID_2) {  // brake
       cf.device_id = 0x0602;
-    } else if (rec[i].ID == 0x302) {  // brake&throtole volt
+    } else if (rec_frames_[i].ID == 0x302) {  // brake&throtole volt
       cf.device_id = 0x0603;
     } else {
       AERROR << "unknown type";
     }
     // CanFrame cf;
-    cf.id = rec[i].ID;
-    cf.len = rec[i].DataLen;
+    cf.id = rec_frames_[i].ID;
+    cf.len = rec_frames_[i].DataLen;
     // cf.timestamp.tv_sec = _recv_frames[i].bcan_msg_timestamp.tv_sec;
     // cf.timestamp.tv_usec = _recv_frames[i].bcan_msg_timestamp.tv_usec;
-    memcpy(cf.data, rec[i].Data, cf.len);
+    memcpy(cf.data, rec_frames_[i].Data, cf.len);
     frames->push_back(cf);
   }
   
+
+  int32_t ret_can2 = 0;
+  //VCI_CAN_OBJ rec_can2[*frame_num];
+  {
+    std::unique_lock<std::mutex> lock(mutex_can2_);
+    ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_frames_, *frame_num, 1000);
+  }
   if (ret_can2 < 0) {
     AERROR << "receive message failed, error code:" << ret;
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
-  *frame_num += ret_can2;
   for (int i = 0; i < ret_can2; ++i) {
     CanFrame cf;
-    if (rec_can2[i].ID == PGN65294_CanID)
+    if (rec_frames_[i].ID == PGN65294_CanID)
     {
       cf.device_id = 0x0600;
-    } else if (rec_can2[i].ID == PGN65296_CanID) {
+    } else if (rec_frames_[i].ID == PGN65296_CanID) {
       cf.device_id = 0x0605;
     }else {
       AERROR << "unknown type";
     }
-    cf.id = rec_can2[i].ID;
-    cf.len = rec_can2[i].DataLen;
-    memcpy(cf.data, rec_can2[i].Data, cf.len);
+    cf.id = rec_frames_[i].ID;
+    cf.len = rec_frames_[i].DataLen;
+    memcpy(cf.data, rec_frames_[i].Data, cf.len);
     frames->push_back(cf);
   }
-  
+  *frame_num = ret_can2 + ret;
   return ErrorCode::OK;
 }
 

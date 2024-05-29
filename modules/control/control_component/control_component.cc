@@ -97,9 +97,9 @@ double PidControl::ComputePID(const double error, double dt, const double min) {
   previous_error_ = error;
   output = error * kp_ + integral_ + diff * kd_;
   if (!is_steer_) {
-    if (fabs(output)< 25.0) {
-      if (output < 0) {output = -21.0 + output;}
-      if (output > 0) {output = 21.0 + output;}
+    if (fabs(output)< 23.0) {
+      if (output < 0) {output = -23.0;}
+      if (output > 0) {output = 23.0;}
     }
     if (output > output_limit_level_) {
       output = output_limit_level_;
@@ -248,7 +248,7 @@ void ControlComponent::set_terminal_echo(bool enabled) {
 }
 
 void ControlComponent::CheckJoy() {
-    const char* inputDevPath = "/dev/input/event3";  
+    const char* inputDevPath = "/dev/input/event16";  
     int inputDev;
     
     inputDev = open(inputDevPath, O_RDONLY);
@@ -263,23 +263,23 @@ void ControlComponent::CheckJoy() {
       ssize_t bytesRead = read(inputDev, &inputEvent, sizeof(inputEvent));
       if(inputEvent.type == EV_ABS){
         if(inputEvent.code == ABS_RZ){
-          if ( inputEvent.value <= 100 ){
+          if ( inputEvent.value <= 15 ){
             key_up_ =false;
             thro_target_value_ = 2.0;
           } else {
             key_up_ = true;
             key_down_ = false;
-            thro_target_value_ = 1.65 - (double)(inputEvent.value - 100) / 923;
+            thro_target_value_ = 1.65 - (double)(inputEvent.value - 15) / 240;
           }
         }
         if(inputEvent.code == ABS_Z){
-          if(inputEvent.value <= 100){
+          if(inputEvent.value <= 15){
             key_down_ = false;
             brake_target_value_ = 2.5;
           }else {
             key_down_ = true;
             key_up_ = false;
-            brake_target_value_ = 1.8 - (double)(inputEvent.value - 100) / 923;
+            brake_target_value_ = 1.8 - (double)(inputEvent.value - 15) / 240;
           }
         }
         if(inputEvent.code == ABS_HAT0X){
@@ -831,13 +831,14 @@ bool ControlComponent::Proc() {
       output = steer_pidcontrol_.ComputePID(error, 0.01, 2.0);
       control_command.set_steering_rate(output);
 
-      printf("[自动]>>>方向盘 输出: %.3lf\n", output);
+      printf("[自动]>>>方向盘 误差：%.3lf; 输出: %.3lf\n", error, output);
       printf("[自动]>>>方向盘 目标角度: %.3lf, 当前角度：%.3lf\n", steer_target_value_, cur_steer_angle);
+      printf("[自动]>>>方向盘 缩放系数: %.3lf.\n", scale);
 
 
       printf("[自动]>>>加速度 %.3lf\n", control_command.acceleration());
       thro_target_value_ = (control_command.acceleration() > 0)?0.76:1.8;
-      brake_target_value_ = (control_command.acceleration() < 0)?0.9:2.5;
+      brake_target_value_ = (control_command.acceleration() < 0)?0.8:2.5;
       error = brake_target_value_ - cur_brake_v;
       output = brake_pidcontrol_.ComputePID(error, 0.01, 0.05);
       control_command.set_brake(output);

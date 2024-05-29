@@ -116,6 +116,8 @@ class HermesCanClient : public CanClient {
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
   bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
 
+  VCI_CAN_OBJ rec_frames_[MAX_CAN_RECV_FRAME_LEN];
+
 };
 
 }  // namespace can
