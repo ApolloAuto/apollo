@@ -401,9 +401,11 @@ bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
   if (segments_.empty()) {
     return false;
   }
+  // 最小距离初始化
   double min_dist = std::numeric_limits<double>::infinity();
   int seg_num = static_cast<int>(segments_.size());
   int min_index = 0;
+  // 判断 ego 的位置与哪个 segment 最近
   for (int i = 0; i < seg_num; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < min_dist) {
