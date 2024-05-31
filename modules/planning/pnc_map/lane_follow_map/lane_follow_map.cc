@@ -366,7 +366,7 @@ bool LaneFollowMap::PassageToSegments(routing::Passage passage,
   return !segments->empty();
 }
 
-std::vector<int> LaneFollowMap::GetNeighborPassages(
+std::vector<int> LaneFollowMap:: GetNeighborPassages(
     const routing::RoadSegment &road, int start_passage) const {
   CHECK_GE(start_passage, 0);
   CHECK_LE(start_passage, road.passage_size());
@@ -383,10 +383,12 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
     return result;
   }
   hdmap::RouteSegments source_segments;
+  // 提取 passage 到 segment 
   if (!PassageToSegments(source_passage, &source_segments)) {
     AERROR << "Failed to convert passage to segments";
     return result;
   }
+  // 下一个查找到的 routing waypoint 在当前车辆所在的 passage 中，则不需要变道，直接返回
   if (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
       source_segments.IsWaypointOnSegment(
           routing_waypoint_index_[next_routing_waypoint_index_].waypoint)) {
@@ -394,6 +396,7 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
            << "] before change lane";
     return result;
   }
+  // 可以变道，将变道结果保存
   std::unordered_set<std::string> neighbor_lanes;
   if (source_passage.change_lane_type() == routing::LEFT) {
     for (const auto &segment : source_segments) {
@@ -410,7 +413,7 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
       }
     }
   }
-
+  // 根据 neighbor_lanes 找到对应的 segment 并保存
   for (int i = 0; i < road.passage_size(); ++i) {
     if (i == start_passage) {
       continue;
@@ -459,7 +462,9 @@ bool LaneFollowMap::GetRouteSegments(
   const int passage_index = route_index[1];
   const auto &road = last_command_.lane_follow_command().road(road_index);
   // Raw filter to find all neighboring passages
+  // 找到相关临近车道，最终返回 passage index 
   auto drive_passages = GetNeighborPassages(road, passage_index);
+  // 根据 passage 找到 segment 
   for (const int index : drive_passages) {
     const auto &passage = road.passage(index);
     hdmap::RouteSegments segments;
@@ -467,6 +472,7 @@ bool LaneFollowMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
+    // 
     const PointENU nearest_point =
         index == passage_index
             ? adc_waypoint_.lane->GetSmoothPoint(adc_waypoint_.s)
@@ -478,6 +484,7 @@ bool LaneFollowMap::GetRouteSegments(
              << nearest_point.ShortDebugString();
       continue;
     }
+    // 如果 passage 不是当前车道进行可驶入检查
     if (index != passage_index) {
       if (!segments.CanDriveFrom(adc_waypoint_)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
@@ -668,6 +675,7 @@ bool LaneFollowMap::ExtendSegments(
   std::unordered_set<std::string> unique_lanes;
   static constexpr double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
+  // 查找轨迹的起点是在哪里
   if (start_s < 0) {
     const auto &first_segment = *segments.begin();
     auto lane = first_segment.lane;
@@ -725,6 +733,7 @@ bool LaneFollowMap::ExtendSegments(
     return true;
   }
   // Extend the trajectory towards the end of the trajectory.
+  // 查找轨迹的终点在哪里
   if (router_s < end_s && !truncated_segments->empty()) {
     auto &back = truncated_segments->back();
     if (back.lane->total_length() > back.end_s) {
