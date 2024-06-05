@@ -24,12 +24,58 @@ import signal
 import sys
 import time
 
+import math
+
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 from modules.common_msgs.chassis_msgs import chassis_pb2
 from modules.common_msgs.control_msgs import control_cmd_pb2
 from modules.common_msgs.localization_msgs import localization_pb2
 from modules.tools.vehicle_calibration.plot_data import Plotter
+
+class PidControlr(object):
+    def __init__(self, kp, ki, kd, integral_limit, ouput_level_high):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.last_error = 0.0
+        self.integral = 0.0
+        self.output_limit_high = ouput_level_high
+        self.output_limit_low = 27
+        self.integral_limit = integral_limit
+        
+        self.error_limit = 0.05
+        self.is_first_hit = True
+        
+    def calculate(self, error, dt):
+        diff = 0.0
+        output = 0.0
+        if self.is_first_hit:
+            self.is_first_hit = False
+        else:
+            diff = (error - self.last_error) / dt
+        self.integral += error * dt * self.ki 
+        if self.integral > self.integral_limit:
+            self.integral = self.integral_limit
+        elif self.integral < -self.integral_limit:
+            self.integral = -self.integral_limit
+        output = self.kp * error + self.integral + self.kd * diff
+        self.last_error = error
+        if 0< output and output < self.output_limit_low:
+            output = self.output_limit_low
+        elif output < 0 and output > -self.output_limit_low:
+            output = -self.output_limit_high
+
+        if output > self.output_limit_high:
+            output = self.output_limit_high
+        elif output < -self.output_limit_high:
+            output = -self.output_limit_high
+
+        if error < self.error_limit and error > -self.error_limit:
+            self.last_error = 0.0
+            error = 0.0
+            output = 0.0
+        return output
 
 
 class DataCollector(object):
@@ -52,12 +98,15 @@ class DataCollector(object):
 
         self.outfile = ""
 
+        self.thro_pid = PidControlr(75.0, 2.0, 0.5, 10, 65)
+        self.brake_pid = PidControlr(95.0, 2.5, 0.5, 10, 85)
+
     def run(self, cmd):
         signal.signal(signal.SIGINT, self.signal_handler)
 
         self.in_session = True
         self.cmd = list(map(float, cmd))
-        out = ''
+        out = './modules/tools/vehicle_calibration/my_data/'
         if self.cmd[0] > 0:
             out += 't'
         else:
@@ -115,7 +164,12 @@ class DataCollector(object):
         """
         New Localization
         """
-        self.acceleration = data.pose.linear_acceleration_vrf.y
+        # self.acceleration = data.pose.linear_acceleration_vrf.y
+        ax = data.pose.linear_acceleration.x
+        ay = data.pose.linear_acceleration.y
+        az = data.pose.linear_acceleration.z
+        self.acceleration = math.sqrt(ax**2 + ay**2 + az**2)-9.8
+        # print(self.acceleration)
         self.localization_received = True
 
     def callback_canbus(self, data):
@@ -147,25 +201,37 @@ class DataCollector(object):
 
         self.controlcmd.header.sequence_num = self.sequence_num
         self.sequence_num += 1
-
+        error = 0.0
         if self.case == 'a':
             if self.cmd[0] > 0:
-                self.controlcmd.throttle = self.cmd[0]
-                self.controlcmd.brake = 0
+                error = self.cmd[0] - self.throttle_percentage
+                self.controlcmd.throttle = self.thro_pid.calculate(error, 0.01)
+                error = 2.5 - self.brake_percentage
+                self.controlcmd.brake = self.brake_pid.calculate(error, 0.01)
+                #self.controlcmd.throttle = self.cmd[0]
+                #self.controlcmd.brake = 0
             else:
                 self.controlcmd.throttle = 0
                 self.controlcmd.brake = -self.cmd[0]
-            if self.vehicle_speed >= self.cmd[1]:
+            #if self.vehicle_speed >= self.cmd[1]:
+            if self.acceleration >= self.cmd[1]:
                 self.case = 'd'
         elif self.case == 'd':
             if self.cmd[2] > 0:
                 self.controlcmd.throttle = self.cmd[0]
                 self.controlcmd.brake = 0
             else:
-                self.controlcmd.throttle = 0
-                self.controlcmd.brake = -self.cmd[2]
-            if self.vehicle_speed == 0:
-                self.in_session = False
+                # self.controlcmd.throttle = 0
+                # self.controlcmd.brake = -self.cmd[2]
+                error = 1.5 - self.throttle_percentage
+                out_thro = self.thro_pid.calculate(error, 0.01)
+                self.controlcmd.throttle = out_thro
+                error = -self.cmd[2] - self.brake_percentage
+                out_bra = self.brake_pid.calculate(error, 0.01)
+                self.controlcmd.brake = out_bra
+            #if self.vehicle_speed == 0:
+                if out_thro == 0.0 and out_bra == 0.0 and self.acceleration < 0.03 and self.acceleration >-0.03: 
+                    self.in_session = False
 
         self.controlcmd.header.timestamp_sec = cyber_time.Time.now().to_sec()
         self.control_pub.write(self.controlcmd)

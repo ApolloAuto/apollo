@@ -34,8 +34,10 @@ void Voltage::Parse(const std::uint8_t *bytes, int32_t length,
 
   printf("*********throttle voltage: %lf V.\n", pot_throt_v);
   printf("*********brake    voltage: %lf V.\n", pot_brake_v);
-  chassis_detail->mutable_gas()->set_throttle_cmd(pot_throt_v);
-  chassis_detail->mutable_brake()->set_brake_cmd(pot_brake_v);
+  // chassis_detail->mutable_gas()->set_throttle_cmd(pot_throt_v);
+  // chassis_detail->mutable_brake()->set_brake_cmd(pot_brake_v);
+  chassis_detail->mutable_gas()->set_throttle_output(pot_throt_v);
+  chassis_detail->mutable_brake()->set_brake_output(pot_brake_v);
 }
 
 uint32_t Voltage::GetPeriod() const {

@@ -59,6 +59,8 @@ namespace canbus {
 // BYTE EXTERN_FLAG = 1;  // 是否是扩展帧，0：标准帧(11位ID) 1：扩展帧（29位ID）
 // BYTE DATA_LEN = 8;  // 数据长度
 #define PGN65293_CanID  0x18FF0D1C//方向盘电动控制,ECU--->EW1
+#define Throttle_CanID   0x0601    //发送报文ID：0x600+节点ID 驱动器1(油门)
+#define Brake_CanID   0x0602   //发送报文ID：0x600+节点ID 驱动器2(刹车)
 
 inline void setCANObjStdConfig(BYTE extern_flag, VCI_CAN_OBJ &obj) {
   obj.TimeStamp = 10;
@@ -349,40 +351,38 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   int32_t delta_period = INIT_PERIOD;
   int32_t new_delta_period = INIT_PERIOD;
 
-  // int64_t tm_start = 0;
+  int64_t tm_start = 0;
   int64_t tm_end = 0;
   int64_t sleep_interval = 0;
 
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    if (!send_) {
-      continue;
-    }
-    // tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
-    // new_delta_period = INIT_PERIOD;
+    // if (!send_) {
+    //   continue;
+    // }
+    tm_start = cyber::Time::Now().ToNanosecond() / 1e6;
+    new_delta_period = INIT_PERIOD;
     for (auto &message : send_messages_) {
-      // bool need_send = NeedSend(message, delta_period);
-      // message.UpdateCurrPeriod(delta_period);
-      // new_delta_period = std::min(new_delta_period, message.curr_period());
+      bool need_send = NeedSend(message, delta_period);
+      message.UpdateCurrPeriod(delta_period);
+      new_delta_period = std::min(new_delta_period, message.curr_period());
 
-      // if (!need_send) {
-      //   continue;
-      // }
+      if (!need_send) {
+        continue;
+      }
 
       //std::vector<VCI_CAN_OBJ> can_frames;
       VCI_CAN_OBJ can_frame = message.CanFrame();
       uint32_t ret = 0;
 
       if (can_frame.ID == PGN65293_CanID) {
-         std::unique_lock<std::mutex> lock(can_client_->mutex_can1_);
-         ret = VCI_Transmit(VCI_USBCAN2, 0, 1, &can_frame, 1);
-      } else {
-        // can_frames.push_back(can_frame);
+        std::unique_lock<std::mutex> lock(can_client_->mutex_can1_);
+        ret = VCI_Transmit(VCI_USBCAN2, 0, 1, &can_frame, 1);
+      } else if (can_frame.ID == Throttle_CanID || can_frame.ID == Brake_CanID){
         std::unique_lock<std::mutex> lock(can_client_->mutex_can2_);
-        ret = VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);
-      }
-
+        ret = VCI_Transmit(VCI_USBCAN2, 0, 0, &can_frame, 1);  
+      } 
       if (ret != 1) {
         AERROR << "Send msg failed";  
         printf("发送数据失败\n");
@@ -402,21 +402,21 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         // pt_manager_->Parse(uid, data, len);
       }
     }
-    send_ = false;
-    // delta_period = new_delta_period;
+    //send_ = false;
+    delta_period = new_delta_period;
     tm_end = cyber::Time::Now().ToNanosecond() / 1e6;
+    sleep_interval = delta_period - (tm_end - tm_start);
 
     // AWARN << "Too much time for calculation: " << tm_end - tm_start  << "us";
-    printf("~~~~~~~~~~~~~~~~~VCI_Transmit time: %lld \n", tm_end);
-    // std::this_thread::sleep_for(std::chrono::microseconds(10));
+    //printf("~~~~~~~~~~~~~~~~~VCI_Transmit time: %lld \n", tm_end);
 
-    // if (sleep_interval > 0) {
-    //   std::this_thread::sleep_for(std::chrono::microseconds(sleep_interval));
-    // } else {
-    //   // do not sleep
-    //   AWARN << "Too much time for calculation: " << tm_end - tm_start
-    //         << "us is more than minimum period: " << delta_period << "us";
-    // }
+    if (sleep_interval > 0) {
+      std::this_thread::sleep_for(std::chrono::microseconds(sleep_interval));
+    } else {
+      // do not sleep
+      AWARN << "Too much time for calculation: " << tm_end - tm_start
+            << "us is more than minimum period: " << delta_period << "us";
+    }
   }
   AINFO << "Can client sender thread stopped!";
 }

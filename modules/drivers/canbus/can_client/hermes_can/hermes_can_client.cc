@@ -299,7 +299,6 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     std::unique_lock<std::mutex> lock(mutex_can1_);
     ret = VCI_Receive(VCI_USBCAN2, 0, 0, rec_frames_, *frame_num, 1000);
   }
-
   // don't log timeout
   if (ret == RX_TIMEOUT) {
     *frame_num = 0;
@@ -308,7 +307,8 @@ apollo::common::ErrorCode HermesCanClient::Receive(
   if (ret < 0) {
     //int ret_rece_error = bcan_get_status(dev_handler_);
     AERROR << "receive message failed, error code:" << ret;
-           //<< "receive error:" << ret_rece_error;
+          //<< "receive error:" << ret_rece_error;
+    printf("-------------can1接收数据失败\n");
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
   //*frame_num = ret;
@@ -334,15 +334,14 @@ apollo::common::ErrorCode HermesCanClient::Receive(
     frames->push_back(cf);
   }
   
-
   int32_t ret_can2 = 0;
-  //VCI_CAN_OBJ rec_can2[*frame_num];
   {
     std::unique_lock<std::mutex> lock(mutex_can2_);
     ret_can2 = VCI_Receive(VCI_USBCAN2, 0, 1, rec_frames_, *frame_num, 1000);
   }
   if (ret_can2 < 0) {
-    AERROR << "receive message failed, error code:" << ret;
+    AERROR << "receive message failed, error code:" << ret_can2;
+    printf("-------------can2接收数据失败\n");
     return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
   }
   for (int i = 0; i < ret_can2; ++i) {

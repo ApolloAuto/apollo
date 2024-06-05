@@ -80,9 +80,9 @@ double PidControl::ComputePID(const double error, double dt, const double min) {
 
   double diff = 0.0;
   double output = 0.0;
+  
   if (first_hit_) {
     first_hit_ = false;
-
   } else {
     diff = (error - previous_error_) / dt;
   }
@@ -94,12 +94,12 @@ double PidControl::ComputePID(const double error, double dt, const double min) {
     integral_ = -integrator_limit_level_;
   }
   
-  previous_error_ = error;
+  
   output = error * kp_ + integral_ + diff * kd_;
   if (!is_steer_) {
-    if (fabs(output)< 23.0) {
-      if (output < 0) {output = -23.0;}
-      if (output > 0) {output = 23.0;}
+    if (fabs(output)< 27.0) {
+      if (output < 0) {output = -27.0;}
+      if (output > 0) {output = 27.0;}
     }
     if (output > output_limit_level_) {
       output = output_limit_level_;
@@ -119,10 +119,12 @@ double PidControl::ComputePID(const double error, double dt, const double min) {
       output = -output_limit_level_;
     }
   }
+
   if (fabs(error) <= min) {
     previous_error_ = 0.0;
     output = 0.0;
   }
+  previous_error_ = error;
   previous_output_ = output;
   return output;
 }
@@ -223,10 +225,12 @@ bool ControlComponent::Init() {
   pad_msg_.set_action((enum DrivingAction)FLAGS_action);
 
   thread_.reset(new std::thread([this] { CheckJoy(); }));
-  PIDParam steer_pid_param_(0.87, 0.14, 0.02, 10.0, 50.0, true);
-  //PIDParam steer_pid_param_(1.50, 0.15, 0.00, 10.0, 50.0, true);
-  PIDParam throttle_pid_param_(85.0, 0.35, 0.001, 3.0, 65.0, false);
-  PIDParam brake_pid_param_(95.0, 0.55, 0.01, 3.0, 80.0, false);
+  PIDParam steer_pid_param_(0.86, 0.14, 0.02, 10.0, 50.0, true);
+  // PIDParam throttle_pid_param_(75.0, 2.0, 0.5, 3.0, 65.0, false);
+  // PIDParam brake_pid_param_(95.0, 2.5, 0.5, 3.0, 80.0, false);
+  PIDParam throttle_pid_param_(4.0, 1.45, 0.0, 10.0, 65.0, false);
+  PIDParam brake_pid_param_(19.75, 0.25, 0.0, 10.0, 80.0, false);
+
   steer_pidcontrol_.Init(steer_pid_param_);
   brake_pidcontrol_.Init(brake_pid_param_);
   throttle_pidcontrol_.Init(throttle_pid_param_);
@@ -248,7 +252,7 @@ void ControlComponent::set_terminal_echo(bool enabled) {
 }
 
 void ControlComponent::CheckJoy() {
-    const char* inputDevPath = "/dev/input/event16";  
+    const char* inputDevPath = "/dev/input/event7";  //终端使用evtest查看  
     int inputDev;
     
     inputDev = open(inputDevPath, O_RDONLY);
@@ -298,15 +302,15 @@ void ControlComponent::CheckJoy() {
         if(inputEvent.code == ABS_HAT0Y){
           if(inputEvent.value == -1){
             //steer_pidcontrol_.SetD(0.01);
-            //throttle_pidcontrol_.SetD(0.01);
-            //brake_pidcontrol_.SetD(0.1);
+            // throttle_pidcontrol_.SetD(0.01);
+            // brake_pidcontrol_.SetD(0.01);
             scale += 0.01;
           } else if(inputEvent.value == 1){
             scale -= 0.01;
       
             //steer_pidcontrol_.SetD(-0.01);
-            //throttle_pidcontrol_.SetD(-0.01);
-            //brake_pidcontrol_.SetD(-0.1);
+            // throttle_pidcontrol_.SetD(-0.01);
+            // brake_pidcontrol_.SetD(-0.01);
           }
         }
       }
@@ -324,36 +328,34 @@ void ControlComponent::CheckJoy() {
         if(inputEvent.code == BTN_NORTH){
           if(inputEvent.value == 1){
             //steer_pidcontrol_.SetP(0.01);
-            //throttle_pidcontrol_.SetP(0.1);
-            //brake_pidcontrol_.SetP(0.1);
+            // throttle_pidcontrol_.SetP(0.01);
+            // brake_pidcontrol_.SetP(0.01);
             
           }
         }
         if(inputEvent.code == BTN_WEST){
           if(inputEvent.value == 1){
             //steer_pidcontrol_.SetP(-0.01);
-            //throttle_pidcontrol_.SetP(-0.1);
-            //brake_pidcontrol_.SetP(-0.1);
-             
-
+            // throttle_pidcontrol_.SetP(-0.01);
+            // brake_pidcontrol_.SetP(-0.01);
           }
         }
         if(inputEvent.code == BTN_TR){
           if(inputEvent.value == 1){
             //steer_pidcontrol_.SetI(0.01);
-            //throttle_pidcontrol_.SetI(0.01);
-            //brake_pidcontrol_.SetI(0.01);
+            // throttle_pidcontrol_.SetI(0.01);
+            // brake_pidcontrol_.SetI(0.01);
           }
         }
         if(inputEvent.code == BTN_TL){
           if(inputEvent.value == 1){
             //steer_pidcontrol_.SetI(-0.01);
-            //brake_pidcontrol_.SetI(-0.01);
-            //throttle_pidcontrol_.SetI(-0.01);
+            // brake_pidcontrol_.SetI(-0.01);
+            // throttle_pidcontrol_.SetI(-0.01);
           }
         }
       }
-     usleep(10000);
+     usleep(30000);
     }   
 }
 
@@ -395,15 +397,15 @@ void ControlComponent::OnKeyBoard(double &cur_brake_v, double &cur_thro_v,
   output = steer_pidcontrol_.ComputePID(error, 0.01, 2.0);
   control_command.set_steering_rate(output);
 
-  printf("[方向盘]>>>目标转角：%.3f;  当前转角：%.3f;\n", steer_target_value_, cur_steer_angle);
-  printf("[方向盘]>>>目标差值:%.3f\n", error);
-  printf("[方向盘]>>>输   出:%.3f\n", output);
-  printf("方向盘:Kp = %.3f; Ki = %.3f; Kd = %.3f\n", steer_pidcontrol_.GetP(), steer_pidcontrol_.GetI(), steer_pidcontrol_.GetD());
+  printf("[手动]>>>>>方向盘 目标转角：%.3f;  当前转角：%.3f;\n", steer_target_value_, cur_steer_angle);
+  printf("[手动]>>>>>方向盘 目标差值:%.3f\n", error);
+  printf("[手动]>>>>>方向盘 输   出:%.3f\n", output);
+  
   
   if(key_up_&&!key_down_) {
      brake_target_value_ = 2.5;
-     error = brake_target_value_ - cur_brake_v;
-     output = brake_pidcontrol_.ComputePID(error, 0.01, 0.05);
+     error = (brake_target_value_ - cur_brake_v)*10;
+     output = brake_pidcontrol_.ComputePID(error, 0.01, 0.5);
     control_command.set_brake(output);
 
      printf("[刹车]>>>目标值: %.3lf, 当前刹车电压值:%.3f\n", brake_target_value_, cur_brake_v);
@@ -411,8 +413,8 @@ void ControlComponent::OnKeyBoard(double &cur_brake_v, double &cur_thro_v,
      printf("[刹车]>>>ouput: %.3lf\n", output);
 
      //if(fabs(error) < 0.5) {
-       error = thro_target_value_ - cur_thro_v;
-       output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.05);
+       error = (thro_target_value_ - cur_thro_v)*10;
+       output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.5);
       control_command.set_throttle(output);
        printf("[油门]>>>目标值：%.3lf, 当前值:%.3f\n",thro_target_value_, cur_thro_v);
        printf("[油门]>>>差值: %.3lf\n", error);
@@ -424,15 +426,15 @@ void ControlComponent::OnKeyBoard(double &cur_brake_v, double &cur_thro_v,
 
   } else if(key_down_&&!key_up_){
     thro_target_value_ = 2.0;
-    error = thro_target_value_ - cur_thro_v;
-    output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.05);
+    error = (thro_target_value_ - cur_thro_v)*10;
+    output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.5);
     printf("[油门]>>>目标值：%.3lf, 当前值:%.3f\n",thro_target_value_, cur_thro_v);
     printf("[油门]>>>差值: %.3lf\n", error);
     printf("[油门]>>>ouput:%.3lf\n", output);
     control_command.set_throttle(output);
    // if(fabs(error) < 0.5) {
-      error = brake_target_value_ - cur_brake_v;
-      output = brake_pidcontrol_.ComputePID(error, 0.01, 0.05);
+      error = (brake_target_value_ - cur_brake_v)*10;
+      output = brake_pidcontrol_.ComputePID(error, 0.01, 0.5);
       printf("[刹车]>>>目标值: %.3lf, 当前刹车电压值:%.3f\n", brake_target_value_, cur_brake_v);
       printf("[刹车]>>>差  值: %.3lf\n", error);
       printf("[刹车]>>>ouput: %.3lf\n", output);
@@ -442,16 +444,16 @@ void ControlComponent::OnKeyBoard(double &cur_brake_v, double &cur_thro_v,
     // }
   } else {
     thro_target_value_ = 2.0;
-    error = thro_target_value_ - cur_thro_v;
-    output = throttle_pidcontrol_.ComputePID(error, 0.1, 0.05);
+    error = (thro_target_value_ - cur_thro_v)*10;
+    output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.5);
     control_command.set_throttle(output);
     printf("[油门]>>>目标值：%.3lf, 当前值:%.3f\n",thro_target_value_, cur_thro_v);
     printf("[油门]>>>差值: %.3lf\n", error);
     printf("[油门]>>>ouput:%.3lf\n", output);
 
     brake_target_value_ = 2.5;
-    error = (brake_target_value_ - cur_brake_v);
-    output = brake_pidcontrol_.ComputePID(error, 0.1, 0.05);
+    error = (brake_target_value_ - cur_brake_v)*10;
+    output = brake_pidcontrol_.ComputePID(error, 0.01, 0.5);
     control_command.set_brake(output);
     printf("[刹车]>>>目标值: %.3lf, 当前刹车电压值:%.3f\n", brake_target_value_, cur_brake_v);
     printf("[刹车]>>>差  值: %.3lf\n", error);
@@ -649,11 +651,12 @@ bool ControlComponent::Proc() {
     return false;
   }
   OnChassis(chassis_msg);
-  double cur_thro_v = chassis_msg->throttle_percentage_cmd();
-  double cur_brake_v = chassis_msg->brake_percentage_cmd();
+
+  double cur_thro_v = chassis_msg->throttle_percentage();
+  double cur_brake_v = chassis_msg->brake_percentage();
   double cur_steer_angle = chassis_msg->steering_percentage();
 
-    
+  
   trajectory_reader_->Observe();
   const auto &trajectory_msg = trajectory_reader_->GetLatestObserved();
   if (trajectory_msg == nullptr) {
@@ -743,7 +746,7 @@ bool ControlComponent::Proc() {
   // }
 
   // injector_->set_control_process(true);
-
+  
   ControlCommand control_command;
   local_view_.mutable_chassis()->set_driving_mode(apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE);
 
@@ -818,6 +821,9 @@ bool ControlComponent::Proc() {
   // injector_->previous_control_command_mutable()->CopyFrom(control_command);
   // injector_->previous_control_debug_mutable()->CopyFrom(
   //     injector_->control_debug_info());
+  printf("[PID参数]>>>方向盘:Kp = %.3f; Ki = %.3f; Kd = %.3f\n", steer_pidcontrol_.GetP(), steer_pidcontrol_.GetI(), steer_pidcontrol_.GetD());
+  printf("[PID参数]>>>刹  车:Kp = %.3lf; Ki = %.3lf; Kd = %.3lf\n", brake_pidcontrol_.GetP(), brake_pidcontrol_.GetI(), brake_pidcontrol_.GetD());
+  printf("[PID参数]>>>油  门:Kp = %.3lf; Ki = %.3lf; Kd = %.3lf\n", throttle_pidcontrol_.GetP(), throttle_pidcontrol_.GetI(), throttle_pidcontrol_.GetD());
 
 
   double error = 0.0;
@@ -830,30 +836,29 @@ bool ControlComponent::Proc() {
       error =  steer_target_value_ -cur_steer_angle;
       output = steer_pidcontrol_.ComputePID(error, 0.01, 2.0);
       control_command.set_steering_rate(output);
-
+    
       printf("[自动]>>>方向盘 误差：%.3lf; 输出: %.3lf\n", error, output);
       printf("[自动]>>>方向盘 目标角度: %.3lf, 当前角度：%.3lf\n", steer_target_value_, cur_steer_angle);
+      printf("[自动]>>>方向盘 转向百分比：%.3lf\n", control_command.steering_target());
       printf("[自动]>>>方向盘 缩放系数: %.3lf.\n", scale);
 
 
       printf("[自动]>>>加速度 %.3lf\n", control_command.acceleration());
       thro_target_value_ = (control_command.acceleration() > 0)?0.76:1.8;
       brake_target_value_ = (control_command.acceleration() < 0)?0.8:2.5;
-      error = brake_target_value_ - cur_brake_v;
-      output = brake_pidcontrol_.ComputePID(error, 0.01, 0.05);
+      error = (brake_target_value_ - cur_brake_v)*10;
+      output = brake_pidcontrol_.ComputePID(error, 0.01, 0.5);
       control_command.set_brake(output);
 
       printf("[自动]>>>刹车 输出: %.3lf\n", output);
       printf("[自动]>>>刹车 目标电压: %.3lf, 当前电压：%.3lf\n", brake_target_value_, cur_brake_v);
-      printf("[自动]>>>刹车 PID参数: Kp = %.3lf; Ki = %.3lf; Kd = %.3lf\n", brake_pidcontrol_.GetP(), brake_pidcontrol_.GetI(), brake_pidcontrol_.GetD());
 
-      error = thro_target_value_ - cur_thro_v;
-      output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.05);
+      error = (thro_target_value_ - cur_thro_v)*10;
+      output = throttle_pidcontrol_.ComputePID(error, 0.01, 0.5);
       control_command.set_throttle(output);
 
       printf("[自动]>>>油门 输出: %.3lf\n", output);
       printf("[自动]>>>油门 目标电压: %.3lf, 当前电压：%.3lf\n", thro_target_value_, cur_thro_v);
-      printf("[自动]>>>油门 PID参数: Kp = %.3lf; Ki = %.3lf; Kd = %.3lf\n", throttle_pidcontrol_.GetP(), throttle_pidcontrol_.GetI(), throttle_pidcontrol_.GetD());
   } else {
     OnKeyBoard(cur_brake_v, cur_thro_v, cur_steer_angle, control_command);
   }

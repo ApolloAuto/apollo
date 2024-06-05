@@ -84,11 +84,11 @@ bool MPCController::LoadControlConf() {
   }
   cf_ = control_conf_.cf();
   cr_ = control_conf_.cr();
-  wheelbase_ = vehicle_param_.wheel_base();
-  steer_ratio_ = vehicle_param_.steer_ratio();
+  wheelbase_ = vehicle_param_.wheel_base();  //轴距，车辆参数中获取
+  steer_ratio_ = vehicle_param_.steer_ratio(); //转向比例
   steer_single_direction_max_degree_ =
-      vehicle_param_.max_steer_angle() * 180 / M_PI;
-  max_lat_acc_ = control_conf_.max_lateral_acceleration();
+      vehicle_param_.max_steer_angle() * 180 / M_PI;  //最大方向转角
+  max_lat_acc_ = control_conf_.max_lateral_acceleration();  //最大侧向加速度
 
   // TODO(Shu, Qi, Yu): add sanity check for conf values
   // steering ratio should be positive
@@ -102,17 +102,17 @@ bool MPCController::LoadControlConf() {
   max_acceleration_ = vehicle_param_.max_acceleration();
   max_deceleration_ = vehicle_param_.max_deceleration();
 
-  const double mass_fl = control_conf_.mass_fl();
+  const double mass_fl = control_conf_.mass_fl();  //车辆左前质量
   const double mass_fr = control_conf_.mass_fr();
   const double mass_rl = control_conf_.mass_rl();
   const double mass_rr = control_conf_.mass_rr();
-  const double mass_front = mass_fl + mass_fr;
-  const double mass_rear = mass_rl + mass_rr;
-  mass_ = mass_front + mass_rear;
+  const double mass_front = mass_fl + mass_fr; //车身前悬质量
+  const double mass_rear = mass_rl + mass_rr; 
+  mass_ = mass_front + mass_rear;  //车身总质量
 
-  lf_ = wheelbase_ * (1.0 - mass_front / mass_);
-  lr_ = wheelbase_ * (1.0 - mass_rear / mass_);
-  iz_ = lf_ * lf_ * mass_front + lr_ * lr_ * mass_rear;
+  lf_ = wheelbase_ * (1.0 - mass_front / mass_);  //车身前悬长度
+  lr_ = wheelbase_ * (1.0 - mass_rear / mass_);  //车辆后悬长度
+  iz_ = lf_ * lf_ * mass_front + lr_ * lr_ * mass_rear;  //转动惯量
 
   mpc_eps_ = control_conf_.eps();
   mpc_max_iteration_ = control_conf_.max_iteration();
@@ -387,8 +387,8 @@ Status MPCController::ComputeControlCommand(
      0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
      (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
     */
-    cf_ = control_conf_.cf();
-    cr_ = control_conf_.cr();
+    cf_ = control_conf_.cf(); //前两轮轮胎的侧偏刚度
+    cr_ = control_conf_.cr(); //后两轮轮胎的侧偏刚度
     matrix_a_(0, 1) = 1.0;
     matrix_a_coeff_(0, 2) = 0.0;
   }
@@ -512,8 +512,7 @@ Status MPCController::ComputeControlCommand(
 
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 
-  double acceleration_cmd =
-      acc_feedback + debug->acceleration_reference();
+  double acceleration_cmd = acc_feedback + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
   GetPathRemain(planning_published_trajectory, debug);

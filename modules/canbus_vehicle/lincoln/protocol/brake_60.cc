@@ -29,23 +29,21 @@ const int32_t Brake60::ID = 0x0602;
 
 void Brake60::Parse(const std::uint8_t *bytes, int32_t length,
                     Lincoln *chassis_detail) const {
-  if (0x2101 != ((bytes[2] << 8) | bytes[1])) {
+  if (0x60 != bytes[0]) {
+    printf(">>>>>>>>刹车：指令发送失败，中止码:0x ");
+    for(int i = 7; i >= 4; --i) {
+      printf("%02X ", bytes[i]);
+    }
+    printf("\n");
     return;
+  } else {
+    printf(">>>>>>>>刹车: 发送成功\n");
   }
-  int highbyte = bytes[5] & 0xFF;
-  int lowbyte = bytes[4] & 0xFF;       
-  bool isNegative = (highbyte & 0x80) != 0;
-  int value = (highbyte << 8) | lowbyte;
-  if (isNegative) {
-    value = -((~value & 0xFFFF) + 1);
-  }
-  double duty_cycle = value * 0.1;
-  printf(">>>>>>>>刹车：%.3f\n", duty_cycle);
-  chassis_detail->mutable_brake()->set_brake_output(duty_cycle);
+
 }
 
 uint32_t Brake60::GetPeriod() const {
-  static const uint32_t PERIOD = 10 * 1000;
+  static const uint32_t PERIOD = 30 * 1000;
   return PERIOD;
 }
 
@@ -56,16 +54,17 @@ void Brake60::UpdateData(uint8_t *data) {
   // set_clear_driver_override_flag_p(data, clear_driver_override_flag_);
   // set_watchdog_counter_p(data, watchdog_counter_);
 
-  int brake = int(pedal_cmd_ * 10);
-  printf("*******brake: %d\n", brake);
-  data[0] = static_cast<unsigned char>(0x23);
+  int brake = static_cast<int>(pedal_cmd_ * 10);
+  
+  data[0] = static_cast<unsigned char>(0x2B);
   data[1] = static_cast<unsigned char>(0x01);
   data[2] = static_cast<unsigned char>(0x20);
   data[3] = static_cast<unsigned char>(0x00);
   data[4] = static_cast<unsigned char>(brake & 0xFF);
   data[5] = static_cast<unsigned char>((brake >> 8) & 0xFF);
-  data[6] = static_cast<unsigned char>((brake >> 16) & 0xFF);
-  data[7] = static_cast<unsigned char>((brake >> 24) & 0xFF);
+  data[6] = static_cast<unsigned char>(0x00);
+  data[7] = static_cast<unsigned char>(0x00);
+  printf("*******brake: %d\n", brake);
 }
 
 void Brake60::Reset() {

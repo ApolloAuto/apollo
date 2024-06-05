@@ -46,7 +46,9 @@ first_flag = True
 lastx = 0
 lasty = 0
 s = 0.0
-
+lastcur = 0.0
+lasttime = 0.0
+dcur = 0.0
 with open(filename, 'w') as f:
     for fbag in fbags:
         reader = RecordReader(fbag)
@@ -57,11 +59,12 @@ with open(filename, 'w') as f:
                 x = localization.pose.position.x
                 y = localization.pose.position.y
                 z = localization.pose.position.z
+                angle_v = localization.pose.angular_velocity.z * math.pi / 180.0
                 
-                if first_flag:
-                    first_flag = False
-                    lastx = x
-                    lasty = y
+                # if first_flag:
+                #     first_flag = False
+                #     lastx = x
+                #     lasty = y
                 vx = localization.pose.linear_velocity.x
                 vy = localization.pose.linear_velocity.y
                 vz = localization.pose.linear_velocity.z
@@ -72,13 +75,22 @@ with open(filename, 'w') as f:
                 a = math.sqrt(ax**2 + ay**2 + az**2) - 9.8
                 heading = localization.pose.heading
                 time = localization.measurement_time
-                
+                curv = -angle_v / v
+                if first_flag:
+                    first_flag = False
+                    lastx = x
+                    lasty = y
+                    lastcur = curv
+                    lasttime = time
                 s += math.sqrt((x - lastx)**2 + (y - lasty)**2)
-                
+                dt = time - lasttime
+                if dt > 0.0:
+                    dcur = (curv - lastcur)/dt
+                lastcur = curv
                 lastx = x
                 lasty = y
                 
                 print(x, y)
-                f.write(str(x) + ", "  + str(y) + ", " + str(z) + ", " + str(v) + ", " + str(a) + ", " + str(0.0) + ", " + str(0.0) + ", " + str(time) + ", " + str(heading) + ", " + str(1) + ", " + str(s) + ", " + str(0.0) + ", " + str(0.0) + ", " + str(0.0) + "\n")
+                f.write(str(x) + ", "  + str(y) + ", " + str(z) + ", " + str(v) + ", " + str(a) + ", " + str(curv) + ", " + str(dcur) + ", " + str(time) + ", " + str(heading) + ", " + str(1) + ", " + str(s) + ", " + str(0.0) + ", " + str(0.0) + ", " + str(0.0) + "\n")
             
 print("File written to: %s" % filename)
