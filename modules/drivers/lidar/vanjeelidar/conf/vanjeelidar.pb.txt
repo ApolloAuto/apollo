@@ -18,11 +18,10 @@ group_address: "0.0.0.0"
 publish_mode: 2
 start_angle: 0
 end_angle: 360
-min_distance: 0.2
-max_distance: 200
+min_distance: 0.3
+max_distance: 120
 use_lidar_clock: true
 dense_points: false
-ts_first_point: false
 wait_for_difop: true
 config_from_file: false
 angle_path: ""

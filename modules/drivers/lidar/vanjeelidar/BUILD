@@ -3,11 +3,11 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-ROBOSENSE_COPTS = ['-DMODULE_NAME=\\"vanjeelidar\\"']
+VANJEE_COPTS = ['-DMODULE_NAME=\\"vanjeelidar\\"']
 
 apollo_component(
     name = "libvanjeelidar_component.so",
-    copts = ROBOSENSE_COPTS,
+    copts = VANJEE_COPTS,
     srcs = [
         "src/vanjeelidar_component.cpp",
     ],

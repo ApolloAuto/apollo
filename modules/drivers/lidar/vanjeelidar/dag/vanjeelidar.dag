@@ -3,7 +3,7 @@ module_config {
     components {
         class_name : "VanjeelidarComponent"
         config {
-          name : "VJHELIOS_Driver"
+          name : "VanjeeLiDAR_Driver"
           config_file_path : "/apollo/modules/drivers/lidar/vanjeelidar/conf/vanjeelidar.pb.txt"
         }
     }

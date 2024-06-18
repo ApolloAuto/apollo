@@ -2,7 +2,7 @@
 
 ## 1 Introduction
 
- **vanjee**  is the lidar driver kit under Apollo platform. Now support *WLR-720* . 
+ **vanjee**  is the lidar driver kit under Apollo platform. Now support *vanjee_720_16  vanjee_720_32* . 
 
 
 ## 2 Run
@@ -24,3 +24,6 @@ mainboard -d /apollo/modules/drivers/lidar/vanjeelidar/dag/vanjeelidar.dag
 - 原始点云 -- /apollo/sensor/vanjeelidar/up/PointCloud2"
 - Scan--/apollo/sensor/vanjeelidar/up/Scan
 
+## 3 Parameters Intro
+
+[Intro to parameters](doc/parameter_intro.md)

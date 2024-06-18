@@ -17,10 +17,10 @@
 
 #include <memory>
 
-#include "vanjeelidar/api/lidar_driver.hpp"
-#include "vanjeelidar/driver/driver_param.hpp"
-#include "vanjeelidar/msg/packet.hpp"
-#include "vanjeelidar/msg/point_cloud_msg.hpp"
+#include <vanjee_driver/api/lidar_driver.hpp>
+#include <vanjee_driver/driver/driver_param.hpp>
+#include <vanjee_driver/msg/packet.hpp>
+#include <vanjee_driver/msg/point_cloud_msg.hpp>
 
 #include "modules/drivers/lidar/vanjeelidar/proto/vanjeelidar.pb.h"
 #include "modules/drivers/lidar/vanjeelidar/proto/vanjeelidar_config.pb.h"
@@ -31,7 +31,7 @@
 
 namespace apollo {
 namespace drivers {
-namespace vanjee {
+namespace lidar {
 
 typedef PointXYZIRT PointT;
 typedef PointCloudT<PointT> PointCloudMsg;
@@ -39,32 +39,33 @@ typedef PointCloudT<PointT> PointCloudMsg;
 using ::vanjee::lidar::InputType;
 
 class VanjeelidarComponent
-        : public LidarComponentBase<vanjee::VanjeeScanPacket> {
+    : public LidarComponentBase<vanjee::VanjeeScanPacket> {
  public:
-    bool Init() override;
+  bool Init() override;
 
-    void ReadScanCallback(const std::shared_ptr<vanjee::VanjeeScanPacket>&
-                                  scan_message) override;
+  void ReadScanCallback(
+      const std::shared_ptr<vanjee::VanjeeScanPacket>& scan_message) override;
 
-    void VanjeePacketCallback(const ::vanjee::lidar::Packet& lidar_packet);
+  void VanjeePacketCallback(const ::vanjee::lidar::Packet& lidar_packet);
 
-    std::shared_ptr<PointCloudMsg> VanjeeCloudAllocateCallback();
+  std::shared_ptr<PointCloudMsg> VanjeeCloudAllocateCallback();
 
-    void VanjeeCloudPutCallback(std::shared_ptr<PointCloudMsg> vanjee_cloud);
+  void VanjeeCloudPutCallback(std::shared_ptr<PointCloudMsg> vanjee_cloud);
 
-    void PreparePointsMsg(PointCloud& msg);
+  void PreparePointsMsg(PointCloud& msg);
 
-    void ProcessCloud();
+  void ProcessCloud();
 
  private:
-    std::shared_ptr<::vanjee::lidar::LidarDriver<PointCloudMsg>> driver_ptr_;
-    apollo::drivers::vanjee::Config conf_;
+  std::shared_ptr<::vanjee::lidar::LidarDriver<PointCloudMsg>> driver_ptr_;
+  apollo::drivers::vanjee::Config conf_;
 
-    ::vanjee::lidar::SyncQueue<std::shared_ptr<PointCloudMsg>> cloud_queue_;
-    std::shared_ptr<SyncBuffering<PointCloudMsg>> cloud_buffer_;
-    std::thread cloud_handle_thread_;
+  ::vanjee::lidar::SyncQueue<std::shared_ptr<PointCloudMsg>> cloud_queue_;
+  std::shared_ptr<SyncBuffering<PointCloudMsg>> cloud_buffer_;
 
-    int seq_ = 0;
+  std::thread cloud_handle_thread_;
+
+  int seq_ = 0;
 };
 CYBER_REGISTER_COMPONENT(VanjeelidarComponent)
 
