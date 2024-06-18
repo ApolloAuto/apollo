@@ -9,7 +9,16 @@
                 channel: "/apollo/prediction"
             }
             readers {
-                channel: "/apollo/test"
+                channel: "/apollo/test1"
+            }
+            readers {
+                channel: "/apollo/test2"
+            }
+            readers {
+                channel: "/apollo/test3"
+            }
+            readers {
+                channel: "/apollo/test4"
             }
         }
       }
