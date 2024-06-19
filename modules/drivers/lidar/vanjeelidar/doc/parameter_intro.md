@@ -18,7 +18,7 @@ start_angle: 0
 end_angle: 360
 min_distance: 0.2
 max_distance: 120
-use_lidar_clock: true
+use_lidar_clock: false
 dense_points: false
 wait_for_difop: true
 config_from_file: false
@@ -29,7 +29,7 @@ angle_path: ""
 
 This is the lidar model, since this configuration file is for vanjee_720_16, we set the model="vanjee_720_16".
 The parameter are as followed below:
-  vanjee_720_16/vanjee_720_32
+  vanjee_720_16/vanjee_720d_16/vanjee_720_32
 
 
 **connect_type**
@@ -64,22 +64,29 @@ This is the publish mode of lidar point cloud. "0": publish the 1st echo ,"1":pu
 
 **start_angle**
 
-The start angle of point cloud.
+The start angle of point cloud,unit:degree.
 
 
 **end_angle**
 
-The end angle of point cloud. The point cloud published would only include the azimuth between start_angle and end_angle.
+The end angle of point cloud,unit:degree.The point cloud published would only include the azimuth between start_angle and end_angle.
 
 
 **min_distance**
 
-The minimum distance of point cloud.
+The minimum distance of point cloud,unit:m.
 
 
 **max_distance**
 
-The maximum distance of point cloud.The point cloud published would only include the distance between min_distance and max_distance.
+The maximum distance of point cloud,unit:m.The point cloud published would only include the distance between min_distance and max_distance.
+
+
+**use_lidar_clock**
+
+  - true: The timestamp of lidar messages is the lidar clock.
+
+  - false: The timestamp of lidar messages is the PC system clock.
 
 
 **dense_point**
@@ -99,9 +106,3 @@ The flag whether read the angle information from the configuration file .Usually
 **angle_path**
 
 The path of angle configuration file .
-
-**use_lidar_clock**
-
-  - True: The timestamp of lidar messages is the lidar clock.
-
-  - False: The timestamp of lidar messages is the PC system clock.

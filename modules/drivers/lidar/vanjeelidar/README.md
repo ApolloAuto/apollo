@@ -2,7 +2,7 @@
 
 ## 1 Introduction
 
- **vanjee**  is the lidar driver kit under Apollo platform. Now support *vanjee_720_16  vanjee_720_32* . 
+ **vanjee**  is the lidar driver kit under Apollo platform. Now support *vanjee_720_16  vanjee_720d_16  vanjee_720_32* . 
 
 
 ## 2 Run
