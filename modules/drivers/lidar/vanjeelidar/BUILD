@@ -21,7 +21,6 @@ apollo_component(
         "//modules/drivers/lidar/common:lidar_common",
     ],
     linkopts = [
-        "-lpcap",
     ]
 )
 

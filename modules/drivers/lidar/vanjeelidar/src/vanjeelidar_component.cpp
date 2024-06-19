@@ -16,8 +16,6 @@
 
 #include "modules/drivers/lidar/vanjeelidar/src/vanjeelidar_component.h"
 
-#include <string>
-
 #include <vanjee_driver/driver/input/input.hpp>
 #include <vanjee_driver/utility/buffer.hpp>
 
@@ -65,7 +63,7 @@ bool VanjeelidarComponent::Init() {
   driver_param.decoder_param = decoder_param;
 
   driver_param.lidar_type = ::vanjee::lidar::strToLidarType(conf_.model());
-
+  driver_param.decoder_param.lidar_type = driver_param.lidar_type;
   if (conf_.config_base().source_type() ==
       LidarConfigBase_SourceType_RAW_PACKET) {
     driver_param.input_type = InputType::RAW_PACKET;
