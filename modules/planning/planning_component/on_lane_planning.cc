@@ -129,12 +129,13 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (config_.has_reference_line_config()) {
     reference_line_config = &config_.reference_line_config();
   }
+  // 启动参考线提供器，会另启动一个线程，执行一个定时任务，每隔50ms提供一次参考线。
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
       injector_->vehicle_state(), reference_line_config);
   reference_line_provider_->Start();
 
   // dispatch planner
-  LoadPlanner();
+  LoadPlanner();  // 设置规划器
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
@@ -239,17 +240,17 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
     next_point->CopyFrom(tp);
   }
 }
-
+// onlaneplanner主体逻辑，由事件触发执行
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
   // when rerouting, reference line might not be updated. In this case, planning
   // module maintains not-ready until be restarted.
-  local_view_ = local_view;
+  local_view_ = local_view;  // 包含规划所需的信息
   const double start_timestamp = Clock::NowInSeconds();
   const double start_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
-          .count();
+          .count();  // 记录时间戳
 
   // localization
   ADEBUG << "Get localization:"
@@ -267,7 +268,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       << "start_timestamp is behind vehicle_state_timestamp by "
       << start_timestamp - vehicle_state_timestamp << " secs";
 
-  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
+  if (!status.ok() ||
+      !util::IsVehicleStateValid(
+          vehicle_state)) {  // 车辆状态信息获取失败 ->
+                             // 记录错误信息，设置轨迹未就绪，并且返回
     const std::string msg =
         "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.";
@@ -288,12 +292,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     common::monitor::MonitorLogBuffer monitor_logger_buffer(
         common::monitor::MonitorMessageItem::PLANNING);
     monitor_logger_buffer.ERROR("ego system time is behind GPS time");
-  }
+  }  // 检查系统时间是否与GPS时间接近
 
   if (start_timestamp - vehicle_state_timestamp <
       FLAGS_message_latency_threshold) {
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
-  }
+  }  // 检查车辆状态时间戳是否与开始时间对齐
 
   // Update reference line provider and reset scenario if new routing
   reference_line_provider_->UpdateVehicleState(vehicle_state);
@@ -306,32 +310,37 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdatePlanningCommand(
         *(local_view_.planning_command));
-    planner_->Reset(frame_.get());
+    planner_->Reset(frame_.get());  // 更新参考线提供者，有新的路线时重置场景
   }
   // Get end lane way point.
-  reference_line_provider_->GetEndLaneWayPoint(local_view_.end_lane_way_point);
+  reference_line_provider_->GetEndLaneWayPoint(
+      local_view_.end_lane_way_point);  // 获取终止车道点
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
   const double planning_cycle_time =
-      1.0 / static_cast<double>(FLAGS_planning_loop_rate);
+      1.0 / static_cast<double>(FLAGS_planning_loop_rate);  // 计算规划周期时间
 
   std::string replan_reason;
+  // 轨迹拼接
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
           *(local_view_.chassis), vehicle_state, start_timestamp,
           planning_cycle_time, FLAGS_trajectory_stitching_preserved_length,
           true, last_publishable_trajectory_.get(), &replan_reason);
 
+  // 使用最终轨迹更新ego
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
+  // 使用给定的序列号和轨迹点初始化frame
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+  // 检查初始化是否成功
   if (status.ok()) {
     injector_->ego_info()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
   }
-
+  // 记录debug信息
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
   }
@@ -367,6 +376,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
+  // 判断是否符合交通规则
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     auto traffic_status =
         traffic_decider_.Execute(frame_.get(), &ref_line_info);
@@ -376,10 +386,11 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
             << " traffic decider failed";
     }
   }
-
+  // 规划轨迹
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
-  // print trajxy
+  // 记录轨迹信息到LOG
+  //  print trajxy
   PrintCurves trajectory_print_curve;
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     trajectory_print_curve.AddPoint("trajxy", p.path_point().x(),
@@ -387,7 +398,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
   trajectory_print_curve.PrintToLog();
 
-  // print obstacle polygon
+  // 记录轨迹和障碍物多边形
+  //  print obstacle polygon
   for (const auto& obstacle : frame_->obstacles()) {
     obstacle->PrintPolygonCurve();
   }
@@ -401,6 +413,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
           .count();
+  // 记录规划时间
   const auto time_diff_ms =
       (end_system_timestamp - start_system_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
@@ -544,7 +557,7 @@ Status OnLanePlanning::Plan(
     frame_->mutable_open_space_info()->set_debug(ptr_debug);
     frame_->mutable_open_space_info()->sync_debug_instance();
   }
-
+  // 调用onlaneplanner_planner
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
                                ptr_trajectory_pb);
 
@@ -703,580 +716,583 @@ Status OnLanePlanning::Plan(
 }
 
 bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
-  // TODO(All): check other config params
-  return true;
+      // TODO(All): check other config params
+      return true;
 }
 
 void PopulateChartOptions(double x_min, double x_max, std::string x_label,
                           double y_min, double y_max, std::string y_label,
                           bool display, Chart* chart) {
-  auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(x_min);
-  options->mutable_x()->set_max(x_max);
-  options->mutable_y()->set_min(y_min);
-  options->mutable_y()->set_max(y_max);
-  options->mutable_x()->set_label_string(x_label);
-  options->mutable_y()->set_label_string(y_label);
-  options->set_legend_display(display);
+      auto* options = chart->mutable_options();
+      options->mutable_x()->set_min(x_min);
+      options->mutable_x()->set_max(x_max);
+      options->mutable_y()->set_min(y_min);
+      options->mutable_y()->set_max(y_max);
+      options->mutable_x()->set_label_string(x_label);
+      options->mutable_y()->set_label_string(y_label);
+      options->set_legend_display(display);
 }
 
 void AddSTGraph(const STGraphDebug& st_graph, Chart* chart) {
-  if (st_graph.name() == "DP_ST_SPEED_OPTIMIZER") {
-    chart->set_title("Speed Heuristic");
-  } else {
-    chart->set_title("Planning S-T Graph");
-  }
-  PopulateChartOptions(-2.0, 10.0, "t (second)", -10.0, 220.0, "s (meter)",
-                       false, chart);
+      if (st_graph.name() == "DP_ST_SPEED_OPTIMIZER") {
+        chart->set_title("Speed Heuristic");
+      } else {
+        chart->set_title("Planning S-T Graph");
+      }
+      PopulateChartOptions(-2.0, 10.0, "t (second)", -10.0, 220.0, "s (meter)",
+                           false, chart);
 
-  for (const auto& boundary : st_graph.boundary()) {
-    // from 'ST_BOUNDARY_TYPE_' to the end
-    std::string type =
-        StGraphBoundaryDebug_StBoundaryType_Name(boundary.type()).substr(17);
+      for (const auto& boundary : st_graph.boundary()) {
+        // from 'ST_BOUNDARY_TYPE_' to the end
+        std::string type =
+            StGraphBoundaryDebug_StBoundaryType_Name(boundary.type())
+                .substr(17);
 
-    auto* boundary_chart = chart->add_polygon();
-    auto* properties = boundary_chart->mutable_properties();
-    (*properties)["borderWidth"] = "2";
-    (*properties)["pointRadius"] = "0";
-    (*properties)["lineTension"] = "0";
-    (*properties)["cubicInterpolationMode"] = "monotone";
-    (*properties)["showLine"] = "true";
-    (*properties)["showText"] = "true";
-    (*properties)["fill"] = "false";
+        auto* boundary_chart = chart->add_polygon();
+        auto* properties = boundary_chart->mutable_properties();
+        (*properties)["borderWidth"] = "2";
+        (*properties)["pointRadius"] = "0";
+        (*properties)["lineTension"] = "0";
+        (*properties)["cubicInterpolationMode"] = "monotone";
+        (*properties)["showLine"] = "true";
+        (*properties)["showText"] = "true";
+        (*properties)["fill"] = "false";
 
-    if (type == "DRIVABLE_REGION") {
-      (*properties)["color"] = "\"rgba(0, 255, 0, 0.5)\"";
-    } else {
-      (*properties)["color"] = "\"rgba(255, 0, 0, 0.8)\"";
-    }
+        if (type == "DRIVABLE_REGION") {
+          (*properties)["color"] = "\"rgba(0, 255, 0, 0.5)\"";
+        } else {
+          (*properties)["color"] = "\"rgba(255, 0, 0, 0.8)\"";
+        }
 
-    boundary_chart->set_label(boundary.name() + "_" + type);
-    for (const auto& point : boundary.point()) {
-      auto* point_debug = boundary_chart->add_point();
-      point_debug->set_x(point.t());
-      point_debug->set_y(point.s());
-    }
-  }
+        boundary_chart->set_label(boundary.name() + "_" + type);
+        for (const auto& point : boundary.point()) {
+          auto* point_debug = boundary_chart->add_point();
+          point_debug->set_x(point.t());
+          point_debug->set_y(point.s());
+        }
+      }
 
-  auto* speed_profile = chart->add_line();
-  auto* properties = speed_profile->mutable_properties();
-  (*properties)["color"] = "\"rgba(255, 255, 255, 0.5)\"";
-  for (const auto& point : st_graph.speed_profile()) {
-    auto* point_debug = speed_profile->add_point();
-    point_debug->set_x(point.t());
-    point_debug->set_y(point.s());
-  }
+      auto* speed_profile = chart->add_line();
+      auto* properties = speed_profile->mutable_properties();
+      (*properties)["color"] = "\"rgba(255, 255, 255, 0.5)\"";
+      for (const auto& point : st_graph.speed_profile()) {
+        auto* point_debug = speed_profile->add_point();
+        point_debug->set_x(point.t());
+        point_debug->set_y(point.s());
+      }
 }
 
 void AddSLFrame(const SLFrameDebug& sl_frame, Chart* chart) {
-  chart->set_title(sl_frame.name());
-  PopulateChartOptions(0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)", false,
-                       chart);
-  auto* sl_line = chart->add_line();
-  sl_line->set_label("SL Path");
-  for (const auto& sl_point : sl_frame.sl_path()) {
-    auto* point_debug = sl_line->add_point();
-    point_debug->set_x(sl_point.s());
-    point_debug->set_x(sl_point.l());
-  }
+      chart->set_title(sl_frame.name());
+      PopulateChartOptions(0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)",
+                           false, chart);
+      auto* sl_line = chart->add_line();
+      sl_line->set_label("SL Path");
+      for (const auto& sl_point : sl_frame.sl_path()) {
+        auto* point_debug = sl_line->add_point();
+        point_debug->set_x(sl_point.s());
+        point_debug->set_x(sl_point.l());
+      }
 }
 
 void AddSpeedPlan(
     const ::google::protobuf::RepeatedPtrField<SpeedPlan>& speed_plans,
     Chart* chart) {
-  chart->set_title("Speed Plan");
-  PopulateChartOptions(0.0, 80.0, "s (meter)", 0.0, 50.0, "v (m/s)", false,
-                       chart);
+      chart->set_title("Speed Plan");
+      PopulateChartOptions(0.0, 80.0, "s (meter)", 0.0, 50.0, "v (m/s)", false,
+                           chart);
 
-  for (const auto& speed_plan : speed_plans) {
-    auto* line = chart->add_line();
-    line->set_label(speed_plan.name());
-    for (const auto& point : speed_plan.speed_point()) {
-      auto* point_debug = line->add_point();
-      point_debug->set_x(point.s());
-      point_debug->set_y(point.v());
-    }
+      for (const auto& speed_plan : speed_plans) {
+        auto* line = chart->add_line();
+        line->set_label(speed_plan.name());
+        for (const auto& point : speed_plan.speed_point()) {
+          auto* point_debug = line->add_point();
+          point_debug->set_x(point.s());
+          point_debug->set_y(point.v());
+        }
 
-    // Set chartJS's dataset properties
-    auto* properties = line->mutable_properties();
-    (*properties)["borderWidth"] = "2";
-    (*properties)["pointRadius"] = "0";
-    (*properties)["fill"] = "false";
-    (*properties)["showLine"] = "true";
-    if (speed_plan.name() == "DpStSpeedOptimizer") {
-      (*properties)["color"] = "\"rgba(27, 249, 105, 0.5)\"";
-    } else if (speed_plan.name() == "QpSplineStSpeedOptimizer") {
-      (*properties)["color"] = "\"rgba(54, 162, 235, 1)\"";
-    }
-  }
+        // Set chartJS's dataset properties
+        auto* properties = line->mutable_properties();
+        (*properties)["borderWidth"] = "2";
+        (*properties)["pointRadius"] = "0";
+        (*properties)["fill"] = "false";
+        (*properties)["showLine"] = "true";
+        if (speed_plan.name() == "DpStSpeedOptimizer") {
+          (*properties)["color"] = "\"rgba(27, 249, 105, 0.5)\"";
+        } else if (speed_plan.name() == "QpSplineStSpeedOptimizer") {
+          (*properties)["color"] = "\"rgba(54, 162, 235, 1)\"";
+        }
+      }
 }
 
 void OnLanePlanning::ExportFailedLaneChangeSTChart(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
-  const auto& src_data = debug_info.planning_data();
-  auto* dst_data = debug_chart->mutable_planning_data();
-  for (const auto& st_graph : src_data.st_graph()) {
-    AddSTGraph(st_graph, dst_data->add_chart());
-  }
+      const auto& src_data = debug_info.planning_data();
+      auto* dst_data = debug_chart->mutable_planning_data();
+      for (const auto& st_graph : src_data.st_graph()) {
+        AddSTGraph(st_graph, dst_data->add_chart());
+      }
 }
 
 void OnLanePlanning::ExportOnLaneChart(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
-  const auto& src_data = debug_info.planning_data();
-  auto* dst_data = debug_chart->mutable_planning_data();
-  for (const auto& st_graph : src_data.st_graph()) {
-    AddSTGraph(st_graph, dst_data->add_chart());
-  }
-  for (const auto& sl_frame : src_data.sl_frame()) {
-    AddSLFrame(sl_frame, dst_data->add_chart());
-  }
-  AddSpeedPlan(src_data.speed_plan(), dst_data->add_chart());
+      const auto& src_data = debug_info.planning_data();
+      auto* dst_data = debug_chart->mutable_planning_data();
+      for (const auto& st_graph : src_data.st_graph()) {
+        AddSTGraph(st_graph, dst_data->add_chart());
+      }
+      for (const auto& sl_frame : src_data.sl_frame()) {
+        AddSLFrame(sl_frame, dst_data->add_chart());
+      }
+      AddSpeedPlan(src_data.speed_plan(), dst_data->add_chart());
 }
 
 void OnLanePlanning::ExportOpenSpaceChart(
     const planning_internal::Debug& debug_info,
     const ADCTrajectory& trajectory_pb, planning_internal::Debug* debug_chart) {
-  // Export Trajectory Visualization Chart.
-  if (FLAGS_enable_record_debug) {
-    AddOpenSpaceOptimizerResult(debug_info, debug_chart);
-    AddPartitionedTrajectory(debug_info, debug_chart);
-    AddStitchSpeedProfile(debug_chart);
-    AddPublishedSpeed(trajectory_pb, debug_chart);
-    AddPublishedAcceleration(trajectory_pb, debug_chart);
-    // AddFallbackTrajectory(debug_info, debug_chart);
-  }
+      // Export Trajectory Visualization Chart.
+      if (FLAGS_enable_record_debug) {
+        AddOpenSpaceOptimizerResult(debug_info, debug_chart);
+        AddPartitionedTrajectory(debug_info, debug_chart);
+        AddStitchSpeedProfile(debug_chart);
+        AddPublishedSpeed(trajectory_pb, debug_chart);
+        AddPublishedAcceleration(trajectory_pb, debug_chart);
+        // AddFallbackTrajectory(debug_info, debug_chart);
+      }
 }
 
 void OnLanePlanning::AddOpenSpaceOptimizerResult(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
-  // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) {
-    return;
-  }
+      // if open space info provider success run
+      if (!frame_->open_space_info().open_space_provider_success()) {
+        return;
+      }
 
-  auto chart = debug_chart->mutable_planning_data()->add_chart();
-  auto open_space_debug = debug_info.planning_data().open_space();
+      auto chart = debug_chart->mutable_planning_data()->add_chart();
+      auto open_space_debug = debug_info.planning_data().open_space();
 
-  chart->set_title("Open Space Trajectory Optimizer Visualization");
-  PopulateChartOptions(open_space_debug.xy_boundary(0) - 1.0,
-                       open_space_debug.xy_boundary(1) + 1.0, "x (meter)",
-                       open_space_debug.xy_boundary(2) - 1.0,
-                       open_space_debug.xy_boundary(3) + 1.0, "y (meter)", true,
-                       chart);
+      chart->set_title("Open Space Trajectory Optimizer Visualization");
+      PopulateChartOptions(open_space_debug.xy_boundary(0) - 1.0,
+                           open_space_debug.xy_boundary(1) + 1.0, "x (meter)",
+                           open_space_debug.xy_boundary(2) - 1.0,
+                           open_space_debug.xy_boundary(3) + 1.0, "y (meter)",
+                           true, chart);
 
-  chart->mutable_options()->set_sync_xy_window_size(true);
-  chart->mutable_options()->set_aspect_ratio(0.9);
-  int obstacle_index = 1;
-  for (const auto& obstacle : open_space_debug.obstacles()) {
-    auto* obstacle_outline = chart->add_line();
-    obstacle_outline->set_label(absl::StrCat("Bdr", obstacle_index));
-    obstacle_index += 1;
-    for (int vertice_index = 0;
-         vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
-      auto* point_debug = obstacle_outline->add_point();
-      point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
-      point_debug->set_y(obstacle.vertices_y_coords(vertice_index));
-    }
-    // Set chartJS's dataset properties
-    auto* obstacle_properties = obstacle_outline->mutable_properties();
-    (*obstacle_properties)["borderWidth"] = "2";
-    (*obstacle_properties)["pointRadius"] = "0";
-    (*obstacle_properties)["lineTension"] = "0";
-    (*obstacle_properties)["fill"] = "false";
-    (*obstacle_properties)["showLine"] = "true";
-  }
+      chart->mutable_options()->set_sync_xy_window_size(true);
+      chart->mutable_options()->set_aspect_ratio(0.9);
+      int obstacle_index = 1;
+      for (const auto& obstacle : open_space_debug.obstacles()) {
+        auto* obstacle_outline = chart->add_line();
+        obstacle_outline->set_label(absl::StrCat("Bdr", obstacle_index));
+        obstacle_index += 1;
+        for (int vertice_index = 0;
+             vertice_index < obstacle.vertices_x_coords_size();
+             vertice_index++) {
+          auto* point_debug = obstacle_outline->add_point();
+          point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
+          point_debug->set_y(obstacle.vertices_y_coords(vertice_index));
+        }
+        // Set chartJS's dataset properties
+        auto* obstacle_properties = obstacle_outline->mutable_properties();
+        (*obstacle_properties)["borderWidth"] = "2";
+        (*obstacle_properties)["pointRadius"] = "0";
+        (*obstacle_properties)["lineTension"] = "0";
+        (*obstacle_properties)["fill"] = "false";
+        (*obstacle_properties)["showLine"] = "true";
+      }
 
-  auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
-  auto* smoothed_line = chart->add_line();
-  smoothed_line->set_label("Smooth");
-  // size_t adc_label = 0;
-  for (int i = 0; i < smoothed_trajectory.vehicle_motion_point_size() / 2;
-       i++) {
-    auto& point = smoothed_trajectory.vehicle_motion_point(i);
-    const auto x = point.trajectory_point().path_point().x();
-    const auto y = point.trajectory_point().path_point().y();
-    // const auto heading = point.trajectory_point().path_point().theta();
-    /*
-        // Draw vehicle shape along the trajectory
-        auto* adc_shape = chart->add_car();
-        adc_shape->set_x(x);
-        adc_shape->set_y(y);
-        adc_shape->set_heading(heading);
-        adc_shape->set_color("rgba(54, 162, 235, 1)");
-        adc_shape->set_label(std::to_string(adc_label));
-        adc_shape->set_hide_label_in_legend(true);
-        ++adc_label;
-    */
-    // Draw vehicle trajectory points
-    auto* point_debug = smoothed_line->add_point();
-    point_debug->set_x(x);
-    point_debug->set_y(y);
-  }
+      auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+      auto* smoothed_line = chart->add_line();
+      smoothed_line->set_label("Smooth");
+      // size_t adc_label = 0;
+      for (int i = 0; i < smoothed_trajectory.vehicle_motion_point_size() / 2;
+           i++) {
+        auto& point = smoothed_trajectory.vehicle_motion_point(i);
+        const auto x = point.trajectory_point().path_point().x();
+        const auto y = point.trajectory_point().path_point().y();
+        // const auto heading = point.trajectory_point().path_point().theta();
+        /*
+            // Draw vehicle shape along the trajectory
+            auto* adc_shape = chart->add_car();
+            adc_shape->set_x(x);
+            adc_shape->set_y(y);
+            adc_shape->set_heading(heading);
+            adc_shape->set_color("rgba(54, 162, 235, 1)");
+            adc_shape->set_label(std::to_string(adc_label));
+            adc_shape->set_hide_label_in_legend(true);
+            ++adc_label;
+        */
+        // Draw vehicle trajectory points
+        auto* point_debug = smoothed_line->add_point();
+        point_debug->set_x(x);
+        point_debug->set_y(y);
+      }
 
-  // Set chartJS's dataset properties
-  auto* smoothed_properties = smoothed_line->mutable_properties();
-  (*smoothed_properties)["borderWidth"] = "2";
-  (*smoothed_properties)["pointRadius"] = "0";
-  (*smoothed_properties)["lineTension"] = "0";
-  (*smoothed_properties)["fill"] = "false";
-  (*smoothed_properties)["showLine"] = "true";
+      // Set chartJS's dataset properties
+      auto* smoothed_properties = smoothed_line->mutable_properties();
+      (*smoothed_properties)["borderWidth"] = "2";
+      (*smoothed_properties)["pointRadius"] = "0";
+      (*smoothed_properties)["lineTension"] = "0";
+      (*smoothed_properties)["fill"] = "false";
+      (*smoothed_properties)["showLine"] = "true";
 
-  auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
-  auto* warm_start_line = chart->add_line();
-  warm_start_line->set_label("WarmStart");
-  for (int i = 0; i < warm_start_trajectory.vehicle_motion_point_size() / 2;
-       i++) {
-    auto* point_debug = warm_start_line->add_point();
-    auto& point = warm_start_trajectory.vehicle_motion_point(i);
-    point_debug->set_x(point.trajectory_point().path_point().x());
-    point_debug->set_y(point.trajectory_point().path_point().y());
-  }
-  // Set chartJS's dataset properties
-  auto* warm_start_properties = warm_start_line->mutable_properties();
-  (*warm_start_properties)["borderWidth"] = "2";
-  (*warm_start_properties)["pointRadius"] = "0";
-  (*warm_start_properties)["lineTension"] = "0";
-  (*warm_start_properties)["fill"] = "false";
-  (*warm_start_properties)["showLine"] = "true";
+      auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
+      auto* warm_start_line = chart->add_line();
+      warm_start_line->set_label("WarmStart");
+      for (int i = 0; i < warm_start_trajectory.vehicle_motion_point_size() / 2;
+           i++) {
+        auto* point_debug = warm_start_line->add_point();
+        auto& point = warm_start_trajectory.vehicle_motion_point(i);
+        point_debug->set_x(point.trajectory_point().path_point().x());
+        point_debug->set_y(point.trajectory_point().path_point().y());
+      }
+      // Set chartJS's dataset properties
+      auto* warm_start_properties = warm_start_line->mutable_properties();
+      (*warm_start_properties)["borderWidth"] = "2";
+      (*warm_start_properties)["pointRadius"] = "0";
+      (*warm_start_properties)["lineTension"] = "0";
+      (*warm_start_properties)["fill"] = "false";
+      (*warm_start_properties)["showLine"] = "true";
 }
 
 void OnLanePlanning::AddPartitionedTrajectory(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
-  // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) {
-    return;
-  }
+      // if open space info provider success run
+      if (!frame_->open_space_info().open_space_provider_success()) {
+        return;
+      }
 
-  const auto& open_space_debug = debug_info.planning_data().open_space();
-  const auto& chosen_trajectories =
-      open_space_debug.chosen_trajectory().trajectory();
-  if (chosen_trajectories.empty() ||
-      chosen_trajectories[0].trajectory_point().empty()) {
-    return;
-  }
+      const auto& open_space_debug = debug_info.planning_data().open_space();
+      const auto& chosen_trajectories =
+          open_space_debug.chosen_trajectory().trajectory();
+      if (chosen_trajectories.empty() ||
+          chosen_trajectories[0].trajectory_point().empty()) {
+        return;
+      }
 
-  const auto& vehicle_state = frame_->vehicle_state();
-  auto chart = debug_chart->mutable_planning_data()->add_chart();
-  auto chart_kappa = debug_chart->mutable_planning_data()->add_chart();
-  auto chart_theta = debug_chart->mutable_planning_data()->add_chart();
-  chart->set_title("Open Space Partitioned Trajectory");
-  chart_kappa->set_title("total kappa");
-  chart_theta->set_title("total theta");
-  auto* options = chart->mutable_options();
-  options->mutable_x()->set_label_string("x (meter)");
-  options->mutable_y()->set_label_string("y (meter)");
-  options->set_sync_xy_window_size(true);
-  options->set_aspect_ratio(0.9);
+      const auto& vehicle_state = frame_->vehicle_state();
+      auto chart = debug_chart->mutable_planning_data()->add_chart();
+      auto chart_kappa = debug_chart->mutable_planning_data()->add_chart();
+      auto chart_theta = debug_chart->mutable_planning_data()->add_chart();
+      chart->set_title("Open Space Partitioned Trajectory");
+      chart_kappa->set_title("total kappa");
+      chart_theta->set_title("total theta");
+      auto* options = chart->mutable_options();
+      options->mutable_x()->set_label_string("x (meter)");
+      options->mutable_y()->set_label_string("y (meter)");
+      options->set_sync_xy_window_size(true);
+      options->set_aspect_ratio(0.9);
 
-  // Draw vehicle state
-  auto* adc_shape = chart->add_car();
-  adc_shape->set_x(vehicle_state.x());
-  adc_shape->set_y(vehicle_state.y());
-  adc_shape->set_heading(vehicle_state.heading());
-  adc_shape->set_label("ADV");
-  adc_shape->set_color("rgba(54, 162, 235, 1)");
+      // Draw vehicle state
+      auto* adc_shape = chart->add_car();
+      adc_shape->set_x(vehicle_state.x());
+      adc_shape->set_y(vehicle_state.y());
+      adc_shape->set_heading(vehicle_state.heading());
+      adc_shape->set_label("ADV");
+      adc_shape->set_color("rgba(54, 162, 235, 1)");
 
-  // Draw the chosen trajectories
-  const auto& chosen_trajectory = chosen_trajectories[0];
-  auto* chosen_line = chart->add_line();
-  chosen_line->set_label("Chosen");
-  for (const auto& point : chosen_trajectory.trajectory_point()) {
-    auto* point_debug = chosen_line->add_point();
-    point_debug->set_x(point.path_point().x());
-    point_debug->set_y(point.path_point().y());
-  }
-  auto* chosen_properties = chosen_line->mutable_properties();
-  (*chosen_properties)["borderWidth"] = "2";
-  (*chosen_properties)["pointRadius"] = "0";
-  (*chosen_properties)["lineTension"] = "0";
-  (*chosen_properties)["fill"] = "false";
-  (*chosen_properties)["showLine"] = "true";
-  auto* theta_line = chart_theta->add_line();
-  auto* kappa_line = chart_kappa->add_line();
-  // Draw partitioned trajectories
-  size_t partitioned_trajectory_label = 0;
-  for (const auto& partitioned_trajectory :
-       open_space_debug.partitioned_trajectories().trajectory()) {
-    auto* partition_line = chart->add_line();
-    partition_line->set_label(
-        absl::StrCat("Partitioned ", partitioned_trajectory_label));
-    ++partitioned_trajectory_label;
-    for (const auto& point : partitioned_trajectory.trajectory_point()) {
-      auto* point_debug = partition_line->add_point();
-      auto* point_theta = theta_line->add_point();
-      auto* point_kappa = kappa_line->add_point();
-      point_debug->set_x(point.path_point().x());
-      point_debug->set_y(point.path_point().y());
-      point_theta->set_x(point.relative_time());
-      point_kappa->set_x(point.relative_time());
-      point_theta->set_y(point.path_point().theta());
-      point_kappa->set_y(point.path_point().kappa());
-    }
+      // Draw the chosen trajectories
+      const auto& chosen_trajectory = chosen_trajectories[0];
+      auto* chosen_line = chart->add_line();
+      chosen_line->set_label("Chosen");
+      for (const auto& point : chosen_trajectory.trajectory_point()) {
+        auto* point_debug = chosen_line->add_point();
+        point_debug->set_x(point.path_point().x());
+        point_debug->set_y(point.path_point().y());
+      }
+      auto* chosen_properties = chosen_line->mutable_properties();
+      (*chosen_properties)["borderWidth"] = "2";
+      (*chosen_properties)["pointRadius"] = "0";
+      (*chosen_properties)["lineTension"] = "0";
+      (*chosen_properties)["fill"] = "false";
+      (*chosen_properties)["showLine"] = "true";
+      auto* theta_line = chart_theta->add_line();
+      auto* kappa_line = chart_kappa->add_line();
+      // Draw partitioned trajectories
+      size_t partitioned_trajectory_label = 0;
+      for (const auto& partitioned_trajectory :
+           open_space_debug.partitioned_trajectories().trajectory()) {
+        auto* partition_line = chart->add_line();
+        partition_line->set_label(
+            absl::StrCat("Partitioned ", partitioned_trajectory_label));
+        ++partitioned_trajectory_label;
+        for (const auto& point : partitioned_trajectory.trajectory_point()) {
+          auto* point_debug = partition_line->add_point();
+          auto* point_theta = theta_line->add_point();
+          auto* point_kappa = kappa_line->add_point();
+          point_debug->set_x(point.path_point().x());
+          point_debug->set_y(point.path_point().y());
+          point_theta->set_x(point.relative_time());
+          point_kappa->set_x(point.relative_time());
+          point_theta->set_y(point.path_point().theta());
+          point_kappa->set_y(point.path_point().kappa());
+        }
 
-    auto* partition_properties = partition_line->mutable_properties();
-    (*partition_properties)["borderWidth"] = "2";
-    (*partition_properties)["pointRadius"] = "0";
-    (*partition_properties)["lineTension"] = "0";
-    (*partition_properties)["fill"] = "false";
-    (*partition_properties)["showLine"] = "true";
-    SetChartminmax(chart_kappa, "time", "total kappa");
-    SetChartminmax(chart_theta, "time", "total theta");
-  }
+        auto* partition_properties = partition_line->mutable_properties();
+        (*partition_properties)["borderWidth"] = "2";
+        (*partition_properties)["pointRadius"] = "0";
+        (*partition_properties)["lineTension"] = "0";
+        (*partition_properties)["fill"] = "false";
+        (*partition_properties)["showLine"] = "true";
+        SetChartminmax(chart_kappa, "time", "total kappa");
+        SetChartminmax(chart_theta, "time", "total theta");
+      }
 
-  // Draw trajectory stitching point (line with only one point)
-  // auto* stitching_line = chart->add_line();
-  // stitching_line->set_label("TrajectoryStitchingPoint");
-  // auto* trajectory_stitching_point = stitching_line->add_point();
-  // trajectory_stitching_point->set_x(
-  //     open_space_debug.trajectory_stitching_point().path_point().x());
-  // trajectory_stitching_point->set_y(
-  //     open_space_debug.trajectory_stitching_point().path_point().y());
-  // // Set chartJS's dataset properties
-  // auto* stitching_properties = stitching_line->mutable_properties();
-  // (*stitching_properties)["borderWidth"] = "3";
-  // (*stitching_properties)["pointRadius"] = "5";
-  // (*stitching_properties)["lineTension"] = "0";
-  // (*stitching_properties)["fill"] = "true";
-  // (*stitching_properties)["showLine"] = "true";
+      // Draw trajectory stitching point (line with only one point)
+      // auto* stitching_line = chart->add_line();
+      // stitching_line->set_label("TrajectoryStitchingPoint");
+      // auto* trajectory_stitching_point = stitching_line->add_point();
+      // trajectory_stitching_point->set_x(
+      //     open_space_debug.trajectory_stitching_point().path_point().x());
+      // trajectory_stitching_point->set_y(
+      //     open_space_debug.trajectory_stitching_point().path_point().y());
+      // // Set chartJS's dataset properties
+      // auto* stitching_properties = stitching_line->mutable_properties();
+      // (*stitching_properties)["borderWidth"] = "3";
+      // (*stitching_properties)["pointRadius"] = "5";
+      // (*stitching_properties)["lineTension"] = "0";
+      // (*stitching_properties)["fill"] = "true";
+      // (*stitching_properties)["showLine"] = "true";
 
-  // Draw fallback trajectory compared with the partitioned and potential
-  // collision_point (line with only one point)
-  // if (open_space_debug.is_fallback_trajectory()) {
-  //   auto* collision_line = chart->add_line();
-  //   collision_line->set_label("FutureCollisionPoint");
-  //   auto* future_collision_point = collision_line->add_point();
-  //   future_collision_point->set_x(
-  //       open_space_debug.future_collision_point().path_point().x());
-  //   future_collision_point->set_y(
-  //       open_space_debug.future_collision_point().path_point().y());
-  //   // Set chartJS's dataset properties
-  //   auto* collision_properties = collision_line->mutable_properties();
-  //   (*collision_properties)["borderWidth"] = "3";
-  //   (*collision_properties)["pointRadius"] = "8";
-  //   (*collision_properties)["lineTension"] = "0";
-  //   (*collision_properties)["fill"] = "true";
-  // (*stitching_properties)["showLine"] = "true";
-  // (*stitching_properties)["pointStyle"] = "cross";
+      // Draw fallback trajectory compared with the partitioned and potential
+      // collision_point (line with only one point)
+      // if (open_space_debug.is_fallback_trajectory()) {
+      //   auto* collision_line = chart->add_line();
+      //   collision_line->set_label("FutureCollisionPoint");
+      //   auto* future_collision_point = collision_line->add_point();
+      //   future_collision_point->set_x(
+      //       open_space_debug.future_collision_point().path_point().x());
+      //   future_collision_point->set_y(
+      //       open_space_debug.future_collision_point().path_point().y());
+      //   // Set chartJS's dataset properties
+      //   auto* collision_properties = collision_line->mutable_properties();
+      //   (*collision_properties)["borderWidth"] = "3";
+      //   (*collision_properties)["pointRadius"] = "8";
+      //   (*collision_properties)["lineTension"] = "0";
+      //   (*collision_properties)["fill"] = "true";
+      // (*stitching_properties)["showLine"] = "true";
+      // (*stitching_properties)["pointStyle"] = "cross";
 
-  // const auto& fallback_trajectories =
-  //     open_space_debug.fallback_trajectory().trajectory();
-  // if (fallback_trajectories.empty() ||
-  //     fallback_trajectories[0].trajectory_point().empty()) {
-  //   return;
-  // }
-  // const auto& fallback_trajectory = fallback_trajectories[0];
-  // // has to define chart boundary first
-  // auto* fallback_line = chart->add_line();
-  // fallback_line->set_label("Fallback");
-  // for (const auto& point : fallback_trajectory.trajectory_point()) {
-  //   auto* point_debug = fallback_line->add_point();
-  //   point_debug->set_x(point.path_point().x());
-  //   point_debug->set_y(point.path_point().y());
-  // }
-  // // Set chartJS's dataset properties
-  // auto* fallback_properties = fallback_line->mutable_properties();
-  // (*fallback_properties)["borderWidth"] = "3";
-  // (*fallback_properties)["pointRadius"] = "2";
-  // (*fallback_properties)["lineTension"] = "0";
-  // (*fallback_properties)["fill"] = "false";
-  // (*fallback_properties)["showLine"] = "true";
-  // }
+      // const auto& fallback_trajectories =
+      //     open_space_debug.fallback_trajectory().trajectory();
+      // if (fallback_trajectories.empty() ||
+      //     fallback_trajectories[0].trajectory_point().empty()) {
+      //   return;
+      // }
+      // const auto& fallback_trajectory = fallback_trajectories[0];
+      // // has to define chart boundary first
+      // auto* fallback_line = chart->add_line();
+      // fallback_line->set_label("Fallback");
+      // for (const auto& point : fallback_trajectory.trajectory_point()) {
+      //   auto* point_debug = fallback_line->add_point();
+      //   point_debug->set_x(point.path_point().x());
+      //   point_debug->set_y(point.path_point().y());
+      // }
+      // // Set chartJS's dataset properties
+      // auto* fallback_properties = fallback_line->mutable_properties();
+      // (*fallback_properties)["borderWidth"] = "3";
+      // (*fallback_properties)["pointRadius"] = "2";
+      // (*fallback_properties)["lineTension"] = "0";
+      // (*fallback_properties)["fill"] = "false";
+      // (*fallback_properties)["showLine"] = "true";
+      // }
 }
 
 void OnLanePlanning::AddStitchSpeedProfile(
     planning_internal::Debug* debug_chart) {
-  if (!injector_->frame_history()->Latest()) {
-    AINFO << "Planning frame is empty!";
-    return;
-  }
+      if (!injector_->frame_history()->Latest()) {
+        AINFO << "Planning frame is empty!";
+        return;
+      }
 
-  // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) {
-    return;
-  }
+      // if open space info provider success run
+      if (!frame_->open_space_info().open_space_provider_success()) {
+        return;
+      }
 
-  auto chart = debug_chart->mutable_planning_data()->add_chart();
-  chart->set_title("Open Space Speed Plan Visualization");
-  auto* options = chart->mutable_options();
-  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
-  double xmin(std::numeric_limits<double>::max()),
-      xmax(std::numeric_limits<double>::lowest()),
-      ymin(std::numeric_limits<double>::max()),
-      ymax(std::numeric_limits<double>::lowest());
-  // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
-  auto* speed_profile = chart->add_line();
-  speed_profile->set_label("Speed Profile");
-  const auto& last_trajectory =
-      injector_->frame_history()->Latest()->current_frame_planned_trajectory();
-  for (const auto& point : last_trajectory.trajectory_point()) {
-    auto* point_debug = speed_profile->add_point();
-    point_debug->set_x(point.relative_time() +
-                       last_trajectory.header().timestamp_sec());
-    point_debug->set_y(point.v());
-    if (point_debug->x() > xmax) xmax = point_debug->x();
-    if (point_debug->x() < xmin) xmin = point_debug->x();
-    if (point_debug->y() > ymax) ymax = point_debug->y();
-    if (point_debug->y() < ymin) ymin = point_debug->y();
-  }
-  options->mutable_x()->set_window_size(xmax - xmin);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(ymin);
-  options->mutable_y()->set_max(ymax);
-  options->mutable_y()->set_label_string("speed (m/s)");
-  // Set chartJS's dataset properties
-  auto* speed_profile_properties = speed_profile->mutable_properties();
-  (*speed_profile_properties)["borderWidth"] = "2";
-  (*speed_profile_properties)["pointRadius"] = "0";
-  (*speed_profile_properties)["lineTension"] = "0";
-  (*speed_profile_properties)["fill"] = "false";
-  (*speed_profile_properties)["showLine"] = "true";
+      auto chart = debug_chart->mutable_planning_data()->add_chart();
+      chart->set_title("Open Space Speed Plan Visualization");
+      auto* options = chart->mutable_options();
+      // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+      double xmin(std::numeric_limits<double>::max()),
+          xmax(std::numeric_limits<double>::lowest()),
+          ymin(std::numeric_limits<double>::max()),
+          ymax(std::numeric_limits<double>::lowest());
+      // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+      auto* speed_profile = chart->add_line();
+      speed_profile->set_label("Speed Profile");
+      const auto& last_trajectory = injector_->frame_history()
+                                        ->Latest()
+                                        ->current_frame_planned_trajectory();
+      for (const auto& point : last_trajectory.trajectory_point()) {
+        auto* point_debug = speed_profile->add_point();
+        point_debug->set_x(point.relative_time() +
+                           last_trajectory.header().timestamp_sec());
+        point_debug->set_y(point.v());
+        if (point_debug->x() > xmax) xmax = point_debug->x();
+        if (point_debug->x() < xmin) xmin = point_debug->x();
+        if (point_debug->y() > ymax) ymax = point_debug->y();
+        if (point_debug->y() < ymin) ymin = point_debug->y();
+      }
+      options->mutable_x()->set_window_size(xmax - xmin);
+      options->mutable_x()->set_label_string("time (s)");
+      options->mutable_y()->set_min(ymin);
+      options->mutable_y()->set_max(ymax);
+      options->mutable_y()->set_label_string("speed (m/s)");
+      // Set chartJS's dataset properties
+      auto* speed_profile_properties = speed_profile->mutable_properties();
+      (*speed_profile_properties)["borderWidth"] = "2";
+      (*speed_profile_properties)["pointRadius"] = "0";
+      (*speed_profile_properties)["lineTension"] = "0";
+      (*speed_profile_properties)["fill"] = "false";
+      (*speed_profile_properties)["showLine"] = "true";
 }
 
 void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
                                        planning_internal::Debug* debug_chart) {
-  // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) {
-    return;
-  }
+      // if open space info provider success run
+      if (!frame_->open_space_info().open_space_provider_success()) {
+        return;
+      }
 
-  auto chart = debug_chart->mutable_planning_data()->add_chart();
-  chart->set_title("Speed Partition Visualization");
-  auto* options = chart->mutable_options();
-  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
-  // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
-  auto* speed_profile = chart->add_line();
-  speed_profile->set_label("Speed Profile");
-  double xmin(std::numeric_limits<double>::max()),
-      xmax(std::numeric_limits<double>::lowest()),
-      ymin(std::numeric_limits<double>::max()),
-      ymax(std::numeric_limits<double>::lowest());
-  for (const auto& point : trajectory_pb.trajectory_point()) {
-    auto* point_debug = speed_profile->add_point();
-    point_debug->set_x(point.relative_time() +
-                       trajectory_pb.header().timestamp_sec());
-    if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE) {
-      point_debug->set_y(point.v());
-    }
-    if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE) {
-      point_debug->set_y(-point.v());
-    }
-    if (point_debug->x() > xmax) xmax = point_debug->x();
-    if (point_debug->x() < xmin) xmin = point_debug->x();
-    if (point_debug->y() > ymax) ymax = point_debug->y();
-    if (point_debug->y() < ymin) ymin = point_debug->y();
-  }
-  options->mutable_x()->set_window_size(xmax - xmin);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(ymin);
-  options->mutable_y()->set_max(ymax);
-  options->mutable_y()->set_label_string("speed (m/s)");
-  // Set chartJS's dataset properties
-  auto* speed_profile_properties = speed_profile->mutable_properties();
-  (*speed_profile_properties)["borderWidth"] = "2";
-  (*speed_profile_properties)["pointRadius"] = "0";
-  (*speed_profile_properties)["lineTension"] = "0";
-  (*speed_profile_properties)["fill"] = "false";
-  (*speed_profile_properties)["showLine"] = "true";
+      auto chart = debug_chart->mutable_planning_data()->add_chart();
+      chart->set_title("Speed Partition Visualization");
+      auto* options = chart->mutable_options();
+      // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+      // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+      auto* speed_profile = chart->add_line();
+      speed_profile->set_label("Speed Profile");
+      double xmin(std::numeric_limits<double>::max()),
+          xmax(std::numeric_limits<double>::lowest()),
+          ymin(std::numeric_limits<double>::max()),
+          ymax(std::numeric_limits<double>::lowest());
+      for (const auto& point : trajectory_pb.trajectory_point()) {
+        auto* point_debug = speed_profile->add_point();
+        point_debug->set_x(point.relative_time() +
+                           trajectory_pb.header().timestamp_sec());
+        if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE) {
+          point_debug->set_y(point.v());
+        }
+        if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE) {
+          point_debug->set_y(-point.v());
+        }
+        if (point_debug->x() > xmax) xmax = point_debug->x();
+        if (point_debug->x() < xmin) xmin = point_debug->x();
+        if (point_debug->y() > ymax) ymax = point_debug->y();
+        if (point_debug->y() < ymin) ymin = point_debug->y();
+      }
+      options->mutable_x()->set_window_size(xmax - xmin);
+      options->mutable_x()->set_label_string("time (s)");
+      options->mutable_y()->set_min(ymin);
+      options->mutable_y()->set_max(ymax);
+      options->mutable_y()->set_label_string("speed (m/s)");
+      // Set chartJS's dataset properties
+      auto* speed_profile_properties = speed_profile->mutable_properties();
+      (*speed_profile_properties)["borderWidth"] = "2";
+      (*speed_profile_properties)["pointRadius"] = "0";
+      (*speed_profile_properties)["lineTension"] = "0";
+      (*speed_profile_properties)["fill"] = "false";
+      (*speed_profile_properties)["showLine"] = "true";
 
-  auto* sliding_line = chart->add_line();
-  sliding_line->set_label("Time");
+      auto* sliding_line = chart->add_line();
+      sliding_line->set_label("Time");
 
-  auto* point_debug_up = sliding_line->add_point();
-  point_debug_up->set_x(Clock::NowInSeconds());
-  point_debug_up->set_y(2.1);
-  auto* point_debug_down = sliding_line->add_point();
-  point_debug_down->set_x(Clock::NowInSeconds());
-  point_debug_down->set_y(-1.1);
+      auto* point_debug_up = sliding_line->add_point();
+      point_debug_up->set_x(Clock::NowInSeconds());
+      point_debug_up->set_y(2.1);
+      auto* point_debug_down = sliding_line->add_point();
+      point_debug_down->set_x(Clock::NowInSeconds());
+      point_debug_down->set_y(-1.1);
 
-  // Set chartJS's dataset properties
-  auto* sliding_line_properties = sliding_line->mutable_properties();
-  (*sliding_line_properties)["borderWidth"] = "2";
-  (*sliding_line_properties)["pointRadius"] = "0";
-  (*sliding_line_properties)["lineTension"] = "0";
-  (*sliding_line_properties)["fill"] = "false";
-  (*sliding_line_properties)["showLine"] = "true";
+      // Set chartJS's dataset properties
+      auto* sliding_line_properties = sliding_line->mutable_properties();
+      (*sliding_line_properties)["borderWidth"] = "2";
+      (*sliding_line_properties)["pointRadius"] = "0";
+      (*sliding_line_properties)["lineTension"] = "0";
+      (*sliding_line_properties)["fill"] = "false";
+      (*sliding_line_properties)["showLine"] = "true";
 }
 
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double curr_timestamp) const {
-  // TODO(Jinyun): use the same method in trajectory stitching
-  //               for forward prediction
-  auto future_xy = injector_->vehicle_state()->EstimateFuturePosition(
-      curr_timestamp - vehicle_state.timestamp());
+      // TODO(Jinyun): use the same method in trajectory stitching
+      //               for forward prediction
+      auto future_xy = injector_->vehicle_state()->EstimateFuturePosition(
+          curr_timestamp - vehicle_state.timestamp());
 
-  VehicleState aligned_vehicle_state = vehicle_state;
-  aligned_vehicle_state.set_x(future_xy.x());
-  aligned_vehicle_state.set_y(future_xy.y());
-  aligned_vehicle_state.set_timestamp(curr_timestamp);
-  return aligned_vehicle_state;
+      VehicleState aligned_vehicle_state = vehicle_state;
+      aligned_vehicle_state.set_x(future_xy.x());
+      aligned_vehicle_state.set_y(future_xy.y());
+      aligned_vehicle_state.set_timestamp(curr_timestamp);
+      return aligned_vehicle_state;
 }
 
 void OnLanePlanning::AddPublishedAcceleration(
     const ADCTrajectory& trajectory_pb, planning_internal::Debug* debug) {
-  // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) {
-    return;
-  }
-  double xmin(std::numeric_limits<double>::max()),
-      xmax(std::numeric_limits<double>::lowest()),
-      ymin(std::numeric_limits<double>::max()),
-      ymax(std::numeric_limits<double>::lowest());
-  auto chart = debug->mutable_planning_data()->add_chart();
-  chart->set_title("Acceleration Partition Visualization");
-  auto* options = chart->mutable_options();
-  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+      // if open space info provider success run
+      if (!frame_->open_space_info().open_space_provider_success()) {
+        return;
+      }
+      double xmin(std::numeric_limits<double>::max()),
+          xmax(std::numeric_limits<double>::lowest()),
+          ymin(std::numeric_limits<double>::max()),
+          ymax(std::numeric_limits<double>::lowest());
+      auto chart = debug->mutable_planning_data()->add_chart();
+      chart->set_title("Acceleration Partition Visualization");
+      auto* options = chart->mutable_options();
+      // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
 
-  auto* acceleration_profile = chart->add_line();
-  acceleration_profile->set_label("Acceleration Profile");
-  for (const auto& point : trajectory_pb.trajectory_point()) {
-    auto* point_debug = acceleration_profile->add_point();
-    point_debug->set_x(point.relative_time() +
-                       trajectory_pb.header().timestamp_sec());
-    if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE)
-      point_debug->set_y(point.a());
-    if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE)
-      point_debug->set_y(-point.a());
-    if (point_debug->x() > xmax) xmax = point_debug->x();
-    if (point_debug->x() < xmin) xmin = point_debug->x();
-    if (point_debug->y() > ymax) ymax = point_debug->y();
-    if (point_debug->y() < ymin) ymin = point_debug->y();
-  }
-  options->mutable_x()->set_window_size(xmax - xmin);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(ymin);
-  options->mutable_y()->set_max(ymax);
-  options->mutable_y()->set_label_string("acceleration (m/s)");
-  // Set chartJS's dataset properties
-  auto* acceleration_profile_properties =
-      acceleration_profile->mutable_properties();
-  (*acceleration_profile_properties)["borderWidth"] = "2";
-  (*acceleration_profile_properties)["pointRadius"] = "0";
-  (*acceleration_profile_properties)["lineTension"] = "0";
-  (*acceleration_profile_properties)["fill"] = "false";
-  (*acceleration_profile_properties)["showLine"] = "true";
+      auto* acceleration_profile = chart->add_line();
+      acceleration_profile->set_label("Acceleration Profile");
+      for (const auto& point : trajectory_pb.trajectory_point()) {
+        auto* point_debug = acceleration_profile->add_point();
+        point_debug->set_x(point.relative_time() +
+                           trajectory_pb.header().timestamp_sec());
+        if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE)
+          point_debug->set_y(point.a());
+        if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE)
+          point_debug->set_y(-point.a());
+        if (point_debug->x() > xmax) xmax = point_debug->x();
+        if (point_debug->x() < xmin) xmin = point_debug->x();
+        if (point_debug->y() > ymax) ymax = point_debug->y();
+        if (point_debug->y() < ymin) ymin = point_debug->y();
+      }
+      options->mutable_x()->set_window_size(xmax - xmin);
+      options->mutable_x()->set_label_string("time (s)");
+      options->mutable_y()->set_min(ymin);
+      options->mutable_y()->set_max(ymax);
+      options->mutable_y()->set_label_string("acceleration (m/s)");
+      // Set chartJS's dataset properties
+      auto* acceleration_profile_properties =
+          acceleration_profile->mutable_properties();
+      (*acceleration_profile_properties)["borderWidth"] = "2";
+      (*acceleration_profile_properties)["pointRadius"] = "0";
+      (*acceleration_profile_properties)["lineTension"] = "0";
+      (*acceleration_profile_properties)["fill"] = "false";
+      (*acceleration_profile_properties)["showLine"] = "true";
 
-  auto* sliding_line = chart->add_line();
-  sliding_line->set_label("Time");
+      auto* sliding_line = chart->add_line();
+      sliding_line->set_label("Time");
 
-  auto* point_debug_up = sliding_line->add_point();
-  point_debug_up->set_x(Clock::NowInSeconds());
-  point_debug_up->set_y(2.1);
-  auto* point_debug_down = sliding_line->add_point();
-  point_debug_down->set_x(Clock::NowInSeconds());
-  point_debug_down->set_y(-1.1);
+      auto* point_debug_up = sliding_line->add_point();
+      point_debug_up->set_x(Clock::NowInSeconds());
+      point_debug_up->set_y(2.1);
+      auto* point_debug_down = sliding_line->add_point();
+      point_debug_down->set_x(Clock::NowInSeconds());
+      point_debug_down->set_y(-1.1);
 
-  // Set chartJS's dataset properties
-  auto* sliding_line_properties = sliding_line->mutable_properties();
-  (*sliding_line_properties)["borderWidth"] = "2";
-  (*sliding_line_properties)["pointRadius"] = "0";
-  (*sliding_line_properties)["lineTension"] = "0";
-  (*sliding_line_properties)["fill"] = "false";
-  (*sliding_line_properties)["showLine"] = "true";
+      // Set chartJS's dataset properties
+      auto* sliding_line_properties = sliding_line->mutable_properties();
+      (*sliding_line_properties)["borderWidth"] = "2";
+      (*sliding_line_properties)["pointRadius"] = "0";
+      (*sliding_line_properties)["lineTension"] = "0";
+      (*sliding_line_properties)["fill"] = "false";
+      (*sliding_line_properties)["showLine"] = "true";
 }
 
-}  // namespace planning
+  }  // namespace planning
 }  // namespace apollo

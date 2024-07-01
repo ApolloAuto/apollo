@@ -98,7 +98,7 @@ class PlanningBase {
   PlanningConfig config_;
   TrafficDecider traffic_decider_;
   std::unique_ptr<Frame> frame_;
-  std::shared_ptr<Planner> planner_;
+  std::shared_ptr<Planner> planner_;  // 实际调用的规划器，会被继承使用
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   std::shared_ptr<DependencyInjector> injector_;
 };

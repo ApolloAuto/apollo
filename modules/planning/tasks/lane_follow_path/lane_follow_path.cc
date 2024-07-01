@@ -55,15 +55,21 @@ apollo::common::Status LaneFollowPath::Process(
   std::vector<PathBoundary> candidate_path_boundaries;
   std::vector<PathData> candidate_path_data;
 
+  // 基于参考线信息和初始SL状态来决定路径边界
   GetStartPointSLState();
+
+  // 基于参考线信息和初始SL状态来决定路径边界。
   if (!DecidePathBounds(&candidate_path_boundaries)) {
     AERROR << "Decide path bound failed";
     return Status::OK();
   }
+  // 基于候选路径边界来优化路径。
   if (!OptimizePath(candidate_path_boundaries, &candidate_path_data)) {
     AERROR << "Optmize path failed";
     return Status::OK();
   }
+
+  // 对候选路径进行评估并返回最优路径
   if (!AssessPath(&candidate_path_data,
                   reference_line_info->mutable_path_data())) {
     AERROR << "Path assessment failed";
@@ -102,15 +108,14 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
         *reference_line_info_, init_sl_state_, config_.extend_buffer(),
         &path_bound);
   }
-  PrintCurves print_curve;
+  PrintCurves print_curve;  // 用于LOG
   auto indexed_obstacles = reference_line_info_->path_decision()->obstacles();
   for (const auto* obs : indexed_obstacles.Items()) {
     const auto& sl_bound = obs->PerceptionSLBoundary();
     for (int i = 0; i < sl_bound.boundary_point_size(); i++) {
       std::string name = obs->Id() + "_obs_sl_boundary";
-      print_curve.AddPoint(
-          name, sl_bound.boundary_point(i).s(),
-          sl_bound.boundary_point(i).l());
+      print_curve.AddPoint(name, sl_bound.boundary_point(i).s(),
+                           sl_bound.boundary_point(i).l());
     }
   }
   print_curve.PrintToLog();
@@ -136,8 +141,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   // lane_follow_status update
   auto* lane_follow_status = injector_->planning_context()
-                                    ->mutable_planning_status()
-                                    ->mutable_lane_follow();
+                                 ->mutable_planning_status()
+                                 ->mutable_lane_follow();
   if (!blocking_obstacle_id.empty()) {
     double current_time = ::apollo::cyber::Clock::NowInSeconds();
     lane_follow_status->set_block_obstacle_id(blocking_obstacle_id);
@@ -167,8 +172,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
       init_sl_state_.second[0] < path_bound[0].l_lower.l) {
     AINFO << "not in self lane maybe lane borrow , init l : "
           << init_sl_state_.second[0] << ", path_bound l: [ "
-          << path_bound[0].l_lower.l << ","
-          << path_bound[0].l_upper.l << " ]";
+          << path_bound[0].l_lower.l << "," << path_bound[0].l_upper.l << " ]";
     return false;
   }
   // std::vector<std::pair<double, double>> regular_path_bound_pair;
@@ -182,22 +186,43 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   return true;
 }
 
+// 该函数基于提供的路径边界来优化路径。
+// 它迭代遍历每个路径边界，使用 PathOptimizerUtil 计算最佳路径，
+// 并将优化后的路径添加到 candidate_path_data 中。
+// 如果找不到有效的路径，则返回 false。
 bool LaneFollowPath::OptimizePath(
     const std::vector<PathBoundary>& path_boundaries,
     std::vector<PathData>* candidate_path_data) {
+  // 加载路径优化器的配置。
   const auto& config = config_.path_optimizer_config();
+
+  // 获取参考线信息中的参考线。
   const ReferenceLine& reference_line = reference_line_info_->reference_line();
+
+  // 初始化优化的结束状态。
   std::array<double, 3> end_state = {0.0, 0.0, 0.0};
+
+  // 迭代计算每个路径边界。
   for (const auto& path_boundary : path_boundaries) {
+    // 获取路径边界的大小。
     size_t path_boundary_size = path_boundary.boundary().size();
+
+    // 检查路径边界是否有效。
     if (path_boundary_size <= 1U) {
-      AERROR << "Get invalid path boundary with size: " << path_boundary_size;
+      AERROR << "Gets an invalid path boundary of magnitude: "
+             << path_boundary_size;
       return false;
     }
+
+    // 初始化向量来存储优化后的路径。
     std::vector<double> opt_l, opt_dl, opt_ddl;
+
+    // 计算加速度界限以进行优化。
     std::vector<std::pair<double, double>> ddl_bounds;
     PathOptimizerUtil::CalculateAccBound(path_boundary, reference_line,
                                          &ddl_bounds);
+
+    // 打印调试信息以获取参考线的 kappa。
     PrintCurves print_debug;
     for (size_t i = 0; i < path_boundary_size; ++i) {
       double s = static_cast<double>(i) * path_boundary.delta_s() +
@@ -207,64 +232,101 @@ bool LaneFollowPath::OptimizePath(
           "ref_kappa", static_cast<double>(i) * path_boundary.delta_s(), kappa);
     }
     print_debug.PrintToLog();
+
+    // 计算用于优化的加速度界限。
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
         std::fmax(init_sl_state_.first[1], 1e-12));
+
+    // 初始化用于优化的参考路径。
     std::vector<double> ref_l(path_boundary_size, 0);
     std::vector<double> weight_ref_l(path_boundary_size, 0);
     PathOptimizerUtil::UpdatePathRefWithBound(
         path_boundary, config.path_reference_l_weight(), &ref_l, &weight_ref_l);
+
+    // 使用计算出的参数来优化路径。
     bool res_opt = PathOptimizerUtil::OptimizePath(
         init_sl_state_, end_state, ref_l, weight_ref_l, path_boundary,
         ddl_bounds, jerk_bound, config, &opt_l, &opt_dl, &opt_ddl);
+
+    // 如果优化成功，将优化后的路径添加到 candidate_path_data 中。
     if (res_opt) {
       auto frenet_frame_path = PathOptimizerUtil::ToPiecewiseJerkPath(
           opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
           path_boundary.start_s());
+
       PathData path_data;
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(std::move(frenet_frame_path));
+
+      // 如果在路径规划中使用前轴中心的标志被设置，
+      // 则将路径点引用从前轴转换为后轴。
       if (FLAGS_use_front_axe_center_in_path_planning) {
         auto discretized_path = DiscretizedPath(
             PathOptimizerUtil::ConvertPathPointRefFromFrontAxeToRearAxe(
                 path_data));
         path_data.SetDiscretizedPath(discretized_path);
       }
+
+      // 设置路径的标签和阻塞物体的 ID。
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
+
       candidate_path_data->push_back(std::move(path_data));
     }
   }
+
+  // 如果 candidate_path_data 为空，返回 false。
   if (candidate_path_data->empty()) {
     return false;
   }
+
   return true;
 }
 
+// 路径评估函数，对候选路径进行评估并返回最优路径。
+// 它首先检查候选路径是否有效，然后对路径点进行决策并将其添加到路径数据中。
+// 最后，它将最优路径返回到 final_path 并更新参考线信息中的相关数据。
 bool LaneFollowPath::AssessPath(std::vector<PathData>* candidate_path_data,
                                 PathData* final_path) {
+  // 获取最后一个候选路径。
   PathData& curr_path_data = candidate_path_data->back();
+
+  // 记录调试信息。
   RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
                   reference_line_info_);
+
+  // 评估候选路径是否有效。
   if (!PathAssessmentDeciderUtil::IsValidRegularPath(*reference_line_info_,
                                                      curr_path_data)) {
     AINFO << "Lane follow path is invalid";
     return false;
   }
 
+  // 初始化路径点决策。
   std::vector<PathPointDecision> path_decision;
   PathAssessmentDeciderUtil::InitPathPointDecision(
       curr_path_data, PathData::PathPointType::IN_LANE, &path_decision);
   curr_path_data.SetPathPointDecisionGuide(std::move(path_decision));
 
+  // 检查路径是否为空。
   if (curr_path_data.Empty()) {
     AINFO << "Lane follow path is empty after trimed";
     return false;
   }
+
+  // 将最优路径复制到 final_path。
   *final_path = curr_path_data;
+
+  // 记录最优路径的标签和阻塞物体的 ID。
   AINFO << final_path->path_label() << final_path->blocking_obstacle_id();
+
+  // 将最优路径添加到参考线信息中的候选路径数据中。
   reference_line_info_->MutableCandidatePathData()->push_back(*final_path);
+
+  // 更新参考线信息中的阻塞物体。
   reference_line_info_->SetBlockingObstacle(
       curr_path_data.blocking_obstacle_id());
+
   return true;
 }
 

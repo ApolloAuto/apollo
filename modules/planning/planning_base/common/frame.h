@@ -227,6 +227,7 @@ class Frame {
   ADCTrajectory current_frame_planned_trajectory_;
 
   // current frame path for future possible speed fallback
+  // 当前帧中规划并发布的轨迹
   DiscretizedPath current_frame_planned_path_;
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;

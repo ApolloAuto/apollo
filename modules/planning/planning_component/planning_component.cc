@@ -40,7 +40,7 @@ using apollo::storytelling::Stories;
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
 
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode) {  // OnLanePlanning是默认规划器
     planning_base_ = std::make_unique<NaviPlanning>(injector_);
   } else {
     planning_base_ = std::make_unique<OnLanePlanning>(injector_);
@@ -60,6 +60,7 @@ bool PlanningComponent::Init() {
 
   planning_base_->Init(config_);
 
+  // 订阅外部指令
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -69,6 +70,7 @@ bool PlanningComponent::Init() {
         planning_command_.CopyFrom(*planning_command);
       });
 
+  // 订阅红绿灯消息
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       config_.topic_config().traffic_light_detection_topic(),
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
@@ -77,6 +79,7 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 
+  // 订阅planning流程干预消息
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
       config_.topic_config().planning_pad_topic(),
       [this](const std::shared_ptr<PadMessage>& pad_msg) {
@@ -102,15 +105,19 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
+  //  创建planning输出轨迹发布者
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 
+  //  道路被阻塞时重规划的client
   rerouting_client_ =
       node_->CreateClient<apollo::external_command::LaneFollowCommand,
                           external_command::CommandStatus>(
           config_.topic_config().routing_request_topic());
   planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
       config_.topic_config().planning_learning_data_topic());
+
+  // 创建planning导航命令实时执行状态发布者
   command_status_writer_ = node_->CreateWriter<external_command::CommandStatus>(
       FLAGS_planning_command_status);
   return true;
@@ -125,9 +132,11 @@ bool PlanningComponent::Proc(
   ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
+  // 检查是否需要重新规划线路
   CheckRerouting();
 
   // process fused input data
+  // 数据存入local_view_并且检查
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
@@ -200,7 +209,8 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
-  planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
+  // 执行注册好的planner，生成路线
+  planning_base_->RunOnce(local_view_, &adc_trajectory_pb);  // 开始规划
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
@@ -209,6 +219,7 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
+  // 发布路线消息
   planning_writer_->Write(adc_trajectory_pb);
 
   // Send command execution feedback.

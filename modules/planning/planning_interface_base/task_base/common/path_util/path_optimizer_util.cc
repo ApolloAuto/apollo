@@ -93,21 +93,45 @@ PathOptimizerUtil::ConvertPathPointRefFromFrontAxeToRearAxe(
   return ret;
 }
 
+// 该函数在 PathOptimizerUtil 命名空间中，用于对路径进行优化
 bool PathOptimizerUtil::OptimizePath(
-    const SLState& init_state, const std::array<double, 3>& end_state,
-    std::vector<double> l_ref, std::vector<double> l_ref_weight,
+    // 初始状态：横向位置、横向速度、横向加速度
+    const SLState& init_state,
+    // 期望的终点状态：横向位置、横向速度、横向加速度
+    const std::array<double, 3>& end_state,
+    // 参考横向位置
+    std::vector<double> l_ref,
+    // 参考横向位置的权重
+    std::vector<double> l_ref_weight,
+    // 路径边界
     const PathBoundary& path_boundary,
-    const std::vector<std::pair<double, double>>& ddl_bounds, double dddl_bound,
-    const PiecewiseJerkPathConfig& config, std::vector<double>* x,
-    std::vector<double>* dx, std::vector<double>* ddx) {
-  // num of knots
+    // 横向加速度的边界
+    const std::vector<std::pair<double, double>>& ddl_bounds,
+    // 横向加加速度的最大值
+    double dddl_bound,
+    // 路径优化的配置
+    const PiecewiseJerkPathConfig& config,
+    // 优化后的横向位置
+    std::vector<double>* x,
+    // 优化后的横向速度
+    std::vector<double>* dx,
+    // 优化后的横向加速度
+    std::vector<double>* ddx) {
+  // 路径点的数量
   const auto& lat_boundaries = path_boundary.boundary();
   const size_t kNumKnots = lat_boundaries.size();
 
+  // 路径点之间的间隔
   double delta_s = path_boundary.delta_s();
+
+  // 创建 PiecewiseJerkPathProblem 实例
   PiecewiseJerkPathProblem piecewise_jerk_problem(kNumKnots, delta_s,
                                                   init_state.second);
+
+  // 用于调试的类，用于记录路径点
   PrintCurves print_curve;
+
+  // 记录路径点
   for (size_t i = 0; i < kNumKnots; i++) {
     print_curve.AddPoint(path_boundary.label() + "_ref_l",
                          i * path_boundary.delta_s(), l_ref[i]);
@@ -122,56 +146,80 @@ bool PathOptimizerUtil::OptimizePath(
     print_curve.AddPoint(path_boundary.label() + "_ddl_upper",
                          i * path_boundary.delta_s(), ddl_bounds[i].second);
   }
+
+  // 记录初始状态
   print_curve.AddPoint(path_boundary.label() + "_opt_l", 0,
                        init_state.second[0]);
   print_curve.AddPoint(path_boundary.label() + "_opt_dl", 0,
                        init_state.second[1]);
   print_curve.AddPoint(path_boundary.label() + "_opt_ddl", 0,
                        init_state.second[2]);
-  // TODO(Hongyi): update end_state settings
+
+  // TODO(Hongyi): 更新 end_state 设置
   std::array<double, 3U> end_state_weight = {config.weight_end_state_l(),
                                              config.weight_end_state_dl(),
                                              config.weight_end_state_ddl()};
+
+  // 设置期望的终点状态
   piecewise_jerk_problem.set_end_state_ref(end_state_weight, end_state);
+
+  // 设置参考横向位置
   piecewise_jerk_problem.set_x_ref(std::move(l_ref_weight), l_ref);
-  // for debug:here should use std::move
+
+  // 用于调试：在此处使用 std::move
   piecewise_jerk_problem.set_weight_x(config.l_weight());
   piecewise_jerk_problem.set_weight_dx(config.dl_weight());
   piecewise_jerk_problem.set_weight_ddx(config.ddl_weight());
   piecewise_jerk_problem.set_weight_dddx(config.dddl_weight());
 
+  // 设置缩放因子
   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
+  // 记录开始时间
   auto start_time = std::chrono::system_clock::now();
 
+  // 设置横向位置的边界
   piecewise_jerk_problem.set_x_bounds(lat_boundaries);
+
+  // 设置横向速度的边界
   piecewise_jerk_problem.set_dx_bounds(
       -config.lateral_derivative_bound_default(),
       config.lateral_derivative_bound_default());
+
+  // 设置横向加速度的边界
   piecewise_jerk_problem.set_ddx_bounds(ddl_bounds);
 
+  // 设置横向加加速度的最大值
   piecewise_jerk_problem.set_dddx_bound(dddl_bound);
 
+  // 进行路径优化
   bool success = piecewise_jerk_problem.Optimize(config.max_iteration());
 
+  // 记录结束时间
   auto end_time = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
-  ADEBUG << "Path Optimizer used time: " << diff.count() * 1000 << " ms.";
 
+  // 计算路径优化所用的时间
+  std::chrono::duration<double> diff = end_time - start_time;
+  ADEBUG << "路径优化器所用时间: " << diff.count() * 1000 << " ms.";
+
+  // 如果路径优化失败，返回 false
   if (!success) {
-    AERROR << path_boundary.label() << "piecewise jerk path optimizer failed";
-    AINFO << "init s(" << init_state.first[0] << "," << init_state.first[1]
+    AERROR << path_boundary.label() << "分段三次曲线路径优化器失败";
+    AINFO << "初始状态：s(" << init_state.first[0] << "," << init_state.first[1]
           << "," << init_state.first[2] << ") l (" << init_state.second[0]
           << "," << init_state.second[1] << "," << init_state.second[2];
-    AINFO << "dx bound" << config.lateral_derivative_bound_default();
-    AINFO << "jerk bound" << dddl_bound;
+    AINFO << "dx 边界: " << config.lateral_derivative_bound_default();
+    AINFO << "jerk 边界: " << dddl_bound;
     print_curve.PrintToLog();
     return false;
   }
 
+  // 记录优化后的路径点
   *x = piecewise_jerk_problem.opt_x();
   *dx = piecewise_jerk_problem.opt_dx();
   *ddx = piecewise_jerk_problem.opt_ddx();
+
+  // 记录优化后的路径点
   for (size_t i = 0; i < kNumKnots; i++) {
     print_curve.AddPoint(path_boundary.label() + "_opt_l",
                          i * path_boundary.delta_s(), (*x)[i]);
@@ -180,7 +228,11 @@ bool PathOptimizerUtil::OptimizePath(
     print_curve.AddPoint(path_boundary.label() + "_opt_ddl",
                          i * path_boundary.delta_s(), (*ddx)[i]);
   }
+
+  // 打印并记录路径点
   print_curve.PrintToLog();
+
+  // 如果路径优化成功，返回 true
   return true;
 }
 

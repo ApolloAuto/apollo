@@ -113,6 +113,7 @@ void PlanningBase::FillPlanningPb(const double timestamp,
 void PlanningBase::LoadPlanner() {
   // Use PublicRoadPlanner as default Planner
   std::string planner_name = "apollo::planning::PublicRoadPlanner";
+  // 读取配置文件的设置
   if ("" != config_.planner()) {
     planner_name = config_.planner();
     planner_name = ConfigUtil::GetFullPlanningClassName(planner_name);
