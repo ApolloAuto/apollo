@@ -1,3 +1,0 @@
-<library path="modules/planning/planners/rtk/librtk_replay_planner.so">
-    <class type="apollo::planning::RTKReplayPlanner" base_class="apollo::planning::Planner"></class>
-</library>

@@ -1,3 +1,0 @@
-world_frame_id: "world"
-transform_query_timeout: 0.02
-output_channel: "/apollo/sensor/lidar16/front/up/compensator/PointCloud2"

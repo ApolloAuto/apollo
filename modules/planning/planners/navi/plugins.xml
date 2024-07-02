@@ -1,3 +1,0 @@
-<library path="modules/planning/planners/public_road/libnavi_planner.so">
-    <class type="apollo::planning::NaviPlanner" base_class="apollo::planning::Planner"></class>
-</library>

@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package apollo.guardian;
-
-message GuardianConf {
-  optional bool guardian_enable = 1 [default = false];
-  optional double guardian_cmd_emergency_stop_percentage = 2 [default = 50];
-  optional double guardian_cmd_soft_stop_percentage = 3 [default = 25];
-}

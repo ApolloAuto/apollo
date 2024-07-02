@@ -1,1 +1,0 @@
-localization_type: MSF

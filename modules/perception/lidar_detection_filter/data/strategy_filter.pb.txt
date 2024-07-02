@@ -1,3 +1,0 @@
-is_merge_inclusive: true
-expand_bbox_dist: 0.2
-allow_fore_merge: true

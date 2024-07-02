@@ -1,2 +1,0 @@
-roi_type: PARK_AND_GO
-perception_obstacle_buffer: 0.0

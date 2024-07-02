@@ -1,6 +1,0 @@
-topic_config {
-  planning_command_topic: "/apollo/planning/command"
-  localization_pose_topic: "/apollo/localization/pose"
-  lane_follow_command_topic: "/apollo/external_command/lane_follow"
-  planning_topic: "/apollo/planning"
-}

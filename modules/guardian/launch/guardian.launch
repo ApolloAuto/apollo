@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>guardian</name>
-        <dag_conf>/apollo/modules/guardian/dag/guardian.dag</dag_conf>
-        <process_name>guardian</process_name>
-    </module>
-</cyber>

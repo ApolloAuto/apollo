@@ -1,2 +1,0 @@
-filter_name: "MrfShapeFilter"
-filter_name: "MrfMotionFilter"

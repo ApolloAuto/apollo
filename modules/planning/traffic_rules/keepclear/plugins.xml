@@ -1,3 +1,0 @@
-<library path="modules/planning/traffic_rules/keepclear/libkeepclear.so">
-    <class type="apollo::planning::KeepClear" base_class="apollo::planning::TrafficRule"></class>
-</library>

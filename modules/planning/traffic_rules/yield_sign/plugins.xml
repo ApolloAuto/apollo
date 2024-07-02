@@ -1,3 +1,0 @@
-<library path="modules/planning/traffic_rules/yield_sign/libyield_sign.so">
-    <class type="apollo::planning::YieldSign" base_class="apollo::planning::TrafficRule"></class>
-</library>

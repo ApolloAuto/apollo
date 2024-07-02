@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/rss_decider/librss_decider.so">
-    <class type="apollo::planning::RssDecider" base_class="apollo::planning::Task"></class>
-</library>

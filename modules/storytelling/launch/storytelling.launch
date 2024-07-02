@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>storytelling</name>
-        <dag_conf>/apollo/modules/storytelling/dag/storytelling.dag</dag_conf>
-        <process_name>storytelling</process_name>
-    </module>
-</cyber>

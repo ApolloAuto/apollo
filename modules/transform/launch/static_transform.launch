@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>static_transform</name>
-        <dag_conf>/apollo/modules/transform/dag/static_transform.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cyber>

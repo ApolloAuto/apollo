@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>lslidarCH128</name>
-        <dag_conf>/apollo/modules/drivers/lidar/lslidar/dag/lslidarCH128.dag</dag_conf>
-        <process_name>lslidar</process_name>
-    </module>
-</cyber>

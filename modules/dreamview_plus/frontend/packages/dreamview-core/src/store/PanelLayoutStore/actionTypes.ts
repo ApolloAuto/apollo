@@ -1,4 +1,0 @@
-export const UPDATE = 'UPDATE';
-export const ADD_PANEL_FROM_OUTSIDE = 'ADD_PANEL_FROM_OUTSIDE';
-export const REFRESH_PANEL = 'REFRESH_PANEL';
-export const RESET_LAYOUT = 'RESET_LAYOUT';

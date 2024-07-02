@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>conti_radar</name>
-        <dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag</dag_conf>
-        <process_name>conti_radar</process_name>
-    </module>
-</cyber>

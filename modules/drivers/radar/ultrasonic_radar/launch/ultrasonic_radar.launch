@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>ultrasonic_radar</name>
-        <dag_conf>/apollo/modules/drivers/radar/ultrasonic_radar/dag/ultrasonic_radar.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cyber>

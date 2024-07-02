@@ -1,2 +1,0 @@
-enabled: true
-stop_distance: 1.0

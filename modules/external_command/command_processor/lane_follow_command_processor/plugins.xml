@@ -1,3 +1,0 @@
-<library path="modules/external_command/command_processor/lane_follow_command_processor/liblane_follow_command_processor.so">
-    <class type="apollo::external_command::LaneFollowCommandProcessor" base_class="apollo::external_command::CommandProcessorBase"></class>
-</library>

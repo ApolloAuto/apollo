@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>canbus</name>
-        <dag_conf>/apollo/modules/canbus/dag/canbus.dag</dag_conf>
-        <process_name>canbus</process_name>
-    </module>
-</cyber>

@@ -1,3 +1,0 @@
-min_path_reference_length: 20
-skip_path_reference_in_side_pass: false
-skip_path_reference_in_change_lane: true

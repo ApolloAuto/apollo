@@ -1,3 +1,0 @@
-<library path="modules/planning/traffic_rules/traffic_light/libtraffic_light.so">
-    <class type="apollo::planning::TrafficLight" base_class="apollo::planning::TrafficRule"></class>
-</library>

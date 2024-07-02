@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/lane_follow_path/liblane_follow_path.so">
-    <class type="apollo::planning::LaneFollowPath" base_class="apollo::planning::Task"></class>
-</library>

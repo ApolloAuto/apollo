@@ -1,7 +1,0 @@
-syntax = "proto2";
-
-package apollo.perception.radar;
-
-message PreprocessorConfig {
-  optional double delay_time = 1 [default = 0.07];
-}

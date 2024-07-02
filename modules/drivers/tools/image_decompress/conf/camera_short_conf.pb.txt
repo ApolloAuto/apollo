@@ -1,2 +1,0 @@
-
-channel_name: "/apollo/sensor/camera/traffic/image_short"

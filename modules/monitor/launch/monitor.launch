@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>monitor</name>
-        <dag_conf>/apollo/modules/monitor/dag/monitor.dag</dag_conf>
-        <process_name>monitor</process_name>
-    </module>
-</cyber>

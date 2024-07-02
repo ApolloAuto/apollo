@@ -1,3 +1,0 @@
-input_command_name: "/apollo/external_command/lane_follow"
-output_command_name: "/apollo/planning/command"
-input_command_status_name: "/apollo/planning/command_status"

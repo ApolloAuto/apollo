@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>routing</name>
-        <dag_conf>/apollo/modules/routing/dag/routing.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cyber>

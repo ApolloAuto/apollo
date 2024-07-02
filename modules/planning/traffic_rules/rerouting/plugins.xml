@@ -1,3 +1,0 @@
-<library path="modules/planning/traffic_rules/rerouting/librerouting.so">
-    <class type="apollo::planning::Rerouting" base_class="apollo::planning::TrafficRule"></class>
-</library>

@@ -1,3 +1,0 @@
-<library path="modules/planning/tasks/reuse_path/libreuse_path.so">
-    <class type="apollo::planning::ReusePath" base_class="apollo::planning::Task"></class>
-</library>

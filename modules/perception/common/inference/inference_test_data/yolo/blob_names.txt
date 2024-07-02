@@ -1,6 +1,0 @@
-loc_pred
-obj_pred
-cls_pred
-ori_pred
-dim_pred
-conv9

@@ -1,2 +1,0 @@
-cooldown_time: 3.0
-prepare_rerouting_time: 2.0

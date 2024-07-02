@@ -1,5 +1,0 @@
-item {
-  source: CANBUS
-  msg: "fake canbus error"
-  log_level: FATAL
-}

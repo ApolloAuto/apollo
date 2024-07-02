@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>racobit_radar</name>
-        <dag_conf>/apollo/modules/drivers/radar/racobit_radar/dag/racobit_radar.dag</dag_conf>
-        <process_name></process_name>
-    </module>
-</cyber>

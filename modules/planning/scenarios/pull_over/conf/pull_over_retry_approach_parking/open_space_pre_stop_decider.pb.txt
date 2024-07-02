@@ -1,2 +1,0 @@
-stop_type: PULL_OVER
-rightaway_stop_distance: 1.0
