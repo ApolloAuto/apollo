@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.drivers.seyond;
+
+
+
+message SeyondPacket {
+  optional bool table_exist = 1;
+  optional bytes data = 2;
+  optional bytes table = 3;
+}
+
+message SeyondScan {
+  optional uint64 timestamp = 1;
+  optional uint32 sequence_num = 2;
+  optional double measurement_time = 3;
+  optional bool is_last_scan = 4;
+  optional uint32 size = 5;
+  repeated SeyondPacket packets = 6;
+}

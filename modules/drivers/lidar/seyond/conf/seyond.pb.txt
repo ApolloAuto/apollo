@@ -1,0 +1,15 @@
+source_type: ONLINE_LIDAR
+scan_channel: "/apollo/sensor/seyond/Scan"
+pointcloud_channel: "/apollo/sensor/seyond/PointCloud2"
+frame_id: "seyond"
+direct_mode: false
+aggregate_num: 50
+device_ip: "172.168.1.10"
+port: 8010
+udp_port: 8010
+reflectance_mode: true
+multiple_return: 1
+coordinate_mode: 3
+max_range: 2000.0
+min_range: 0.4
+log_level: "info"

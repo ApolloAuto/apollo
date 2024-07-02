@@ -1,0 +1,10 @@
+module_config {
+    module_library : "modules/drivers/lidar/seyond/libseyond_driver_component.so"
+    components {
+        class_name : "SeyondComponent"
+        config {
+          name : "seyond_driver"
+          config_file_path : "/apollo/modules/drivers/lidar/seyond/conf/seyond.pb.txt"
+        }
+    }
+}
