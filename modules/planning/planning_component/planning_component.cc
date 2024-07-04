@@ -209,7 +209,7 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
-  // 执行注册好的planner，生成路线
+  // 执行注册好的planner
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);  // 开始规划
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
@@ -222,6 +222,7 @@ bool PlanningComponent::Proc(
   // 发布路线消息
   planning_writer_->Write(adc_trajectory_pb);
 
+  //执行状态反馈
   // Send command execution feedback.
   // Error occured while executing the command.
   external_command::CommandStatus command_status;
