@@ -153,6 +153,8 @@ StageResult LaneFollowStage::Process(
 StageResult LaneFollowStage::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
+  // 判断是否当前参考线是可换道的车道，如果不是那么增加cost
+  // RULE_BASED_STOP_DECIDER之后是速度相关
   if (!reference_line_info->IsChangeLanePath()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
@@ -167,9 +169,9 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
         std::chrono::duration<double>(
             std::chrono::system_clock::now().time_since_epoch())
             .count();
-
+    // 设置任务状态
     ret.SetTaskStatus(task->Execute(frame, reference_line_info));
-
+    // 记录调试信息
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
     ADEBUG << "after task[" << task->Name()
@@ -257,7 +259,7 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
       }
     }
   }
-
+  // 检查轨迹有效性
   if (FLAGS_enable_trajectory_check) {
     if (ConstraintChecker::ValidTrajectory(trajectory) !=
         ConstraintChecker::Result::VALID) {
@@ -266,7 +268,7 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
       return ret.SetStageStatus(StageStatusType::ERROR, msg);
     }
   }
-
+  // 设置轨迹和可行使性
   reference_line_info->SetTrajectory(trajectory);
   reference_line_info->SetDrivable(true);
   ret.SetStageStatus(StageStatusType::RUNNING);
