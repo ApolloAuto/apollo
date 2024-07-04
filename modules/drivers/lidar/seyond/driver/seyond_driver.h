@@ -134,7 +134,7 @@ class SeyondDriver {
   uint32_t coordinate_mode_{3};
   bool direct_mode_{false};
   bool raw_packets_mode_{false};
-  uint32_t aggregate_packets_num_{50};
+  uint32_t aggregate_packets_num_{100};
 
   double max_range_{2000.0};
   double min_range_{0.4};

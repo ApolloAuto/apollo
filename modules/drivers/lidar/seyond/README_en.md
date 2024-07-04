@@ -31,7 +31,7 @@ Default Topic：
 | pointcloud_channel | -            | PointCloud channel name   |
 | frame_id           | seyond       | frame_id   |
 | direct_mode        | false        | skip the scan channel and publish pointcloud   |
-| aggregate_num      | 50           | aggregate packets num for Scan channel   |
+| aggregate_num      | 100          | aggregate packets num for Scan channel   |
 | device_ip          | 172.168.1.10 | lidar ip   |
 | port               | 8010         | tcp port   |
 | udp_port           | 8010         | udp port, if < 0, use tcp for transmission   |

@@ -3,7 +3,7 @@ scan_channel: "/apollo/sensor/seyond/Scan"
 pointcloud_channel: "/apollo/sensor/seyond/PointCloud2"
 frame_id: "seyond"
 direct_mode: false
-aggregate_num: 50
+aggregate_num: 100
 device_ip: "172.168.1.10"
 port: 8010
 udp_port: 8010
