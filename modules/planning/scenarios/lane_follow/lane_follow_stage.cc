@@ -78,56 +78,73 @@ void LaneFollowStage::RecordObstacleDebugInfo(
     }
   }
 }
-
+// lane_follow场景的执行函数
+// 处理车辆在规划路径上的行为，包括跟随车道线、变道等
 StageResult LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  // 如果没有可用的参考线信息，返回任务完成
   if (frame->reference_line_info().empty()) {
     return StageResult(StageStatusType::FINISHED);
   }
 
+  // 标记是否存在可行驶的参考线
   bool has_drivable_reference_line = false;
 
+  // 调试信息：输出参考线数量
   ADEBUG << "Number of reference lines:\t"
          << frame->mutable_reference_line_info()->size();
 
   unsigned int count = 0;
   StageResult result;
+  // 依次处理每条参考线
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     // TODO(SHU): need refactor
+    // 若已处理到最后一条参考线，跳出循环
     if (count++ == frame->mutable_reference_line_info()->size()) {
       break;
     }
     ADEBUG << "No: [" << count << "] Reference Line.";
     ADEBUG << "IsChangeLanePath: " << reference_line_info.IsChangeLanePath();
 
+    // 若已存在可行驶的参考线，将后续参考线标记为不可行驶并跳出循环
     if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);
       break;
     }
 
+    // 基于当前参考线进行路径和速度规划
     result =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
 
+    // 若路径和速度规划没有出错
     if (!result.HasError()) {
+      // 若当前参考线不是变道路径
       if (!reference_line_info.IsChangeLanePath()) {
+        // 调试信息：输出当前参考线不是变道路径
         ADEBUG << "reference line is NOT lane change ref.";
+        // 标记当前参考线为可行驶
         has_drivable_reference_line = true;
         continue;
       }
+      // 若当前参考线的代价小于指定阈值
       if (reference_line_info.Cost() < kStraightForwardLineCost) {
         // If the path and speed optimization succeed on target lane while
         // under smart lane-change or IsClearToChangeLane under older version
+        // 若路径和速度优化在目标车道上成功，标记当前参考线为可行驶
         has_drivable_reference_line = true;
         reference_line_info.SetDrivable(true);
       } else {
+        // 若路径和速度优化在目标车道上失败，标记当前参考线为不可行驶
         reference_line_info.SetDrivable(false);
         ADEBUG << "\tlane change failed";
       }
     } else {
+      // 若路径和速度规划出错，标记当前参考线为不可行驶
       reference_line_info.SetDrivable(false);
     }
   }
 
+  // 返回任务状态：若存在可行驶的参考线，返回任务运行中状态；否则返回任务出错状态
   return has_drivable_reference_line
              ? result.SetStageStatus(StageStatusType::RUNNING)
              : result.SetStageStatus(StageStatusType::ERROR);

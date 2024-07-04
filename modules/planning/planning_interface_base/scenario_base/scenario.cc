@@ -83,11 +83,14 @@ bool Scenario::Init(std::shared_ptr<DependencyInjector> injector,
   return true;
 }
 
+// 处理场景的主函数，根据当前的stage和轨迹点来执行任务
 ScenarioResult Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  //若当前stage为空，创建初始stage
   if (current_stage_ == nullptr) {
     current_stage_ = CreateStage(
         *stage_pipeline_map_[scenario_pipeline_config_.stage(0).name()]);
+    //创建失败
     if (nullptr == current_stage_) {
       AERROR << "Create stage " << scenario_pipeline_config_.stage(0).name()
              << " failed!";
@@ -96,22 +99,27 @@ ScenarioResult Scenario::Process(
     }
     AINFO << "Create stage " << current_stage_->Name();
   }
+   // 如果当前阶段为空名，则表示场景已完成
   if (current_stage_->Name().empty()) {
     scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_DONE);
     return scenario_result_;
   }
+  // 处理当前阶段并获取返回结果
   auto ret = current_stage_->Process(planning_init_point, frame);
   scenario_result_.SetStageResult(ret);
+   // 根据返回结果来更新场景和阶段的状态
   switch (ret.GetStageStatus()) {
     case StageStatusType::ERROR: {
       AERROR << "Stage '" << current_stage_->Name() << "' returns error";
       scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_UNKNOWN);
       break;
     }
+      //下个周期继续执行当前stage
     case StageStatusType::RUNNING: {
       scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_PROCESSING);
       break;
     }
+      //切换下一个stage
     case StageStatusType::FINISHED: {
       auto next_stage = current_stage_->NextStage();
       if (next_stage != current_stage_->Name()) {

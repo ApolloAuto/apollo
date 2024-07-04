@@ -26,11 +26,14 @@
 namespace apollo {
 namespace planning {
 
+// 场景切换器中调用，判断是否可以切换到此场景，返回true则切换
 bool LaneFollowScenario::IsTransferable(const Scenario* other_scenario,
                                         const Frame& frame) {
+  //frame是否包含lane_follow
   if (!frame.local_view().planning_command->has_lane_follow_command()) {
     return false;
   }
+  //是否有参考线
   if (frame.reference_line_info().empty()) {
     return false;
   }
