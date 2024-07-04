@@ -62,6 +62,7 @@ apollo::common::Status LaneChangePath::Process(
                            ->mutable_planning_status()
                            ->mutable_change_lane()
                            ->status();
+  // 检查是否变道
   if (!reference_line_info->IsChangeLanePath() ||
       reference_line_info->path_reusable()) {
     ADEBUG << "Skip this time" << reference_line_info->IsChangeLanePath()
@@ -78,15 +79,17 @@ apollo::common::Status LaneChangePath::Process(
   }
   std::vector<PathBoundary> candidate_path_boundaries;
   std::vector<PathData> candidate_path_data;
-
+  // 尝试获取变道路径的边界和数据
   GetStartPointSLState();
   if (!DecidePathBounds(&candidate_path_boundaries)) {
     return Status(ErrorCode::PLANNING_ERROR, "lane change path bounds failed");
   }
+  // 尝试优化变道路径
   if (!OptimizePath(candidate_path_boundaries, &candidate_path_data)) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "lane change path optimize failed");
   }
+  // 评估变道路径
   if (!AssessPath(&candidate_path_data,
                   reference_line_info->mutable_path_data())) {
     return Status(ErrorCode::PLANNING_ERROR, "No valid lane change path");
