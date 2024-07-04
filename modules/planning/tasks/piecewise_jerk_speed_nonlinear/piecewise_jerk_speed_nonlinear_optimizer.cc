@@ -25,12 +25,13 @@
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/planning/planning_base/proto/ipopt_return_status.pb.h"
+
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/tasks/piecewise_jerk_speed_nonlinear/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
@@ -77,11 +78,11 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
+  // 若到达终点则不进行速度规划
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
-
+  // 构建优化变量边界
   const auto problem_setups_status =
       SetUpStatesAndBounds(path_data, *speed_data);
   if (!problem_setups_status.ok()) {
@@ -94,7 +95,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   std::vector<double> acceleration;
 
   const auto qp_start = std::chrono::system_clock::now();
-
+  // 基于QP算法对动态规划的粗ST曲线进行平滑
   const auto qp_smooth_status =
       OptimizeByQP(speed_data, &distance, &velocity, &acceleration);
 
@@ -106,7 +107,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     speed_data->clear();
     return qp_smooth_status;
   }
-
+  // 基于QP算法平滑限速曲线
   const bool speed_limit_check_status = CheckSpeedLimitFeasibility();
 
   if (speed_limit_check_status) {
@@ -141,7 +142,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     }
 
     const auto nlp_start = std::chrono::system_clock::now();
-
+    // 基于非线性规划优化ST曲线
     const auto nlp_smooth_status =
         OptimizeByNLP(&distance, &velocity, &acceleration);
 
@@ -243,18 +244,15 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
             s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
             break;
           case STBoundary::BoundaryType::FOLLOW:
-            s_upper_bound =
-                std::fmin(s_upper_bound, s_upper);
+            s_upper_bound = std::fmin(s_upper_bound, s_upper);
             if (!speed_data.EvaluateByTime(curr_t, &sp)) {
               const std::string msg =
                   "rough speed profile estimation for soft follow fence failed";
               AERROR << msg;
               return Status(ErrorCode::PLANNING_ERROR, msg);
             }
-            s_soft_upper_bound =
-                std::fmin(s_soft_upper_bound,
-                          s_upper -
-                              std::min(7.0, 2.5 * sp.v()));
+            s_soft_upper_bound = std::fmin(
+                s_soft_upper_bound, s_upper - std::min(7.0, 2.5 * sp.v()));
             break;
           case STBoundary::BoundaryType::OVERTAKE:
             s_lower_bound = std::fmax(s_lower_bound, s_lower);
@@ -454,10 +452,12 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   std::array<double, 3> init_states = {s_init_, s_dot_init_, s_ddot_init_};
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots_, delta_t_,
                                                    init_states);
+  // 设置速度、加速度和加加速度的边界
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_states[1]));
   piecewise_jerk_problem.set_ddx_bounds(s_ddot_min_, s_ddot_max_);
   piecewise_jerk_problem.set_dddx_bound(s_dddot_min_, s_dddot_max_);
+  // 设置路径 s 的边界
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
   // TODO(Jinyun): parameter tunnings
@@ -465,7 +465,9 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config_.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config_.jerk_weight());
+  // 用于调试的 PrintCurves 实例
   PrintCurves debug;
+  // 获取路径 s 的参考值
   std::vector<double> x_ref;
   for (int i = 0; i < num_of_knots_; ++i) {
     const double curr_t = i * delta_t_;
@@ -486,6 +488,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // 获取优化结果
   *distance = piecewise_jerk_problem.opt_x();
   *velocity = piecewise_jerk_problem.opt_dx();
   *acceleration = piecewise_jerk_problem.opt_ddx();

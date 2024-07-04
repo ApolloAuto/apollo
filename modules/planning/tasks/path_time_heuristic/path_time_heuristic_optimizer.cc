@@ -60,28 +60,37 @@ bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
   return true;
 }
 
+// 处理路径数据并生成速度数据
 Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     SpeedData* const speed_data) {
+  // 保存初始点
   init_point_ = init_point;
 
+  // 若路径数据为空，返回错误状态
   if (path_data.discretized_path().empty()) {
     const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // ST以生成速度数据
   if (!SearchPathTimeGraph(speed_data)) {
     const std::string msg = absl::StrCat(
         Name(), ": Failed to search graph with dynamic programming.");
     AERROR << msg;
+    // 记录调试信息
     RecordDebugInfo(*speed_data, reference_line_info_->mutable_st_graph_data()
                                      ->mutable_st_graph_debug());
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  // 再次记录调试信息
   RecordDebugInfo(
       *speed_data,
       reference_line_info_->mutable_st_graph_data()->mutable_st_graph_debug());
+
+  // 若一切正常，返回成功状态
   return Status::OK();
 }
 

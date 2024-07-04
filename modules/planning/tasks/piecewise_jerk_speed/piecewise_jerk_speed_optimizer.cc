@@ -18,19 +18,21 @@
  * @file piecewise_jerk_fallback_speed.cc
  **/
 
-#include <algorithm>
+#include "modules/planning/tasks/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
-#include "modules/planning/tasks/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -55,18 +57,20 @@ bool PiecewiseJerkSpeedOptimizer::Init(
 Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
                                             const TrajectoryPoint& init_point,
                                             SpeedData* const speed_data) {
+  // 检查是否到达终点，如果到达终点不再进行速度规划
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
 
   ACHECK(speed_data != nullptr);
   SpeedData reference_speed_data = *speed_data;
-
+  // 检查路径是否为空
   if (path_data.discretized_path().empty()) {
     const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  // 获取信息
   StGraphData& st_graph_data = *reference_line_info_->mutable_st_graph_data();
   PrintCurves print_debug;
   const auto& veh_param =
@@ -91,6 +95,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   // Update STBoundary
   const double kEpsilon = 0.1;
   std::vector<std::pair<double, double>> s_bounds;
+  // 根据障碍物和ST graph构建s的约束
   for (int i = 0; i < num_of_knots; ++i) {
     double curr_t = i * delta_t;
     double s_lower_bound = 0.0;
@@ -169,6 +174,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     print_debug.AddPoint("sv_boundary_upper", path_s, v_upper_bound);
   }
   AdjustInitStatus(s_dot_bounds, delta_t, init_s);
+  // 速度规划任务
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
   piecewise_jerk_problem.set_weight_ddx(config_.acc_weight());
@@ -185,7 +191,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 
-  // Solve the problem
+  // Solve the problem 优化求解
   if (!piecewise_jerk_problem.Optimize()) {
     const std::string msg = "Piecewise jerk speed optimizer failed!";
     AERROR << msg << ".try to fallback.";
@@ -228,6 +234,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     speed_data->AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
                                  (dds[i] - dds[i - 1]) / delta_t);
   }
+  // 填充速度点，满足轨迹的时间长度
   SpeedProfileGenerator::FillEnoughSpeedPoints(speed_data);
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
   print_debug.PrintToLog();

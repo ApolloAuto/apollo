@@ -25,9 +25,9 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/planning_base/common/path/path_data.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/common.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/tasks/speed_bounds_decider/speed_limit_decider.h"
 #include "modules/planning/tasks/speed_bounds_decider/st_boundary_mapper.h"
 
@@ -49,7 +49,7 @@ bool SpeedBoundsDecider::Init(
   // Load the config this task.
   return Decider::LoadConfig<SpeedBoundsDeciderConfig>(&config_);
 }
-
+// 产生ST可行驶区间
 Status SpeedBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // retrieve data from frame and reference_line_info

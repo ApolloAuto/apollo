@@ -124,7 +124,7 @@ bool PathOptimizerUtil::OptimizePath(
   // 路径点之间的间隔
   double delta_s = path_boundary.delta_s();
 
-  // 创建 PiecewiseJerkPathProblem 实例
+  // 路径优化
   PiecewiseJerkPathProblem piecewise_jerk_problem(kNumKnots, delta_s,
                                                   init_state.second);
 
@@ -192,7 +192,7 @@ bool PathOptimizerUtil::OptimizePath(
   // 设置横向加加速度的最大值
   piecewise_jerk_problem.set_dddx_bound(dddl_bound);
 
-  // 进行路径优化
+  // OSQP进行路径优化
   bool success = piecewise_jerk_problem.Optimize(config.max_iteration());
 
   // 记录结束时间

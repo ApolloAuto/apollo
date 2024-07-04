@@ -47,7 +47,7 @@ PiecewiseJerkProblem::PiecewiseJerkProblem(
 
   weight_x_ref_vec_ = std::vector<double>(num_of_knots_, 0.0);
 }
-
+// 构建优化问题
 bool PiecewiseJerkProblem::FormulateProblem(OSQPData* data) {
   // calculate kernel
   std::vector<c_float> P_data;
@@ -55,7 +55,7 @@ bool PiecewiseJerkProblem::FormulateProblem(OSQPData* data) {
   std::vector<c_int> P_indptr;
   CalculateKernel(&P_data, &P_indices, &P_indptr);
 
-  // calculate affine constraints
+  // calculate affine constraints 线性约束
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
@@ -64,6 +64,7 @@ bool PiecewiseJerkProblem::FormulateProblem(OSQPData* data) {
   CalculateAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
                             &upper_bounds);
 
+    // offset补偿，用于尽量拟合参考线
   // calculate offset
   std::vector<c_float> q;
   CalculateOffset(&q);
@@ -93,6 +94,7 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
     FreeData(data);
     return false;
   }
+  // OSQP设置
   OSQPSettings* settings = SolverDefaultSettings();
   settings->max_iter = max_iter;
   OSQPWorkspace* osqp_work = nullptr;
@@ -150,7 +152,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
       num_of_variables);
 
   int constraint_index = 0;
-  // set x, x', x'' bounds
+  // 变量约束，设置上下边界
+  //  set x, x', x'' bounds
   for (int i = 0; i < num_of_variables; ++i) {
     if (i < n) {
       variables[i].emplace_back(constraint_index, 1.0);
@@ -175,6 +178,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
     ++constraint_index;
   }
   CHECK_EQ(constraint_index, num_of_variables);
+
+  // 三个运动学约束
 
   // x(i->i+1)''' = (x(i+1)'' - x(i)'') / delta_s
   for (int i = 0; i + 1 < n; ++i) {
@@ -221,7 +226,7 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
     upper_bounds->at(constraint_index) = 0.0;
     ++constraint_index;
   }
-
+  // 初始状态约束 最终轨迹的初始状态要与当前车辆状态保持一致。
   // constrain on x_init
   variables[0].emplace_back(constraint_index, 1.0);
   lower_bounds->at(constraint_index) = x_init_[0] * scale_factor_[0];

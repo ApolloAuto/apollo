@@ -84,6 +84,7 @@ common::Status SpeedDecider::Execute(Frame* frame,
 SpeedDecider::STLocation SpeedDecider::GetSTLocation(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
     const STBoundary& st_boundary) const {
+  // 若boundary为空，设置为BELOW；一般情况下这个障碍物直接被跳过，不考虑
   if (st_boundary.IsEmpty()) {
     return BELOW;
   }
@@ -92,9 +93,11 @@ SpeedDecider::STLocation SpeedDecider::GetSTLocation(
   bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
+  // 遍历速度曲线中的每一个点
   for (size_t i = 0; i + 1 < speed_profile.size(); ++i) {
     const STPoint curr_st(speed_profile[i].s(), speed_profile[i].t());
     const STPoint next_st(speed_profile[i + 1].s(), speed_profile[i + 1].t());
+    // 跳过和障碍物不在一个ST范围内的
     if (curr_st.t() < start_t && next_st.t() < start_t) {
       continue;
     }
@@ -104,11 +107,13 @@ SpeedDecider::STLocation SpeedDecider::GetSTLocation(
 
     if (!FLAGS_use_st_drivable_boundary) {
       common::math::LineSegment2d speed_line(curr_st, next_st);
+      // 检查是否碰撞
       if (st_boundary.HasOverlap(speed_line)) {
         ADEBUG << "speed profile cross st_boundaries.";
         st_location = CROSS;
 
         if (!FLAGS_use_st_drivable_boundary) {
+          // 检查类型是否是KEEP_CLEAR
           if (st_boundary.boundary_type() ==
               STBoundary::BoundaryType::KEEP_CLEAR) {
             if (!CheckKeepClearCrossable(path_decision, speed_profile,
@@ -218,22 +223,24 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
 
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
+  // 检查DP的结果
   if (speed_profile.size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
+  // 遍历障碍物
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->path_st_boundary();
-
+    // 若障碍物的STBoundary在ST_Graph内，忽略
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0 ||
         boundary.min_t() >= speed_profile.back().t()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
+    // 若已经有了纵向决策，忽略
     if (obstacle->HasLongitudinalDecision()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
@@ -258,9 +265,9 @@ Status SpeedDecider::MakeObjectDecision(
       }
       continue;
     }
-
+    // 根据路径决策、DP得到的速度曲线、障碍物边界获取STlocation
     auto location = GetSTLocation(path_decision, speed_profile, boundary);
-
+    // 检查KEEP_CLEAR区域是否阻塞
     if (!FLAGS_use_st_drivable_boundary) {
       if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         if (CheckKeepClearBlocked(path_decision, *obstacle)) {
@@ -271,12 +278,14 @@ Status SpeedDecider::MakeObjectDecision(
 
     switch (location) {
       case BELOW:
+        // 若障碍物类型为KEEP_CLEAR，创建停止决策
         if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*mutable_obstacle, &stop_decision, 0.0)) {
             mutable_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                       stop_decision);
           }
+          // 检查ADC是否处于跟车的状态
         } else if (CheckIsFollow(*obstacle, boundary)) {
           // stop for low_speed decelerating
           if (IsFollowTooClose(*mutable_obstacle)) {
@@ -318,6 +327,7 @@ Status SpeedDecider::MakeObjectDecision(
         }
         break;
       case CROSS:
+        // 障碍物是否阻塞
         if (mutable_obstacle->IsBlockingObstacle()) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*mutable_obstacle, &stop_decision,
