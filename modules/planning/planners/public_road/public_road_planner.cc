@@ -64,7 +64,7 @@ Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
     scenario_debug->set_msg(scenario_->GetMsg());
   }
 
-  // 如果场景的状态为STATUS_DONE，则仅在前一个场景的状态为STATUS_DONE时更新场景管理器
+  // 仅在前一个场景的状态为STATUS_DONE时更新场景管理器
   if (result.GetScenarioStatus() == ScenarioStatusType::STATUS_DONE) {
     // only updates scenario manager when previous scenario's status is
     // STATUS_DONE
