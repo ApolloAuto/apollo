@@ -27,6 +27,7 @@ namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
+  // 获取配置参数
   RoutingConfig routing_conf;
   ACHECK(cyber::ComponentBase::GetProtoConfig(&routing_conf))
       << "Unable to load routing conf file: "
@@ -79,13 +80,16 @@ bool RoutingComponent::Init() {
   return routing_.Init().ok() && routing_.Start().ok();
 }
 
+// 收到router请求
 bool RoutingComponent::Proc(
     const std::shared_ptr<routing::RoutingRequest>& request) {
   auto response = std::make_shared<routing::RoutingResponse>();
+  // router请求是否成功
   if (!routing_.Process(request, response.get())) {
     return false;
   }
   common::util::FillHeader(node_->Name(), response.get());
+  // 发送数据
   response_writer_->Write(response);
   {
     std::lock_guard<std::mutex> guard(mutex_);
