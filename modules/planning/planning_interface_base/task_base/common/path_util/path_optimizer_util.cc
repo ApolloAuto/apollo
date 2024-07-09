@@ -172,7 +172,7 @@ bool PathOptimizerUtil::OptimizePath(
   piecewise_jerk_problem.set_weight_ddx(config.ddl_weight());
   piecewise_jerk_problem.set_weight_dddx(config.dddl_weight());
 
-  // 设置缩放因子
+  // 设置缩放因子 状态的量级
   piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
   // 记录开始时间
