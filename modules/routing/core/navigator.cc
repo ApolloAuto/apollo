@@ -55,8 +55,7 @@ bool ShowRequestInfo(const routing::RoutingRequest& request,
   return true;
 }
 
-bool GetWayNodes(const routing::RoutingRequest& request,
-                 const TopoGraph* graph,
+bool GetWayNodes(const routing::RoutingRequest& request, const TopoGraph* graph,
                  std::vector<const TopoNode*>* const way_nodes,
                  std::vector<double>* const way_s) {
   for (const auto& point : request.waypoint()) {
@@ -124,10 +123,12 @@ bool Navigator::Init(const routing::RoutingRequest& request,
                      std::vector<const TopoNode*>* const way_nodes,
                      std::vector<double>* const way_s) {
   Clear();
+  // 获取routing请求，对应图中的节点
   if (!GetWayNodes(request, graph_.get(), way_nodes, way_s)) {
     AERROR << "Failed to find search terminal point in graph!";
     return false;
   }
+  // 根据请求生成对应的黑名单lane
   black_list_generator_->GenerateBlackMapFromRequest(request, graph_.get(),
                                                      &topo_range_manager_);
   return true;

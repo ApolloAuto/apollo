@@ -61,6 +61,8 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
       routing_conf_(routing_conf) {}
 
 bool GraphCreator::Create() {
+  // 这里注意，有2种格式，一种是Opendrive格式，通过OpendriveAdapter来读取
+  // 另外一种是apollo自己定义的格式。
   if (absl::EndsWith(base_map_file_path_, ".xml")) {
     if (!hdmap::adapter::OpendriveAdapter::LoadData(base_map_file_path_,
                                                     &pbmap_)) {
@@ -75,14 +77,14 @@ bool GraphCreator::Create() {
   }
 
   AINFO << "Number of lanes: " << pbmap_.lane_size();
-
+  // graph_为最后保存的图，消息格式在topo_graph.proto中申明
   graph_.set_hdmap_version(pbmap_.header().version());
   graph_.set_hdmap_district(pbmap_.header().district());
 
   node_index_map_.clear();
   road_id_map_.clear();
   showed_edge_id_set_.clear();
-
+  // 从base_map中读取道路和lane对应关系，base_map的消息结构在map.proto和map_road.proto中
   for (const auto& road : pbmap_.road()) {
     for (const auto& section : road.section()) {
       for (const auto& lane_id : section.lane_id()) {
@@ -90,11 +92,11 @@ bool GraphCreator::Create() {
       }
     }
   }
-
+  // 初始化禁止的车道线，从配置文件中读取最小掉头半径
   InitForbiddenLanes();
   const double min_turn_radius =
       VehicleConfigHelper::GetConfig().vehicle_param().min_turn_radius();
-
+  // 遍历base_map中的lane，并且创建节点。
   for (const auto& lane : pbmap_.lane()) {
     const auto& lane_id = lane.id().id();
     if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
@@ -108,7 +110,12 @@ bool GraphCreator::Create() {
       continue;
     }
     AINFO << "Current lane id: " << lane_id;
+    // 存储图中节点index和lane_id的关系，因为跳过node可以找到lane，
+    // 而通过lane_id需要遍历节点才能找到节点index。
     node_index_map_[lane_id] = graph_.node_size();
+
+    // 如果从road_id_map_中找到lane_id，则把创建节点的时候指定道路id，
+    // 如果没有找到那么road_id则为空。
     const auto iter = road_id_map_.find(lane_id);
     if (iter != road_id_map_.end()) {
       node_creator::GetPbNode(lane, iter->second, routing_conf_,
@@ -120,18 +127,27 @@ bool GraphCreator::Create() {
   }
 
   for (const auto& lane : pbmap_.lane()) {
+    // 遍历base_map中的lane，并且创建边。
     const auto& lane_id = lane.id().id();
+    // 跳过不是城市道路(CITY_DRIVING)的车道
     if (forbidden_lane_id_set_.find(lane_id) != forbidden_lane_id_set_.end()) {
       ADEBUG << "Ignored lane id: " << lane_id
              << " because its type is NOT CITY_DRIVING.";
       continue;
     }
+
+    // 这里就是通过上面所说的通过lane_id找到node的index，得到节点，
+    // 如果不保存，则需要遍历所有节点通过lane_id来查找节点，原因为node中有lane_id，
+    // 而lane结构中没有node_id。
     const auto& from_node = graph_.node(node_index_map_[lane_id]);
 
+    // 添加一条该节点到下一个节点的边，注意这里没有换道，所以方向为前。
     AddEdge(from_node, lane.successor_id(), Edge::FORWARD);
     if (lane.length() < FLAGS_min_length_for_lane_change) {
       continue;
     }
+    // 车道有左边界，并且允许变道
+    // 添加一条该节点到左边邻居的边
     if (lane.has_left_boundary() && IsAllowedToCross(lane.left_boundary())) {
       AddEdge(from_node, lane.left_neighbor_forward_lane_id(), Edge::LEFT);
     }

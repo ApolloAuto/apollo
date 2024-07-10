@@ -35,7 +35,7 @@ bool RoutingComponent::Init() {
 
   AINFO << "Config file: " << cyber::ComponentBase::ConfigFilePath()
         << " is loaded.";
-
+  // 设置消息qos
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name(routing_conf.topic_config().routing_response_topic());
   auto qos = attr.mutable_qos_profile();
@@ -80,7 +80,7 @@ bool RoutingComponent::Init() {
   return routing_.Init().ok() && routing_.Start().ok();
 }
 
-// 收到router请求
+// 收到router请求触发
 bool RoutingComponent::Proc(
     const std::shared_ptr<routing::RoutingRequest>& request) {
   auto response = std::make_shared<routing::RoutingResponse>();
