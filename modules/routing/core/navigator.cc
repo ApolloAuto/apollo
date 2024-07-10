@@ -157,10 +157,12 @@ bool Navigator::SearchRouteByStrategy(
     const std::vector<double>& way_s,
     std::vector<NodeWithRange>* const result_nodes) const {
   std::unique_ptr<Strategy> strategy_ptr;
+  // 通过Astar算法来查找路径
   strategy_ptr.reset(new AStarStrategy(FLAGS_enable_change_lane_in_result));
 
   result_nodes->clear();
   std::vector<NodeWithRange> node_vec;
+  // 编译routing_request节点
   for (size_t i = 1; i < way_nodes.size(); ++i) {
     const auto* way_start = way_nodes[i - 1];
     const auto* way_end = way_nodes[i];
@@ -168,23 +170,29 @@ bool Navigator::SearchRouteByStrategy(
     double way_end_s = way_s[i];
 
     TopoRangeManager full_range_manager = topo_range_manager_;
+    // 添加黑名单，这里主要是把车道根据起点和终点做分割。
     black_list_generator_->AddBlackMapFromTerminal(
         way_start, way_end, way_start_s, way_end_s, &full_range_manager);
 
+    // 因为对车道做了分割，这里会创建子图，比如一个车道分成2个子节点，
+    // 2个子节点会创建一张子图。
     SubTopoGraph sub_graph(full_range_manager.RangeMap());
+
+    // 获取起点
     const auto* start = sub_graph.GetSubNodeWithS(way_start, way_start_s);
     if (start == nullptr) {
       AERROR << "Sub graph node is nullptr, origin node id: "
              << way_start->LaneId() << ", s:" << way_start_s;
       return false;
     }
+    // 获取终点
     const auto* end = sub_graph.GetSubNodeWithS(way_end, way_end_s);
     if (end == nullptr) {
       AERROR << "Sub graph node is nullptr, origin node id: "
              << way_end->LaneId() << ", s:" << way_end_s;
       return false;
     }
-
+    // 通过Astar查找最优路径
     std::vector<NodeWithRange> cur_result_nodes;
     if (!strategy_ptr->Search(graph, &sub_graph, start, end,
                               &cur_result_nodes)) {
@@ -192,11 +200,11 @@ bool Navigator::SearchRouteByStrategy(
              << " to " << end->LaneId();
       return false;
     }
-
+    // 保存结果到node_vec
     node_vec.insert(node_vec.end(), cur_result_nodes.begin(),
                     cur_result_nodes.end());
   }
-
+  // 合并Route
   if (!MergeRoute(node_vec, result_nodes)) {
     AERROR << "Failed to merge route.";
     return false;

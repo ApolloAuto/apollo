@@ -179,13 +179,15 @@ bool Reconstruct(
     const std::unordered_map<const TopoNode*, const TopoNode*>& came_from,
     const TopoNode* dest_node, std::vector<NodeWithRange>* result_nodes) {
   std::vector<const TopoNode*> result_node_vec;
+  // 终点设置为第一个搜索点
   result_node_vec.push_back(dest_node);
-
+  // 从search 获取came_from的map中搜索路径车道ID
   auto iter = came_from.find(dest_node);
   while (iter != came_from.end()) {
     result_node_vec.push_back(iter->second);
     iter = came_from.find(iter->second);
   }
+  // 路线反转，生成顺序正确的路线信息
   std::reverse(result_node_vec.begin(), result_node_vec.end());
   if (!AdjustLaneChange(&result_node_vec)) {
     AERROR << "Failed to adjust lane change";
@@ -221,43 +223,49 @@ double AStarStrategy::HeuristicCost(const TopoNode* src_node,
   return distance;
 }
 
+// 输入:起点、终点、读取的拓扑地图以及根据起点终点生成的子拓扑图、到起点到达终点的点集：
 bool AStarStrategy::Search(const TopoGraph* graph,
                            const SubTopoGraph* sub_graph,
                            const TopoNode* src_node, const TopoNode* dest_node,
                            std::vector<NodeWithRange>* const result_nodes) {
   Clear();
   AINFO << "Start A* search algorithm.";
-
+  // 该优先列表将f最小的值作为最优点
   std::priority_queue<SearchNode> open_set_detail;
-
+  // 将地图选取的起点作为搜索的第一个点,计算起点到终点的代价值(曼哈顿距离)并作为f
   SearchNode src_search_node(src_node);
   src_search_node.f = HeuristicCost(src_node, dest_node);
+  // 将该点加入到开放列表之中
   open_set_detail.push(src_search_node);
-
   open_set_.insert(src_node);
   g_score_[src_node] = 0.0;
   enter_s_[src_node] = src_node->StartS();
-
+  // 定义当前节点
   SearchNode current_node;
   std::unordered_set<const TopoEdge*> next_edge_set;
   std::unordered_set<const TopoEdge*> sub_edge_set;
   while (!open_set_detail.empty()) {
+    // 若open集非空,选取最优的为当前节点,开始搜索
     current_node = open_set_detail.top();
     const auto* from_node = current_node.topo_node;
+    // 若当前点等于目标点,结束搜索
     if (current_node.topo_node == dest_node) {
+      // ReconstructL:从终点到起点进行反向搜索，获取轨迹点
       if (!Reconstruct(came_from_, from_node, result_nodes)) {
         AERROR << "Failed to reconstruct route.";
         return false;
       }
       return true;
     }
+    // 将当前点从搜索点集中清除
     open_set_.erase(from_node);
     open_set_detail.pop();
-
+    // 跳过closed集中添加的点
     if (closed_set_.count(from_node) != 0) {
       // if showed before, just skip...
       continue;
     }
+    // 将当前点添加到closed集中
     closed_set_.emplace(from_node);
 
     // if residual_s is less than FLAGS_min_length_for_lane_change, only move
@@ -277,18 +285,24 @@ bool AStarStrategy::Search(const TopoGraph* graph,
 
     for (const auto* edge : next_edge_set) {
       const auto* to_node = edge->ToNode();
+      // 跳过closed集中的点
       if (closed_set_.count(to_node) == 1) {
         continue;
       }
+      // 跳过不能换到到达的点
       if (GetResidualS(edge, to_node) < FLAGS_min_length_for_lane_change) {
         continue;
       }
+      // 将当前节点的g值和能够达到的点的cost值相加
+      // GetCostToNeighbor返回相邻节点的cost和边edge的cost
       tentative_g_score =
           g_score_[current_node.topo_node] + GetCostToNeighbor(edge);
+      // 若下一点需要换道才能到达,cost会减少部分值
       if (edge->Type() != TopoEdgeType::TET_FORWARD) {
         tentative_g_score -=
             (edge->FromNode()->Cost() + edge->ToNode()->Cost()) / 2;
       }
+      // 计算能够达到点的f值
       double f = tentative_g_score + HeuristicCost(to_node, dest_node);
       if (open_set_.count(to_node) != 0 && f >= g_score_[to_node]) {
         continue;
@@ -311,10 +325,12 @@ bool AStarStrategy::Search(const TopoGraph* graph,
       }
 
       g_score_[to_node] = f;
+      // 初始化下一节点
       SearchNode next_node(to_node);
       next_node.f = f;
       open_set_detail.push(next_node);
       came_from_[to_node] = from_node;
+      // 将能够达到的点加入open集
       if (open_set_.count(to_node) == 0) {
         open_set_.insert(to_node);
       }
