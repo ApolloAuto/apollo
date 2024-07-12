@@ -130,55 +130,55 @@ std::vector<routing::RoutingRequest> Routing::FillLaneInfoIfMissing(
   }
   return fixed_requests;
 
-// 处理路由请求并返回相应的路由响应
-bool Routing::Process(
-    // 该函数接受一个指向RoutingRequest对象的智能指针作为参数
-    const std::shared_ptr<routing::RoutingRequest>& routing_request,
-    // 该函数返回一个指向RoutingResponse对象的指针
-    routing::RoutingResponse* const routing_response) {
-  // 首先检查传入的路由请求是否为空
-  if (nullptr == routing_request) {
-    AWARN << "Routing request is empty!";
-    // 如果为空，返回true并结束函数
-    return true;
-  }
-  // 接着检查传入的路由响应是否为空
-  CHECK_NOTNULL(routing_response);
-  // 记录接收到的路由请求
-  AINFO << "Get new routing request:" << routing_request->DebugString();
+  // 处理路由请求并返回相应的路由响应
+  bool Routing::Process(
+      // 该函数接受一个指向RoutingRequest对象的智能指针作为参数
+      const std::shared_ptr<routing::RoutingRequest>& routing_request,
+      // 该函数返回一个指向RoutingResponse对象的指针
+      routing::RoutingResponse* const routing_response) {
+    // 首先检查传入的路由请求是否为空
+    if (nullptr == routing_request) {
+      AWARN << "Routing request is empty!";
+      // 如果为空，返回true并结束函数
+      return true;
+    }
+    // 接着检查传入的路由响应是否为空
+    CHECK_NOTNULL(routing_response);
+    // 记录接收到的路由请求
+    AINFO << "Get new routing request:" << routing_request->DebugString();
 
-  // 填充缺失的车道信息，并返回一组新的路由请求
-  const auto& fixed_requests = FillLaneInfoIfMissing(*routing_request);
-  // 定义一个变量来存储最短的路由长度
-  double min_routing_length = std::numeric_limits<double>::max();
-  // 迭代处理每一个新的路由请求
-  for (const auto& fixed_request : fixed_requests) {
-    // 为每一个新的路由请求创建一个路由响应
-    routing::RoutingResponse routing_response_temp;
-    // 在导航器中搜索路由并将结果存储在临时路由响应中
-    if (navigator_ptr_->SearchRoute(fixed_request, &routing_response_temp)) {
-      // 计算临时路由响应的路由长度
-      const double routing_length =
-          routing_response_temp.measurement().distance();
-      // 如果路由长度小于目前存储的最短路由长度，则更新最短路由长度和路由响应
-      if (routing_length < min_routing_length) {
-        routing_response->CopyFrom(routing_response_temp);
-        min_routing_length = routing_length;
+    // 填充缺失的车道信息，并返回一组新的路由请求
+    const auto& fixed_requests = FillLaneInfoIfMissing(*routing_request);
+    // 定义一个变量来存储最短的路由长度
+    double min_routing_length = std::numeric_limits<double>::max();
+    // 迭代处理每一个新的路由请求
+    for (const auto& fixed_request : fixed_requests) {
+      // 为每一个新的路由请求创建一个路由响应
+      routing::RoutingResponse routing_response_temp;
+      // 在导航器中搜索路由并将结果存储在临时路由响应中
+      if (navigator_ptr_->SearchRoute(fixed_request, &routing_response_temp)) {
+        // 计算临时路由响应的路由长度
+        const double routing_length =
+            routing_response_temp.measurement().distance();
+        // 如果路由长度小于目前存储的最短路由长度，则更新最短路由长度和路由响应
+        if (routing_length < min_routing_length) {
+          routing_response->CopyFrom(routing_response_temp);
+          min_routing_length = routing_length;
+        }
       }
     }
-  }
-  // 如果找到了最短的路由，则记录路由成功并返回true
-  if (min_routing_length < std::numeric_limits<double>::max()) {
-    monitor_logger_buffer_.INFO("Routing success!");
-    return true;
-  }
+    // 如果找到了最短的路由，则记录路由成功并返回true
+    if (min_routing_length < std::numeric_limits<double>::max()) {
+      monitor_logger_buffer_.INFO("Routing success!");
+      return true;
+    }
 
-  // 如果没有找到最短的路由，则记录路由失败并返回false
-  AERROR << "Failed to search route with navigator.";
-  monitor_logger_buffer_.WARN("Routing failed! " +
-                              routing_response->status().msg());
-  return false;
-}
+    // 如果没有找到最短的路由，则记录路由失败并返回false
+    AERROR << "Failed to search route with navigator.";
+    monitor_logger_buffer_.WARN("Routing failed! " +
+                                routing_response->status().msg());
+    return false;
+  }
 
 }  // namespace routing
 }  // namespace apollo

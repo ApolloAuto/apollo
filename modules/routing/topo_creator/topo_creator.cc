@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
-  const auto base_map = apollo::hdmap::BaseMapFile();
+  const auto base_map = apollo::hdmap::BaseMapFile();  // string, store file dir
   const auto routing_map = apollo::hdmap::RoutingMapFile();
 
   apollo::routing::GraphCreator creator(base_map, routing_map, routing_conf);
