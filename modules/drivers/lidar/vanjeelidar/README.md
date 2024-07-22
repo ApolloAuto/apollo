@@ -2,7 +2,7 @@
 
 ## 1 Introduction
 
- **vanjee**  is the lidar driver kit under Apollo platform. Now support *vanjee_720_16  vanjee_720d_16  vanjee_720_32* . 
+ **vanjee**  is the lidar driver kit under Apollo platform. Now support *vanjee_720_16","vanjee_720_32*.
 
 
 ## 2 Run
@@ -13,15 +13,15 @@
 cyber_launch start /apollo/modules/drivers/lidar/vanjeelidar/launch/vanjeelidar.launch
 ```
 
-或
+or
 
 ```sh
 mainboard -d /apollo/modules/drivers/lidar/vanjeelidar/dag/vanjeelidar.dag
 ```
 
-默认话题名：
+default topic name：
 
-- 原始点云 -- /apollo/sensor/vanjeelidar/up/PointCloud2"
+- raw point cloud -- /apollo/sensor/vanjeelidar/up/PointCloud2"
 - Scan--/apollo/sensor/vanjeelidar/up/Scan
 
 ## 3 Parameters Intro

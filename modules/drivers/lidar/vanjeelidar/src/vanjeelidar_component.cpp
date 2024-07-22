@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <vector>
 
+#include <vector>
 #include "modules/drivers/lidar/vanjeelidar/src/vanjeelidar_component.h"
 
 #include <vanjee_driver/driver/input/input.hpp>
@@ -64,7 +64,6 @@ bool VanjeelidarComponent::Init() {
   driver_param.decoder_param = decoder_param;
 
   driver_param.lidar_type = ::vanjee::lidar::strToLidarType(conf_.model());
-  driver_param.decoder_param.lidar_type = driver_param.lidar_type;
   if (conf_.config_base().source_type() ==
       LidarConfigBase_SourceType_RAW_PACKET) {
     driver_param.input_type = InputType::RAW_PACKET;

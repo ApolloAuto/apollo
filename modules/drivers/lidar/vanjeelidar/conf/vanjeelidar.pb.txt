@@ -7,7 +7,7 @@ config_base {
   source_type: ONLINE_LIDAR
 }
 
-# sample: "vanjee_720_16,vanjee_720d_16,vanjee_720_32"
+# sample: "vanjee_720_16,vanjee_720_32"
 model: "vanjee_720_16"
 connect_type: 1
 host_msop_port: 3001
@@ -23,4 +23,4 @@ use_lidar_clock: false
 dense_points: false
 wait_for_difop: true
 config_from_file: false
-angle_path: ""
+angle_path: "/usr/local/include/vanjee_driver/param/Vanjee_720_16.csv"

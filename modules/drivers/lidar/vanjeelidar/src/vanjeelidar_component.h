@@ -33,8 +33,8 @@ namespace apollo {
 namespace drivers {
 namespace lidar {
 
-typedef PointXYZIRT PointT;
-typedef PointCloudT<PointT> PointCloudMsg;
+typedef ::vanjee::lidar::PointXYZIRT PointT;
+typedef ::vanjee::lidar::PointCloudT<PointT> PointCloudMsg;
 
 using ::vanjee::lidar::InputType;
 
