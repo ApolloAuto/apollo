@@ -7,7 +7,7 @@ proto_library(
     name = "seyond_config_proto",
     srcs = ["seyond_config.proto"],
     deps = [
-        ":seyond_proto",
+        "//modules/drivers/lidar/common/proto:lidar_config_base_proto",
     ],
 )
 

@@ -12,9 +12,6 @@ message SeyondPacket {
 
 message SeyondScan {
   optional uint64 timestamp = 1;
-  optional uint32 sequence_num = 2;
-  optional double measurement_time = 3;
-  optional bool is_last_scan = 4;
-  optional uint32 size = 5;
-  repeated SeyondPacket packets = 6;
+  optional double measurement_time = 2;
+  repeated SeyondPacket packets = 3;
 }

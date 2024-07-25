@@ -16,21 +16,21 @@ filegroup(
 )
 
 apollo_component(
-    name = "libseyond_driver_component.so",
+    name = "libseyond_component.so",
     srcs = [
-        "driver/seyond_component.cc",
-        "driver/seyond_driver.cc",
+        "src/seyond_component.cpp",
+        "src/seyond_driver.cpp",
     ],
     hdrs = [
-        "driver/seyond_component.h",
-        "driver/seyond_driver.h",
+        "src/seyond_component.h",
+        "src/seyond_driver.h",
     ],
     copts = SEYOND_COPTS + ['-std=c++17'],
     deps = [
-        "//cyber",
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
-        "//modules/drivers/lidar/seyond/proto:seyond_cc_proto",
-        "//modules/drivers/lidar/seyond/proto:seyond_config_cc_proto",
+        "//modules/drivers/lidar/seyond/proto:seyond_config_proto",
+        "//modules/drivers/lidar/seyond/proto:seyond_proto",
+        "//modules/drivers/lidar/common:lidar_common",
     ],
     linkopts = [
         "-linnoclientsdk",

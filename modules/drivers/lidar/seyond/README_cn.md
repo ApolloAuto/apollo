@@ -26,12 +26,6 @@ mainboard -d /apollo/modules/drivers/lidar/seyond/dag/seyond.dag
 ## 3 参数介绍
 | 参数                | 默认值        | 描述  |
 | :--------:         | :---------:  | :---------:   |
-| source_type        | ONLINE_LIDAR | 源类型: ONLINE_LIDAR/RAW_PACKET   |
-| scan_channel       | -            | Scan channle名称   |
-| pointcloud_channel | -            | 点云 channel名称   |
-| frame_id           | seyond       | frame_id   |
-| direct_mode        | false        | 跳过Scan通道，直接发布点云模式   |
-| aggregate_num      | 100          | Scan通道发布聚合包数量   |
 | device_ip          | 172.168.1.10 | 雷达 ip   |
 | port               | 8010         | tcp 端口   |
 | udp_port           | 8010         | udp端口，若<0, 使用tcp传输   |

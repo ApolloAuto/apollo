@@ -24,10 +24,9 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "cyber/time/time.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/seyond/proto/seyond.pb.h"
-#include "modules/drivers/lidar/seyond/proto/seyond_config.pb.h"
+
 #include "seyond/sdk_common/inno_lidar_api.h"
 #include "seyond/sdk_common/inno_lidar_other_api.h"
 #include "seyond/sdk_common/inno_lidar_packet.h"
@@ -35,20 +34,43 @@
 
 namespace apollo {
 namespace drivers {
-namespace seyond {
+namespace lidar {
 
-using apollo::cyber::Node;
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::PointXYZIT;
-using apollo::drivers::seyond::SeyondPacket;
-using apollo::drivers::seyond::SeyondScan;
+
+struct SeyondParam {
+  std::string device_ip = "";
+  uint32_t port;
+  uint32_t udp_port;
+  bool reflectance_mode;
+  uint32_t multiple_return;
+  uint32_t coordinate_mode;
+  double max_range;
+  double min_range;
+  std::string log_level = "";
+  bool raw_packets_mode = false;
+
+  void print() const {
+    inno_log_info("------------------------------------------------------");
+    inno_log_info("             Seyond Lidar Parameters ");
+    inno_log_info("device_ip: %s", device_ip.c_str());
+    inno_log_info("port: %d", port);
+    inno_log_info("udp_port: %d", udp_port);
+    inno_log_info("reflectance_mode: %d", reflectance_mode);
+    inno_log_info("multiple_return: %d", multiple_return);
+    inno_log_info("coordinate_mode: %d", coordinate_mode);
+    inno_log_info("max_range: %f", max_range);
+    inno_log_info("min_range: %f", min_range);
+    inno_log_info("log_level: %s", log_level.c_str());
+    inno_log_info("raw_packets_mode: %d", raw_packets_mode);
+    inno_log_info("------------------------------------------------------");
+  }
+};
 
 class SeyondDriver {
  public:
-  explicit SeyondDriver(const std::shared_ptr<apollo::cyber::Node> &node,
-                        const apollo::drivers::seyond::Config &seyond_conf);
+  SeyondDriver();
   ~SeyondDriver();
 
   static int32_t data_callback_s_(int32_t handle_, void *ctx,
@@ -76,17 +98,17 @@ class SeyondDriver {
     (reinterpret_cast<SeyondDriver *>(ctx))->log_callback_(level, header2, msg);
   }
 
-  static double apollo_get_time_in_second_s(void *) {
-    apollo::cyber::Time current_time = apollo::cyber::Time::Now();
-    double ret = current_time.ToSecond();
-    return ret;
-  }
-
   // lidar configuration
-  void setup_param();
-  bool init_lidar();
-  int32_t set_input_parameter_();
-  bool init();
+  void register_publish_packet_callback(
+      const std::function<void(const InnoDataPacket *, bool)>
+          &callback) {
+    packet_publish_cb_ = callback;
+  }
+  void register_publish_point_callback(const std::function<void()> &callback) {
+    point_publish_cb_ = callback;
+  }
+  bool setup_lidar();
+  bool init(SeyondParam& param);
   bool start();
   bool pause();
   bool stop();
@@ -101,51 +123,27 @@ class SeyondDriver {
   void log_callback_(enum InnoLogLevel level, const char *header2,
                      const char *msg);
 
-  int32_t process_packets_and_publish_frame_(const InnoDataPacket *pkt);
-  int32_t collect_packets_and_publish_packets_(const InnoDataPacket *pkt);
   int32_t process_scan_packet_(
-      const std::shared_ptr<SeyondScan> &lidar_packets);
+      const std::shared_ptr<seyond::SeyondScan> &lidar_packets);
   void convert_and_parse_(const InnoDataPacket *pkt);
   int32_t process_data_packet_(const InnoDataPacket *pkt);
   template <typename PointType>
   void process_xyz_point_data_(bool is_en_data, bool is_use_refl,
                                uint32_t point_num, PointType point_ptr);
 
- private:
+ public:
   // apollo
-  std::shared_ptr<::apollo::cyber::Node> node_ptr_{nullptr};
-  apollo::drivers::seyond::Config conf_;
-  std::string pointcloud_channel_{"/apollo/sensor/seyond/PointCloud2"};
-  std::string scan_channel_{"/apollo/sensor/seyond/Scan"};
-  std::shared_ptr<Writer<SeyondScan>> scan_writer_ptr_{nullptr};
-  std::shared_ptr<Reader<SeyondScan>> scan_reader_ptr_{nullptr};
-  std::shared_ptr<Writer<PointCloud>> pcd_writer_ptr_{nullptr};
-  std::shared_ptr<SeyondScan> scan_packets_ptr_{nullptr};
   std::shared_ptr<PointCloud> point_cloud_ptr_{nullptr};
 
+  std::function<void(const InnoDataPacket *, bool)> packet_publish_cb_;
+  std::function<void()> point_publish_cb_;
+
   // config
+  SeyondParam param_;
   int32_t handle_{-1};
-  std::string lidar_name_{"seyond"};
-  std::string frame_id_{"seyond"};
-  std::string device_ip_{"172.168.1.10"};
-  uint32_t port_{8010};
-  bool reflectance_mode_{false};
-  uint32_t multiple_return_{1};
-  uint32_t coordinate_mode_{3};
-  bool direct_mode_{false};
-  bool raw_packets_mode_{false};
-  uint32_t aggregate_packets_num_{100};
-
-  double max_range_{2000.0};
-  double min_range_{0.4};
-
-  std::string log_level_{"info"};
-
-  int32_t udp_port_{8010};
+  std::string lidar_name_{"seyond_lidar"};
 
   // for robinw-generic
-  uint32_t table_send_hz_{10};
-  uint32_t frame_count_{0};
   bool anglehv_table_init_{false};
   std::vector<char> anglehv_table_;
 
@@ -157,6 +155,6 @@ class SeyondDriver {
   std::vector<uint8_t> convert_buffer_;
 };
 
-}  // namespace seyond
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo

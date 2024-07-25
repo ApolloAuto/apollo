@@ -17,33 +17,42 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
-
-#include "modules/drivers/lidar/seyond/driver/seyond_driver.h"
+#include "modules/drivers/lidar/seyond/src/seyond_driver.h"
+#include "modules/drivers/lidar/seyond/proto/seyond.pb.h"
 #include "modules/drivers/lidar/seyond/proto/seyond_config.pb.h"
 
-
+#include "modules/drivers/lidar/common/lidar_component_base.h"
+#include "modules/drivers/lidar/common/sync_buffering.h"
+#include "modules/drivers/lidar/common/util.h"
 
 namespace apollo {
 namespace drivers {
-namespace seyond {
+namespace lidar {
 
-using apollo::cyber::Component;
-using apollo::cyber::ComponentBase;
-
-class SeyondComponent : public ::apollo::cyber::Component<> {
+class SeyondComponent
+    : public LidarComponentBase<seyond::SeyondScan> {
  public:
-  ~SeyondComponent() {
-  }
   bool Init() override;
 
- private:
-  std::shared_ptr<SeyondDriver> driver_{nullptr};
-  apollo::drivers::seyond::Config seyond_conf_;
-};
+  void ReadScanCallback(
+      const std::shared_ptr<seyond::SeyondScan>& scan_message) override;
 
+  void PointCloudCallback();
+
+  void SeyondPacketCallback(const InnoDataPacket *pkt, bool is_next_frame);
+
+
+ private:
+  std::shared_ptr<SeyondDriver> driver_ptr_;
+  apollo::drivers::seyond::Config conf_;
+
+  std::shared_ptr<seyond::SeyondScan> scan_packets_ptr_{nullptr};
+
+  uint32_t table_send_hz_{10};
+  uint32_t frame_count_{0};
+};
 CYBER_REGISTER_COMPONENT(SeyondComponent)
 
-}  // namespace seyond
+}  // namespace lidar
 }  // namespace drivers
 }  // namespace apollo

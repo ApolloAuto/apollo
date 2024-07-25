@@ -2,24 +2,20 @@ syntax = "proto2";
 
 package apollo.drivers.seyond;
 
+import "modules/drivers/lidar/common/proto/lidar_config_base.proto";
+
 message Config {
-  enum SourceType {
-    ONLINE_LIDAR = 0;
-    RAW_PACKET = 1;
-  }
-  required SourceType source_type = 1;
-  optional string scan_channel = 2;
-  optional string pointcloud_channel = 3;
-  optional string frame_id = 4 [default = "seyond"];
-  optional bool direct_mode = 5 [default = false];
-  optional uint32 aggregate_num = 6 [default = 50];
-  optional string device_ip = 7 [default = "172.168.1.10"];
-  optional uint32 port = 8 [default = 8010];
-  optional int32 udp_port = 9 [default = 8010];
-  optional bool reflectance_mode = 10 [default = false];
-  optional uint32 multiple_return = 11 [default = 0];
-  optional uint32 coordinate_mode = 12 [default = 3];
-  optional double max_range = 13 [default = 2000.0];
-  optional double min_range = 14 [default = 0.4];
-  optional string log_level = 15 [default = "info"];
+
+  // lidar base
+  required apollo.drivers.lidar.LidarConfigBase config_base = 1;
+
+  optional string device_ip = 2 [default = "172.168.1.10"];
+  optional uint32 port = 3 [default = 8010];
+  optional int32 udp_port = 4 [default = 8010];
+  optional bool reflectance_mode = 5 [default = false];
+  optional uint32 multiple_return = 6 [default = 0];
+  optional uint32 coordinate_mode = 7 [default = 3];
+  optional double max_range = 8 [default = 2000.0];
+  optional double min_range = 9 [default = 0.4];
+  optional string log_level = 10 [default = "info"];
 }
