@@ -22,6 +22,9 @@ namespace apollo {
 namespace drivers {
 namespace lidar {
 
+std::function<void(int32_t, const char *, const char *)>
+    SeyondDriver::log_cb_s_ = nullptr;
+
 static void coordinate_transfer(PointXYZIT *point, uint32_t coordinate_mode,
                                 float x, float y, float z) {
   switch (coordinate_mode) {
@@ -139,8 +142,7 @@ bool SeyondDriver::setup_lidar() {
 bool SeyondDriver::init(SeyondParam& param) {
   param_ = param;
   set_log_and_message_level();
-  inno_lidar_setup_sig_handler();
-  inno_lidar_set_logs(-1, -1, NULL, 0, 0, log_callback_s_, this, NULL, 0, 0, 1);
+  inno_lidar_set_logs(-1, -1, NULL, 0, 0, log_callback_s_, NULL, NULL, 0, 0, 1);
   return true;
 }
 
@@ -216,31 +218,6 @@ int32_t SeyondDriver::status_callback_(const InnoStatusPacket *pkt) {
   return 0;
 }
 
-void SeyondDriver::log_callback_(enum InnoLogLevel level, const char *header2,
-                                 const char *msg) {
-  switch (level) {
-    case INNO_LOG_LEVEL_FATAL:
-    case INNO_LOG_LEVEL_CRITICAL:
-      AERROR << header2 << " " << msg;
-      break;
-    case INNO_LOG_LEVEL_ERROR:
-    case INNO_LOG_LEVEL_TEMP:
-      AERROR << header2 << " " << msg;
-      break;
-    case INNO_LOG_LEVEL_WARNING:
-    case INNO_LOG_LEVEL_DEBUG:
-      AWARN << header2 << " " << msg;
-      break;
-    case INNO_LOG_LEVEL_INFO:
-      AINFO << header2 << " " << msg;
-      break;
-    case INNO_LOG_LEVEL_TRACE:
-    case INNO_LOG_LEVEL_DETAIL:
-    default:
-      AINFO << header2 << " " << msg;
-  }
-}
-
 int32_t SeyondDriver::data_callback_(const InnoDataPacket *pkt) {
   // get first frame id
   if (current_frame_id_ == -1) {
@@ -273,7 +250,8 @@ int32_t SeyondDriver::data_callback_(const InnoDataPacket *pkt) {
     point_cloud_ptr_->set_height(1);
     point_cloud_ptr_->set_width(frame_points_width_);
     // data publish
-    point_publish_cb_();
+    cloud_publish_cb_(point_cloud_ptr_);
+    point_cloud_ptr_ = allocate_cloud_cb_();
     current_frame_id_ = pkt->idx;
     frame_points_width_ = 0;
   }
@@ -313,7 +291,8 @@ int32_t SeyondDriver::process_scan_packet_(
   point_cloud_ptr_->set_height(1);
   point_cloud_ptr_->set_width(frame_points_width_);
   frame_points_width_ = 0;
-  point_publish_cb_();
+  cloud_publish_cb_(point_cloud_ptr_);
+  point_cloud_ptr_ = allocate_cloud_cb_();
 
   return 0;
 }

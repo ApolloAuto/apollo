@@ -37,10 +37,14 @@ class SeyondComponent
   void ReadScanCallback(
       const std::shared_ptr<seyond::SeyondScan>& scan_message) override;
 
-  void PointCloudCallback();
+  void SeyondCloudCallback(std::shared_ptr<PointCloud> cloud);
 
   void SeyondPacketCallback(const InnoDataPacket *pkt, bool is_next_frame);
 
+  std::shared_ptr<PointCloud> SeyondCloudAllocateCallback();
+
+  static void SeyondLogCallback(int32_t level, const char *header,
+                                const char *msg);
 
  private:
   std::shared_ptr<SeyondDriver> driver_ptr_;

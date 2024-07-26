@@ -23,7 +23,6 @@
 #include <thread>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/seyond/proto/seyond.pb.h"
 
@@ -95,7 +94,7 @@ class SeyondDriver {
   static void log_callback_s_(void *ctx, enum InnoLogLevel level,
                               const char *header1, const char *header2,
                               const char *msg) {
-    (reinterpret_cast<SeyondDriver *>(ctx))->log_callback_(level, header2, msg);
+    SeyondDriver::log_cb_s_(static_cast<int32_t>(level), header1, msg);
   }
 
   // lidar configuration
@@ -104,8 +103,17 @@ class SeyondDriver {
           &callback) {
     packet_publish_cb_ = callback;
   }
-  void register_publish_point_callback(const std::function<void()> &callback) {
-    point_publish_cb_ = callback;
+  void register_publish_point_callback(
+      const std::function<void(std::shared_ptr<PointCloud>)> &cloud_callback,
+      const std::function<std::shared_ptr<PointCloud>()> &allocate_callback) {
+    cloud_publish_cb_ = cloud_callback;
+    allocate_cloud_cb_ = allocate_callback;
+    point_cloud_ptr_ = allocate_cloud_cb_();
+  }
+  void register_log_callback(
+      const std::function<void(int32_t, const char *, const char *)>
+          &log_callback) {
+    log_cb_s_ = log_callback;
   }
   bool setup_lidar();
   bool init(SeyondParam& param);
@@ -120,8 +128,6 @@ class SeyondDriver {
   int32_t status_callback_(const InnoStatusPacket *pkt);
 
   void set_log_and_message_level();
-  void log_callback_(enum InnoLogLevel level, const char *header2,
-                     const char *msg);
 
   int32_t process_scan_packet_(
       const std::shared_ptr<seyond::SeyondScan> &lidar_packets);
@@ -132,20 +138,24 @@ class SeyondDriver {
                                uint32_t point_num, PointType point_ptr);
 
  public:
+  // for generic
+  bool anglehv_table_init_{false};
+  std::vector<char> anglehv_table_;
+
+ private:
   // apollo
   std::shared_ptr<PointCloud> point_cloud_ptr_{nullptr};
 
   std::function<void(const InnoDataPacket *, bool)> packet_publish_cb_;
-  std::function<void()> point_publish_cb_;
+  std::function<void(std::shared_ptr<PointCloud>)> cloud_publish_cb_;
+  std::function<std::shared_ptr<PointCloud>()> allocate_cloud_cb_;
+
+  static std::function<void(int32_t, const char*, const char*)> log_cb_s_;
 
   // config
   SeyondParam param_;
   int32_t handle_{-1};
   std::string lidar_name_{"seyond_lidar"};
-
-  // for robinw-generic
-  bool anglehv_table_init_{false};
-  std::vector<char> anglehv_table_;
 
   // frame status
   uint32_t packets_width_{0};

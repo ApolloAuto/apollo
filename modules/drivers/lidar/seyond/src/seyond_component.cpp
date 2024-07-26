@@ -25,8 +25,9 @@ bool SeyondComponent::Init() {
     return false;
   }
 
-  driver_ptr_ = std::make_shared<SeyondDriver>();
   this->InitBase(conf_.config_base());
+
+  driver_ptr_ = std::make_shared<SeyondDriver>();
 
   SeyondParam driver_param;
   driver_param.device_ip = conf_.device_ip();
@@ -44,17 +45,20 @@ bool SeyondComponent::Init() {
     driver_param.raw_packets_mode = true;
   }
 
+  driver_ptr_->register_log_callback(&SeyondComponent::SeyondLogCallback);
+
   driver_ptr_->register_publish_packet_callback(
         std::bind(&SeyondComponent::SeyondPacketCallback, this,
                   std::placeholders::_1, std::placeholders::_2));
 
   driver_ptr_->register_publish_point_callback(
-        std::bind(&SeyondComponent::PointCloudCallback, this));
+      std::bind(&SeyondComponent::SeyondCloudCallback, this,
+                std::placeholders::_1),
+      std::bind(&SeyondComponent::SeyondCloudAllocateCallback, this));
 
   driver_param.print();
 
   scan_packets_ptr_ = std::make_shared<seyond::SeyondScan>();
-  driver_ptr_->point_cloud_ptr_ = AllocatePointCloud();
 
   if (!driver_ptr_->init(driver_param)) {
     AERROR << "seyond Driver init failed";
@@ -74,9 +78,12 @@ void SeyondComponent::ReadScanCallback(
   driver_ptr_->process_scan_packet_(scan_message);
 }
 
-void SeyondComponent::PointCloudCallback() {
-  WritePointCloud(driver_ptr_->point_cloud_ptr_);
-  driver_ptr_->point_cloud_ptr_ = AllocatePointCloud();
+void SeyondComponent::SeyondCloudCallback(std::shared_ptr<PointCloud> cloud) {
+  WritePointCloud(cloud);
+}
+
+std::shared_ptr<PointCloud> SeyondComponent::SeyondCloudAllocateCallback() {
+  return AllocatePointCloud();
 }
 
 void SeyondComponent::SeyondPacketCallback(const InnoDataPacket *pkt,
@@ -99,6 +106,24 @@ void SeyondComponent::SeyondPacketCallback(const InnoDataPacket *pkt,
     scan_packet->set_table_exist(true);
     scan_packet->mutable_table()->assign(driver_ptr_->anglehv_table_.data(),
                                          driver_ptr_->anglehv_table_.size());
+  }
+}
+
+void SeyondComponent::SeyondLogCallback(int32_t level, const char *header,
+                                        const char *msg) {
+  switch (level) {
+    case 0:  // INNO_LOG_LEVEL_FATAL
+    case 1:  // INNO_LOG_LEVEL_CRITICAL
+    case 2:  // INNO_LOG_LEVEL_ERROR
+    case 3:  // INNO_LOG_LEVEL_TEMP
+      AERROR << header << " " << msg;
+      break;
+    case 4:  // INNO_LOG_LEVEL_WARNING
+    case 5:  // INNO_LOG_LEVEL_DEBUG
+      AWARN << header << " " << msg;
+      break;
+    default:
+      AINFO << header << " " << msg;
   }
 }
 
