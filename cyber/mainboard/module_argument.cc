@@ -37,7 +37,7 @@ void ModuleArgument::DisplayUsage() {
         << "    --plugin=plugin_description_file_path: the description file of "
            "plugin\n"
         << "    --disable_plugin_autoload : default enable autoload "
-           "mode of plugins, use disable_plugin_autoload to ingore autoload\n"
+           "mode of plugins, use disable_plugin_autoload to ignore autoload\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
         << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "

@@ -69,7 +69,7 @@ class ParameterClient {
    * @brief Set the Parameter object
    *
    * @param parameter parameter to be set
-   * @return true set parameter succues
+   * @return true set parameter success
    * @return false 1. call service timeout
    *               2. parameter not exists
    *               The corresponding log will be recorded at the same time
