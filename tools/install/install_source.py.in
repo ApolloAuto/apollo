@@ -230,7 +230,7 @@ def install_src_file():
                 dst_full = src_install_dirs_dict[file_filter][i]["dst"]
                 if not os.path.exists(dst_full):
                     os.makedirs(dst_full)
-                if file_filter == "*.h":
+                if file_filter == "*.h*":
                     # prevent header of proto being deleted
                     shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
                         .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))
@@ -242,7 +242,7 @@ def install_src_file():
             dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
             if not os.path.exists(dst_full):
                 os.makedirs(dst_full)
-            if file_filter == "*.h":
+            if file_filter == "*.h*":
                 # prevent header of proto being deleted
                 shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
                     .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
