@@ -1,17 +1,17 @@
 data {
-    # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT
-    format: NOVATEL_BINARY
+    # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT,FORSENSE_TEXT
+    format: HUACE_TEXT
 
     # protocol optional: serial, tcp, udp, ntrip, can_card_parameter
     serial {
-        device: "/dev/ttyACM0"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate:460800
     }
 
     # tcp, udp: e.g.
     #tcp {
     #    address: "192.168.10.100"
-    #    port: 9904
+    #    baud_rate:460800
     #}
 
     # can_card_parameter: e.g.
@@ -37,18 +37,18 @@ data {
 #}
 
 rtk_to {
-    format: NOVATEL_BINARY
+    format: HUACE_TEXT
     serial {
-        device: "/dev/ttyACM1"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate:460800
     }
 }
 
 command {
-    format: NOVATEL_BINARY
+    format: HUACE_TEXT
     serial {
-        device: "/dev/ttyACM2"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate:460800
     }
 }
 
@@ -58,7 +58,7 @@ proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no
 
 tf {
     frame_id: "world"
-    child_frame_id: "novatel"
+    child_frame_id: "HUACE_TEXT"
     enable: true
 }
 
