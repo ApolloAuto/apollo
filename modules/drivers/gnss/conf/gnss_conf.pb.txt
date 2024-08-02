@@ -1,6 +1,6 @@
 data {
     # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT,FORSENSE_TEXT
-    format: HUACE_TEXT
+    format: FORSENSE_TEXT
 
     # protocol optional: serial, tcp, udp, ntrip, can_card_parameter
     serial {
@@ -11,7 +11,7 @@ data {
     # tcp, udp: e.g.
     #tcp {
     #    address: "192.168.10.100"
-    #    baud_rate:460800
+    #    port:460800
     #}
 
     # can_card_parameter: e.g.
@@ -37,7 +37,7 @@ data {
 #}
 
 rtk_to {
-    format: HUACE_TEXT
+    format: FORSENSE_TEXT
     serial {
         device: "/dev/ttyUSB0"
         baud_rate:460800
@@ -45,7 +45,7 @@ rtk_to {
 }
 
 command {
-    format: HUACE_TEXT
+    format: FORSENSE_TEXT
     serial {
         device: "/dev/ttyUSB0"
         baud_rate:460800
