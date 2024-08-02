@@ -4,7 +4,7 @@ data {
 
     # protocol optional: serial, tcp, udp, ntrip, can_card_parameter
     serial {
-        device: "/dev/ttyUSB0"
+        device: "/dev/ttyUSB1"
         baud_rate:460800
     }
 
@@ -39,7 +39,7 @@ data {
 rtk_to {
     format: FORSENSE_TEXT
     serial {
-        device: "/dev/ttyUSB0"
+        device: "/dev/ttyUSB1"
         baud_rate:460800
     }
 }
@@ -47,7 +47,7 @@ rtk_to {
 command {
     format: FORSENSE_TEXT
     serial {
-        device: "/dev/ttyUSB0"
+        device: "/dev/ttyUSB1"
         baud_rate:460800
     }
 }
