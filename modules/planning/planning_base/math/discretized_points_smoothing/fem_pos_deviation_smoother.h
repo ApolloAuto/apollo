@@ -64,7 +64,7 @@ class FemPosDeviationSmoother {
  private:
   FemPosDeviationSmootherConfig config_;
 
-// park generic
+  // park generic
  public:
   bool Solve(const std::vector<std::pair<double, double>>& raw_point2d,
              const std::vector<double>& bounds, std::vector<double>* opt_x,

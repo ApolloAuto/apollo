@@ -11,7 +11,7 @@ import {
     CURRENT_MODE,
 } from './actionTypes';
 import * as TYPES from './actionTypes';
-import { MainApi } from '../../services/api';
+import { MainApi, OtherApi } from '../../services/api';
 import { AsyncAction } from '../base/Middleware';
 import { noop } from '../../util/similarFunctions';
 
@@ -28,7 +28,7 @@ export const changeMode = (
     callback?: (mode: CURRENT_MODE) => void,
 ): AsyncAction<TYPES.IInitState, ChangeModeAction> => {
     noop();
-    return async (dispatch, state) => {
+    return async (_dispatch, state) => {
         logger.debug('changeMode', { state, payload });
         await mainApi.changeSetupMode(payload);
         if (callback) {
@@ -89,20 +89,33 @@ export const changeDynamic = (
     payload: TYPES.ChangeDynamicPayload,
 ): AsyncAction<TYPES.IInitState, ChangeDynamicAction> => {
     noop();
-    return async (dispatch, state) => {
+    return async (_dispatch, state) => {
         logger.debug('changeDynamic', { state, payload });
         await mainApi.changeDynamicModel(payload);
     };
 };
 
 export const changeScenarios = (
+    otherApi: OtherApi,
     mainApi: MainApi,
     payload: TYPES.ChangeScenariosPayload,
 ): AsyncAction<TYPES.IInitState, TYPES.ChangeScenariosAction> => {
     noop();
     return async (dispatch, state) => {
         logger.debug('changeScenarios', { state, payload });
-        await mainApi.changeScenarios(payload.scenarioId, payload.scenariosSetId);
+        const res = await otherApi.changeScenarios(payload.scenarioId, payload.scenariosSetId);
+        if (res) {
+            await mainApi.changeMap(res.currentScenarioMap).then((status) => {
+                if (!status.isOk) {
+                    message({
+                        type: 'error',
+                        content: 'Auto-switching map failed',
+                        key: 'MODE_SETTING_SCENARIO_CHANGE_ERROR',
+                    });
+                }
+                otherApi.resetScenario();
+            });
+        }
         dispatch({
             type: ACTIONS.CHANGE_SCENARIOS,
             payload,

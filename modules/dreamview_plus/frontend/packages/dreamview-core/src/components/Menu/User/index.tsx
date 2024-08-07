@@ -1,19 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-    IconIcSettingClick,
-    IconIcCloudProfile,
-    IconIcHelpHover,
-    IconIcProductDocumentation,
-    IconIcApolloDeveloperCommunity,
-    IconIcSuggest,
-    IconIcFaq,
-    useImagePrak,
-} from '@dreamview/dreamview-ui';
+import { IconPark, useImagePrak } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import packageJson from '@dreamview/dreamview-core/package.json';
-import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
+import { makeStyles, useThemeContext } from '@dreamview/dreamview-theme';
 import useStyle, { useMenuItemStyle } from './useStyle';
 import showSettingModal from './SettingModal';
+import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
 import { CURRENT_MODE, usePickHmiStore } from '../../../store/HmiStore';
 import showViewLoginModal from '../../WelcomeGuide/showViewLoginModal';
 import { useUserInfoStore } from '../../../store/UserInfoStore';
@@ -45,42 +37,48 @@ type UserProps = {
     setEnterGuideStateMemo: (currentMode: CURRENT_MODE) => void;
 };
 
+const useDividerStyle = makeStyles((theme) => ({
+    'gray-divider': {
+        height: '1px',
+        backgroundColor: theme.tokens.colors.divider2,
+    },
+}));
+
 function Divider() {
-    const { classes } = useMakeStyle((theme) => ({
-        'gray-divider': {
-            height: '1px',
-            backgroundColor: theme.tokens.colors.divider2,
-        },
-    }))();
+    const { classes } = useDividerStyle();
     return <div className={classes['gray-divider']} />;
 }
 
 function User(props: UserProps) {
     const { setEnterGuideStateMemo } = props;
     const [hmi] = usePickHmiStore();
-    const [{ userInfo }] = useUserInfoStore();
+    const [{ isLogin, userInfo }] = useUserInfoStore();
     const hasLogin = !!userInfo?.id;
     const { theme } = useThemeContext();
     const { classes } = useStyle(theme);
     const { t } = useTranslation('personal');
     const IconPersonalCenterDefault = useImagePrak('ic_personal_center_default');
+    const { isPluginConnected, pluginApi, mainApi } = useWebSocketServices();
 
     const { menusSetting, menusProfile } = useMemo(
         () => ({
             menusSetting: [
                 {
-                    icon: <IconIcSettingClick />,
+                    icon: <IconPark name='IcSettingClick' />,
                     text: t('setting'),
                     onClick: () => {
                         //
                         showSettingModal({
                             dreamviewVersion: packageJson.version,
                             dockerVersion: hmi?.dockerImage,
+                            pluginApi,
+                            isLogin,
+                            userInfo,
                         });
                     },
                 },
                 {
-                    icon: <IconIcCloudProfile />,
+                    icon: <IconPark name='IcCloudProfile' />,
                     text: t('cloud'),
                     onClick: () => {
                         window.open('https://apollo.baidu.com/workspace');
@@ -89,21 +87,21 @@ function User(props: UserProps) {
             ],
             menusProfile: [
                 {
-                    icon: <IconIcFaq />,
+                    icon: <IconPark name='IcFaq' />,
                     text: t('faq'),
                     onClick: () => {
                         window.open('https://apollo.baidu.com/community/article/1223');
                     },
                 },
                 {
-                    icon: <IconIcHelpHover />,
+                    icon: <IconPark name='IcHelpHover' />,
                     text: t('guide'),
                     onClick: () => {
                         setEnterGuideStateMemo(hmi.currentMode);
                     },
                 },
                 {
-                    icon: <IconIcProductDocumentation />,
+                    icon: <IconPark name='IcProductDocumentation' />,
                     text: t('document'),
                     onClick: () => {
                         //
@@ -113,14 +111,14 @@ function User(props: UserProps) {
                     },
                 },
                 {
-                    icon: <IconIcApolloDeveloperCommunity />,
+                    icon: <IconPark name='IcApolloDeveloperCommunity' />,
                     text: t('community'),
                     onClick: () => {
                         window.open('https://apollo.baidu.com');
                     },
                 },
                 {
-                    icon: <IconIcSuggest />,
+                    icon: <IconPark name='IcSuggest' />,
                     text: t('technicalSupport'),
                     onClick: () => {
                         window.open('https://apollo.baidu.com/workspace?modal=feedback');
@@ -128,7 +126,7 @@ function User(props: UserProps) {
                 },
             ],
         }),
-        [hmi.dockerImage, hmi.currentMode, t],
+        [hmi.dockerImage, hmi.currentMode, t, pluginApi, userInfo, isLogin],
     );
 
     return (

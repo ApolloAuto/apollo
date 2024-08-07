@@ -21,19 +21,11 @@
 
 #include "modules/perception/common/algorithm/geometry/common.h"
 #include "modules/perception/common/algorithm/geometry/convex_hull_2d.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
-
-static const float kEpsilon = 1e-6f;
-static const float kEpsilonForSize = 1e-2f;
-static const float kEpsilonForLine = 1e-3f;
-using apollo::perception::base::PointD;
-using apollo::perception::base::PointF;
-using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
-using PointFCloud = apollo::perception::base::PointCloud<PointF>;
-using PolygonDType = apollo::perception::base::PointCloud<PointD>;
 
 bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
   return true;
@@ -51,6 +43,9 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
       ComputePolygon2D(objects->at(i));
       ComputePolygonSizeCenter(objects->at(i));
       ComputeOtherObjectInformation(objects->at(i));
+      if (FLAGS_need_judge_front_critical) {
+          JudgeFrontCritical(objects->at(i), frame->lidar2novatel_extrinsics);
+      }
     }
   }
   return true;
@@ -199,6 +194,20 @@ void ObjectBuilder::GetMinMax3D(const PointFCloud& cloud,
     (*min_pt)[2] = std::min((*min_pt)[2], cloud[i].z);
     (*max_pt)[2] = std::max((*max_pt)[2], cloud[i].z);
   }
+}
+
+void ObjectBuilder::JudgeFrontCritical(
+    ObjectPtr object, Eigen::Affine3d& lidar2novatel_pose) {
+    Eigen::Vector3d obj_center = object->center;
+    obj_center = lidar2novatel_pose * obj_center;
+    auto x_in_novatel = obj_center(0);
+    auto y_in_novatel = obj_center(1);
+    if (y_in_novatel > FLAGS_y_back && y_in_novatel < FLAGS_y_front &&
+        x_in_novatel > FLAGS_x_back && x_in_novatel < FLAGS_x_front &&
+        object->lidar_supplement.is_clustered) {
+        object->is_front_critical = true;
+        AINFO << "Object " << object->id << " is FRONT-CRITICAL";
+    }
 }
 
 }  // namespace lidar

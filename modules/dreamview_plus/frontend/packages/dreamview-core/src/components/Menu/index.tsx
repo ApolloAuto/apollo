@@ -1,14 +1,5 @@
 import React, { PropsWithChildren, useCallback, useEffect } from 'react';
-import {
-    IconIcGlobalSettingsNormal,
-    IconIcAddPanel,
-    IconIcProfileMangerNormal,
-    IconIcDefaultAvatar,
-    OperatePopover,
-    Popover,
-    useImagePrak,
-    IconIcDreamview,
-} from '@dreamview/dreamview-ui';
+import { OperatePopover, Popover, useImagePrak, IconPark } from '@dreamview/dreamview-ui';
 import {
     ENUM_MENU_KEY,
     ENUM_CERT_STATUS,
@@ -18,6 +9,7 @@ import {
 import { ChangeCertStatusAction, UpdateMenuAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
 import { useThemeContext } from '@dreamview/dreamview-theme';
 import { useTranslation } from 'react-i18next';
+import Logger from '@dreamview/log';
 import useStyle from './useStyle';
 import useWebSocketServices from '../../services/hooks/useWebSocketServices';
 import User from './User';
@@ -26,6 +18,8 @@ import { CURRENT_MODE } from '../../store/HmiStore';
 import IcMoon from './moon.svg';
 import IcSun from './sun.svg';
 import { useChangeTheme } from '../../store/ThemeProviderStore';
+
+const logger = Logger.getInstance('Menu');
 
 interface IActivatableMenu {
     onClick?: () => void;
@@ -52,7 +46,7 @@ function ActivatableMenu(props: PropsWithChildren<IActivatableMenu>) {
         <Popover placement='right' trigger='hover' content={popoverContent}>
             <li
                 onClick={onClick}
-                className={cx(classes['menu-item'], classes['menu-item-icon'], {
+                className={cx(classes['menu-item'], {
                     [classes.active]: activeMenuKey === menuKey,
                 })}
             >
@@ -103,7 +97,7 @@ function Menu(props: MenuProps) {
             pluginApi
                 .checkCertStatus()
                 .then(() => {
-                    console.log('checkCertStatus success');
+                    logger.info('checkCertStatus success');
                     dispatch(ChangeCertStatusAction(ENUM_CERT_STATUS.SUCCESS));
                 })
                 .catch(() => {
@@ -124,7 +118,7 @@ function Menu(props: MenuProps) {
                     menuKey={ENUM_MENU_KEY.MODE_SETTING}
                     onMenuChange={onMenuChange}
                 >
-                    <IconIcGlobalSettingsNormal />
+                    <IconPark name='IcGlobalSettingsNormal' />
                 </ActivatableMenuMemo>
             </ul>
             <ul>
@@ -143,7 +137,7 @@ function Menu(props: MenuProps) {
                     menuKey={ENUM_MENU_KEY.ADD_PANEL}
                     onMenuChange={onMenuChange}
                 >
-                    <IconIcAddPanel />
+                    <IconPark name='IcAddPanel' />
                 </ActivatableMenuMemo>
                 {/* <ActivatableMenuMemo
                     popover={<>Save Panel 快捷键</>}
@@ -160,7 +154,7 @@ function Menu(props: MenuProps) {
                         menuKey={ENUM_MENU_KEY.PROFILE_MANAGEER}
                         onMenuChange={onMenuChange}
                     >
-                        <IconIcProfileMangerNormal />
+                        <IconPark name='IcProfileMangerNormal' />
                     </ActivatableMenuMemo>
                 )}
                 <li className={cx(classes['menu-item'])}>
@@ -185,7 +179,7 @@ function Menu(props: MenuProps) {
                                     />
                                 )
                             ) : (
-                                <IconIcDefaultAvatar />
+                                <IconPark name='IcDefaultAvatar' />
                             )}
                         </div>
                     </OperatePopover>

@@ -10,4 +10,5 @@ message LidarOutputComponentConfig {
   optional string lidar_frame_output_dir = 5 [default = ""];
   optional string lidar_frame_channel_name = 6 [default = "/perception/lidar/detection"];
   optional bool use_lidar_cooridinate = 7 [default = true];
+  optional bool timestamp_two_decimal_format = 8 [default = false];
 }

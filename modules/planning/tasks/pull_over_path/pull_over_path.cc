@@ -120,9 +120,12 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   std::string blocking_obstacle_id = "";
   PathBound temp_path_bound = path_bound;
+  std::vector<SLPolygon> obs_sl_polygons;
+  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
+                                       init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          *reference_line_info_, init_sl_state_, &path_bound,
-          &blocking_obstacle_id, &path_narrowest_width)) {
+          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
+          &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
     return false;

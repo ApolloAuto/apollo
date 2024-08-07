@@ -60,4 +60,18 @@ message LonBasedPidControllerConf{
   optional double full_stop_path_remain_gain = 37;
 
   optional int32 use_opposite_slope_compensation = 38 [default = 1];
+
+  optional double speed_itfc_full_stop_speed = 39 [default = 0.09];
+
+  optional double speed_itfc_path_remain_min = 40 [default = 0.10];
+
+  optional double speed_itfc_dcc_emergency = 41 [default = -1.5];
+
+  optional double speed_itfc_speed_cmd = 42 [default = 0.10];
+
+  optional double speed_itfc_path_remain_max = 43 [default = 0.60];
+
+  optional double speed_itfc_acc_thres = 44 [default = 0.0];
+
+  optional bool use_speed_itfc = 45 [default = false];
 }

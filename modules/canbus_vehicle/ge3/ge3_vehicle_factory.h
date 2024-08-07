@@ -26,9 +26,12 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/ge3/proto/ge3.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/ge3/ge3_controller.h"
+#include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -97,8 +100,7 @@ class Ge3VehicleFactory : public AbstractVehicleFactory {
    * @brief create ge3 vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<VehicleController<::apollo::canbus::Ge3>>
-  CreateVehicleController();
+  std::unique_ptr<ge3::Ge3Controller> CreateVehicleController();
 
   /**
    * @brief create ge3 message manager
@@ -111,7 +113,7 @@ class Ge3VehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Ge3> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Ge3> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Ge3>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Ge3>> vehicle_controller_;
+  std::unique_ptr<ge3::Ge3Controller> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Ge3>>
       chassis_detail_writer_;

@@ -21,6 +21,8 @@ namespace canbus {
 
 void AbstractVehicleFactory::UpdateHeartbeat() {}
 
+bool AbstractVehicleFactory::CheckChassisCommunicationFault() { return false; }
+
 void AbstractVehicleFactory::SetVehicleParameter(
     const VehicleParameter &vehicle_parameter) {
   vehicle_parameter_ = vehicle_parameter;

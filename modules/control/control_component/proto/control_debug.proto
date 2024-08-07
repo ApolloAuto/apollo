@@ -4,6 +4,7 @@ package apollo.control;
 
 import "modules/common_msgs/control_msgs/control_cmd.proto";
 import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
 import "modules/common_msgs/basic_msgs/pnc_point.proto";
 import "modules/control/control_component/proto/check_status.proto";
 import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
@@ -16,6 +17,16 @@ message ControlDebugInfo {
   optional SimpleMPCPlusDebug simple_mpc_debug = 4;
   optional SimpleAntiSlopeDebug simple_anti_slope_debug = 5;
   optional CleaningSafetyCheckDebug cleaning_safety_check_debug = 6;
+  optional ControlComponentDebug control_component_debug = 7;
+  optional apollo.common.Header debug_header = 8;
+}
+
+message ControlComponentDebug {
+  optional double vehicle_pitch = 1;
+  optional bool is_auto = 2;
+  optional bool from_else_to_auto = 3;
+  optional double process_control_time_diff = 4;
+  optional bool process_control_exceeded = 5;
 }
 
 message SimpleLongitudinalPlusDebug {
@@ -126,9 +137,97 @@ message SimpleLateralPlusDebug {
   // lat acc in ENU, in m/s^2
   optional double lateral_centripetal_acceleration = 34;
   optional string control_task_name = 35;
+
+  // lat control check
   optional ControlCheckDebug lat_control_check_debug = 36;
+
+  // openspace rate
   optional double efai_rate = 37;
   optional double ed_rate = 38;
+
+  // heading error debug
+  optional double heading_error_by_ref = 39;
+  optional double heading_error_by_auto_compensation = 40;
+  optional AHCValue ahc_value = 41;
+
+  optional bool is_lock_steer = 42;
+
+  // look ahead back control debug
+  optional apollo.common.TrajectoryPoint lookahead_point = 43;
+  optional double lookahead_station = 44;
+  optional double lookback_station = 45;
+  optional double lookahead_time = 46;
+  optional double lookahead_station_s_diff = 47;
+  optional apollo.common.TrajectoryPoint lookahead_point_new = 48;
+  optional apollo.common.TrajectoryPoint lookback_point_new = 49;
+  optional double lookahead_time_new = 50;
+  optional double lookahead_station_s_diff_new = 51;
+  optional double lateral_error_feedback_new = 52;
+  optional double heading_error_feedback_new = 53;
+  optional bool enable_look_ahead_back_control = 54;
+
+  // lat localization com position
+  optional apollo.common.PointENU lat_com_position = 55;
+
+  optional bool is_in_large_curvature = 56;
+
+  optional apollo.common.TrajectoryPoint target_point_lr = 57;
+  optional apollo.common.TrajectoryPoint matched_point_com = 58;
+  optional apollo.common.TrajectoryPoint matched_point_local = 59;
+  optional apollo.common.TrajectoryPoint absolute_point_local = 60;
+
+  optional double lateral_error_target_lr = 61;
+  optional double heading_error_target_lr = 62;
+  optional double curvature_target_lr = 63;
+
+  optional double lateral_error_target_com = 64;
+  optional double heading_error_target_com = 65;
+  optional double curvature_target_com = 66;
+
+  optional double lateral_error_match_com = 67;
+  optional double heading_error_match_com = 68;
+  optional double curvature_match_com = 69;
+
+  optional double lateral_error_match_local = 70;
+  optional double heading_error_match_local = 71;
+  optional double curvature_match_local = 72;
+
+  optional double lateral_error_absolute_local = 73;
+  optional double heading_error_absolute_local = 74;
+  optional double curvature_absolute_local = 75;
+
+  optional int32 now_reverse_stage = 76;
+  optional int32 current_choose_point = 77;
+  repeated double continous_lateral_errors = 78;
+  repeated double continous_heading_errors = 79;
+
+  optional double com_length = 80;
+  optional double lr = 81;
+  // lat localization lr position
+  optional apollo.common.PointENU lat_lr_position = 82;
+  optional double lookback_time_new = 83;
+  optional double lookback_station_s_diff_new = 84;
+  optional double lookahead_curvature = 85;
+  optional double lookahead_curvature_new = 86;
+  optional double lookback_curvature_new = 87;
+
+  optional double lateral_error_lqr_input = 88;
+  optional double heading_error_lqr_input = 89;
+  optional double lqr_iteration_num = 90;
+  optional double lqr_result_diff = 91;
+  optional double com_change = 92;
+  optional int32 current_sign = 93;
+  optional int32 current_min_error_point = 94;
+}
+
+message AHCValue {
+  optional double ahc_sum = 1;
+  optional double ahc_mean = 2;
+  optional double ahc_peak = 3;
+  optional double ahc_compensating_value = 4;
+  optional double ahc_compensated_value = 5;
+  optional bool ahc_is_compensating = 6;
+  optional double compensation_output_value = 7;
 }
 
 message SimpleMPCPlusDebug {
@@ -229,6 +328,8 @@ message ControlCheckDebug {
   optional uint32 speed_error_check_w_count = 12;
   optional double lateral_error_e = 13;
   optional double lateral_error_w = 14;
+  optional double heading_error_e = 15;
+  optional double heading_error_w = 16;
 }
 
 message SimpleAntiSlopeDebug {
@@ -261,4 +362,5 @@ message CleaningSafetyCheckDebug {
   optional apollo.perception.PerceptionEdgeInfo edge_info = 7;
   optional double post_process_throttle_cmd = 8;
   optional double post_process_brake_cmd = 9;
+  optional bool is_in_large_curvature = 10;
 }

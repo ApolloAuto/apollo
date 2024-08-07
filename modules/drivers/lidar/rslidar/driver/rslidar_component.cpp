@@ -60,6 +60,7 @@ bool RslidarComponent::Init() {
 
     ::robosense::lidar::RSDriverParam driver_param;
     driver_param.input_param = input_param;
+    driver_param.decoder_param = decoder_param;
     driver_param.lidar_type = ::robosense::lidar::strToLidarType(conf_.model());
 
     if (conf_.config_base().source_type()
@@ -140,7 +141,7 @@ void RslidarComponent::PreparePointsMsg(PointCloud& msg) {
 
     double lidar_time = GetSecondTimestampFromNanosecondTimestamp(timestamp);
     double diff_time = msg.header().timestamp_sec() - lidar_time;
-    if (diff_time > 0.02) {
+    if (diff_time > 0.2) {
         AINFO << std::fixed << std::setprecision(16)
               << "system time: " << msg.header().timestamp_sec()
               << ", lidar time: " << lidar_time << ", diff is:" << diff_time;

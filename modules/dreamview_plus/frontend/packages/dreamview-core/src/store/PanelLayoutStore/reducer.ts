@@ -137,6 +137,8 @@ const initModeLayoutRelation: () => IModeLayoutRelation = () => ({
     [CURRENT_MODE.MAP_EDITOR]: genereatePanelId('MapEditor'),
     [CURRENT_MODE.CAMERA_CALIBRATION]: genereatePanelId('CameraCalibration'),
     [CURRENT_MODE.LiDAR_CALIBRATION]: genereatePanelId('LidarCalibration'),
+    [CURRENT_MODE.DYNAMICS_CALIBRATION]: genereatePanelId('DynamicsCalibration'),
+    [CURRENT_MODE.CANBUS_DEBUG]: genereatePanelId('CanbusDebug'),
 });
 
 export const mosaicId = (() => {

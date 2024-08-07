@@ -10,18 +10,11 @@ import {
     WorkerMessage,
     WorkerMessageType,
 } from '@dreamview/dreamview-core/src/services/WebSocketManager/type';
-import { type IConversionOptions } from 'protobufjs';
 import { isNil } from 'lodash';
 
 const decodeStreamData = apollo.dreamview.StreamData.decode;
-const toObjectStreamData = apollo.dreamview.StreamData.toObject;
-//
-const logger = Logger.getInstance('ChildWebSocketWorker');
 
-const toObjectOptions: IConversionOptions = {
-    enums: String,
-    longs: String,
-};
+const logger = Logger.getInstance('ChildWebSocketWorker');
 
 let childSocket: WebSocketSubject<ArrayBuffer>;
 let childSpt: Subscription;
@@ -29,13 +22,13 @@ const MAX_RETRIES = 5;
 
 const deserializer = (data: unknown, name: string): Nullable<StreamMessage> => {
     try {
-        if (typeof data === 'string') {
-            return <StreamMessage>JSON.parse(data);
-        }
         if (data instanceof ArrayBuffer) {
             const arrayBuffer = new Uint8Array(data);
-            const message = decodeStreamData(arrayBuffer);
-            return <StreamMessage>toObjectStreamData(message, toObjectOptions);
+            return <StreamMessage>decodeStreamData(arrayBuffer);
+        }
+
+        if (typeof data === 'string') {
+            return <StreamMessage>JSON.parse(data);
         }
         logger.error(`Failed to decode message from ${name}, data: ${data}`);
         return null;
@@ -101,6 +94,9 @@ const connectChildSocket = (url: string, name: StreamDataNames): void => {
                             dataName,
                             ...(isNil(channelName) ? {} : { channelName }),
                             data,
+                            // performance: {
+                            //     startTimestamp: Date.now(),
+                            // },
                         },
                     } as WorkerMessage<WorkerMessageType>,
                     // @ts-ignore

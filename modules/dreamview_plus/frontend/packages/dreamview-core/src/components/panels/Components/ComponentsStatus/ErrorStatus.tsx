@@ -1,4 +1,4 @@
-import { IconIcErrorMessage } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import React from 'react';
 import useStyle from './useStyle';
 
@@ -7,7 +7,8 @@ export function ErrorStatus() {
 
     return (
         <div className={classes['status-fatal']}>
-            <IconIcErrorMessage
+            <IconPark
+                name='IcErrorMessage'
                 style={{
                     fontSize: '16px',
                     marginRight: '6px',

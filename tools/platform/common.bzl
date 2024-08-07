@@ -159,7 +159,8 @@ def execute(
         cmdline,
         error_msg = None,
         error_details = None,
-        empty_stdout_fine = False):
+        empty_stdout_fine = False,
+        ignore_error = True):
     """Executes an arbitrary shell command.
 
     Args:
@@ -174,6 +175,7 @@ def execute(
     """
     result = raw_exec(repository_ctx, cmdline)
     if result.stderr or not (empty_stdout_fine or result.stdout):
+      if not ignore_error:
         fail(
             "\n".join([
                 error_msg.strip() if error_msg else "Repository command failed",
@@ -296,6 +298,11 @@ def make_copy_files_rule(repository_ctx, name, srcs, outs):
     ],
     cmd = \"""%s \""",
 )""" % (name, "\n".join(outs), " && \\\n".join(cmds))
+
+def get_copy_dir_files(repository_ctx, src_dir, out_dir):
+    outs = read_dir(repository_ctx, src_dir)
+    outs = [('        "%s",' % out.replace(src_dir, out_dir)) for out in outs]
+    return outs 
 
 def make_copy_dir_rule(repository_ctx, name, src_dir, out_dir, exceptions = None):
     """Returns a rule to recursively copy a directory.

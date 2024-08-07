@@ -53,12 +53,12 @@ command {
 }
 
 rtk_solution_type: RTK_RECEIVER_SOLUTION
-imu_type: ADIS16488
+imu_type: CPT_XW5651
 proj4_text: "+proj=utm +zone=50 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
 tf {
     frame_id: "world"
-    child_frame_id: "novatel"
+    child_frame_id: "imu"
     enable: true
 }
 
@@ -99,3 +99,5 @@ gpsbin_folder: "/apollo/data/gpsbin"
 
 logout_commands: "EVENTOUTCONTROL MARK2 DISABLE\r\n"
 logout_commands: "EVENTOUTCONTROL MARK1 DISABLE\r\n"
+
+use_gnss_time: true

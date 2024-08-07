@@ -19,7 +19,7 @@
 mkdir -p proto_bundle
 
 # proto dependencies
-SIMULATION_PROTO='../proto/simulation_world.proto ../proto/chart.proto ../proto/camera_update.proto'
+SIMULATION_PROTO='../../common_msgs/dreamview_msgs/simulation_world.proto ../../common_msgs/dreamview_msgs/chart.proto ../proto/camera_update.proto'
 COMMON_PROTOS='../../common/proto/*.proto ../../common/configs/proto/vehicle_config.proto'
 LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto ../../localization/proto/localization_status.proto'
 CHASSIS_PROTOS='../../canbus/proto/chassis.proto'

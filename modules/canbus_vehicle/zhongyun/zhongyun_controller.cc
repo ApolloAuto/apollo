@@ -42,6 +42,7 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 ErrorCode ZhongyunController::Init(
     const VehicleParameter& params,
     CanSender<::apollo::canbus::Zhongyun>* const can_sender,
+    CanReceiver<::apollo::canbus::Zhongyun>* const can_receiver,
     MessageManager<::apollo::canbus::Zhongyun>* const message_manager) {
   if (is_initialized_) {
     AINFO << "ZhongyunController has already been initialized.";
@@ -60,6 +61,12 @@ ErrorCode ZhongyunController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
+
+  if (can_receiver == nullptr) {
+    AERROR << "Canbus receiver is null.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "Protocol manager is null.";

@@ -47,7 +47,8 @@ StageResult ParkAndGoStagePreCruise::Process(
   // const bool ready_to_cruise =
   //     CheckADCReadyToCruise(frame, scenario_config_);
   auto vehicle_status = injector_->vehicle_state();
-  ADEBUG << vehicle_status->steering_percentage();
+  AINFO << "Current steering percentage: "
+        << vehicle_status->steering_percentage();;
 
   if ((std::fabs(vehicle_status->steering_percentage()) <
        scenario_config.max_steering_percentage_when_cruise()) &&

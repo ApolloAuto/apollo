@@ -5,11 +5,12 @@ import {
     usePluginApi,
     useStreamApi,
     useMetadata,
+    useOtherApi,
 } from '@dreamview/dreamview-core/src/store/WebSocketManagerStore';
 import { CustomEventTypes } from '@dreamview/dreamview-core/src/store/EventHandlersStore/eventType';
 import { useEventHandlersContext } from '../../store/EventHandlersStore';
-import { MetadataItem } from '../WebSocketManager/type';
-import { MainApi, PluginApi, StreamApi } from '../api';
+import { MetadataItem } from '../WebSocketManager';
+import { MainApi, OtherApi, PluginApi, StreamApi } from '../api';
 import { Nullable } from '../../util/similarFunctions';
 
 type useWebSocketServicesReturnType = {
@@ -19,6 +20,7 @@ type useWebSocketServicesReturnType = {
     mainApi: Nullable<MainApi>;
     pluginApi: Nullable<PluginApi>;
     streamApi: Nullable<StreamApi>;
+    otherApi: Nullable<OtherApi>;
     setMetaData: (metadata: MetadataItem[]) => void;
 };
 
@@ -28,6 +30,8 @@ export default function useWebSocketServices(): useWebSocketServicesReturnType {
     const streamApiIns = useStreamApi();
 
     const pluginApiIns = usePluginApi();
+
+    const otherApiIns = useOtherApi();
 
     const [metadata, setMetaData] = useMetadata();
 
@@ -64,6 +68,7 @@ export default function useWebSocketServices(): useWebSocketServicesReturnType {
         mainApi: mainApiIns,
         streamApi: streamApiIns,
         pluginApi: pluginApiIns,
+        otherApi: otherApiIns,
         setMetaData,
     };
 }

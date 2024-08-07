@@ -145,6 +145,9 @@ class ReferenceLine {
   bool XYToSL(const double heading, const common::math::Vec2d& xy_point,
               common::SLPoint* const sl_point,
               double warm_start_s = -1.0) const;
+  bool XYToSL(const common::math::Vec2d& xy_point,
+              common::SLPoint* const sl_point, double hueristic_start_s,
+              double hueristic_end_s) const;
 
   template <class XYPoint>
   bool XYToSL(const XYPoint& xy, common::SLPoint* const sl_point) const {
@@ -160,9 +163,9 @@ class ReferenceLine {
                     double* const road_right_width) const;
 
   hdmap::Road::Type GetRoadType(const double s) const;
-  void GetLaneBoundaryType(const double s,
-        hdmap::LaneBoundaryType::Type* const left_boundary_type,
-        hdmap::LaneBoundaryType::Type* const right_boundary_type) const;
+  void GetLaneBoundaryType(
+      const double s, hdmap::LaneBoundaryType::Type* const left_boundary_type,
+      hdmap::LaneBoundaryType::Type* const right_boundary_type) const;
 
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
@@ -217,6 +220,8 @@ class ReferenceLine {
 
   const hdmap::Path& GetMapPath() const { return map_path_; }
 
+  void SetEgoPosition(common::math::Vec2d ego_pos) { ego_position_ = ego_pos; }
+
  private:
   /**
    * @brief Linearly interpolate p0 and p1 by s0 and s1.
@@ -263,6 +268,7 @@ class ReferenceLine {
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
   uint32_t priority_ = 0;
+  common::math::Vec2d ego_position_;
 };
 
 }  // namespace planning

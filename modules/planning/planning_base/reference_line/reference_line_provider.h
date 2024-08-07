@@ -97,7 +97,7 @@ class ReferenceLineProvider {
   bool UpdatedReferenceLine() { return is_reference_line_updated_.load(); }
 
   void GetEndLaneWayPoint(
-      std::shared_ptr<routing::LaneWaypoint>& end_point) const;
+      std::shared_ptr<routing::LaneWaypoint> end_point) const;
 
   hdmap::LaneInfoConstPtr GetLaneById(const hdmap::Id& id) const;
 

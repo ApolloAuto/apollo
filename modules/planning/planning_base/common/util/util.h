@@ -57,10 +57,13 @@ void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files);
 
 double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
-                                   double s);
+                                   double s, bool* is_left);
 
 double CalculateEquivalentEgoWidth(
-    const apollo::hdmap::LaneInfoConstPtr lane_info, double s);
+    const apollo::hdmap::LaneInfoConstPtr lane_info, double s, bool* is_left);
+
+double left_arc_bound_with_heading(double delta_x, double r, double heading);
+double right_arc_bound_with_heading(double delta_x, double r, double heading);
 
 }  // namespace util
 }  // namespace planning

@@ -39,6 +39,16 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
+modules {
+  key: "IndoorLocalization"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch"
+    }
+  }
+}
 cyber_modules {
   key: "Guardian"
   value: {

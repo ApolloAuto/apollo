@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { IconIcCompile } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import ChartBase, { initOptions } from '@dreamview/dreamview-core/src/components/panels/PncMonitor/Chart/ChartBase';
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 import differenceBy from 'lodash/differenceBy';
 import lodashGet from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
@@ -67,18 +67,14 @@ function getOption(data: Record<string, any>, config: CustomChartBaseProps['conf
     });
 }
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'chart-item': {
-            marginBottom: theme.tokens.margin.speace,
-        },
-        'chart-item-active': {
-            border: `1px solid ${theme.tokens.colors.brand3}`,
-        },
-    }));
-
-    return hoc();
-}
+const useStyle = makeStyles((theme) => ({
+    'chart-item': {
+        marginBottom: theme.tokens.margin.speace,
+    },
+    'chart-item-active': {
+        border: `1px solid ${theme.tokens.colors.brand3}`,
+    },
+}));
 
 type noopFunc = () => void;
 
@@ -102,7 +98,7 @@ function CustomChartBase(prop: CustomChartBaseProps) {
         propOnClick(config);
     };
 
-    const titleExtra = <IconIcCompile onClick={onClick} />;
+    const titleExtra = <IconPark name='IcCompile' onClick={onClick} />;
 
     const updatelineData = useCallback((line: ILineConfig, lineData: any) => {
         const channelX = line[KEY.lineChannelX];

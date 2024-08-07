@@ -10,7 +10,7 @@ import omit from 'rc-util/lib/omit';
 import './index.less';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
 import IconWrapper from './IconWrapper';
-import { IconIcLoading } from '../../icons';
+import IconPark from '../../IconPark';
 import showWaveEffect from '../Wave/WaveEffect';
 
 export type SizeType = 'small' | 'middle' | 'large' | undefined;
@@ -156,7 +156,7 @@ const InternalButton: React.ForwardRefRenderFunction<HTMLButtonElement | HTMLAnc
         rootClassName,
     );
 
-    const internalIconLoading = innerLoading ? <IconIcLoading spin /> : undefined;
+    const internalIconLoading = innerLoading ? <IconPark name='IcLoading' spin /> : undefined;
 
     const iconNode =
         icon && !innerLoading ? (

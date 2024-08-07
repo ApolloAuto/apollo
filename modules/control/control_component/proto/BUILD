@@ -34,6 +34,7 @@ proto_library(
         ":check_status_proto",
         "//modules/common_msgs/control_msgs:control_cmd_proto",
         "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_proto",
         "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
         "//modules/common_msgs/routing_msgs:routing_geometry_proto",

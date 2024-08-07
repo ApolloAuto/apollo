@@ -141,6 +141,8 @@ class LonController : public ControlTask {
   bool controller_initialized_ = false;
 
   double previous_acceleration_ = 0.0;
+  double reference_spd_ = 0.0;
+  double reference_spd_cmd_ = 0.0;
   double previous_acceleration_reference_ = 0.0;
 
   PIDController speed_pid_controller_;

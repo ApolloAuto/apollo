@@ -138,8 +138,8 @@ class OpenSpaceInfo {
     return obstacles_vertices_vec_;
   }
 
-  std::vector<std::vector<common::math::Vec2d>> *
-  mutable_obstacles_vertices_vec() {
+  std::vector<std::vector<common::math::Vec2d>>
+      *mutable_obstacles_vertices_vec() {
     return &obstacles_vertices_vec_;
   }
 
@@ -266,13 +266,13 @@ class OpenSpaceInfo {
     return fallback_trajectory_;
   }
 
-  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> *
-  mutable_publishable_trajectory_data() {
+  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
+      *mutable_publishable_trajectory_data() {
     return &publishable_trajectory_data_;
   }
 
-  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> &
-  publishable_trajectory_data() const {
+  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
+      &publishable_trajectory_data() const {
     return publishable_trajectory_data_;
   }
 
@@ -412,29 +412,21 @@ class OpenSpaceInfo {
     return &path_planning_trajectory_result_;
   }
 
-  bool replan_flag() const {
-    return replan_flag_;
-  }
+  bool replan_flag() const { return replan_flag_; }
 
-  void set_replan_flag(const bool flag) {
-    replan_flag_ = flag;
-  }
+  void set_replan_flag(const bool flag) { replan_flag_ = flag; }
 
-  ParkingType parking_type() const {
-    return parking_type_;
-  }
+  ParkingType parking_type() const { return parking_type_; }
 
-  void set_parking_type(const ParkingType type) {
-    parking_type_ = type;
-  }
+  void set_parking_type(const ParkingType type) { parking_type_ = type; }
 
   const std::vector<std::vector<common::math::Vec2d>>
-  &soft_boundary_vertices_vec() const {
+      &soft_boundary_vertices_vec() const {
     return soft_boundary_vertices_vec_;
   }
 
   std::vector<std::vector<common::math::Vec2d>>
-  *mutable_soft_boundary_vertices_vec() {
+      *mutable_soft_boundary_vertices_vec() {
     return &soft_boundary_vertices_vec_;
   }
 

@@ -96,15 +96,23 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   nms_strategy_ = model_param_.nms_strategy();
   diff_class_iou_ = model_param_.diff_class_iou();
   diff_class_nms_ = model_param_.diff_class_nms();
-  if (diff_class_nms_) {
-    nms_strategy_table_ = {
-      {base::ObjectType::BICYCLE, {base::ObjectType::PEDESTRIAN,
-       base::ObjectType::UNKNOWN}},
-      {base::ObjectType::PEDESTRIAN, {base::ObjectType::UNKNOWN}},
-      {base::ObjectType::VEHICLE, {base::ObjectType::BICYCLE,
-       base::ObjectType::PEDESTRIAN, base::ObjectType::UNKNOWN}}
-    };
-  }
+
+  cone_score_threshold_ = model_param_.postprocess().cone_score_threshold();
+  ped_score_threshold_ = model_param_.postprocess().ped_score_threshold();
+  cyc_score_threshold_ = model_param_.postprocess().cyc_score_threshold();
+  small_mot_score_threshold_ =
+      model_param_.postprocess().small_mot_score_threshold();
+  big_mot_score_threshold_ =
+      model_param_.postprocess().big_mot_score_threshold();
+  // if (diff_class_nms_) {
+  //   nms_strategy_table_ = {
+  //     {base::ObjectType::BICYCLE, {base::ObjectType::PEDESTRIAN,
+  //      base::ObjectType::UNKNOWN}},
+  //     {base::ObjectType::PEDESTRIAN, {base::ObjectType::UNKNOWN}},
+  //     {base::ObjectType::VEHICLE, {base::ObjectType::BICYCLE,
+  //      base::ObjectType::PEDESTRIAN, base::ObjectType::UNKNOWN}}
+  //   };
+  // }
   return true;
 }
 
@@ -119,8 +127,7 @@ float get_3Dbox_iou_len(float center1, float len1, float center2, float len2) {
     return std::min(x22, x21) - std::max(x12, x11);
 }
 
-float get_3dbox_iou(base::ObjectPtr obj1, base::ObjectPtr obj2,
-                    int index1, int index2) {
+float get_3dbox_iou(base::ObjectPtr obj1, base::ObjectPtr obj2) {
     auto center1 = obj1->center;
     auto center2 = obj2->center;
     auto size1 = obj1->size;
@@ -131,26 +138,24 @@ float get_3dbox_iou(base::ObjectPtr obj1, base::ObjectPtr obj2,
     float v1 = size1(0) * size1(1) * size1(2);
     float v2 = size2(0) * size2(1) * size2(2);
     float vo = x_len * y_len * z_len;
-    ADEBUG << "center point IOU: (" << index1 << ", " << index2
-           << ") v1:" << v1 << " v2:" << v2 << " vo:" << vo;
     return vo / (v1 + v2 - vo);
 }
 
-bool nms_by_strategy(std::shared_ptr<base::Object> obj1,
-            std::shared_ptr<base::Object> obj2,
-            std::map<base::ObjectType, std::vector<base::ObjectType>> table) {
-    if (obj1.get()->type == obj2.get()->type) {
-        return obj1.get()->confidence > obj2.get()->confidence;
-    }
-    std::vector<base::ObjectType> obj_type_array = table[obj1.get()->type];
-    if (std::find(obj_type_array.begin(), obj_type_array.end(),
-                  obj2->type) != obj_type_array.end()) {
-        return true;
-    } else {
-        return false;
-    }
-    return true;
-}
+// bool nms_by_strategy(std::shared_ptr<base::Object> obj1,
+//         std::shared_ptr<base::Object> obj2,
+//         std::map<base::ObjectType, std::vector<base::ObjectType>> table) {
+//     if (obj1.get()->type == obj2.get()->type) {
+//         return obj1.get()->confidence > obj2.get()->confidence;
+//     }
+//     std::vector<base::ObjectType> obj_type_array = table[obj1.get()->type];
+//     if (std::find(obj_type_array.begin(), obj_type_array.end(),
+//                   obj2->type) != obj_type_array.end()) {
+//         return true;
+//     } else {
+//         return false;
+//     }
+//     return true;
+// }
 
 bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
                                   LidarFrame *frame) {
@@ -310,28 +315,15 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   std::vector<int64_t> out_labels;
   std::vector<float> out_scores;
 
-  FilterScore(output_bbox_blob, output_label_blob, output_score_blob,
-              model_param_.postprocess().score_threshold(), &out_detections,
-              &out_labels, &out_scores);
+  // FilterScore(output_bbox_blob, output_label_blob, output_score_blob,
+  //           model_param_.postprocess().score_threshold(), &out_detections,
+  //           &out_labels, &out_scores);
+
+  FilterDiffScore(output_bbox_blob, output_label_blob, output_score_blob,
+              &out_detections, &out_labels, &out_scores);
 
   GetObjects(frame->lidar2world_pose, out_detections,
              out_labels, out_scores, &frame->segmented_objects);
-
-  if (model_param_.filter_by_points()) {
-    FilterObjectsbyPoints(&frame->segmented_objects);
-  }
-  PERF_BLOCK("class_nms")
-  if (diff_class_nms_) {
-    FilterObjectsbyClassNMS(&frame->segmented_objects);
-  }
-  PERF_BLOCK_END
-
-  // filter semantic if it's not unknown
-  if (model_param_.filter_by_semantic_type()) {
-    FilterObjectsbySemanticType(&frame->segmented_objects);
-  }
-
-  FilterForegroundPoints(&frame->segmented_objects);
 
   std::stringstream sstr;
   sstr << "[CenterPointDetection BeforeNMS] "
@@ -342,11 +334,28 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
            << obj->center(1) << ", " << obj->center(2) << ", "
            << obj->size(0) << ", " << obj->size(1) << ", "
            << obj->size(2) << ", " << obj->theta << ", "
-           << static_cast<int>(obj->type) << std::endl;
+           << static_cast<int>(obj->type) << ", "
+           << obj->confidence << std::endl;
   }
   ADEBUG << sstr.str();
 
+  if (model_param_.filter_by_points()) {
+    FilterObjectsbyPoints(&frame->segmented_objects);
+  }
+
+  PERF_BLOCK("class_nms")
+  if (diff_class_nms_) {
+    FilterObjectsbyClassNMS(&frame->segmented_objects);
+  }
+  PERF_BLOCK_END
   nms_time_ = timer.toc(true);
+
+  // filter semantic if it's not unknown
+  if (model_param_.filter_by_semantic_type()) {
+    FilterObjectsbySemanticType(&frame->segmented_objects);
+  }
+
+  FilterForegroundPoints(&frame->segmented_objects);
 
   SetPointsInROI(&frame->segmented_objects);
 
@@ -509,6 +518,11 @@ void CenterPointDetection::GetBoxIndices(
     std::vector<std::shared_ptr<Object>> *objects) {
   for (size_t point_idx = 0; point_idx < original_cloud_->size(); ++point_idx) {
     const auto &point = original_cloud_->at(point_idx);
+    if (model_param_.filter_ground_points() &&
+        original_cloud_->points_label(point_idx) == static_cast<uint8_t>(
+            LidarPointLabel::GROUND)) {
+        continue;
+    }
     float px = point.x;
     float py = point.y;
     float pz = point.z;
@@ -633,6 +647,16 @@ void CenterPointDetection::GetObjects(
     object->lidar_supplement.is_orientation_ready = true;
     object->confidence = scores.at(i);
 
+    // centerpoint-model original output
+    object->lidar_supplement.detections.resize(7);
+    object->lidar_supplement.detections[0] = x;
+    object->lidar_supplement.detections[1] = y;
+    object->lidar_supplement.detections[2] = z;
+    object->lidar_supplement.detections[3] = dx;
+    object->lidar_supplement.detections[4] = dy;
+    object->lidar_supplement.detections[5] = dz;
+    object->lidar_supplement.detections[6] = yaw;
+
     // compute vertexes of bounding box and transform to world coordinate
     object->lidar_supplement.on_use = true;
     object->lidar_supplement.is_background = false;
@@ -713,6 +737,22 @@ base::ObjectSubType CenterPointDetection::GetObjectSubType(const int label) {
   }
 }
 
+// for apollo model
+float CenterPointDetection::GetObjectScoreThreshold(const int label) {
+    switch (label) {
+        case 0:
+            return small_mot_score_threshold_;
+        case 1:
+            return big_mot_score_threshold_;
+        case 2:
+            return cyc_score_threshold_;
+        case 3:
+            return ped_score_threshold_;
+        default:
+            return cone_score_threshold_;
+    }
+}
+
 void CenterPointDetection::FilterScore(
     const std::shared_ptr<apollo::perception::base::Blob<float>> &box3d,
     const std::shared_ptr<apollo::perception::base::Blob<float>> &label,
@@ -734,6 +774,32 @@ void CenterPointDetection::FilterScore(
       label_preds_filtered->insert(label_preds_filtered->end(),
                                    static_cast<int64_t>(label_ptr[i]));
 
+      scores_filtered->push_back(score_ptr[i]);
+    }
+  }
+}
+
+void CenterPointDetection::FilterDiffScore(
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &box3d,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &label,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &scores,
+  std::vector<float> *box3d_filtered,
+  std::vector<int64_t> *label_preds_filtered,
+  std::vector<float> *scores_filtered) {
+  const auto bbox_ptr = box3d->cpu_data();
+  const auto label_ptr = label->cpu_data();
+  const auto score_ptr = scores->cpu_data();
+
+  float threshold = 0.0;
+  for (int i = 0; i < scores->count(); ++i) {
+    threshold = GetObjectScoreThreshold(static_cast<int64_t>(label_ptr[i]));
+    if (score_ptr[i] > threshold) {
+      box3d_filtered->insert(box3d_filtered->end(),
+          bbox_ptr + model_param_.postprocess().num_output_box_feature() * i,
+          bbox_ptr +
+              model_param_.postprocess().num_output_box_feature() * (i + 1));
+      label_preds_filtered->insert(label_preds_filtered->end(),
+          static_cast<int64_t>(label_ptr[i]));
       scores_filtered->push_back(score_ptr[i]);
     }
   }
@@ -770,11 +836,55 @@ void CenterPointDetection::FilterForegroundPoints(
 
 void CenterPointDetection::FilterObjectsbyClassNMS(
     std::vector<std::shared_ptr<base::Object>> *objects) {
+    auto ordinary_nms_strategy = [&](size_t i, size_t j,
+        bool use_strategy = false) {
+        // return FILTER_INDEX
+        size_t type_i = static_cast<size_t>(objects->at(i)->type);
+        size_t type_j = static_cast<size_t>(objects->at(j)->type);
+        size_t filter_index =
+            (objects->at(i)->confidence < objects->at(j)->confidence) ? i : j;
+        // ordinary_nms_strategy: VEHICLE > BICYCLE > PEDESTRIAN > TRAFFICCONE
+        if (nms_strategy_ || use_strategy) {
+            return type_i > type_j ? j : i;
+        }
+        return filter_index;
+    };
+
+    auto special_nms_strategy = [&](size_t keep_index,
+          base::ObjectType keep_type, size_t filter_index,
+          base::ObjectType filter_type, float conf_buffer) {
+        if (nms_strategy_) {
+            return;
+        }
+        objects->at(keep_index)->lidar_supplement.raw_probs.clear();
+        objects->at(keep_index)->type_probs.clear();
+
+        objects->at(keep_index)->lidar_supplement.raw_probs.push_back(
+            std::vector<float>(static_cast<int>(
+                base::ObjectType::MAX_OBJECT_TYPE), 0.f));
+        float sum_confidence = objects->at(keep_index)->confidence +
+                               objects->at(filter_index)->confidence;
+        float filter_prob = 1.0 * (objects->at(filter_index)->confidence
+              + conf_buffer) / (sum_confidence + conf_buffer);
+        float keep_prob = 1.0 * objects->at(keep_index)->confidence /
+              (sum_confidence + conf_buffer);
+        objects->at(keep_index)->lidar_supplement.raw_probs.back()[
+            static_cast<int>(filter_type)] = filter_prob;
+        objects->at(keep_index)->lidar_supplement.raw_probs.back()[
+            static_cast<int>(keep_type)] = keep_prob;
+        objects->at(keep_index)->type_probs.assign(
+            objects->at(keep_index)->lidar_supplement.raw_probs.back().begin(),
+            objects->at(keep_index)->lidar_supplement.raw_probs.back().end());
+    };
+
     std::vector<bool> delete_array(objects->size(), false);
+    std::vector<bool> nms_visited(objects->size(), false);
+    std::vector<std::vector<size_t>> nms_pairs;
+    nms_pairs.resize(objects->size());
     // different class nms
     for (size_t i = 0; i < objects->size(); i++) {
         auto &obj_i = objects->at(i);
-        if (!obj_i) {
+        if (!obj_i || nms_visited[i]) {
             continue;
         }
         for (size_t j = i + 1; j < objects->size(); j++) {
@@ -782,26 +892,98 @@ void CenterPointDetection::FilterObjectsbyClassNMS(
             if (!obj_j) {
                 continue;
             }
-            if (get_3dbox_iou(obj_i, obj_j, i, j) <= diff_class_iou_) {
+            if (get_3dbox_iou(obj_i, obj_j) <= diff_class_iou_) {
                 continue;
             }
-            // should NMS
-            if (nms_strategy_) {
-                if (nms_by_strategy(obj_i, obj_j, nms_strategy_table_)) {
-                    delete_array[j] = true;
-                } else {
-                    delete_array[i] = true;
+            nms_visited[j] = true;
+            nms_pairs[i].push_back(j);
+        }
+    }
+    // do NMS
+    for (size_t i = 0; i < objects->size(); i++) {
+        if (nms_pairs[i].size() == 0) {
+            continue;
+        }
+        if (nms_pairs[i].size() == 1) {
+            size_t filter_index = ordinary_nms_strategy(i, nms_pairs[i][0]);
+            size_t keep_index = filter_index == i ? nms_pairs[i][0] : i;
+
+            delete_array[keep_index] = false;
+            delete_array[filter_index] = true;
+
+            // special-nms-strategy
+            auto filter_type = objects->at(filter_index)->type;
+            auto reserve_type = objects->at(keep_index)->type;
+            // Only trafficcone reserve but bicycle filter -> add bicycle conf
+            if (filter_type == base::ObjectType::BICYCLE &&
+                reserve_type == base::ObjectType::UNKNOWN) {
+                special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
+                    filter_index, base::ObjectType::BICYCLE, 0.3);
+            }
+            // Only pedestrian reserve but bicycle filter -> add bicycle conf
+            if (filter_type == base::ObjectType::BICYCLE &&
+                reserve_type == base::ObjectType::PEDESTRIAN) {
+                special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
+                    filter_index, base::ObjectType::BICYCLE, 0.2);
+            }
+            // Only trafficcone reserve but ped filter -> add ped conf
+            // if (filter_type == base::ObjectType::PEDESTRIAN &&
+            //     reserve_type == base::ObjectType::UNKNOWN) {
+            //     special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
+            //         filter_index, base::ObjectType::PEDESTRIAN, 0.2);
+            // }
+            // Only ped reserve but trafficcone filter -> add trafficcone conf
+            if (filter_type == base::ObjectType::UNKNOWN &&
+                reserve_type == base::ObjectType::PEDESTRIAN) {
+                special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
+                  filter_index, base::ObjectType::UNKNOWN, 0.2);
+            }
+            ADEBUG << "Only Two NMS: reserve " << keep_index
+                   << " filter " << filter_index;
+        }
+        if (nms_pairs[i].size() >= 2) {
+            // car strategy
+            bool have_car = false;
+            if (objects->at(i)->type == base::ObjectType::VEHICLE) {
+                have_car = true;
+            }
+            for (size_t k = 0; k < nms_pairs[i].size() && !have_car; k++) {
+                auto type = objects->at(nms_pairs[i][k])->type;
+                if (type == base::ObjectType::VEHICLE) {
+                    have_car = true;
+                    break;
+                }
+            }
+            // no car -> BICYCLE priorTo PEDESTRIAN priorTo TRAFFICCONE
+            // have car -> confidence
+            if (have_car) {
+                auto keep_conf = objects->at(i)->confidence;
+                auto keep_index = i;
+                for (size_t k = 0; k < nms_pairs[i].size(); k++) {
+                    if (objects->at(nms_pairs[i][k])->confidence > keep_conf) {
+                        delete_array[keep_index] = true;
+                        keep_conf = objects->at(nms_pairs[i][k])->confidence;
+                        keep_index = nms_pairs[i][k];
+                    } else {
+                        delete_array[nms_pairs[i][k]] = true;
+                        ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
+                    }
                 }
             } else {
-                // reserve by score
-                if (objects->at(i)->confidence > objects->at(j)->confidence) {
-                    delete_array[j] = true;
-                } else {
-                    delete_array[i] = true;
+                auto keep_type = static_cast<size_t>(objects->at(i)->type);
+                auto keep_index = i;
+                for (size_t k = 0; k < nms_pairs[i].size(); k++) {
+                    if (static_cast<size_t>(
+                        objects->at(nms_pairs[i][k])->type) > keep_type) {
+                        delete_array[keep_index] = true;
+                        keep_type = static_cast<size_t>(
+                            objects->at(nms_pairs[i][k])->type);
+                        keep_index = nms_pairs[i][k];
+                    } else {
+                        delete_array[nms_pairs[i][k]] = true;
+                        ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
+                    }
                 }
-                // size_t index = (objects->at(i)->confidence
-                // >= objects->at(j)->confidence ? i : j);
-                // delete_array[index] = true;
             }
         }
     }

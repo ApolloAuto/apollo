@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
@@ -47,6 +48,7 @@ bool emergency_brake = false;
 ErrorCode DevkitController::Init(
     const VehicleParameter& params,
     CanSender<::apollo::canbus::Devkit>* const can_sender,
+    CanReceiver<::apollo::canbus::Devkit>* const can_receiver,
     MessageManager<::apollo::canbus::Devkit>* const message_manager) {
   if (is_initialized_) {
     AINFO << "DevkitController has already been initiated.";
@@ -65,6 +67,12 @@ ErrorCode DevkitController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
+
+  if (can_receiver == nullptr) {
+    AERROR << "Canbus receiver is null.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "protocol manager is null.";
@@ -443,6 +451,15 @@ Chassis DevkitController::chassis() {
         "Chassis has some fault, please check the chassis_detail.");
   }
 
+  if (is_chassis_communication_error_) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "devkit chassis detail is lost! Please check the communication error.");
+    set_chassis_error_code(Chassis::CHASSIS_CAN_LOST);
+    set_driving_mode(Chassis::EMERGENCY_MODE);
+  }
+
   return chassis_;
 }
 
@@ -606,6 +623,19 @@ void DevkitController::Acceleration(double acc) {
   // None
 }
 
+// confirm the car is driven by speed command
+// speed:-xx.0~xx.0, unit:m/s
+void DevkitController::Speed(double speed) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "The current drive mode does not need to set speed.";
+    return;
+  }
+  /* ADD YOUR OWN CAR CHASSIS OPERATION
+  // TODO(ALL): CHECK YOUR VEHICLE WHETHER SUPPORT THIS DRIVE MODE
+  */
+}
+
 // devkit default, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with default angle speed, 25-250 (default:250)
@@ -721,18 +751,66 @@ void DevkitController::ResetProtocol() {
   message_manager_->ResetSendMessages();
 }
 
+bool DevkitController::CheckChassisCommunicationError() {
+  Devkit chassis_detail_receiver;
+  ADEBUG << "Can receiver finished recv once: "
+         << can_receiver_->IsFinishRecvOnce();
+  if (message_manager_->GetSensorRecvData(&chassis_detail_receiver) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis receive detail failed.";
+  }
+  ADEBUG << "chassis_detail_receiver is "
+         << chassis_detail_receiver.ShortDebugString();
+  size_t receiver_data_size = chassis_detail_receiver.ByteSizeLong();
+  ADEBUG << "check chassis detail receiver_data_size is " << receiver_data_size;
+  // check receiver data is null
+  if (receiver_data_size < 2) {
+    if (is_need_count_) {
+      lost_chassis_reveive_detail_count_++;
+    }
+  } else {
+    lost_chassis_reveive_detail_count_ = 0;
+    is_need_count_ = true;
+  }
+  ADEBUG << "lost_chassis_reveive_detail_count_ is "
+         << lost_chassis_reveive_detail_count_;
+  // check receive data lost threshold is (100 * 10)ms
+  if (lost_chassis_reveive_detail_count_ > 100) {
+    is_need_count_ = false;
+    is_chassis_communication_error_ = true;
+    AERROR << "neolix chassis detail is lost, please check the communication "
+              "error.";
+    message_manager_->ClearSensorRecvData();
+    message_manager_->ClearSensorData();
+    return true;
+  } else {
+    is_chassis_communication_error_ = false;
+  }
+
+  Devkit chassis_detail_sender;
+  if (message_manager_->GetSensorSenderData(&chassis_detail_sender) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis receive detail failed.";
+  }
+  ADEBUG << "chassis_detail_sender is "
+         << chassis_detail_sender.ShortDebugString();
+  size_t sender_data_size = chassis_detail_sender.ByteSizeLong();
+  ADEBUG << "check chassis detail sender_data_size is " << sender_data_size;
+
+  message_manager_->ClearSensorRecvData();
+  message_manager_->ClearSensorSenderData();
+  return false;
+}
+
 bool DevkitController::CheckChassisError() {
+  if (is_chassis_communication_error_) {
+    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
+    return false;
+  }
   Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "ChassisDetail has no devkit vehicle info.");
-    return false;
-  } else {
-    chassis_.clear_engage_advice();
+  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis detail failed.";
   }
 
   // steer fault
@@ -858,6 +936,12 @@ void DevkitController::SecurityDogThreadFunc() {
       can_sender_->Update();
       emergency_brake = false;
     }
+
+    if (!emergency_mode && !is_chassis_communication_error_ &&
+        mode == Chassis::EMERGENCY_MODE) {
+      set_chassis_error_code(Chassis::NO_ERROR);
+    }
+
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {

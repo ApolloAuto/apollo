@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './index.less';
-import { IconIcAddADesktopShortcut } from '../../icons';
+import IconPark from '../../IconPark';
 
 type Props = {
     primary: boolean;
@@ -23,7 +23,7 @@ export function MyComponent(props: Props) {
             }}
         >
             {children}
-            <IconIcAddADesktopShortcut spin />
+            <IconPark name='IcAddADesktopShortcut' spin />
         </div>
     );
 }

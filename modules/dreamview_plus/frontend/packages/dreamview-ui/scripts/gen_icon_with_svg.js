@@ -29,21 +29,17 @@ const svgoConfig = (prefix) => ({
 const ICON_PATTERN = /^(.+)\.svg$/;
 
 function genPath(filePath) {
-    const RAW_DIR = path.resolve(__dirname, `${filePath}/raw_svgs`);
-    const SVG_DIR = path.resolve(__dirname, `${filePath}/svgs`);
-    const ICON_TPL_DIR = path.resolve(__dirname, `${filePath}/icon_templates`);
-    const MODULE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'component.tpl'), 'utf8');
-    const EXPORT_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'export.tpl'), 'utf8');
-    const TYPE_TPL = fs.readFileSync(path.join(ICON_TPL_DIR, 'type.tpl'), 'utf8');
+    const RAW_DIR = path.resolve(__dirname, `${filePath}/SourceFile`);
+    const SVG_DIR = path.resolve(__dirname, `${filePath}/svg`);
+    const IMPORT_TPL = fs.readFileSync(path.join(__dirname, '../src/IconPark/templates/import.tpl'), 'utf8');
+    const EXPORT_TPL = fs.readFileSync(path.join(__dirname, '../src/IconPark/templates/export.tpl'), 'utf8');
     const ICON_SRC = path.resolve(__dirname, filePath);
 
     return {
         RAW_DIR,
         SVG_DIR,
-        ICON_TPL_DIR,
-        MODULE_TPL,
+        IMPORT_TPL,
         EXPORT_TPL,
-        TYPE_TPL,
         ICON_SRC,
     };
 }
@@ -192,12 +188,6 @@ async function generate(paths) {
     rimraf.sync(paths.SVG_DIR);
     mkdirp.sync(paths.SVG_DIR);
 
-    const iconsDir = path.join(paths.ICON_SRC, 'icons');
-    const iconComponentsDir = path.join(iconsDir, 'components');
-    rimraf.sync(iconsDir);
-    mkdirp.sync(iconsDir);
-    mkdirp.sync(iconComponentsDir);
-
     const iconSvgs = await getSVGFiles(paths.RAW_DIR, { keepSvgFill: false });
     const flattenIconSvgs = flatten(iconSvgs);
     Promise.all(
@@ -209,28 +199,27 @@ async function generate(paths) {
 
             const name = upperFirst(camelCase(slug));
 
-            const moduleCode = paths.MODULE_TPL.replace(/\{type\}/g, 'Icon')
-                .replace(/\{slug\}/g, slug)
-                .replace(/\{name\}/g, name);
-
-            fs.writeFileSync(path.join(iconComponentsDir, `${name}.tsx`), moduleCode, 'utf8');
-
             return { slug, name, file };
         }),
     )
         .then((iconInfos) => {
-            const exportFile = iconInfos
-                .map(({ slug, name, file }) => `${paths.EXPORT_TPL.replace(/\{name\}/g, name)}\n`)
-                .join('');
-            fs.writeFileSync(path.join(iconsDir, 'index.ts'), exportFile, 'utf8');
-            fs.writeFileSync(path.join(iconsDir, 'type.ts'), paths.TYPE_TPL, 'utf8');
+            const importFile = iconInfos
+                .map(({ name, file }) => `${paths.IMPORT_TPL.replace(/\{name\}/g, name).replace(/\{file\}/g, file)}\n`)
+                .join('')
+                .replace(/\n$/, '');
+            const exportFile = iconInfos.map(({ name }) => `${name}`).join(',\n    ');
+            fs.writeFileSync(
+                path.join(paths.ICON_SRC, 'index.ts'),
+                paths.EXPORT_TPL.replace(/\{importFile\}/g, importFile).replace(/\{exportFile\}/g, `${exportFile},`),
+                'utf8',
+            );
         })
         .catch((error) => {
             console.error('Error generating icons:', error);
         });
 }
-const drakFilePath = genPath('../src/iconDrak');
-const lightFilePath = genPath('../src');
+const drakFilePath = genPath('../src/IconPark/Drak');
+const lightFilePath = genPath('../src/IconPark/Light');
 
 generate(drakFilePath);
 generate(lightFilePath);

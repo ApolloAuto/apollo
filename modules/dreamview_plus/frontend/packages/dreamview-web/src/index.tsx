@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Logger from '@dreamview/log';
 import { initI18n } from '@dreamview/dreamview-lang';
+import { PerformanceMonitorPluginAdaptor } from '@dreamview/dreamview-analysis';
 
 const logger = Logger.getInstance(__filename);
 
@@ -37,5 +38,10 @@ export default async function dreamviewWebInit() {
 
     await initI18n();
 
-    root.render(<Root />);
+    root.render(
+        <>
+            <Root />
+            <PerformanceMonitorPluginAdaptor />
+        </>
+    );
 }

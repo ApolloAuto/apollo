@@ -24,6 +24,7 @@
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/class_loader/class_loader_register_macro.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -97,6 +98,11 @@ class AbstractVehicleFactory {
    * @brief create cansender heartbeat
    */
   virtual void UpdateHeartbeat();
+
+  /**
+   * @brief check chassis detail communication fault
+   */
+  virtual bool CheckChassisCommunicationFault();
 
  private:
   VehicleParameter vehicle_parameter_;

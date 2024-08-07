@@ -28,6 +28,8 @@
 namespace apollo {
 namespace planning {
 
+using common::math::Vec2d;
+
 bool FemPosDeviationSqpOsqpInterface::Solve() {
   // Sanity Check
   if (ref_points_.empty()) {
@@ -73,7 +75,7 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
 
   // Calculate offset
   std::vector<c_float> q;
-  CalculateOffset(&q);
+  CalculateOffset(ref_points_, &q);
 
   // Calculate affine constraints
   std::vector<c_float> A_data;
@@ -142,7 +144,7 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
 
     while (sub_itr < sqp_sub_max_iter_) {
       SetPrimalWarmStart(opt_xy_, &primal_warm_start);
-      CalculateOffset(&q);
+      CalculateOffset(opt_xy_, &q);
       CalculateAffineConstraint(opt_xy_, &A_data, &A_indices, &A_indptr,
                                 &lower_bounds, &upper_bounds);
       osqp_update_lin_cost(work, q.data());
@@ -323,7 +325,8 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
   P_indptr->push_back(ind_p);
 }
 
-void FemPosDeviationSqpOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
+void FemPosDeviationSqpOsqpInterface::CalculateOffset(
+    std::vector<std::pair<double, double>> points, std::vector<c_float>* q) {
   q->resize(num_of_variables_);
   for (int i = 0; i < num_of_points_; ++i) {
     const auto& ref_point_xy = ref_points_[i];
@@ -332,6 +335,30 @@ void FemPosDeviationSqpOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
   }
   for (int i = 0; i < num_of_slack_variables_; ++i) {
     (*q)[num_of_pos_variables_ + i] = weight_curvature_constraint_slack_var_;
+  }
+  AINFO << "FLAGS_enable_obstacle_potential_field: "
+        << FLAGS_enable_obstacle_potential_field
+        << " num_of_points_: " << num_of_points_
+        << "point_box_: " << point_box_.size();
+  if (FLAGS_enable_obstacle_potential_field &&
+      point_box_.size() == num_of_points_ - 1) {
+    AINFO << "use obstacle potential field";
+    for (int i = 1; i < num_of_points_ - 1; ++i) {
+      double grad_x = 0;
+      double grad_y = 0;
+      point_box_[i].push_back(point_box_[i].front());
+      for (int j = 0; j < 4; j++) {
+        Vec2d edge_vec(point_box_[i][j + 1].x() - point_box_[i][j].x(),
+                       point_box_[i][j + 1].y() - point_box_[i][j].y());
+        Vec2d ego_vec(points[i].first - point_box_[i][j].x(),
+                      points[i].second - point_box_[i][j].y());
+        grad_x += edge_vec.y() / edge_vec.CrossProd(ego_vec);
+        grad_y += -edge_vec.x() / edge_vec.CrossProd(ego_vec);
+      }
+
+      (*q)[2 * i] += FLAGS_sqp_obstacle_weight * grad_x;
+      (*q)[2 * i + 1] += FLAGS_sqp_obstacle_weight * grad_y;
+    }
   }
 }
 

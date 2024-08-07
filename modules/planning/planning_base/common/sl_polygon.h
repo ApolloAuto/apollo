@@ -45,7 +45,7 @@ class SLPolygon {
   };
   SLPolygon() = default;
   explicit SLPolygon(SLBoundary sl_boundary, std::string id = "",
-                     bool print_log = true);
+                     bool print_log = false);
   virtual ~SLPolygon() = default;
   static double GetInterpolatedLFromBoundary(
       const std::vector<SLPoint>& boundary, const double s);

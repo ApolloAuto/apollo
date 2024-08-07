@@ -50,6 +50,7 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 ErrorCode LincolnController::Init(
     const VehicleParameter &params,
     CanSender<::apollo::canbus::Lincoln> *const can_sender,
+    CanReceiver<::apollo::canbus::Lincoln> *const can_receiver,
     MessageManager<::apollo::canbus::Lincoln> *const message_manager) {
   if (is_initialized_) {
     AINFO << "LincolnController has already been initiated.";
@@ -68,6 +69,12 @@ ErrorCode LincolnController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
+
+  if (can_receiver == nullptr) {
+    AERROR << "Canbus receiver is null.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "Protocol manager is null.";

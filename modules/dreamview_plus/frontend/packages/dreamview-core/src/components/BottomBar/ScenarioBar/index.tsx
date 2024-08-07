@@ -23,7 +23,7 @@ function ScenarioBar(props: ScenarioBarProps) {
     const [panelInfoState] = usePanelInfoStore();
     const layout = useGetCurrentLayout();
     const { t } = useTranslation('pncMonitor');
-    const { mainApi, isMainConnected } = useWebSocketServices();
+    const { mainApi, isMainConnected, otherApi } = useWebSocketServices();
     const [hmi] = usePickHmiStore();
     const { t: tBottomBar } = useTranslation('bottomBar');
 
@@ -72,15 +72,24 @@ function ScenarioBar(props: ScenarioBarProps) {
     }, [hmi.currentScenarioId, t]);
 
     const startScenario = useCallback(
-        (fromScenario: boolean, end: BusinessEventInfo['RoutePoint'], waypoint: BusinessEventInfo['RoutePoint'][]) => {
-            if (!mainApi) {
-                return;
-            }
-            mainApi.startScenario({
-                fromScenario,
-                end,
-                waypoint,
-            });
+        (
+            fromScenario: boolean,
+            end?: BusinessEventInfo['RoutePoint'],
+            waypoint?: BusinessEventInfo['RoutePoint'][],
+        ) => {
+            otherApi
+                ?.startScenario({
+                    fromScenario,
+                    end,
+                    waypoint,
+                })
+                .catch((err) => {
+                    console.error(err);
+                    message({
+                        type: 'error',
+                        content: t('scenarioSimulationFailed'),
+                    });
+                });
         },
         [mainApi],
     );
@@ -109,9 +118,7 @@ function ScenarioBar(props: ScenarioBarProps) {
                 startScenario(!endPonit, endPonit, waypoint);
             }
         } else {
-            mainApi.startScenario({
-                fromScenario: true,
-            });
+            startScenario(true);
         }
     }, [hmi.modules, errormsg, isMainConnected, getRouteInfo, startCycle, startScenario, mainApi, t]);
 
@@ -120,7 +127,7 @@ function ScenarioBar(props: ScenarioBarProps) {
             return;
         }
         if (isMainConnected) {
-            mainApi.stopScenario();
+            otherApi.stopScenario();
         }
     }, [errormsg, isMainConnected, mainApi]);
 
@@ -129,20 +136,20 @@ function ScenarioBar(props: ScenarioBarProps) {
             return;
         }
         if (isMainConnected) {
-            mainApi.resetScenario();
+            otherApi.resetScenario();
         }
     }, [errormsg, isMainConnected]);
 
     useKeyDownEvent(onStart, onEnd);
 
-    const buttonStatus = (() => {
+    const buttonStatus = useMemo(() => {
         if (errormsg) {
             return DynamicEffectButtonStatus.DISABLE;
         }
-        return hmi.otherComponents?.ScenarioSimulation?.status === SIM_CONTROL_STATUS.OK
+        return hmi.simOtherComponents?.ScenarioSimulation?.message === SIM_CONTROL_STATUS.OK
             ? DynamicEffectButtonStatus.STOP
             : DynamicEffectButtonStatus.START;
-    })();
+    }, [errormsg, hmi.simOtherComponents]);
 
     const behavior = {
         [DynamicEffectButtonStatus.DISABLE]: {

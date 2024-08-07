@@ -1,0 +1,10 @@
+module_config {
+    module_library : "modules/drivers/lidar/livox/liblivox_component.so"
+    components {
+        class_name : "LivoxLidarComponent"
+        config {
+          name : "Livox_Driver"
+          config_file_path : "/apollo/modules/drivers/lidar/livox/conf/livox.pb.txt"
+        }
+    }
+}

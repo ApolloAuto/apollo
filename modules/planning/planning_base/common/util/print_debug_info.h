@@ -62,7 +62,6 @@ class PrintCurves {
  private:
   std::map<std::string, PrintPoints> curve_map_;
 };
-
 class PrintBox {
  public:
   explicit PrintBox(std::string id) : id_(id) {}

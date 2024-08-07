@@ -12,7 +12,11 @@ apollo_cc_binary(
         "module_controller.cc",
         "module_controller.h",
     ],
-    linkopts = ["-pthread"],
+    linkopts = [
+        "-pthread",
+        "-lprofiler",
+        "-ltcmalloc",
+    ],
     deps = [
         "//cyber",
         "//cyber/plugin_manager:cyber_plugin_manager",

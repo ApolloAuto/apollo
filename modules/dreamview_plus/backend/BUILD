@@ -90,6 +90,7 @@ apollo_cc_library(
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common_msgs/localization_msgs:gps_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/transform_msgs:transform_proto",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",

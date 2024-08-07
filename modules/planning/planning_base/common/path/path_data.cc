@@ -95,8 +95,8 @@ const FrenetFramePath &PathData::frenet_frame_path() const {
   return frenet_path_;
 }
 
-const std::vector<std::tuple<double, PathData::PathPointType, double>> &
-PathData::path_point_decision_guide() const {
+const std::vector<std::tuple<double, PathData::PathPointType, double>>
+    &PathData::path_point_decision_guide() const {
   return path_point_decision_guide_;
 }
 

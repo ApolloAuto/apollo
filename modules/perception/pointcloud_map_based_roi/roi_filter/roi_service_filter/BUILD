@@ -1,5 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_plugin", "apollo_cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,6 +20,7 @@ apollo_cc_library(
     hdrs = [
         "roi_service_filter.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//modules/perception/pointcloud_map_based_roi:apollo_perception_pointcloud_map_based_roi",
         "//cyber",

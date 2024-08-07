@@ -3,6 +3,7 @@ import { generate } from 'short-uuid';
 import { IWorker, Task, TaskInternal, WorkerResponse } from './type';
 import { WorkerFactory } from './WorkerFactory';
 import MessageQueue from '../util/MessageQueue';
+import { DispatchTaskOption } from '../services/WebSocketManager';
 
 export interface WorkerPoolManagerConfig<TPayload> {
     name: string;
@@ -10,6 +11,13 @@ export interface WorkerPoolManagerConfig<TPayload> {
     performanceMode?: boolean;
     workerFactory: WorkerFactory<TPayload>;
 }
+
+const getCoreCount = (): number => {
+    if (navigator.hardwareConcurrency) {
+        return navigator.hardwareConcurrency;
+    }
+    return 10;
+};
 
 export default class WorkerPoolManager<TPayload> {
     private static totalWorkerCount = 0;
@@ -20,20 +28,28 @@ export default class WorkerPoolManager<TPayload> {
 
     private logger: Logger;
 
-    private maxWorkerSize = 20;
+    private maxWorkerSize = getCoreCount();
 
     private minWorkerSize = 1;
 
-    private pidController: { integral: number; previousError: number; Kp: number; Ki: number; Kd: number } = {
-        integral: 0,
-        previousError: 0,
-        // 任务数量增加时快速增加线程数
-        Kp: 0.2,
-        // 处理长期的小误差
-        Ki: 0.01,
-        // 预测未来趋势，平滑系统响应。
-        Kd: 0.05,
-    };
+    private pidController: {
+        setpoint: number;
+        integral: number;
+        previousError: number;
+        Kp: number;
+        Ki: number;
+        Kd: number;
+    } = {
+            setpoint: 1,
+            integral: 0,
+            previousError: 0,
+            // 任务数量增加时快速增加线程数
+            Kp: 0.01,
+            // 处理长期的小误差
+            Ki: 0.005,
+            // 预测未来趋势，平滑系统响应。
+            Kd: 0.01,
+        };
 
     set workerSize(size: number) {
         this.adjustWorkerSize(size);
@@ -52,9 +68,9 @@ export default class WorkerPoolManager<TPayload> {
 
     private handleDequeue = (task: TaskInternal<TPayload>) => {
         this.logger.debug(`Dequeue task: ${this.queue.size},${task.id}`);
-        if (this.queue.size === 0) {
-            this.terminateIdleWorkers();
-        }
+        // if (this.queue.size === 0) {
+        //     this.terminateIdleWorkers();
+        // }
     };
 
     private readonly workerFactory: WorkerFactory<TPayload>;
@@ -78,37 +94,46 @@ export default class WorkerPoolManager<TPayload> {
     }
 
     init(): void {
-        for (let i = 0; i < this.minWorkerSize / 2; i += 1) {
-            this.createWorker();
-        }
+        // 初始化调整值
+        const initialWorkerSize = this.config.performanceMode ? this.maxWorkerSize : this.minWorkerSize;
         const { size } = this.config;
-        if (size) {
-            this.workerSize = size;
+        this.workerSize = size || initialWorkerSize;
+    }
+
+    private sendTaskToWorker(
+        worker: IWorker<TPayload>,
+        taskInternal: TaskInternal<TPayload>,
+        option?: DispatchTaskOption,
+    ): void {
+        try {
+            if (taskInternal.transferList) {
+                worker.postMessage(taskInternal, taskInternal.transferList);
+            } else {
+                worker.postMessage(taskInternal);
+            }
+            worker.setIdle(false);
+            option?.callback?.();
+        } catch (error) {
+            this.logger.error(JSON.stringify(error));
         }
     }
 
-    private sendTaskToWorker(worker: IWorker<TPayload>, taskInternal: TaskInternal<TPayload>): void {
-        if (taskInternal.transferList) {
-            worker.postMessage(taskInternal, taskInternal.transferList);
-        } else {
-            worker.postMessage(taskInternal);
-        }
-        worker.setIdle(false);
-    }
-
-    dispatchTask(task: Task<TPayload>): Promise<WorkerResponse<unknown>> {
+    dispatchTask(task: Task<TPayload>, option?: DispatchTaskOption): Promise<WorkerResponse<unknown>> {
         return new Promise((resolve, reject) => {
             const id = `${task.type}-${generate()}`;
             const worker = this.getAvailableWorker();
             const taskInternal: TaskInternal<TPayload> = { id, priority: 0, ...task };
             if (worker) {
-                this.sendTaskToWorker(worker, taskInternal);
+                this.sendTaskToWorker(worker, taskInternal, option);
             } else if (this.pool.length < this.maxWorkerSize) {
                 const newWorker = this.createWorker();
-                this.sendTaskToWorker(newWorker, taskInternal);
+                this.sendTaskToWorker(newWorker, taskInternal, option);
             } else {
                 // fixme: 实现优先级逻辑
-                this.queue.enqueue(taskInternal);
+                this.queue.enqueue({
+                    ...taskInternal,
+                    option,
+                });
             }
             this.taskResolvers.set(id, { resolve, reject });
         });
@@ -134,7 +159,7 @@ export default class WorkerPoolManager<TPayload> {
             const task = this.queue.dequeue();
             const idleWorker = this.getAvailableWorker();
             if (idleWorker) {
-                this.sendTaskToWorker(idleWorker, task);
+                this.sendTaskToWorker(idleWorker, task, task.option);
             }
         }
     }
@@ -158,22 +183,26 @@ export default class WorkerPoolManager<TPayload> {
         }
     }
 
-    private adjustWorkerSizeWithPID(): void {
-        const error = this.queue.size; // 理想队列长度为0
+    public adjustWorkerSizeWithPID(): void {
+        const error = this.pidController.setpoint - this.queue.size;
         this.pidController.integral += error;
-        const derivative = error - this.pidController.previousError;
+        // 限制积分项，防止积分饱和
+        this.pidController.integral = Math.max(Math.min(this.pidController.integral, 1000), -1000);
 
+        const derivative = error - this.pidController.previousError; // 计算微分项
+        // 计算PID调整值
         const adjustment =
             this.pidController.Kp * error +
             this.pidController.Ki * this.pidController.integral +
             this.pidController.Kd * derivative;
 
-        // 判断阈值，避免小的队列变动立即触发线程数调整
-        if (Math.abs(adjustment) > 2) {
-            this.workerSize = Math.round(this.workerSize + adjustment);
-            this.workerSize = Math.min(Math.max(this.workerSize, this.minWorkerSize), this.maxWorkerSize);
-        }
+        // 应用PID调整值进行线程大小调整，考虑到调整可能是小数，使用Math.round来取整
+        const tempWorkerSize = Math.round(this.pool.length + adjustment);
+        // 应用计算出的调整后的线程大小
+        const adjestSize = Math.min(Math.max(tempWorkerSize, this.minWorkerSize), this.maxWorkerSize);
 
+        this.workerSize = adjestSize;
+        // 更新错误值，供下次计算使用
         this.pidController.previousError = error;
     }
 
@@ -184,24 +213,21 @@ export default class WorkerPoolManager<TPayload> {
             this.resizeTimeoutId = null;
         }
 
-        if (size < this.pool.length) {
+        // 调整线程池大小至目标值
+        while (this.pool.length > size) {
             // 减少workers数量
             const idleWorker = this.pool.find((worker) => worker.isIdle);
             if (idleWorker) {
                 idleWorker.terminate();
                 this.pool = this.pool.filter((worker) => worker !== idleWorker);
                 WorkerPoolManager.totalWorkerCount -= 1;
+            } else {
+                break; // 如果没有空闲worker，停止尝试
             }
-
-            // 设置3秒后再次调用此方法，直到达到目标size
-            if (this.pool.length > size) {
-                this.resizeTimeoutId = setTimeout(() => this.adjustWorkerSize(size), 3000) as unknown as number;
-            }
-        } else if (size > this.pool.length) {
-            while (this.pool.length < size) {
-                this.createWorker();
-            }
-            this.dispatchQueuedTasks();
+        }
+        while (this.pool.length < size) {
+            // 增加workers数量
+            this.createWorker();
         }
     }
 
@@ -218,7 +244,7 @@ export default class WorkerPoolManager<TPayload> {
             if (worker.isIdle && now - worker.lastUsedTime > idleThreshold) {
                 const task = this.queue.dequeue();
                 if (task) {
-                    this.sendTaskToWorker(worker, task);
+                    this.sendTaskToWorker(worker, task, task.option);
                 } else {
                     worker.setIdle(false);
                 }
@@ -258,5 +284,13 @@ export default class WorkerPoolManager<TPayload> {
         this.logger.info('[Active Workers]/[Current Workers]/[All Workers]:');
         this.logger.info(` ${activeWorkerCount} / ${this.pool.length} / ${allWorkers}`);
         this.logger.info(`Queued Tasks: ${queuedTasksCount}`);
+    }
+
+    getWorkerCount(): number {
+        return this.pool.length;
+    }
+
+    getTaskCount(): number {
+        return this.queue.size;
     }
 }

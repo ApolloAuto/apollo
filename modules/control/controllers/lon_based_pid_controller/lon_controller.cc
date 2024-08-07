@@ -586,6 +586,27 @@ Status LonController::ComputeControlCommand(
     cmd->set_gear_location(chassis->gear_location());
   }
 
+  if (lon_based_pidcontroller_conf_.use_speed_itfc()) {
+    reference_spd_cmd_ = reference_spd_ + debug->speed_offset();
+    if ((reference_spd_ <=
+         lon_based_pidcontroller_conf_.speed_itfc_full_stop_speed()) &&
+        (chassis->gear_location() == canbus::Chassis::GEAR_DRIVE)) {
+      if ((debug->path_remain() >=
+           lon_based_pidcontroller_conf_.speed_itfc_path_remain_min()) &&
+          (debug->preview_acceleration_reference() >=
+           lon_based_pidcontroller_conf_.speed_itfc_dcc_emergency()) &&
+          (debug->path_remain() <=
+           lon_based_pidcontroller_conf_.speed_itfc_path_remain_max())) {
+        if (debug->preview_acceleration_reference() <=
+            lon_based_pidcontroller_conf_.speed_itfc_acc_thres()) {
+          reference_spd_cmd_ =
+              lon_based_pidcontroller_conf_.speed_itfc_speed_cmd();
+        }
+      }
+    }
+    cmd->set_speed(reference_spd_cmd_);
+  }
+
   return Status::OK();
 }
 
@@ -680,6 +701,9 @@ void LonController::ComputeLongitudinalErrors(
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());
+  if (lon_based_pidcontroller_conf_.use_speed_itfc()) {
+    reference_spd_ = reference_point.v();
+  }
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,

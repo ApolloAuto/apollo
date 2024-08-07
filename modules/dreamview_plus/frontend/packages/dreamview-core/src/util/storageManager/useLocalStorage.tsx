@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { LocalStorage } from './LocalStorage';
 
-export function useLocalStorage<T>(propKey: string, version?: string) {
+export function useLocalStorage<T>(propKey: string, version?: string): LocalStorage<T> {
     const [storageManager] = useState(() => new LocalStorage(propKey, version));
 
     return storageManager;

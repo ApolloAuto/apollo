@@ -1,18 +1,19 @@
 import React, { PropsWithChildren } from 'react';
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 
 type SubContentProps = PropsWithChildren & {
     style?: React.CSSProperties;
 };
+const useStyle = makeStyles((theme) => ({
+    'dreamview-panel-sub-content': {
+        fontFamily: 'PingFangSC-Regular',
+        fontSize: theme.tokens.font.size.regular,
+        color: theme.tokens.colors.fontColor4,
+    },
+}));
 
 export function SubContentOrigin(props: SubContentProps) {
-    const { classes } = useMakeStyle((theme) => ({
-        'dreamview-panel-sub-content': {
-            fontFamily: 'PingFangSC-Regular',
-            fontSize: theme.tokens.font.size.regular,
-            color: theme.tokens.colors.fontColor4,
-        },
-    }))();
+    const { classes } = useStyle();
     return (
         <div
             style={{

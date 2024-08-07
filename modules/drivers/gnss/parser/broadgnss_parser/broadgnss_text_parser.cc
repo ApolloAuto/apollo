@@ -63,7 +63,7 @@ bool BroadGnssTextParser::PrepareMessage() {
     }
   }
   if (data_start != data_) {
-    AWARN << "BroadGnss message has been truncated: " << data_;
+    AINFO << "BroadGnss message has been truncated: " << data_;
   }
 
   if (*data_start != '$') {
@@ -75,7 +75,7 @@ bool BroadGnssTextParser::PrepareMessage() {
   }
 
   if (*(data_end_ - 1) != 0x0A) {
-    AWARN << "BroadGnss ASCII message is not complete: " << data_start;
+    AINFO << "BroadGnss ASCII message is not complete: " << data_start;
     return false;
   } else {
     ADEBUG << "BroadGnss ASCII message is complete";
@@ -90,9 +90,25 @@ bool BroadGnssTextParser::PrepareMessage() {
   if (fields.empty()) {
     return false;
   }
+  auto valid_fields = [&]() -> bool {
+    for (size_t i = 1; i < fields.size(); ++i) {
+      if (fields[i].empty()) {
+        fields[i] = "0";
+      } else if (fields[i].find_first_not_of("0123456789.- ") !=
+                 std::string::npos) {
+        AERROR << "BroadGnss ASCII message field error: " << fields[i]
+               << ", input str: " << input_str_;
+        return false;
+      }
+    }
+    return true;
+  };
   if (fields[0] == protocol_.GIAVP) {
     if (fields.size() != protocol_.GIAVP_SIZE) {
       AERROR << "BroadGnss GIAVP message format error: " << data_;
+      return false;
+    }
+    if (!valid_fields()) {
       return false;
     }
     PrepareMessageGIAVP(fields);
@@ -100,6 +116,9 @@ bool BroadGnssTextParser::PrepareMessage() {
   } else if (fields[0] == protocol_.GPINS) {
     if (fields.size() != protocol_.GPINS_SIZE) {
       AERROR << "BroadGnss GPINS message format error:" << data_;
+      return false;
+    }
+    if (!valid_fields()) {
       return false;
     }
     PrepareMessageGPINS(fields);
@@ -112,14 +131,12 @@ void BroadGnssTextParser::PrepareMessageCommon(
     const std::vector<std::string> &fields) {
   broadgnss_message_.gps_timestamp_sec =
       std::stoi(fields[1]) * SECONDS_PER_WEEK + std::stod(fields[2]);
-  broadgnss_message_.unix_timestamp_sec =
-      apollo::drivers::util::gps2unix(broadgnss_message_.gps_timestamp_sec);
   broadgnss_message_.heading = std::stod(fields[3]);
   broadgnss_message_.pitch = std::stod(fields[4]);
   broadgnss_message_.roll = std::stod(fields[5]);
-  broadgnss_message_.latitude = std::stod(fields[6].empty() ? "0" : fields[6]);
-  broadgnss_message_.longitude = std::stod(fields[7].empty() ? "0" : fields[7]);
-  broadgnss_message_.altitude = std::stod(fields[8].empty() ? "0" : fields[8]);
+  broadgnss_message_.latitude = std::stod(fields[6]);
+  broadgnss_message_.longitude = std::stod(fields[7]);
+  broadgnss_message_.altitude = std::stod(fields[8]);
   broadgnss_message_.ve = std::stod(fields[9]);
   broadgnss_message_.vn = std::stod(fields[10]);
   broadgnss_message_.vu = std::stod(fields[11]);

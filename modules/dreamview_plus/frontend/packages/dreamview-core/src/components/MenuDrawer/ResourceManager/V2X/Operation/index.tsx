@@ -1,14 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    IconIcDelete,
-    IconIcSucceed as IconIcInUse,
-    IconUpload,
-    IconRefresh,
-    IconIcUseRetry,
-    IconIcDownloading as IconIcDownload,
-    Popover,
-} from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { ENUM_DOWNLOAD_STATUS } from '@dreamview/dreamview-core/src/services/api/types';
 import useStyle from './useStyle';
 
@@ -79,7 +71,7 @@ function RenderOperation(props: IRenderDownLoadStatus) {
     const icUpload = (
         <Popover className={classes.font18} trigger='hover' content={t('upload')}>
             <span onClick={onUpload}>
-                <IconUpload />
+                <IconPark name='Upload' />
             </span>
         </Popover>
     );
@@ -87,7 +79,7 @@ function RenderOperation(props: IRenderDownLoadStatus) {
     const icDelete = (
         <Popover trigger='hover' content={t('delete')}>
             <span onClick={onDelete}>
-                <IconIcDelete />
+                <IconPark name='IcDelete' />
             </span>
         </Popover>
     );
@@ -95,7 +87,7 @@ function RenderOperation(props: IRenderDownLoadStatus) {
     const icUpdate = (
         <Popover trigger='hover' content={t('download')}>
             <span onClick={onRefresh}>
-                <IconIcDownload />
+                <IconPark name='IcDownloading' />
             </span>
         </Popover>
     );
@@ -103,7 +95,7 @@ function RenderOperation(props: IRenderDownLoadStatus) {
     const icReset = (
         <Popover trigger='hover' content={t('reset')}>
             <span className={classes.retry} onClick={onReset}>
-                <IconIcUseRetry />
+                <IconPark name='IcUseRetry' />
             </span>
         </Popover>
     );
@@ -111,7 +103,7 @@ function RenderOperation(props: IRenderDownLoadStatus) {
     if (isInUsed) {
         return (
             <div>
-                <IconIcInUse className={classes['source-operate-icon']} />
+                <IconPark name='IcSucceed' className={classes['source-operate-icon']} />
             </div>
         );
     }

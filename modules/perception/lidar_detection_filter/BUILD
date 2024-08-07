@@ -25,6 +25,7 @@ apollo_cc_library(
         "interface/base_object_filter.h",
         "object_filter_bank/object_filter_bank.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/common/util:common_util",

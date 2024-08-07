@@ -18,8 +18,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus_vehicle/ge3/ge3_controller.h"
-#include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -71,6 +69,7 @@ bool Ge3VehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
+                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -159,10 +158,9 @@ void Ge3VehicleFactory::PublishChassisDetail() {
   chassis_detail_writer_->Write(chassis_detail);
 }
 
-std::unique_ptr<VehicleController<::apollo::canbus::Ge3>>
+std::unique_ptr<ge3::Ge3Controller>
 Ge3VehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<VehicleController<::apollo::canbus::Ge3>>(
-      new ge3::Ge3Controller());
+  return std::unique_ptr<ge3::Ge3Controller>(new ge3::Ge3Controller());
 }
 
 std::unique_ptr<MessageManager<::apollo::canbus::Ge3>>

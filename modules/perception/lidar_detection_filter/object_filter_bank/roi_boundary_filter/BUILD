@@ -1,5 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_plugin", "apollo_cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,6 +16,7 @@ apollo_cc_library(
     name = "lib_rbf",
     srcs = ["roi_boundary_filter.cc"],
     hdrs = ["roi_boundary_filter.h"],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/perception/common:perception_common_util",

@@ -654,7 +654,7 @@ bool NovatelParser::HandleBestVel(const novatel::BestVel* vel,
 bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
   rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
              imu->y_velocity_change * imu_measurement_hz_,
-             imu->z_velocity_change * imu_measurement_hz_,
+             imu->z_velocity_change * imu_measurement_hz_ + 9.8,
              ins_.mutable_linear_acceleration());
   rfu_to_flu(imu->x_angle_change * imu_measurement_hz_,
              imu->y_angle_change * imu_measurement_hz_,

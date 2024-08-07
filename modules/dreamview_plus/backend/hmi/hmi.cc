@@ -269,7 +269,6 @@ void HMI::RegisterMessageHandlers() {
         // Extra works for current Dreamview.
         if (hmi_action == HMIAction::CHANGE_VEHICLE) {
           // Reload lidar params for point cloud service.
-          PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
         } else if (hmi_action == HMIAction::CHANGE_MAP) {
           response["data"]["info"]["data"]["isOk"] = is_ok;

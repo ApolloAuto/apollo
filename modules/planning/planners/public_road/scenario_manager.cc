@@ -80,6 +80,7 @@ void ScenarioManager::Reset(Frame* frame) {
     current_scenario_->Exit(frame);
   }
   AINFO << "Reset to default scenario:" << default_scenario_type_->Name();
+  default_scenario_type_->Reset();
   current_scenario_ = default_scenario_type_;
 }
 }  // namespace planning

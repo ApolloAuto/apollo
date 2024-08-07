@@ -235,3 +235,7 @@ DEFINE_string(default_rtk_record_file, "/apollo/data/log/garage.csv",
 
 DEFINE_string(default_rtk_record_path, "/apollo/data/log/",
               "Default rtk record path.");
+
+DEFINE_bool(dv_cpu_profile, false, "enable cpu profile");
+
+DEFINE_bool(dv_heap_profile, false, "enable heap profile");

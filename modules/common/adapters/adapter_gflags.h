@@ -35,6 +35,7 @@ DECLARE_string(monitor_topic);
 DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
 DECLARE_string(control_debug_info_topic);
+DECLARE_string(control_interative_topic);
 DECLARE_string(control_preprocessor_topic);
 DECLARE_string(control_local_view_topic);
 DECLARE_string(control_core_command_topic);

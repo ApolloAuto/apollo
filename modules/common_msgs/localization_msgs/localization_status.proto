@@ -164,12 +164,76 @@ message MsfSensorMsgStatus {
   optional ImuMsgDataStatus imu_data_status = 3;
 }
 
+// The init pose source 
+enum MsfInitPoseSource {
+    UNKNOWN_SOURCE = 0;
+    GNSS_HEADING = 1;
+    LOCAL_SEARCH_FROM_INTEGPVA = 2;
+    LOCAL_SEARCH_FROM_FILE = 3;
+    LOCAL_UPDATE_FROM_FILE = 4;
+    USER_INTERACTION = 5;
+    INSPVA_RECORD = 6;
+    GNSS_VELOCITY = 7;
+    GLOBAL_LIDAR = 8;
+}
+
+// The status of gnss map offset
+enum MsfGnssMapOffsetStatus {
+    MSF_LOCAL_GNSS_MAP_OFFSET_NORMAL = 0;
+    MSF_LOCAL_GNSS_MAP_OFFSET_ABNORMAL = 1;
+}
+
+// The gnss map offset
+message MsfGnssMapOffset {
+    optional MsfGnssMapOffsetStatus status = 1;
+    optional double offsetx = 2;
+    optional double offsety = 3;
+}
+
+// The init pose status
+enum MsfInitPoseStatus { 
+    INIT_WAITING = 0;
+    INIT_DOING = 1;
+    INIT_SUCCESSFUL = 2;
+    INIT_FAILED = 3;
+    INIT_TERMINATED = 4;
+}
+
+// The init details
+message MsfInitDetails { 
+    optional MsfInitPoseSource init_pose_source = 1;
+    optional MsfInitPoseStatus local_search_from_integpva_status = 2;
+    optional MsfInitPoseStatus local_search_from_file_status = 3;
+    optional MsfInitPoseStatus local_update_from_file_status = 4;
+    optional MsfInitPoseStatus user_interaction_status = 5;
+    optional int32 gnss_position_type = 6;
+    optional MsfInitPoseStatus local_from_global_lidar_status = 7;
+}
+
+// The initializaiton status of localization module
+enum MSFInitStatus {
+    MSF_INIT = 0;
+    MSF_ALIGNING = 1;
+    MSF_ALIGNED_INIT = 2;
+    MSF_ALIGNED_CONVERGED = 3;
+    MSF_ALIGNED_CONVERGING = 4;
+    MSF_ALIGNED_GOOD = 5;
+    MSF_ALIGNED_VALID = 6;
+}
+
 // The status of msf localization module
 message MsfStatus {
   optional LocalLidarConsistency local_lidar_consistency = 1;
   optional GnssConsistency gnss_consistency = 2;
   optional LocalLidarStatus local_lidar_status = 3;
-  optional LocalLidarQuality local_lidar_quality = 4;
-  optional GnssPositionType gnsspos_position_type = 5;
-  optional MsfRunningStatus msf_running_status = 6;
+  optional GnssPositionType gnsspos_position_type = 4;
+  optional uint32 heading_position_type = 5;
+  optional MSFInitStatus msf_init_status = 6;
+  optional MsfRunningStatus msf_running_status = 7;
+  optional MsfInitDetails msf_init_details = 8;
+  optional LocalLidarQuality local_lidar_quality = 9;
+  optional MsfGnssMapOffset gnss_map_offset = 10;
+  optional bool lidar_alt_from_map = 11;
+  optional double local_lidar_score = 12;
+  optional bool local_reliability_status = 13 [default = false];
 }

@@ -19,12 +19,32 @@ modules {
   }
 }
 modules {
-  key: "Lidar"
+  key: "CameraDriver"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/drivers/camera/launch/camera.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/drivers/camera/launch/camera.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/drivers/camera/launch/camera.launch"
+    }
+  }
+}
+modules {
+  key: "LidarPerception"
   value: {
     start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_lidar.launch &"
     stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_lidar.launch &"
     process_monitor_config {
       command_keywords: "start /apollo/modules/perception/launch/perception_lidar.launch"
+    }
+  }
+}
+modules {
+  key: "LidarDriver"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/drivers/lidar/launch/driver.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/drivers/lidar/launch/driver.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/drivers/lidar/launch/driver.launch"
     }
   }
 }
@@ -117,6 +137,16 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
+modules {
+  key: "IndoorLocalization"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/slam_local_indoor/launch/slam_local_indoor.launch"
+    }
+  }
+}
 cyber_modules {
   key: "Guardian"
   value: {
@@ -164,7 +194,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Lidar"
+  key: "LidarPerception"
   value: {
     process {
       command_keywords: "start /apollo/modules/perception/launch/perception_lidar.launch"
@@ -188,9 +218,25 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Camera"
+  key: "CameraPerception"
   value: {
     # Special CameraMonitor.
+  }
+}
+monitored_components {
+  key: "CameraDriver"
+  value: {
+    process {
+      command_keywords: "start /apollo/modules/drivers/camera/launch/camera.launch"
+    }
+  }
+}
+monitored_components {
+  key: "LidarDriver"
+  value: {
+    process {
+      command_keywords: "start /apollo/modules/drivers/lidar/launch/driver.launch"
+    }
   }
 }
 operations: Record

@@ -1,52 +1,48 @@
-import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
+import { makeStyles, useThemeContext } from '@dreamview/dreamview-theme';
 import React, { useEffect, useMemo, useState } from 'react';
-import { IconIcClassificationNotes } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'legend-flex-container': {
-            textAlign: 'center',
-            marginBottom: '-6px',
-            marginTop: theme.tokens.margin.speace2,
+const useStyle = makeStyles((theme) => ({
+    'legend-flex-container': {
+        textAlign: 'center',
+        marginBottom: '-6px',
+        marginTop: theme.tokens.margin.speace2,
+    },
+    'legend-container': {
+        display: 'inline-flex',
+        flexWrap: 'wrap',
+        margin: `0 6px 0px ${theme.tokens.margin.speace2}`,
+    },
+    'legend-item': {
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        userSelect: 'none',
+        color: theme.tokens.colors.fontColor5,
+        ...theme.tokens.typography.sideText,
+        marginRight: '10px',
+        '& .anticon': {
+            marginRight: '6px',
         },
-        'legend-container': {
-            display: 'inline-flex',
-            flexWrap: 'wrap',
-            margin: `0 6px 0px ${theme.tokens.margin.speace2}`,
+    },
+    'legend-unactive': {
+        position: 'relative',
+        color: theme.tokens.colors.fontColor1,
+        '& .anticon': {
+            color: `${theme.tokens.colors.fontColor1} !important`,
         },
-        'legend-item': {
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            userSelect: 'none',
-            color: theme.tokens.colors.fontColor5,
-            ...theme.tokens.typography.sideText,
-            marginRight: '10px',
-            '& .anticon': {
-                marginRight: '6px',
-            },
+        '&::after': {
+            content: '""',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            margin: 'auto',
+            height: '1px',
+            background: theme.tokens.colors.fontColor1,
         },
-        'legend-unactive': {
-            position: 'relative',
-            color: theme.tokens.colors.fontColor1,
-            '& .anticon': {
-                color: `${theme.tokens.colors.fontColor1} !important`,
-            },
-            '&::after': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                margin: 'auto',
-                height: '1px',
-                background: theme.tokens.colors.fontColor1,
-            },
-        },
-        'legend-icon': {},
-    }));
-
-    return hoc();
-}
+    },
+    'legend-icon': {},
+}));
 
 interface LegendProps {
     legends: Array<{ name: string; color: string }>;
@@ -57,8 +53,7 @@ function Legend(props: LegendProps) {
     const { legends, onClick: propOnClick } = props;
     const { classes, cx } = useStyle();
     const [selected, setSelected] = useState<Record<string, boolean>>({});
-    const { useStyles } = useThemeContext();
-    const { theme } = useStyles();
+    const { tokens } = useThemeContext();
     useEffect(() => {
         const result: Record<string, boolean> = {};
         legends.forEach(({ name }) => {
@@ -94,9 +89,10 @@ function Legend(props: LegendProps) {
                         onClick={() => onClick(item.name)}
                         key={`${item.name}_${index + 1}`}
                     >
-                        <IconIcClassificationNotes
+                        <IconPark
+                            name='IcClassificationNotes'
                             // className={classes}
-                            style={{ color: item.color || theme.components.pncMonitor.chartColors[index] }}
+                            style={{ color: item.color || tokens.components.pncMonitor.chartColors[index] }}
                         />
                         {item.name}
                     </div>

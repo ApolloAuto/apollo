@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/ic_warning_message</title>
+    <defs>
+        <circle id="path-1" cx="8" cy="8" r="6"></circle>
+    </defs>
+    <g id="icon/ic_warning_message" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <circle stroke="#FF6F00" cx="8" cy="8" r="5.5"></circle>
+        <path d="M8,9.6875 C8.31066017,9.6875 8.5625,9.93933983 8.5625,10.25 C8.5625,10.5606602 8.31066017,10.8125 8,10.8125 C7.68933983,10.8125 7.4375,10.5606602 7.4375,10.25 C7.4375,9.93933983 7.68933983,9.6875 8,9.6875 Z M8.3625,5.1875 C8.47295695,5.1875 8.5625,5.27704305 8.5625,5.3875 L8.5625,8.7375 C8.5625,8.84795695 8.47295695,8.9375 8.3625,8.9375 L7.6375,8.9375 C7.52704305,8.9375 7.4375,8.84795695 7.4375,8.7375 L7.4375,5.3875 C7.4375,5.27704305 7.52704305,5.1875 7.6375,5.1875 L8.3625,5.1875 Z" id="形状结合" fill="#FF6F00" fill-rule="nonzero" mask="url(#mask-2)"></path>
+    </g>
+</svg>

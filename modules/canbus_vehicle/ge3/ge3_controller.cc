@@ -42,6 +42,7 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode Ge3Controller::Init(
     const VehicleParameter& params, CanSender<Ge3>* const can_sender,
+    CanReceiver<Ge3>* const can_receiver,
     MessageManager<::apollo::canbus::Ge3>* const message_manager) {
   if (is_initialized_) {
     AINFO << "Ge3Controller has already been initiated.";
@@ -61,6 +62,12 @@ ErrorCode Ge3Controller::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
+
+  if (can_receiver == nullptr) {
+    AERROR << "Canbus receiver is null.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "protocol manager is null.";

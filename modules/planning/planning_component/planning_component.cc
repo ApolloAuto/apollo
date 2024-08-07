@@ -18,6 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -29,13 +30,16 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Vec2d;
 using apollo::cyber::ComponentBase;
 using apollo::hdmap::HDMapUtil;
+
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
+using apollo::perception::PerceptionEdgeInfo;
 
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
@@ -91,6 +95,14 @@ bool PlanningComponent::Init() {
         ADEBUG << "Received story_telling data: run story_telling callback.";
         std::lock_guard<std::mutex> lock(mutex_);
         stories_.CopyFrom(*stories);
+      });
+
+  edge_info_reader_ = node_->CreateReader<PerceptionEdgeInfo>(
+      config_.topic_config().perception_edge_info_topic(),
+      [this](const std::shared_ptr<PerceptionEdgeInfo>& edge_info) {
+        ADEBUG << "Received edge_info data: run edge_info callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        edge_info_.CopyFrom(*edge_info);
       });
 
   if (FLAGS_use_navigation_mode) {
@@ -163,6 +175,15 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.stories = std::make_shared<Stories>(stories_);
   }
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!local_view_.perception_road_edge ||
+        !common::util::IsProtoEqual(local_view_.perception_road_edge->header(),
+                                    edge_info_.header())) {
+      local_view_.perception_road_edge =
+          std::make_shared<PerceptionEdgeInfo>(edge_info_);
+    }
+  }
 
   if (!CheckInput()) {
     AINFO << "Input check failed";
@@ -204,6 +225,7 @@ bool PlanningComponent::Proc(
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
+  SetLocation(&adc_trajectory_pb);
   // modify trajectory relative time due to the timestamp change in header
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
@@ -259,6 +281,8 @@ void PlanningComponent::CheckRerouting() {
 
 bool PlanningComponent::CheckInput() {
   ADCTrajectory trajectory_pb;
+
+  SetLocation(&trajectory_pb);
   auto* not_ready = trajectory_pb.mutable_decision()
                         ->mutable_main_decision()
                         ->mutable_not_ready();
@@ -291,6 +315,25 @@ bool PlanningComponent::CheckInput() {
     return false;
   }
   return true;
+}
+
+void PlanningComponent::SetLocation(ADCTrajectory* const ptr_trajectory_pb) {
+  auto p = ptr_trajectory_pb->mutable_location_pose();
+  p->mutable_vehice_location()->set_x(
+      local_view_.localization_estimate->pose().position().x());
+  p->mutable_vehice_location()->set_y(
+      local_view_.localization_estimate->pose().position().y());
+  const Vec2d& adc_position = {
+      local_view_.localization_estimate->pose().position().x(),
+      local_view_.localization_estimate->pose().position().y()};
+  Vec2d left_point, right_point;
+  if (planning_base_->GenerateWidthOfLane(adc_position, left_point,
+                                          right_point)) {
+    p->mutable_left_lane_boundary_point()->set_x(left_point.x());
+    p->mutable_left_lane_boundary_point()->set_y(left_point.y());
+    p->mutable_right_lane_boundary_point()->set_x(right_point.x());
+    p->mutable_right_lane_boundary_point()->set_y(right_point.y());
+  }
 }
 
 }  // namespace planning

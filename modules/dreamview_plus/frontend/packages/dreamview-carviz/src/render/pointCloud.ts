@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Logger from '@dreamview/log';
+import { DreamviewAnalysis, perfMonitor } from '@dreamview/dreamview-analysis';
 import { pointCloudHeightColorMapping } from '../constant/common';
 import { disposeMesh, getPointSize } from '../utils/common';
 
@@ -54,6 +55,7 @@ export default class PointCloud {
     }
 
     update(pointCloud) {
+        perfMonitor.mark('pointCloudUpdateStart');
         if (!this.option.layerOption.Perception.pointCloud || !pointCloud.num || pointCloud.num.length % 3 !== 0) {
             logger.warn('pointCloud length should be multiples of 3');
             return;
@@ -62,8 +64,18 @@ export default class PointCloud {
         const x = adcMesh?.position?.x || 0;
         const y = adcMesh?.position?.y || 0;
         const heading = adcMesh?.rotation?.y || 0;
-
         const pointCloudSize = pointCloud.num.length / 3;
+        DreamviewAnalysis.logData(
+            'pointCloud',
+            {
+                pointCloudSize,
+            },
+            {
+                useStatistics: {
+                    useMax: true,
+                },
+            },
+        );
         const total = Math.min(pointCloudSize, MAX_POINTS);
 
         this.pointCloudMesh.geometry.setDrawRange(0, total);
@@ -97,6 +109,8 @@ export default class PointCloud {
             this.meshFlag = true;
             this.scene.add(this.pointCloudMesh);
         }
+        perfMonitor.mark('pointCloudUpdateEnd');
+        perfMonitor.measure('pointCloudUpdate', 'pointCloudUpdateStart', 'pointCloudUpdateEnd');
     }
 
     updateOffsetPosition() {
@@ -121,6 +135,7 @@ export default class PointCloud {
     }
 
     disposeLastFrame() {
+        this.meshFlag = false;
         this.scene.remove(this.pointCloudMesh);
     }
 }

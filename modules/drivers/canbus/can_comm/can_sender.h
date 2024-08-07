@@ -31,11 +31,11 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cyber/common/macros.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "cyber/time/time.h"
-#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -333,12 +333,14 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         AERROR << "Send msg failed:" << can_frame.CanFrameString();
       }
       if (enable_log()) {
-        ADEBUG << "send_can_frame#" << can_frame.CanFrameString()
-               << "echo send_can_frame# in chssis_detail.";
+        AINFO << "send_can_frame#" << can_frame.CanFrameString();
+      }
+      {
+        bool is_recv_prase = false;
         uint32_t uid = can_frame.id;
         const uint8_t *data = can_frame.data;
         uint8_t len = can_frame.len;
-        pt_manager_->Parse(uid, data, len);
+        pt_manager_->Parse(uid, data, len, is_recv_prase);
       }
     }
     delta_period = new_delta_period;

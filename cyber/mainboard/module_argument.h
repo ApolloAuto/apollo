@@ -47,6 +47,12 @@ class ModuleArgument {
   const std::string& GetSchedName() const;
   const std::list<std::string>& GetDAGConfList() const;
   const std::list<std::string>& GetPluginDescriptionList() const;
+  const bool GetEnableCpuprofile() const { return enable_cpuprofile_; }
+  const std::string GetProfileFilename() const { return profile_filename_; }
+  const bool GetEnableHeapprofile() const { return enable_heapprofile_; }
+  const std::string GetHeapProfileFilename() const {
+    return heapprofile_filename_;
+  }
   const bool& GetDisablePluginsAutoLoad() const;
 
  private:
@@ -55,6 +61,10 @@ class ModuleArgument {
   std::string binary_name_;
   std::string process_group_;
   std::string sched_name_;
+  bool enable_cpuprofile_ = false;
+  std::string profile_filename_;
+  bool enable_heapprofile_ = false;
+  std::string heapprofile_filename_;
   bool disable_plugin_autoload_ = false;
 };
 

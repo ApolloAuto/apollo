@@ -18,8 +18,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
-#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -71,6 +69,7 @@ bool %(car_type_cap)sVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
+                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -163,9 +162,16 @@ void %(car_type_cap)sVehicleFactory::UpdateHeartbeat() {
     can_sender_.Update_Heartbeat();
 }
 
-std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>
+bool %(car_type_cap)sVehicleFactory::CheckChassisCommunicationFault() {
+  if (vehicle_controller_->CheckChassisCommunicationError()) {
+    return true;
+  }
+  return false;
+}
+
+std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController>
 %(car_type_cap)sVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>(
+  return std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController>(
       new %(car_type_lower)s::%(car_type_cap)sController());
 }
 

@@ -149,6 +149,7 @@ bool ShmDispatcher::Init() {
   notifier_ = NotifierFactory::CreateNotifier();
   thread_ = std::thread(&ShmDispatcher::ThreadFunc, this);
   scheduler::Instance()->SetInnerThreadAttr("shm_disp", &thread_);
+  // statistics::Statistics::Instance()->CreateSpan("protobuf_parse_time");
   return true;
 }
 

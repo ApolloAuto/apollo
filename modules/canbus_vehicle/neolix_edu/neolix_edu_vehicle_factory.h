@@ -26,9 +26,12 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/neolix_edu/proto/neolix_edu.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/neolix_edu/neolix_edu_controller.h"
+#include "modules/canbus_vehicle/neolix_edu/neolix_edu_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -92,13 +95,14 @@ class Neolix_eduVehicleFactory : public AbstractVehicleFactory {
    */
   void PublishChassisDetail() override;
 
+  bool CheckChassisCommunicationFault();
+
  private:
   /**
    * @brief create Neolix_edu vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>>
-  CreateVehicleController();
+  std::unique_ptr<neolix_edu::Neolix_eduController> CreateVehicleController();
 
   /**
    * @brief create Neolix_edu message manager
@@ -114,8 +118,7 @@ class Neolix_eduVehicleFactory : public AbstractVehicleFactory {
       can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Neolix_edu>>
       message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>>
-      vehicle_controller_;
+  std::unique_ptr<neolix_edu::Neolix_eduController> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Neolix_edu>>
       chassis_detail_writer_;

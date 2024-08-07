@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "gperftools/profiler.h"
+#include "gperftools/heap-profiler.h"
+#include "gperftools/malloc_extension.h"
+
 #include "cyber/common/global_data.h"
 #include "cyber/init.h"
 #include "modules/dreamview_plus/backend/dreamview.h"
@@ -21,6 +25,38 @@
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   // Added by caros to improve dv performance
+
+  std::signal(SIGTERM, [](int sig){
+    apollo::cyber::OnShutdown(sig);
+    if (FLAGS_dv_cpu_profile) {
+      ProfilerStop();
+    }
+    if (FLAGS_dv_heap_profile) {
+      HeapProfilerDump("Befor shutdown");
+      HeapProfilerStop();
+    }
+  });
+
+  std::signal(SIGINT, [](int sig){
+    apollo::cyber::OnShutdown(sig);
+    if (FLAGS_dv_cpu_profile) {
+      ProfilerStop();
+    }
+    if (FLAGS_dv_heap_profile) {
+      HeapProfilerDump("Befor shutdown");
+      HeapProfilerStop();
+    }
+  });
+
+  if (FLAGS_dv_cpu_profile) {
+    auto base_name_cpu = std::string(argv[0]) + "_cpu" + std::string(".prof");
+    ProfilerStart(base_name_cpu.c_str());
+  }
+  if (FLAGS_dv_heap_profile) {
+    auto base_name_heap = std::string(argv[0]) + "_heap" + std::string(".prof");
+    HeapProfilerStart(base_name_heap.c_str());
+  }
+
   apollo::cyber::GlobalData::Instance()->SetProcessGroup("dreamview_sched");
   apollo::cyber::Init(argv[0]);
 

@@ -49,6 +49,8 @@ void Object::Reset() {
 
   confidence = 1.0f;
 
+  is_front_critical = false;
+
   track_id = -1;
   velocity = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
   velocity_uncertainty << 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f;

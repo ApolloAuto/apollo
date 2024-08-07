@@ -27,7 +27,7 @@ apollo_cc_library(
         "ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h",
         "interface/base_ground_detector.h",
     ],
-    copts = select(
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"] + select(
         {
             "@platforms//cpu:x86_64": ["-msse4.1"],
             "@platforms//cpu:aarch64": ["-march=armv8-a+fp+simd+crc"],

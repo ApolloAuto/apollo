@@ -27,9 +27,9 @@
 
 #include "cyber/task/task.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planning_base/common/trajectory_stitcher.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -153,9 +153,9 @@ Status OpenSpaceTrajectoryProvider::Process() {
       if (open_space_info.target_parking_spot_id() != "") {
         double angle = open_space_info.open_space_end_pose()[2];
         temp_target[0] = straight_trajectory_length_ * cos(angle) +
-                            open_space_info.open_space_end_pose()[0];
+                         open_space_info.open_space_end_pose()[0];
         temp_target[1] = straight_trajectory_length_ * sin(angle) +
-                            open_space_info.open_space_end_pose()[1];
+                         open_space_info.open_space_end_pose()[1];
       }
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.stitching_trajectory = stitching_trajectory;
@@ -431,18 +431,13 @@ void OpenSpaceTrajectoryProvider::LoadResult(
     double v = 0.3;
     double t = distance / v * 2;
     double a = v / t;
-    double start_x =
-        optimizer_trajectory_ptr->back().path_point().x();
-    double start_y =
-        optimizer_trajectory_ptr->back().path_point().y();
-    double start_time =
-        optimizer_trajectory_ptr->back().relative_time();
+    double start_x = optimizer_trajectory_ptr->back().path_point().x();
+    double start_y = optimizer_trajectory_ptr->back().path_point().y();
+    double start_time = optimizer_trajectory_ptr->back().relative_time();
     std::vector<double> end_pose =
         frame_->open_space_info().open_space_end_pose();
-    double unit_x =
-        -cos(optimizer_trajectory_ptr->back().path_point().theta());
-    double unit_y =
-        -sin(optimizer_trajectory_ptr->back().path_point().theta());
+    double unit_x = -cos(optimizer_trajectory_ptr->back().path_point().theta());
+    double unit_y = -sin(optimizer_trajectory_ptr->back().path_point().theta());
     for (size_t i = 1; i <= t / 0.1; i++) {
       double x = 0, y = 0, v_now = 0, a_now = 0;
       v_now = v - a * i * 0.1;
@@ -451,13 +446,12 @@ void OpenSpaceTrajectoryProvider::LoadResult(
       x = scale * unit_x;
       y = scale * unit_y;
       ADEBUG << start_x + x << ", " << start_y + y << ", "
-                << start_time + 0.1 * i << ", "
-                << v_now << ", " << a_now;
+             << start_time + 0.1 * i << ", " << v_now << ", " << a_now;
       TrajectoryPoint point;
       point.mutable_path_point()->set_x(start_x + x);
       point.mutable_path_point()->set_y(start_y + y);
       point.mutable_path_point()->set_theta(
-            optimizer_trajectory_ptr->back().path_point().theta());
+          optimizer_trajectory_ptr->back().path_point().theta());
       point.mutable_path_point()->set_s(0.0);
       point.mutable_path_point()->set_kappa(0.0);
       point.set_relative_time(start_time + 0.1 * i);

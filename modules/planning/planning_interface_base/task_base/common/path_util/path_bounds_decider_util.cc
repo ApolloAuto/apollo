@@ -28,6 +28,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/planning_base/common/sl_polygon.h"
+#include "modules/planning/planning_base/common/util/util.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
@@ -117,7 +119,9 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryWithBuffer(
 bool PathBoundsDeciderUtil::UpdateLeftPathBoundaryWithBuffer(
     double left_bound, BoundType left_type, std::string left_id,
     PathBoundPoint* const bound_point) {
-  left_bound = left_bound - GetBufferBetweenADCCenterAndEdge();
+  double adc_half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+  left_bound = left_bound - adc_half_width;
   PathBoundPoint new_point = *bound_point;
   if (new_point.l_upper.l > left_bound) {
     new_point.l_upper.l = left_bound;
@@ -138,7 +142,9 @@ bool PathBoundsDeciderUtil::UpdateLeftPathBoundaryWithBuffer(
 bool PathBoundsDeciderUtil::UpdateRightPathBoundaryWithBuffer(
     double right_bound, BoundType right_type, std::string right_id,
     PathBoundPoint* const bound_point) {
-  right_bound = right_bound + GetBufferBetweenADCCenterAndEdge();
+  double adc_half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+  right_bound = right_bound + adc_half_width;
   PathBoundPoint new_point = *bound_point;
   if (new_point.l_lower.l < right_bound) {
     new_point.l_lower.l = right_bound;
@@ -162,233 +168,278 @@ void PathBoundsDeciderUtil::TrimPathBounds(
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
     }
-    int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
-    for (int i = 0; i < range; ++i) {
+    double front_edge_to_center =
+        VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
+    double trimmed_s =
+        path_boundaries->at(path_blocked_idx).s - front_edge_to_center;
+    AINFO << "Trimmed from " << path_boundaries->back().s << " to "
+          << path_boundaries->at(path_blocked_idx - 1).s;
+    while (path_boundaries->size() > 1 &&
+           path_boundaries->back().s > trimmed_s) {
       path_boundaries->pop_back();
     }
   }
 }
 
-std::string PathBoundsDeciderUtil::FindFarthestBlockObstaclesId(
-    const std::unordered_map<std::string, double>& obs_id_to_start_s) {
-  std::string nearest_obstcles_id = "";
-  double max_start_s = std::numeric_limits<double>::lowest();
-  for (auto obs : obs_id_to_start_s) {
-    if (obs.second > max_start_s) {
-      nearest_obstcles_id = obs.first;
-      max_start_s = obs.second;
-    }
-  }
-  return nearest_obstcles_id;
-}
-
-bool CompareLeftBound(const std::pair<std::string, double>& lhs,
-                      const std::pair<std::string, double>& rhs) {
-  if (lhs.first == rhs.first) {
-    return false;
-  }
-  return lhs.second < rhs.second;
-}
-bool CompareRightBound(const std::pair<std::string, double>& lhs,
-                       const std::pair<std::string, double>& rhs) {
-  if (lhs.first == rhs.first) {
-    return false;
-  }
-  return lhs.second > rhs.second;
-}
-bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-    const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
-    PathBoundary* const path_boundaries,
-    std::string* const blocking_obstacle_id,
-    double* const narrowest_width) {
-  // Preprocessing.
-  auto indexed_obstacles = reference_line_info.path_decision().obstacles();
-  auto sorted_obstacles =
-      SortObstaclesForSweepLine(indexed_obstacles, init_sl_state);
-  AINFO << "There are " << sorted_obstacles.size() << " obstacles.";
-  double center_line = init_sl_state.second[0];
-  ADEBUG << "init l" << init_sl_state.second[0];
-  size_t obs_idx = 0;
-  int path_blocked_idx = -1;
-  std::multiset<std::pair<std::string, double>, decltype(CompareRightBound)*>
-      right_bounds(CompareRightBound);
-  std::multiset<std::pair<std::string, double>, decltype(CompareLeftBound)*>
-      left_bounds(CompareLeftBound);
-  right_bounds.insert(
-      std::make_pair("", std::numeric_limits<double>::lowest()));
-  left_bounds.insert(std::make_pair("", std::numeric_limits<double>::max()));
-  // Maps obstacle ID's to the decided ADC pass direction, if ADC should
-  // pass from left, then true; otherwise, false.
-  std::unordered_map<std::string, bool> obs_id_to_direction;
-  // Maps obstacle ID's to the decision of whether side-pass on this obstacle
-  // is allowed. If allowed, then true; otherwise, false.
-  std::unordered_map<std::string, bool> obs_id_to_sidepass_decision;
-  // Maps obstacle ID's to start s on this obstacle
-  std::unordered_map<std::string, double> obs_id_to_start_s;
-  // Step through every path point.
-  for (size_t i = 1; i < path_boundaries->size(); ++i) {
-    double curr_s = (*path_boundaries)[i].s;
-    // Check and see if there is any obstacle change:
-    if (obs_idx < sorted_obstacles.size() &&
-        std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
-      while (obs_idx < sorted_obstacles.size() &&
-             std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
-        const auto& curr_obstacle = sorted_obstacles[obs_idx];
-        const double curr_obstacle_s = std::get<1>(curr_obstacle);
-        const double curr_obstacle_l_min = std::get<2>(curr_obstacle);
-        const double curr_obstacle_l_max = std::get<3>(curr_obstacle);
-        const std::string curr_obstacle_id = std::get<4>(curr_obstacle);
-        ADEBUG << "id[" << curr_obstacle_id << "] s[" << curr_obstacle_s
-               << "] curr_obstacle_l_min[" << curr_obstacle_l_min
-               << "] curr_obstacle_l_max[" << curr_obstacle_l_max
-               << "] center_line[" << center_line << "]";
-        if (std::get<0>(curr_obstacle) == 1) {
-          // A new obstacle enters into our scope:
-          //   - Decide which direction for the ADC to pass.
-          //   - Update the left/right bound accordingly.
-          //   - If boundaries blocked, then decide whether can side-pass.
-          //   - If yes, then borrow neighbor lane to side-pass.
-
-          if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
-            // Obstacle is to the right of center-line, should pass from
-            // left.
-            ADEBUG << curr_obstacle_id << "left nudge";
-            obs_id_to_direction[curr_obstacle_id] = true;
-            right_bounds.insert(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_max));
-          } else {
-            // Obstacle is to the left of center-line, should pass from
-            // right.
-            obs_id_to_direction[curr_obstacle_id] = false;
-            left_bounds.insert(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_min));
-          }
-          ADEBUG << curr_obstacle_id << "right nudge";
-          obs_id_to_start_s[curr_obstacle_id] = curr_obstacle_s;
-        } else {
-          // An existing obstacle exits our scope.
-          if (obs_id_to_direction[curr_obstacle_id]) {
-            right_bounds.erase(right_bounds.find(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_max)));
-          } else {
-            left_bounds.erase(left_bounds.find(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_min)));
-          }
-          obs_id_to_direction.erase(curr_obstacle_id);
-          obs_id_to_start_s.erase(curr_obstacle_id);
-        }
-        // Update the bounds and center_line.
-        if (!UpdateLeftPathBoundaryWithBuffer(
-                left_bounds.begin()->second, BoundType::OBSTACLE,
-                left_bounds.begin()->first, &(*path_boundaries)[i])) {
-          path_blocked_idx = static_cast<int>(i);
-          if (!obs_id_to_start_s.empty()) {
-            *blocking_obstacle_id =
-                FindFarthestBlockObstaclesId(obs_id_to_start_s);
-          }
-          break;
-        }
-        if (!UpdateRightPathBoundaryWithBuffer(
-                right_bounds.begin()->second, BoundType::OBSTACLE,
-                right_bounds.begin()->first, &(*path_boundaries)[i])) {
-          path_blocked_idx = static_cast<int>(i);
-          if (!obs_id_to_start_s.empty()) {
-            *blocking_obstacle_id =
-                FindFarthestBlockObstaclesId(obs_id_to_start_s);
-          }
-          break;
-        }
-
-        ++obs_idx;
-      }
-    } else {
-      // If no obstacle change, update the bounds and center_line.
-      if (!UpdateLeftPathBoundaryWithBuffer(
-              left_bounds.begin()->second, BoundType::OBSTACLE,
-              left_bounds.begin()->first, &(*path_boundaries)[i])) {
-        path_blocked_idx = static_cast<int>(i);
-        if (!obs_id_to_start_s.empty()) {
-          *blocking_obstacle_id =
-              FindFarthestBlockObstaclesId(obs_id_to_start_s);
-        }
-        break;
-      }
-      if (!UpdateRightPathBoundaryWithBuffer(
-              right_bounds.begin()->second, BoundType::OBSTACLE,
-              right_bounds.begin()->first, &(*path_boundaries)[i])) {
-        path_blocked_idx = static_cast<int>(i);
-        if (!obs_id_to_start_s.empty()) {
-          *blocking_obstacle_id =
-              FindFarthestBlockObstaclesId(obs_id_to_start_s);
-        }
-        break;
-      }
-    }
-    center_line =
-        ((*path_boundaries)[i].l_lower.l + (*path_boundaries)[i].l_upper.l) /
-        2.0;
-    // Early exit if path is blocked.
-    if (path_blocked_idx != -1) {
-      break;
-    }
-  }
-  AINFO << "blocking_obstacle_id" << *blocking_obstacle_id << ","
-        << path_blocked_idx;
-  TrimPathBounds(path_blocked_idx, path_boundaries);
-
-  return true;
-}
-
-// The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
-std::vector<ObstacleEdge> PathBoundsDeciderUtil::SortObstaclesForSweepLine(
-    const IndexedList<std::string, Obstacle>& indexed_obstacles,
-    const SLState& init_sl_state) {
-  std::vector<ObstacleEdge> sorted_obstacles;
-
-  // Go through every obstacle and preprocess it.
-  for (const auto* obstacle : indexed_obstacles.Items()) {
-    // Only focus on those within-scope obstacles.
+void PathBoundsDeciderUtil::GetSLPolygons(
+    const ReferenceLineInfo& reference_line_info,
+    std::vector<SLPolygon>* polygons, const SLState& init_sl_state) {
+  polygons->clear();
+  auto obstacles = reference_line_info.path_decision().obstacles();
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+  for (const auto* obstacle : obstacles.Items()) {
     if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
-    // Only focus on obstacles that are ahead of ADC.
-    if (obstacle->PerceptionSLBoundary().end_s() < init_sl_state.first[0]) {
+    auto xy_poly = obstacle->PerceptionPolygon();
+
+    // if (obstacle->PerceptionSLBoundary().end_s() < init_sl_state.first[0]) {
+    //     continue;
+    // }
+    if (obstacle->PerceptionSLBoundary().end_s() < adc_back_edge_s) {
       continue;
     }
-    // Decompose each obstacle's rectangle into two edges: one at
-    // start_s; the other at end_s.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
-    sorted_obstacles.emplace_back(
-        1, obstacle_sl.start_s() - FLAGS_obstacle_lon_start_buffer,
-        obstacle_sl.start_l() - FLAGS_obstacle_lat_buffer,
-        obstacle_sl.end_l() + FLAGS_obstacle_lat_buffer, obstacle->Id());
-    sorted_obstacles.emplace_back(
-        0, obstacle_sl.end_s() + FLAGS_obstacle_lon_end_buffer,
-        obstacle_sl.start_l() - FLAGS_obstacle_lat_buffer,
-        obstacle_sl.end_l() + FLAGS_obstacle_lat_buffer, obstacle->Id());
+    polygons->emplace_back(obstacle_sl, obstacle->Id());
   }
+  sort(polygons->begin(), polygons->end(),
+       [](const SLPolygon& a, const SLPolygon& b) {
+         return a.MinS() < b.MinS();
+       });
+}
 
-  // Sort.
-  std::sort(sorted_obstacles.begin(), sorted_obstacles.end(),
-            [](const ObstacleEdge& lhs, const ObstacleEdge& rhs) {
-              if (std::get<1>(lhs) != std::get<1>(rhs)) {
-                return std::get<1>(lhs) < std::get<1>(rhs);
-              } else {
-                return std::get<0>(lhs) > std::get<0>(rhs);
-              }
-            });
+bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
+    PathBoundary* path_boundary, std::vector<SLPolygon>* sl_polygon,
+    std::vector<double>* center_l, std::string* blocked_id,
+    double* narrowest_width) {
+  if (center_l->empty()) {
+    center_l->push_back(
+        (path_boundary->front().l_lower.l + path_boundary->front().l_upper.l) /
+        2.0);
+  }
+  *narrowest_width =
+      path_boundary->front().l_upper.l - path_boundary->front().l_lower.l;
+  size_t nudge_check_count = size_t(FLAGS_max_nudge_check_distance /
+                                    FLAGS_path_bounds_decider_resolution);
+  double last_max_nudge_l = center_l->front();
 
-  return sorted_obstacles;
+  for (size_t i = 1; i < path_boundary->size(); ++i) {
+    auto& left_bound = path_boundary->at(i).l_upper;
+    auto& right_bound = path_boundary->at(i).l_lower;
+    double default_width = right_bound.l - left_bound.l;
+    auto begin_it =
+        center_l->end() - std::min(nudge_check_count, center_l->size());
+    last_max_nudge_l = *std::max_element(
+        begin_it, center_l->end(),
+        [](double a, double b) { return std::fabs(a) < std::fabs(b); });
+    AINFO << "last max nudge l: " << last_max_nudge_l;
+    for (size_t j = 0; j < sl_polygon->size(); j++) {
+      // double min_s = sl_polygon->at(j).MinS() -
+      // FLAGS_path_bounds_decider_resolution; double max_s =
+      // sl_polygon->at(j).MaxS() + FLAGS_path_bounds_decider_resolution;
+      double min_s = sl_polygon->at(j).MinS();
+      double max_s =
+          sl_polygon->at(j).MaxS() + FLAGS_obstacle_lon_end_buffer_park;
+      if (max_s - min_s < FLAGS_path_bounds_decider_resolution) {
+        max_s += FLAGS_path_bounds_decider_resolution;
+        min_s -= FLAGS_path_bounds_decider_resolution;
+      }
+      if (max_s < path_boundary->at(i).s) {
+        continue;
+      }
+      if (min_s > path_boundary->at(i).s) {
+        break;
+      }
+      double l_lower = std::max<double>(
+          sl_polygon->at(j).GetRightBoundaryByS(path_boundary->at(i).s),
+          path_boundary->at(i).l_lower.l);
+      double l_upper = std::min<double>(
+          sl_polygon->at(j).GetLeftBoundaryByS(path_boundary->at(i).s),
+          path_boundary->at(i).l_upper.l);
+      if (sl_polygon->at(j).NudgeInfo() == SLPolygon::UNDEFINED) {
+        AINFO << "last_max_nudge_l: " << last_max_nudge_l
+              << ", obs l: " << l_lower << ", " << l_upper;
+        if (last_max_nudge_l < (l_lower + l_upper) / 2) {
+          sl_polygon->at(j).SetNudgeInfo(SLPolygon::RIGHT_NUDGE);
+          AINFO << sl_polygon->at(j).id() << " right nudge";
+        } else {
+          sl_polygon->at(j).SetNudgeInfo(SLPolygon::LEFT_NUDGE);
+          AINFO << sl_polygon->at(j).id() << " left nudge";
+        }
+      } else {
+        AINFO << "last_max_nudge_l: " << last_max_nudge_l
+              << ", obs l: " << l_lower << ", " << l_upper
+              << ", nudge info: " << sl_polygon->at(j).NudgeInfo();
+      }
+      if (sl_polygon->at(j).NudgeInfo() == SLPolygon::RIGHT_NUDGE) {
+        // right nudge
+        l_lower -= GetBufferBetweenADCCenterAndEdge();
+        if (l_lower <= right_bound.l) {
+          // boundary is blocked
+          *blocked_id = sl_polygon->at(j).id();
+          AINFO << "blocked at " << *blocked_id << ", "
+                << path_boundary->at(i).s << ", l_lower: " << l_lower
+                << ", l_upper: " << l_upper;
+          sl_polygon->at(j).SetNudgeInfo(SLPolygon::BLOCKED);
+          break;
+        }
+        if (l_lower < left_bound.l) {
+          AINFO << "update left_bound [s, l]: [" << path_boundary->at(i).s
+                << ", " << l_lower << "]";
+          left_bound.l = l_lower;
+          left_bound.type = BoundType::OBSTACLE;
+          left_bound.id = sl_polygon->at(j).id();
+          *narrowest_width =
+              std::min(*narrowest_width, left_bound.l - right_bound.l);
+        }
+      } else {
+        // left nudge
+        l_upper += GetBufferBetweenADCCenterAndEdge();
+        if (l_upper >= left_bound.l) {
+          // boundary is blocked
+          *blocked_id = sl_polygon->at(j).id();
+          AINFO << "blocked at " << *blocked_id << ", "
+                << path_boundary->at(i).s << ", l_lower: " << l_lower
+                << ", l_upper: " << l_upper;
+          sl_polygon->at(j).SetNudgeInfo(SLPolygon::BLOCKED);
+          break;
+        }
+        if (l_upper > right_bound.l) {
+          AINFO << "update right_bound [s, l]: [" << path_boundary->at(i).s
+                << ", " << l_upper << "]";
+          right_bound.l = l_upper;
+          right_bound.type = BoundType::OBSTACLE;
+          right_bound.id = sl_polygon->at(j).id();
+          *narrowest_width =
+              std::min(*narrowest_width, left_bound.l - right_bound.l);
+        }
+      }
+    }
+    // if blocked, trim path
+    if (!blocked_id->empty()) {
+      TrimPathBounds(i, path_boundary);
+      *narrowest_width = default_width;
+      return false;
+    }
+    center_l->push_back((left_bound.l + right_bound.l) / 2.0);
+    AINFO << "update center_l: " << (left_bound.l + right_bound.l) / 2.0;
+  }
+  return true;
+}
+
+bool PathBoundsDeciderUtil::AddCornerPoint(
+    double s, double l_lower, double l_upper, const PathBoundary& path_boundary,
+    InterPolatedPointVec* extra_constraints) {
+  size_t left_index = 0;
+  size_t right_index = 0;
+  double left_weight = 0.0;
+  double right_weight = 0.0;
+  if (!path_boundary.get_interpolated_s_weight(s, &left_weight, &right_weight,
+                                               &left_index, &right_index)) {
+    AERROR << "Fail to find extra path bound point in path boundary: " << s
+           << ", path boundary start s: " << path_boundary.front().s
+           << ", path boundary end s: " << path_boundary.back().s;
+    return false;
+  }
+  if (left_weight < 0.05 || right_weight < 0.05) {
+    // filter contraint that near evaulated point
+    return false;
+  }
+  ADEBUG << "corner" << s << "left_weight" << left_weight << "right_weight"
+         << right_weight << "left_index" << left_index << "right_index"
+         << right_index << "l_lower" << l_lower << "l_upper" << l_upper;
+  extra_constraints->emplace_back(left_weight, right_weight, l_lower, l_upper,
+                                  left_index, right_index, s);
+  return true;
+}
+
+void PathBoundsDeciderUtil::AddCornerBounds(
+    const std::vector<SLPolygon>& sl_polygons, PathBoundary* path_boundary) {
+  std::vector<SLPoint> left_corner_points;
+  std::vector<SLPoint> right_corner_points;
+  auto* extra_path_bound = path_boundary->mutable_extra_path_bound();
+  for (const auto& obs_polygon : sl_polygons) {
+    if (obs_polygon.MinS() > path_boundary->back().s) {
+      ADEBUG << "obs_polygon.MinS()" << obs_polygon.MinS()
+             << "path_boundary->back().s" << path_boundary->back().s;
+      break;
+    }
+    if (obs_polygon.MaxS() < path_boundary->front().s) {
+      continue;
+    }
+    if (obs_polygon.NudgeInfo() == SLPolygon::LEFT_NUDGE) {
+      for (auto pt : obs_polygon.LeftBoundary()) {
+        right_corner_points.emplace_back(pt);
+      }
+    } else if (obs_polygon.NudgeInfo() == SLPolygon::RIGHT_NUDGE) {
+      for (auto pt : obs_polygon.RightBoundary()) {
+        left_corner_points.emplace_back(pt);
+      }
+    }
+  }
+  for (const auto corner_point : left_corner_points) {
+    double corner_l = corner_point.l() - GetBufferBetweenADCCenterAndEdge();
+    double bound_l_upper =
+        path_boundary->get_upper_bound_by_s(corner_point.s());
+    double bound_l_lower =
+        path_boundary->get_lower_bound_by_s(corner_point.s());
+    ADEBUG << corner_point.s() << "left corner_l" << corner_l << "bound_l_upper"
+           << bound_l_upper << "bound_l_lower" << bound_l_lower;
+    if (corner_l < bound_l_upper) {
+      AddCornerPoint(corner_point.s(), bound_l_lower, corner_l, *path_boundary,
+                     extra_path_bound);
+    }
+  }
+  for (const auto corner_point : right_corner_points) {
+    double corner_l = corner_point.l() + GetBufferBetweenADCCenterAndEdge();
+    double bound_l_upper =
+        path_boundary->get_upper_bound_by_s(corner_point.s());
+    double bound_l_lower =
+        path_boundary->get_lower_bound_by_s(corner_point.s());
+    ADEBUG << corner_point.s() << "right corner_l" << corner_l
+           << "bound_l_upper" << bound_l_upper << "bound_l_lower"
+           << bound_l_lower;
+    if (corner_l > bound_l_lower) {
+      AddCornerPoint(corner_point.s(), corner_l, bound_l_upper, *path_boundary,
+                     extra_path_bound);
+    }
+  }
+}
+
+bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
+    std::vector<SLPolygon>* const sl_polygons, const SLState& init_sl_state,
+    PathBoundary* const path_boundary, std::string* const blocking_obstacle_id,
+    double* const narrowest_width) {
+  std::vector<double> center_line;
+  // center_line.push_back(init_sl_state.second[0]);
+  center_line.push_back(0.0);
+  UpdatePathBoundaryBySLPolygon(path_boundary, sl_polygons, &center_line,
+                                blocking_obstacle_id, narrowest_width);
+  PrintCurves print_curve;
+  for (const auto& pt : *path_boundary) {
+    print_curve.AddPoint("obs_polygon_l_lower", pt.s, pt.l_lower.l);
+    print_curve.AddPoint("obs_polygon_l_upper", pt.s, pt.l_upper.l);
+  }
+  RelaxEgoLateralBoundary(path_boundary, init_sl_state);
+  if (FLAGS_enable_corner_constraint) {
+    AddCornerBounds(*sl_polygons, path_boundary);
+  }
+  const auto& extra_path_bound = path_boundary->extra_path_bound();
+  for (const auto& pt : extra_path_bound) {
+    print_curve.AddPoint("extra_bound", pt.rear_axle_s, pt.lower_bound);
+    print_curve.AddPoint("extra_bound", pt.rear_axle_s, pt.upper_bound);
+    ADEBUG << "extra_bound" << pt.rear_axle_s << "l_lower" << pt.lower_bound
+           << "l_upper" << pt.lower_bound;
+  }
+  print_curve.PrintToLog();
+  return true;
 }
 
 double PathBoundsDeciderUtil::GetBufferBetweenADCCenterAndEdge() {
   double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-  // TODO(all): currently it's a fixed number. But it can take into account
-  // many factors such as: ADC length, possible turning angle, speed, etc.
-  static constexpr double kAdcEdgeBuffer = 0.0;
 
-  return (adc_half_width + kAdcEdgeBuffer);
+  return (adc_half_width + FLAGS_obstacle_lat_buffer);
 }
 
 bool PathBoundsDeciderUtil::IsWithinPathDeciderScopeObstacle(
@@ -414,38 +465,6 @@ bool PathBoundsDeciderUtil::IsWithinPathDeciderScopeObstacle(
   // should not side-pass such obstacles.
 
   return true;
-}
-
-bool PathBoundsDeciderUtil::ComputeSLBoundaryIntersection(
-    const SLBoundary& sl_boundary, const double s, double* ptr_l_min,
-    double* ptr_l_max) {
-  *ptr_l_min = std::numeric_limits<double>::max();
-  *ptr_l_max = -std::numeric_limits<double>::max();
-
-  // invalid polygon
-  if (sl_boundary.boundary_point_size() < 3) {
-    return false;
-  }
-
-  bool has_intersection = false;
-  for (auto i = 0; i < sl_boundary.boundary_point_size(); ++i) {
-    auto j = (i + 1) % sl_boundary.boundary_point_size();
-    const auto& p0 = sl_boundary.boundary_point(i);
-    const auto& p1 = sl_boundary.boundary_point(j);
-
-    if (common::util::WithinBound<double>(std::fmin(p0.s(), p1.s()),
-                                          std::fmax(p0.s(), p1.s()), s)) {
-      has_intersection = true;
-      auto l = common::math::lerp<double>(p0.l(), p0.s(), p1.l(), p1.s(), s);
-      if (l < *ptr_l_min) {
-        *ptr_l_min = l;
-      }
-      if (l > *ptr_l_max) {
-        *ptr_l_max = l;
-      }
-    }
-  }
-  return has_intersection;
 }
 
 common::TrajectoryPoint
@@ -518,6 +537,55 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
 
   PathBoundsDeciderUtil::TrimPathBounds(path_blocked_idx, path_bound);
 
+  return true;
+}
+
+bool PathBoundsDeciderUtil::GetBoundaryFromRoad(
+    const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
+    PathBoundary* const path_bound) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_bound);
+  ACHECK(!path_bound->empty());
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+  double adc_lane_width =
+      GetADCLaneWidth(reference_line, init_sl_state.first[0]);
+  // Go through every point, update the boudnary based on the road boundary.
+  double past_road_left_width = adc_lane_width / 2.0;
+  double past_road_right_width = adc_lane_width / 2.0;
+  int path_blocked_idx = -1;
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    // 1. Get road boundary.
+    double curr_s = (*path_bound)[i].s;
+    double curr_road_left_width = 0.0;
+    double curr_road_right_width = 0.0;
+    if (!reference_line.GetRoadWidth(curr_s, &curr_road_left_width,
+                                     &curr_road_right_width)) {
+      AWARN << "Failed to get lane width at s = " << curr_s;
+      curr_road_left_width = past_road_left_width;
+      curr_road_right_width = past_road_right_width;
+    }
+
+    past_road_left_width = curr_road_left_width;
+    past_road_right_width = curr_road_right_width;
+
+    double curr_left_bound = curr_road_left_width;
+    double curr_right_bound = -curr_road_right_width;
+    ADEBUG << "At s = " << curr_s
+           << ", left road bound = " << curr_road_left_width
+           << ", right road bound = " << curr_road_right_width;
+
+    // 2. Update into path_bound.
+    if (!UpdatePathBoundaryWithBuffer(curr_left_bound, curr_right_bound,
+                                      BoundType::ROAD, BoundType::ROAD, "", "",
+                                      &path_bound->at(i))) {
+      path_blocked_idx = static_cast<int>(i);
+    }
+    if (path_blocked_idx != -1) {
+      break;
+    }
+  }
+  AINFO << "path_blocked_idx: " << path_blocked_idx;
+  TrimPathBounds(path_blocked_idx, path_bound);
   return true;
 }
 
@@ -610,6 +678,64 @@ int PathBoundsDeciderUtil::IsPointWithinPathBound(
   }
   ADEBUG << "Laterally outside the boundary.";
   return -1;
+}
+
+bool PathBoundsDeciderUtil::RelaxEgoLateralBoundary(
+    PathBoundary* path_boundary, const SLState& init_sl_state) {
+  if (path_boundary->size() < 2) {
+    AINFO << "path_boundary size = 0, return.";
+    return false;
+  }
+  const auto& init_pt = path_boundary->at(0);
+  double min_radius =
+      std::min(FLAGS_relax_ego_radius, common::VehicleConfigHelper::Instance()
+                                           ->GetConfig()
+                                           .vehicle_param()
+                                           .min_turn_radius());
+  double init_frenet_heading =
+      common::math::Vec2d(1.0, init_sl_state.second[1]).Angle();
+  double init_pt_l = init_sl_state.second[0];
+  for (size_t i = 1; i < path_boundary->size(); ++i) {
+    auto& left_bound = path_boundary->at(i).l_upper;
+    auto& right_bound = path_boundary->at(i).l_lower;
+    if (left_bound.type == BoundType::OBSTACLE) {
+      double protective_restrict = util::left_arc_bound_with_heading(
+          path_boundary->at(i).s - init_pt.s, min_radius, init_frenet_heading);
+      double left_obs_constraint =
+          std::max(left_bound.l, init_pt_l + protective_restrict);
+      AINFO << "init_pt_l: " << init_pt_l << ", left_bound: " << left_bound.l
+            << ",  diff s: " << path_boundary->at(i).s - init_pt.s
+            << ", min_radius: " << min_radius
+            << ", init_frenet_heading: " << init_frenet_heading
+            << ", protective_restrict: " << protective_restrict
+            << ", left_obs_constraint: " << left_obs_constraint;
+      left_obs_constraint = std::min(left_bound.l + FLAGS_obstacle_lat_buffer -
+                                         FLAGS_ego_front_slack_buffer,
+                                     left_obs_constraint);
+      AINFO << "left_obs_constraint: " << left_obs_constraint;
+      left_bound.l = left_obs_constraint;
+    }
+
+    if (right_bound.type == BoundType::OBSTACLE) {
+      double protective_restrict = util::right_arc_bound_with_heading(
+          path_boundary->at(i).s - init_pt.s, min_radius, init_frenet_heading);
+      double right_obs_constraint =
+          std::min(right_bound.l, init_pt_l + protective_restrict);
+      AINFO << "init_pt_l: " << init_pt_l << ", right_bound: " << right_bound.l
+            << ",  diff s: " << path_boundary->at(i).s - init_pt.s
+            << ", min_radius: " << min_radius
+            << ", init_frenet_heading: " << init_frenet_heading
+            << ", protective_restrict: " << protective_restrict
+            << ", right_obs_constraint: " << right_obs_constraint;
+      right_obs_constraint =
+          std::max(right_bound.l - FLAGS_obstacle_lat_buffer +
+                       FLAGS_ego_front_slack_buffer,
+                   right_obs_constraint);
+      AINFO << "right_obs_constraint: " << right_obs_constraint;
+      right_bound.l = right_obs_constraint;
+    }
+  }
+  return true;
 }
 
 }  // namespace planning

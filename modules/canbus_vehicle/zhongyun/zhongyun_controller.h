@@ -46,6 +46,7 @@ class ZhongyunController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Zhongyun>* const can_sender,
+      CanReceiver<::apollo::canbus::Zhongyun>* const can_receiver,
       MessageManager<::apollo::canbus::Zhongyun>* const message_manager)
       override;
 

@@ -8,7 +8,11 @@ apollo_cc_binary(
     srcs = [
         "main.cc",
     ],
-    linkopts = ["-pthread"],
+    linkopts = [
+        "-pthread",
+        "-lprofiler",
+        "-ltcmalloc",
+    ],
     deps = [
         ":recorder",
         "//cyber",

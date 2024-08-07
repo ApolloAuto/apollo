@@ -17,11 +17,13 @@
 #include "modules/canbus_vehicle/ch/ch_controller.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus_vehicle/ch/proto/ch.pb.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -51,13 +53,15 @@ class ChControllerTest : public ::testing::Test {
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
   CanSender<::apollo::canbus::Ch> sender_;
+  CanReceiver<::apollo::canbus::Ch> receiver_;
   ChMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
 };
 
 TEST_F(ChControllerTest, Init) {
-  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
+  ErrorCode ret =
+      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -65,14 +69,14 @@ TEST_F(ChControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
   EXPECT_EQ(controller_.SetDrivingMode(chassis.driving_mode()), ErrorCode::OK);
 }
 
 TEST_F(ChControllerTest, Status) {
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
   controller_.SetHorn(control_cmd_.signal());
@@ -82,7 +86,7 @@ TEST_F(ChControllerTest, Status) {
 }
 
 TEST_F(ChControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
             ErrorCode::OK);

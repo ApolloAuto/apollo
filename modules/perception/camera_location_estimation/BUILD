@@ -28,6 +28,7 @@ apollo_cc_library(
         "transformer/multicue/obj_mapper.h",
         "transformer/singlestage/singlestage_transformer.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         "//modules/perception/camera_location_estimation/proto:camera_location_estimation_cc_proto",

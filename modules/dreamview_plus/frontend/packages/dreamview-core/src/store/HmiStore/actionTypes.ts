@@ -122,6 +122,8 @@ export enum CURRENT_MODE {
     MAP_EDITOR = 'Map Editor',
     CAMERA_CALIBRATION = 'Camera Calibration',
     LiDAR_CALIBRATION = 'Lidar Calibration',
+    DYNAMICS_CALIBRATION = 'Dynamics Calibration',
+    CANBUS_DEBUG = 'Canbus Debug',
 }
 
 export enum PREPROCESS_STATUS {
@@ -193,6 +195,13 @@ export type IInitState = {
     dockerImage: string;
     currentDynamicModel: string;
     otherComponents: Record<
+        string,
+        {
+            message: string;
+            status: SIM_CONTROL_STATUS;
+        }
+    >;
+    simOtherComponents: Record<
         string,
         {
             message: string;

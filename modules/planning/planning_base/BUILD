@@ -2,6 +2,7 @@ load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apo
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/proto:proto.bzl", "apollo_py_binary")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
@@ -33,6 +34,7 @@ apollo_cc_library(
         "common/path_decision.cc",
         "common/planning_context.cc",
         "common/reference_line_info.cc",
+        "common/sl_polygon.cc",
         "common/smoothers/smoother.cc",
         "common/speed/speed_data.cc",
         "common/speed/st_boundary.cc",
@@ -114,7 +116,6 @@ apollo_cc_library(
         "common/learning_based_data.h",
         "common/local_view.h",
         "common/message_process.h",
-        "common/nudge_info.h",
         "common/obstacle.h",
         "common/obstacle_blocking_analyzer.h",
         "common/open_space_info.h",

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/statistics/statistics.h"
+#include "cyber/transport/common/endpoint.h"
 #include "cyber/transport/dispatcher/rtps_dispatcher.h"
 
 namespace apollo {
@@ -57,9 +59,17 @@ void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
   RETURN_IF(!AttributesFiller::FillInSubAttr(self_attr.channel_name(), qos,
                                              &sub_attr));
 
-  new_sub.sub_listener = std::make_shared<SubListener>(
-      std::bind(&RtpsDispatcher::OnMessage, this, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3));
+  auto listener_adapter = [this, self_attr](uint64_t channel_id,
+                                const std::shared_ptr<std::string>& msg_str,
+                                const MessageInfo& msg_info) {
+    statistics::Statistics::Instance()->AddRecvCount(
+      self_attr, msg_info.msg_seq_num());
+    statistics::Statistics::Instance()->SetTotalMsgsStatus(
+                              self_attr, msg_info.msg_seq_num());
+    this->OnMessage(channel_id, msg_str, msg_info);
+  };
+
+  new_sub.sub_listener = std::make_shared<SubListener>(listener_adapter);
 
   new_sub.sub = eprosima::fastrtps::Domain::createSubscriber(
       participant_->fastrtps_participant(), sub_attr,

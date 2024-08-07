@@ -46,8 +46,10 @@ void HuaCeBaseParser::GetMessages(MessageInfoVec* messages) {
   FillIns();
   FillInsStat();
 
-  messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
-                                  reinterpret_cast<MessagePtr>(&bestpos_)});
+  if (bestpos_ratecontrol_.check()) {
+    messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
+                                    reinterpret_cast<MessagePtr>(&bestpos_)});
+  }
   messages->push_back(
       MessageInfo{MessageType::IMU, reinterpret_cast<MessagePtr>(&imu_)});
   messages->push_back(MessageInfo{MessageType::HEADING,
@@ -104,7 +106,7 @@ void HuaCeBaseParser::PrepareMessageStatus(const uint8_t& system_state,
 }
 
 void HuaCeBaseParser::FillGnssBestpos() {
-  bestpos_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  bestpos_.set_measurement_time(decode_message_.gps_timestamp_sec);
   bestpos_.set_sol_status(decode_message_.solution_status);
   bestpos_.set_sol_type(decode_message_.solution_type);
   bestpos_.set_latitude(decode_message_.Latitude);
@@ -163,13 +165,13 @@ void HuaCeBaseParser::FillImu() {
              imu_.mutable_linear_acceleration());
   rfu_to_flu(decode_message_.GyroX, decode_message_.GyroY,
              decode_message_.GyroZ, imu_.mutable_angular_velocity());
-  imu_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  imu_.set_measurement_time(decode_message_.gps_timestamp_sec);
 }
 
 void HuaCeBaseParser::FillHeading() {
   heading_.set_solution_status(decode_message_.solution_status);
   heading_.set_position_type(decode_message_.solution_type);
-  heading_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  heading_.set_measurement_time(decode_message_.gps_timestamp_sec);
   heading_.set_heading(decode_message_.Heading);
   heading_.set_pitch(decode_message_.Pitch);
   heading_.set_heading_std_dev(decode_message_.yaw_std);

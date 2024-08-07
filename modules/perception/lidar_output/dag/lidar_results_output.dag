@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/lidar_output/liblidar_output_component.so"
+  components {
+    class_name : "LidarOutputComponent"
+    config {
+      name : "LidarOutput"
+      config_file_path : "/apollo/modules/perception/lidar_output/conf/lidar_output_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/inner/PrefusedObjects"
+      }
+    }
+  }
+}

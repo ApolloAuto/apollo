@@ -37,6 +37,7 @@
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/time/time.h"
 #include "cyber/transport/transport.h"
+#include "cyber/statistics/statistics.h"
 
 namespace apollo {
 namespace cyber {
@@ -259,11 +260,33 @@ bool Reader<MessageT>::Init() {
   if (init_.exchange(true)) {
     return true;
   }
+  auto statistics_center = statistics::Statistics::Instance();
+  if (!statistics_center->RegisterChanVar(role_attr_)) {
+    AWARN << "Failed to register reader var!";
+  }
   std::function<void(const std::shared_ptr<MessageT>&)> func;
   if (reader_func_ != nullptr) {
     func = [this](const std::shared_ptr<MessageT>& msg) {
+      uint64_t process_start_time;
+      uint64_t proc_done_time;
+      uint64_t proc_start_time;
+
       this->Enqueue(msg);
       this->reader_func_(msg);
+      // sampling proc latency in microsecond
+      proc_done_time = Time::Now().ToMicrosecond();
+      proc_start_time = static_cast<uint64_t>(latest_recv_time_sec_*1000000UL);
+
+      statistics::Statistics::Instance()->SamplingProcLatency<uint64_t>(
+                      this->role_attr_, (proc_done_time-proc_start_time));
+      if (statistics::Statistics::Instance()->GetProcStatus(
+                            this->role_attr_, &process_start_time)) {
+        auto cyber_latency = proc_start_time - process_start_time;
+        if (process_start_time > 0 && cyber_latency > 0) {
+          statistics::Statistics::Instance()->SamplingCyberLatency(
+                                        this->role_attr_, cyber_latency);
+        }
+      }
     };
   } else {
     func = [this](const std::shared_ptr<MessageT>& msg) { this->Enqueue(msg); };

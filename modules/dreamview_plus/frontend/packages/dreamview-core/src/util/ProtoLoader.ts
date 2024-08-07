@@ -2,12 +2,6 @@ import * as protobuf from 'protobufjs';
 import Logger from '@dreamview/log';
 import { indexedDBStorage } from './indexedDB/IndexedDBStorage';
 
-declare module 'protobufjs' {
-    interface Root {
-        loadWithCache(filename: string | string[], options?: protobuf.IParseOptions): Promise<protobuf.Root>;
-    }
-}
-
 export enum ProtoStatus {
     Loading = 'loading',
     Loaded = 'loaded',
@@ -20,7 +14,7 @@ const Root = protobuf.Root;
 const logger = Logger.getInstance('ProtoLoader');
 
 interface ProtoLoadedMsg {
-    [key: string]: any
+    [key: string]: any;
 }
 
 export class ProtoLoader {
@@ -28,7 +22,7 @@ export class ProtoLoader {
 
     // origin: 这个参数是当前正在解析的 .proto 文件的路径。
     // target: 这个参数是在 .proto 文件中使用 import 语句指定的路径
-    private resolvePath = function (origin: string, target: string) {
+    private resolvePath = function (_origin: string, target: string) {
         if (target.startsWith('modules')) {
             return `proto/${target}`;
         }
@@ -39,6 +33,10 @@ export class ProtoLoader {
         this.loadedProtoFiles = {};
     }
 
+    private jsonDescriptor: any = {};
+
+    private rootCache: { [key: string]: protobuf.Root } = {};
+
     async loadAndCacheProto(
         protoPath: string,
         config?: {
@@ -47,6 +45,9 @@ export class ProtoLoader {
         },
     ): Promise<protobuf.Root> {
         try {
+            if (this.rootCache[protoPath]) {
+                return this.rootCache[protoPath];
+            }
             const theProtoLoaderStatus = await ProtoLoader.getProtoCache(protoPath);
 
             if (theProtoLoaderStatus && theProtoLoaderStatus === ProtoStatus.Loading) {
@@ -58,8 +59,10 @@ export class ProtoLoader {
 
             // 尝试从 IndexedDB 缓存中获取 Proto 对象
             const cachedProto = await this.getProtoDescriptor(config?.dataName, config?.channelName);
+            // @ts-ignore
             if (cachedProto && cachedProto.nested) {
-                return Root.fromJSON(cachedProto);
+                this.rootCache[protoPath] = Root.fromJSON(cachedProto);
+                return this.rootCache[protoPath];
             }
 
             await ProtoLoader.setProtoCache(protoPath, ProtoStatus.Loading, 500);
@@ -74,6 +77,7 @@ export class ProtoLoader {
                     await this.setProtoDescriptor(descriptor, config);
                 }
             }
+            this.rootCache[protoPath] = root;
             return root;
         } catch (error) {
             logger.error(`Error loading or caching proto ${protoPath}: ${error}`);
@@ -93,22 +97,22 @@ export class ProtoLoader {
                 loadFileName = `proto/${fileName}`;
             }
 
-            //first to set map, default belive it can be loaded.
+            // first to set map, default belive it can be loaded.
             this.loadedProtoFiles[fileName] = new protobuf.Root();
 
-            let dependFiles: string[]=[];
-            await fetch(loadFileName).then((response) => response.text())
-            .then((protoContent) => {
-                const root = protobuf.parse(protoContent);
-                this.loadedProtoFiles[fileName] = root;
-                root.imports.forEach((item) => {
-                    dependFiles.push(item);
+            const dependFiles: string[] = [];
+            await fetch(loadFileName)
+                .then((response) => response.text())
+                .then((protoContent) => {
+                    const root = protobuf.parse(protoContent);
+                    this.loadedProtoFiles[fileName] = root;
+                    root.imports.forEach((item) => {
+                        dependFiles.push(item);
+                    });
                 });
-            });
 
             await Promise.all(dependFiles.map((file) => this.loadRecursive(file, rootFileName)));
-        }
-        catch (error) {
+        } catch (error) {
             logger.error(`Error loading or caching proto ${fileName}: ${error}`);
             throw error;
         }
@@ -127,8 +131,12 @@ export class ProtoLoader {
 
     async getProtoDescriptor(dataName: string, channelName?: string) {
         const key = `${dataName}${channelName ? `-${channelName}` : ''}`;
+        if (this.jsonDescriptor[key]) {
+            return this.jsonDescriptor[key];
+        }
         const storeManager = await indexedDBStorage.getStoreManager('ProtoDescriptor');
-        return storeManager.getItem(key);
+        this.jsonDescriptor[key] = storeManager.getItem(key);
+        return this.jsonDescriptor[key];
     }
 
     static async setProtoCache(path: string, descriptor: any, timeout?: number) {

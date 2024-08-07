@@ -1,0 +1,48 @@
+can_conf {
+
+  can_card_parameter {
+    brand: SOCKET_CAN_RAW
+    type: PCI_CARD
+    channel_id: CHANNEL_ID_ONE
+  }
+
+  enable_debug_mode: true
+  enable_receiver_log: true
+}
+
+radar_conf {
+  max_distance_valid: true
+  sensor_id_valid: false
+  radar_power_valid: false
+  output_type_valid: true
+  send_quality_valid: true
+  send_ext_info_valid: true
+  sort_index_valid: false
+  store_in_nvm_valid: true
+  rcs_threshold_valid: true
+  baudrate_valid: true
+  collision_detection_coordinates_valid: true
+  collision_detection_activation_valid: true
+
+  max_distance: 160
+  sensor_id: 0
+  output_type: OUTPUT_TYPE_OBJECTS
+  radar_power: 0
+  send_ext_info: false
+  send_quality: false
+  sort_index: 1
+  store_in_nvm: 0
+  rcs_threshold: RCS_THRESHOLD_STANDARD
+  baudrate: 0
+  region_max_output_number: 50
+  region_id: 1
+  point1_longitude: 0
+  point1_lateral: 5
+  point2_longitude: 20
+  point2_lateral: -5
+
+  # unit: nanoseconds, 20ms for 50Hz
+  input_send_interval: 20000000
+}
+
+radar_channel: "/apollo/sensor/nanoradar/front"

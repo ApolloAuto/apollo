@@ -132,3 +132,6 @@ DEFINE_bool(is_control_ut_test_mode, false,
 
 DEFINE_bool(publish_control_debug_info, false,
             "True to run control in ut test mode");
+
+DEFINE_bool(query_forward_station_point_only, false,
+            "only use the trajectory point in future");

@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { OperatePopover, IconIcAddPanel } from '@dreamview/dreamview-ui';
+import { OperatePopover, IconPark } from '@dreamview/dreamview-ui';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
 import { useTranslation } from 'react-i18next';
 import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
@@ -137,7 +137,7 @@ function ChartsInner() {
                     ))}
                     <Div rif={!isChartCountMax} className={classes['charts-operation']}>
                         <BlueButton onClick={onAddNewChart}>
-                            <IconIcAddPanel />
+                            <IconPark name='IcAddPanel' />
                             {t('newChart')}
                         </BlueButton>
                     </Div>

@@ -44,6 +44,7 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 ErrorCode Neolix_eduController::Init(
     const VehicleParameter& params,
     CanSender<::apollo::canbus::Neolix_edu>* const can_sender,
+    CanReceiver<::apollo::canbus::Neolix_edu>* const can_receiver,
     MessageManager<::apollo::canbus::Neolix_edu>* const message_manager) {
   if (is_initialized_) {
     AINFO << "Neolix_eduController has already been initiated.";
@@ -62,6 +63,12 @@ ErrorCode Neolix_eduController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
+
+  if (can_receiver == nullptr) {
+    AERROR << "Canbus receiver is null.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "protocol manager is null.";
@@ -294,6 +301,15 @@ Chassis Neolix_eduController::chassis() {
         "Chassis has some fault, please check the chassis_detail.");
   }
 
+  if (is_chassis_communication_error_) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "neolix chassis detail is lost! Please check the communication error.");
+    set_chassis_error_code(Chassis::CHASSIS_CAN_LOST);
+    set_driving_mode(Chassis::EMERGENCY_MODE);
+  }
+
   return chassis_;
 }
 
@@ -492,20 +508,60 @@ void Neolix_eduController::ResetProtocol() {
   message_manager_->ResetSendMessages();
 }
 
-bool Neolix_eduController::CheckChassisError() {
-  Neolix_edu chassis_detail;
-  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-    AERROR_EVERY(100) << "Get chassis detail failed.";
+bool Neolix_eduController::CheckChassisCommunicationError() {
+  Neolix_edu chassis_detail_receiver;
+  ADEBUG << "Can receiver finished recv once: "
+         << can_receiver_->IsFinishRecvOnce();
+  if (message_manager_->GetSensorRecvData(&chassis_detail_receiver) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis receive detail failed.";
   }
-  if (!chassis_.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no neolix vehicle info.";
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "ChassisDetail has no neolix vehicle info.");
-    return false;
+  ADEBUG << "chassis_detail_receiver is "
+         << chassis_detail_receiver.ShortDebugString();
+  size_t receiver_data_size = chassis_detail_receiver.ByteSizeLong();
+  ADEBUG << "check chassis detail receiver_data_size is " << receiver_data_size;
+  // check receiver data is null
+  if (receiver_data_size < 2) {
+    if (is_need_count_) {
+      lost_chassis_reveive_detail_count_++;
+    }
   } else {
-    chassis_.clear_engage_advice();
+    lost_chassis_reveive_detail_count_ = 0;
+    is_need_count_ = true;
+  }
+  ADEBUG << "lost_chassis_reveive_detail_count_ is "
+         << lost_chassis_reveive_detail_count_;
+  // check receive data lost threshold is (100 * 10)ms
+  if (lost_chassis_reveive_detail_count_ > 100) {
+    is_need_count_ = false;
+    is_chassis_communication_error_ = true;
+    AERROR << "neolix chassis detail is lost, please check the communication "
+              "error.";
+    message_manager_->ClearSensorRecvData();
+    message_manager_->ClearSensorData();
+    return true;
+  } else {
+    is_chassis_communication_error_ = false;
+  }
+
+  Neolix_edu chassis_detail_sender;
+  if (message_manager_->GetSensorSenderData(&chassis_detail_sender) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis receive detail failed.";
+  }
+  ADEBUG << "chassis_detail_sender is "
+         << chassis_detail_sender.ShortDebugString();
+  size_t sender_data_size = chassis_detail_sender.ByteSizeLong();
+  ADEBUG << "check chassis detail sender_data_size is " << sender_data_size;
+
+  message_manager_->ClearSensorRecvData();
+  message_manager_->ClearSensorSenderData();
+  return false;
+}
+
+bool Neolix_eduController::CheckChassisError() {
+  if (is_chassis_communication_error_) {
+    AERROR_EVERY(100) << "ChassisDetail has no neolix vehicle info.";
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
    */
@@ -567,11 +623,18 @@ void Neolix_eduController::SecurityDogThreadFunc() {
       emergency_mode = true;
     }
 
+    // chassis error process
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
       can_sender_->Update();
     }
+
+    if (!emergency_mode && !is_chassis_communication_error_ &&
+        mode == Chassis::EMERGENCY_MODE) {
+      set_chassis_error_code(Chassis::NO_ERROR);
+    }
+
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {

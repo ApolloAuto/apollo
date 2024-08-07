@@ -62,6 +62,10 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
        ++i) {
     trajectory_points_.push_back(
         planning_published_trajectory->trajectory_point(i));
+    auto *path_point = trajectory_points_.back().mutable_path_point();
+    if (!path_point->has_z()) {
+      path_point->set_z(0.0);
+    }
   }
 }
 

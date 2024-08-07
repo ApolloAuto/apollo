@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import type { apollo } from '@dreamview/dreamview';
-import { IconIcCoverageHover, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { isEmpty } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
@@ -133,7 +133,7 @@ function InternalCameraView() {
                     trigger='click'
                 >
                     <span className={classes['camera-btn-item']}>
-                        <IconIcCoverageHover />
+                        <IconPark name='IcCoverageHover' />
                     </span>
                 </Popover>
             </div>

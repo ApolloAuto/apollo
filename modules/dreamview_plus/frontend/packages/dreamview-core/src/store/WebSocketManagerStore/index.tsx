@@ -1,12 +1,11 @@
 import React, { PropsWithChildren, useEffect, useRef, useLayoutEffect } from 'react';
 import { Factory } from '../base';
-import { MainApi, PluginApi, StreamApi } from '../../services/api';
-import { WebSocketManager } from '../../services/WebSocketManager';
-import { ConnectionStatusEnum, MetadataItem } from '../../services/WebSocketManager/type';
-import { CustomizeEvent, useEventHandlersContext } from '../EventHandlersStore';
-import { CustomEventTypes } from '../EventHandlersStore/eventType';
+import { MainApi, OtherApi, PluginApi, StreamApi } from '../../services/api';
+import { WebSocketManager, ConnectionStatusEnum, MetadataItem, SocketNameEnum } from '../../services/WebSocketManager';
+import { CustomizeEvent, useEventHandlersContext, CustomEventTypes } from '../EventHandlersStore';
 import * as TYPES from './actionTypes';
 import { IInitState, initState, reducer } from './reducer';
+import { StreamDataNames } from '../../services/api/types';
 
 export const { StoreProvider, useStore } = Factory.createStoreProvider<IInitState, TYPES.CombineAction>({
     initialState: initState,
@@ -35,6 +34,11 @@ function WebSocketManagerInner(): React.ReactElement {
     useEffect(() => {
         store.mainApi.webSocketManager.connectMain().subscribe((status) => {
             if (status === ConnectionStatusEnum.METADATA) {
+                const metadata = store.mainApi.webSocketManager.getMetadata();
+                if (metadata.find((item) => item.dataName === StreamDataNames.SIM_HMI_STATUS)) {
+                    // 包含仿真模块，则触发连接仿真模块（仿真模块化改造）
+                    store.otherApi.getSocketIns(SocketNameEnum.SIMULATION);
+                }
                 mainConnectionRef.current.publish('main:connection successful');
             }
         });
@@ -75,6 +79,11 @@ export function usePluginApi(): PluginApi {
 export function useStreamApi(): StreamApi {
     const [store] = useStore();
     return store?.streamApi;
+}
+
+export function useOtherApi(): OtherApi {
+    const [store] = useStore();
+    return store?.otherApi;
 }
 
 export function useMetadata(): [MetadataItem[], (metadata: MetadataItem[]) => void] {

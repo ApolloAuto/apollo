@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import { Form, Input, IconIcDelete, IconIcAddPanel, IconIcClose, message } from '@dreamview/dreamview-ui';
-import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
+import { Form, Input, IconPark, message } from '@dreamview/dreamview-ui';
+import { makeStylesWithProps, useThemeContext } from '@dreamview/dreamview-theme';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/lib/interface';
 import tinycolor from 'tinycolor2';
@@ -9,143 +9,143 @@ import BlueButton from './BlueButton';
 import ChartLine from './ChartLine';
 import { IChartConfig, KEY, IChannelList, initChartValue, initLineValue, IChartListItem } from './const';
 
-function useStyle(themeText: string) {
-    const hoc = useMakeStyle((theme, prop) => ({
-        bottom14: {
-            marginBottom: '14px',
+const useHoc = makeStylesWithProps<{ themeText: string }>()((theme, prop) => ({
+    bottom14: {
+        marginBottom: '14px',
+    },
+    'chart-editing': {
+        height: '80vh',
+        background: theme.components.pncMonitor.chartEditingBgColor,
+        width: '372px',
+        margin: '-12px 0',
+        borderRadius: theme.tokens.border.borderRadius.large,
+        '& .dreamview-radio-wrapper': {
+            color: '#808B9D',
         },
-        'chart-editing': {
-            height: '80vh',
-            background: theme.components.pncMonitor.chartEditingBgColor,
-            width: '372px',
-            margin: '-12px 0',
-            borderRadius: theme.tokens.border.borderRadius.large,
-            '& .dreamview-radio-wrapper': {
-                color: '#808B9D',
-            },
-            '.ant-form-item-control-input .dreamview-select-single .dreamview-select-selector': {
-                background: prop.themeText === 'drak' ? '#343C4D' : 'white',
-            },
-            '& .anticon-close-circle': {
-                width: '20px',
-                height: '20px',
-                fontSize: '20px',
-                marginTop: '-2px',
-                marginLeft: '-2px',
-                color: '#808B9D',
-            },
-            '& .dreamview-select input': {
-                height: '100% !important',
-            },
-            '& .dreamview-select-clear': {
-                borderRadius: '4px',
-            },
-            '& .dreamview-select-clear .anticon-close-circle': {
-                width: '16px',
-                height: '16px',
-                fontSize: '16px',
-            },
-            '& .dreamview-input-affix-wrapper-focused': {
-                borderColor: '#4096ff',
-            },
-            '& .ant-form-item-label': {
-                flex: 1,
-                '&  > label': {
-                    height: '40px',
-                    color: theme.tokens.colors.fontColor4,
-                    ...theme.tokens.typography.content,
-                },
-            },
-            '& .ant-form-item-control': {
-                width: '254px',
-                flexGrow: 'unset',
-            },
-            '& .ant-form-item': {
-                marginBottom: theme.tokens.margin.speace2,
-            },
-            '& .dreamview-input-affix-wrapper': {
+        '.ant-form-item-control-input .dreamview-select-single .dreamview-select-selector': {
+            background: prop.themeText === 'drak' ? '#343C4D' : 'white',
+        },
+        '& .anticon-close-circle': {
+            width: '20px',
+            height: '20px',
+            fontSize: '20px',
+            marginTop: '-2px',
+            marginLeft: '-2px',
+            color: '#808B9D',
+        },
+        '& .dreamview-select input': {
+            height: '100% !important',
+        },
+        '& .dreamview-select-clear': {
+            borderRadius: '4px',
+        },
+        '& .dreamview-select-clear .anticon-close-circle': {
+            width: '16px',
+            height: '16px',
+            fontSize: '16px',
+        },
+        '& .dreamview-input-affix-wrapper-focused': {
+            borderColor: '#4096ff',
+        },
+        '& .ant-form-item-label': {
+            flex: 1,
+            '&  > label': {
                 height: '40px',
-            },
-            '& .ant-form-item-control-input': {
-                height: '40px',
+                color: theme.tokens.colors.fontColor4,
+                ...theme.tokens.typography.content,
             },
         },
-        'chart-new-line': {
-            display: 'flex',
-            marginTop: '-4px',
+        '& .ant-form-item-control': {
+            width: '254px',
+            flexGrow: 'unset',
         },
-        'chart-editing-divider': {
-            height: '1px',
-            background: theme.tokens.colors.divider2,
+        '& .ant-form-item': {
             marginBottom: theme.tokens.margin.speace2,
         },
-        title: {
-            padding: `${theme.tokens.padding.speace} ${theme.tokens.padding.speace3}`,
-            ...theme.tokens.typography.title,
-            color: theme.components.pncMonitor.chartTitleColor,
-            '& .anticon': {
-                position: 'absolute',
-                right: theme.tokens.margin.speace2,
-                top: '12px',
-                cursor: 'pointer',
-                color: theme.tokens.colors.fontColor5,
-            },
-        },
-        'content-box': {
-            padding: `0 ${theme.tokens.padding.speace3}`,
-            height: 'calc(80vh - 17px - 42px)',
-        },
-        'chart-editing-title': {
-            height: '20px',
-            lineHeight: '20px',
-            display: 'flex',
-            marginBottom: theme.tokens.margin.speace,
-            paddingLeft: theme.tokens.padding.speace,
-            position: 'relative',
-            color: theme.tokens.colors.fontColor5,
-            fontFamily: 'PingFangSC-Medium',
-            fontWeight: 500,
-            '&::after': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                top: '4px',
-                width: '2px',
-                height: '12px',
-                backgroundColor: theme.tokens.colors.brand3,
-            },
-        },
-        'chart-editing-extra': {
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-        },
-        'chart-delete-btn': {
-            ...theme.tokens.typography.content,
-            margin: `${theme.tokens.margin.speace3} auto`,
-            width: '160px',
+        '& .dreamview-input-affix-wrapper': {
             height: '40px',
-            lineHeight: '40px',
-            textAlign: 'center',
-            background: theme.components.pncMonitor.deleteBtnBgColor,
-            borderRadius: theme.tokens.border.borderRadius.large,
-            color: '#F75660',
-            cursor: 'pointer',
-            '& .anticon': {
-                marginRight: '6px',
-                fontSize: theme.tokens.font.size.large,
-            },
-            '&:hover': {
-                background: tinycolor(theme.tokens.colors.background1).setAlpha(0.9).toRgbString(),
-            },
-            '&:active': {
-                opacity: 0.8,
-            },
         },
-    }));
+        '& .ant-form-item-control-input': {
+            height: '40px',
+        },
+    },
+    'chart-new-line': {
+        display: 'flex',
+        marginTop: '-4px',
+    },
+    'chart-editing-divider': {
+        height: '1px',
+        background: theme.tokens.colors.divider2,
+        marginBottom: theme.tokens.margin.speace2,
+    },
+    title: {
+        padding: `${theme.tokens.padding.speace} ${theme.tokens.padding.speace3}`,
+        ...theme.tokens.typography.title,
+        color: theme.components.pncMonitor.chartTitleColor,
+        '& .anticon': {
+            position: 'absolute',
+            right: theme.tokens.margin.speace2,
+            top: '12px',
+            cursor: 'pointer',
+            color: theme.tokens.colors.fontColor5,
+        },
+    },
+    'content-box': {
+        padding: `0 ${theme.tokens.padding.speace3}`,
+        height: 'calc(80vh - 17px - 42px)',
+    },
+    'chart-editing-title': {
+        height: '20px',
+        lineHeight: '20px',
+        display: 'flex',
+        marginBottom: theme.tokens.margin.speace,
+        paddingLeft: theme.tokens.padding.speace,
+        position: 'relative',
+        color: theme.tokens.colors.fontColor5,
+        fontFamily: 'PingFangSC-Medium',
+        fontWeight: 500,
+        '&::after': {
+            content: '""',
+            position: 'absolute',
+            left: 0,
+            top: '4px',
+            width: '2px',
+            height: '12px',
+            backgroundColor: theme.tokens.colors.brand3,
+        },
+    },
+    'chart-editing-extra': {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+    },
+    'chart-delete-btn': {
+        ...theme.tokens.typography.content,
+        margin: `${theme.tokens.margin.speace3} auto`,
+        width: '160px',
+        height: '40px',
+        lineHeight: '40px',
+        textAlign: 'center',
+        background: theme.components.pncMonitor.deleteBtnBgColor,
+        borderRadius: theme.tokens.border.borderRadius.large,
+        color: '#F75660',
+        cursor: 'pointer',
+        '& .anticon': {
+            marginRight: '6px',
+            fontSize: theme.tokens.font.size.large,
+        },
+        '&:hover': {
+            background: tinycolor(theme.tokens.colors.background1).setAlpha(0.9).toRgbString(),
+        },
+        '&:active': {
+            opacity: 0.8,
+        },
+    },
+}));
 
-    return hoc({ themeText });
+function useStyle(themeText: string) {
+    return useHoc({ themeText });
 }
 
 function Divider() {
@@ -192,7 +192,7 @@ function ChartEditing(props: ChartEditingProps) {
     };
     const newLineButton = (
         <BlueButton onClick={onAddNewLine} className={classes['chart-new-line']} size='small'>
-            <IconIcAddPanel />
+            <IconPark name='IcAddPanel' />
             {t('newLine')}
         </BlueButton>
     );
@@ -220,7 +220,7 @@ function ChartEditing(props: ChartEditingProps) {
         <div className={classes['chart-editing']}>
             <div className={classes.title}>
                 {t('chartEditing')}
-                <IconIcClose onClick={onCloseClick} />
+                <IconPark name='IcClose' onClick={onCloseClick} />
             </div>
             <Divider />
             <CustomScroll className={classes['content-box']}>
@@ -257,7 +257,7 @@ function ChartEditing(props: ChartEditingProps) {
                     </Form.List>
                 </Form>
                 <div onClick={onDeleteClick} className={classes['chart-delete-btn']}>
-                    <IconIcDelete />
+                    <IconPark name='IcDelete' />
                     {t('deleteChart')}
                 </div>
             </CustomScroll>

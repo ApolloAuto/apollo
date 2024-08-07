@@ -11,6 +11,22 @@ import "modules/common_msgs/map_msgs/map_id.proto";
 import "modules/common_msgs/planning_msgs/decision.proto";
 import "modules/common_msgs/planning_msgs/planning_internal.proto";
 
+message Point {
+  optional double x = 1;
+  optional double y = 2; 
+}
+
+message LocationPose {
+  //vehice location pose
+  optional Point vehice_location = 1;
+
+  // left width point of vehice location
+  optional Point left_lane_boundary_point = 2;
+
+  // right width SL point of vehice location
+  optional Point right_lane_boundary_point = 3;
+}
+
 message EStop {
   // is_estop == true when emergency stop is required
   optional bool is_estop = 1;
@@ -107,6 +123,7 @@ message ADCTrajectory {
     SPEED_FALLBACK = 3;
     PATH_REUSED = 4;
     OPEN_SPACE = 5;
+    EDGE_FOLLOW = 6;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
 
@@ -118,6 +135,10 @@ message ADCTrajectory {
   // complete dead end flag
   optional bool car_in_dead_end = 24;
 
+  // vehicle location pose
+  optional LocationPose location_pose = 25;
+
   // output related to RSS
   optional RSSInfo rss_info = 100;
+ 
 }

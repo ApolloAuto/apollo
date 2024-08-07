@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>nano_radar</name>
+        <dag_conf>/apollo/modules/drivers/radar/nano_radar/dag/nano_radar.dag</dag_conf>
+        <process_name>nano_radar</process_name>
+    </module>
+</cyber>

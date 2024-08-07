@@ -27,6 +27,7 @@
 
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common_msgs/guardian_msgs/guardian.pb.h"
+
 #include "cyber/common/macros.h"
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
@@ -87,6 +88,7 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
       const apollo::guardian::GuardianCommand &guardian_command);
   apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
+  void CheckChassisCommunication();
 
   CanbusConf canbus_conf_;
   std::shared_ptr<::apollo::canbus::AbstractVehicleFactory> vehicle_object_ =
@@ -97,9 +99,11 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
       control_command_reader_;
   std::shared_ptr<cyber::Reader<apollo::external_command::ChassisCommand>>
       chassis_command_reader_;
-  int64_t last_timestamp_ = 0;
+  int64_t last_timestamp_controlcmd_ = 0;
+  int64_t last_timestamp_chassiscmd_ = 0;
   ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;
+  bool is_chassis_communicate_lost_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(CanbusComponent)

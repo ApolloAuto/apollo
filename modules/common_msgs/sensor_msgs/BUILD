@@ -61,6 +61,14 @@ proto_library(
 )
 
 proto_library(
+    name = "nano_radar_proto",
+    srcs = ["nano_radar.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+proto_library(
     name = "smartereye_proto",
     srcs = ["smartereye.proto"],
     deps = [

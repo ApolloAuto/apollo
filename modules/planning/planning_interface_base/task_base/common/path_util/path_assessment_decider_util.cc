@@ -33,27 +33,27 @@ bool PathAssessmentDeciderUtil::IsValidRegularPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   // Basic sanity checks.
   if (path_data.Empty()) {
-    ADEBUG << path_data.path_label() << ": path data is empty.";
+    AERROR << path_data.path_label() << ": path data is empty.";
     return false;
   }
   // Check if the path is greatly off the reference line.
   if (IsGreatlyOffReferenceLine(path_data)) {
-    ADEBUG << path_data.path_label() << ": ADC is greatly off reference line.";
+    AERROR << path_data.path_label() << ": ADC is greatly off reference line.";
     return false;
   }
   // Check if the path is greatly off the road.
   if (IsGreatlyOffRoad(reference_line_info, path_data)) {
-    ADEBUG << path_data.path_label() << ": ADC is greatly off road.";
+    AERROR << path_data.path_label() << ": ADC is greatly off road.";
     return false;
   }
   // Check if there is any collision.
   if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
-    ADEBUG << path_data.path_label() << ": ADC has collision.";
+    AINFO << path_data.path_label() << ": ADC has collision.";
     return false;
   }
 
   if (IsStopOnReverseNeighborLane(reference_line_info, path_data)) {
-    ADEBUG << path_data.path_label() << ": stop at reverse neighbor lane";
+    AERROR << path_data.path_label() << ": stop at reverse neighbor lane";
     return false;
   }
 
@@ -66,8 +66,8 @@ bool PathAssessmentDeciderUtil::IsGreatlyOffReferenceLine(
   const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
     if (std::fabs(frenet_path_point.l()) > kOffReferenceLineThreshold) {
-      ADEBUG << "Greatly off reference line at s = " << frenet_path_point.s()
-             << ", with l = " << frenet_path_point.l();
+      AINFO << "Greatly off reference line at s = " << frenet_path_point.s()
+            << ", with l = " << frenet_path_point.l();
       return true;
     }
   }
@@ -85,8 +85,8 @@ bool PathAssessmentDeciderUtil::IsGreatlyOffRoad(
             frenet_path_point.s(), &road_left_width, &road_right_width)) {
       if (frenet_path_point.l() > road_left_width + kOffRoadThreshold ||
           frenet_path_point.l() < -road_right_width - kOffRoadThreshold) {
-        ADEBUG << "Greatly off-road at s = " << frenet_path_point.s()
-               << ", with l = " << frenet_path_point.l();
+        AINFO << "Greatly off-road at s = " << frenet_path_point.s()
+              << ", with l = " << frenet_path_point.l();
         return true;
       }
     }
@@ -127,7 +127,8 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
     if (path_data.frenet_frame_path().back().s() -
             path_data.frenet_frame_path()[i].s() <
         (FLAGS_num_extra_tail_bound_point + 1) *
-            FLAGS_path_bounds_decider_resolution) {
+                FLAGS_path_bounds_decider_resolution +
+            vehicle_param.length()) {
       break;
     }
     double path_point_start_s = frenet_path[i].s() - back_edge_to_center;
@@ -154,8 +155,8 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
           obstacle->PerceptionPolygon();
       for (const auto& corner_point : ABCDpoints) {
         if (obstacle_polygon.IsPointIn(corner_point)) {
-          ADEBUG << "ADC is colliding with obstacle at path s = "
-                 << path_point.s();
+          AERROR << "ADC is colliding with obstacle at path s = "
+                 << path_point.s() << "with obstacle " << obstacle->Id();
           return true;
         }
       }
@@ -216,19 +217,25 @@ bool PathAssessmentDeciderUtil::IsStopOnReverseNeighborLane(
   if (path_data.path_label().find("left") != std::string::npos &&
       path_point_sl.l() > lane_left_width) {
     if (reference_line_info.GetNeighborLaneInfo(
-            ReferenceLineInfo::LaneType::LeftReverse, path_point_sl.s(),
+            ReferenceLineInfo::LaneType::LeftForward, path_point_sl.s(),
             &neighbor_lane_id, &neighbor_lane_width)) {
-      ADEBUG << "stop path point at LeftReverse neighbor lane["
-             << neighbor_lane_id.id() << "]";
+      AINFO << "stop path point at LeftForward neighbor lane["
+            << neighbor_lane_id.id() << "]";
+      return false;
+    } else {
+      AINFO << "stop path point at LeftReverse neighbor lane";
       return true;
     }
   } else if (path_data.path_label().find("right") != std::string::npos &&
              path_point_sl.l() < -lane_right_width) {
     if (reference_line_info.GetNeighborLaneInfo(
-            ReferenceLineInfo::LaneType::RightReverse, path_point_sl.s(),
+            ReferenceLineInfo::LaneType::RightForward, path_point_sl.s(),
             &neighbor_lane_id, &neighbor_lane_width)) {
-      ADEBUG << "stop path point at RightReverse neighbor lane["
-             << neighbor_lane_id.id() << "]";
+      AINFO << "stop path point at RightForward neighbor lane["
+            << neighbor_lane_id.id() << "]";
+      return false;
+    } else {
+      AINFO << "stop path point at RightReverse neighbor lane";
       return true;
     }
   }
@@ -259,7 +266,7 @@ void PathAssessmentDeciderUtil::TrimTailingOutLanePoints(
   }
 
   // Trim.
-  ADEBUG << "Trimming " << path_data->path_label();
+  AINFO << "Trimming " << path_data->path_label();
   auto frenet_path = path_data->frenet_frame_path();
   auto path_point_decision = path_data->path_point_decision_guide();
   while (!path_point_decision.empty() &&
@@ -267,18 +274,20 @@ void PathAssessmentDeciderUtil::TrimTailingOutLanePoints(
              PathData::PathPointType::IN_LANE) {
     if (std::get<1>(path_point_decision.back()) ==
         PathData::PathPointType::OUT_ON_FORWARD_LANE) {
-      ADEBUG << "Trimming out forward lane point";
+      AINFO << "Trimming out forward lane point";
     } else if (std::get<1>(path_point_decision.back()) ==
                PathData::PathPointType::OUT_ON_REVERSE_LANE) {
-      ADEBUG << "Trimming out reverse lane point";
+      AINFO << "Trimming out reverse lane point";
     } else {
-      ADEBUG << "Trimming unknown lane point";
+      AINFO << "Trimming unknown lane point";
     }
     frenet_path.pop_back();
     path_point_decision.pop_back();
   }
   path_data->SetFrenetPath(std::move(frenet_path));
   path_data->SetPathPointDecisionGuide(std::move(path_point_decision));
+  AINFO << "After TrimTailingOutLanePoints: FrenetPath size: "
+        << path_data->frenet_frame_path().size();
 }
 
 }  // namespace planning

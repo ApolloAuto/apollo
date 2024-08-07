@@ -26,8 +26,8 @@
     "build": "webpack --mode production --progress --config config/webpack.config.js --stats-error-details --stats-children"
   },
   "dependencies": {
-    "@dreamview/dreamview-theme": "1.2.1",
-    "@dreamview/log": "1.1.4",
+    "@dreamview/dreamview-theme": "^1.2.1",
+    "@dreamview/log": "^1.1.4",
     "@types/react-dom": "^18.2.4",
     "antd": "5.5.1",
     "lodash": "^4.17.21",
@@ -47,8 +47,8 @@
     "@babel/preset-env": "^7.21.5",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.23.3",
-    "@dreamview/eslint-config-dreamview": "1.1.4",
-    "@dreamview/tslint-config-dreamview": "1.1.4",
+    "@dreamview/eslint-config-dreamview": "^1.1.4",
+    "@dreamview/tslint-config-dreamview": "^1.1.4",
     "@jest/globals": "^29.5.0",
     "@storybook/addon-essentials": "^7.0.12",
     "@storybook/addon-interactions": "^7.0.12",

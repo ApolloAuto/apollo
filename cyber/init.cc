@@ -41,6 +41,9 @@
 #include "cyber/time/clock.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
+#include "cyber/statistics/statistics.h"
+
+#include "gflags/gflags.h"
 
 namespace apollo {
 namespace cyber {
@@ -93,7 +96,7 @@ void OnShutdown(int sig) {
 
 void ExitHandle() { Clear(); }
 
-bool Init(const char* binary_name) {
+bool Init(const char* binary_name, const std::string& dag_info) {
   std::lock_guard<std::mutex> lg(g_mutex);
   if (GetState() != STATE_UNINITIALIZED) {
     return false;
@@ -127,6 +130,24 @@ bool Init(const char* binary_name) {
         };
     clock_node->CreateReader<apollo::cyber::proto::Clock>(kClockChannel, cb);
   }
+
+  if (dag_info != "") {
+    std::string dump_path;
+    if (dag_info.length() > 200) {
+      std::string truncated = dag_info.substr(0, 200);
+      dump_path = common::GetEnv(
+        "APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" + truncated;
+    } else {
+      dump_path = \
+        common::GetEnv("APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" + dag_info;
+    }
+    google::SetCommandLineOption("bvar_dump_file", dump_path.c_str());
+  } else {
+    statistics::Statistics::Instance()->DisableChanVar();
+  }
+  google::SetCommandLineOption("bvar_dump_exclude", "*qps");
+  google::SetCommandLineOption("bvar_dump", "true");
+
   return true;
 }
 

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/control/control_component/proto/control_debug.pb.h"
 
@@ -89,6 +90,14 @@ class DependencyInjector {
 
   const bool control_process() const { return control_process_; }
 
+  ControlInteractiveMsg* mutable_control_interactive_info() {
+    return &control_interactive_msg_;
+  }
+
+  const ControlInteractiveMsg& control_interactive_info() const {
+    return control_interactive_msg_;
+  }
+
  private:
   apollo::common::VehicleStateProvider vehicle_state_;
   SimpleLongitudinalDebug lon_debug_;
@@ -96,6 +105,7 @@ class DependencyInjector {
   ControlDebugInfo control_debug_info_;
   ControlDebugInfo control_debug_previous_;
   ControlCommand control_command_;
+  ControlInteractiveMsg control_interactive_msg_;
   bool control_process_ = false;
 };
 

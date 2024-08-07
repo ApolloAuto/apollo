@@ -165,12 +165,10 @@ function Dynamical() {
     }, []);
 
     const activeIndex = useMemo(
-        () => ({
-            activeIndex: data.findIndex((item) => item.name === currentDynamicModel) + 1,
-        }),
+        () => data.findIndex((item) => item.name === currentDynamicModel) + 1,
         [data, currentDynamicModel],
     );
-    const { classes } = useTableHover()(activeIndex);
+    const { classes } = useTableHover(activeIndex);
 
     const columns = useMemo(
         () => getColumns(t, refreshList, updateDownloadProgress, currentDynamicModel),

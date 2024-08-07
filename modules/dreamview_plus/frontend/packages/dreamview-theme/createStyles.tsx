@@ -15,54 +15,50 @@
  **************************************************************************** */
 
 import { createMakeAndWithStyles } from 'tss-react';
-import React, { useRef } from 'react';
-import isEqual from 'lodash/isEqual';
-import { CSSObject } from '@emotion/react';
-import { light, IDefaultTheme, ITheme, getToken } from './tokens/baseToken';
+import React, { useMemo } from 'react';
+import { light, IDefaultTheme, drak, ITheme } from './tokens/baseToken';
 
-const context = React.createContext(null);
+const context = React.createContext<{
+    theme: ITheme;
+    tokens: IDefaultTheme;
+}>({
+    theme: 'light',
+    tokens: light,
+});
 
 interface ProviderProps {
     theme?: ITheme;
 }
 
-const defaultTheme = {
-    theme: 'light',
-    tokens: getToken('light'),
-    ...createMakeAndWithStyles({
-        useTheme: () => light,
-    }),
-};
-
 export function Provider(props: React.PropsWithChildren<ProviderProps>) {
     const { theme = 'light' } = props;
-    const prevHoc = useRef(defaultTheme);
-    const prevTheme = useRef('');
 
-    const hoc = React.useMemo(() => {
-        if (!isEqual(prevTheme.current, theme)) {
-            prevHoc.current = {
-                ...createMakeAndWithStyles({
-                    useTheme: () => getToken(theme),
-                }),
-                theme,
-                tokens: getToken(theme),
-            };
-        }
-        return prevHoc.current;
-    }, [theme]);
+    const values = useMemo(
+        () => ({
+            theme,
+            tokens: {
+                light,
+                drak,
+            }[theme],
+        }),
+        [theme],
+    );
 
-    prevTheme.current = theme;
-
-    return <context.Provider value={hoc}>{props.children}</context.Provider>;
+    return <context.Provider value={values}>{props.children}</context.Provider>;
 }
 
 export function useThemeContext() {
     return React.useContext(context);
 }
 
-export const useMakeStyle = (styleFuc: (theme: IDefaultTheme, prop?: any) => CSSObject) => {
-    const { makeStyles } = useThemeContext();
-    const hoc = React.useMemo(() => makeStyles()(styleFuc), [makeStyles]);
-    return hoc;
-};
+function useTheme() {
+    return React.useContext(context).tokens;
+}
+
+const { makeStyles: initUseStyle } = createMakeAndWithStyles<IDefaultTheme>({
+    useTheme,
+});
+
+export const makeStylesWithProps = initUseStyle;
+
+export const makeStyles = initUseStyle();

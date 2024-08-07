@@ -32,6 +32,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/planning_base/common/util/print_debug_info.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
@@ -197,8 +198,8 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
 
   adc_state_ = vehicle_state;
   if (!GetNearestPointFromRouting(vehicle_state, &adc_waypoint_)) {
-    AERROR << "Failed to get waypoint from routing with point: "
-           << "(" << vehicle_state.x() << ", " << vehicle_state.y() << ", "
+    AERROR << "Failed to get waypoint from routing with point: " << "("
+           << vehicle_state.x() << ", " << vehicle_state.y() << ", "
            << vehicle_state.z() << ").";
     return false;
   }
@@ -474,6 +475,9 @@ bool LaneFollowMap::GetRouteSegments(
              << ", forward: " << forward_length;
       return false;
     }
+    AINFO << "before PrintSegmentsDebugInfo";
+    PrintSegmentsDebugInfo(&route_segments->back(), "origin");
+    AINFO << "after PrintSegmentsDebugInfo";
     if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
       route_segments->back().SetRouteEndWaypoint(last_waypoint);
     }
@@ -754,6 +758,36 @@ void LaneFollowMap::AppendLaneToPoints(
       break;
     }
   }
+}
+
+void LaneFollowMap::PrintSegmentsDebugInfo(
+    const apollo::hdmap::RouteSegments *segments, std::string debug_str) {
+  PrintCurves trans_left_pt_print_curve;
+  PrintCurves trans_right_pt_print_curve;
+  PrintCurves trans_center_print_curve;
+  for (size_t i = 0; i < segments->size(); ++i) {
+    for (const auto &seg :
+         segments->at(i).lane->lane().left_boundary().curve().segment()) {
+      for (const auto &pt : seg.line_segment().point()) {
+        trans_left_pt_print_curve.AddPoint(debug_str + "_left_pt_print", pt.x(),
+                                           pt.y());
+      }
+    }
+    for (const auto &seg :
+         segments->at(i).lane->lane().right_boundary().curve().segment()) {
+      for (const auto &pt : seg.line_segment().point()) {
+        trans_right_pt_print_curve.AddPoint(debug_str + "_right_pt_print",
+                                            pt.x(), pt.y());
+      }
+    }
+    for (const auto &pt : segments->at(i).lane->points()) {
+      trans_center_print_curve.AddPoint(debug_str + "_center_pt_print", pt.x(),
+                                        pt.y());
+    }
+  }
+  trans_left_pt_print_curve.PrintToLog();
+  trans_right_pt_print_curve.PrintToLog();
+  trans_center_print_curve.PrintToLog();
 }
 
 }  // namespace planning

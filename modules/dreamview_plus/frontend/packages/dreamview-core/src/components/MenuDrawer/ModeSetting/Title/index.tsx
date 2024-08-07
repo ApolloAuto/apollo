@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { IconIcArrowsDown, Collapse } from '@dreamview/dreamview-ui';
+import { IconPark, Collapse } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 
 interface IModeSettingTitle {
@@ -59,7 +59,7 @@ function ModeSettingTitle(props: React.PropsWithChildren<IModeSettingTitle>) {
                 })}
             >
                 {title}
-                <IconIcArrowsDown />
+                <IconPark name='IcArrowsDown' />
             </div>
             <div
                 style={{

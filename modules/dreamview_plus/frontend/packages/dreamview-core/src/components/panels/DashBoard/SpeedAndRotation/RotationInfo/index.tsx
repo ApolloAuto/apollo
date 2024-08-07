@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useImagePrak, IconIcDextroversionHighlight, IconIcLeftTurnDefault } from '@dreamview/dreamview-ui';
+import { useImagePrak, IconPark } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 import './index.less';
 
@@ -51,13 +51,14 @@ function RotationInfo(props: RotationInfoProps) {
                 <span className={classes['dashboard-rotation-info-font-small']}>Rotation Ratio</span>
             </div>
             <div className={classes['dashboard-rotation-info-wheel']}>
-                <IconIcLeftTurnDefault
+                <IconPark
+                    name='IcLeftTurnDefault'
                     className={isLeftOn ? 'turn-signal' : ''}
                     style={{
                         fontSize: 16,
                     }}
                 />
-                {/* <IconIcAimingCircle
+                {/* <IconPark name='IcAimingCircle'
                     rotate={steeringAngle}
                     style={{
                         marginLeft: 10,
@@ -78,7 +79,8 @@ function RotationInfo(props: RotationInfoProps) {
                     src={img}
                     alt=''
                 />
-                <IconIcDextroversionHighlight
+                <IconPark
+                    name='IcDextroversionHighlight'
                     className={isRightOn ? 'turn-signal' : ''}
                     style={{
                         fontSize: 16,

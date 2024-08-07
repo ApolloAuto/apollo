@@ -84,9 +84,11 @@ class MessageManager {
    * @param length the length of data array
    */
   virtual void Parse(const uint32_t message_id, const uint8_t *data,
-                     int32_t length);
+                     int32_t length, bool is_recv_prase);
 
   void ClearSensorData();
+  void ClearSensorRecvData();
+  void ClearSensorSenderData();
 
   std::condition_variable *GetMutableCVar();
 
@@ -105,6 +107,20 @@ class MessageManager {
    */
   common::ErrorCode GetSensorData(SensorType *const sensor_data);
 
+  /**
+   * @brief get chassis recv detail. used lock_guard in this function to avoid
+   * concurrent read/write issue.
+   * @param chassis_detail chassis_detail to be filled.
+   */
+  common::ErrorCode GetSensorRecvData(SensorType *const sensor_recv_data);
+
+  /**
+   * @brief get chassis sender detail. used lock_guard in this function to avoid
+   * concurrent read/write issue.
+   * @param chassis_detail chassis_detail to be filled.
+   */
+  common::ErrorCode GetSensorSenderData(SensorType *const sensor_sender_data);
+
   /*
    * @brief reset send messages
    */
@@ -121,11 +137,20 @@ class MessageManager {
   std::vector<std::unique_ptr<ProtocolData<SensorType>>> recv_protocol_data_;
 
   std::unordered_map<uint32_t, ProtocolData<SensorType> *> protocol_data_map_;
+  std::unordered_map<uint32_t, ProtocolData<SensorType> *>
+      recv_protocol_data_map_;
+  std::unordered_map<uint32_t, ProtocolData<SensorType> *>
+      sender_protocol_data_map_;
+
   std::unordered_map<uint32_t, CheckIdArg> check_ids_;
   std::set<uint32_t> received_ids_;
 
   std::mutex sensor_data_mutex_;
   SensorType sensor_data_;
+  std::mutex sensor_data_recv_mutex_;
+  SensorType sensor_recv_data_;
+  std::mutex sensor_data_sender_mutex_;
+  SensorType sensor_sender_data_;
   bool is_received_on_time_ = false;
 
   std::condition_variable cvar_;
@@ -139,6 +164,7 @@ void MessageManager<SensorType>::AddRecvProtocolData() {
   if (dt == nullptr) {
     return;
   }
+  recv_protocol_data_map_[T::ID] = dt;
   protocol_data_map_[T::ID] = dt;
   if (need_check) {
     check_ids_[T::ID].period = dt->GetPeriod();
@@ -156,6 +182,7 @@ void MessageManager<SensorType>::AddSendProtocolData() {
   if (dt == nullptr) {
     return;
   }
+  sender_protocol_data_map_[T::ID] = dt;
   protocol_data_map_[T::ID] = dt;
   if (need_check) {
     check_ids_[T::ID].period = dt->GetPeriod();
@@ -180,16 +207,40 @@ MessageManager<SensorType>::GetMutableProtocolDataById(
 
 template <typename SensorType>
 void MessageManager<SensorType>::Parse(const uint32_t message_id,
-                                       const uint8_t *data, int32_t length) {
+                                       const uint8_t *data, int32_t length,
+                                       bool is_recv_prase) {
   ProtocolData<SensorType> *protocol_data =
       GetMutableProtocolDataById(message_id);
   if (protocol_data == nullptr) {
     return;
   }
+  // parse all
   {
     std::lock_guard<std::mutex> lock(sensor_data_mutex_);
     protocol_data->Parse(data, length, &sensor_data_);
   }
+  if (is_recv_prase) {
+    // parse revceiver
+    {
+      std::lock_guard<std::mutex> lock(sensor_data_recv_mutex_);
+      protocol_data->Parse(data, length, &sensor_recv_data_);
+    }
+    if (recv_protocol_data_map_.find(message_id) ==
+        recv_protocol_data_map_.end()) {
+      AERROR << "Failed to get recv data, " << "message is " << message_id;
+    }
+  } else {
+    // parse sender
+    {
+      std::lock_guard<std::mutex> lock(sensor_data_sender_mutex_);
+      protocol_data->Parse(data, length, &sensor_sender_data_);
+    }
+    if (sender_protocol_data_map_.find(message_id) ==
+        sender_protocol_data_map_.end()) {
+      AERROR << "Failed to get recv data, " << "message is " << message_id;
+    }
+  }
+
   received_ids_.insert(message_id);
   // check if need to check period
   const auto it = check_ids_.find(message_id);
@@ -215,6 +266,18 @@ void MessageManager<SensorType>::ClearSensorData() {
 }
 
 template <typename SensorType>
+void MessageManager<SensorType>::ClearSensorRecvData() {
+  std::lock_guard<std::mutex> lock(sensor_data_recv_mutex_);
+  sensor_recv_data_.Clear();
+}
+
+template <typename SensorType>
+void MessageManager<SensorType>::ClearSensorSenderData() {
+  std::lock_guard<std::mutex> lock(sensor_data_sender_mutex_);
+  sensor_sender_data_.Clear();
+}
+
+template <typename SensorType>
 std::condition_variable *MessageManager<SensorType>::GetMutableCVar() {
   return &cvar_;
 }
@@ -228,6 +291,30 @@ ErrorCode MessageManager<SensorType>::GetSensorData(
   }
   std::lock_guard<std::mutex> lock(sensor_data_mutex_);
   sensor_data->CopyFrom(sensor_data_);
+  return ErrorCode::OK;
+}
+
+template <typename SensorType>
+ErrorCode MessageManager<SensorType>::GetSensorRecvData(
+    SensorType *const sensor_recv_data) {
+  if (sensor_recv_data == nullptr) {
+    AERROR << "Failed to get receiver data due to nullptr.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  std::lock_guard<std::mutex> lock(sensor_data_recv_mutex_);
+  sensor_recv_data->CopyFrom(sensor_recv_data_);
+  return ErrorCode::OK;
+}
+
+template <typename SensorType>
+ErrorCode MessageManager<SensorType>::GetSensorSenderData(
+    SensorType *const sensor_sender_data) {
+  if (sensor_sender_data == nullptr) {
+    AERROR << "Failed to get sender data due to nullptr.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+  std::lock_guard<std::mutex> lock(sensor_data_sender_mutex_);
+  sensor_sender_data->CopyFrom(sensor_sender_data_);
   return ErrorCode::OK;
 }
 

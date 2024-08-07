@@ -25,4 +25,14 @@ RUN bash /opt/apollo/installers/install_release_deps.sh
 # RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
 
 RUN bash /opt/apollo/installers/post_install.sh dev
+
+RUN bash /opt/apollo/installers/install_pkg_repo.sh
+
+COPY rcfiles/setup.sh /opt/apollo/neo/
+
 RUN bash /opt/apollo/installers/install_rsdriver.sh
+RUN bash /opt/apollo/installers/install_livox_driver.sh
+RUN bash /opt/apollo/installers/install_hesai2_driver.sh
+RUN bash /opt/apollo/installers/install_vanjee_driver.sh
+
+RUN pip3 install tensorflow==2.3.0

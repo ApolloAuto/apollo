@@ -1,3 +1,3 @@
 export { MyComponent } from './components/MyComponent';
 export * from './components';
-export * from './icons';
+export { default as IconPark } from './IconPark';

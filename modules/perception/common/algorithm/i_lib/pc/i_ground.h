@@ -23,6 +23,9 @@
 #include "modules/perception/common/algorithm/i_lib/geometry/i_plane.h"
 #include "modules/perception/common/algorithm/i_lib/pc/i_struct_s.h"
 
+#include "Eigen/Core"
+#include "Eigen/Sparse"
+
 namespace apollo {
 namespace perception {
 namespace algorithm {
@@ -31,12 +34,16 @@ struct GroundPlaneLiDAR {
     IZero4(params);
     nr_support = 0;
     is_detected = false;
+    is_from_self = 7;
+    invalid_status = 7;
   }
 
   GroundPlaneLiDAR &operator=(const GroundPlaneLiDAR &pi) {
     ICopy4(pi.params, this->params);
     this->nr_support = pi.GetNrSupport();
     this->is_detected = pi.GetStatus();
+    this->is_from_self = pi.GetOrigin();
+    this->invalid_status = pi.GetInvalidStatus();
     return (*this);
   }
 
@@ -116,10 +123,20 @@ struct GroundPlaneLiDAR {
 
   void SetStatus(bool flag) { is_detected = flag; }
 
+  int GetOrigin() const { return is_from_self; }
+
+  void SetOrigin(int origin) { is_from_self = origin; }
+
+  int GetInvalidStatus() const { return invalid_status; }
+
+  void SetInvalidStatus(int flag) { invalid_status = flag; }
+
   float params[4];
 
  private:
   bool is_detected;
+  int is_from_self; // 0: self, 1: neighbor
+  int invalid_status; //0: IsValid, 1: inliers small, 2: NormalToZ big
   int nr_support;
 };
 
@@ -189,6 +206,9 @@ struct PlaneFitGroundDetectorParam {
   float candidate_filter_threshold;
   int nr_ransac_iter_threshold;
   int nr_smooth_iter;
+  bool use_math_optimize;
+  bool single_frame_detect;
+  bool debug_output;
 };
 
 struct PlaneFitPointCandIndices {
@@ -226,7 +246,9 @@ void IPlaneSpherToEucli(const GroundPlaneSpherical &src, GroundPlaneLiDAR *dst);
 
 class BaseGroundDetector {
  public:
-  explicit BaseGroundDetector(const PlaneFitGroundDetectorParam &param)
+  // explicit BaseGroundDetector(const PlaneFitGroundDetectorParam &param)
+  //     : param_(param) {}
+  explicit BaseGroundDetector(PlaneFitGroundDetectorParam &param)
       : param_(param) {}
   virtual ~BaseGroundDetector() {}
   virtual bool Detect(const float *point_cloud, float *height_above_ground,
@@ -234,24 +256,31 @@ class BaseGroundDetector {
                       unsigned int nr_point_elements) = 0;
 
  protected:
-  const PlaneFitGroundDetectorParam &param_;
+  // const PlaneFitGroundDetectorParam &param_;
+  PlaneFitGroundDetectorParam &param_;
 };
 
 class PlaneFitGroundDetector : public BaseGroundDetector {
   static const int dim_point_ = 3;
 
  public:
-  explicit PlaneFitGroundDetector(const PlaneFitGroundDetectorParam &param);
+  // explicit PlaneFitGroundDetector(const PlaneFitGroundDetectorParam &param);
+  explicit PlaneFitGroundDetector(PlaneFitGroundDetectorParam &param);
   ~PlaneFitGroundDetector();
   bool Init();
   bool Detect(const float *point_cloud, float *height_above_ground,
               unsigned int nr_points, unsigned int nr_point_elements);
+  void ResetParams(float ori_z_lower, float ori_z_upper);
+  void UpdateParams(float parsing_ground_z, float buffer, double timestamp);
   const char *GetLabel() const;
   const VoxelGridXY<float> *GetGrid() const;
   const GroundPlaneLiDAR *GetGroundPlane(int r, int c) const;
   unsigned int GetGridDimX() const;
   unsigned int GetGridDimY() const;
   float GetUnknownHeight();
+
+  void Pc2Voxel(float x, float y, float z, int *row, int *col);
+
   PlaneFitPointCandIndices **GetCandis() const;
 
  protected:
@@ -281,6 +310,13 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
                  PlaneFitPointCandIndices *candi, unsigned int nr_points,
                  unsigned int nr_point_element);
   int Smooth();
+  int SmoothInOrder();
+  void GetInliers(int *inliers);
+  void Optimization();
+  void PlaneRefine();
+  void SetGroundPlaneSpherParams(float *params);
+  void GetGroundPlaneSpherParams(float *params);
+  void SmoothInMath();
   int SmoothLine(unsigned int up, unsigned int r, unsigned int dn);
   int CompleteGrid(const GroundPlaneSpherical &lt,
                    const GroundPlaneSpherical &rt,
@@ -318,8 +354,20 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   char *labels_;
   float *sampled_z_values_;
   float *pf_threeds_;
+  float *spher_params_;
   int *sampled_indices_;
+  int age_ = 0;
   std::pair<int, int> *order_table_;
+  double frame_timestamp_ = 0.0;
+
+  // global optimize
+  float **weight_buffer_ = nullptr;
+  int *inliers_ = nullptr;
+  float *sphe_params_ = nullptr;
+  std::vector<std::vector<unsigned int>> neighbors_;
+  Eigen::SparseMatrix<float> a_array_;
+  Eigen::SparseMatrix<float> b_array_;
+  Eigen::SimplicialLDLT<Eigen::SparseMatrix<float>> solver_;
 };
 
 }  // namespace algorithm

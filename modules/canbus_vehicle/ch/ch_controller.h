@@ -24,6 +24,7 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/ch/protocol/brake_command_111.h"
 #include "modules/canbus_vehicle/ch/protocol/gear_command_114.h"
@@ -45,6 +46,7 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Ch>* const can_sender,
+      CanReceiver<::apollo::canbus::Ch>* const can_receiver,
       MessageManager<::apollo::canbus::Ch>* const message_manager) override;
 
   bool Start() override;
@@ -59,6 +61,12 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+
+  /**
+   * @brief ccheck the chassis detail received or lost.
+   */
+  bool CheckChassisCommunicationError();
+
   FRIEND_TEST(ChControllerTest, SetDrivingMode);
   FRIEND_TEST(ChControllerTest, Status);
   FRIEND_TEST(ChControllerTest, UpdateDrivingMode);
@@ -138,6 +146,9 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
+  uint32_t lost_chassis_reveive_detail_count_ = 0;
+  bool is_need_count_ = true;
+  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace ch
