@@ -44,12 +44,12 @@ void ModuleArgument::DisplayUsage() {
            "mode of plugins, use disable_plugin_autoload to ingore autoload\n"
         << "    -c, --cpuprofile: enable gperftools cpu profile\n"
         << "    -o, --profile_filename=filename: the filename to dump the "
-            "profile to, default value is ${process_group}_cpu.prof. Only work "
-            "with -c option\n"
+           "profile to, default value is ${process_group}_cpu.prof. Only work "
+           "with -c option\n"
         << "    -H, --heapprofile: enable gperftools heap profile\n"
         << "    -O, --heapprofile_filename=filename: the filename to dump the "
-            "profile to, default value is ${process_group}_mem.prof. Only work "
-            "with -c option\n"
+           "profile to, default value is ${process_group}_mem.prof. Only work "
+           "with -c option\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
         << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "
@@ -144,7 +144,7 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
         plugin_description_list_.emplace_back(std::string(optarg));
         break;
       case ARGS_OPT_CODE_DISABLE_PLUGIN_AUTOLOAD:
-          disable_plugin_autoload_ = true;
+        disable_plugin_autoload_ = true;
         break;
       case 'c':
 #ifndef BASE_PROFILER_H_

@@ -25,6 +25,10 @@ message Stream {
 
     BROADGNSS_TEXT = 30;
     BROADGNSS_BINARY = 31;
+
+    ENBROAD_TEXT = 40;
+    ENBROAD_BINARY = 41;
+
   }
   optional Format format = 1;
 
