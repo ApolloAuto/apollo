@@ -20,10 +20,10 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <cerrno>
 
 #include "cyber/cyber.h"
-
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
@@ -75,6 +75,18 @@ void UdpStream::open() {
     // error
     AERROR << "Create socket failed, errno: " << errno << ", "
            << strerror(errno);
+    return;
+  }
+
+  struct sockaddr_in peer_sockaddr;
+  socklen_t socklenth = sizeof(peer_sockaddr);
+  bzero(&peer_sockaddr, sizeof(peer_sockaddr));
+  peer_sockaddr.sin_family = AF_INET;
+  peer_sockaddr.sin_port = peer_port_;
+  peer_sockaddr.sin_addr.s_addr = INADDR_ANY;
+  if (bind(fd, (struct sockaddr*)&peer_sockaddr, sizeof(peer_sockaddr)) == -1) {
+    AERROR << " Socket bind failed! Port " << peer_port_;
+    ::close(fd);
     return;
   }
 
@@ -153,7 +165,7 @@ bool UdpStream::Connect() {
   }
 
   // upper layer support ping method ??
-  Login();
+  // Login();
   status_ = Stream::Status::CONNECTED;
   return true;
 }
@@ -175,7 +187,7 @@ size_t UdpStream::read(uint8_t* buffer, size_t max_length) {
   bzero(&peer_sockaddr, sizeof(peer_sockaddr));
   peer_sockaddr.sin_family = AF_INET;
   peer_sockaddr.sin_port = peer_port_;
-  peer_sockaddr.sin_addr.s_addr = peer_addr_;
+  peer_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
   while ((ret = ::recvfrom(sockfd_, buffer, max_length, 0,
                            (struct sockaddr*)&peer_sockaddr,

@@ -19,10 +19,12 @@
 #include <string>
 
 #include "gtest/gtest.h"
+
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus_vehicle/ge3/proto/ge3.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -46,6 +48,7 @@ class Ge3ControllerTest : public ::testing::Test {
  protected:
   Ge3Controller controller_;
   CanSender<::apollo::canbus::Ge3> sender_;
+  CanReceiver<::apollo::canbus::Ge3> receiver_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   Ge3MessageManager msg_manager_;
@@ -53,7 +56,8 @@ class Ge3ControllerTest : public ::testing::Test {
 };
 
 TEST_F(Ge3ControllerTest, Init) {
-  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
+  ErrorCode ret =
+      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -61,7 +65,7 @@ TEST_F(Ge3ControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
 
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
@@ -69,7 +73,7 @@ TEST_F(Ge3ControllerTest, SetDrivingMode) {
 }
 
 TEST_F(Ge3ControllerTest, Status) {
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
@@ -81,7 +85,7 @@ TEST_F(Ge3ControllerTest, Status) {
 }
 
 TEST_F(Ge3ControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &msg_manager_);
+  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),

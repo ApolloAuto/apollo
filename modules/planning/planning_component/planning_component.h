@@ -60,6 +60,7 @@ class PlanningComponent final
  private:
   void CheckRerouting();
   bool CheckInput();
+  void SetLocation(ADCTrajectory* const ptr_trajectory_pb);
 
  private:
   std::shared_ptr<cyber::Reader<perception::TrafficLightDetection>>
@@ -72,6 +73,8 @@ class PlanningComponent final
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
   std::shared_ptr<cyber::Reader<storytelling::Stories>> story_telling_reader_;
   std::shared_ptr<cyber::Reader<PlanningCommand>> planning_command_reader_;
+  std::shared_ptr<cyber::Reader<perception::PerceptionEdgeInfo>>
+      edge_info_reader_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;
@@ -87,6 +90,7 @@ class PlanningComponent final
   relative_map::MapMsg relative_map_;
   storytelling::Stories stories_;
   PlanningCommand planning_command_;
+  perception::PerceptionEdgeInfo edge_info_;
   LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;

@@ -333,6 +333,36 @@
       </tab>
       <tab type="user" visible="yes" title="Fuel研发云平台" intro="" url="https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/Fuel%E7%A0%94%E5%8F%91%E4%BA%91%E5%B9%B3%E5%8F%B0/%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/%E6%A6%82%E8%A7%88" />
       <tab type="user" visible="yes" title="仿真平台" intro="" url="https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/%E4%BB%BF%E7%9C%9F%E5%B9%B3%E5%8F%B0/%E6%A6%82%E8%A7%88" />
+      <tab type="usergroup" visible="yes" title="地图" intro="" url="[none]">
+        <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE6_xA6_x82_xE8_xBF_xB0" />
+        <tab type="user" visible="yes" title="开通地图服务" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_xBC_x80_xE9_x80_x9A_xE5_x9C_xB0_xE5_x9B_xBE_xE6_x9C_x8D_xE5_x8A_xA1" />
+        <tab type="user" visible="yes" title="准备工作" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x87_x86_xE5_xA4_x87_xE5_xB7_xA5_xE4_xBD_x9C" />
+        <tab type="user" visible="yes" title="环境配置" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE7_x8E_xAF_xE5_xA2_x83_xE9_x85_x8D_xE7_xBD_xAE" />
+        <tab type="user" visible="yes" title="地图采集" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE9_x87_x87_xE9_x9B_x86" />
+        <tab type="usergroup" visible="yes" title="地图编辑" intro="" url="[none]">
+          <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE6_xA6_x82_xE8_xBF_xB0" />
+          <tab type="user" visible="yes" title="车道" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE8_xBD_xA6_xE9_x81_x93" />
+          <tab type="user" visible="yes" title="路口" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE8_xB7_xAF_xE5_x8F_xA3" />
+          <tab type="user" visible="yes" title="线" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE7_xBA_xBF" />
+          <tab type="user" visible="yes" title="红绿灯" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE7_xBA_xA2_xE7_xBB_xBF_xE7_x81_xAF" />
+          <tab type="user" visible="yes" title="测距" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE6_xB5_x8B_xE8_xB7_x9D" />
+          <tab type="user" visible="yes" title="减速带" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE5_x87_x8F_xE9_x80_x9F_xE5_xB8_xA6" />
+          <tab type="user" visible="yes" title="停车位" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE5_x81_x9C_xE8_xBD_xA6_xE4_xBD_x8D" />
+          <tab type="user" visible="yes" title="人行横道" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE4_xBA_xBA_xE8_xA1_x8C_xE6_xA8_xAA_xE9_x81_x93" />
+          <tab type="user" visible="yes" title="交通标志牌" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE7_xBC_x96_xE8_xBE_x91_2_xE4_xBA_xA4_xE9_x80_x9A_xE6_xA0_x87_xE5_xBF_x97_xE7_x89_x8C" />
+        </tab>
+        <tab type="user" visible="yes" title="仿真验证" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE4_xBB_xBF_xE7_x9C_x9F_xE9_xAA_x8C_xE8_xAF_x81" />
+        <tab type="user" visible="yes" title="常见问题" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_xB8_xB8_xE8_xA7_x81_xE9_x97_xAE_xE9_xA2_x98" />
+      </tab>
+      <tab type="usergroup" visible="yes" title="标定工具" intro="" url="[none]">
+        <tab type="user" visible="yes" title="功能概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_x8A_x9F_xE8_x83_xBD_xE6_xA6_x82_xE8_xBF_xB0" />
+        <tab type="user" visible="yes" title="开通标定工具" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_xBC_x80_xE9_x80_x9A_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7" />
+        <tab type="user" visible="yes" title="准备工作" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_x87_x86_xE5_xA4_x87_xE5_xB7_xA5_xE4_xBD_x9C" />
+        <tab type="user" visible="yes" title="环境配置" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE7_x8E_xAF_xE5_xA2_x83_xE9_x85_x8D_xE7_xBD_xAE" />
+        <tab type="user" visible="yes" title="激光雷达标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE6_xA0_x87_xE5_xAE_x9A" />
+        <tab type="user" visible="yes" title="相机标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE7_x9B_xB8_xE6_x9C_xBA_xE6_xA0_x87_xE5_xAE_x9A" />
+        <tab type="user" visible="yes" title="附录" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE9_x99_x84_xE5_xBD_x95" />
+      </tab>
     </tab>
     <tab type="usergroup" visible="yes" title="故障排查" intro="" url="[none]">
       <tab type="usergroup" visible="yes" title="安装编译" intro="" url="[none]">

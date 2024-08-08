@@ -5,3 +5,5 @@ reserved_invisible_time: 0.3
 use_frame_timestamp: true
 set_static_outside_hdmap: true
 print_debug_log: false
+delay_time_output: 0.0
+pub_track_times: 1

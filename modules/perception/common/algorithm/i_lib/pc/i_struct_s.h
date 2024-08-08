@@ -183,6 +183,32 @@ inline int IAssignPointToVoxel(const T *data, T bound_x_min, T bound_x_max,
 }
 
 template <typename T>
+inline int AssignPointToVoxel(T xx, T yy, T zz, T bound_x_min, T bound_x_max,
+                               T bound_y_min, T bound_y_max, T bound_z_min,
+                               T bound_z_max, T voxel_width_x_rec,
+                               T voxel_width_y_rec, int nr_voxel_x,
+                               int nr_voxel_y) {
+  int i, j, k;
+  T x = xx;
+  T y = yy;
+  T z = zz;
+
+  // points that are outside the defined BBOX are ignored
+  if (x < bound_x_min || x > bound_x_max || y < bound_y_min ||
+      y > bound_y_max || z < bound_z_min || z > bound_z_max) {
+    return (-1);
+  }
+
+  // compute the x, y voxel indices
+  k = IMin(nr_voxel_x - 1,
+           static_cast<int>((x - bound_x_min) * voxel_width_x_rec));
+  j = IMin(nr_voxel_y - 1,
+           static_cast<int>((y - bound_y_min) * voxel_width_y_rec));
+  i = (nr_voxel_x * j) + k;
+  return (i);
+}
+
+template <typename T>
 class Voxel {
  public:
   Voxel() {}
@@ -852,6 +878,21 @@ bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
 
     cptr_remainder += nr_point_element;
   }
+
+  // for (i = 0; i < nr_voxel; ++i) {
+  //     voxels_[i].indices_.clear();
+  // }
+  // for (i = 0; i < nr_points; i++, n++) {
+  //     float x = data_[nr_point_element_ * i];
+  //     float y = data_[nr_point_element_ * i + 1];
+  //     float z = data_[nr_point_element_ * i + 2];
+  //     id = AssignPointToVoxel(x, y, z, dim_x_[0], dim_x_[1], dim_y_[0], dim_y_[1], dim_z_[0], dim_z_[1], 
+  //         voxel_width_x_rec, voxel_width_y_rec, static_cast<int>(nr_voxel_x_), static_cast<int>(nr_voxel_y_));
+      
+  //     if (id >= 0) {
+  //         voxels_[id].indices_.push_back(i);
+  //     }
+  // }
 
   initialized_ = true;
   return (initialized_);

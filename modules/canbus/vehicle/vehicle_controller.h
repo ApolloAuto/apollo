@@ -26,10 +26,12 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/external_command_msgs/chassis_command.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/external_command_msgs/chassis_command.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -41,6 +43,7 @@
 namespace apollo {
 namespace canbus {
 
+using ::apollo::drivers::canbus::CanReceiver;
 using ::apollo::drivers::canbus::CanSender;
 using ::apollo::drivers::canbus::MessageManager;
 
@@ -63,6 +66,7 @@ class VehicleController {
    */
   virtual common::ErrorCode Init(
       const VehicleParameter &params, CanSender<SensorType> *const can_sender,
+      CanReceiver<SensorType> *const can_receiver,
       MessageManager<SensorType> *const message_manager) = 0;
 
   /**
@@ -133,6 +137,11 @@ class VehicleController {
   virtual void Acceleration(double acc) = 0;
 
   /*
+   * @brief drive with new speed:-xx.0~xx.0, unit:m/s
+   */
+  virtual void Speed(double speed) {}
+
+  /*
    * @brief steering with old angle speed angle:-99.99~0.00~99.99, unit:%,
    * left:+, right:-
    */
@@ -192,6 +201,7 @@ class VehicleController {
   canbus::VehicleParameter params_;
   common::VehicleParam vehicle_params_;
   CanSender<SensorType> *can_sender_ = nullptr;
+  CanReceiver<SensorType> *can_receiver_ = nullptr;
   MessageManager<SensorType> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
@@ -321,6 +331,7 @@ ErrorCode VehicleController<SensorType>::Update(
     Gear(control_command.gear_location());
     Throttle(control_command.throttle());
     Acceleration(control_command.acceleration());
+    Speed(control_command.speed());
     Brake(control_command.brake());
     SetEpbBreak(control_command);
     SetLimits();

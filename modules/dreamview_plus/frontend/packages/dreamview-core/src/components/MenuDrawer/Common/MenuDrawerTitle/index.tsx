@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMenuStore } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { CloseMenuAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
-import { IconIcClose } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 
 interface IMenuDrawerTitle {
@@ -28,7 +28,7 @@ function MenuDrawerTitle(props: IMenuDrawerTitle) {
                 <span className={classes['menu-drawer-title-ic']}>{extra}</span>
                 &nbsp;&nbsp;&nbsp;
                 <span className={classes['menu-drawer-title-ic']} onClick={onClose}>
-                    <IconIcClose />
+                    <IconPark name='IcClose' />
                 </span>
             </div>
         </div>

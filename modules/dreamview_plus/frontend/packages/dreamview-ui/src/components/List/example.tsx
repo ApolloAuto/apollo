@@ -2,7 +2,7 @@ import { ListProps } from 'antd';
 import React, { useState } from 'react';
 import { List } from '.';
 import { ListItem } from './ListItem';
-import { IconIcSucceed, IconIcUse } from '../../icons';
+import IconPark from '../../IconPark';
 
 export function Template<T>(props: ListProps<T>) {
     const [data, setData] = useState([
@@ -50,8 +50,8 @@ export function Template<T>(props: ListProps<T>) {
         <List>
             {data.map((item) => (
                 <ListItem
-                    activeIcon={<IconIcSucceed />}
-                    hoverIcon={<IconIcUse />}
+                    activeIcon={<IconPark name='IcSucceed' />}
+                    hoverIcon={<IconPark name='IcUse' />}
                     onClick={(e) => {
                         itemOnClick(e, item.key);
                     }}

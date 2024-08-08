@@ -231,8 +231,8 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
       traj_point.path_point().y(), traj_point.v(), traj_point.a(),
       traj_point.path_point().theta(), traj_point.path_point().kappa(),
       &s_condition, &l_condition);
-  AINFO << "planning_start_point x,y,the,k" << std::fixed
-        << traj_point.path_point().x() << "," << traj_point.path_point().y()
+  AINFO << "planning_start_point x,y,the,k: " << std::fixed
+        << traj_point.path_point().x() << ", y: " << traj_point.path_point().y()
         << "," << traj_point.path_point().theta() << ","
         << traj_point.path_point().kappa() << "," << traj_point.v() << ","
         << traj_point.a();
@@ -446,6 +446,25 @@ bool ReferenceLine::XYToSL(const double heading,
   return true;
 }
 
+bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
+                           common::SLPoint* const sl_point,
+                           double hueristic_start_s,
+                           double hueristic_end_s) const {
+  double s = 0.0;
+  double l = 0.0;
+  double min_distance = 0.0;
+  if (!map_path_.GetProjectionWithHueristicParams(xy_point, hueristic_start_s,
+                                                  hueristic_end_s, &s, &l,
+                                                  &min_distance)) {
+    AERROR << "Cannot get nearest point from path with hueristic_start_s: "
+           << hueristic_start_s << " hueristic_end_s: " << hueristic_end_s;
+    return false;
+  }
+  sl_point->set_s(s);
+  sl_point->set_l(l);
+  return true;
+}
+
 ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
     const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
     const double s1, const InterpolatedIndex& index) const {
@@ -457,6 +476,7 @@ ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
   DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
 
   auto map_path_point = map_path_.GetSmoothPoint(index);
+  map_path_point.set_heading(map_path_.unit_directions()[index.id].Angle());
   const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
   const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
 
@@ -565,6 +585,15 @@ hdmap::Road::Type ReferenceLine::GetRoadType(const double s) const {
     }
   }
   return road_type;
+}
+
+void ReferenceLine::GetLaneBoundaryType(
+    const double s, hdmap::LaneBoundaryType::Type* const left_boundary_type,
+    hdmap::LaneBoundaryType::Type* const right_boundary_type) const {
+  auto ref_point = GetReferencePoint(s);
+  const auto waypoint = ref_point.lane_waypoints().front();
+  *left_boundary_type = hdmap::LeftBoundaryType(waypoint);
+  *right_boundary_type = hdmap::RightBoundaryType(waypoint);
 }
 
 void ReferenceLine::GetLaneFromS(
@@ -727,25 +756,61 @@ bool ReferenceLine::GetSLBoundary(
 
   // The order must be counter-clockwise
   std::vector<SLPoint> sl_corners;
-  for (const auto& point : corners) {
-    SLPoint sl_point;
-    if (!XYToSL(point, &sl_point, warm_start_s)) {
-      AERROR << "Failed to get projection for point: " << point.DebugString()
-             << " on reference line.";
+  std::vector<common::math::Vec2d> obs_corners = corners;
+  // get first point which is closest to ego position
+  {
+    int first_index = 0;
+    double min_dist = std::numeric_limits<double>::max();
+    for (int i = 0; i < obs_corners.size(); ++i) {
+      double ego_dist = ego_position_.DistanceTo(obs_corners[i]);
+      if (ego_dist < min_dist) {
+        min_dist = ego_dist;
+        first_index = i;
+      }
+    }
+    std::rotate(obs_corners.begin(), obs_corners.begin() + first_index,
+                obs_corners.end());
+    const common::math::Vec2d& first_point = obs_corners.front();
+    AINFO << "first_point: " << std::setprecision(9) << first_point.x() << ", "
+          << first_point.y();
+    SLPoint first_sl_point;
+    if (!XYToSL(first_point, &first_sl_point, warm_start_s)) {
+      AERROR << "Failed to get projection for point: "
+             << first_point.DebugString() << " on reference line.";
+      return false;
+    }
+    sl_corners.push_back(std::move(first_sl_point));
+  }
+
+  double hueristic_start_s = 0.0;
+  double hueristic_end_s = 0.0;
+  double distance = 0.0;
+  SLPoint sl_point;
+  for (size_t i = 1; i < obs_corners.size(); ++i) {
+    distance = obs_corners[i].DistanceTo(obs_corners[i - 1]);
+    hueristic_start_s = sl_corners.back().s() - 2.0 * distance;
+    hueristic_end_s = sl_corners.back().s() + 2.0 * distance;
+    if (!XYToSL(obs_corners[i], &sl_point, hueristic_start_s,
+                hueristic_end_s)) {
+      AERROR << "Failed to get projection for point: "
+             << obs_corners[i].DebugString() << " on reference line.";
       return false;
     }
     sl_corners.push_back(std::move(sl_point));
   }
 
-  for (size_t i = 0; i < corners.size(); ++i) {
+  for (size_t i = 0; i < obs_corners.size(); ++i) {
     auto index0 = i;
-    auto index1 = (i + 1) % corners.size();
-    const auto& p0 = corners[index0];
-    const auto& p1 = corners[index1];
+    auto index1 = (i + 1) % obs_corners.size();
+    const auto& p0 = obs_corners[index0];
+    const auto& p1 = obs_corners[index1];
 
     const auto p_mid = (p0 + p1) * 0.5;
+    distance = obs_corners[index0].DistanceTo(p_mid);
+    hueristic_start_s = sl_corners[index0].s() - 2.0 * distance;
+    hueristic_end_s = sl_corners[index0].s() + 2.0 * distance;
     SLPoint sl_point_mid;
-    if (!XYToSL(p_mid, &sl_point_mid, warm_start_s)) {
+    if (!XYToSL(p_mid, &sl_point_mid, hueristic_start_s, hueristic_end_s)) {
       AERROR << "Failed to get projection for point: " << p_mid.DebugString()
              << " on reference line.";
       return false;

@@ -177,6 +177,7 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       vehicle_state.linear_velocity());
 
   for (auto& ref_line : reference_lines) {
+    ref_line.SetEgoPosition(Vec2d(vehicle_state.x(), vehicle_state.y()));
     if (!ref_line.Segment(Vec2d(vehicle_state.x(), vehicle_state.y()),
                           planning::FLAGS_look_backward_distance,
                           forward_limit)) {
@@ -300,7 +301,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   if (local_view_.planning_command->is_motion_command() &&
       util::IsDifferentRouting(last_command_, *local_view_.planning_command)) {
     last_command_ = *local_view_.planning_command;
-    AINFO << "new_command:" << last_command_.DebugString();
+    // AINFO << "new_command:" << last_command_.DebugString();
     reference_line_provider_->Reset();
     injector_->history()->Clear();
     injector_->planning_context()->mutable_planning_status()->Clear();

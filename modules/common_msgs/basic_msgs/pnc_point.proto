@@ -74,6 +74,7 @@ message TrajectoryPoint {
 
   // Gaussian probability information
   optional GaussianInfo gaussian_info = 7;
+
 }
 
 message Trajectory {

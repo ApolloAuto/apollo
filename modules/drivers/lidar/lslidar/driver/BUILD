@@ -5,33 +5,6 @@ load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     library_dest = "drivers/lib/lidar/lslidar/driver",
-#     targets = [
-#         ":liblslidar_driver_component.so",
-#     ],
-# )
-
-apollo_cc_binary(
-    name = "liblslidar_driver_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":lslidar_driver_component_lib"],
-)
-
-apollo_cc_library(
-    name = "lslidar_driver_component_lib",
-    srcs = ["lslidar_driver_component.cc"],
-    hdrs = ["lslidar_driver_component.h"],
-    copts = ['-DMODULE_NAME=\\"lslidar\\"'],
-    deps = [
-        "//cyber",
-        "//modules/common/util:util_tool",
-        "//modules/drivers/lidar/lslidar/driver",
-    ],
-)
-
 apollo_cc_library(
     name = "driver",
     srcs = [

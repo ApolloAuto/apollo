@@ -8,5 +8,6 @@ export default {
     progressBgColor: '#343947',
     progressColorActiveColor: {
         backgroundImage: 'linear-gradient(270deg, rgb(85, 156, 250) 1%, rgb(50, 136, 250) 100%)',
+        backgroundColor: 'transparent',
     },
 };

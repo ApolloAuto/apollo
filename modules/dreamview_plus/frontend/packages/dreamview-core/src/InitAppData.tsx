@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { Subscription } from 'rxjs';
+import React, { useEffect, useRef } from 'react';
 import {
     updateStatus,
     usePickHmiStore,
@@ -16,13 +15,17 @@ import {
 } from '@dreamview/dreamview-core/src/services/WebSocketManager';
 import DreamviewConfig from '@dreamview/dreamview-core/package.json';
 import { useRegistryInitEvent, IAppInitStatus } from '@dreamview/dreamview-core/src/store/AppInitStore';
-import { Emptyable, noop } from './util/similarFunctions';
+import { message } from '@dreamview/dreamview-ui';
+import { noop } from './util/similarFunctions';
 import useWebSocketServices from './services/hooks/useWebSocketServices';
 import { StreamDataNames } from './services/api/types';
 import { useUserInfoStore } from './store/UserInfoStore';
 import { initUserInfo } from './store/UserInfoStore/actions';
 import useComponentDisplay from './hooks/useComponentDisplay';
 import { menuStoreUtils, useMenuStore } from './store/MenuStore';
+
+// @ts-ignore
+window.dreamviewVersion = DreamviewConfig.version;
 
 function useInitProto() {
     const changeHandler = useRegistryInitEvent('Proto Parsing', 2);
@@ -85,6 +88,7 @@ function useInitWebSocket() {
     const changeHandler = useRegistryInitEvent('Websocket Connect', 1);
     useEffect(() => {
         let progress = 0;
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         let message = 'Websocket Connecting...';
         let websocketStatus = IAppInitStatus.LOADING;
         const timer = setInterval(() => {
@@ -155,6 +159,9 @@ function useInitUserMixInfo() {
                             isLogin: true,
                         }),
                     );
+                    pluginApi.getSubscribeList({
+                        useCache: true,
+                    });
                 })
                 .catch(() => {
                     dispatch(ChangeCertStatusAction(ENUM_CERT_STATUS.FAIL));
@@ -162,16 +169,68 @@ function useInitUserMixInfo() {
         }
     }, [isPluginConnected]);
 
+    const event = useRef<any>({});
+    const eventValue = useRef<any>({});
+    const addDreamviewEventListener = (name: string, callback: any) => {
+        if (!event.current[name]) {
+            event.current[name] = [];
+        }
+        event.current[name].push(callback);
+        if (eventValue.current[name]) {
+            try {
+                callback(eventValue.current[name]);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const removeDreamviewEventListener = (name: string, callback: any) => {
+        if (!event.current[name]) {
+            event.current[name] = [];
+        }
+        event.current[name] = event.current[name].filter((item: any) => callback !== item);
+    };
+
+    const dispatchDreamviewEvent = (name: string, value: any, memo?: any) => {
+        if (memo) {
+            eventValue.current[name] = value;
+        }
+        if (event.current[name]) {
+            event.current[name].forEach((cb: any) => {
+                try {
+                    cb(value);
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        }
+    };
+
+    useEffect(() => {
+        // @ts-ignore
+        window.addDreamviewEventListener = addDreamviewEventListener;
+        // @ts-ignore
+        window.removeDreamviewEventListener = removeDreamviewEventListener;
+    }, []);
+
     useEffect(() => {
         if (pluginApi?.getAccountInfo && CertSuccessState) {
-            pluginApi?.getAccountInfo().then((res) => {
-                dispatchUserInfo(
-                    initUserInfo({
-                        userInfo: res,
-                        isLogin: true,
-                    }),
-                );
-            });
+            pluginApi
+                ?.getAccountInfo()
+                .then((res) => {
+                    dispatchUserInfo(
+                        initUserInfo({
+                            userInfo: res,
+                            isLogin: true,
+                        }),
+                    );
+                    dispatchDreamviewEvent('dreamviewUserInfo', res, true);
+                })
+                .catch((e: any) => {
+                    // console.log(e.data.info.message);
+                    message({ type: 'error', content: e?.data?.info?.message || '登陆异常', duration: 3 });
+                });
         }
     }, [pluginApi, CertSuccessState]);
 }
@@ -183,15 +242,11 @@ function useInitHmiStatus() {
     useEffect(() => {
         if (!isMainConnected) return noop;
 
-        let subsctiptiion: Emptyable<Subscription>;
-
-        if (metadata.findIndex((item) => item.dataName === StreamDataNames.HMI_STATUS) > -1) {
-            subsctiptiion = streamApi?.subscribeToData(StreamDataNames.HMI_STATUS).subscribe((data) => {
-                dispatch(updateStatus(data as any));
-            });
-        }
+        const subscription = streamApi?.subscribeToData(StreamDataNames.HMI_STATUS).subscribe((data) => {
+            dispatch(updateStatus(data as any));
+        });
         return () => {
-            subsctiptiion?.unsubscribe();
+            subscription?.unsubscribe();
         };
     }, [metadata]);
 }
@@ -203,8 +258,10 @@ function useInitAppData() {
     useEffect(() => {
         if (isMainConnected) {
             mainApi.loadRecords();
-            mainApi.loadScenarios();
+            // fixme： 需要针对仿真调整
+            // mainApi.loadScenarios();
             mainApi.loadRTKRecords();
+            mainApi.loadMaps();
             mainApi.getInitData().then((r) => {
                 dispatch(updateCurrentMode(r.currentMode));
                 dispatch(updateCurrentOperate(r.currentOperation));
@@ -228,7 +285,12 @@ function useInitDynamic() {
 
 function useInitDreamviewVersion() {
     useEffect(() => {
-        window.dreamviewVersion = DreamviewConfig.version;
+        // 创建一个隐藏的div存放版本号
+        const versionDiv = document.createElement('div');
+        versionDiv.style.display = 'none';
+        versionDiv.id = 'dreamviewVersion';
+        versionDiv.innerHTML = DreamviewConfig.version;
+        document.body.appendChild(versionDiv);
     }, []);
 }
 

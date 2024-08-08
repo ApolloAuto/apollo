@@ -105,6 +105,15 @@ class PiecewiseJerkProblem {
   void set_x_ref(std::vector<double> weight_x_ref_vec,
                  std::vector<double> x_ref);
 
+  /**
+   * @brief Set towing x ref object and piecewised towing_x_ref weightings
+   *
+   * @param weight_towing_x_ref_vec: piecewised towing x_ref weightings
+   * @param towing_x_ref: objective value of x
+   */
+  void set_towing_x_ref(std::vector<double> weight_towing_x_ref_vec,
+                        std::vector<double> towing_x_ref);
+
   void set_end_state_ref(const std::array<double, 3>& weight_end_state,
                          const std::array<double, 3>& end_state_ref);
 
@@ -136,8 +145,8 @@ class PiecewiseJerkProblem {
 
   void FreeData(OSQPData* data);
 
-  bool CheckLowUpperBound(std::vector<c_float>& lower,
-                          std::vector<c_float>& upper);
+  bool CheckLowUpperBound(const std::vector<c_float>& lower,
+                          const std::vector<c_float>& upper);
 
   template <typename T>
   T* CopyData(const std::vector<T>& vec) {
@@ -174,6 +183,10 @@ class PiecewiseJerkProblem {
   std::vector<double> x_ref_;
   // un-uniformed weighting
   std::vector<double> weight_x_ref_vec_;
+
+  bool has_towing_x_ref_ = false;
+  std::vector<double> towing_x_ref_;
+  std::vector<double> weight_towing_x_ref_vec_;
 
   bool has_end_state_ref_ = false;
   std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};

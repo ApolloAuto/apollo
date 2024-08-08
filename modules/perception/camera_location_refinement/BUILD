@@ -26,6 +26,7 @@ apollo_cc_library(
         "location_refiner/location_refiner_postprocessor.h",
         "location_refiner/obj_postprocessor.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

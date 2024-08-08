@@ -181,12 +181,10 @@ function HDMap() {
     }, []);
 
     const activeIndex = useMemo(
-        () => ({
-            activeIndex: data.findIndex((item) => item.name === currentRecordId) + 1,
-        }),
+        () => data.findIndex((item) => item.name === currentRecordId) + 1,
         [data, currentRecordId],
     );
-    const { classes } = useTableHover()(activeIndex);
+    const { classes } = useTableHover(activeIndex);
 
     const columns = useMemo(
         () => getColumns(t, refreshList, updateDownloadProgress, currentRecordId),

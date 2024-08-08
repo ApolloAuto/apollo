@@ -27,6 +27,7 @@
 #include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
 #include "modules/perception/common/util.h"
 #include "modules/perception/lidar_tracking/tracker/common/track_pool_types.h"
+#include "modules/perception/lidar_tracking/tracker/multi_lidar_fusion/util.h"
 
 namespace apollo {
 namespace perception {
@@ -54,6 +55,8 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   use_frame_timestamp_ = config.use_frame_timestamp();
   set_static_outside_hdmap_ = config.set_static_outside_hdmap();
   print_debug_log_ = config.print_debug_log();
+  delay_output_ = config.delay_time_output();
+  pub_track_times_ = config.pub_track_times();
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
@@ -218,17 +221,93 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   base::ObjectPool::Instance().BatchGet(num_objects, &tracked_objects);
   size_t pos = 0;
   size_t num_predict = 0;
+  size_t num_front_critical_reserve = 0;
+  size_t num_blind_trafficcone = 0;
   auto collect = [&](std::vector<MlfTrackDataPtr>* tracks) {
     for (auto& track_data : *tracks) {
-      if (!output_predict_objects_ && track_data->is_current_state_predicted_) {
-        ++num_predict;
-      } else {
-        if (!track_data->ToObject(-global_to_local_offset_, frame->timestamp,
-                                  tracked_objects[pos])) {
-          AERROR << "Tracking failed";
+      // if (!output_predict_objects_ &&
+      //      track_data->is_current_state_predicted_) {
+      //   ++num_predict;
+      // } else {
+      //   if (!track_data->ToObject(-global_to_local_offset_,
+      //        frame->timestamp, tracked_objects[pos], true)) {
+      //     AERROR << "Tracking failed";
+      //     continue;
+      //   }
+      //   ++pos;
+      // }
+      if (track_data->age_ <= pub_track_times_) {
+          if (track_data->is_front_critical_track_) {
+              AINFO << "[DelayOutput] track_id: " << track_data->track_id_
+                    << " time is " << std::to_string(frame->timestamp)
+                    << " not output";
+          }
           continue;
-        }
-        ++pos;
+      }
+      track_data->is_reserve_blind_cone_ = false;
+      // == false -> OUTPUT
+      if (!track_data->is_current_state_predicted_) {
+          if (!track_data->ToObject(-global_to_local_offset_,
+              frame->timestamp, tracked_objects[pos], true)) {
+              AERROR << "Tracking failed";
+              continue;
+          }
+          ++pos;
+          ADEBUG << "track_id: " << track_data->track_id_
+                 << " detetcted, obj-time is "
+                 << std::to_string(frame->timestamp) << " and output";
+          continue;
+      } else {
+          // == true: output_predict_objects_ == true -> OUTPUT
+          if (output_predict_objects_) {
+              if (!track_data->ToObject(-global_to_local_offset_,
+                  frame->timestamp, tracked_objects[pos], true)) {
+                  AERROR << "Tracking failed";
+                  continue;
+              }
+              ++pos;
+              continue;
+          } else {
+              // output_predict_objects_ == false
+              // should judge front-critical and time
+              TrackedObjectConstPtr latest_object =
+                  track_data->GetLatestObject().second;
+              // front-critical and within time -> OUTPUT
+              if (latest_object != nullptr &&
+                  track_data->is_front_critical_track_ &&
+                  latest_object->output_velocity.head<2>().norm() < 0.01 &&
+                  frame->timestamp -
+                      track_data->GetLatestObject().first <= delay_output_) {
+                  ++num_front_critical_reserve;
+                  AINFO << "track_id: " << track_data->track_id_
+                        << " missed, obj-time is "
+                        << std::to_string(track_data->GetLatestObject().first)
+                        << " and predict output";
+                  if (!track_data->ToObject(-global_to_local_offset_,
+                       frame->timestamp, tracked_objects[pos], false)) {
+                      AERROR << "Tracking failed";
+                      continue;
+                  }
+                  ++pos;
+                  continue;
+              } else if (JudgeBlindTrafficCone(track_data, frame->timestamp,
+                  -global_to_local_offset_, frame->lidar2world_pose,
+                  frame->lidar2novatel_extrinsics)) {
+                  ++num_blind_trafficcone;
+                  if (!track_data->ToObject(-global_to_local_offset_,
+                       frame->timestamp, tracked_objects[pos], false)) {
+                      AERROR << "Tracking failed";
+                      continue;
+                  }
+                  track_data->is_reserve_blind_cone_ = true;
+                  ++pos;
+                  continue;
+              } else {
+                  // NO front-critical or beyond time -> NO OUTPUT
+                  ++num_predict;
+                  continue;
+              }
+          }
       }
     }
   };
@@ -236,6 +315,8 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   collect(&background_track_data_);
   if (num_predict != 0) {
     AINFO << "MlfEngine, num_predict: " << num_predict
+          << " num front_critical: " << num_front_critical_reserve
+          << " num blind trafficcone: " << num_blind_trafficcone
           << " num_objects: " << num_objects;
     if (num_predict > num_objects) {
       AERROR << "num_predict > num_objects";
@@ -249,8 +330,13 @@ void MlfEngine::RemoveStaleTrackData(const std::string& name, double timestamp,
                                      std::vector<MlfTrackDataPtr>* tracks) {
   size_t pos = 0;
   for (size_t i = 0; i < tracks->size(); ++i) {
-    if (tracks->at(i)->latest_visible_time_ + reserved_invisible_time_ >=
-        timestamp) {
+    float reserve_time = reserved_invisible_time_;
+    if (tracks->at(i)->is_front_critical_track_ &&
+        reserved_invisible_time_ < delay_output_) {
+        reserve_time = delay_output_;
+    }
+    if (tracks->at(i)->latest_visible_time_ + reserve_time >= timestamp ||
+        tracks->at(i)->is_reserve_blind_cone_) {
       if (i != pos) {
         tracks->at(pos) = tracks->at(i);
       }

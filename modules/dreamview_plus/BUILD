@@ -18,6 +18,10 @@ apollo_cc_binary(
     data = [
         ":frontend",
     ],
+    linkopts = [
+        "-ltcmalloc",
+        "-lprofiler",
+    ],
     deps = [
         "//cyber",
         "//modules/dreamview_plus/backend:apollo_dreamview_plus_backend",

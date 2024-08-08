@@ -8,5 +8,6 @@ export default {
     progressBgColor: '#E1E6EC',
     progressColorActiveColor: {
         backgroundColor: '#055FE7',
+        backgroundImage: 'none',
     },
 };

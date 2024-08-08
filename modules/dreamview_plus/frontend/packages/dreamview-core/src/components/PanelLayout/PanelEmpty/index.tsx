@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconIcAddPanel } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
 import { usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { update } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
@@ -20,7 +20,7 @@ const space2 = `${spaceWidth * 2}px`;
 function AddIcon(prop: { className: string }) {
     const { theme } = useThemeContext();
     if (theme === 'drak') {
-        return <IconIcAddPanel />;
+        return <IconPark name='IcAddPanel' />;
     }
 
     return (

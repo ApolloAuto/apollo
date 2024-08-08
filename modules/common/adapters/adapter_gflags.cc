@@ -46,6 +46,8 @@ DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
 DEFINE_string(control_debug_info_topic, "/apollo/control/debug",
               "control debug info topic name");
+DEFINE_string(control_interative_topic, "/apollo/control/interactive",
+              "control interactive info to others topic name");
 DEFINE_string(control_preprocessor_topic, "/apollo/control/preprocessor",
               "control preprocessor topic name");
 DEFINE_string(control_local_view_topic, "/apollo/control/localview",

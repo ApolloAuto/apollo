@@ -19,4 +19,6 @@ message RuleBasedStopDeciderConfig {
   optional bool enable_lane_change_urgency_checking = 12 [default = false];
   // Threshold for too short path length
   optional double short_path_length_threshold = 13 [default = 20.0];
+  // True to check the stop for side pass onto reverse lane
+  optional bool enable_stop_on_side_pass = 14 [default = false];
 }

@@ -58,7 +58,7 @@ class Map {
         this.yieldSignal = new YieldSignal(scene, coordinates, this.colors);
         this.clearArea = new ClearArea(scene, coordinates);
         this.crosswalk = new Crosswalk(scene, coordinates);
-        this.lane = new Lane(scene, text, option, coordinates);
+        this.lane = new Lane(scene, text, option, coordinates, this.colors);
         this.junction = new Junction(scene, coordinates);
         this.pncJunction = new PncJunction(scene, coordinates);
         this.road = new Road(scene, coordinates);

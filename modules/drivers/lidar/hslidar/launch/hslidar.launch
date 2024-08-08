@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>hslidar</name>
+        <dag_conf>/apollo/modules/drivers/lidar/hslidar/dag/hslidar.dag</dag_conf>
+        <process_name>hslidar</process_name>
+    </module>
+</cyber>

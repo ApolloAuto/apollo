@@ -28,6 +28,7 @@ DECLARE_string(base_map_filename);
 DECLARE_string(sim_map_filename);
 DECLARE_string(routing_map_filename);
 DECLARE_string(end_way_point_filename);
+DECLARE_string(current_start_point_filename);
 DECLARE_string(default_routing_filename);
 DECLARE_string(park_go_routing_filename);
 DECLARE_string(speed_control_filename);

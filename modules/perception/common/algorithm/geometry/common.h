@@ -355,6 +355,106 @@ void CalculateDistAndDirToBoundary(
   }
 }
 
+// @brief given center size and dir
+// calculate the other-four corners
+template <typename Type>
+void CalculateCornersFromCenter(Type center_x, Type center_y, Type center_z,
+    Type size_x, Type size_y, Type size_z, Type theta,
+    Eigen::Matrix<Type, 8, 1> *corners) {
+    Type cos_theta = cos(theta);
+    Type sin_theta = sin(theta);
+    Type hx = size_x * 0.5;
+    Type hy = size_y * 0.5;
+
+    Type left_up_x = (-hx) * cos_theta + (-hy) * sin_theta + center_x;
+    Type left_up_y = (-hx) * (-sin_theta) + (-hy) * cos_theta + center_y;
+    Type right_up_x = (-hx) * cos_theta + hy * sin_theta + center_x;
+    Type right_up_y = (-hx) * (-sin_theta) + hy * cos_theta + center_y;
+    Type right_down_x = hx * cos_theta + hy * sin_theta + center_x;
+    Type right_down_y = hx * (-sin_theta) + hy * cos_theta + center_y;
+    Type left_down_x = hx * cos_theta + (-hy) * sin_theta + center_x;
+    Type left_down_y = hx * (-sin_theta) + (-hy) * cos_theta + center_y;
+    
+    (*corners)(0) = left_up_x;
+    (*corners)(1) = left_up_y;
+    (*corners)(2) = right_up_x;
+    (*corners)(3) = right_up_y;
+    (*corners)(4) = right_down_x;
+    (*corners)(5) = right_down_y;
+    (*corners)(6) = left_down_x;
+    (*corners)(7) = left_down_y;
+}
+
+// @brief return true if two 2D line segment `(p1, q1)` and
+// `(p2, q2)` intersect
+template <typename T>
+bool IsLineSegments2DIntersect(
+    const Eigen::Matrix<T, 2, 1> &p1,
+    const Eigen::Matrix<T, 2, 1> &q1,
+    const Eigen::Matrix<T, 2, 1> &p2,
+    const Eigen::Matrix<T, 2, 1> &q2) {
+  // find orientation of ordered triplet (p, q, r).
+  // returns values:
+  // 0 --> p, q and r are collinear
+  // 1 --> Clockwise
+  // 2 --> Counterclockwise
+  auto find_orientation = [](const Eigen::Matrix<T, 2, 1> &p,
+                              const Eigen::Matrix<T, 2, 1> &q,
+                              const Eigen::Matrix<T, 2, 1> &r) -> int {
+    // comparing slopes of line segments (p, q) and (q, r)
+    // k1 = (q[1] - p[1]) / (q[0] - p[0])
+    // k2 = (r[1] - q[1]) / (r[0] - q[0])
+    // if k1 < k2, -> counterclockwise
+    // if k1 > k2, -> clockwise
+    // if k1 == k2, -> collinear
+    float ret = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+    // collinear
+    if (std::fabs(ret) < std::numeric_limits<float>::epsilon()) {
+      return 0;
+    }
+    // clock or counterclock wise
+    return (ret > 0.f) ? 1 : 2;
+  };
+
+  // given three 'collinear' points p, q, r
+  // check whether point p is on line segment (q, r)
+  auto is_on_segment = [](const Eigen::Matrix<T, 2, 1> &p,
+                          const Eigen::Matrix<T, 2, 1> &q,
+                          const Eigen::Matrix<T, 2, 1> &r) -> bool {
+    return p[0] <= std::max(q[0], r[0])
+          && p[0] >= std::min(q[0], r[0])
+          && p[1] <= std::max(q[1], r[1])
+          && p[1] >= std::min(q[1], r[1]);
+  };
+
+  // Two line segments (p1, q1) and (p2, q2) intersect <=>
+  // (p1, q1, p2) and (p1, q1, q2) have different orientations and
+  // (p2, q2, p1) and (p2, q2, q1) have different orientations.
+  int orientation_p1_q1_p2 = find_orientation(p1, q1, p2);
+  int orientation_p1_q1_q2 = find_orientation(p1, q1, q2);
+  int orientation_p2_q2_p1 = find_orientation(p2, q2, p1);
+  int orientation_p2_q2_q1 = find_orientation(p2, q2, q1);
+  if (orientation_p1_q1_p2 != orientation_p1_q1_q2
+    && orientation_p2_q2_p1 != orientation_p2_q2_q1) {
+    return true;
+  }
+
+  // Special cases, two line segments are collinear
+  if (orientation_p1_q1_p2 == 0 && is_on_segment(p2, p1, q1)) {
+    return true;
+  }
+  if (orientation_p1_q1_q2 == 0 && is_on_segment(q2, p1, q1)) {
+    return true;
+  }
+  if (orientation_p2_q2_p1 == 0 && is_on_segment(p1, p2, q2)) {
+    return true;
+  }
+  if (orientation_p2_q2_q1 == 0 && is_on_segment(q1, p2, q2)) {
+    return true;
+  }
+  return false;
+}
+
 }  // namespace algorithm
 }  // namespace perception
 }  // namespace apollo

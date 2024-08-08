@@ -39,6 +39,7 @@ bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   claping_speed_threshold_ = config.claping_speed_threshold();
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();
   cyc_refine_speed_ = config.cyc_refine_speed();
+  car_refine_speed_ = config.car_refine_speed();
   return true;
 }
 
@@ -114,10 +115,10 @@ bool MlfMotionRefiner::CheckStaticHypothesisByState(
         velocity_noise_level_0 = speed < (cyc_refine_speed_ / 6.0);
         velocity_noise_level_1 = speed < (cyc_refine_speed_ / 4.0);
         velocity_noise_level_2 = speed < (cyc_refine_speed_ / 2.0);
-    } else {
-        velocity_noise_level_0 = speed < (claping_speed_threshold_ / 8.0);
-        velocity_noise_level_1 = speed < (claping_speed_threshold_ / 4.0);
-        velocity_noise_level_2 = speed < (claping_speed_threshold_ / 2.0);
+    } else if (type_select == base::ObjectType::VEHICLE) {
+        velocity_noise_level_0 = speed < (car_refine_speed_ / 8.0);
+        velocity_noise_level_1 = speed < (car_refine_speed_ / 4.0);
+        velocity_noise_level_2 = speed < (car_refine_speed_ / 2.0);
     }
 
     // believe track is static if speed_level 0 is so small

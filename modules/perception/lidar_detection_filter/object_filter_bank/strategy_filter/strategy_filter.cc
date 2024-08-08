@@ -35,6 +35,10 @@ bool StrategyFilter::Init(const ObjectFilterInitOptions& options) {
     is_merge_inclusive_ = config.is_merge_inclusive();
     expand_dist_ = config.expand_bbox_dist();
     allow_fore_merge_ = config.allow_fore_merge();
+    is_filter_below_objects_ = config.is_filter_below_objects();
+    below_threshold_ = config.below_threshold();
+    is_filter_small_size_ = config.is_filter_small_size();
+    small_size_threshold_ = config.small_size_thres();
     AINFO << "[StrategyFilter] expand_dist is " << expand_dist_;
     return true;
 }
@@ -156,8 +160,15 @@ void StrategyFilter::MergeInclusiveObjects(LidarFrame* frame) {
                     small_obj->lidar_supplement.cloud_world;
                 big_obj->lidar_supplement.num_points_in_roi +=
                     small_obj->lidar_supplement.num_points_in_roi;
+                big_obj->lidar_supplement.point_ids.insert(
+                    big_obj->lidar_supplement.point_ids.end(),
+                    small_obj->lidar_supplement.point_ids.begin(),
+                    small_obj->lidar_supplement.point_ids.end());
+
                 small_obj->lidar_supplement.cloud.clear();
                 small_obj->lidar_supplement.cloud_world.clear();
+                small_obj->lidar_supplement.point_ids.clear();
+
                 sorted_objects[j].need_refine = true;
                 AINFO << "BIG: " << std::to_string(big_obj->id)
                       << " INCLUDE SMALL: " << std::to_string(small_obj->id);
@@ -189,6 +200,59 @@ void StrategyFilter::MergeInclusiveObjects(LidarFrame* frame) {
     objects.resize(valid_pos);
 }
 
+void StrategyFilter::FilterBelowGroundObjects(LidarFrame* frame) {
+    std::vector<base::ObjectPtr>& objects = frame->segmented_objects;
+    std::vector<bool> filter_flag(objects.size(), false);
+
+    // filter below ground
+    for (size_t i = 0; i < objects.size(); ++i) {
+        float z_diff = frame->original_ground_z - objects[i]->center(2);
+        if (z_diff >= below_threshold_) {
+            AINFO << "[BelowGround] id: " << objects[i]->id
+                  << " diff: " << z_diff;
+            filter_flag[i] = true;
+        }
+    }
+    size_t valid_pos = 0;
+    for (size_t i = 0; i < objects.size(); ++i) {
+        if (filter_flag.at(i)) {
+            continue;
+        }
+        objects.at(valid_pos) = objects.at(i);
+        ++valid_pos;
+    }
+    objects.resize(valid_pos);
+    AINFO << "[FilterBelowGroundObjects] from " << filter_flag.size()
+          << " to " << valid_pos;
+}
+
+void StrategyFilter::FilterSmallSizeObjects(LidarFrame* frame) {
+    std::vector<base::ObjectPtr>& objects = frame->segmented_objects;
+    std::vector<bool> filter_flag(objects.size(), false);
+
+    // filter small size object
+    for (size_t i = 0; i < objects.size(); ++i) {
+        if (objects[i]->size(0) <= small_size_threshold_ &&
+            objects[i]->size(1) <= small_size_threshold_) {
+            AINFO << "[SmallSize] id: " << objects[i]->id << " pc size is "
+                  << objects[i]->lidar_supplement.cloud.size() << " size is: "
+                  << objects[i]->size(0) << ", " << objects[i]->size(0);
+            filter_flag[i] = true;
+        }
+    }
+    size_t valid_pos = 0;
+    for (size_t i = 0; i < objects.size(); ++i) {
+        if (filter_flag.at(i)) {
+            continue;
+        }
+        objects.at(valid_pos) = objects.at(i);
+        ++valid_pos;
+    }
+    objects.resize(valid_pos);
+    AINFO << "[FilterSmallSizeObjects] from " << filter_flag.size()
+          << " to " << valid_pos;
+}
+
 bool StrategyFilter::Filter(const ObjectFilterOptions& options,
     LidarFrame* frame) {
     if (!frame) {
@@ -198,6 +262,14 @@ bool StrategyFilter::Filter(const ObjectFilterOptions& options,
     AINFO << "[BeforeMergeInclusive]: "
           << std::to_string(frame->timestamp) << " object size is "
           << frame->segmented_objects.size();
+
+    if (is_filter_below_objects_) {
+        FilterBelowGroundObjects(frame);
+    }
+
+    if (is_filter_small_size_) {
+        FilterSmallSizeObjects(frame);
+    }
 
     PERF_BLOCK("strategy_filter_merge")
     if (is_merge_inclusive_) {

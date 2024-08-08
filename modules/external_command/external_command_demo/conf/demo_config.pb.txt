@@ -1,5 +1,6 @@
 left_path_width: 2.0
 right_path_width: 2.0
+min_distance_error: 0.1
 target_speed: 3.0
 point1_x: 750938.87
 point1_y: 2564015.21

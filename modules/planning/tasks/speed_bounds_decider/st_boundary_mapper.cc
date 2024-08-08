@@ -46,8 +46,8 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
 
 STBoundaryMapper::STBoundaryMapper(
     const SpeedBoundsDeciderConfig& config, const ReferenceLine& reference_line,
@@ -283,20 +283,21 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
 
     // 2. Go through every point of the predicted obstacle trajectory.
     double trajectory_time_interval =
-              obstacle.Trajectory().trajectory_point()[1].relative_time();
-    int trajectory_step = std::min(
-                            FLAGS_trajectory_check_collision_time_step,
-                            std::max(vehicle_param_.width() / obstacle.speed()
-                          / trajectory_time_interval, 1.0));
+        obstacle.Trajectory().trajectory_point()[1].relative_time();
+    int trajectory_step =
+        std::min(FLAGS_trajectory_check_collision_time_step,
+                 std::max(vehicle_param_.width() / obstacle.speed() /
+                              trajectory_time_interval,
+                          1.0));
     bool trajectory_point_collision_status = false;
     int previous_index = 0;
 
     for (int i = 0; i < trajectory.trajectory_point_size();
-          i = std::min(i + trajectory_step,
-                        trajectory.trajectory_point_size() - 1)) {
+         i = std::min(i + trajectory_step,
+                      trajectory.trajectory_point_size() - 1)) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       Polygon2d obstacle_shape =
-                  obstacle.GetObstacleTrajectoryPolygon(trajectory_point);
+          obstacle.GetObstacleTrajectoryPolygon(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
       static constexpr double kNegtiveTimeThreshold = -1.0;
@@ -304,25 +305,21 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
         continue;
       }
       bool collision = CheckOverlapWithTrajectoryPoint(
-                                      discretized_path, obstacle_shape,
-                                      upper_points, lower_points,
-                                      l_buffer, default_num_point,
-                                      obstacle_length, obstacle_width,
-                                      trajectory_point_time);
+          discretized_path, obstacle_shape, upper_points, lower_points,
+          l_buffer, default_num_point, obstacle_length, obstacle_width,
+          trajectory_point_time);
       if ((trajectory_point_collision_status ^ collision) && i != 0) {
         // Start retracing track points forward
         int index = i - 1;
-        while ((trajectory_point_collision_status ^ collision)
-                  && index > previous_index) {
+        while ((trajectory_point_collision_status ^ collision) &&
+               index > previous_index) {
           const auto& point = trajectory.trajectory_point(index);
           trajectory_point_time = point.relative_time();
           obstacle_shape = obstacle.GetObstacleTrajectoryPolygon(point);
           collision = CheckOverlapWithTrajectoryPoint(
-                                      discretized_path, obstacle_shape,
-                                      upper_points, lower_points,
-                                      l_buffer, default_num_point,
-                                      obstacle_length, obstacle_width,
-                                      trajectory_point_time);
+              discretized_path, obstacle_shape, upper_points, lower_points,
+              l_buffer, default_num_point, obstacle_length, obstacle_width,
+              trajectory_point_time);
           index--;
         }
         trajectory_point_collision_status = !trajectory_point_collision_status;
@@ -334,30 +331,21 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
 
   // Sanity checks and return.
   std::sort(lower_points->begin(), lower_points->end(),
-            [](const STPoint& a, const STPoint& b) {
-              return a.t() < b.t();
-            });
+            [](const STPoint& a, const STPoint& b) { return a.t() < b.t(); });
   std::sort(upper_points->begin(), upper_points->end(),
-            [](const STPoint& a, const STPoint& b) {
-              return a.t() < b.t();
-            });
+            [](const STPoint& a, const STPoint& b) { return a.t() < b.t(); });
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 1 && upper_points->size() > 1);
 }
 
 bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
-    const DiscretizedPath& discretized_path,
-    const Polygon2d& obstacle_shape,
-    std::vector<STPoint>* upper_points,
-    std::vector<STPoint>* lower_points,
-    const double l_buffer,
-    int default_num_point,
-    const double obstacle_length,
-    const double obstacle_width,
-    const double trajectory_point_time) const {
+    const DiscretizedPath& discretized_path, const Polygon2d& obstacle_shape,
+    std::vector<STPoint>* upper_points, std::vector<STPoint>* lower_points,
+    const double l_buffer, int default_num_point, const double obstacle_length,
+    const double obstacle_width, const double trajectory_point_time) const {
   const double step_length = vehicle_param_.front_edge_to_center();
   auto path_len = std::min(speed_bounds_config_.max_trajectory_len(),
-                               discretized_path.Length());
+                           discretized_path.Length());
   // Go through every point of the ADC's path.
   for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
     const auto curr_adc_path_point =
@@ -366,8 +354,8 @@ bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
       // Found overlap, start searching with higher resolution
       const double backward_distance = -step_length;
       const double forward_distance = vehicle_param_.length() +
-                                      vehicle_param_.width() +
-                                      obstacle_length + obstacle_width;
+                                      vehicle_param_.width() + obstacle_length +
+                                      obstacle_width;
       const double default_min_step = 0.1;  // in meters
       const double fine_tuning_step_length = std::fmin(
           default_min_step, discretized_path.Length() / default_num_point);
@@ -385,8 +373,8 @@ bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
           break;
         }
         if (!find_low) {
-          const auto& point_low = discretized_path.Evaluate(
-              low_s + discretized_path.front().s());
+          const auto& point_low =
+              discretized_path.Evaluate(low_s + discretized_path.front().s());
           if (!CheckOverlap(point_low, obstacle_shape, l_buffer)) {
             low_s += fine_tuning_step_length;
           } else {
@@ -394,8 +382,8 @@ bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
           }
         }
         if (!find_high) {
-          const auto& point_high = discretized_path.Evaluate(
-              high_s + discretized_path.front().s());
+          const auto& point_high =
+              discretized_path.Evaluate(high_s + discretized_path.front().s());
           if (!CheckOverlap(point_high, obstacle_shape, l_buffer)) {
             high_s -= fine_tuning_step_length;
           } else {

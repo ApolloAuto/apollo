@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "modules/drivers/gnss/parser/asensing_parser/protocol_asensing.h"
+#include "modules/drivers/gnss/parser/parser_common.h"
 
 typedef struct { /* time struct */
   time_t time;   /* time (s) expressed by standard time_t */
@@ -97,6 +98,7 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
   static const double angular_coefficient = 300.0 / 32768;
   static const double acc_coefficient = 12.0 / 32768 * 9.7883105;
   static const double velocity_coefficient = 100.0 / 32768;
+  static const double deg_to_rad = M_PI / 180.0;
 
   int sub_index = 3;
   uint8_t check_sum = 0;
@@ -149,13 +151,14 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
     sub_index = 44;
     uint8_t modestatus = toValue<uint8_t>(data, sub_index);
     sub_index = 46;
-    int16_t data1 = toValue<uint8_t>(data, sub_index);
-    int16_t data2 = toValue<uint8_t>(data, sub_index);
-    int16_t data3 = toValue<uint8_t>(data, sub_index);
+    int16_t data1 = toValue<uint16_t>(data, sub_index);
+    int16_t data2 = toValue<uint16_t>(data, sub_index);
+    int16_t data3 = toValue<uint16_t>(data, sub_index);
 
     sub_index = 52;
     uint32_t timiddle = toValue<uint32_t>(data, sub_index);
     double t_ms = timiddle * 2.5 * 0.0001;
+    uint8_t loop_type = toValue<uint8_t>(data, sub_index);
     sub_index = 58;
     uint32_t t_week = (toValue<uint32_t>(data, sub_index));
 
@@ -166,12 +169,12 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
 
     pos += m_lengthImu;
 
-    insdata.Pitch_deg = pitch;                  /*俯仰角*/
-    insdata.Roll_deg = roll;                    /*横滚角*/
-    insdata.Yaw_deg = yaw;                      /*航向角*/
-    insdata.GyroX = imu_msg_x_angular_velocity; /*gx*/
-    insdata.GyroY = imu_msg_y_angular_velocity;
-    insdata.GyroZ = imu_msg_z_angular_velocity;
+    insdata.Pitch_deg = pitch;                               /*俯仰角*/
+    insdata.Roll_deg = roll;                                 /*横滚角*/
+    insdata.Yaw_deg = yaw;                                   /*航向角*/
+    insdata.GyroX = imu_msg_x_angular_velocity * deg_to_rad; /*gx*/
+    insdata.GyroY = imu_msg_y_angular_velocity * deg_to_rad;
+    insdata.GyroZ = imu_msg_z_angular_velocity * deg_to_rad;
     insdata.AccX_g = imu_msg_x_acc; /* 零偏修正后加速度计 */
     insdata.AccY_g = imu_msg_y_acc;
     insdata.AccZ_g = imu_msg_z_acc;
@@ -187,6 +190,7 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
     insdata.VelD_mps =
         imu_msg_ground_velocity; /*融合后 NED down velocity (m/s) */
     insdata.InsStatus = imu_msg_ins_status;
+    insdata.LoopType = loop_type;
     insdata.data1 = data1;
     insdata.data2 = data2;
     insdata.data3 = data3;
@@ -244,7 +248,7 @@ void Decode_0B::parseGnss(const uint8_t* data, int& pos) {
     double m_gnssMsg_alt_sigma = (toValue<int16_t>(data, sub_index)) * 0.001;
 
     double m_gnssMsg_gps_fix = toValue<uint16_t>(data, sub_index);
-    double m_gnssMsg_rtk_age = toValue<uint16_t>(data, sub_index);
+    float m_gnssMsg_rtk_age = toValue<uint16_t>(data, sub_index);
     uint8_t m_gnssMsg_flags_pos = data[sub_index++];
     uint8_t m_gnssMsg_flags_vel = data[sub_index++];
     uint8_t m_gnssMsg_flags_attitude = data[sub_index++];
@@ -290,6 +294,7 @@ void Decode_0B::parseGnss(const uint8_t* data, int& pos) {
     insdata.Lon_deg = m_gnssMsg_longitude;
     insdata.Lat_deg = m_gnssMsg_latitude; /*融合后Latitude (deg)*/
     insdata.Alt_m = m_gnssMsg_altitude;   /*融合后Altitude (m)*/
+    insdata.differential_age = m_gnssMsg_rtk_age;
 
     data_w.clear();
     data_w.push_back(std::to_string(m_gnssMsg_longitude));

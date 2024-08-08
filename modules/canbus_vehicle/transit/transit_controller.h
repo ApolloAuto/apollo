@@ -47,6 +47,7 @@ class TransitController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Transit>* const can_sender,
+      CanReceiver<::apollo::canbus::Transit>* const can_receiver,
       MessageManager<::apollo::canbus::Transit>* const message_manager)
       override;
 

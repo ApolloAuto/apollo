@@ -52,6 +52,7 @@ class LexusController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Lexus>* const can_sender,
+      CanReceiver<::apollo::canbus::Lexus>* const can_receiver,
       MessageManager<::apollo::canbus::Lexus>* const message_manager) override;
 
   bool Start() override;

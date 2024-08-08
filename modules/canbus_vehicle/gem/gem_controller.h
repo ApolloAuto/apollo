@@ -47,6 +47,7 @@ class GemController final : public VehicleController<::apollo::canbus::Gem> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Gem>* const can_sender,
+      CanReceiver<::apollo::canbus::Gem>* const can_receiver,
       MessageManager<::apollo::canbus::Gem>* const message_manager) override;
 
   bool Start() override;

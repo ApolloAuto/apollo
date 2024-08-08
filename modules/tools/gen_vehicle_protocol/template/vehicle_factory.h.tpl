@@ -30,6 +30,8 @@
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -97,13 +99,17 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
    */
   void UpdateHeartbeat();
 
+  /**
+   * @brief check the chassis detail can receive lost
+   */
+  bool CheckChassisCommunicationFault();
+
  private:
   /**
    * @brief create %(car_type_lower)s vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>
-  CreateVehicleController();
+  std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController> CreateVehicleController();
 
   /**
    * @brief create %(car_type_lower)s message manager
@@ -116,7 +122,7 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::%(car_type_cap)s> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::%(car_type_cap)s> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::%(car_type_cap)s>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>> vehicle_controller_;
+  std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::%(car_type_cap)s>>
       chassis_detail_writer_;

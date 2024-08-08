@@ -25,6 +25,7 @@ apollo_cc_library(
         "interface/base_roi_filter.h",
         "map_manager/map_manager.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/common/math",

@@ -30,11 +30,10 @@
 #include <thread>
 #include <vector>
 
-#include "cyber/common/macros.h"
-#include "cyber/cyber.h"
-
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
@@ -84,6 +83,13 @@ class CanReceiver {
   bool IsRunning() const;
 
   /**
+   * @brief Get the receive status in once receive buf.
+   *        To check if it is running.
+   * @return If this CAN receiver is running.
+   */
+  bool IsFinishRecvOnce() const;
+
+  /**
    * @brief Start the CAN receiver.
    * @return The error code indicating the status of this action.
    */
@@ -101,6 +107,7 @@ class CanReceiver {
 
  private:
   std::atomic<bool> is_running_ = {false};
+  std::atomic<bool> is_finish_recv_once_ = {false};
   // CanClient, MessageManager pointer life is managed by outer program
   CanClient *can_client_ = nullptr;
   MessageManager<SensorType> *pt_manager_ = nullptr;
@@ -142,6 +149,8 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
   auto default_period = 10 * 1000;
 
   while (IsRunning()) {
+    is_finish_recv_once_.exchange(false);
+    ADEBUG << "is_finish_recv_once_ 1 is " << is_finish_recv_once_.load();
     std::vector<CanFrame> buf;
     int32_t frame_num = MAX_CAN_RECV_FRAME_LEN;
     if (can_client_->Receive(&buf, &frame_num) !=
@@ -169,15 +178,18 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
     }
     receive_none_count = 0;
 
+    bool is_recv_prase = true;
     for (const auto &frame : buf) {
       uint8_t len = frame.len;
       uint32_t uid = frame.id;
       const uint8_t *data = frame.data;
-      pt_manager_->Parse(uid, data, len);
+      pt_manager_->Parse(uid, data, len, is_recv_prase);
       if (enable_log_) {
-        ADEBUG << "recv_can_frame#" << frame.CanFrameString();
+        AINFO << "recv_can_frame#" << frame.CanFrameString();
       }
     }
+    is_finish_recv_once_.exchange(true);
+    ADEBUG << "is_finish_recv_once_ 2 is " << is_finish_recv_once_.load();
     cyber::Yield();
   }
   AINFO << "Can client receiver thread stopped.";
@@ -186,6 +198,12 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
 template <typename SensorType>
 bool CanReceiver<SensorType>::IsRunning() const {
   return is_running_.load();
+}
+
+template <typename SensorType>
+bool CanReceiver<SensorType>::IsFinishRecvOnce() const {
+  ADEBUG << "is_finish_recv_once_ state is " << is_finish_recv_once_.load();
+  return is_finish_recv_once_.load();
 }
 
 template <typename SensorType>

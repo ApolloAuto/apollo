@@ -570,7 +570,7 @@ function _determine_perception_disabled() {
 function _determine_localization_disabled() {
   if [ "${ARCH}" != "x86_64" ]; then
     # Skip msf for non-x86_64 platforms
-    DISABLED_TARGETS="${disabled} except //modules/localization/msf/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/localization/msf/..."
   fi
 }
 
@@ -582,6 +582,12 @@ function _determine_planning_disabled() {
 }
 
 function determine_disabled_targets() {
+  if [[ -n "${CUSTOM_DISABLED_TARGETS}" ]]; then
+    disabled_targets=($(IFS=' ' echo "${CUSTOM_DISABLED_TARGETS}"))
+    for target in "${disabled_targets[@]}"; do
+      DISABLED_TARGETS="${DISABLED_TARGETS} except ${target}"
+    done
+  fi
   if [[ "$#" -eq 0 ]]; then
     _determine_drivers_disabled
     _determine_localization_disabled
@@ -742,10 +748,14 @@ function run_bazel() {
   info "${TAB}$1 Targets: ${sp}${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  if [[ $(uname -m) == "x86_64" ]]; then
-    job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  if [[ -n "${CUSTOM_JOB_ARGS}" ]]; then
+    job_args="${CUSTOM_JOB_ARGS}"
   else
-    job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.7  --copt=-fPIC --host_copt=-fPIC" 
+    if [[ $(uname -m) == "x86_64" ]]; then
+      job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+    else
+      job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.7  --copt=-fPIC --host_copt=-fPIC"
+    fi
   fi
   set -x
   [[ ${1} == "Test" ]] && CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --action_env APOLLO_CONF_PATH=${APOLLO_CONF_PATH}"

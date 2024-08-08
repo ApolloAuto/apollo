@@ -347,6 +347,9 @@ bool HMIWorker::Trigger(const HMIAction action) {
     case HMIAction::STOP_RECORD:
       StopRecordPlay();
       break;
+    case HMIAction::LOAD_MAPS:
+      ReloadMaps();
+      break;
     default:
       AERROR << "HMIAction not implemented, yet!";
       return false;
@@ -1855,7 +1858,7 @@ bool HMIWorker::LoadRecords() {
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
     // Skip format that dv cannot parse: record not ending in record
-    int record_suffix_length = 7;
+    size_t record_suffix_length = 7;
     if (record_id.length() - index != record_suffix_length) {
         continue;
     }
@@ -1995,6 +1998,27 @@ void HMIWorker::DeleteRecord(const std::string &record_id) {
       return;
     }
   }
+  return;
+}
+
+void HMIWorker::ReloadMaps() {
+  WLock wlock(status_mutex_);
+  config_.mutable_maps()->clear();
+  *(config_.mutable_maps()) =
+      util::HMIUtil::ListDirAsDict(FLAGS_maps_data_path);
+  status_.clear_maps();
+  for (const auto &map : config_.maps()) {
+    status_.add_maps(map.first);
+  }
+  if (status_.current_map() != "") {
+    // if current map is not empty, check whether it exists in config
+    if (config_.maps().find(status_.current_map()) == config_.maps().end()) {
+      // if not, set current map to empty string
+      AINFO << "Current map is not in status. Reset it.";
+      status_.set_current_map("");
+    }
+  }
+  status_changed_ = true;
   return;
 }
 

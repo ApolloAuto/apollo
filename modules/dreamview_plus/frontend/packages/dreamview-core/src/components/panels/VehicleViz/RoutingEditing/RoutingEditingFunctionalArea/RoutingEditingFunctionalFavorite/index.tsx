@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, message, useImagePrak } from '@dreamview/dreamview-ui';
-import IconIcRemoveAllPoints from '@dreamview/dreamview-ui/src/icons/components/IcRemoveAllPoints';
+import { Button, message, useImagePrak, IconPark } from '@dreamview/dreamview-ui';
 import EventEmitter from 'eventemitter3';
 import { useTranslation } from 'react-i18next';
 import { RoutingEditor } from '@dreamview/dreamview-carviz';
@@ -245,7 +244,7 @@ function RoutingEditingFunctionalFavorite(props: RoutingEditingFunctionalFavorit
                                         classes['favorite-common-item-op-hover-remove'],
                                     )}
                                 >
-                                    <IconIcRemoveAllPoints />
+                                    <IconPark name='IcRemoveAllPoints' />
                                 </span>
                             </div>
                         </div>

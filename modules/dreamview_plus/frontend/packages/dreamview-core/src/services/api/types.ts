@@ -14,6 +14,7 @@ export enum MainApiTypes {
     StartPlayRtkRecorder = 'StartPlayRtkRecorder',
     PlayRecorderAction = 'PlayRecorderAction',
     HMIAction = 'HMIAction',
+    SimHMIAction = 'SimHMIAction',
     Dump = 'Dump',
     Reset = 'Reset',
     GetDataHandlerConf = 'GetDataHandlerConf',
@@ -57,12 +58,23 @@ export enum PluginApiTypes {
 }
 
 /**
+ * 其他API类型枚举
+ */
+export enum OtherApiTypes {
+    SendScenarioSimulationRequest = 'SendScenarioSimulationRequest',
+    StopScenarioSimulation = 'StopScenarioSimulation',
+    ResetScenarioSimulation = 'ResetScenarioSimulation',
+}
+
+/**
  * 流数据名称枚举
  */
 export enum StreamDataNames {
     SIM_WORLD = 'simworld',
     CAMERA = 'camera',
     HMI_STATUS = 'hmistatus',
+    // 仿真专用HMI数据
+    SIM_HMI_STATUS = 'simhmistatus',
     POINT_CLOUD = 'pointcloud',
     Map = 'map',
     Obstacle = 'obstacle',
@@ -110,6 +122,7 @@ export enum HMIActions {
     LoadRecord = 'LOAD_RECORD',
     LoadScenarios = 'LOAD_SCENARIOS',
     LoadRTKRecords = 'LOAD_RTK_RECORDS',
+    LoadMaps = 'LOAD_MAPS',
     ChangeRecord = 'CHANGE_RECORD',
     ChangeRTKRecord = 'CHANGE_RTK_RECORD',
     DeleteRecord = 'DELETE_RECORD',
@@ -127,10 +140,18 @@ export enum HMIActions {
 }
 
 /**
+ * SIM操作枚举
+ */
+export enum SimHMIAction {
+    LOAD_SCENARIOS = 'LOAD_SCENARIOS',
+    CHANGE_SCENARIO = 'CHANGE_SCENARIO',
+}
+
+/**
  * HMI数据负载类型
  */
 export type HMIDataPayload = {
-    action: HMIActions;
+    action: HMIActions | SimHMIAction;
     value?: string;
 };
 

@@ -5,20 +5,17 @@ import { useMosaicId } from '@dreamview/dreamview-core/src/store/PanelLayoutStor
 import RenderTile from '@dreamview/dreamview-core/src/components/panels/base/RenderTile';
 import { genereatePanelId } from '@dreamview/dreamview-core/src/util/layout';
 import { noop } from '@dreamview/dreamview-core/src/util/similarFunctions';
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 
-function useStyle() {
-    const hoc = useMakeStyle(() => ({
-        'layout-root': {
-            width: 500,
+const useStyle = makeStyles(() => ({
+    'layout-root': {
+        width: 500,
+        height: 600,
+        '& .mosaic-window-body': {
             height: 600,
-            '& .mosaic-window-body': {
-                height: 600,
-            },
         },
-    }));
-    return hoc();
-}
+    },
+}));
 
 const layout: MosaicNode<string> = genereatePanelId('terminalWin');
 

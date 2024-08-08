@@ -48,6 +48,11 @@ postprocess {
   top_enlarge_height: 0.25
   width_enlarge_value: 0
   length_enlarge_value: 0
+  cone_score_threshold: 0.50
+  ped_score_threshold: 0.25
+  cyc_score_threshold: 0.25
+  small_mot_score_threshold: 0.25
+  big_mot_score_threshold: 0.25
 }
 
 paddle_settings {
@@ -67,3 +72,5 @@ min_points_threshold: 3
 diff_class_nms: true
 diff_class_iou: 0.25
 nms_strategy: false
+filter_by_semantic_type: false
+filter_ground_points: false

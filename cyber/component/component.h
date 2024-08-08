@@ -28,6 +28,8 @@
 #include "cyber/common/util.h"
 #include "cyber/component/component_base.h"
 #include "cyber/croutine/routine_factory.h"
+#include "cyber/statistics/statistics.h"
+#include "cyber/time/time.h"
 #include "cyber/data/data_visitor.h"
 #include "cyber/scheduler/scheduler.h"
 
@@ -181,14 +183,30 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
+  auto role_attr = std::make_shared<proto::RoleAttributes>();
+  role_attr->set_node_name(config.name());
+  role_attr->set_channel_name(config.readers(0).channel());
+
   std::weak_ptr<Component<M0>> self =
       std::dynamic_pointer_cast<Component<M0>>(shared_from_this());
-  auto func = [self](const std::shared_ptr<M0>& msg) {
+  auto func = [self, role_attr](const std::shared_ptr<M0>& msg) {
+    auto start_time = Time::Now().ToMicrosecond();
     auto ptr = self.lock();
     if (ptr) {
       ptr->Process(msg);
     } else {
       AERROR << "Component object has been destroyed.";
+    }
+    auto end_time = Time::Now().ToMicrosecond();
+    // sampling proc latency and cyber latency in microsecond
+    uint64_t process_start_time;
+    statistics::Statistics::Instance()->SamplingProcLatency<
+                        uint64_t>(*role_attr, end_time-start_time);
+    if (statistics::Statistics::Instance()->GetProcStatus(
+          *role_attr, &process_start_time) && (
+                        start_time-process_start_time) > 0) {
+      statistics::Statistics::Instance()->SamplingCyberLatency(
+                        *role_attr, start_time-process_start_time);
     }
   };
 
@@ -257,6 +275,10 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
+  auto role_attr = std::make_shared<proto::RoleAttributes>();
+  role_attr->set_node_name(config.name());
+  role_attr->set_channel_name(config.readers(0).channel());
+
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
@@ -267,12 +289,24 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
     auto blocker1 = blocker::BlockerManager::Instance()->GetBlocker<M1>(
         config.readers(1).channel());
 
-    auto func = [self, blocker1](const std::shared_ptr<M0>& msg0) {
+    auto func = [self, blocker1, role_attr](const std::shared_ptr<M0>& msg0) {
+      auto start_time = Time::Now().ToMicrosecond();
       auto ptr = self.lock();
       if (ptr) {
         if (!blocker1->IsPublishedEmpty()) {
           auto msg1 = blocker1->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1);
+          auto end_time = Time::Now().ToMicrosecond();
+          // sampling proc latency and cyber latency in microsecond
+          uint64_t process_start_time;
+          statistics::Statistics::Instance()->SamplingProcLatency<
+                            uint64_t>(*role_attr, end_time-start_time);
+          if (statistics::Statistics::Instance()->GetProcStatus(
+                *role_attr, &process_start_time) && (
+                                  start_time-process_start_time) > 0) {
+            statistics::Statistics::Instance()->SamplingCyberLatency(
+                              *role_attr, start_time-process_start_time);
+          }
         }
       } else {
         AERROR << "Component object has been destroyed.";
@@ -295,11 +329,23 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1>> self =
       std::dynamic_pointer_cast<Component<M0, M1>>(shared_from_this());
-  auto func = [self](const std::shared_ptr<M0>& msg0,
+  auto func = [self, role_attr](const std::shared_ptr<M0>& msg0,
                      const std::shared_ptr<M1>& msg1) {
+    auto start_time = Time::Now().ToMicrosecond();
     auto ptr = self.lock();
     if (ptr) {
       ptr->Process(msg0, msg1);
+      auto end_time = Time::Now().ToMicrosecond();
+      // sampling proc latency and cyber latency in microsecond
+      uint64_t process_start_time;
+      statistics::Statistics::Instance()->SamplingProcLatency<
+                        uint64_t>(*role_attr, end_time-start_time);
+      if (statistics::Statistics::Instance()->GetProcStatus(
+            *role_attr, &process_start_time) && (
+                                start_time-process_start_time) > 0) {
+        statistics::Statistics::Instance()->SamplingCyberLatency(
+                          *role_attr, start_time-process_start_time);
+      }
     } else {
       AERROR << "Component object has been destroyed.";
     }
@@ -359,6 +405,11 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   reader_cfg.channel_name = config.readers(0).channel();
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
+
+  auto role_attr = std::make_shared<proto::RoleAttributes>();
+  role_attr->set_node_name(config.name());
+  role_attr->set_channel_name(config.readers(0).channel());
+
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
@@ -372,13 +423,26 @@ bool Component<M0, M1, M2, NullType>::Initialize(
     auto blocker2 = blocker::BlockerManager::Instance()->GetBlocker<M2>(
         config.readers(2).channel());
 
-    auto func = [self, blocker1, blocker2](const std::shared_ptr<M0>& msg0) {
+    auto func = [self, blocker1, blocker2, role_attr](
+                        const std::shared_ptr<M0>& msg0) {
+      auto start_time = Time::Now().ToMicrosecond();
       auto ptr = self.lock();
       if (ptr) {
         if (!blocker1->IsPublishedEmpty() && !blocker2->IsPublishedEmpty()) {
           auto msg1 = blocker1->GetLatestPublishedPtr();
           auto msg2 = blocker2->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1, msg2);
+          auto end_time = Time::Now().ToMicrosecond();
+          // sampling proc latency and cyber latency in microsecond
+          uint64_t process_start_time;
+          statistics::Statistics::Instance()->SamplingProcLatency<
+                              uint64_t>(*role_attr, end_time-start_time);
+          if (statistics::Statistics::Instance()->GetProcStatus(
+                *role_attr, &process_start_time) && (
+                                    start_time-process_start_time) > 0) {
+            statistics::Statistics::Instance()->SamplingCyberLatency(
+                              *role_attr, start_time-process_start_time);
+          }
         }
       } else {
         AERROR << "Component object has been destroyed.";
@@ -404,12 +468,24 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   std::weak_ptr<Component<M0, M1, M2, NullType>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, NullType>>(
           shared_from_this());
-  auto func = [self](const std::shared_ptr<M0>& msg0,
-                     const std::shared_ptr<M1>& msg1,
-                     const std::shared_ptr<M2>& msg2) {
+  auto func = [self, role_attr](const std::shared_ptr<M0>& msg0,
+                                const std::shared_ptr<M1>& msg1,
+                                const std::shared_ptr<M2>& msg2) {
+    auto start_time = Time::Now().ToMicrosecond();
     auto ptr = self.lock();
     if (ptr) {
       ptr->Process(msg0, msg1, msg2);
+      auto end_time = Time::Now().ToMicrosecond();
+      // sampling proc latency and cyber latency in microsecond
+      uint64_t process_start_time;
+      statistics::Statistics::Instance()->SamplingProcLatency<
+                        uint64_t>(*role_attr, end_time-start_time);
+      if (statistics::Statistics::Instance()->GetProcStatus(
+            *role_attr, &process_start_time) && (
+                                  start_time-process_start_time) > 0) {
+        statistics::Statistics::Instance()->SamplingCyberLatency(
+                            *role_attr, start_time-process_start_time);
+      }
     } else {
       AERROR << "Component object has been destroyed.";
     }
@@ -476,6 +552,10 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
+  auto role_attr = std::make_shared<proto::RoleAttributes>();
+  role_attr->set_node_name(config.name());
+  role_attr->set_channel_name(config.readers(0).channel());
+
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
   if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
@@ -492,7 +572,8 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
         config.readers(3).channel());
 
     auto func = [self, blocker1, blocker2,
-                 blocker3](const std::shared_ptr<M0>& msg0) {
+                 blocker3, role_attr](const std::shared_ptr<M0>& msg0) {
+      auto start_time = Time::Now().ToMicrosecond();
       auto ptr = self.lock();
       if (ptr) {
         if (!blocker1->IsPublishedEmpty() && !blocker2->IsPublishedEmpty() &&
@@ -501,6 +582,17 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
           auto msg2 = blocker2->GetLatestPublishedPtr();
           auto msg3 = blocker3->GetLatestPublishedPtr();
           ptr->Process(msg0, msg1, msg2, msg3);
+          auto end_time = Time::Now().ToMicrosecond();
+          // sampling proc latency and cyber latency in microsecond
+          uint64_t process_start_time;
+          statistics::Statistics::Instance()->SamplingProcLatency<
+                            uint64_t>(*role_attr, end_time-start_time);
+          if (statistics::Statistics::Instance()->GetProcStatus(
+                *role_attr, &process_start_time) && (
+                                      start_time-process_start_time) > 0) {
+            statistics::Statistics::Instance()->SamplingCyberLatency(
+                                *role_attr, start_time-process_start_time);
+          }
         }
       } else {
         AERROR << "Component object has been destroyed.";
@@ -528,11 +620,25 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
   auto func =
-      [self](const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
-             const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
+      [self, role_attr](const std::shared_ptr<M0>& msg0,
+                        const std::shared_ptr<M1>& msg1,
+                        const std::shared_ptr<M2>& msg2,
+                        const std::shared_ptr<M3>& msg3) {
+        auto start_time = Time::Now().ToMicrosecond();
         auto ptr = self.lock();
         if (ptr) {
           ptr->Process(msg0, msg1, msg2, msg3);
+          auto end_time = Time::Now().ToMicrosecond();
+          // sampling proc latency and cyber latency in microsecond
+          uint64_t process_start_time;
+          statistics::Statistics::Instance()->SamplingProcLatency<
+                            uint64_t>(*role_attr, end_time-start_time);
+          if (statistics::Statistics::Instance()->GetProcStatus(
+                *role_attr, &process_start_time) && (
+                                      start_time-process_start_time) > 0) {
+            statistics::Statistics::Instance()->SamplingCyberLatency(
+                              *role_attr, start_time-process_start_time);
+          }
         } else {
           AERROR << "Component object has been destroyed." << std::endl;
         }

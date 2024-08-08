@@ -1,0 +1,239 @@
+{
+    "row": 2,
+    "col": 3,
+    "subplot": [
+        {
+            "title": "xy",
+            "x_label": "x",
+            "y_label": "y",
+            "row": 0,
+            "col": 0
+        },
+        {
+            "title": "sl",
+            "x_label": "s",
+            "y_label": "l",
+            "row": 0,
+            "col": 1
+        },
+        {
+            "title": "vt",
+            "x_label": "t",
+            "y_label": "v",
+            "row": 1,
+            "col": 0
+        },
+        {
+            "title": "st",
+            "x_label": "t",
+            "y_label": "s",
+            "row": 1,
+            "col": 1
+        },
+        {
+            "title": "DP-Search",
+            "x_label": "t",
+            "y_label": "s",
+            "row": 2,
+            "col": 0
+        }
+    ],
+    "line": [
+        {
+            "label": "trajxy",
+            "marker": "o-",
+            "subplot": "xy"
+        },
+        {
+            "label": "output_path",
+            "marker": "*-",
+            "subplot": "xy"
+        },
+        {
+            "label": ".*_ObsPolygon",
+            "marker": "*-",
+            "subplot": "xy"
+        },
+        {
+            "label": "ego_box",
+            "marker": "-*",
+            "subplot": "xy",
+            "type": "box"
+        },
+        {
+            "label": ".*_BlockObsPolygon",
+            "marker": "*-",
+            "subplot": "xy"
+        },
+        {
+            "label": ".*BlockSLPolygons",
+            "marker": "*-",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_NudgePoints",
+            "marker": "*-",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_l_lower",
+            "marker": "-*",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_l_upper",
+            "marker": "-*",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_opt_l",
+            "marker": "-*",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_ref_l",
+            "marker": "-*",
+            "subplot": "sl"
+        },
+        {
+            "label": ".*_dl_lower",
+            "marker": "-*",
+            "subplot": "sdl"
+        },
+        {
+            "label": ".*_dl_upper",
+            "marker": "-*",
+            "subplot": "sdl"
+        },
+        {
+            "label": ".*_opt_dl",
+            "marker": "-*",
+            "subplot": "sdl"
+        },
+        {
+            "label": ".*_ddl_lower",
+            "marker": "-*",
+            "subplot": "sddl"
+        },
+        {
+            "label": ".*_ddl_upper",
+            "marker": "-*",
+            "subplot": "sddl"
+        },
+        {
+            "label": ".*_opt_ddl",
+            "marker": "-*",
+            "subplot": "sddl"
+        },
+        {
+            "label": "st_bounds_lower",
+            "marker": "-",
+            "subplot": "st"
+        },
+        {
+            "label": "st_weighting",
+            "marker": "-*",
+            "subplot": "st"
+        },
+        {
+            "label": "st_reference_line",
+            "marker": "-*",
+            "subplot": "st"
+        },
+        {
+            "label": "st_bounds_upper",
+            "marker": "-",
+            "subplot": "st"
+        },
+        {
+            "label": "optimize_st_curve",
+            "marker": "*-",
+            "subplot": "st"
+        },
+        {
+            "label": "faststop_trajectory_fallback_st_curve",
+            "marker": "o-",
+            "subplot": "st"
+        },
+        {
+            "label": "stop_profile_st_curve",
+            "marker": "^-",
+            "subplot": "st"
+        },
+        {
+            "label": "vt_boundary_lower",
+            "marker": "-",
+            "subplot": "vt"
+        },
+        {
+            "label": "vt_boundary_upper",
+            "marker": "-",
+            "subplot": "vt"
+        },
+        {
+            "label": "optimize_vt_curve",
+            "marker": "*-",
+            "subplot": "vt"
+        },
+        {
+            "label": "vt_reference_line",
+            "marker": "*-",
+            "subplot": "vt"
+        },
+        {
+            "label": "optimize_at_curve",
+            "marker": "*-",
+            "subplot": "at"
+        },
+        {
+            "label": "optimize_sv_curve",
+            "marker": "-",
+            "subplot": "sv"
+        },
+        {
+            "label": "curr_speed_limit",
+            "marker": "*-",
+            "subplot": "sv"
+        },
+        {
+            "label": "speed_limit_from_centripetal_acc",
+            "marker": ".-",
+            "subplot": "sv"
+        },
+        {
+            "label": "speed_limit_from_nearby_obstacles",
+            "marker": ".-",
+            "subplot": "sv"
+        },
+        {
+            "label": "speed_limit_from_ref",
+            "marker": ".-",
+            "subplot": "sv"
+        },
+        {
+            "label": "sv_boundary_lower",
+            "marker": ".-",
+            "subplot": "sv"
+        },
+        {
+            "label": "sv_boundary_upper",
+            "marker": ".-",
+            "subplot": "sv"
+        },
+        {
+            "label": ".*_obs_st_bounds",
+            "marker": ".-",
+            "subplot": "st"
+        },
+        {
+            "label": "dp_node_edge_usable",
+            "marker": "*",
+            "subplot": "DP-Search"
+        },
+        {
+            "label": "dp_result",
+            "marker": ".-",
+            "subplot": "DP-Search"
+        }
+    ]
+}

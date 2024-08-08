@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { ENUM_DOWNLOAD_STATUS, ScenarioSet, ScenarioSetRecord } from '@dreamview/dreamview-core/src/services/api/types';
@@ -26,7 +26,7 @@ interface IOperations {
 }
 
 function Operations(props: IOperations) {
-    const { onDelete: propOnDelete, status, id, currentScenarioId, onUpdateDownloadProgress, recordName } = props;
+    const { onDelete: propOnDelete, status, id, currentScenarioId, onUpdateDownloadProgress } = props;
     const { isPluginConnected, pluginApi } = useWebSocketServices();
     const usSubScribe = useRef<any>({
         do: () => true,
@@ -132,7 +132,7 @@ const format = (v: any) =>
         }));
 
 function Scenarios() {
-    const { isPluginConnected, pluginApi, isMainConnected, mainApi } = useWebSocketServices();
+    const { isPluginConnected, pluginApi, isMainConnected, mainApi, otherApi } = useWebSocketServices();
     const [hmi] = usePickHmiStore();
 
     const currentScenarioSetId = hmi?.currentScenarioSetId;
@@ -140,10 +140,8 @@ function Scenarios() {
     const scrollHeight = useScrollHeight();
 
     const loadScenarios = useCallback(() => {
-        if (isMainConnected) {
-            mainApi.loadScenarios();
-        }
-    }, [isMainConnected]);
+        otherApi.loadScenarios();
+    }, []);
 
     const { data, setOriginData, refreshList } = useDataSource<ScenarioSetRecord>({
         apiConnected: isPluginConnected,
@@ -191,13 +189,11 @@ function Scenarios() {
     );
 
     const activeIndex = useMemo(
-        () => ({
-            activeIndex: data.findIndex((item) => item.id === currentScenarioSetId) + 1,
-        }),
+        () => data.findIndex((item) => item.id === currentScenarioSetId) + 1,
         [data, currentScenarioSetId],
     );
 
-    const { classes } = useTableHover()(activeIndex);
+    const { classes } = useTableHover(activeIndex);
 
     return (
         <Background>

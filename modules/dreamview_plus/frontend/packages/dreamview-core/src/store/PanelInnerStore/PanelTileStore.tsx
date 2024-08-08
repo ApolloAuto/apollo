@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useContext, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useContext } from 'react';
 import EventEmitter from 'eventemitter3';
 import { MosaicContext, MosaicPath } from 'react-mosaic-component';
 import { FullScreenFnRef } from './type';
@@ -35,11 +35,10 @@ export function PanelTileProvider(props: React.PropsWithChildren<PanelTileProvid
                         })
                         .catch(() => {
                             console.log('panel closed cancelled');
-                        }).finally(
-                            () => {
-                                mosaicActions.remove(path);
-                            },
-                    );
+                        })
+                        .finally(() => {
+                            mosaicActions.remove(path);
+                        });
                 } else {
                     mosaicActions.remove(path);
                 }

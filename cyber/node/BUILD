@@ -17,6 +17,7 @@ apollo_cc_library(
         "writer.h",
         "writer_base.h",
     ],
+    linkopts = ["-lbvar"],
     deps = [
         "//cyber/blocker:cyber_blocker",
         "//cyber/common:cyber_common",
@@ -32,6 +33,7 @@ apollo_cc_library(
         "//cyber/transport:cyber_transport",
         "//cyber/event:cyber_event",
         "//cyber/proto:role_attributes_cc_proto",
+        # "//cyber/statistics:apollo_statistics",
     ],
 )
 

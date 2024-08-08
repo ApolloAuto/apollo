@@ -21,10 +21,11 @@
 #include <vector>
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/common.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_interface_base/task_base/common/lane_change_util/lane_change_util.h"
 
 namespace apollo {
@@ -53,7 +54,9 @@ bool RuleBasedStopDecider::Init(
 apollo::common::Status RuleBasedStopDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // 1. Rule_based stop for side pass onto reverse lane
-  StopOnSidePass(frame, reference_line_info);
+  if (config_.enable_stop_on_side_pass()) {
+    StopOnSidePass(frame, reference_line_info);
+  }
 
   // 2. Rule_based stop for urgent lane change
   if (config_.enable_lane_change_urgency_checking()) {

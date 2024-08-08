@@ -122,5 +122,38 @@ void PlanningBase::LoadPlanner() {
           planner_name);
 }
 
+bool PlanningBase::GenerateWidthOfLane(const Vec2d& current_location,
+                                       Vec2d& left_point, Vec2d& right_point) {
+  double left_width = 0, right_width = 0;
+  const auto frame = injector_->frame_history()->Latest();
+  if (nullptr == frame || frame->reference_line_info().empty()) {
+    AINFO << "Reference lane is empty!";
+    return false;
+  }
+  const auto& reference_line_info = frame->reference_line_info().front();
+  // get current SL
+  common::SLPoint current_sl;
+  reference_line_info.reference_line().XYToSL(current_location, &current_sl);
+  // Get the lane width of vehicle location
+  bool get_width_of_lane = reference_line_info.reference_line().GetLaneWidth(
+      current_sl.s(), &left_width, &right_width);
+  AINFO << "get_width_of_lane: " << get_width_of_lane
+        << ", left_width: " << left_width << ", right_width: " << right_width;
+  if (get_width_of_lane && left_width != 0 && right_width != 0) {
+    AINFO << "Get the width of lane successfully!";
+    SLPoint sl_left_point, sl_right_point;
+    sl_left_point.set_s(current_sl.s());
+    sl_left_point.set_l(left_width);
+    sl_right_point.set_s(current_sl.s());
+    sl_right_point.set_l(-right_width);
+    reference_line_info.reference_line().SLToXY(sl_left_point, &left_point);
+    reference_line_info.reference_line().SLToXY(sl_right_point, &right_point);
+    return true;
+  } else {
+    AINFO << "Failed to get the width of lane!";
+    return false;
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo

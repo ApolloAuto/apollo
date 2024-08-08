@@ -33,7 +33,7 @@ const std::vector<float> MlfTrackObjectDistance::kForegroundDefaultWeight = {
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kBackgroundDefaultWeight = {
-    0.f, 0.f, 0.f, 0.f, 0.f, 0.2f, 0.8f};
+    0.f, 0.f, 0.f, 0.4f, 0.f, 0.6f, 0.0f};
 
 bool MlfTrackObjectDistance::Init(
     const MlfTrackObjectDistanceInitOptions& options) {

@@ -1,20 +1,8 @@
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import tinycolor from 'tinycolor2';
 import { FormListFieldData } from 'antd';
-import {
-    Form,
-    Input,
-    IconIcNotVisual,
-    IconIcClassificationNotes,
-    IconIcDelete,
-    IconIcArrowsDown,
-    IconIcVisual,
-    ColorPicker,
-    Select,
-    Popover,
-    IconIcDownloadingCancel,
-} from '@dreamview/dreamview-ui';
+import { Form, Input, IconPark, ColorPicker, Select, Popover } from '@dreamview/dreamview-ui';
 import { SelectProps } from '@dreamview/dreamview-ui/src/components/Select';
 import { useTranslation } from 'react-i18next';
 import { ProtoLoader } from '@dreamview/dreamview-core/src/util/ProtoLoader';
@@ -23,102 +11,97 @@ import lodashGet from 'lodash/get';
 import CustomPopover from '../../CustomPopover';
 import { KEY, HIDDEL_OPTION, LINE_WIDTH, IChannelList, IChannelListItem, IChartListItem } from './const';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'chart-line-collapse': {
-            position: 'relative',
-            marginBottom: theme.tokens.margin.speace2,
-            border: '0',
-            '& .ant-form-item:last-of-type': {
-                marginBottom: '0',
-            },
-            '& .dreamview-select': {
-                width: '100% !important',
-                height: '40px',
-            },
-            '& .ant-form-item-control': {
-                width: '228px',
-                flexGrow: 'unset',
-            },
+const useStyle = makeStyles((theme) => ({
+    'chart-line-collapse': {
+        position: 'relative',
+        marginBottom: theme.tokens.margin.speace2,
+        border: '0',
+        '& .ant-form-item:last-of-type': {
+            marginBottom: '0',
         },
-        'chart-line-collapse-title': {
-            display: 'flex',
-            alignItems: 'center',
-            border: theme.components.pncMonitor.chartLineBorder,
-            borderTopLeftRadius: '6px !important',
-            borderTopRightRadius: '6px !important',
+        '& .dreamview-select': {
+            width: '100% !important',
             height: '40px',
-            padding: `0 ${theme.tokens.padding.speace2}`,
-            backgroundColor: theme.components.pncMonitor.chartBgColor,
-            overflow: 'hidden',
-            color: theme.tokens.colors.fontColor5,
-            cursor: 'default',
         },
-        'chart-line-collapse-content': {
-            padding: theme.tokens.padding.speace2,
-            backgroundColor: theme.components.pncMonitor.chartBgColor,
-            border: theme.components.pncMonitor.chartLineBorder,
-            borderTop: 'none',
-            borderBottomLeftRadius: '8px',
-            borderBottomRightRadius: '8px',
-            '& .ant-form-item-control': {
-                width: '228px',
-            },
+        '& .ant-form-item-control': {
+            width: '228px',
+            flexGrow: 'unset',
         },
-        'chart-line-collapse-expand': {
-            overflow: 'hidden',
+    },
+    'chart-line-collapse-title': {
+        display: 'flex',
+        alignItems: 'center',
+        border: theme.components.pncMonitor.chartLineBorder,
+        borderTopLeftRadius: '6px !important',
+        borderTopRightRadius: '6px !important',
+        height: '40px',
+        padding: `0 ${theme.tokens.padding.speace2}`,
+        backgroundColor: theme.components.pncMonitor.chartBgColor,
+        overflow: 'hidden',
+        color: theme.tokens.colors.fontColor5,
+        cursor: 'default',
+    },
+    'chart-line-collapse-content': {
+        padding: theme.tokens.padding.speace2,
+        backgroundColor: theme.components.pncMonitor.chartBgColor,
+        border: theme.components.pncMonitor.chartLineBorder,
+        borderTop: 'none',
+        borderBottomLeftRadius: '8px',
+        borderBottomRightRadius: '8px',
+        '& .ant-form-item-control': {
+            width: '228px',
+        },
+    },
+    'chart-line-collapse-expand': {
+        overflow: 'hidden',
+        transition: theme.tokens.transitions.easeInOut('all'),
+    },
+    'arrow-down': {
+        position: 'absolute',
+        right: '16px',
+        '& svg': {
             transition: theme.tokens.transitions.easeInOut('all'),
         },
-        'arrow-down': {
-            position: 'absolute',
-            right: '16px',
-            '& svg': {
-                transition: theme.tokens.transitions.easeInOut('all'),
-            },
-        },
+    },
 
-        'form-hidden-ic': {
-            marginLeft: theme.tokens.margin.speace3,
-            '& .ant-form-item-control-input': {
-                minHeight: '0',
-                height: 'auto',
-            },
-            '& .ant-form-item-control-input-content': {
-                display: 'flex',
-                alignItems: 'center',
-            },
+    'form-hidden-ic': {
+        marginLeft: theme.tokens.margin.speace3,
+        '& .ant-form-item-control-input': {
+            minHeight: '0',
+            height: 'auto',
         },
+        '& .ant-form-item-control-input-content': {
+            display: 'flex',
+            alignItems: 'center',
+        },
+    },
 
-        'line-color': {
-            fontSize: '10px',
-        },
-        'line-title': {
-            marginLeft: '6px',
-        },
-        'line-hidden-active': {
-            display: 'block',
-            // marginLeft: theme.tokens.margin.speace3,
-            fontSize: theme.tokens.font.size.large,
-            color: theme.tokens.colors.fontColor5,
-        },
-        'line-hidden-unactive': {
-            display: 'block',
-            // marginLeft: theme.tokens.margin.speace3,
-            fontSize: theme.tokens.font.size.large,
-            color: tinycolor(theme.tokens.colors.fontColor5).setAlpha(0.7).toRgbString(),
-        },
-        'line-delete': {
-            marginLeft: theme.tokens.margin.speace2,
-            fontSize: theme.tokens.font.size.large,
-        },
-    }));
-
-    return hoc();
-}
-
+    'line-color': {
+        fontSize: '10px',
+    },
+    'line-title': {
+        marginLeft: '6px',
+    },
+    'line-hidden-active': {
+        display: 'block',
+        // marginLeft: theme.tokens.margin.speace3,
+        fontSize: theme.tokens.font.size.large,
+        color: theme.tokens.colors.fontColor5,
+    },
+    'line-hidden-unactive': {
+        display: 'block',
+        // marginLeft: theme.tokens.margin.speace3,
+        fontSize: theme.tokens.font.size.large,
+        color: tinycolor(theme.tokens.colors.fontColor5).setAlpha(0.7).toRgbString(),
+    },
+    'line-delete': {
+        marginLeft: theme.tokens.margin.speace2,
+        fontSize: theme.tokens.font.size.large,
+    },
+}));
 function IcArrowsDown(props: any) {
     const { isActive, className } = props;
-    return <IconIcArrowsDown className={className} rotate={isActive ? 180 : 0} />;
+    return <IconPark name='IcArrowsDown' className={className} rotate={isActive ? 180 : 0} />;
 }
 
 interface ChartLineProps {
@@ -145,86 +128,81 @@ const lineWidthOption = [
     },
 ];
 
-function useMyColorPickerStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'my-popover': {
-            '& .dreamview-popover-inner': {
-                background: 'rgba(255,77,88,0.25)',
-            },
-            '& .dreamview-popover-arrow::before': {
-                background: theme.tokens.colors.transparent,
-            },
-            '& .dreamview-popover-arrow::after': {
-                background: 'rgba(255,77,88,0.25)',
-            },
-            '& .dreamview-popover-inner-content': {
-                color: '#FF4D58',
-                ...theme.tokens.typography.content,
-            },
-            '& .anticon': {
-                marginRight: '6px',
-            },
+const useMyColorPickerStyle = makeStyles((theme) => ({
+    'my-popover': {
+        '& .dreamview-popover-inner': {
+            background: 'rgba(255,77,88,0.25)',
         },
-        'my-color-picker': {
+        '& .dreamview-popover-arrow::before': {
+            background: theme.tokens.colors.transparent,
+        },
+        '& .dreamview-popover-arrow::after': {
+            background: 'rgba(255,77,88,0.25)',
+        },
+        '& .dreamview-popover-inner-content': {
+            color: '#FF4D58',
+            ...theme.tokens.typography.content,
+        },
+        '& .anticon': {
+            marginRight: '6px',
+        },
+    },
+    'my-color-picker': {
+        position: 'relative',
+        height: '40px',
+        background: theme.tokens.colors.background1,
+        borderRadius: '6px',
+        padding: `0 ${theme.tokens.padding.speace2}`,
+        display: 'flex',
+        alignItems: 'center',
+        color: theme.tokens.colors.fontColor5,
+        ...theme.tokens.typography.content,
+        '& .ant-color-picker-trigger': {
+            height: '16px',
+            width: '16px',
+            minWidth: '0',
+            padding: 0,
+            background: 'none',
+            boxShadow: 'none',
+            border: 'none',
             position: 'relative',
-            height: '40px',
-            background: theme.tokens.colors.background1,
+            zIndex: 2,
+        },
+        '& .ant-color-picker-color-block': {
+            height: '16px',
+            width: '16px',
+        },
+        '& input': {
+            position: 'absolute',
+            left: '0',
+            right: '0',
+            top: '0',
+            bottom: '0',
+            width: '100%',
+            height: '100%',
+            paddingLeft: '48px',
+            transition: 'all 0.2s',
+            border: theme.components.pncMonitor.chartEditingColorPickerBorder,
             borderRadius: '6px',
-            padding: `0 ${theme.tokens.padding.speace2}`,
-            display: 'flex',
-            alignItems: 'center',
+            background: theme.components.pncMonitor.pickerBgColor,
+            outline: 'none',
+            caretColor: theme.tokens.colors.brand3,
             color: theme.tokens.colors.fontColor5,
             ...theme.tokens.typography.content,
-            '& .ant-color-picker-trigger': {
-                height: '16px',
-                width: '16px',
-                minWidth: '0',
-                padding: 0,
-                background: 'none',
-                boxShadow: 'none',
-                border: 'none',
-                position: 'relative',
-                zIndex: 2,
+            '&:hover': {
+                border: theme.components.pncMonitor.chartEditingColorPickerActiveBorder,
+                boxShadow: theme.components.pncMonitor.chartEditingColorPickerBoxShadow,
             },
-            '& .ant-color-picker-color-block': {
-                height: '16px',
-                width: '16px',
-            },
-            '& input': {
-                position: 'absolute',
-                left: '0',
-                right: '0',
-                top: '0',
-                bottom: '0',
-                width: '100%',
-                height: '100%',
-                paddingLeft: '48px',
-                transition: 'all 0.2s',
-                border: theme.components.pncMonitor.chartEditingColorPickerBorder,
-                borderRadius: '6px',
-                background: theme.components.pncMonitor.pickerBgColor,
-                outline: 'none',
-                caretColor: theme.tokens.colors.brand3,
-                color: theme.tokens.colors.fontColor5,
-                ...theme.tokens.typography.content,
-                '&:hover': {
-                    border: theme.components.pncMonitor.chartEditingColorPickerActiveBorder,
-                    boxShadow: theme.components.pncMonitor.chartEditingColorPickerBoxShadow,
-                },
-                '&:focus': {
-                    border: theme.components.pncMonitor.chartEditingColorPickerActiveBorder,
-                    boxShadow: theme.components.pncMonitor.chartEditingColorPickerBoxShadow,
-                },
-            },
-            'text-i': {
-                marginTop: '2px',
+            '&:focus': {
+                border: theme.components.pncMonitor.chartEditingColorPickerActiveBorder,
+                boxShadow: theme.components.pncMonitor.chartEditingColorPickerBoxShadow,
             },
         },
-    }));
-
-    return hoc();
-}
-
+    },
+    'text-i': {
+        marginTop: '2px',
+    },
+}));
 interface MyColorPickerProps {
     value?: string;
     onChange?: (value: string) => void;
@@ -287,7 +265,7 @@ function MyColorPicker(props: MyColorPickerProps) {
 
     const errorContext = (
         <span>
-            <IconIcDownloadingCancel />
+            <IconPark name='IcDownloadingCancel' />
             {t('invalidColor')}
         </span>
     );
@@ -338,9 +316,9 @@ function HiddenIc(props: HiddenIcProps) {
 
     const ic =
         value === HIDDEL_OPTION.SHOW ? (
-            <IconIcVisual onClick={onHideClick} className={classes['line-hidden-active']} />
+            <IconPark name='IcVisual' onClick={onHideClick} className={classes['line-hidden-active']} />
         ) : (
-            <IconIcNotVisual onClick={onShowClick} className={classes['line-hidden-unactive']} />
+            <IconPark name='IcNotVisual' onClick={onShowClick} className={classes['line-hidden-unactive']} />
         );
     const content = value === HIDDEL_OPTION.SHOW ? t('hideLine') : t('showLine');
 
@@ -456,14 +434,14 @@ export default function ChartLine(props: ChartLineProps) {
 
     const title = (
         <>
-            <IconIcClassificationNotes style={{ color: lineColor }} className={classes['line-color']} />
+            <IconPark name='IcClassificationNotes' style={{ color: lineColor }} className={classes['line-color']} />
             <span className={classes['line-title']}>
                 {t('line')}
                 {index + 1}
             </span>
             <FormHiddenIc filed={filed} />
             <CustomPopover trigger='hover' content={t('deleteLine')}>
-                <IconIcDelete onClick={onDeleteClick} className={classes['line-delete']} />
+                <IconPark name='IcDelete' onClick={onDeleteClick} className={classes['line-delete']} />
             </CustomPopover>
             <IcArrowsDown className={classes['arrow-down']} isActive={openStatus} />
         </>

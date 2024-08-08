@@ -99,3 +99,5 @@ DECLARE_double(pitch_offset_deg);
 DECLARE_bool(is_control_ut_test_mode);
 
 DECLARE_bool(publish_control_debug_info);
+
+DECLARE_bool(query_forward_station_point_only);

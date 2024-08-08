@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import cloneDeep from 'lodash/cloneDeep';
+import assign from 'lodash/assign';
 import isEqual from 'lodash/isEqual';
 import isArray from 'lodash/isArray';
 import * as TYPES from './actionTypes';
@@ -74,11 +74,11 @@ export const reducerHander = {
     updateCurrentMode: (draftHmi: any, mode: string) => {
         draftHmi.currentMode = mode;
     },
-    toggleModule(hmi: TYPES.IInitState, prop: { key: string }) {
+    toggleModule(_hmi: TYPES.IInitState, prop: { key: string }) {
         console.log('module', prop);
     },
     updateStatusSimp: (originHmi: any, draftHmi: any, newStatus: any) => {
-        const prevStatus = cloneDeep(originHmi.prevStatus);
+        const prevStatus = originHmi?.prevStatus;
         Object.keys(newStatus).forEach((key: string) => {
             const prevValue = prevStatus[key];
             const newValue = newStatus[key];
@@ -95,6 +95,10 @@ export const reducerHander = {
             } else if (key === 'currentRecordStatus') {
                 draftHmi.currentRecordId = newStatus.currentRecordStatus?.currentRecordId;
                 draftHmi.currentRecordStatus = newStatus.currentRecordStatus;
+            } else if (key === 'modules') {
+                draftHmi.modules = new Map(Object.entries(newStatus.modules ?? []).sort());
+            } else if (key === 'modulesLock') {
+                draftHmi.modulesLock = new Map(Object.entries(newStatus.modulesLock ?? []).sort());
             } else if (isArray(prevValue) && isArray(newValue)) {
                 draftHmi[key] = newStatus[key].sort();
             } else {
@@ -102,12 +106,6 @@ export const reducerHander = {
             }
         });
 
-        draftHmi.modules = new Map(Object.entries(newStatus.modules ?? []).sort());
-
-        draftHmi.modulesLock = new Map(Object.entries(newStatus.modulesLock ?? []).sort());
-
-        draftHmi.backendShutdown = newStatus.backendShutdown;
-
-        draftHmi.prevStatus = newStatus;
+        assign(draftHmi.prevStatus, newStatus);
     },
 };

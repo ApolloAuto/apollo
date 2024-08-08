@@ -138,10 +138,23 @@ void CanbusComponent::PublishChassis() {
   ADEBUG << chassis.ShortDebugString();
 }
 
+void CanbusComponent::CheckChassisCommunication() {
+  if (vehicle_object_->CheckChassisCommunicationFault()) {
+    AERROR << "Can not get the chassis info, please check the chassis "
+              "communication!";
+    is_chassis_communicate_lost_ = true;
+  } else {
+    is_chassis_communicate_lost_ = false;
+  }
+}
+
 bool CanbusComponent::Proc() {
+  CheckChassisCommunication();
   PublishChassis();
-  if (FLAGS_enable_chassis_detail_pub) {
-    vehicle_object_->PublishChassisDetail();
+  if (!is_chassis_communicate_lost_) {
+    if (FLAGS_enable_chassis_detail_pub) {
+      vehicle_object_->PublishChassisDetail();
+    }
   }
   vehicle_object_->UpdateHeartbeat();
   return true;
@@ -150,15 +163,16 @@ bool CanbusComponent::Proc() {
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
-  if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
+  if (current_timestamp - last_timestamp_controlcmd_ <
+      FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
               "FLAGS_min_cmd_interval["
            << FLAGS_min_cmd_interval << "], actual time interval["
-           << current_timestamp - last_timestamp_ << "].";
+           << current_timestamp - last_timestamp_controlcmd_ << "].";
     return;
   }
 
-  last_timestamp_ = current_timestamp;
+  last_timestamp_controlcmd_ = current_timestamp;
   ADEBUG << "Control_sequence_number:"
          << control_command.header().sequence_num() << ", Time_of_delay:"
          << current_timestamp -
@@ -172,15 +186,16 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
 void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
   int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
-  if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
+  if (current_timestamp - last_timestamp_chassiscmd_ <
+      FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
               "FLAGS_min_cmd_interval["
            << FLAGS_min_cmd_interval << "], actual time interval["
-           << current_timestamp - last_timestamp_ << "].";
+           << current_timestamp - last_timestamp_chassiscmd_ << "].";
     return;
   }
 
-  last_timestamp_ = current_timestamp;
+  last_timestamp_chassiscmd_ = current_timestamp;
   ADEBUG << "Control_sequence_number:"
          << chassis_command.header().sequence_num() << ", Time_of_delay:"
          << current_timestamp -

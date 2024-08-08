@@ -40,6 +40,8 @@ struct HuaCeProtocol {
   size_t GPCHCX_SIZE = 46;
 };
 
+#define ACC_UNIT 9.806
+
 class HuaCeTextParser : public HuaCeBaseParser {
  public:
   explicit HuaCeTextParser(const config::Config &config)
@@ -86,16 +88,34 @@ bool HuaCeTextParser::PrepareMessage() {
   }
 
   std::vector<std::string> fields;
-  std::stringstream ss(input_str_);
+  std::stringstream ss(input_str_.substr(0, input_str_.rfind('*')));
   for (std::string field; std::getline(ss, field, ',');) {
     fields.push_back(field);
   }
   if (fields.empty()) {
     return false;
   }
+  auto valid_fields = [&]() -> bool {
+    for (size_t i = 1; i < fields.size(); ++i) {
+      if (fields[i].empty()) {
+        fields[i] = "0";
+      } else if (i == 33 && fields[i] == "X") {
+        continue;
+      } else if (fields[i].find_first_not_of("0123456789.- ") !=
+                 std::string::npos) {
+        AERROR << "HUACE ASCII message field error: " << fields[i]
+               << ", input str: " << input_str_;
+        return false;
+      }
+    }
+    return true;
+  };
   if (fields[0] == protocol_.GPCHC) {
     if (fields.size() < protocol_.GPCHC_SIZE) {
       AERROR << "GPCHC message format error: " << data_start;
+      return false;
+    }
+    if (!valid_fields()) {
       return false;
     }
     PrepareMessageGPCHC(fields);
@@ -103,6 +123,9 @@ bool HuaCeTextParser::PrepareMessage() {
   } else if (fields[0] == protocol_.GPCHCX) {
     if (fields.size() < protocol_.GPCHCX_SIZE) {
       AERROR << "GPCHCX message format error:" << data_start;
+      return false;
+    }
+    if (!valid_fields()) {
       return false;
     }
     PrepareMessageGPCHCX(fields);
@@ -118,17 +141,15 @@ void HuaCeTextParser::PrepareMessageGPCHC(
   decode_message_.GPSTime = std::stod(fields[2]);
   decode_message_.gps_timestamp_sec =
       decode_message_.GPSWeek * SECONDS_PER_WEEK + decode_message_.GPSTime;
-  decode_message_.unix_timestamp_sec =
-      apollo::drivers::util::gps2unix(decode_message_.gps_timestamp_sec);
   decode_message_.Heading = std::stod(fields[3]);
   decode_message_.Pitch = std::stod(fields[4]);
   decode_message_.Roll = std::stod(fields[5]);
-  decode_message_.GyroX = std::stod(fields[6]);
-  decode_message_.GyroY = std::stod(fields[7]);
-  decode_message_.GyroZ = std::stod(fields[8]);
-  decode_message_.AccX = std::stod(fields[9]);
-  decode_message_.AccY = std::stod(fields[10]);
-  decode_message_.AccZ = std::stod(fields[11]);
+  decode_message_.GyroX = std::stod(fields[6]) * DEG_TO_RAD;
+  decode_message_.GyroY = std::stod(fields[7]) * DEG_TO_RAD;
+  decode_message_.GyroZ = std::stod(fields[8]) * DEG_TO_RAD;
+  decode_message_.AccX = std::stod(fields[9]) * ACC_UNIT;
+  decode_message_.AccY = std::stod(fields[10]) * ACC_UNIT;
+  decode_message_.AccZ = std::stod(fields[11]) * ACC_UNIT;
   decode_message_.Latitude = std::stod(fields[12].empty() ? "0" : fields[12]);
   decode_message_.Longitude = std::stod(fields[13].empty() ? "0" : fields[13]);
   decode_message_.Altitude = std::stod(fields[14].empty() ? "0" : fields[14]);

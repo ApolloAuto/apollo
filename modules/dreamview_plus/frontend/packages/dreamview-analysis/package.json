@@ -1,0 +1,42 @@
+{
+  "name": "@dreamview/dreamview-analysis",
+  "version": "1.0.0",
+  "description": "Provide performance data collection and analysis capabilities for various front-end applications",
+  "keywords": [
+    "dreamview"
+  ],
+  "author": "wangkang12 <wangkang12@baidu.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "index.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "ssh://wangkang12@icode.baidu.com:8235/baidu/apollo-bj/apollo"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/react-resizable": "^3.0.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rxjs": "^7.8.1"
+  },
+  "dependencies": {
+    "@dreamview/eslint-config-dreamview": "^1.1.4",
+    "@dreamview/log": "^1.1.4",
+    "@dreamview/tslint-config-dreamview": "^1.1.4",
+    "@types/events": "^3.0.3",
+    "events": "^3.3.0",
+    "re-resizable": "^6.9.16",
+    "react-draggable": "^4.4.6",
+    "react-json-view": "^1.21.3"
+  }
+}

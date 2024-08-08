@@ -16,6 +16,7 @@
 
 #include "cyber/component/timer_component.h"
 
+#include "cyber/statistics/statistics.h"
 #include "cyber/timer/timer.h"
 
 namespace apollo {
@@ -44,9 +45,21 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
   }
   interval_ = config.interval();
 
+  auto role_attr = std::make_shared<proto::RoleAttributes>();
+  role_attr->set_node_name(config.name());
+  role_attr->set_channel_name(statistics::TIMER_COMPONENT_CHAN_NAME);
+  statistics::Statistics::Instance()->RegisterChanVar(*role_attr);
+
   std::shared_ptr<TimerComponent> self =
       std::dynamic_pointer_cast<TimerComponent>(shared_from_this());
-  auto func = [self]() { self->Process(); };
+  auto func = [self, role_attr]() {
+    auto start_time = Time::Now().ToNanosecond();
+    self->Process();
+    auto end_time = Time::Now().ToNanosecond();
+    // sampling proc latency in microsecond
+    statistics::Statistics::Instance()->SamplingProcLatency<
+                  uint64_t>(*role_attr, (end_time-start_time)/1000);
+  };
   timer_.reset(new Timer(config.interval(), func, false));
   timer_->Start();
   return true;

@@ -43,6 +43,7 @@ class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Ge3>* const can_sender,
+      CanReceiver<Ge3>* const can_receiver,
       MessageManager<::apollo::canbus::Ge3>* const message_manager) override;
 
   bool Start() override;

@@ -1,7 +1,7 @@
 import Logger from '@dreamview/log';
 import { mergeMap, throwError, of, catchError } from 'rxjs';
 import { apollo } from '@dreamview/dreamview';
-import { webSocketManager } from '../WebSocketManager';
+import { webSocketManager, Metadata, SocketNameEnum } from '../WebSocketManager';
 import { ReqDataType, RequestDataType } from '../models/request-message.model';
 import {
     HMIActions,
@@ -35,7 +35,6 @@ import {
     IGetTuplesObjectStoreParams,
     RoutePathInfo,
 } from './types';
-import { Metadata, SocketNameEnum } from '../WebSocketManager/type';
 
 type IMapElementIds = apollo.dreamview.IMapElementIds;
 type IMap = apollo.hdmap.IMap;
@@ -461,6 +460,18 @@ export class MainApi {
                 info: {
                     action: HMIActions.ChangeDynamic,
                     value: dynamicName,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    loadMaps() {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.LoadMaps,
                 },
             },
             type: MainApiTypes.HMIAction,

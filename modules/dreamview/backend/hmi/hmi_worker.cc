@@ -1175,18 +1175,18 @@ bool HMIWorker::LoadScenarios() {
                                              &user_ads_group_info)) {
       AERROR << "Unable to parse UserAdsGroup from file "
              << scenario_set_json_path;
-      return false;
+      continue;
     }
     if (!user_ads_group_info.has_name()) {
       AERROR << "Failed to get ads group name!";
-      return false;
+      continue;
     }
     const std::string scenario_set_name = user_ads_group_info.name();
     ScenarioSet new_scenario_set;
     if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
                            &new_scenario_set)) {
       AERROR << "Failed to update scenario_set!";
-      return false;
+      continue;
     }
     scenario_sets[scenario_set_id] = new_scenario_set;
   }
@@ -1388,7 +1388,7 @@ bool HMIWorker::LoadRecords() {
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
     // Skip format that dv cannot parse: record not ending in record
-    int record_suffix_length = 7;
+    size_t record_suffix_length = 7;
     if (record_id.length() - index != record_suffix_length) {
         continue;
     }

@@ -19,41 +19,43 @@
 namespace apollo {
 namespace drivers {
 namespace lslidar {
+namespace parser {
 
 using apollo::drivers::PointCloud;
 using apollo::drivers::lslidar::LslidarScan;
 
 void Convert::init(const Config& lslidar_config) {
-  config_ = lslidar_config;
-  // we use Beijing time by default
+    config_ = lslidar_config;
+    // we use Beijing time by default
 
-  AERROR << "Convert::init";
-  parser_.reset(LslidarParserFactory::CreateParser(config_));
-  if (parser_.get() == nullptr) {
-    AFATAL << "Create parser failed.";
-    return;
-  }
-  parser_->setup();
+    AERROR << "Convert::init";
+    parser_.reset(LslidarParserFactory::CreateParser(config_));
+    if (parser_.get() == nullptr) {
+        AFATAL << "Create parser failed.";
+        return;
+    }
+    parser_->setup();
 }
 
 /** @brief Callback for raw scan messages. */
 void Convert::ConvertPacketsToPointcloud(
-    const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-    std::shared_ptr<apollo::drivers::PointCloud> point_cloud) {
-  AINFO_EVERY(100) << "Converting scan msg seq "
-                   << scan_msg->header().sequence_num();
+        const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
+        std::shared_ptr<apollo::drivers::PointCloud> point_cloud) {
+    AINFO_EVERY(100) << "Converting scan msg seq "
+                     << scan_msg->header().sequence_num();
 
-  parser_->GeneratePointcloud(scan_msg, point_cloud);
+    parser_->GeneratePointcloud(scan_msg, point_cloud);
 
-  if (point_cloud == nullptr || point_cloud->point().empty()) {
-    AERROR << "point cloud has no point";
-    return;
-  }
+    if (point_cloud == nullptr || point_cloud->point().empty()) {
+        AERROR << "point cloud has no point";
+        return;
+    }
 
-  parser_->Order(point_cloud);
-  point_cloud->set_is_dense(false);
+    parser_->Order(point_cloud);
+    point_cloud->set_is_dense(false);
 }
 
+}  // namespace parser
 }  // namespace lslidar
 }  // namespace drivers
 }  // namespace apollo

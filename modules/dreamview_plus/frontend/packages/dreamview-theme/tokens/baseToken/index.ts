@@ -123,13 +123,3 @@ export const drak = {
 };
 
 export type IDefaultTheme = typeof light;
-
-export const getToken = (theme: ITheme) => {
-    if (theme === 'drak') {
-        return drak;
-    }
-    if (theme === 'light') {
-        return light;
-    }
-    return light;
-};

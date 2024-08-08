@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IconIcHelpNormal, Popover, Switch, InputNumber, message } from '@dreamview/dreamview-ui';
+import { IconPark, Popover, Switch, InputNumber, message } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 import { useVizStore } from '../../../VizStore';
@@ -84,7 +84,7 @@ export default function RoutingEditingFunctionalLoop(props: RoutingEditingFuncti
                     rootClassName={classes['functional-loop-switch-help']}
                 >
                     <div className={classes['functional-loop-switch-remind']}>
-                        <IconIcHelpNormal />
+                        <IconPark name='IcHelpNormal' />
                     </div>
                 </Popover>
             </div>

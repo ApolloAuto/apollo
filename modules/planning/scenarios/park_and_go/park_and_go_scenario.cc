@@ -53,9 +53,11 @@ bool ParkAndGoScenario::Init(std::shared_ptr<DependencyInjector> injector,
 bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
                                        const Frame& frame) {
   if (!frame.local_view().planning_command->has_lane_follow_command()) {
+    AINFO << "PARK_AND_GO: Don't has lane follow command!";
     return false;
   }
   if (other_scenario == nullptr || frame.reference_line_info().empty()) {
+    AINFO << "PARK_AND_GO: Don't has reference line info or other scenario!";
     return false;
   }
   bool park_and_go = false;
@@ -78,6 +80,7 @@ bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
   // check ego vehicle distance to destination
   const auto routing_end = frame.local_view().end_lane_way_point;
   if (nullptr == routing_end) {
+    AINFO << "PARK_AND_GO: Don't has end lane way point!";
     return false;
   }
   common::SLPoint dest_sl;
@@ -88,8 +91,8 @@ bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
 
   bool is_ego_on_lane = false;
   bool is_lane_type_city_driving = false;
-  HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      adc_point, 5.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s, &l);
+  HDMapUtil::BaseMap().GetNearestLaneWithDistance(
+      adc_point, 5.0, &lane, &s, &l);
   if (lane != nullptr && lane->IsOnLane({adc_point.x(), adc_point.y()})) {
     is_ego_on_lane = true;
     if (lane->lane().type() == hdmap::Lane::CITY_DRIVING) {
@@ -102,9 +105,8 @@ bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
   bool is_vehicle_static = (std::fabs(adc_speed) < max_abs_speed_when_stopped);
   bool is_distance_far_enough =
       (adc_distance_to_dest > scenario_config.min_dist_to_dest());
-  AINFO << "PARK_AND_GO: " << is_vehicle_static << ","
-         << is_distance_far_enough << "," << is_ego_on_lane
-         << "," << is_lane_type_city_driving;
+  AINFO << "PARK_AND_GO: " << is_vehicle_static << "," << is_distance_far_enough
+        << "," << is_ego_on_lane << "," << is_lane_type_city_driving;
   // if vehicle is static, far enough to destination and (off-lane or not on
   // city_driving lane)
   if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&

@@ -171,6 +171,36 @@ pages:
         url: https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/Fuel%E7%A0%94%E5%8F%91%E4%BA%91%E5%B9%B3%E5%8F%B0/%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/%E6%A6%82%E8%A7%88
       - title: 仿真平台
         url: https://apollo.baidu.com/Apollo-Homepage-Document/Apollo_Studio/%E4%BB%BF%E7%9C%9F%E5%B9%B3%E5%8F%B0/%E6%A6%82%E8%A7%88
+      - title: 地图
+        pages:
+          - title: 概述
+          - title: 开通地图服务
+          - title: 准备工作
+          - title: 环境配置
+          - title: 地图采集
+          - title: 地图编辑
+            pages:
+              - title: 概述
+              - title: 车道
+              - title: 路口
+              - title: 线
+              - title: 红绿灯
+              - title: 测距
+              - title: 减速带
+              - title: 停车位
+              - title: 人行横道
+              - title: 交通标志牌
+          - title: 仿真验证
+          - title: 常见问题
+      - title: 标定工具
+        pages:
+          - title: 功能概述
+          - title: 开通标定工具
+          - title: 准备工作
+          - title: 环境配置
+          - title: 激光雷达标定
+          - title: 相机标定
+          - title: 附录
   - title: 故障排查
     pages:
       - title: 安装编译

@@ -26,9 +26,12 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/devkit/proto/devkit.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/devkit/devkit_controller.h"
+#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -92,13 +95,14 @@ class DevkitVehicleFactory : public AbstractVehicleFactory {
    */
   void PublishChassisDetail() override;
 
+  bool CheckChassisCommunicationFault();
+
  private:
   /**
    * @brief create devkit vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>
-  CreateVehicleController();
+  std::unique_ptr<devkit::DevkitController> CreateVehicleController();
 
   /**
    * @brief create devkit message manager
@@ -112,8 +116,7 @@ class DevkitVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Devkit> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Devkit> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Devkit>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>
-      vehicle_controller_;
+  std::unique_ptr<devkit::DevkitController> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Devkit>>
       chassis_detail_writer_;

@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { IconIcRoutingEditingEnter, IconIcCommonRoutin } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 
@@ -19,7 +19,7 @@ export const RoutingEditingBtn = forwardRef<HTMLDivElement, RoutingEditingBtnPro
             ref={ref}
         >
             <i className={classes['routing-editing-btn__icon']}>
-                <IconIcRoutingEditingEnter />
+                <IconPark name='IcRoutingEditingEnter' />
             </i>
             <div className={classes['routing-editing-btn__text']}>{t('routingEditing')}</div>
         </div>
@@ -36,7 +36,7 @@ export const CommonRoutingEditingBtn = forwardRef<HTMLDivElement, RoutingEditing
             ref={ref}
         >
             <i className={classes['common-routing-editing-btn__icon']}>
-                <IconIcCommonRoutin />
+                <IconPark name='IcCommonRoutin' />
             </i>
         </div>
     );

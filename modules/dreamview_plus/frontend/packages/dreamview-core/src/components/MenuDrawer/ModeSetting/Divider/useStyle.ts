@@ -1,12 +1,7 @@
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 
-export default function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'mode-setting-divider': {
-            // borderBottom: `1.5px solid ${theme.tokens.divider.color.strong}`,
-            // marginBottom: theme.tokens.margin.speace2,
-            height: 0,
-        },
-    }));
-    return hoc();
-}
+export default makeStyles(() => ({
+    'mode-setting-divider': {
+        height: 0,
+    },
+}));

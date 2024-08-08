@@ -14,11 +14,10 @@ import { adjustTerminalSize, getPid } from '../../../util/terminalService';
 import './index.less';
 import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
 import { usePickHmiStore, ENUM_DATARECORD_PROCESS_STATUS } from '../../../store/HmiStore';
+import { getWsProtocol, getHost } from '../../../services/WebSocketManager/constant';
 
 function getUrl() {
-    const protocol = window.location.protocol;
-    const wsProtocol = protocol === 'http:' ? 'ws://' : 'wss://';
-    return `${wsProtocol}127.0.0.1:8889/terminals`;
+    return `${getWsProtocol()}${getHost()}:8889/terminals`;
 }
 
 function debounce(fn, delay) {

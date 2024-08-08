@@ -68,4 +68,5 @@ message TrafficLightDetection {
     CAMERA_FRONT_WIDE = 3;
   };
   optional CameraID camera_id = 5;
+  optional string camera_name = 6;
 }

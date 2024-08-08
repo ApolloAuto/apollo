@@ -22,9 +22,9 @@
 
 #include <memory>
 #include <string>
-#include <vector>
-#include <utility>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "modules/planning/tasks/speed_decider/proto/speed_decider.pb.h"
 

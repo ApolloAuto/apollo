@@ -61,10 +61,12 @@ class LincolnController final
    * @brief initialize the lincoln vehicle controller.
    * @return init error_code
    */
-  common::ErrorCode Init(const VehicleParameter &params,
-                         CanSender<::apollo::canbus::Lincoln> *const can_sender,
-                         MessageManager<::apollo::canbus::Lincoln>
-                             *const message_manager) override;
+  common::ErrorCode Init(
+      const VehicleParameter &params,
+      CanSender<::apollo::canbus::Lincoln> *const can_sender,
+      CanReceiver<::apollo::canbus::Lincoln> *const can_receiver,
+      MessageManager<::apollo::canbus::Lincoln> *const message_manager)
+      override;
 
   /**
    * @brief start the vehicle controller.

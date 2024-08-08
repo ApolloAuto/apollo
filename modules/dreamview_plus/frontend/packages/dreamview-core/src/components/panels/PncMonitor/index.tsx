@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { Tabs, Checkbox, Popover, IconIcScreen } from '@dreamview/dreamview-ui';
+import { Tabs, Checkbox, Popover, IconPark } from '@dreamview/dreamview-ui';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
 import { useTranslation } from 'react-i18next';
 import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
@@ -46,7 +46,7 @@ function Filter(props: FilterProps) {
             content={content}
             title={t('filtrate')}
         >
-            <IconIcScreen className={classes['pnc-monitor-filter']} />
+            <IconPark name='IcScreen' className={classes['pnc-monitor-filter']} />
         </Popover>
     );
 }

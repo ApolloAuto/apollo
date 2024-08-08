@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconIcWarningMessage } from '../../../icons';
+import IconPark from '../../../IconPark';
 
 export default function NoDataPlaceHolder() {
     const { t } = useTranslation('panels');
@@ -13,7 +13,8 @@ export default function NoDataPlaceHolder() {
                 textAlign: 'center',
             }}
         >
-            <IconIcWarningMessage
+            <IconPark
+                name='IcWarningMessage'
                 style={{
                     color: '#FF8D26',
                     fontSize: 16,

@@ -1,5 +1,5 @@
 import React, { forwardRef, useMemo } from 'react';
-import { IconIcCommonRoutin, IconIcLocation, IconIcLoopRouting, IconIcWayPoint } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 import { FunctionalNameEnum } from './types';
 
@@ -23,28 +23,28 @@ function RoutingEditingFunctionalItem(
             case FunctionalNameEnum.RELOCATE:
                 return (
                     <i>
-                        <IconIcLocation />
+                        <IconPark name='IcLocation' />
                     </i>
                 );
 
             case FunctionalNameEnum.WAYPOINT:
                 return (
                     <i>
-                        <IconIcWayPoint />
+                        <IconPark name='IcWayPoint' />
                     </i>
                 );
 
             case FunctionalNameEnum.LOOP:
                 return (
                     <i>
-                        <IconIcLoopRouting />
+                        <IconPark name='IcLoopRouting' />
                     </i>
                 );
 
             case FunctionalNameEnum.FAVORITE:
                 return (
                     <i>
-                        <IconIcCommonRoutin />
+                        <IconPark name='IcCommonRoutin' />
                     </i>
                 );
             default:

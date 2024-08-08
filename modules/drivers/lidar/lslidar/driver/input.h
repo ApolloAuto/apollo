@@ -17,47 +17,49 @@
 #pragma once
 
 #include <unistd.h>
-
-
 #include <cstdio>
 #include <string>
-#include <pcap.h>
-#include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
 
+#include <pcap.h>
 #include "cyber/cyber.h"
+#include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace lslidar {
+namespace driver {
 
 static const size_t FIRING_DATA_PACKET_SIZE = 1212;
-static uint16_t MSOP_DATA_PORT_NUMBER =
-    2368;  // lslidar default data port on PC
+static uint16_t MSOP_DATA_PORT_NUMBER
+        = 2368;  // lslidar default data port on PC
 
 class Input {
  public:
-  Input(uint16_t portport = MSOP_DATA_PORT_NUMBER,
-        std::string lidar_ip = "192.168.1.200", int packet_size = 1212);
-  virtual ~Input();
-  virtual int GetPacket(LslidarPacket *pkt);
+    Input(uint16_t portport = MSOP_DATA_PORT_NUMBER,
+          std::string lidar_ip = "192.168.1.200",
+          int packet_size = 1212);
+    virtual ~Input();
+    virtual int GetPacket(LslidarPacket *pkt);
 
  protected:
-  int port_;
-  int sockfd_;
-  uint64_t pointcloudTimeStamp;
-  in_addr devip_;
-  int packet_size_;
+    int port_;
+    int sockfd_;
+    uint64_t pointcloudTimeStamp;
+    in_addr devip_;
+    int packet_size_;
 };
 
 /** @brief Live lslidar input from socket. */
 class InputSocket : public Input {
  public:
-  InputSocket(uint16_t port = MSOP_DATA_PORT_NUMBER,
-              std::string lidar_ip = "192.168.1.200", int packet_size = 1212);
+    InputSocket(
+            uint16_t port = MSOP_DATA_PORT_NUMBER,
+            std::string lidar_ip = "192.168.1.200",
+            int packet_size = 1212);
 
-  virtual ~InputSocket();
+    virtual ~InputSocket();
 
-  virtual int GetPacket(LslidarPacket *pkt);
+    virtual int GetPacket(LslidarPacket *pkt);
 };
 
 /** @brief lslidar input from PCAP dump file.
@@ -66,29 +68,34 @@ class InputSocket : public Input {
  */
 class InputPCAP : public Input {
  public:
-  InputPCAP(uint16_t port = MSOP_DATA_PORT_NUMBER,
-            std::string lidar_ip = "192.168.1.200", int packet_size = 1212,
-            double packet_rate = 0.0, std::string filename = "",
-            bool read_once = false, bool read_fast = false,
+    InputPCAP(
+            uint16_t port = MSOP_DATA_PORT_NUMBER,
+            std::string lidar_ip = "192.168.1.200",
+            int packet_size = 1212,
+            double packet_rate = 0.0,
+            std::string filename = "",
+            bool read_once = false,
+            bool read_fast = false,
             double repeat_delay = 0.0);
 
-  virtual ~InputPCAP();
+    virtual ~InputPCAP();
 
-  virtual int GetPacket(LslidarPacket *pkt);
+    virtual int GetPacket(LslidarPacket *pkt);
 
  private:
-  double packet_rate_;
-  std::string filename_;
-  pcap_t *pcap_;
-  bpf_program pcap_packet_filter_;
-  char errbuf_[PCAP_ERRBUF_SIZE];
-  bool empty_;
-  bool read_once_;
-  bool read_fast_;
-  double repeat_delay_;
-  std::string lidar_ip_;
+    double packet_rate_;
+    std::string filename_;
+    pcap_t *pcap_;
+    bpf_program pcap_packet_filter_;
+    char errbuf_[PCAP_ERRBUF_SIZE];
+    bool empty_;
+    bool read_once_;
+    bool read_fast_;
+    double repeat_delay_;
+    std::string lidar_ip_;
 };
 
+}  // namespace driver
 }  // namespace lslidar
 }  // namespace drivers
 }  // namespace apollo

@@ -21,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {

@@ -57,6 +57,7 @@ message MlfMotionRefinerConfig {
   optional double claping_acceleration_threshold = 1 [default = 10];
   optional double claping_speed_threshold = 2 [default = 1.0];
   optional double cyc_refine_speed = 3 [default = 1.2];
+  optional double car_refine_speed = 4 [default = 1.0];
 }
 
 message MlfShapeFilterConfig {
@@ -81,4 +82,6 @@ message MlfEngineConfig {
   optional bool use_frame_timestamp = 5 [default = false];
   optional bool set_static_outside_hdmap = 6 [default = false];
   optional bool print_debug_log = 7 [default = false];
+  optional double delay_time_output = 8 [default = 0.25];
+  optional uint32 pub_track_times = 9 [default = 1];
 }

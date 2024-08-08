@@ -40,6 +40,13 @@ enum class PointSemanticLabel {
   MAX_LABEL,
 };  // enum class PointSemanticLabel
 
+enum class PointMotionLabel {
+  UNKNOWN = 0,
+  STATIC = 1,
+  DYNAMIC = 2,
+  MAX_LABEL,
+};  // enum class PointMotionLabel
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

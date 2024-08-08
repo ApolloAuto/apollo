@@ -5,3 +5,4 @@ save_lidar_frame_message: false
 lidar_frame_output_dir: "/apollo/data/benchmark/model_dt"
 lidar_frame_channel_name: "/perception/lidar/detection"
 use_lidar_cooridinate: true
+timestamp_two_decimal_format: false

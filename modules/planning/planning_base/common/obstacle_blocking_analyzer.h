@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <string>
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/planning_base/common/frame.h"
 
@@ -55,6 +56,22 @@ bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
 
 bool IsParkedVehicle(const ReferenceLine& reference_line,
                      const Obstacle* obstacle);
+
+bool IsBlockingObstacleFarFromIntersection(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id);
+
+double DistanceBlockingObstacleToIntersection(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id);
+
+double DistanceBlockingObstacleToJunction(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id);
+
+bool IsBlockingObstacleWithinDestination(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id, const double threshold);
 
 }  // namespace planning
 }  // namespace apollo

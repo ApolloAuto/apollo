@@ -91,6 +91,7 @@ class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
   std::string lidar_frame_output_dir_;
   std::shared_ptr<apollo::cyber::Reader<LidarFrameMessage>> lidar_frame_reader_;
   bool use_lidar_cooridinate_ = false;
+  bool timestamp_two_decimal_format_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(LidarOutputComponent);

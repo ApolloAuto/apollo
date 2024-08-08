@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.cyber.benchmark;
+
+message BenchmarkMsg {
+  repeated uint32 data = 1;
+  optional bytes data_bytes = 2;
+}

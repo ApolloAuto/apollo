@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { IconIcCoverageHover, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import { apollo } from '@dreamview/dreamview';
 import { Subscription } from 'rxjs';
@@ -222,7 +222,7 @@ function Cloud() {
                 <ViewBtn carviz={carviz}>
                     <Popover placement='leftTop' trigger='click' content={layerMenuNode}>
                         <span className={classes['viz-btn-item']}>
-                            <IconIcCoverageHover />
+                            <IconPark name='IcCoverageHover' />
                         </span>
                     </Popover>
                     <Popover

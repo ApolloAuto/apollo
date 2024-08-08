@@ -24,6 +24,7 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus_vehicle/devkit/protocol/gear_command_103.h"
@@ -46,6 +47,7 @@ class DevkitController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Devkit>* const can_sender,
+      CanReceiver<::apollo::canbus::Devkit>* const can_receiver,
       MessageManager<::apollo::canbus::Devkit>* const message_manager) override;
 
   bool Start() override;
@@ -60,6 +62,11 @@ class DevkitController final
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+
+  /**
+   * @brief ccheck the chassis detail received or lost.
+   */
+  bool CheckChassisCommunicationError();
 
   /**
    * for test
@@ -91,6 +98,10 @@ class DevkitController final
   // drive with acceleration/deceleration
   // acc:-7.0~5.0 unit:m/s^2
   void Acceleration(double acc) override;
+
+  // drive with speed
+  // speed:-xx.0~xx.0 unit:m/s
+  void Speed(double speed);
 
   // steering with old angle speed
   // angle:-99.99~0.00~99.99, unit:, left:+, right:-
@@ -143,6 +154,9 @@ class DevkitController final
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
+  uint32_t lost_chassis_reveive_detail_count_ = 0;
+  bool is_need_count_ = true;
+  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace devkit

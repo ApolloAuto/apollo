@@ -30,6 +30,7 @@
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_interface_base/traffic_rules_base/traffic_decider.h"
 
@@ -47,6 +48,8 @@ class DependencyInjector;
 class HDMap;
 class LocalView;
 
+using apollo::common::SLPoint;
+using apollo::common::math::Vec2d;
 /**
  * @class planning
  *
@@ -82,6 +85,9 @@ class PlanningBase {
    */
   bool IsPlanningFinished(
       const ADCTrajectory::TrajectoryType& current_trajectory_type) const;
+
+  bool GenerateWidthOfLane(const Vec2d& current_location, Vec2d& left_point,
+                           Vec2d& right_point);
 
  protected:
   virtual void FillPlanningPb(const double timestamp,

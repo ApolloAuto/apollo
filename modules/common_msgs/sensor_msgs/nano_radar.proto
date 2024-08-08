@@ -1,0 +1,146 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message NanoObjectListStatus_60A {
+  optional int32 nof_objects = 1 [default = 0];
+  optional int32 meas_counter = 2 [default = -1];
+  optional int32 interface_version = 3;
+}
+
+
+
+message NanoRadarState_201 {
+  enum OutputType {
+    OUTPUT_TYPE_NONE = 0;
+    OUTPUT_TYPE_OBJECTS = 1;
+    OUTPUT_TYPE_CLUSTERS = 2;
+    OUTPUT_TYPE_ERROR = 3;
+  }
+  
+  enum RcsThreshold {
+    RCS_THRESHOLD_STANDARD = 0;
+    RCS_THRESHOLD_HIGH_SENSITIVITY = 1;
+    RCS_THRESHOLD_ERROR = 2;
+  }
+  
+  optional uint32 max_distance = 1;
+  optional uint32 radar_power = 2;
+  optional OutputType output_type = 3;
+  optional RcsThreshold rcs_threshold = 4;
+  optional bool send_quality = 5;
+  optional bool send_ext_info = 6;
+}
+
+message NanoSoftwareVersion_700 {
+  optional uint32 soft_major_release = 1;
+  optional uint32 soft_minor_release = 2;
+  optional uint32 soft_patch_level = 3;
+}
+
+message NanoCollisionDetectionRegionState_402 {
+  //                x axis  ^
+  //                        | longitude_dist
+  //     P2(Long2,Lat2)     |
+  //        ----------------------------------
+  //        |               |                |
+  //        |               |                |
+  //        |               |                |
+  //        ----------------------------------
+  //                        |             P1(Long1,Lat1)
+  //                        |
+  //                        |         lateral_dist
+  //                        --------------------->
+  //                                        y axis
+  //        ooooooooooooo   //radar front surface max:50m x 50m
+  optional uint32 region_id = 1;
+  optional uint32 region_max_output_number = 2;
+  optional double point1_longitude = 3;
+  optional double point1_lateral = 4;
+  optional double point2_longitude = 5;
+  optional double point2_lateral = 6;
+  optional bool coordinates_valid = 7;
+  optional bool activation_valid = 8;
+}
+
+message NanoRadarObs {
+  //                x axis  ^
+  //                        | longitude_dist
+  //                        |
+  //                        |
+  //                        |
+  //                        |     lateral_dist
+  //                        |           y axis
+  //                        ----------------->
+  //        ooooooooooooo   //radar front surface 77GHz
+
+  optional apollo.common.Header header = 1;
+  optional bool clusterortrack = 2;  // 0 = track, 1 = cluster
+  optional int32 obstacle_id = 3;    // obstacle Id
+  // longitude distance to the radar; (+) = target far away the radar unit = m
+  optional double longitude_dist = 4;
+  // lateral distance to the radar; (+) = right; unit = m
+  optional double lateral_dist = 5;
+  // longitude velocity to the radar; (+) = forward; unit = m/s
+  optional double longitude_vel = 6;
+  // lateral velocity to the radar; (+) = right; unit = m/s
+  optional double lateral_vel = 7;
+  // obstacle Radar Cross-Section; unit = dBsm
+  optional double rcs = 8;
+  // 0 = moving, 1 = stationary, 2 = oncoming, 3 = stationary candidate
+  // 4 = unknown, 5 = crossing stationary, 6 = crossing moving, 7 = stopped
+  optional int32 dynprop = 9;
+  // longitude distance standard deviation to the radar; (+) = forward; unit = m
+  optional double longitude_dist_rms = 10;
+  // lateral distance standard deviation to the radar; (+) = left; unit = m
+  optional double lateral_dist_rms = 11;
+  // longitude velocity standard deviation to the radar; (+) = forward; unit =
+  // m/s
+  optional double longitude_vel_rms = 12;
+  // lateral velocity standard deviation to the radar; (+) = left; unit = m/s
+  optional double lateral_vel_rms = 13;
+  // obstacle probability of existence
+  optional double probexist = 14;
+
+  // The following is only valid for the track object message
+  // 0 = deleted, 1 = new, 2 = measured, 3 = predicted, 4 = deleted for, 5 = new
+  // from merge
+  optional int32 meas_state = 15;
+  // longitude acceleration to the radar; (+) = forward; unit = m/s2
+  optional double longitude_accel = 16;
+  // lateral acceleration to the radar; (+) = left; unit = m/s2
+  optional double lateral_accel = 17;
+  // orientation angle to the radar; (+) = counterclockwise; unit = degree
+  optional double oritation_angle = 18;
+  // longitude acceleration standard deviation to the radar; (+) = forward; unit
+  // = m/s2
+  optional double longitude_accel_rms = 19;
+  // lateral acceleration standard deviation to the radar; (+) = left; unit =
+  // m/s2
+  optional double lateral_accel_rms = 20;
+  // orientation angle standard deviation to the radar; (+) = counterclockwise;
+  // unit = degree
+  optional double oritation_angle_rms = 21;
+  optional double length = 22;  // obstacle length; unit = m
+  optional double width = 23;   // obstacle width; unit = m
+  // 0: point; 1: car; 2: truck; 3: pedestrian; 4: motorcycle; 5: bicycle; 6:
+  // wide; 7: unknown
+  optional int32 obstacle_class = 24;
+  // Object Range
+  optional double obstacle_range = 25;
+  // Object Velocity
+  optional double obstacle_vel = 26;
+  // Object Angle
+  optional double obstacle_angle = 27;
+}
+
+message NanoRadar {
+  optional apollo.common.Header header = 1;
+  repeated NanoRadarObs contiobs = 2;  // conti radar obstacle array
+  optional NanoRadarState_201 radar_state = 3;
+  optional NanoCollisionDetectionRegionState_402 radar_region_state = 4;
+  optional NanoObjectListStatus_60A object_list_status = 6;
+  optional NanoSoftwareVersion_700 software_version = 7;
+}
