@@ -36,6 +36,7 @@
   <depend>livox-driver</depend>
   <depend>hesai2-driver</depend>
   <depend>vanjee-driver</depend>
+  <depend>seyond-driver</depend>
 
   <depend>bazel-extend-tools</depend>
   <depend expose="False">3rd-rules-python</depend>
