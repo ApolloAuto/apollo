@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>vanjeelidar</name>
+        <dag_conf>/apollo/modules/drivers/lidar/vanjeelidar/dag/vanjeelidar.dag</dag_conf>
+        <process_name>vanjeelidar</process_name>
+    </module>
+</cyber>
