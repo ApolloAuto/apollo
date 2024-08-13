@@ -9,7 +9,7 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map_creator --use_plane_inliers_only true \
+$APOLLO_BIN_PREFIX/modules/localization/msf/lossless_map_creator --use_plane_inliers_only true \
   --pcd_folders $1 \
   --pose_files $2 \
   --map_folder $4 \
@@ -17,7 +17,7 @@ $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map
   --coordinate_type UTM \
   --map_resolution_type single
 
-$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map_to_lossy_map \
+$APOLLO_BIN_PREFIX/modules/localization/msf/lossless_map_to_lossy_map \
   --srcdir $4/lossless_map \
   --dstdir $4
 

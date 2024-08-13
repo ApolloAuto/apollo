@@ -32,7 +32,7 @@ ODOMETRY_LOC_FILE="odometry_loc.txt"
 function data_exporter() {
   local BAG_FILE=$1
   local OUT_FOLDER=$2
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/cyber_record_parser \
+  $APOLLO_BIN_PREFIX/modules/localization/msf/cyber_record_parser \
     --bag_file $BAG_FILE \
     --out_folder $OUT_FOLDER \
     --cloud_topic $CLOUD_TOPIC \
@@ -44,20 +44,20 @@ function data_exporter() {
 
 function compare_poses() {
   local IN_FOLDER=$1
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
+  $APOLLO_BIN_PREFIX/modules/localization/msf/compare_poses \
     --in_folder $IN_FOLDER \
     --loc_file_a $GNSS_LOC_FILE \
     --loc_file_b $ODOMETRY_LOC_FILE \
     --imu_to_ant_offset_file "$ANT_IMU_FILE" \
     --compare_file "compare_gnss_odometry.txt"
 
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
+  $APOLLO_BIN_PREFIX/modules/localization/msf/compare_poses \
     --in_folder $IN_FOLDER \
     --loc_file_a $LIDAR_LOC_FILE \
     --loc_file_b $ODOMETRY_LOC_FILE \
     --compare_file "compare_lidar_odometry.txt"
 
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/compare_poses \
+  $APOLLO_BIN_PREFIX/modules/localization/msf/compare_poses \
     --in_folder $IN_FOLDER \
     --loc_file_a $FUSION_LOC_FILE \
     --loc_file_b $ODOMETRY_LOC_FILE \

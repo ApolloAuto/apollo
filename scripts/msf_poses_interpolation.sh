@@ -9,7 +9,7 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/poses_interpolator \
+$APOLLO_BIN_PREFIX/modules/localization/msf/poses_interpolator \
   --input_poses_path $1 \
   --ref_timestamps_path $2 \
   --extrinsic_path $3 \

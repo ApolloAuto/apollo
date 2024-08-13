@@ -26,7 +26,7 @@ OUT_FOLDER=$2
 function data_exporter() {
   local BAG_FILE=$1
   local OUT_FOLDER=$2
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/cyber_record_parser \
+  $APOLLO_BIN_PREFIX/modules/localization/msf/cyber_record_parser \
     --bag_file $BAG_FILE \
     --out_folder $OUT_FOLDER \
     --cloud_topic $CLOUD_TOPIC \
