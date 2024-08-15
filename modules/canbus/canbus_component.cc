@@ -88,30 +88,47 @@ bool CanbusComponent::Init() {
   chassis_cmd_reader_config.pending_queue_size =
       FLAGS_control_cmd_pending_queue_size;
 
+  // init cmd reader
   if (FLAGS_receive_guardian) {
     guardian_cmd_reader_ = node_->CreateReader<GuardianCommand>(
         guardian_cmd_reader_config,
         [this](const std::shared_ptr<GuardianCommand> &cmd) {
           ADEBUG << "Received guardian data: run canbus callback.";
+          const auto start_time = Time::Now().ToMicrosecond();
           OnGuardianCommand(*cmd);
+          const auto end_time = Time::Now().ToMicrosecond();
+          if ((end_time - start_time) * 1e-6 > FLAGS_guardian_period) {
+            AWARN << "Guardian callback time: "
+                  << (end_time - start_time) * 1e-3 << " ms.";
+          }
         });
   } else {
     control_command_reader_ = node_->CreateReader<ControlCommand>(
         control_cmd_reader_config,
         [this](const std::shared_ptr<ControlCommand> &cmd) {
           ADEBUG << "Received control data: run canbus callback.";
+          const auto start_time = Time::Now().ToMicrosecond();
           OnControlCommand(*cmd);
-        });
-    chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
-        chassis_cmd_reader_config,
-        [this](const std::shared_ptr<ChassisCommand> &cmd) {
-          ADEBUG << "Received control data: run canbus callback.";
-          OnChassisCommand(*cmd);
+          const auto end_time = Time::Now().ToMicrosecond();
+          if ((end_time - start_time) * 1e-6 > FLAGS_control_period) {
+            AWARN << "Control callback time: " << (end_time - start_time) * 1e-3
+                  << " ms.";
+          }
         });
   }
 
+  // init chassis cmd reader
+  chassis_command_reader_ = node_->CreateReader<ChassisCommand>(
+      chassis_cmd_reader_config,
+      [this](const std::shared_ptr<ChassisCommand> &cmd) {
+        ADEBUG << "Received control data: run canbus callback.";
+        OnChassisCommand(*cmd);
+      });
+
+  // init chassis writer
   chassis_writer_ = node_->CreateWriter<Chassis>(FLAGS_chassis_topic);
 
+  // start canbus vehicle
   if (!vehicle_object_->Start()) {
     AERROR << "Fail to start canclient, cansender, canreceiver, canclient, "
               "vehicle controller.";
@@ -138,54 +155,155 @@ void CanbusComponent::PublishChassis() {
   ADEBUG << chassis.ShortDebugString();
 }
 
-void CanbusComponent::CheckChassisCommunication() {
+bool CanbusComponent::Proc() {
+  const auto start_time = Time::Now().ToMicrosecond();
+
+  if (FLAGS_receive_guardian) {
+    guardian_cmd_reader_->Observe();
+    const auto &guardian_cmd_msg = guardian_cmd_reader_->GetLatestObserved();
+    if (guardian_cmd_msg == nullptr) {
+      AERROR << "guardian cmd msg is not ready!";
+    } else {
+      OnGuardianCommandCheck(*guardian_cmd_msg);
+    }
+  } else {
+    control_command_reader_->Observe();
+    const auto &control_cmd_msg = control_command_reader_->GetLatestObserved();
+    if (control_cmd_msg == nullptr) {
+      AERROR << "control cmd msg is not ready!";
+    } else {
+      OnControlCommandCheck(*control_cmd_msg);
+    }
+  }
+
+  // check can receiver msg lost
   if (vehicle_object_->CheckChassisCommunicationFault()) {
     AERROR << "Can not get the chassis info, please check the chassis "
               "communication!";
-    is_chassis_communicate_lost_ = true;
-  } else {
-    is_chassis_communicate_lost_ = false;
   }
-}
 
-bool CanbusComponent::Proc() {
-  CheckChassisCommunication();
+  // publish "/apollo/canbus/chassis"
   PublishChassis();
-  if (!is_chassis_communicate_lost_) {
-    if (FLAGS_enable_chassis_detail_pub) {
-      vehicle_object_->PublishChassisDetail();
-    }
+
+  // publish "/apollo/canbus/chassis_detail"
+  if (FLAGS_enable_chassis_detail_pub) {
+    vehicle_object_->PublishChassisDetail();
   }
+
+  // publish "/apollo/canbus/chassis_detail_sender"
+  if (FLAGS_enable_chassis_detail_sender_pub) {
+    vehicle_object_->PublishChassisDetailSender();
+  }
+
+  // update heartbeat in can sender
   vehicle_object_->UpdateHeartbeat();
+
+  const auto end_time = Time::Now().ToMicrosecond();
+  const double time_diff_ms = (end_time - start_time) * 1e-3;
+  if (time_diff_ms > (1 / FLAGS_chassis_freq * 1e3)) {
+    AWARN << "CanbusComponent::Proc() takes too much time: " << time_diff_ms
+          << " ms";
+  }
+
   return true;
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp = Time::Now().ToMicrosecond();
+  // us : microsecord = 1e-3 millisecond = 1e-6 second
+  double current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
+  // us < 5 ms(millisecond) *1000 (=5000us microsecord)
   if (current_timestamp - last_timestamp_controlcmd_ <
       FLAGS_min_cmd_interval * 1000) {
-    ADEBUG << "Control command comes too soon. Ignore.\n Required "
+    ADEBUG << "Control command comes too soon. Ignore. Required "
               "FLAGS_min_cmd_interval["
-           << FLAGS_min_cmd_interval << "], actual time interval["
-           << current_timestamp - last_timestamp_controlcmd_ << "].";
+           << FLAGS_min_cmd_interval << "] ms, actual time interval["
+           << (current_timestamp - last_timestamp_controlcmd_) * 1e-3
+           << "] ms.";
     return;
   }
-
   last_timestamp_controlcmd_ = current_timestamp;
-  ADEBUG << "Control_sequence_number:"
-         << control_command.header().sequence_num() << ", Time_of_delay:"
-         << current_timestamp -
-                static_cast<int64_t>(control_command.header().timestamp_sec() *
-                                     1e6)
-         << " micro seconds";
 
-  vehicle_object_->UpdateCommand(&control_command);
+  if (!is_control_cmd_time_delay_) {
+    vehicle_object_->UpdateCommand(&control_command);
+  }
+}
+
+void CanbusComponent::OnControlCommandCheck(
+    const ControlCommand &control_command) {
+  // us : microsecord = 1e-3 millisecond = 1e-6 second
+  double current_timestamp = Time::Now().ToMicrosecond();
+  // cmd_time_diff: s
+  double cmd_time_diff =
+      current_timestamp * 1e-6 - control_command.header().timestamp_sec();
+  if (FLAGS_use_control_cmd_check &&
+      (cmd_time_diff > (FLAGS_max_control_miss_num * FLAGS_control_period))) {
+    AERROR << "Control cmd timeout, sequence_number:"
+           << control_command.header().sequence_num()
+           << ", Time_of_delay:" << cmd_time_diff << " s"
+           << ", time delay threshold: "
+           << (FLAGS_max_control_miss_num * FLAGS_control_period) << " s";
+
+    if (vehicle_object_->Driving_Mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_STEER_ONLY ||
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY) {
+      is_control_cmd_time_delay_ = true;
+      GuardianCommand new_guardian_command;
+      new_guardian_command.mutable_control_command()->CopyFrom(control_command);
+      ProcessGuardianCmdTimeout(&new_guardian_command);
+      ADEBUG << "new_guardian_command is "
+             << new_guardian_command.ShortDebugString();
+      vehicle_object_->UpdateCommand(&new_guardian_command.control_command());
+    }
+  } else {
+    is_control_cmd_time_delay_ = false;
+  }
+}
+
+void CanbusComponent::OnGuardianCommand(
+    const GuardianCommand &guardian_command) {
+  if (!is_control_cmd_time_delay_) {
+    OnControlCommand(guardian_command.control_command());
+  }
+}
+
+void CanbusComponent::OnGuardianCommandCheck(
+    const GuardianCommand &guardian_command) {
+  // us : microsecord = 1e-3 millisecond = 1e-6 second
+  double current_timestamp = Time::Now().ToMicrosecond();
+  // cmd_time_diff: s
+  double guardian_cmd_time_diff =
+      current_timestamp * 1e-6 - guardian_command.header().timestamp_sec();
+  if (FLAGS_use_guardian_cmd_check &&
+      (guardian_cmd_time_diff >
+       (FLAGS_max_guardian_miss_num * FLAGS_guardian_period))) {
+    AERROR << "Guardain cmd timeout, sequence_number:"
+           << guardian_command.header().sequence_num()
+           << ", Time_of_delay:" << guardian_cmd_time_diff << " s"
+           << ", time delay threshold: "
+           << (FLAGS_max_guardian_miss_num * FLAGS_guardian_period) << " s";
+
+    if (vehicle_object_->Driving_Mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_STEER_ONLY ||
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY) {
+      is_control_cmd_time_delay_ = true;
+      GuardianCommand new_guardian_command;
+      new_guardian_command.CopyFrom(guardian_command);
+      ProcessGuardianCmdTimeout(&new_guardian_command);
+      ADEBUG << "new_guardian_command is "
+             << new_guardian_command.ShortDebugString();
+      vehicle_object_->UpdateCommand(&new_guardian_command.control_command());
+    }
+  } else {
+    is_control_cmd_time_delay_ = false;
+  }
 }
 
 void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
+  // us : microsecord = 1e-3 millisecond = 1e-6 second
   int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
+  // us < 5 ms(millisecond) *1000 (=5000us microsecord)
   if (current_timestamp - last_timestamp_chassiscmd_ <
       FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
@@ -194,8 +312,8 @@ void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
            << current_timestamp - last_timestamp_chassiscmd_ << "].";
     return;
   }
-
   last_timestamp_chassiscmd_ = current_timestamp;
+
   ADEBUG << "Control_sequence_number:"
          << chassis_command.header().sequence_num() << ", Time_of_delay:"
          << current_timestamp -
@@ -206,14 +324,45 @@ void CanbusComponent::OnChassisCommand(const ChassisCommand &chassis_command) {
   vehicle_object_->UpdateCommand(&chassis_command);
 }
 
-void CanbusComponent::OnGuardianCommand(
-    const GuardianCommand &guardian_command) {
-  OnControlCommand(guardian_command.control_command());
-}
-
 common::Status CanbusComponent::OnError(const std::string &error_msg) {
   monitor_logger_buffer_.ERROR(error_msg);
   return ::apollo::common::Status(ErrorCode::CANBUS_ERROR, error_msg);
+}
+
+void CanbusComponent::ProcessTimeoutByClearCanSender() {
+  if (vehicle_object_->Driving_Mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      vehicle_object_->Driving_Mode() != Chassis::AUTO_STEER_ONLY &&
+      vehicle_object_->Driving_Mode() != Chassis::AUTO_SPEED_ONLY &&
+      !FLAGS_chassis_debug_mode) {
+    ADEBUG << "The current driving mode does not need to check cmd timeout.";
+    if (vehicle_object_->IsSendProtocolClear()) {
+      AINFO << "send protocol is clear, ignore driving mode, need to recover "
+               "send protol.";
+      vehicle_object_->AddSendProtocol();
+    }
+    return;
+  }
+
+  if (!is_control_cmd_time_delay_previous_ && is_control_cmd_time_delay_) {
+    AINFO << "control cmd time latency delay, clear send protocol.";
+    vehicle_object_->ClearSendProtocol();
+  } else if (is_control_cmd_time_delay_previous_ &&
+             !is_control_cmd_time_delay_) {
+    AINFO << "control cmd time latency reover, add send protocol.";
+    if (vehicle_object_->IsSendProtocolClear()) {
+      vehicle_object_->AddSendProtocol();
+    }
+  }
+  is_control_cmd_time_delay_previous_ = is_control_cmd_time_delay_;
+}
+
+void CanbusComponent::ProcessGuardianCmdTimeout(
+    GuardianCommand *guardian_command) {
+  AINFO << "Into cmd timeout process, set estop.";
+  guardian_command->mutable_control_command()->set_throttle(0.0);
+  guardian_command->mutable_control_command()->set_steering_target(0.0);
+  guardian_command->mutable_control_command()->set_steering_rate(25.0);
+  guardian_command->mutable_control_command()->set_brake(FLAGS_estop_brake);
 }
 
 }  // namespace canbus

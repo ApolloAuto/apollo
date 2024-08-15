@@ -169,6 +169,10 @@ class CanSender {
   void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
                   bool init_with_one = false);
 
+  void ClearMessage();
+
+  bool IsMessageClear();
+
   /**
    * @brief Start the CAN sender.
    * @return The error code indicating the status of this action.
@@ -336,11 +340,10 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         AINFO << "send_can_frame#" << can_frame.CanFrameString();
       }
       {
-        bool is_recv_prase = false;
         uint32_t uid = can_frame.id;
         const uint8_t *data = can_frame.data;
         uint8_t len = can_frame.len;
-        pt_manager_->Parse(uid, data, len, is_recv_prase);
+        pt_manager_->ParseSender(uid, data, len);
       }
     }
     delta_period = new_delta_period;
@@ -419,6 +422,19 @@ void CanSender<SensorType>::Update() {
   for (auto &message : send_messages_) {
     message.Update();
   }
+}
+
+template <typename SensorType>
+void CanSender<SensorType>::ClearMessage() {
+  send_messages_.clear();
+}
+
+template <typename SensorType>
+bool CanSender<SensorType>::IsMessageClear() {
+  if (send_messages_.empty()) {
+    return true;
+  }
+  return false;
 }
 
 template <typename SensorType>

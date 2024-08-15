@@ -47,7 +47,6 @@ class GemControllerTest : public ::testing::Test {
  protected:
   GemController controller_;
   CanSender<::apollo::canbus::Gem> sender_;
-  CanReceiver<::apollo::canbus::Gem> receiver_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   GemMessageManager msg_manager_;
@@ -55,8 +54,7 @@ class GemControllerTest : public ::testing::Test {
 };
 
 TEST_F(GemControllerTest, Init) {
-  ErrorCode ret =
-      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -64,7 +62,7 @@ TEST_F(GemControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
@@ -72,7 +70,7 @@ TEST_F(GemControllerTest, SetDrivingMode) {
 }
 
 TEST_F(GemControllerTest, Status) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
@@ -84,7 +82,7 @@ TEST_F(GemControllerTest, Status) {
 }
 
 TEST_F(GemControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),

@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus_vehicle/zhongyun/zhongyun_controller.h"
-
 #include <string>
 
 #include "gtest/gtest.h"
@@ -24,8 +22,8 @@
 #include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/common/file.h"
+#include "modules/canbus_vehicle/zhongyun/zhongyun_controller.h"
 #include "modules/canbus_vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
@@ -48,7 +46,6 @@ class ZhongyunControllerTest : public ::testing::Test {
  protected:
   ZhongyunController controller_;
   CanSender<Zhongyun> sender_;
-  CanReceiver<Zhongyun> receiver_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   ZhongyunMessageManager msg_manager_;
@@ -56,8 +53,7 @@ class ZhongyunControllerTest : public ::testing::Test {
 };
 
 TEST_F(ZhongyunControllerTest, Init) {
-  ErrorCode ret =
-      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -65,7 +61,7 @@ TEST_F(ZhongyunControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
@@ -73,7 +69,7 @@ TEST_F(ZhongyunControllerTest, SetDrivingMode) {
 }
 
 TEST_F(ZhongyunControllerTest, Status) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
@@ -85,7 +81,7 @@ TEST_F(ZhongyunControllerTest, Status) {
 }
 
 TEST_F(ZhongyunControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),

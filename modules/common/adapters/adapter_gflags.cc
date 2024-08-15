@@ -27,6 +27,9 @@ DEFINE_string(audio_detection_topic, "/apollo/audio_detection",
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
+DEFINE_string(chassis_detail_sender_topic,
+              "/apollo/canbus/chassis_detail_sender",
+              "chassis detail sender_topic name");
 DEFINE_string(chassis_command_topic, "/apollo/chassis_control",
               "chassis command topic name");
 DEFINE_string(localization_topic, "/apollo/localization/pose",

@@ -21,7 +21,19 @@ namespace canbus {
 
 void AbstractVehicleFactory::UpdateHeartbeat() {}
 
+void AbstractVehicleFactory::PublishChassisDetailSender() {}
+
 bool AbstractVehicleFactory::CheckChassisCommunicationFault() { return false; }
+
+void AbstractVehicleFactory::AddSendProtocol() {}
+
+void AbstractVehicleFactory::ClearSendProtocol() {}
+
+bool AbstractVehicleFactory::IsSendProtocolClear() { return false; }
+
+Chassis::DrivingMode AbstractVehicleFactory::Driving_Mode() {
+  return Chassis::COMPLETE_MANUAL;
+}
 
 void AbstractVehicleFactory::SetVehicleParameter(
     const VehicleParameter &vehicle_parameter) {

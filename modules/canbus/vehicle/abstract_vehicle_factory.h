@@ -24,7 +24,6 @@
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/class_loader/class_loader_register_macro.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -95,6 +94,11 @@ class AbstractVehicleFactory {
   virtual void PublishChassisDetail() = 0;
 
   /**
+   * @brief publish chassis for vehicle messages
+   */
+  virtual void PublishChassisDetailSender();
+
+  /**
    * @brief create cansender heartbeat
    */
   virtual void UpdateHeartbeat();
@@ -103,6 +107,26 @@ class AbstractVehicleFactory {
    * @brief check chassis detail communication fault
    */
   virtual bool CheckChassisCommunicationFault();
+
+  /**
+   * @brief add send protocol message
+   */
+  virtual void AddSendProtocol();
+
+  /**
+   * @brief clear send protocol message, make a sender can error
+   */
+  virtual void ClearSendProtocol();
+
+  /**
+   * @brief check send protocol message whether is clear or not
+   */
+  virtual bool IsSendProtocolClear();
+
+  /**
+   * @brief get chassis driving mode
+   */
+  virtual Chassis::DrivingMode Driving_Mode();
 
  private:
   VehicleParameter vehicle_parameter_;

@@ -178,12 +178,11 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
     }
     receive_none_count = 0;
 
-    bool is_recv_prase = true;
     for (const auto &frame : buf) {
       uint8_t len = frame.len;
       uint32_t uid = frame.id;
       const uint8_t *data = frame.data;
-      pt_manager_->Parse(uid, data, len, is_recv_prase);
+      pt_manager_->Parse(uid, data, len);
       if (enable_log_) {
         AINFO << "recv_can_frame#" << frame.CanFrameString();
       }

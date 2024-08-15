@@ -44,7 +44,6 @@ class Neolix_eduController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Neolix_edu>* const can_sender,
-      CanReceiver<::apollo::canbus::Neolix_edu>* const can_receiver,
       MessageManager<::apollo::canbus::Neolix_edu>* const message_manager)
       override;
 
@@ -60,11 +59,18 @@ class Neolix_eduController final
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+
+  /**
+   * @brief add the sender message.
+   */
+  void AddSendMessage() override;
+
+  /**
+   * for test
+   */
   FRIEND_TEST(Neolix_eduControllerTest, SetDrivingMode);
   FRIEND_TEST(Neolix_eduControllerTest, Status);
   FRIEND_TEST(Neolix_eduControllerTest, UpdateDrivingMode);
-
-  bool CheckChassisCommunicationError();
 
  private:
   // main logical function for operation the car enter or exit the auto driving
@@ -136,9 +142,6 @@ class Neolix_eduController final
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
-  uint32_t lost_chassis_reveive_detail_count_ = 0;
-  bool is_need_count_ = true;
-  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace neolix_edu

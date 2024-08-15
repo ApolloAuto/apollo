@@ -30,6 +30,8 @@
 #include "modules/common_msgs/external_command_msgs/chassis_command.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
+#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -43,6 +45,7 @@
 namespace apollo {
 namespace canbus {
 
+using apollo::cyber::Time;
 using ::apollo::drivers::canbus::CanReceiver;
 using ::apollo::drivers::canbus::CanSender;
 using ::apollo::drivers::canbus::MessageManager;
@@ -66,7 +69,6 @@ class VehicleController {
    */
   virtual common::ErrorCode Init(
       const VehicleParameter &params, CanSender<SensorType> *const can_sender,
-      CanReceiver<SensorType> *const can_receiver,
       MessageManager<SensorType> *const message_manager) = 0;
 
   /**
@@ -94,6 +96,7 @@ class VehicleController {
   virtual common::ErrorCode Update(const control::ControlCommand &command);
   virtual common::ErrorCode Update(
       const external_command::ChassisCommand &command);
+
   /**
    * @brief set vehicle to appointed driving mode.
    * @param driving mode to be appointed.
@@ -101,6 +104,16 @@ class VehicleController {
    */
   virtual common::ErrorCode SetDrivingMode(
       const Chassis::DrivingMode &driving_mode);
+
+  virtual bool CheckChassisCommunicationError();
+
+  virtual void AddSendMessage();
+
+  virtual SensorType GetNewRecvChassisDetail();
+
+  virtual SensorType GetNewSenderChassisDetail();
+
+  virtual Chassis::DrivingMode driving_mode();
 
  private:
   /*
@@ -192,7 +205,6 @@ class VehicleController {
   virtual bool VerifyID() = 0;
 
  protected:
-  virtual Chassis::DrivingMode driving_mode();
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
 
  protected:
@@ -207,11 +219,118 @@ class VehicleController {
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command
   std::mutex mode_mutex_;  // only use in this base class
+  uint32_t lost_chassis_reveive_detail_count_ = 0;  // check chassis detail lost
+  bool is_need_count_ = true;                       // check chassis detail lost
+  size_t sender_data_size_previous_ = 0.0;       // check apollo sender preiod
+  int64_t start_time_ = 0;                       // check apollo sender preiod
+  bool is_chassis_communication_error_ = false;  // check chassis communication
 };
 
 using common::ErrorCode;
 using control::ControlCommand;
 using external_command::ChassisCommand;
+
+template <typename SensorType>
+bool VehicleController<SensorType>::CheckChassisCommunicationError() {
+  SensorType chassis_detail_sender;
+  if (message_manager_->GetSensorCheckSenderData(&chassis_detail_sender) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get " << typeid(SensorType).name()
+                      << " chassis receive detail failed.";
+  }
+  size_t sender_data_size = chassis_detail_sender.ByteSizeLong();
+  ADEBUG << "check chassis detail sender_data_size is " << sender_data_size;
+  int64_t end_time = 0;
+  if ((sender_data_size_previous_ < 2) && (sender_data_size > 2)) {
+    end_time = ::apollo::cyber::Time::Now().ToMicrosecond();
+    ADEBUG << "end_time is " << end_time;
+    if (start_time_ > 0) {
+      const double sender_diff = (end_time - start_time_) * 1e-3;
+      ADEBUG << "sender protocol preiod is " << sender_diff;
+    }
+  } else if ((sender_data_size_previous_ > 2) && (sender_data_size < 2)) {
+    start_time_ = ::apollo::cyber::Time::Now().ToMicrosecond();
+    ADEBUG << "start_time_ is " << start_time_;
+  }
+  sender_data_size_previous_ = sender_data_size;
+  message_manager_->ClearSensorCheckSenderData();
+
+  SensorType chassis_detail_receiver;
+  if (message_manager_->GetSensorCheckRecvData(&chassis_detail_receiver) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get " << typeid(SensorType).name()
+                      << " chassis receive detail failed.";
+  }
+  ADEBUG << "chassis_detail_receiver is "
+         << chassis_detail_receiver.ShortDebugString();
+  size_t receiver_data_size = chassis_detail_receiver.ByteSizeLong();
+  ADEBUG << "check chassis detail receiver_data_size is " << receiver_data_size;
+  // check receiver data is null
+  if (receiver_data_size < 2) {
+    if (is_need_count_) {
+      lost_chassis_reveive_detail_count_++;
+    }
+  } else {
+    lost_chassis_reveive_detail_count_ = 0;
+    is_need_count_ = true;
+  }
+  ADEBUG << "lost_chassis_reveive_detail_count_ is "
+         << lost_chassis_reveive_detail_count_;
+  // check receive data lost threshold is (100 * 10)ms
+  if (lost_chassis_reveive_detail_count_ > 100) {
+    is_need_count_ = false;
+    is_chassis_communication_error_ = true;
+    AERROR << typeid(SensorType).name()
+           << " chassis detail is lost, please check the "
+              "communication error.";
+    message_manager_->ClearSensorCheckRecvData();
+    message_manager_->ResetSendMessages();
+    return true;
+  } else {
+    is_chassis_communication_error_ = false;
+  }
+  message_manager_->ClearSensorCheckRecvData();
+
+  return false;
+}
+
+template <typename SensorType>
+void VehicleController<SensorType>::AddSendMessage() {}
+
+template <typename SensorType>
+SensorType VehicleController<SensorType>::GetNewRecvChassisDetail() {
+  SensorType receiver_chassis_detail;
+  if (message_manager_->GetSensorRecvData(&receiver_chassis_detail) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get " << typeid(SensorType).name()
+                      << " chassis detail receiver failed.";
+    return receiver_chassis_detail;
+  }
+  ADEBUG << "receiver_chassis_detail is "
+         << receiver_chassis_detail.ShortDebugString();
+  if (is_chassis_communication_error_) {
+    message_manager_->ClearSensorRecvData();
+  }
+  return receiver_chassis_detail;
+}
+
+template <typename SensorType>
+SensorType VehicleController<SensorType>::GetNewSenderChassisDetail() {
+  SensorType sender_chassis_detail;
+  if (message_manager_->GetSensorSenderData(&sender_chassis_detail) !=
+      ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get " << typeid(SensorType).name()
+                      << " chassis detail receiver failed.";
+    return sender_chassis_detail;
+  }
+  message_manager_->GetSensorSenderData(&sender_chassis_detail);
+  ADEBUG << "sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  if (can_sender_->IsMessageClear()) {
+    message_manager_->ClearSensorSenderData();
+  }
+  return sender_chassis_detail;
+}
 
 template <typename SensorType>
 Chassis::DrivingMode VehicleController<SensorType>::driving_mode() {
@@ -291,38 +410,52 @@ ErrorCode VehicleController<SensorType>::Update(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  // Execute action to transform driving mode
   if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
-    AINFO << "Canbus received pad msg: "
-          << control_command.pad_msg().ShortDebugString();
-    if (control_command.pad_msg().action() == control::DrivingAction::VIN_REQ) {
-      if (!VerifyID()) {
-        AINFO << "Response vid failed, please request again.";
+    ADEBUG << "Canbus received pad msg: "
+           << control_command.pad_msg().ShortDebugString();
+    const double current_timestamp = Time::Now().ToSecond();
+    // pad_msg_time_diff: s
+    const double pad_msg_time_diff =
+        current_timestamp - control_command.pad_msg().header().timestamp_sec();
+    // Execute action to transform driving mode
+    if ((FLAGS_chassis_debug_mode ||
+         (pad_msg_time_diff < FLAGS_pad_msg_delay_interval)) &&
+        !is_chassis_communication_error_) {
+      if (control_command.pad_msg().action() ==
+          control::DrivingAction::VIN_REQ) {
+        if (!VerifyID()) {
+          AINFO << "Response vid failed, please request again.";
+        } else {
+          AINFO << "Response vid success!";
+        }
       } else {
-        AINFO << "Response vid success!";
+        Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
+        switch (control_command.pad_msg().action()) {
+          case control::DrivingAction::START: {
+            mode = Chassis::COMPLETE_AUTO_DRIVE;
+            break;
+          }
+          case control::DrivingAction::RESET: {
+            // In COMPLETE_MANUAL mode
+            AINFO << "Into the Reset action.";
+            break;
+          }
+          default: {
+            AERROR << "No response for this action.";
+            break;
+          }
+        }
+        auto error_code = SetDrivingMode(mode);
+        if (error_code != ErrorCode::OK) {
+          AERROR << "Failed to set driving mode.";
+        } else {
+          AINFO << "Set driving mode success.";
+        }
       }
     } else {
-      Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
-      switch (control_command.pad_msg().action()) {
-        case control::DrivingAction::START: {
-          mode = Chassis::COMPLETE_AUTO_DRIVE;
-          break;
-        }
-        case control::DrivingAction::RESET: {
-          // In COMPLETE_MANUAL mode
-          break;
-        }
-        default: {
-          AERROR << "No response for this action.";
-          break;
-        }
-      }
-      auto error_code = SetDrivingMode(mode);
-      if (error_code != ErrorCode::OK) {
-        AERROR << "Failed to set driving mode.";
-      } else {
-        AINFO << "Set driving mode success.";
-      }
+      ADEBUG << "pad msg time out, current time interval is "
+             << pad_msg_time_diff << " s, threshold is "
+             << FLAGS_pad_msg_delay_interval << " s";
     }
   }
 

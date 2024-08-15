@@ -19,13 +19,12 @@
 #include <string>
 
 #include "gtest/gtest.h"
+#include "cyber/common/file.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus_vehicle/wey/proto/wey.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
-#include "cyber/common/file.h"
 #include "modules/canbus_vehicle/wey/wey_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
@@ -48,7 +47,6 @@ class WeyControllerTest : public ::testing::Test {
  protected:
   WeyController controller_;
   CanSender<::apollo::canbus::Wey> sender_;
-  CanReceiver<::apollo::canbus::Wey> receiver_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   WeyMessageManager msg_manager_;
@@ -56,8 +54,7 @@ class WeyControllerTest : public ::testing::Test {
 };
 
 TEST_F(WeyControllerTest, Init) {
-  ErrorCode ret =
-      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -65,7 +62,7 @@ TEST_F(WeyControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
@@ -73,7 +70,7 @@ TEST_F(WeyControllerTest, SetDrivingMode) {
 }
 
 TEST_F(WeyControllerTest, Status) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
@@ -85,7 +82,7 @@ TEST_F(WeyControllerTest, Status) {
 }
 
 TEST_F(WeyControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),

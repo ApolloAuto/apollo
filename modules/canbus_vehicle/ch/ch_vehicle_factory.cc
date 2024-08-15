@@ -69,7 +69,6 @@ bool ChVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
-                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -83,6 +82,9 @@ bool ChVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   chassis_detail_writer_ =
       node_->CreateWriter<::apollo::canbus::Ch>(FLAGS_chassis_detail_topic);
+
+  chassis_detail_sender_writer_ = node_->CreateWriter<::apollo::canbus::Ch>(
+      FLAGS_chassis_detail_sender_topic);
 
   return true;
 }
@@ -152,10 +154,16 @@ Chassis ChVehicleFactory::publish_chassis() {
 }
 
 void ChVehicleFactory::PublishChassisDetail() {
-  Ch chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
+  Ch chassis_detail = vehicle_controller_->GetNewRecvChassisDetail();
+  ADEBUG << "latest chassis_detail is " << chassis_detail.ShortDebugString();
   chassis_detail_writer_->Write(chassis_detail);
+}
+
+void ChVehicleFactory::PublishChassisDetailSender() {
+  Ch sender_chassis_detail = vehicle_controller_->GetNewSenderChassisDetail();
+  ADEBUG << "latest sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  chassis_detail_sender_writer_->Write(sender_chassis_detail);
 }
 
 bool ChVehicleFactory::CheckChassisCommunicationFault() {
@@ -165,8 +173,10 @@ bool ChVehicleFactory::CheckChassisCommunicationFault() {
   return false;
 }
 
-std::unique_ptr<ch::ChController> ChVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<ch::ChController>(new ch::ChController());
+std::unique_ptr<VehicleController<::apollo::canbus::Ch>>
+ChVehicleFactory::CreateVehicleController() {
+  return std::unique_ptr<VehicleController<::apollo::canbus::Ch>>(
+      new ch::ChController());
 }
 
 std::unique_ptr<MessageManager<::apollo::canbus::Ch>>

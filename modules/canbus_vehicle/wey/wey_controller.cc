@@ -43,7 +43,6 @@ double angle_init = 0;
 ErrorCode WeyController::Init(
     const VehicleParameter& params,
     CanSender<::apollo::canbus::Wey>* const can_sender,
-    CanReceiver<::apollo::canbus::Wey>* const can_receiver,
     MessageManager<::apollo::canbus::Wey>* const message_manager) {
   if (is_initialized_) {
     AINFO << "WeyController has already been initialized.";
@@ -62,12 +61,6 @@ ErrorCode WeyController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
-
-  if (can_receiver == nullptr) {
-    AERROR << "Canbus receiver is null.";
-    return ErrorCode::CANBUS_ERROR;
-  }
-  can_receiver_ = can_receiver;
 
   if (message_manager == nullptr) {
     AERROR << "Protocol manager is null.";

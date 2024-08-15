@@ -54,15 +54,13 @@ class Neolix_eduControllerTest : public ::testing::Test {
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
   CanSender<::apollo::canbus::Neolix_edu> sender_;
-  CanReceiver<::apollo::canbus::Neolix_edu> receiver_;
   Neolix_eduMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
 };
 
 TEST_F(Neolix_eduControllerTest, Init) {
-  ErrorCode ret =
-      controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
@@ -70,14 +68,14 @@ TEST_F(Neolix_eduControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(chassis.driving_mode());
   EXPECT_EQ(controller_.driving_mode(), chassis.driving_mode());
   EXPECT_EQ(controller_.SetDrivingMode(chassis.driving_mode()), ErrorCode::OK);
 }
 
 TEST_F(Neolix_eduControllerTest, Status) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
   controller_.SetHorn(control_cmd_.signal());
@@ -88,7 +86,7 @@ TEST_F(Neolix_eduControllerTest, Status) {
 }
 
 TEST_F(Neolix_eduControllerTest, UpdateDrivingMode) {
-  controller_.Init(params_, &sender_, &receiver_, &msg_manager_);
+  controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.SetDrivingMode(Chassis::COMPLETE_MANUAL),
             ErrorCode::OK);

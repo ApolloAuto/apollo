@@ -69,7 +69,6 @@ bool Neolix_eduVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
-                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -83,6 +82,10 @@ bool Neolix_eduVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   chassis_detail_writer_ = node_->CreateWriter<::apollo::canbus::Neolix_edu>(
       FLAGS_chassis_detail_topic);
+
+  chassis_detail_sender_writer_ =
+      node_->CreateWriter<::apollo::canbus::Neolix_edu>(
+          FLAGS_chassis_detail_sender_topic);
 
   return true;
 }
@@ -152,10 +155,21 @@ Chassis Neolix_eduVehicleFactory::publish_chassis() {
 }
 
 void Neolix_eduVehicleFactory::PublishChassisDetail() {
-  Neolix_edu chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
+  Neolix_edu chassis_detail = vehicle_controller_->GetNewRecvChassisDetail();
+  ADEBUG << "latest chassis_detail is " << chassis_detail.ShortDebugString();
   chassis_detail_writer_->Write(chassis_detail);
+}
+
+void Neolix_eduVehicleFactory::PublishChassisDetailSender() {
+  Neolix_edu sender_chassis_detail =
+      vehicle_controller_->GetNewSenderChassisDetail();
+  ADEBUG << "latest sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  chassis_detail_sender_writer_->Write(sender_chassis_detail);
+}
+
+void Neolix_eduVehicleFactory::UpdateHeartbeat() {
+  can_sender_.Update_Heartbeat();
 }
 
 bool Neolix_eduVehicleFactory::CheckChassisCommunicationFault() {
@@ -165,9 +179,28 @@ bool Neolix_eduVehicleFactory::CheckChassisCommunicationFault() {
   return false;
 }
 
-std::unique_ptr<neolix_edu::Neolix_eduController>
+void Neolix_eduVehicleFactory::AddSendProtocol() {
+  vehicle_controller_->AddSendMessage();
+}
+
+void Neolix_eduVehicleFactory::ClearSendProtocol() {
+  can_sender_.ClearMessage();
+}
+
+bool Neolix_eduVehicleFactory::IsSendProtocolClear() {
+  if (can_sender_.IsMessageClear()) {
+    return true;
+  }
+  return false;
+}
+
+Chassis::DrivingMode Neolix_eduVehicleFactory::Driving_Mode() {
+  return vehicle_controller_->driving_mode();
+}
+
+std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>>
 Neolix_eduVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<neolix_edu::Neolix_eduController>(
+  return std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>>(
       new neolix_edu::Neolix_eduController());
 }
 

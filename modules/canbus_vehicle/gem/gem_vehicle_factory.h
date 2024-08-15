@@ -26,12 +26,9 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/gem/proto/gem.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus_vehicle/gem/gem_controller.h"
-#include "modules/canbus_vehicle/gem/gem_message_manager.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -99,7 +96,8 @@ class GemVehicleFactory : public AbstractVehicleFactory {
    * @brief create Gem vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<gem::GemController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::Gem>>
+  CreateVehicleController();
 
   /**
    * @brief create Gem message manager
@@ -112,7 +110,7 @@ class GemVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Gem> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Gem> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Gem>> message_manager_;
-  std::unique_ptr<gem::GemController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Gem>> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Gem>>
       chassis_detail_writer_;

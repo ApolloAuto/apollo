@@ -82,13 +82,18 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
 
   void PublishChassis();
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
+  void OnControlCommandCheck(
+      const apollo::control::ControlCommand &control_command);
   void OnChassisCommand(
       const apollo::external_command::ChassisCommand &chassis_command);
   void OnGuardianCommand(
       const apollo::guardian::GuardianCommand &guardian_command);
+  void OnGuardianCommandCheck(
+      const apollo::guardian::GuardianCommand &guardian_command);
   apollo::common::Status OnError(const std::string &error_msg);
-  void RegisterCanClients();
-  void CheckChassisCommunication();
+  void ProcessTimeoutByClearCanSender();
+  void ProcessGuardianCmdTimeout(
+      apollo::guardian::GuardianCommand *guardian_command);
 
   CanbusConf canbus_conf_;
   std::shared_ptr<::apollo::canbus::AbstractVehicleFactory> vehicle_object_ =
@@ -99,11 +104,12 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
       control_command_reader_;
   std::shared_ptr<cyber::Reader<apollo::external_command::ChassisCommand>>
       chassis_command_reader_;
-  int64_t last_timestamp_controlcmd_ = 0;
+  double last_timestamp_controlcmd_ = 0.0;
   int64_t last_timestamp_chassiscmd_ = 0;
   ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;
-  bool is_chassis_communicate_lost_ = false;
+  bool is_control_cmd_time_delay_ = false;
+  bool is_control_cmd_time_delay_previous_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(CanbusComponent)

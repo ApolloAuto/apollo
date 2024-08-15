@@ -18,6 +18,8 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
+#include "modules/canbus_vehicle/transit/transit_controller.h"
+#include "modules/canbus_vehicle/transit/transit_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -69,7 +71,6 @@ bool TransitVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
-                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -158,9 +159,9 @@ void TransitVehicleFactory::PublishChassisDetail() {
   chassis_detail_writer_->Write(chassis_detail);
 }
 
-std::unique_ptr<transit::TransitController>
+std::unique_ptr<VehicleController<::apollo::canbus::Transit>>
 TransitVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<transit::TransitController>(
+  return std::unique_ptr<VehicleController<::apollo::canbus::Transit>>(
       new transit::TransitController());
 }
 

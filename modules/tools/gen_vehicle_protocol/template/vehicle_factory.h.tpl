@@ -90,26 +90,52 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
   Chassis publish_chassis() override;
 
   /**
+   * @brief create cansender heartbeat
+   */
+  void UpdateHeartbeat() override;
+
+  /**
    * @brief publish chassis for vehicle messages
    */
   void PublishChassisDetail() override;
 
   /**
-   * @brief create cansender heartbeat
+   * @brief publish chassis for apollo sender messages
    */
-  void UpdateHeartbeat();
+  void PublishChassisDetailSender() override;
 
   /**
-   * @brief check the chassis detail can receive lost
+   * @brief check chassis can receiver lost
    */
-  bool CheckChassisCommunicationFault();
+  bool CheckChassisCommunicationFault() override;
+
+  /**
+   * @brief add the can sender messages
+   */
+  void AddSendProtocol() override;
+
+  /**
+   * @brief clear the can sender messages
+   */
+  void ClearSendProtocol() override;
+
+  /**
+   * @brief check the sender message clear or not
+   */
+  bool IsSendProtocolClear() override;
+
+  /**
+   * @brief get the latest chassis driving mode
+   */
+  Chassis::DrivingMode Driving_Mode() override;
 
  private:
   /**
    * @brief create %(car_type_lower)s vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>
+  CreateVehicleController();
 
   /**
    * @brief create %(car_type_lower)s message manager
@@ -122,10 +148,12 @@ class %(car_type_cap)sVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::%(car_type_cap)s> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::%(car_type_cap)s> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::%(car_type_cap)s>> message_manager_;
-  std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::%(car_type_cap)s>>
       chassis_detail_writer_;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::%(car_type_cap)s>>
+      chassis_detail_sender_writer_;
 };
 
 CYBER_REGISTER_VEHICLEFACTORY(%(car_type_cap)sVehicleFactory)

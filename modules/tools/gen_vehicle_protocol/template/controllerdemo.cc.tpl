@@ -42,10 +42,13 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 }  // namespace
 
+void %(car_type_cap)sController::AddSendMessage() {
+%(protocol_add_list)s
+}
+
 ErrorCode %(car_type_cap)sController::Init(
 	const VehicleParameter& params,
 	CanSender<::apollo::canbus::%(car_type_cap)s> *const can_sender,
-  CanReceiver<::apollo::canbus::%(car_type_cap)s>* const can_receiver,
   MessageManager<::apollo::canbus::%(car_type_cap)s> *const message_manager) {
   if (is_initialized_) {
     AINFO << "%(car_type_cap)sController has already been initiated.";
@@ -66,11 +69,6 @@ ErrorCode %(car_type_cap)sController::Init(
   }
   can_sender_ = can_sender;
 
-  if (can_receiver == nullptr) {
-    return ErrorCode::CANBUS_ERROR;
-  }
-  can_receiver_ = can_receiver;
-
   if (message_manager == nullptr) {
     AERROR << "protocol manager is null.";
     return ErrorCode::CANBUS_ERROR;
@@ -79,9 +77,8 @@ ErrorCode %(car_type_cap)sController::Init(
 
   // sender part
 %(protocol_ptr_get_list)s
-%(protocol_add_list)s
+  AddSendMessage();
 
-  // need sleep to ensure all messages received
   AINFO << "%(car_type_cap)sController is initialized.";
 
   is_initialized_ = true;
@@ -116,20 +113,21 @@ void %(car_type_cap)sController::Stop() {
 
 Chassis %(car_type_cap)sController::chassis() {
   chassis_.Clear();
+  %(car_type_cap)s chassis_detail = GetNewRecvChassisDetail();;
 
-  %(car_type_cap)s chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-
-  // 21, 22, previously 1, 2
+  // 1, 2
   // if (driving_mode() == Chassis::EMERGENCY_MODE) {
   //   set_chassis_error_code(Chassis::NO_ERROR);
   // }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
+
   // 3
   chassis_.set_engine_started(true);
+
   %(protocol_chassis_get_list)s
+
   // check chassis error
   if (CheckChassisError()) {
     chassis_.mutable_engage_advice()->set_advice(
@@ -137,6 +135,7 @@ Chassis %(car_type_cap)sController::chassis() {
     chassis_.mutable_engage_advice()->set_reason(
         "Chassis has some fault, please check the chassis_detail.");
   }
+
   // check the chassis detail lost
   if (is_chassis_communication_error_) {
     chassis_.mutable_engage_advice()->set_advice(
@@ -364,11 +363,11 @@ void %(car_type_cap)sController::SetTurningSignal(const VehicleSignal& vehicle_s
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
-    turnsignal_68_->set_turn_left();
+
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {
-    turnsignal_68_->set_turn_right();
+
   } else {
-    turnsignal_68_->set_turn_none();
+
   }
   */
 }
@@ -428,65 +427,10 @@ void %(car_type_cap)sController::ResetProtocol() {
   message_manager_->ResetSendMessages();
 }
 
-bool %(car_type_cap)sController::CheckChassisCommunicationError() {
-  %(car_type_cap)s chassis_detail_receiver;
-  ADEBUG << "Can receiver finished recv once: "
-         << can_receiver_->IsFinishRecvOnce();
-  if (message_manager_->GetSensorRecvData(&chassis_detail_receiver) !=
-      ErrorCode::OK) {
-    AERROR_EVERY(100) << "Get chassis receive detail failed.";
-  }
-  ADEBUG << "chassis_detail_receiver is "
-         << chassis_detail_receiver.ShortDebugString();
-  size_t receiver_data_size = chassis_detail_receiver.ByteSizeLong();
-  ADEBUG << "check chassis detail receiver_data_size is " << receiver_data_size;
-  // check receiver data is null
-  if (receiver_data_size < 2) {
-    if (is_need_count_) {
-      lost_chassis_reveive_detail_count_++;
-    }
-  } else {
-    lost_chassis_reveive_detail_count_ = 0;
-    is_need_count_ = true;
-  }
-  ADEBUG << "lost_chassis_reveive_detail_count_ is "
-         << lost_chassis_reveive_detail_count_;
-  // check receive data lost threshold is (100 * 10)ms
-  if (lost_chassis_reveive_detail_count_ > 100) {
-    is_need_count_ = false;
-    is_chassis_communication_error_ = true;
-    AERROR << "neolix chassis detail is lost, please check the communication "
-              "error.";
-    message_manager_->ClearSensorRecvData();
-    message_manager_->ClearSensorData();
-    return true;
-  } else {
-    is_chassis_communication_error_ = false;
-  }
-
-  %(car_type_cap)s chassis_detail_sender;
-  if (message_manager_->GetSensorSenderData(&chassis_detail_sender) !=
-      ErrorCode::OK) {
-    AERROR_EVERY(100) << "Get chassis receive detail failed.";
-  }
-  ADEBUG << "chassis_detail_sender is "
-         << chassis_detail_sender.ShortDebugString();
-  size_t sender_data_size = chassis_detail_sender.ByteSizeLong();
-  ADEBUG << "check chassis detail sender_data_size is " << sender_data_size;
-
-  message_manager_->ClearSensorRecvData();
-  message_manager_->ClearSensorSenderData();
-  return false;
-}
-
 bool %(car_type_cap)sController::CheckChassisError() {
   if (is_chassis_communication_error_) {
     AERROR_EVERY(100) << "ChassisDetail has no %(car_type_lower)s vehicle info.";
     return false;
-  }
-  %(car_type_cap)s chassis_detail;
-  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-    AERROR_EVERY(100) << "Get chassis detail failed.";
   }
 
   /* ADD YOUR OWN CAR CHASSIS OPERATION
@@ -581,24 +525,23 @@ bool %(car_type_cap)sController::CheckResponse(const int32_t flags, bool need_wa
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
-  Chassis chassis = Chassis();
 
   do {
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis.has_check_response() &&
-                      chassis.check_response().has_is_eps_online() &&
-                      chassis.check_response().is_eps_online();
+      is_eps_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_eps_online() &&
+                      chassis_.check_response().is_eps_online();
       check_ok = check_ok && is_eps_online;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis.has_check_response() &&
-                      chassis.check_response().has_is_vcu_online() &&
-                      chassis.check_response().is_vcu_online();
-      is_esp_online = chassis.has_check_response() &&
-                      chassis.check_response().has_is_esp_online() &&
-                      chassis.check_response().is_esp_online();
+      is_vcu_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_vcu_online() &&
+                      chassis_.check_response().is_vcu_online();
+      is_esp_online = chassis_.has_check_response() &&
+                      chassis_.check_response().has_is_esp_online() &&
+                      chassis_.check_response().is_esp_online();
       check_ok = check_ok && is_vcu_online && is_esp_online;
     }
     if (check_ok) {
@@ -613,9 +556,14 @@ bool %(car_type_cap)sController::CheckResponse(const int32_t flags, bool need_wa
     }
   } while (need_wait && retry_num);
 
-  AERROR << "check_response fail: is_eps_online:" << is_eps_online
-         << ", is_vcu_online:" << is_vcu_online
-         << ", is_esp_online:" << is_esp_online;
+  if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
+    AERROR << "steer check_response fail: is_eps_online:" << is_eps_online;
+  }
+
+  if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
+    AERROR << "speed check_response fail: " << "is_vcu_online:" << is_vcu_online
+           << ", is_esp_online:" << is_esp_online;
+  }
 
   return false;
 }

@@ -36,9 +36,11 @@ uint32_t Adsepscommand56::GetPeriod() const {
 }
 
 void Adsepscommand56::Parse(const std::uint8_t* bytes, int32_t length,
-                             Neolix_edu* chassis) const {
+                            Neolix_edu* chassis) const {
   chassis->mutable_ads_eps_command_56()->set_drive_enable(
       drive_enable(bytes, length));
+  chassis->mutable_ads_eps_command_56()->set_auto_target_angle(
+      auto_target_angle(bytes, length));
 }
 
 void Adsepscommand56::UpdateData(uint8_t* data) {
@@ -76,8 +78,8 @@ void Adsepscommand56::set_p_drive_enable(uint8_t* data, bool drive_enable) {
   to_set.set_value(x, 0, 1);
 }
 
-bool Adsepscommand56::drive_enable(
-    const std::uint8_t* bytes, int32_t length) const {
+bool Adsepscommand56::drive_enable(const std::uint8_t* bytes,
+                                   int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
@@ -109,6 +111,20 @@ void Adsepscommand56::set_p_auto_target_angle(uint8_t* data,
   t = x & 0xFF;
   Byte to_set1(data + 2);
   to_set1.set_value(t, 0, 8);
+}
+
+double Adsepscommand56::auto_target_angle(const std::uint8_t* bytes,
+                                          int32_t length) const {
+  Byte t0(bytes + 2);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 3);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = 0.0625 * x + -2048;
+  return ret;
 }
 
 Adsepscommand56* Adsepscommand56::set_auto_drivercmd_alivecounter(
