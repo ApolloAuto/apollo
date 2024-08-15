@@ -18,6 +18,8 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
+#include "modules/canbus_vehicle/lincoln/lincoln_controller.h"
+#include "modules/canbus_vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -69,7 +71,6 @@ bool LincolnVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
-                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -158,9 +159,9 @@ void LincolnVehicleFactory::PublishChassisDetail() {
   chassis_detail_writer_->Write(chassis_detail);
 }
 
-std::unique_ptr<lincoln::LincolnController>
+std::unique_ptr<VehicleController<::apollo::canbus::Lincoln>>
 LincolnVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<lincoln::LincolnController>(
+  return std::unique_ptr<VehicleController<::apollo::canbus::Lincoln>>(
       new lincoln::LincolnController());
 }
 

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus_vehicle/neolix_edu/proto/neolix_edu.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -118,6 +119,10 @@ class Adsbrakecommand46 : public ::apollo::drivers::canbus::ProtocolData<
                                      int auto_drivercmd_checksum);
 
   bool drive_enable(const std::uint8_t* bytes, const int32_t length) const;
+
+  bool auto_parking_command(const std::uint8_t* bytes, int32_t length) const;
+
+  int32_t auto_brake_command(const std::uint8_t* bytes, int32_t length) const;
 
  private:
   bool drive_enable_;

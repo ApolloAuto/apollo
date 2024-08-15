@@ -24,8 +24,8 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
+#include "modules/canbus/vehicle/vehicle_controller.h"
 %(control_protocol_include_list)s
 
 namespace apollo {
@@ -42,7 +42,6 @@ class %(car_type_cap)sController final : public VehicleController<::apollo::canb
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::%(car_type_cap)s> *const can_sender,
-      CanReceiver<::apollo::canbus::%(car_type_cap)s>* const can_receiver,
       MessageManager<::apollo::canbus::%(car_type_cap)s> *const message_manager) override;
 
   bool Start() override;
@@ -59,9 +58,9 @@ class %(car_type_cap)sController final : public VehicleController<::apollo::canb
   Chassis chassis() override;
 
   /**
-   * @brief check the chassis detail received or lost.
+   * @brief add the sender message.
    */
-  bool CheckChassisCommunicationError();
+  void AddSendMessage() override;
 
  private:
   // main logical function for operation the car enter or exit the auto driving
@@ -139,9 +138,6 @@ class %(car_type_cap)sController final : public VehicleController<::apollo::canb
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
-  uint32_t lost_chassis_reveive_detail_count_ = 0;
-  bool is_need_count_ = true;
-  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace %(car_type_lower)s

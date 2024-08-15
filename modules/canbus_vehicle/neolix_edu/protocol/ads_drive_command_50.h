@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus_vehicle/neolix_edu/proto/neolix_edu.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -109,6 +110,11 @@ class Adsdrivecommand50 : public ::apollo::drivers::canbus::ProtocolData<
                                      int auto_drivercmd_checksum);
 
   bool drive_enable(const std::uint8_t* bytes, const int32_t length) const;
+
+  Ads_drive_command_50::Auto_shift_commandType auto_shift_command(
+      const std::uint8_t* bytes, int32_t length) const;
+
+  double auto_drive_torque(const std::uint8_t* bytes, int32_t length) const;
 
  private:
   bool drive_enable_;

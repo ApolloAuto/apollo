@@ -45,7 +45,6 @@ class WeyController final : public VehicleController<::apollo::canbus::Wey> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Wey>* const can_sender,
-      CanReceiver<::apollo::canbus::Wey>* const can_receiver,
       MessageManager<::apollo::canbus::Wey>* const message_manager) override;
 
   bool Start() override;

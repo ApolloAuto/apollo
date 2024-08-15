@@ -91,18 +91,52 @@ class DevkitVehicleFactory : public AbstractVehicleFactory {
   Chassis publish_chassis() override;
 
   /**
+   * @brief create cansender heartbeat
+   */
+  void UpdateHeartbeat() override;
+
+  /**
    * @brief publish chassis for vehicle messages
    */
   void PublishChassisDetail() override;
 
-  bool CheckChassisCommunicationFault();
+  /**
+   * @brief publish chassis for apollo sender messages
+   */
+  void PublishChassisDetailSender() override;
+
+  /**
+   * @brief check chassis can receiver lost
+   */
+  bool CheckChassisCommunicationFault() override;
+
+  /**
+   * @brief add the can sender messages
+   */
+  void AddSendProtocol() override;
+
+  /**
+   * @brief clear the can sender messages
+   */
+  void ClearSendProtocol() override;
+
+  /**
+   * @brief check the sender message clear or not
+   */
+  bool IsSendProtocolClear() override;
+
+  /**
+   * @brief get the latest chassis driving mode
+   */
+  Chassis::DrivingMode Driving_Mode() override;
 
  private:
   /**
    * @brief create devkit vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<devkit::DevkitController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>
+  CreateVehicleController();
 
   /**
    * @brief create devkit message manager
@@ -116,10 +150,13 @@ class DevkitVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Devkit> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Devkit> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Devkit>> message_manager_;
-  std::unique_ptr<devkit::DevkitController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Devkit>>
       chassis_detail_writer_;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Devkit>>
+      chassis_detail_sender_writer_;
 };
 
 CYBER_REGISTER_VEHICLEFACTORY(DevkitVehicleFactory)

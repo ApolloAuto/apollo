@@ -26,12 +26,9 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus_vehicle/zhongyun/zhongyun_controller.h"
-#include "modules/canbus_vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -100,7 +97,8 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
    * @brief create zhongyun vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<zhongyun::ZhongyunController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::Zhongyun>>
+  CreateVehicleController();
 
   /**
    * @brief create zhongyun message manager
@@ -115,7 +113,8 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Zhongyun>
       can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Zhongyun>> message_manager_;
-  std::unique_ptr<zhongyun::ZhongyunController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Zhongyun>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Zhongyun>>
       chassis_detail_writer_;

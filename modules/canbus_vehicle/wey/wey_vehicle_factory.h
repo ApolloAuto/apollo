@@ -26,12 +26,9 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/wey/proto/wey.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus_vehicle/wey/wey_controller.h"
-#include "modules/canbus_vehicle/wey/wey_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -100,7 +97,8 @@ class WeyVehicleFactory : public AbstractVehicleFactory {
    * @brief create wey vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<wey::WeyController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::Wey>>
+  CreateVehicleController();
 
   /**
    * @brief create wey message manager
@@ -113,7 +111,7 @@ class WeyVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Wey> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Wey> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Wey>> message_manager_;
-  std::unique_ptr<wey::WeyController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Wey>> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Wey>>
       chassis_detail_writer_;

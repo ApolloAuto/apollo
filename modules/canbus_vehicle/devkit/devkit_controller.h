@@ -47,7 +47,6 @@ class DevkitController final
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Devkit>* const can_sender,
-      CanReceiver<::apollo::canbus::Devkit>* const can_receiver,
       MessageManager<::apollo::canbus::Devkit>* const message_manager) override;
 
   bool Start() override;
@@ -64,9 +63,9 @@ class DevkitController final
   Chassis chassis() override;
 
   /**
-   * @brief ccheck the chassis detail received or lost.
+   * @brief add the sender message.
    */
-  bool CheckChassisCommunicationError();
+  void AddSendMessage() override;
 
   /**
    * for test
@@ -154,9 +153,6 @@ class DevkitController final
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
-  uint32_t lost_chassis_reveive_detail_count_ = 0;
-  bool is_need_count_ = true;
-  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace devkit

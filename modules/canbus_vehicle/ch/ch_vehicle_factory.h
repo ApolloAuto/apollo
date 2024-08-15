@@ -94,14 +94,23 @@ class ChVehicleFactory : public AbstractVehicleFactory {
    */
   void PublishChassisDetail() override;
 
-  bool CheckChassisCommunicationFault();
+  /**
+   * @brief publish chassis for apollo sender messages
+   */
+  void PublishChassisDetailSender() override;
+
+  /**
+   * @brief check chassis can receiver lost
+   */
+  bool CheckChassisCommunicationFault() override;
 
  private:
   /**
    * @brief create ch vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<ch::ChController> CreateVehicleController();
+  std::unique_ptr<VehicleController<::apollo::canbus::Ch>>
+  CreateVehicleController();
 
   /**
    * @brief create ch message manager
@@ -114,10 +123,12 @@ class ChVehicleFactory : public AbstractVehicleFactory {
   CanSender<::apollo::canbus::Ch> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Ch> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Ch>> message_manager_;
-  std::unique_ptr<ch::ChController> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Ch>> vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Ch>>
       chassis_detail_writer_;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Ch>>
+      chassis_detail_sender_writer_;
 };
 
 CYBER_REGISTER_VEHICLEFACTORY(ChVehicleFactory)

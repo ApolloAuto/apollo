@@ -69,7 +69,6 @@ bool %(car_type_cap)sVehicleFactory::Init(const CanbusConf *canbus_conf) {
   AINFO << "The vehicle controller is successfully created.";
 
   if (vehicle_controller_->Init(canbus_conf->vehicle_parameter(), &can_sender_,
-                                &can_receiver_,
                                 message_manager_.get()) != ErrorCode::OK) {
     AERROR << "Failed to init vehicle controller.";
     return false;
@@ -83,6 +82,9 @@ bool %(car_type_cap)sVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   chassis_detail_writer_ =
       node_->CreateWriter<::apollo::canbus::%(car_type_cap)s>(FLAGS_chassis_detail_topic);
+
+  chassis_detail_sender_writer_ = node_->CreateWriter<::apollo::canbus::%(car_type_cap)s>(
+      FLAGS_chassis_detail_sender_topic);
 
   return true;
 }
@@ -152,10 +154,16 @@ Chassis %(car_type_cap)sVehicleFactory::publish_chassis() {
 }
 
 void %(car_type_cap)sVehicleFactory::PublishChassisDetail() {
-  %(car_type_cap)s chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
+  %(car_type_cap)s chassis_detail = vehicle_controller_->GetNewRecvChassisDetail();
+  ADEBUG << "latest chassis_detail is " << chassis_detail.ShortDebugString();
   chassis_detail_writer_->Write(chassis_detail);
+}
+
+void %(car_type_cap)sVehicleFactory::PublishChassisDetailSender() {
+  %(car_type_cap)s sender_chassis_detail = vehicle_controller_->GetNewSenderChassisDetail();
+  ADEBUG << "latest sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  chassis_detail_sender_writer_->Write(sender_chassis_detail);
 }
 
 void %(car_type_cap)sVehicleFactory::UpdateHeartbeat() {
@@ -169,9 +177,28 @@ bool %(car_type_cap)sVehicleFactory::CheckChassisCommunicationFault() {
   return false;
 }
 
-std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController>
+void %(car_type_cap)sVehicleFactory::AddSendProtocol() {
+  vehicle_controller_->AddSendMessage();
+}
+
+void %(car_type_cap)sVehicleFactory::ClearSendProtocol() {
+  can_sender_.ClearMessage();
+}
+
+bool %(car_type_cap)sVehicleFactory::IsSendProtocolClear() {
+  if (can_sender_.IsMessageClear()) {
+    return true;
+  }
+  return false;
+}
+
+Chassis::DrivingMode %(car_type_cap)sVehicleFactory::Driving_Mode() {
+  return vehicle_controller_->driving_mode();
+}
+
+std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>
 %(car_type_cap)sVehicleFactory::CreateVehicleController() {
-  return std::unique_ptr<%(car_type_lower)s::%(car_type_cap)sController>(
+  return std::unique_ptr<VehicleController<::apollo::canbus::%(car_type_cap)s>>(
       new %(car_type_lower)s::%(car_type_cap)sController());
 }
 

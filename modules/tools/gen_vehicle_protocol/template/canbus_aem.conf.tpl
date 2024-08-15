@@ -3,4 +3,9 @@
 --load_vehicle_library=/opt/apollo/neo/lib/modules/canbus_vehicle/%(car_type_lower)s/lib%(car_type_lower)s_vehicle_factory_lib.so
 --load_vehicle_class_name=%(car_type_cap)sVehicleFactory
 --enable_chassis_detail_pub
+--enable_chassis_detail_sender_pub
+--chassis_debug_mode=false
+--use_control_cmd_check=false
+--use_guardian_cmd_check=false
 --noreceive_guardian
+--estop_brake=30.0

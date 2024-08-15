@@ -46,7 +46,6 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Ch>* const can_sender,
-      CanReceiver<::apollo::canbus::Ch>* const can_receiver,
       MessageManager<::apollo::canbus::Ch>* const message_manager) override;
 
   bool Start() override;
@@ -61,11 +60,6 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
-
-  /**
-   * @brief ccheck the chassis detail received or lost.
-   */
-  bool CheckChassisCommunicationError();
 
   FRIEND_TEST(ChControllerTest, SetDrivingMode);
   FRIEND_TEST(ChControllerTest, Status);
@@ -146,9 +140,6 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
-  uint32_t lost_chassis_reveive_detail_count_ = 0;
-  bool is_need_count_ = true;
-  bool is_chassis_communication_error_ = false;
 };
 
 }  // namespace ch
