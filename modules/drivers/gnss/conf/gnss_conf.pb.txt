@@ -1,11 +1,11 @@
 data {
-    # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT
-    format: NOVATEL_BINARY
+    # format optional: NOVATEL_BINARY, HUACE_TEXT, ASENSING_BINARY, BROADGNSS_TEXT,FORSENSE_TEXT
+    format: FORSENSE_TEXT
 
     # protocol optional: serial, tcp, udp, ntrip, can_card_parameter
     serial {
-        device: "/dev/ttyACM0"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate: 460800
     }
 
     # tcp, udp: e.g.
@@ -37,18 +37,18 @@ data {
 #}
 
 rtk_to {
-    format: NOVATEL_BINARY
+    format: FORSENSE_TEXT
     serial {
-        device: "/dev/ttyACM1"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate: 460800
     }
 }
 
 command {
-    format: NOVATEL_BINARY
+    format: FORSENSE_TEXT
     serial {
-        device: "/dev/ttyACM2"
-        baud_rate: 115200
+        device: "/dev/ttyUSB0"
+        baud_rate: 460800
     }
 }
 

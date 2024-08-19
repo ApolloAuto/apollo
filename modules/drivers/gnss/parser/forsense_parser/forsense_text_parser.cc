@@ -34,8 +34,8 @@ namespace drivers {
 namespace gnss {
 
 struct ForsenseProtocol {
-  std::string GPCHC = "$GPYJ";
-  size_t GPCHC_SIZE = 24;
+  std::string GPYJ = "$GPYJ";
+  size_t GPYJ_SIZE = 24;
 };
 
 class ForsenseTextParser : public ForsenseBaseParser {
@@ -45,7 +45,7 @@ class ForsenseTextParser : public ForsenseBaseParser {
   bool PrepareMessage() override;
 
  private:
-  void PrepareMessageGPCHC(const std::vector<std::string> &fields);
+  void PrepareMessageGPYJ(const std::vector<std::string> &fields);
 
   ForsenseProtocol protocol_;
   std::string input_str_;
@@ -90,18 +90,18 @@ bool ForsenseTextParser::PrepareMessage() {
   if (fields.empty()) {
     return false;
   }
-  if (fields[0] == protocol_.GPCHC) {
-    if (fields.size() < protocol_.GPCHC_SIZE) {
-      AERROR << "GPCHC message format error: " << data_start;
+  if (fields[0] == protocol_.GPYJ) {
+    if (fields.size() < protocol_.GPYJ_SIZE) {
+      AERROR << "GPYJ message format error: " << data_start;
       return false;
     }
-    PrepareMessageGPCHC(fields);
+    PrepareMessageGPYJ(fields);
     return true;
   } 
   return false;
 }
 
-void ForsenseTextParser::PrepareMessageGPCHC(
+void ForsenseTextParser::PrepareMessageGPYJ(
     const std::vector<std::string> &fields) {
   decode_message_.messageID = fields[0];
   decode_message_.GPSWeek = std::stoi(fields[1]);
