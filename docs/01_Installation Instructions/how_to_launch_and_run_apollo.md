@@ -63,7 +63,7 @@ cd docs/02_Quick\ Start/demo_guide/
 python3 record_helper.py demo_3.5.record
 
 # You can now replay this demo "record" in a loop with the '-l' flag
-cyber_recorder play -f docs/demo_guide/demo_3.5.record -l
+cyber_recorder play -f docs/02_Quick\ Start/demo_guide/demo_3.5.record -l
 ```
 
 Dreamview should show a running vehicle now. (The following image might be
