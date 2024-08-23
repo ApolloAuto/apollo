@@ -1,0 +1,9 @@
+ip: "192.168.10.108"
+lidar_recv_port: 2368
+pointcloud_channel: "/apollo/sensor/zvision_ml30/PointCloud2"
+scan_channel: "/apollo/sensor/zvision_ml30/Scan"
+time_zone: 8
+frame_id: "zvision_lidar_ml30"
+model: ML30B1
+calibration_online: false
+calibration_file: "/apollo/modules/drivers/zvision/params/ML30_Default.cal"

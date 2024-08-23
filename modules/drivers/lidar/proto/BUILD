@@ -51,4 +51,24 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "zvision_config_proto",
+    srcs = ["zvision_config.proto"],
+    deps = [
+        ":zvision_proto",
+    ],
+)
+
+
+proto_library(
+    name = "config_proto",
+    srcs = ["config.proto"],
+    deps = [
+        ":hesai_config_proto",
+        ":velodyne_config_proto",
+        ":lidar_parameter_proto",
+        ":zvision_config_proto",
+    ],
+)
+
 apollo_package()

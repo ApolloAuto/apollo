@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package apollo.drivers.zvision;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum Model {
+  UNKNOWN = 0;
+  ML30B1 = 1;
+  ML30SA1 = 2;
+  MLX = 3;
+  EZ6 = 4;
+}
+
+message ZvisionPacket {
+  optional uint64 stamp = 1;
+  optional bytes data = 2;
+}
+
+message ZvisionScan {
+  optional apollo.common.Header header = 1;
+  optional Model model = 2;  // zvision device model
+  repeated ZvisionPacket firing_pkts = 3;
+  optional uint64 basetime = 4 [default = 0];
+}

@@ -1,0 +1,67 @@
+
+##################################################
+#                   drivers                      #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/zvision/driver/libzvision_driver_component.so"
+    components {
+        class_name : "ZvisionDriverComponent"
+        config {
+          name : "zvision_ml30sa1_driver_sensor_1"
+          config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_1.pb.txt"
+        }
+    }
+
+    components {
+        class_name : "ZvisionDriverComponent"
+        config {
+          name : "zvision_ml30sa1_driver_sensor_2"
+          config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_2.pb.txt"
+        }
+    }
+
+    components {
+        class_name : "ZvisionDriverComponent"
+        config {
+          name : "zvision_ml30sa1_driver_sensor_3"
+          config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_3.pb.txt"
+        }
+    }
+}
+
+
+
+##################################################
+#                   convert                      #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/zvision/parser/libzvision_convert_component.so"
+    components {
+      class_name : "ZvisionConvertComponent"
+      config {
+        name : "zvision_ml30_convert_sensor_1"
+        config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_1.pb.txt"
+        readers {channel: "/apollo/sensor/zvision_ml30sa1/sensor1/Scan"}
+      }
+    }
+
+    components {
+      class_name : "ZvisionConvertComponent"
+      config {
+        name : "zvision_ml30_convert_sensor_2"
+        config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_2.pb.txt"
+        readers {channel: "/apollo/sensor/zvision_ml30sa1/sensor2/Scan"}
+      }
+    }
+
+    components {
+      class_name : "ZvisionConvertComponent"
+      config {
+        name : "zvision_ml30_convert_sensor_3"
+        config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1_sensor_3.pb.txt"
+        readers {channel: "/apollo/sensor/zvision_ml30sa1/sensor3/Scan"}
+      }
+    }
+}

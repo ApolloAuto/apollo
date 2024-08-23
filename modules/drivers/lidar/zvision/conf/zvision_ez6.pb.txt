@@ -1,0 +1,7 @@
+ip: "192.168.10.108"
+lidar_recv_port: 2368
+pointcloud_channel: "/apollo/sensor/zvision_ez6/PointCloud2"
+scan_channel: "/apollo/sensor/zvision_ez6/Scan"
+time_zone: 8
+frame_id: "zvision_lidar_ez6"
+model: EZ6

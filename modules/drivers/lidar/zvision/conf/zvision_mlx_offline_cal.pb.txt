@@ -1,0 +1,9 @@
+ip: "192.168.10.108"
+lidar_recv_port: 8000
+pointcloud_channel: "/apollo/sensor/zvision_mlx/PointCloud2"
+scan_channel: "/apollo/sensor/zvision_mlx/Scan"
+time_zone: 8
+frame_id: "zvision_lidar_mlx"
+model: MLX
+calibration_online: false
+calibration_file: "/apollo/modules/drivers/zvision/params/MLX_Default.cal"

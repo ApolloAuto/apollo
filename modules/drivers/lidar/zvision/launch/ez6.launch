@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>zvision</name>
+        <dag_conf>/apollo/modules/drivers/lidar/zvision/dag/zvision_ez6.dag</dag_conf>
+        <process_name>zvision</process_name>
+    </module>
+</cyber>
