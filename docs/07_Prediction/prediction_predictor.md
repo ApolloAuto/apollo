@@ -20,7 +20,7 @@ Here, we mainly introduce three typical predictors，extrapolation predictor, mo
 
 # Where is the code
 
-Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules/prediction/predictor).
+Please refer [prediction predictor](../../../apollo/modules/prediction/predictor/).
 
 # Code Reading
 
