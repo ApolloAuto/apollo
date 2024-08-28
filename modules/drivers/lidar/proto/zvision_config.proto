@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package apollo.drivers.zvision;
+
+import "modules/drivers/lidar/proto/zvision.proto";
+
+message Config {
+  optional Model model = 1;
+  optional string ip = 2 [default = "192.168.10.108"];
+  optional uint32 lidar_recv_port = 3;
+  optional uint32 gps_recv_port = 4;
+  optional uint32 start_angle = 5;
+  optional string pointcloud_channel = 6;
+  optional uint32 time_zone = 7;
+  optional string frame_id = 8;
+  optional string scan_channel = 9;
+  optional bool calibration_online = 11 [default = false];
+  optional string calibration_file = 12;
+  optional uint32 tcp_cmd_port = 13 [default = 3000];
+  optional uint32 packets_per_scan = 14;
+  optional bool need_transform = 15 [default = false];
+  optional float tx = 16 [default = 0.0];
+  optional float ty = 17 [default = 0.0];
+  optional float tz = 18 [default = 0.0];
+  optional float roll = 19 [default = 0.0];
+  optional float pitch = 20 [default = 0.0];
+  optional float yaw = 21 [default = 0.0];
+
+}
+
+message CompensatorConfig {
+  optional string output_channel = 1;
+  optional float transform_query_timeout = 2 [default = 0.02];
+  optional string world_frame_id = 3 [default = "world"];
+  optional string target_frame_id = 4;
+  optional uint32 point_cloud_size = 5;
+}

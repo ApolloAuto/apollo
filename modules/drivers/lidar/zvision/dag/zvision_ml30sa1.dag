@@ -1,0 +1,22 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/zvision/driver/libzvision_driver_component.so"
+    components {
+        class_name : "ZvisionDriverComponent"
+        config {
+          name : "zvision_ml30sa1_driver"
+          config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1.pb.txt"
+        }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/zvision/parser/libzvision_convert_component.so"
+    components {
+      class_name : "ZvisionConvertComponent"
+      config {
+        name : "zvision_ml30sa1_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/zvision/conf/zvision_ml30sa1.pb.txt"
+        readers {channel: "/apollo/sensor/zvision_ml30sa1/Scan"}
+      }
+    }
+}
