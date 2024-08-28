@@ -248,7 +248,7 @@ def print_angle_error(error_roll, error_pitch, error_yaw):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('Usage: %s [evaluation file] [evaluation type]' % argv[0])
+        print('Usage: %s [evaluation file] [evaluation type]' % sys.argv[0])
         sys.exit(0)
     elif not os.path.isfile(sys.argv[1]):
         print('File does not exist')
