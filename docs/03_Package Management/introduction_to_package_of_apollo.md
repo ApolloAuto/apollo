@@ -2,7 +2,7 @@
 
 ## Overview
 
-This article briefly introduces how to develop an Apollo extension module, with a simple example of how to create the project code of an extension module and the role of the necessary files contained in it. It alos explains how to use the buildtool to compile the extension module.
+This article briefly introduces how to develop an Apollo extension module, with a simple example of how to create the project code of an extension module and the role of the necessary files contained in it. It also explains how to use the buildtool to compile the extension module.
 
 To read this article you need a preliminary grasp of
 

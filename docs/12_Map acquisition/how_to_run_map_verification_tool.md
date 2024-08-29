@@ -7,7 +7,7 @@ The Map Data Verification tool is designed to help Apollo developers detect any 
 In order to run your data on this tool, please follow the steps below:
 
 1. Build Apollo as recommended in the [Build Guide](../01_Installation%20Instructions/apollo_software_installation_guide.md) until the `./apollo.sh build` step.
-2. Once instde dev docker and after running `./apollo.sh build` please go to the folder `modules/tools/map_datachecker/`
+2. Once inside dev docker and after running `./apollo.sh build` please go to the folder `modules/tools/map_datachecker/`
 3. Starting the server:
     ```bash
     bash server.sh start
