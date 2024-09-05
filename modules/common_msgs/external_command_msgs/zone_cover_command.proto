@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/external_command_msgs/geometry.proto";
+
+message ZoneCoverCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  required string overlap_id = 3;
+  optional double target_speed = 4;
+  repeated RoiPolygon non_drivable_roi = 5;
+  optional RoiPolygon drivable_roi = 6;
+}

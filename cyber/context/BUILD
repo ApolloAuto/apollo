@@ -19,6 +19,7 @@ apollo_cc_test(
     size = "small",
     srcs = ["context_test.cc"],
     linkstatic = True,
+    linkopts = ["-lm"],
     deps = [
         ":cyber_context",
         "@com_google_googletest//:gtest_main",

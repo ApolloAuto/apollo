@@ -4,6 +4,7 @@ package apollo.perception.lidar.centerpoint;
 
 import "modules/perception/common/proto/model_info.proto";
 import "modules/perception/common/proto/model_process.proto";
+import "modules/perception/common/proto/plugin_param.proto";
 
 message ModelParam {
   optional common.ModelInfo info = 1;
@@ -19,4 +20,5 @@ message ModelParam {
   optional bool nms_strategy = 11 [default = true];
   optional bool filter_by_semantic_type = 12 [default = false];
   optional bool filter_ground_points = 13 [default = false];
+  optional PluginParam plugins = 14;
 }

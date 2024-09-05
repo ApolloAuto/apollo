@@ -578,9 +578,18 @@ def meta_executor(package_path):
 
             ldd_query = "ldd {}".format(os.path.join(prefix, dst))
             elf_query = "patchelf --print-needed {}".format(os.path.join(prefix, dst))
-
-            ld_result = subprocess.check_output(
-                ldd_query, shell=True).decode("utf-8").split("\n")
+            
+            ret = subprocess.run(
+                ldd_query, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            failed_num = 0
+            while ret.returncode != 0:
+                failed_num += 1
+                if failed_num > 10:
+                    print(f"\033[31m[ERROR]\033[0m execute {ldd_query} failed")
+                    exit(-1)
+                ret = subprocess.run(
+                    ldd_query, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)  
+            ld_result = ret.stdout.decode("utf-8").split("\n")
 
             ld_result_str = "".join(ld_result)
             loop = False

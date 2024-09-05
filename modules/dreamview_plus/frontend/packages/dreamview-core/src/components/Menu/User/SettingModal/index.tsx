@@ -45,6 +45,7 @@ interface ISettingModal {
     isLogin: boolean;
     userInfo: any;
     pluginApi: any;
+    updateSubscribeAccount: () => void;
 }
 
 function Tabs(props: { tabs: KEY[]; activeKey: string; setActiveKey: (key: KEY) => void }) {
@@ -479,7 +480,7 @@ function Device(props: { account: any; isLogin: boolean; userInfo: any; onClose:
 }
 
 function SettingModal(props: ModalComponentProps & ISettingModal) {
-    const { destroy, pluginApi } = props;
+    const { destroy, pluginApi, updateSubscribeAccount: propUpdateSubscribeAccount } = props;
     const [activeKey, setActiveKey] = useState(KEY.GENERAL);
     const [account, setAccountInfo] = useState(null);
 
@@ -496,10 +497,8 @@ function SettingModal(props: ModalComponentProps & ISettingModal) {
             ?.getSubscribeAccountInfo()
             .then((r: any) => {
                 setAccountInfo(r);
-            })
-            .catch((err: any) => {
-                messageError(err);
             });
+        propUpdateSubscribeAccount();
     };
 
     useEffect(() => {

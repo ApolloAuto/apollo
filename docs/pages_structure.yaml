@@ -175,7 +175,6 @@ pages:
         pages:
           - title: 概述
           - title: 开通地图服务
-          - title: 准备工作
           - title: 环境配置
           - title: 地图采集
           - title: 地图编辑

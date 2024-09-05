@@ -1,0 +1,3 @@
+<library path="cyber/ros_bridge/converters/examples/apollo_ros_converter/libapollo_ros_converter_plugin.so">
+    <class type="apollo::cyber::ApolloRosConverter" base_class="apollo::cyber::MessageConverter"></class>
+</library>

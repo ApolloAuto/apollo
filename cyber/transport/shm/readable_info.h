@@ -32,7 +32,8 @@ using ReadableInfoPtr = std::shared_ptr<ReadableInfo>;
 class ReadableInfo {
  public:
   ReadableInfo();
-  ReadableInfo(uint64_t host_id, uint32_t block_index, uint64_t channel_id);
+  ReadableInfo(uint64_t host_id, int32_t block_index,
+      uint64_t channel_id, int32_t arena_block_index = -1);
   virtual ~ReadableInfo();
 
   ReadableInfo& operator=(const ReadableInfo& other);
@@ -44,8 +45,12 @@ class ReadableInfo {
   uint64_t host_id() const { return host_id_; }
   void set_host_id(uint64_t host_id) { host_id_ = host_id; }
 
-  uint32_t block_index() const { return block_index_; }
-  void set_block_index(uint32_t block_index) { block_index_ = block_index; }
+  int32_t block_index() const { return block_index_; }
+  void set_block_index(int32_t block_index) { block_index_ = block_index; }
+
+  int32_t arena_block_index() const { return arena_block_index_; }
+  void set_arena_block_index(
+    int32_t arena_block_index) { arena_block_index_ = arena_block_index; }
 
   uint64_t channel_id() const { return channel_id_; }
   void set_channel_id(uint64_t channel_id) { channel_id_ = channel_id; }
@@ -54,7 +59,8 @@ class ReadableInfo {
 
  private:
   uint64_t host_id_;
-  uint32_t block_index_;
+  int32_t block_index_;
+  int32_t arena_block_index_;
   uint64_t channel_id_;
 };
 

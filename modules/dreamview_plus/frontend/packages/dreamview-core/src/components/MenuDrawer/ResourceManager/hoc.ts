@@ -12,6 +12,8 @@ interface IDatasource {
     name: string;
     type: string;
     id: string;
+    public: boolean;
+    category: string;
 }
 
 interface IuseDataSource<T> {

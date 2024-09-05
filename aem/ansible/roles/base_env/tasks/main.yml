@@ -1,0 +1,16 @@
+---
+# tasks file for ansible/roles/base_env
+
+- name: Install Base Packages by OS
+  ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "default.yaml"
+      paths:
+        - 'tasks'

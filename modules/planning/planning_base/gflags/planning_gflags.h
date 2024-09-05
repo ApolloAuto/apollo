@@ -230,8 +230,8 @@ DECLARE_double(near_stop_speed);
 
 DECLARE_double(near_stop_deceleration);
 
-DECLARE_double(referfece_line_max_forward_heading_diff);
-DECLARE_double(referfece_line_max_backward_heading_diff);
+DECLARE_double(reference_line_max_forward_heading_diff);
+DECLARE_double(reference_line_max_backward_heading_diff);
 
 // Nudge decisider
 DECLARE_bool(enable_nudge_decider);
@@ -265,7 +265,8 @@ DECLARE_double(open_space_max_jerk);
 
 // Nudge decisider
 DECLARE_bool(enable_nudge_decider);
-DECLARE_double(max_nudge_check_distance);
+DECLARE_double(max_nudge_check_distance_in_lk);
+DECLARE_double(max_nudge_check_distance_in_lc);
 DECLARE_double(path_trim_destination_threshold);
 
 // Edge follow buffer
@@ -285,8 +286,23 @@ DECLARE_double(edge_follow_look_backward_distance);
 // lane escape
 DECLARE_bool(enable_lane_escape);
 
+// zone cover
+DECLARE_bool(use_zigzag_type_path_lane);
+DECLARE_bool(change_end_pose);
+DECLARE_bool(calculate_next_trajectory);
+DECLARE_bool(enable_non_drivablle_roi);
+
 // for path easy solution
 DECLARE_double(ego_front_slack_buffer);
-DECLARE_double(relax_ego_radius);
+DECLARE_double(relax_ego_radius_buffer);
+DECLARE_double(relax_path_s_threshold);
 DECLARE_bool(enable_corner_constraint);
+DECLARE_bool(enable_expand_obs_corner);
+DECLARE_double(expand_obs_corner_lon_buffer);
+DECLARE_bool(enable_adc_vertex_constraint);
 DECLARE_double(obstacle_lon_end_buffer_park);
+
+DECLARE_bool(enable_control_interactive_replan);
+
+DECLARE_int32(close_range_obstacle_nudge_range_remain_farmes);
+DECLARE_double(close_range_obstacle_nudge_pedestrian_waiting_time);

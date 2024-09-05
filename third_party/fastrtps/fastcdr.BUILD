@@ -8,7 +8,7 @@ cc_library(
     hdrs = glob(["**/*"]),
     linkopts = [
         "-L/usr/local/fast-rtps/lib",
-        "-lfastcdr",
+        "-lapollo_fastcdr",
     ],
     visibility = ["//visibility:public"],
 )

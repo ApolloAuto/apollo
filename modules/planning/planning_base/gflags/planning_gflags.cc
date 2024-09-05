@@ -433,11 +433,11 @@ DEFINE_double(
     "smaller than this value before stopping so that control can keep up.");
 
 DEFINE_double(
-    referfece_line_max_forward_heading_diff, 3.1415926536 / 2,
+    reference_line_max_forward_heading_diff, 2.5,
     "max angle difference between the forward reference line and ego heading");
 
 DEFINE_double(
-    referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
+    reference_line_max_backward_heading_diff, 3.1415926536,
     "max angle difference between the backward reference line and ego heading");
 
 // park generic
@@ -480,8 +480,10 @@ DEFINE_double(open_space_max_jerk, 4.0, "the max jerk for open space planning");
 
 // Nudge decisider
 DEFINE_bool(enable_nudge_decider, true, "Enable use nudge decider");
-DEFINE_double(max_nudge_check_distance, 15.0,
-              "Max nudge check distance in path boundary decider");
+DEFINE_double(max_nudge_check_distance_in_lk, 4.0,
+              "Max nudge check distance in kane keep path boundary decider");
+DEFINE_double(max_nudge_check_distance_in_lc, 3.0,
+              "Max nudge check distance in lane change path boundary decider");
 DEFINE_double(path_trim_destination_threshold, 20.0,
               "Distance threshold to destination in path trim operation");
 
@@ -512,11 +514,35 @@ DEFINE_double(edge_follow_look_backward_distance, 50,
 // lane escape
 DEFINE_bool(enable_lane_escape, true, "Enable lane escape");
 
+// zone cover
+DEFINE_bool(use_zigzag_type_path_lane, false,
+            "use arc type path when in zone cover stage");
+DEFINE_bool(change_end_pose, false, "change end pose when in zone cover stage");
+DEFINE_bool(calculate_next_trajectory, false,
+            "calculate next trajectory when in zone cover stage");
+DEFINE_bool(enable_non_drivablle_roi, false,
+            "enable non drivable roi when in zone cover stage");
+
 // for path easy solution
 DEFINE_double(ego_front_slack_buffer, 0.25,
-              "edge follow look backward distance in reference line");
-DEFINE_double(relax_ego_radius, 2.0, "relax_ego_radius");
-DEFINE_bool(enable_corner_constraint, false, "enable_corner_constraint");
+              "the lateral threshold to relaxing the solution space");
+DEFINE_double(relax_ego_radius_buffer, 10.0, "relax_ego_radius buffer");
+DEFINE_double(relax_path_s_threshold, 5.0, "relax path boundary s threshold");
+DEFINE_bool(enable_corner_constraint, false,
+            "enable use obstacle corner constraint");
+DEFINE_bool(enable_expand_obs_corner, false, "enable expand_obs_corner");
+DEFINE_double(expand_obs_corner_lon_buffer, 0.6,
+              "expand obs corner lon buffer");
+DEFINE_bool(enable_adc_vertex_constraint, false,
+            "enable use adc vertex constraint");
 DEFINE_double(obstacle_lon_end_buffer_park, 0.6,
               "obstacle longitudinal end buffer (meters) for deciding "
               "path boundaries");
+
+DEFINE_bool(enable_control_interactive_replan, true,
+            "enable replan with control interactive masg");
+
+DEFINE_int32(close_range_obstacle_nudge_range_remain_farmes, 5,
+             "remain the nudge range in frames");
+DEFINE_double(close_range_obstacle_nudge_pedestrian_waiting_time, 2.0,
+              "waiting time for pedestrians");

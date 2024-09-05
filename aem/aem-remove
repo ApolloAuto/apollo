@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+###############################################################################
+# Copyright 2024 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# script flags
+#set -u
+#set -e
+#set -x
+
+# load basic functions
+if [[ ! "${AEM_INITED}" == 1 ]]; then
+  home_dir="$(dirname $(realpath $0))"
+  source "${home_dir}/run.sh"
+fi
+
+parse_arguments() {
+  while [[ $# -gt 0 ]]; do
+    local opt="$1"
+    shift
+    case "${opt}" in
+      -n | --name)
+        export APOLLO_ENV_NAME="$1"
+        export APOLLO_ENV_CONTAINER_NAME="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"
+        shift 1
+        ;;
+      -w | --workspace)
+        export APOLLO_ENV_WORKSPACE="$1"
+        shift 1
+        ;;
+      *)
+        error "unkown argument $1"
+        exit 1
+        ;;
+    esac
+  done
+}
+
+execute() {
+
+  [[ -f "${PWD}/.env" ]] && set -a && source "${PWD}/.env" && set +a
+
+  parse_arguments "$@"
+
+  if [[ ! -d "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}" ]]; then
+    if [[ ! -d "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}" ]]; then
+      error "env ${APOLLO_ENV_NAME} not found"
+      return 1
+    elif ! docker_container_exists "${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"; then
+      error "env ${APOLLO_ENV_NAME} not found"
+      return 1
+    fi
+    # env created by old version
+    apollo_remove_env_old
+    return $?
+  fi
+
+  [[ -f "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}/env.config" ]] && set -a && source "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}/env.config" && set +a
+
+  if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+    apollo_remove_hostenv
+  elif [[ "${APOLLO_ENV_BACKEND}" == "docker" ]]; then
+    apollo_remove_container
+  else
+    echo "unknown backend: ${APOLLO_ENV_BACKEND}"
+    exit 1
+  fi
+
+  apollo_remove_envhome
+}
+
+execute "$@"

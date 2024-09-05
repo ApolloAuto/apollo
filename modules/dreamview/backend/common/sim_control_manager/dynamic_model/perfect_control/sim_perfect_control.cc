@@ -145,13 +145,12 @@ void SimPerfectControl::ReSetPoinstion(double x, double y, double heading) {
   // z use default 0
   point.mutable_path_point()->set_z(0);
   point.mutable_path_point()->set_theta(heading);
-  AINFO << "start point:" << point.DebugString();
   SetStartPoint(point);
   InternalReset();
 }
 
 void SimPerfectControl::InitStartPoint(double start_velocity,
-                                       double start_acceleration) {
+                                       double start_acceleration) {                               
   TrajectoryPoint point;
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
@@ -261,28 +260,29 @@ void SimPerfectControl::OnPlanningCommand(
   current_routing_header_ = planning_command->header();
   AINFO << "planning_command: " << planning_command->DebugString();
 
-  if (planning_command->lane_follow_command()
-          .routing_request()
-          .is_start_pose_set()) {
-    auto lane_follow_command = planning_command->mutable_lane_follow_command();
-    const auto &start_pose =
-        lane_follow_command->routing_request().waypoint(0).pose();
-    ClearPlanning();
-    TrajectoryPoint point;
-    point.mutable_path_point()->set_x(start_pose.x());
-    point.mutable_path_point()->set_y(start_pose.y());
-    point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
-    point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
-    double theta = 0.0;
-    double s = 0.0;
+  // if (planning_command->lane_follow_command()
+  //         .routing_request()
+  //         .is_start_pose_set()) {
+  //   auto lane_follow_command = planning_command->mutable_lane_follow_command();
+  //   const auto &start_pose =
+  //       lane_follow_command->routing_request().waypoint(0).pose();
+  //   ClearPlanning();
+  //   TrajectoryPoint point;
+  //   point.mutable_path_point()->set_x(start_pose.x());
+  //   point.mutable_path_point()->set_y(start_pose.y());
+  //   point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
+  //   point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
+  //   double theta = 0.0;
+  //   double s = 0.0;
 
-    // Find the lane nearest to the start pose and get its heading as theta.
-    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                          &theta, &s);
+  //   // Find the lane nearest to the start pose and get its heading as theta.
+  //   map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
+  //                                         &theta, &s);
 
-    point.mutable_path_point()->set_theta(theta);
-    SetStartPoint(point);
-  }
+  //   point.mutable_path_point()->set_theta(theta);
+  //   SetStartPoint(point);
+  // }
+  return;
 }
 
 void SimPerfectControl::OnPredictionObstacles(
@@ -321,12 +321,12 @@ void SimPerfectControl::Start() {
   }
 }
 
-void SimPerfectControl::Start(double x, double y) {
+void SimPerfectControl::Start(double x, double y, double v, double a) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     // Do not use localization info. use scenario start point to init start
     // point.
-    InitStartPoint(x, y, 0, 0);
+    InitStartPoint(x, y, v, a);
     InternalReset();
     sim_control_timer_->Start();
     sim_prediction_timer_->Start();
@@ -384,11 +384,12 @@ bool SimPerfectControl::PerfectControlModel(
   if (!received_planning_) {
     prev_point_ = next_point_;
   } else {
-    if (current_trajectory_->estop().is_estop() ||
-        next_point_index_ >= trajectory.size()) {
+    if (current_trajectory_->estop().is_estop()) {
       // Freeze the car when there's an estop or the current trajectory has
       // been exhausted.
       Freeze();
+    } else if (next_point_index_ >= trajectory.size()) {
+       prev_point_ = next_point_;
     } else {
       // Determine the status of the car based on received planning message.
       while (next_point_index_ < trajectory.size() &&

@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -73,8 +74,8 @@ class PlanningComponent final
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
   std::shared_ptr<cyber::Reader<storytelling::Stories>> story_telling_reader_;
   std::shared_ptr<cyber::Reader<PlanningCommand>> planning_command_reader_;
-  std::shared_ptr<cyber::Reader<perception::PerceptionEdgeInfo>>
-      edge_info_reader_;
+  std::shared_ptr<cyber::Reader<control::ControlInteractiveMsg>>
+      control_interactive_reader_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;
@@ -90,7 +91,7 @@ class PlanningComponent final
   relative_map::MapMsg relative_map_;
   storytelling::Stories stories_;
   PlanningCommand planning_command_;
-  perception::PerceptionEdgeInfo edge_info_;
+  control::ControlInteractiveMsg control_interactive_msg_;
   LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;

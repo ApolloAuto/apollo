@@ -58,6 +58,8 @@ class Interpolation2D {
    */
   double Interpolate(const KeyType &xy) const;
 
+  bool CheckMap() const;
+
  private:
   double InterpolateYz(const std::map<double, double> &yz_table,
                        double y) const;

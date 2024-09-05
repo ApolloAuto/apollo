@@ -72,6 +72,7 @@ void OpenSpaceTrajectoryProvider::Stop() {
     trajectory_error_.store(false);
     trajectory_skipped_.store(false);
     optimizer_thread_counter = 0;
+    last_trajctory_point.Clear();
   }
 }
 
@@ -87,6 +88,7 @@ void OpenSpaceTrajectoryProvider::Restart() {
     trajectory_error_.store(false);
     trajectory_skipped_.store(false);
     optimizer_thread_counter = 0;
+    is_planned_ = false;
   }
 }
 
@@ -104,6 +106,14 @@ Status OpenSpaceTrajectoryProvider::Process() {
     GenerateStopTrajectory(trajectory_data);
     return Status::OK();
   }
+
+  // when in zone cover stage, should change end pose
+  if (FLAGS_change_end_pose) {
+    AINFO << "Restart OpenSpaceTrajectoryProvider!";
+    FLAGS_calculate_next_trajectory = true;
+    Restart();
+  }
+
   // Start thread when getting in Process() for the first time
   if (config_.enable_open_space_planner_thread() && !thread_init_flag_) {
     task_future_ = cyber::Async(
@@ -129,6 +139,17 @@ Status OpenSpaceTrajectoryProvider::Process() {
         1.0 / static_cast<double>(FLAGS_planning_loop_rate);
     stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
         planning_cycle_time, vehicle_state);
+    if (FLAGS_calculate_next_trajectory &&
+        last_trajctory_point.has_path_point() && !is_stop_due_to_fallback) {
+      last_trajctory_point.mutable_path_point()->set_s(0.0);
+      last_trajctory_point.set_v(0.1);
+      last_trajctory_point.set_relative_time(0.1);
+      stitching_trajectory =
+          std::vector<TrajectoryPoint>(1, last_trajctory_point);
+    }
+    for (auto& trajectorypoint : stitching_trajectory) {
+      AINFO << "stitching_trajectory: " << trajectorypoint.DebugString();
+    }
     need_replan = true;
     injector_->planning_context()
         ->mutable_planning_status()
@@ -234,7 +255,14 @@ Status OpenSpaceTrajectoryProvider::Process() {
                     "open_space_trajectory_provider");
     } else {
       AINFO << "Stop due to computation not finished";
-      GenerateStopTrajectory(trajectory_data);
+      if (previous_frame && !previous_frame->open_space_info()
+                                 .stitched_trajectory_result()
+                                 .empty()) {
+        *(trajectory_data) =
+            previous_frame->open_space_info().stitched_trajectory_result();
+      } else {
+        GenerateStopTrajectory(trajectory_data);
+      }
       return Status(ErrorCode::OK, "Stop due to computation not finished");
     }
   } else {

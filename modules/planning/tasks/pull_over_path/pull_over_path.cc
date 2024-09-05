@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -124,8 +125,8 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
                                        init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
-          &path_narrowest_width)) {
+          *reference_line_info_, &obs_sl_polygons, init_sl_state_, &path_bound,
+          &blocking_obstacle_id, &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
     return false;

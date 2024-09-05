@@ -106,6 +106,15 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
       boundary->pop_back();
       continue;
     }
+
+    std::string label;
+    if (decided_side_pass_direction_[i] == SidePassDirection::LEFT_BORROW) {
+      label = "regular/left" + borrow_lane_type;
+    } else {
+      label = "regular/right" + borrow_lane_type;
+    }
+    path_bound.set_label(label);
+
     // path_bound.DebugString("after_neighbor_lane");
     // 3. Fine-tune the boundary based on static obstacles
     PathBound temp_path_bound = path_bound;
@@ -113,8 +122,8 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_,
                                          &obs_sl_polygons, init_sl_state_);
     if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-            &obs_sl_polygons, init_sl_state_, &path_bound,
-            &blocking_obstacle_id, &path_narrowest_width)) {
+            *reference_line_info_, &obs_sl_polygons, init_sl_state_,
+            &path_bound, &blocking_obstacle_id, &path_narrowest_width)) {
       const std::string msg =
           "Failed to decide fine tune the boundaries after "
           "taking into consideration all static obstacles.";
@@ -132,13 +141,7 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
       counter++;
     }
     ADEBUG << "Completed generating path boundaries.";
-    std::string label;
-    if (decided_side_pass_direction_[i] == SidePassDirection::LEFT_BORROW) {
-      label = "regular/left" + borrow_lane_type;
-    } else {
-      label = "regular/right" + borrow_lane_type;
-    }
-    path_bound.set_label(label);
+
     path_bound.set_blocking_obstacle_id(blocking_obstacle_id);
     RecordDebugInfo(path_bound, path_bound.label(), reference_line_info_);
   }

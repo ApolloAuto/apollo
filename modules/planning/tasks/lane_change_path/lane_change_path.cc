@@ -122,14 +122,16 @@ bool LaneChangePath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   // 3. Remove the S-length of target lane out of the path-bound.
   GetBoundaryFromLaneChangeForbiddenZone(&path_bound);
 
+  path_bound.set_label("regular/lane_change");
+
   PathBound temp_path_bound = path_bound;
   std::string blocking_obstacle_id;
   std::vector<SLPolygon> obs_sl_polygons;
   PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
                                        init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
-          &path_narrowest_width)) {
+          *reference_line_info_, &obs_sl_polygons, init_sl_state_, &path_bound,
+          &blocking_obstacle_id, &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
     return false;
@@ -143,7 +145,7 @@ bool LaneChangePath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     path_bound.push_back(temp_path_bound[path_bound.size()]);
     counter++;
   }
-  path_bound.set_label("regular/lane_change");
+
   path_bound.set_blocking_obstacle_id(blocking_obstacle_id);
   RecordDebugInfo(path_bound, path_bound.label(), reference_line_info_);
   return true;

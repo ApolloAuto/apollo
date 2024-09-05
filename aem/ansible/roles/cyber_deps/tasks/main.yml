@@ -1,0 +1,155 @@
+---
+# tasks file for ansible/roles/cyber_deps
+- name: Update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: yes
+
+# required by cyber_monitor
+- name: Install ncurses
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libncurses5-dev
+    state: latest
+    update_cache: false
+
+# required by cyber_core
+- name: Install uuid
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libuuid1
+      - uuid-dev
+    state: latest
+    update_cache: false
+
+- name: Install perftools
+  become: true
+  ansible.builtin.apt:
+    name:
+      - gperftools
+      - bvar
+      - libunwind-dev
+    state: latest
+    update_cache: false
+
+- name: Add sysroot to ldconfig
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ld.so.conf.d/apollo.conf
+    line: /opt/apollo/sysroot/lib
+    create: yes
+
+# - name: Install abseil protobuf fastrtps gflags glog
+#   become: true
+#   ansible.builtin.apt:
+#     name:
+#       - apollo-neo-3rd-absl
+#       - apollo-neo-3rd-protobuf
+#       - apollo-neo-3rd-fastrtps
+#       - apollo-neo-3rd-gflags
+#       - apollo-neo-3rd-glog
+#     state: latest
+#     update_cache: false
+
+# run local script to install third party libraries
+- name: Install protobuf
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_protobuf.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "protobuf-3.14.0"
+    PROTOBUF_INSTALL_PREFIX: "/usr"
+
+- name: Install fast-rtps
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_fast-rtps.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "fast-rtps-1.5.0"
+
+# - name: Install fast-rtps deps
+#   become: true
+#   ansible.builtin.apt:
+#     name:
+#       - libtinyxml2-dev
+#       - libasio-dev
+#     state: latest
+#     update_cache: false
+#
+# - name: Download prebuilt fast-rtps
+#   become: true
+#   ansible.builtin.get_url:
+#     url: https://apollo-system.cdn.bcebos.com/archive/6.0/fast-rtps-1.5.0-1.prebuilt.x86_64.tar.gz
+#     checksum: sha256:7f6cd1bee91f3c08149013b3d0d5ff46290fbed17b13a584fe8625d7553f603d
+#     dest: /tmp/fast-rtps-1.5.0-1.prebuilt.x64_64.tar.gz
+#
+# - name: Extract prebuilt fast-rtps
+#   become: true
+#   ansible.builtin.unarchive:
+#     src: /tmp/fast-rtps-1.5.0-1.prebuilt.x64_64.tar.gz
+#     dest: /usr/local/
+#     extra_opts:
+#       - --transform
+#       - 's/^fast-rtps-1.5.0-1/fast-rtps/'
+#     remote_src: yes
+#     creates: /usr/local/fast-rtps
+#
+# - name: Add fast-rtps to ldconfig
+#   become: true
+#   ansible.builtin.lineinfile:
+#     path: /etc/ld.so.conf.d/fast-rtps.conf
+#     line: /usr/local/fast-rtps/lib
+#     create: yes
+#
+# - name: Run ldconfig
+#   become: true
+#   ansible.builtin.command:
+#     cmd: ldconfig
+
+- name: Install abseil
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_abseil.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "abseil-cpp-20220623.1"
+    INSTALL_PREFIX: "/opt/apollo/absl"
+
+- name: Install gflags
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_gflags.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "gflags-2.2.2"
+
+- name: Install glog
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_glog.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "glog-0.4.0"
+
+# - name: Install gflags and glog
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_gflags_glog.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     GFLAGS_VERSION: "2.2.2"
+#     GFLAGS_PKG_CHECKSUM: "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf"
+#     GFLAGS_PKG_DOWNLOAD_LINK: "https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"
+#     GLOG_VERSION: "0.4.0"
+#     GLOG_PKG_CHECKSUM: "f28359aeba12f30d73d9e4711ef356dc842886968112162bc73002645139c39c"
+#     GLOG_PKG_DOWNLOAD_LINK: "https://github.com/google/glog/archive/v0.4.0.tar.gz"

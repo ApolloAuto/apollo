@@ -208,6 +208,16 @@ void MotionCommandProcessorBase<T>::OnCommand(
     const std::shared_ptr<T>& command, std::shared_ptr<CommandStatus>& status) {
   CHECK_NOTNULL(command);
   CHECK_NOTNULL(status);
+  if (command->has_header()) {
+    double timestamp = apollo::cyber::Clock::NowInSeconds();
+    AINFO << std::setprecision(12) << "timestamp: " << timestamp << " "
+          << "request for " << command->header().timestamp_sec();
+    if (timestamp - command->header().timestamp_sec() > 2.0) {
+      AINFO << "request for " << command->header().module_name()
+            << " has been timeouted";
+      return;
+    }
+  }
   last_received_command_.CopyFrom(*command);
   status->set_command_id(command->command_id());
   // Convert command to RoutingRequest.

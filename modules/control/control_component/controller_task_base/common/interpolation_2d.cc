@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "cyber/common/log.h"
+#include "modules/control/control_component/common/control_gflags.h"
 
 namespace {
 
@@ -36,6 +37,47 @@ bool Interpolation2D::Init(const DataType &xyz) {
   }
   for (const auto &t : xyz) {
     xyz_[std::get<0>(t)][std::get<1>(t)] = std::get<2>(t);
+  }
+
+  if (!CheckMap()) {
+    AERROR << "calibration map is not correct.";
+    return false;
+  }
+
+  return true;
+}
+
+bool Interpolation2D::CheckMap() const {
+  double keysize = xyz_.begin()->second.size();
+  auto itr_ = xyz_.begin();
+  for (; itr_ != xyz_.end(); itr_++) {
+    if (FLAGS_use_calibration_dimension_equal_check) {
+      if (keysize != itr_->second.size()) {
+        AERROR << "calibration map dimension is not equal.";
+        AERROR << "first value: " << keysize
+               << ", second value: " << itr_->second.size();
+        return false;
+      }
+    }
+
+    int pos_count = 0;
+    int nag_count = 0;
+    auto inner_itr_ = itr_->second.begin();
+    for (; inner_itr_ != itr_->second.end(); inner_itr_++) {
+      if (inner_itr_->first > 0) {
+        pos_count++;
+      } else if (inner_itr_->first < 0) {
+        nag_count++;
+      }
+    }
+    if (nag_count == 0) {
+      AERROR << "calibration has all pos map";
+      return false;
+    }
+    if (pos_count == 0) {
+      AERROR << "calibration has all nag map";
+      return false;
+    }
   }
   return true;
 }

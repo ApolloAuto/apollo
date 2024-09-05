@@ -20,11 +20,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/aabox2d.h"
-#include "modules/common/math/aaboxkdtree2d.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common_msgs/map_msgs/map_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
@@ -34,11 +30,17 @@ limitations under the License.
 #include "modules/common_msgs/map_msgs/map_parking_space.pb.h"
 #include "modules/common_msgs/map_msgs/map_pnc_junction.pb.h"
 #include "modules/common_msgs/map_msgs/map_road.pb.h"
+#include "modules/common_msgs/map_msgs/map_rsu.pb.h"
 #include "modules/common_msgs/map_msgs/map_signal.pb.h"
 #include "modules/common_msgs/map_msgs/map_speed_bump.pb.h"
 #include "modules/common_msgs/map_msgs/map_stop_sign.pb.h"
 #include "modules/common_msgs/map_msgs/map_yield_sign.pb.h"
-#include "modules/common_msgs/map_msgs/map_rsu.pb.h"
+
+#include "modules/common/math/aabox2d.h"
+#include "modules/common/math/aaboxkdtree2d.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::hdmap
@@ -86,6 +88,7 @@ class RoadInfo;
 class ParkingSpaceInfo;
 class PNCJunctionInfo;
 class RSUInfo;
+class AreaInfo;
 class HDMapImpl;
 
 struct LineBoundary {
@@ -137,6 +140,7 @@ using PolygonRoiPtr = std::shared_ptr<PolygonRoi>;
 using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
 using RSUInfoConstPtr = std::shared_ptr<const RSUInfo>;
+using AreaInfoConstPtr = std::shared_ptr<const AreaInfo>;
 
 class LaneInfo {
  public:
@@ -188,6 +192,7 @@ class LaneInfo {
   const std::vector<OverlapInfoConstPtr> &pnc_junctions() const {
     return pnc_junctions_;
   }
+  const std::vector<OverlapInfoConstPtr> &areas() const { return areas_; }
   double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
@@ -257,6 +262,7 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> speed_bumps_;
   std::vector<OverlapInfoConstPtr> parking_spaces_;
   std::vector<OverlapInfoConstPtr> pnc_junctions_;
+  std::vector<OverlapInfoConstPtr> areas_;
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
@@ -300,6 +306,38 @@ using JunctionPolygonBox =
     ObjectWithAABox<JunctionInfo, apollo::common::math::Polygon2d>;
 using JunctionPolygonKDTree =
     apollo::common::math::AABoxKDTree2d<JunctionPolygonBox>;
+
+class AreaInfo {
+ public:
+  explicit AreaInfo(const Area &ad_area);
+
+  const Id &id() const { return ad_area_.id(); }
+  const Area &area() const { return ad_area_; }
+  const apollo::hdmap::Area_Type type() const { return ad_area_.type(); }
+  const std::string &get_name() const { return ad_area_.name(); }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+  const std::vector<std::shared_ptr<const AreaInfo>> &OverlapUnDriveableAreas()
+      const {
+    return overlap_undriveable_areas_;
+  }
+
+ private:
+  friend class HDMapImpl;
+  void Init();
+  void PostProcess(const HDMapImpl &map_instance);
+  void UpdateOverlaps(const HDMapImpl &map_instance);
+
+ private:
+  const Area &ad_area_;
+  apollo::common::math::Polygon2d polygon_;
+
+  std::vector<std::shared_ptr<const AreaInfo>> overlap_undriveable_areas_;
+
+  std::vector<Id> overlap_ids_;
+};
+using AreaPolygonBox =
+    ObjectWithAABox<AreaInfo, apollo::common::math::Polygon2d>;
+using AreaPolygonKDTree = apollo::common::math::AABoxKDTree2d<AreaPolygonBox>;
 
 class SignalInfo {
  public:
@@ -521,14 +559,10 @@ using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 class RSUInfo {
  public:
-  explicit RSUInfo(const RSU& rsu);
+  explicit RSUInfo(const RSU &rsu);
 
-  const Id& id() const {
-    return _rsu.id();
-  }
-  const RSU& rsu() const {
-    return _rsu;
-  }
+  const Id &id() const { return _rsu.id(); }
+  const RSU &rsu() const { return _rsu; }
 
  private:
   RSU _rsu;

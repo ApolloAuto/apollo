@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,6 +13,7 @@ apollo_cc_library(
         "for_each.h",
         "macros.h",
         "object_pool.h",
+        "pthread_rw_lock.h",
         "reentrant_rw_lock.h",
         "rw_lock_guard.h",
         "signal.h",
@@ -97,4 +98,5 @@ apollo_cc_test(
 )
 
 apollo_package()
+
 cpplint()

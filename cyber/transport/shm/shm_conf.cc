@@ -31,14 +31,18 @@ void ShmConf::Update(const uint64_t& real_msg_size) {
   ceiling_msg_size_ = GetCeilingMessageSize(real_msg_size);
   block_buf_size_ = GetBlockBufSize(ceiling_msg_size_);
   block_num_ = GetBlockNum(ceiling_msg_size_);
-  managed_shm_size_ =
-      EXTRA_SIZE + STATE_SIZE + (BLOCK_SIZE + block_buf_size_) * block_num_;
+  managed_shm_size_ = EXTRA_SIZE + STATE_SIZE + \
+                      (BLOCK_SIZE + block_buf_size_) * block_num_ + \
+                      (BLOCK_SIZE + ARENA_MESSAGE_SIZE) * ARENA_BLOCK_NUM;
 }
 
 const uint64_t ShmConf::EXTRA_SIZE = 1024 * 4;
 const uint64_t ShmConf::STATE_SIZE = 1024;
 const uint64_t ShmConf::BLOCK_SIZE = 1024;
 const uint64_t ShmConf::MESSAGE_INFO_SIZE = 1024;
+
+const uint32_t ShmConf::ARENA_BLOCK_NUM = 512;
+const uint64_t ShmConf::ARENA_MESSAGE_SIZE = 1024;
 
 const uint32_t ShmConf::BLOCK_NUM_16K = 512;
 const uint64_t ShmConf::MESSAGE_SIZE_16K = 1024 * 16;

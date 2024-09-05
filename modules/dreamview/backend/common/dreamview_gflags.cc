@@ -239,3 +239,8 @@ DEFINE_string(default_rtk_record_path, "/apollo/data/log/",
 DEFINE_bool(dv_cpu_profile, false, "enable cpu profile");
 
 DEFINE_bool(dv_heap_profile, false, "enable heap profile");
+
+DEFINE_double(
+    monitor_timeout_threshold, 2.5,
+    "Monitor the maximum tolerable time from the last message sent. If "
+    "it exceeds the time, the autonomous driving will be exited.");

@@ -1,0 +1,19 @@
+converter {
+  type: "LidarPointcloud"
+}
+
+converter {
+  type: "HeadingMsgFusion"
+}
+
+converter {
+  type: "ImuMsgConverter"
+}
+
+converter {
+  type: "NavMsgConverter"
+}
+
+converter {
+  type: "OdometryMsgConverter"
+}

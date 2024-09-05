@@ -24,7 +24,7 @@ Decode_0A::Decode_0A() {
       "GyroX_degps,GyroY_degps,GyroZ_degps,AccX_g,AccY_g,AccZ_g,T_deg[0],"
       "SysTime_ms";
 
-  createFileAndWrite(filename1, content1);
+  // createFileAndWrite(filename1, content1);
 
   registProtocol(m_type, m_length, this);
 }
@@ -69,21 +69,22 @@ void Decode_0A::subData(const uint8_t* sub_address, int& index) {
 
     index += dataLength;
 
-    std::vector<std::string> data_w;
-    data_w.clear();
-    data_w.push_back(std::to_string(pubMsg_gx));
-    data_w.push_back(std::to_string(pubMsg_gy));
-    data_w.push_back(std::to_string(pubMsg_gz));
-    data_w.push_back(std::to_string(pubMsg_ax));
-    data_w.push_back(std::to_string(pubMsg_ay));
-    data_w.push_back(std::to_string(pubMsg_az));
-    data_w.push_back(std::to_string(pubMsg_temperature));
-    data_w.push_back(std::to_string(time));
-    if (AppendCsv(filename1, data_w)) {
-      // std::cout << "数据成功写入到文件 " << filename << "\n";
-    } else {
-      std::cerr << "写入文件时出现错误\n";
-    }
+    // Do not write csv.
+    // std::vector<std::string> data_w;
+    // data_w.clear();
+    // data_w.push_back(std::to_string(pubMsg_gx));
+    // data_w.push_back(std::to_string(pubMsg_gy));
+    // data_w.push_back(std::to_string(pubMsg_gz));
+    // data_w.push_back(std::to_string(pubMsg_ax));
+    // data_w.push_back(std::to_string(pubMsg_ay));
+    // data_w.push_back(std::to_string(pubMsg_az));
+    // data_w.push_back(std::to_string(pubMsg_temperature));
+    // data_w.push_back(std::to_string(time));
+    // if (AppendCsv(filename1, data_w)) {
+    //   // std::cout << "数据成功写入到文件 " << filename << "\n";
+    // } else {
+    //   std::cerr << "写入文件时出现错误\n";
+    // }
 
   } else {
     index += 3;

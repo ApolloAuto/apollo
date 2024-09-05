@@ -5,6 +5,15 @@ load("//tools:apollo_package.bzl", "apollo_package")
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
+    name = "precise_parking_command_proto",
+    srcs = ["precise_parking_command.proto"],
+    deps = [
+        ":external_geometry_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+proto_library(
     name = "valet_parking_command_proto",
     srcs = ["valet_parking_command.proto"],
     deps = [
@@ -54,6 +63,15 @@ proto_library(
 proto_library(
     name = "free_space_command_proto",
     srcs = ["free_space_command.proto"],
+    deps = [
+        ":external_geometry_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+proto_library(
+    name = "zone_cover_command_proto",
+    srcs = ["zone_cover_command.proto"],
     deps = [
         ":external_geometry_proto",
         "//modules/common_msgs/basic_msgs:header_proto",

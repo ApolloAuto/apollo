@@ -239,30 +239,77 @@ double CalculateEquivalentEgoWidth(
   return std::max(eq_half_w, half_w);
 }
 
-double left_arc_bound_with_heading(double delta_x, double r, double heading) {
+bool left_arc_bound_with_heading(double delta_x, double r, double heading,
+                                 double* result) {
   // calculate △L(positive or negative) with an arc with given radius, and given
   // init_heading the circle can be written as (x-Rsin)^2 + (y+Rcos)^2 = R^2 the
   // upper side of the circel = (sqrt(R^2 - (x-Rsin)^2) - Rcos) is what we need
   if (delta_x > r * (1.0 + std::sin(heading)) - 1e-6) {
-    return std::numeric_limits<double>::lowest();
+    *result = std::numeric_limits<double>::lowest();
+    return false;
   }
-  // return std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) - r
-  // * std::cos(heading);
-  return r * std::cos(heading) -
-         std::sqrt(r * r - std::pow(delta_x + r * std::sin(heading), 2));
+
+  *result = std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) -
+            r * std::cos(heading);
+  return true;
 }
 
-double right_arc_bound_with_heading(double delta_x, double r, double heading) {
+bool right_arc_bound_with_heading(double delta_x, double r, double heading,
+                                  double* result) {
   // calculate △L(positive or negative) with an arc with given radius, and given
   // init_heading the circle can be written as (x+Rsin)^2 + (y-Rcos)^2 = R^2 the
   // upper side of the circel = (Rcos - sqrt(R^2 - (x+Rsin)^2) )is what we need
   if (delta_x > r * (1.0 - std::sin(heading)) - 1e-6) {
-    return std::numeric_limits<double>::max();
+    *result = std::numeric_limits<double>::max();
+    return false;
   }
-  // return r * std::cos(heading) - std::sqrt(r * r - std::pow(delta_x + r *
-  // std::sin(heading), 2));
-  return std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) -
-         r * std::cos(heading);
+  *result = r * std::cos(heading) -
+            std::sqrt(r * r - std::pow(delta_x + r * std::sin(heading), 2));
+  return true;
+}
+
+bool left_arc_bound_with_heading_with_reverse_kappa(double delta_x, double r,
+                                                    double heading,
+                                                    double kappa,
+                                                    double* result) {
+  // calculate △L(positive or negative) with an arc with given radius, and given
+  // init_heading the circle can be written as (x-Rsin)^2 + (y+Rcos)^2 = R^2 the
+  // upper side of the circel = (sqrt(R^2 - (x-Rsin)^2) - Rcos) is what we need
+  if (heading > 0 || kappa < 0 ||
+      delta_x > r * (1.0 - std::sin(heading)) - 1e-6) {
+    *result = std::numeric_limits<double>::lowest();
+    return false;
+  }
+  if (delta_x < -r * std::sin(heading)) {
+    *result = r * std::cos(heading) -
+              std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2));
+  } else {
+    *result = std::sqrt(r * r - std::pow(delta_x + r * std::sin(heading), 2)) -
+              r * (2 - std::cos(heading));
+  }
+  return true;
+}
+
+bool right_arc_bound_with_heading_with_reverse_kappa(double delta_x, double r,
+                                                     double heading,
+                                                     double kappa,
+                                                     double* result) {
+  // calculate △L(positive or negative) with an arc with given radius, and given
+  // init_heading the circle can be written as (x+Rsin)^2 + (y-Rcos)^2 = R^2 the
+  // upper side of the circel = (Rcos - sqrt(R^2 - (x+Rsin)^2) )is what we need
+  if (heading < 0 || kappa > 0 ||
+      delta_x > r * (1.0 - std::sin(heading)) - 1e-6) {
+    *result = std::numeric_limits<double>::max();
+    return false;
+  }
+  if (delta_x < r * std::sin(heading)) {
+    *result = std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) -
+              r * std::cos(heading);
+  } else {
+    *result = r * (2 - std::cos(heading)) -
+              std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2));
+  }
+  return true;
 }
 
 }  // namespace util

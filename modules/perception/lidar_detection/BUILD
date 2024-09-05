@@ -139,7 +139,6 @@ apollo_cc_library(
         "detector/point_pillars_detection/point_pillars.cc",
         "detector/point_pillars_detection/point_pillars_detection.cc",
         "detector/point_pillars_detection/preprocess_points.cc",
-        "object_builder/object_builder.cc",
     ],
     hdrs = [
         "detector/center_point_detection/center_point_detection.h",
@@ -160,7 +159,7 @@ apollo_cc_library(
         "detector/point_pillars_detection/point_pillars_detection.h",
         "detector/point_pillars_detection/preprocess_points.h",
         "interface/base_lidar_detector.h",
-        "object_builder/object_builder.h",
+        "interface/base_down_sample.h",
     ],
     copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
@@ -185,6 +184,7 @@ apollo_cc_library(
         "//modules/perception/lidar_detection/detector/cnn_segmentation/proto:model_param_cc_proto",
         "//modules/perception/lidar_detection/detector/mask_pillars_detection/proto:model_param_cc_proto",
         "//modules/perception/lidar_detection/detector/point_pillars_detection/proto:model_param_cc_proto",
+        "//modules/perception/lidar_detection/down_sample_bank/pcl_down_sample/proto:pcl_down_sample_proto",
         "//modules/perception/lidar_detection/proto:lidar_detection_component_config_cc_proto",
         "@com_google_absl//:absl",
         "@com_google_googletest//:gtest",

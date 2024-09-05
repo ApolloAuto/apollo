@@ -308,6 +308,12 @@ void ReferenceLineInfo::InitFirstOverlaps() {
     first_encounter_overlaps_.emplace_back(YIELD_SIGN, yield_sign_overlap);
   }
 
+  // area
+  hdmap::PathOverlap area_overlap;
+  if (GetFirstOverlap(map_path.area_overlaps(), &area_overlap)) {
+    first_encounter_overlaps_.emplace_back(AREA, area_overlap);
+  }
+
   // sort by start_s
   if (!first_encounter_overlaps_.empty()) {
     std::sort(first_encounter_overlaps_.begin(),
@@ -464,7 +470,7 @@ bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
   }
   // if adc is on the road, and obstacle behind adc, ignore
   const auto& obstacle_boundary = obstacle.PerceptionSLBoundary();
-  if (obstacle_boundary.end_s() > reference_line_.Length()) {
+  if (obstacle_boundary.start_s() > reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ && !IsChangeLanePath() &&
@@ -1134,6 +1140,22 @@ int ReferenceLineInfo::GetJunction(const double s,
   return 0;
 }
 
+int ReferenceLineInfo::GetArea(const double s,
+                               hdmap::PathOverlap* area_overlap) const {
+  CHECK_NOTNULL(area_overlap);
+  const std::vector<hdmap::PathOverlap>& area_overlaps =
+      reference_line_.map_path().area_overlaps();
+
+  static constexpr double kError = 1.0;  // meter
+  for (const auto& overlap : area_overlaps) {
+    if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
+      *area_overlap = overlap;
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void ReferenceLineInfo::SetBlockingObstacle(
     const std::string& blocking_obstacle_id) {
   blocking_obstacle_ = path_decision_.Find(blocking_obstacle_id);
@@ -1206,12 +1228,20 @@ hdmap::PathOverlap* ReferenceLineInfo::GetOverlapOnReferenceLine(
       }
     }
   } else if (overlap_type == ReferenceLineInfo::JUNCTION) {
-    // yield_sign_overlap
+    // junction_overlap
     const auto& junction_overlaps =
         reference_line_.map_path().junction_overlaps();
     for (const auto& junction_overlap : junction_overlaps) {
       if (junction_overlap.object_id == overlap_id) {
         return const_cast<hdmap::PathOverlap*>(&junction_overlap);
+      }
+    }
+  } else if (overlap_type == ReferenceLineInfo::AREA) {
+    // area_overlap
+    const auto& area_overlaps = reference_line_.map_path().area_overlaps();
+    for (const auto& area_overlap : area_overlaps) {
+      if (area_overlap.object_id == overlap_id) {
+        return const_cast<hdmap::PathOverlap*>(&area_overlap);
       }
     }
   }
@@ -1221,5 +1251,71 @@ hdmap::PathOverlap* ReferenceLineInfo::GetOverlapOnReferenceLine(
 std::vector<PathData>* ReferenceLineInfo::MutableCandidatePathData() {
   return &candidate_path_data_;
 }
+
+void ReferenceLineInfo::GetRangeOverlaps(
+    std::vector<hdmap::PathOverlap>* path_overlaps, double start_s,
+    double end_s) {
+  CHECK_NOTNULL(path_overlaps);
+  const std::vector<hdmap::PathOverlap>& junction_overlaps =
+      reference_line_.map_path().junction_overlaps();
+
+  static constexpr double kError = 0.1;  // meter
+  AINFO << "GetRangeOverlaps start_s: " << start_s << ", end_s: " << end_s;
+  for (const auto& overlap : junction_overlaps) {
+    if (start_s >= overlap.end_s - kError) {
+      continue;
+    } else if (end_s < overlap.start_s - kError) {
+      break;
+    } else {
+      AINFO << "overlap emplace_back " << overlap.start_s << ", "
+            << overlap.end_s << " ]";
+      path_overlaps->emplace_back(overlap);
+    }
+  }
+}
+
+const std::vector<double>& ReferenceLineInfo::reference_line_towing_l() const {
+  return reference_line_towing_l_;
+}
+
+std::vector<double>* ReferenceLineInfo::mutable_reference_line_towing_l() {
+  return &reference_line_towing_l_;
+}
+
+const PathBoundary& ReferenceLineInfo::reference_line_towing_path_boundary()
+    const {
+  return reference_line_towing_path_boundary_;
+}
+
+PathBoundary* ReferenceLineInfo::mutable_reference_line_towing_path_boundary() {
+  return &reference_line_towing_path_boundary_;
+}
+
+void ReferenceLineInfo::PrintReferenceSegmentDebugString() {
+  PrintCurves print_curve;
+  const auto& lane_segments = reference_line_.GetMapPath().lane_segments();
+  for (size_t i = 0; i < lane_segments.size(); ++i) {
+    for (const auto& seg :
+         lane_segments.at(i).lane->lane().left_boundary().curve().segment()) {
+      for (const auto& pt : seg.line_segment().point()) {
+        print_curve.AddPoint(std::to_string(index_) + "_left_pt_print", pt.x(),
+                             pt.y());
+      }
+    }
+    for (const auto& seg :
+         lane_segments.at(i).lane->lane().right_boundary().curve().segment()) {
+      for (const auto& pt : seg.line_segment().point()) {
+        print_curve.AddPoint(std::to_string(index_) + "_right_pt_print", pt.x(),
+                             pt.y());
+      }
+    }
+    for (const auto& pt : lane_segments.at(i).lane->points()) {
+      print_curve.AddPoint(std::to_string(index_) + "_center_pt_print", pt.x(),
+                           pt.y());
+    }
+  }
+  print_curve.PrintToLog();
+}
+
 }  // namespace planning
 }  // namespace apollo

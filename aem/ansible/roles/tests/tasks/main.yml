@@ -1,0 +1,48 @@
+---
+# tasks file for ansible/roles/base_env
+
+- name: detect nodejs version
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      if [ -x "$(command -v node)" ]; then
+        node --version
+      else
+        echo 0
+      fi
+    executable: /bin/bash
+  register: node_version
+
+- name: setup nodejs apt source and install nodejs
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      apt-get install -y nodejs
+  when:
+    - node_version.stdout == "0" or node_version.stdout is version("v20", "<")
+
+- name: detect bazel version
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      if [ -x "$(command -v bazel)" ]; then
+        bazel --version | cut -d ' ' -f 2
+      else
+        echo 0
+      fi
+    executable: /bin/bash
+  register: bazel_version
+
+- name: setup bazel apt source and install bazel
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > /usr/share/keyrings/bazel-release.pub.gpg
+      echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-release.pub.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+      apt-get update && apt-get install -y bazel-5.3.2
+      ln -sf /usr/bin/bazel-5.3.2 /usr/bin/bazel
+    executable: /bin/bash
+  when:
+    - bazel_version.stdout == "0" or bazel_version.stdout is version("5.3.2", "<")
+

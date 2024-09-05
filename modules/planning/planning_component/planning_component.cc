@@ -34,12 +34,12 @@ using apollo::common::math::Vec2d;
 using apollo::cyber::ComponentBase;
 using apollo::hdmap::HDMapUtil;
 
+using apollo::control::ControlInteractiveMsg;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
-using apollo::perception::PerceptionEdgeInfo;
 
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
@@ -97,12 +97,13 @@ bool PlanningComponent::Init() {
         stories_.CopyFrom(*stories);
       });
 
-  edge_info_reader_ = node_->CreateReader<PerceptionEdgeInfo>(
-      config_.topic_config().perception_edge_info_topic(),
-      [this](const std::shared_ptr<PerceptionEdgeInfo>& edge_info) {
-        ADEBUG << "Received edge_info data: run edge_info callback.";
+  control_interactive_reader_ = node_->CreateReader<ControlInteractiveMsg>(
+      config_.topic_config().control_interative_topic(),
+      [this](const std::shared_ptr<ControlInteractiveMsg>&
+                 control_interactive_msg) {
+        ADEBUG << "Received story_telling data: run story_telling callback.";
         std::lock_guard<std::mutex> lock(mutex_);
-        edge_info_.CopyFrom(*edge_info);
+        control_interactive_msg_.CopyFrom(*control_interactive_msg);
       });
 
   if (FLAGS_use_navigation_mode) {
@@ -177,11 +178,12 @@ bool PlanningComponent::Proc(
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!local_view_.perception_road_edge ||
-        !common::util::IsProtoEqual(local_view_.perception_road_edge->header(),
-                                    edge_info_.header())) {
-      local_view_.perception_road_edge =
-          std::make_shared<PerceptionEdgeInfo>(edge_info_);
+    if (!local_view_.control_interactive_msg ||
+        !common::util::IsProtoEqual(
+            local_view_.control_interactive_msg->header(),
+            control_interactive_msg_.header())) {
+      local_view_.control_interactive_msg =
+          std::make_shared<ControlInteractiveMsg>(control_interactive_msg_);
     }
   }
 

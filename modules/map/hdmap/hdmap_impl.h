@@ -21,13 +21,8 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/aabox2d.h"
-#include "modules/common/math/aaboxkdtree2d.h"
-#include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/common_msgs/map_msgs/map.pb.h"
+#include "modules/common_msgs/map_msgs/map_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
 #include "modules/common_msgs/map_msgs/map_geometry.pb.h"
@@ -40,6 +35,13 @@ limitations under the License.
 #include "modules/common_msgs/map_msgs/map_speed_bump.pb.h"
 #include "modules/common_msgs/map_msgs/map_stop_sign.pb.h"
 #include "modules/common_msgs/map_msgs/map_yield_sign.pb.h"
+
+#include "modules/common/math/aabox2d.h"
+#include "modules/common/math/aaboxkdtree2d.h"
+#include "modules/common/math/line_segment2d.h"
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/map/hdmap/hdmap_common.h"
 
 /**
  * @namespace apollo::hdmap
@@ -58,6 +60,7 @@ class HDMapImpl {
   using LaneTable = std::unordered_map<std::string, std::shared_ptr<LaneInfo>>;
   using JunctionTable =
       std::unordered_map<std::string, std::shared_ptr<JunctionInfo>>;
+  using AreaTable = std::unordered_map<std::string, std::shared_ptr<AreaInfo>>;
   using SignalTable =
       std::unordered_map<std::string, std::shared_ptr<SignalInfo>>;
   using CrosswalkTable =
@@ -77,8 +80,7 @@ class HDMapImpl {
       std::unordered_map<std::string, std::shared_ptr<ParkingSpaceInfo>>;
   using PNCJunctionTable =
       std::unordered_map<std::string, std::shared_ptr<PNCJunctionInfo>>;
-  using RSUTable =
-      std::unordered_map<std::string, std::shared_ptr<RSUInfo>>;
+  using RSUTable = std::unordered_map<std::string, std::shared_ptr<RSUInfo>>;
 
  public:
   /**
@@ -108,7 +110,23 @@ class HDMapImpl {
   ParkingSpaceInfoConstPtr GetParkingSpaceById(const Id& id) const;
   PNCJunctionInfoConstPtr GetPNCJunctionById(const Id& id) const;
   RSUInfoConstPtr GetRSUById(const Id& id) const;
+  AreaInfoConstPtr GetAreaById(const Id& id) const;
 
+  /**
+   * @brief convert id data type
+   * @param string_id string type of id
+   * @return proto type of id
+   */
+  Id CreateHDMapId(const std::string& string_id) const;
+  /**
+   * @brief get all areas in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param areas store all areas in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetAreas(const apollo::common::PointENU& point, double distance,
+               std::vector<AreaInfoConstPtr>* areas) const;
   /**
    * @brief get all lanes in certain range
    * @param point the central point of the range
@@ -354,9 +372,9 @@ class HDMapImpl {
    * @return 0:success, otherwise failed
    */
   int GetForwardNearestRSUs(const apollo::common::PointENU& point,
-                    double distance, double central_heading,
-                    double max_heading_difference,
-                    std::vector<RSUInfoConstPtr>* rsus) const;
+                            double distance, double central_heading,
+                            double max_heading_difference,
+                            std::vector<RSUInfoConstPtr>* rsus) const;
 
   bool GetMapHeader(Header* map_header) const;
 
@@ -365,6 +383,8 @@ class HDMapImpl {
                std::vector<LaneInfoConstPtr>* lanes) const;
   int GetJunctions(const apollo::common::math::Vec2d& point, double distance,
                    std::vector<JunctionInfoConstPtr>* junctions) const;
+  int GetAreas(const apollo::common::math::Vec2d&, double distance,
+               std::vector<AreaInfoConstPtr>* areas) const;
   int GetCrosswalks(const apollo::common::math::Vec2d& point, double distance,
                     std::vector<CrosswalkInfoConstPtr>* crosswalks) const;
   int GetSignals(const apollo::common::math::Vec2d& point, double distance,
@@ -423,6 +443,7 @@ class HDMapImpl {
   void BuildSpeedBumpSegmentKDTree();
   void BuildParkingSpacePolygonKDTree();
   void BuildPNCJunctionPolygonKDTree();
+  void BuildAreaPolygonKDTree();
 
   template <class KDTree>
   static int SearchObjects(const apollo::common::math::Vec2d& center,
@@ -435,6 +456,7 @@ class HDMapImpl {
   Map map_;
   LaneTable lane_table_;
   JunctionTable junction_table_;
+  AreaTable area_table_;
   CrosswalkTable crosswalk_table_;
   SignalTable signal_table_;
   StopSignTable stop_sign_table_;
@@ -452,6 +474,9 @@ class HDMapImpl {
 
   std::vector<JunctionPolygonBox> junction_polygon_boxes_;
   std::unique_ptr<JunctionPolygonKDTree> junction_polygon_kdtree_;
+
+  std::vector<AreaPolygonBox> area_polygon_boxes_;
+  std::unique_ptr<AreaPolygonKDTree> area_polygon_kdtree_;
 
   std::vector<CrosswalkPolygonBox> crosswalk_polygon_boxes_;
   std::unique_ptr<CrosswalkPolygonKDTree> crosswalk_polygon_kdtree_;

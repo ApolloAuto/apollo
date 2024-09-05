@@ -10,6 +10,7 @@ proto_library(
     deps = [
         "//modules/perception/common/proto:model_info_proto",
         "//modules/perception/common/proto:model_process_proto",
+        "//modules/perception/common/proto:plugin_param_proto",
     ],
 )
 

@@ -23,9 +23,15 @@
 #include <vector>
 
 typedef struct {
-  float Pitch_deg; /*俯仰角*/
-  float Roll_deg;  /*横滚角*/
-  float Yaw_deg;   /*航向角*/
+  /*俯仰角*/
+  float Pitch_deg;
+  float Pitch_rad;
+  /*横滚角*/
+  float Roll_deg;
+  float Roll_rad;
+  /*航向角*/
+  float Yaw_deg;
+  float Yaw_rad;
 
   float GyroX;
   float GyroY;

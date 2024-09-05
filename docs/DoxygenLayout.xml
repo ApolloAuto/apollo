@@ -336,7 +336,6 @@
       <tab type="usergroup" visible="yes" title="地图" intro="" url="[none]">
         <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE6_xA6_x82_xE8_xBF_xB0" />
         <tab type="user" visible="yes" title="开通地图服务" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_xBC_x80_xE9_x80_x9A_xE5_x9C_xB0_xE5_x9B_xBE_xE6_x9C_x8D_xE5_x8A_xA1" />
-        <tab type="user" visible="yes" title="准备工作" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x87_x86_xE5_xA4_x87_xE5_xB7_xA5_xE4_xBD_x9C" />
         <tab type="user" visible="yes" title="环境配置" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE7_x8E_xAF_xE5_xA2_x83_xE9_x85_x8D_xE7_xBD_xAE" />
         <tab type="user" visible="yes" title="地图采集" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE5_x9C_xB0_xE5_x9B_xBE_2_xE5_x9C_xB0_xE5_x9B_xBE_xE9_x87_x87_xE9_x9B_x86" />
         <tab type="usergroup" visible="yes" title="地图编辑" intro="" url="[none]">

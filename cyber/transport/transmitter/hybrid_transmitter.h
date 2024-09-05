@@ -71,6 +71,8 @@ class HybridTransmitter : public Transmitter<M> {
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
+  bool AcquireMessage(std::shared_ptr<M>& msg);
+
  private:
   void InitMode();
   void ObtainConfig();
@@ -141,7 +143,7 @@ void HybridTransmitter<M>::Enable(const RoleAttributes& opposite_attr) {
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
   receivers_[mapping_table_[relation]].insert(id);
-  transmitters_[mapping_table_[relation]]->Enable();
+  transmitters_[mapping_table_[relation]]->Enable(opposite_attr);
   TransmitHistoryMsg(opposite_attr);
 }
 
@@ -155,9 +157,7 @@ void HybridTransmitter<M>::Disable(const RoleAttributes& opposite_attr) {
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
   receivers_[mapping_table_[relation]].erase(id);
-  if (receivers_[mapping_table_[relation]].empty()) {
-    transmitters_[mapping_table_[relation]]->Disable();
-  }
+  transmitters_[mapping_table_[relation]]->Disable(opposite_attr);
 }
 
 template <typename M>
@@ -169,6 +169,18 @@ bool HybridTransmitter<M>::Transmit(const MessagePtr& msg,
     item.second->Transmit(msg, msg_info);
   }
   return true;
+}
+
+template <typename M>
+bool HybridTransmitter<M>::AcquireMessage(std::shared_ptr<M>& msg) {
+  bool result = false;
+  for (auto& item : transmitters_) {
+    result = item.second->AcquireMessage(msg);
+    if (result) {
+      return true;
+    }
+  }
+  return false;
 }
 
 template <typename M>

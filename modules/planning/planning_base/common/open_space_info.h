@@ -138,8 +138,8 @@ class OpenSpaceInfo {
     return obstacles_vertices_vec_;
   }
 
-  std::vector<std::vector<common::math::Vec2d>>
-      *mutable_obstacles_vertices_vec() {
+  std::vector<std::vector<common::math::Vec2d>> *
+  mutable_obstacles_vertices_vec() {
     return &obstacles_vertices_vec_;
   }
 
@@ -266,13 +266,13 @@ class OpenSpaceInfo {
     return fallback_trajectory_;
   }
 
-  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
-      *mutable_publishable_trajectory_data() {
+  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> *
+  mutable_publishable_trajectory_data() {
     return &publishable_trajectory_data_;
   }
 
-  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
-      &publishable_trajectory_data() const {
+  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> &
+  publishable_trajectory_data() const {
     return publishable_trajectory_data_;
   }
 
@@ -420,23 +420,43 @@ class OpenSpaceInfo {
 
   void set_parking_type(const ParkingType type) { parking_type_ = type; }
 
-  const std::vector<std::vector<common::math::Vec2d>>
-      &soft_boundary_vertices_vec() const {
+  const std::vector<std::vector<common::math::Vec2d>> &
+  soft_boundary_vertices_vec() const {
     return soft_boundary_vertices_vec_;
   }
 
-  std::vector<std::vector<common::math::Vec2d>>
-      *mutable_soft_boundary_vertices_vec() {
+  std::vector<std::vector<common::math::Vec2d>> *
+  mutable_soft_boundary_vertices_vec() {
     return &soft_boundary_vertices_vec_;
   }
 
+  void set_trajectory_type(const ADCTrajectory::TrajectoryType type) {
+    trajectory_type_ = type;
+  }
+
+  ADCTrajectory::TrajectoryType trajectory_type() const {
+    return trajectory_type_;
+  }
+
+  // This function is simply used to tell the control module that the current
+  // path has a collision with an obstacle. It does not do anything about the
+  // collision!!!
+  void set_is_collision(const bool &is_collision) {
+    is_collision_ = is_collision;
+  }
+
+  bool is_collision() const { return is_collision_; }
+
  private:
   DiscretizedTrajectory path_planning_trajectory_result_;
-
   bool replan_flag_ = false;
 
   // @brief vector storing the vertices of obstacles in counter-clock-wise order
   std::vector<std::vector<common::math::Vec2d>> soft_boundary_vertices_vec_;
+
+  // follow parameter is only used for precise parking
+  ADCTrajectory::TrajectoryType trajectory_type_ = ADCTrajectory::OPEN_SPACE;
+  bool is_collision_ = false;
 };
 
 }  // namespace planning

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import Logger from '@dreamview/log';
 import { mergeMap, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -331,10 +332,10 @@ export class PluginApi {
     }
 
     // 场景集的更新和下载是同一个接口
-    downloadScenarioSet(scenarioSetId: string, requestId: string) {
+    downloadScenarioSet(scenarioSetId: string, is_classic: boolean, requestId: string) {
         return this.requestStream<string, Partial<ScenarioSet>>({
             data: {
-                info: scenarioSetId,
+                info: JSON.stringify({ scenarioSetId, is_classic }),
                 name: PluginApiNames.DownloadScenarioSet,
                 requestId,
             },

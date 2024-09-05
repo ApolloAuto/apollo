@@ -1,0 +1,26 @@
+---
+
+- name: Install mesa glvnd xcb1
+  become: true
+  ansible.builtin.apt:
+    name:
+      # - freeglut3-dev
+      # - libgl1-mesa-dev
+      # - libegl1-mesa-dev
+      # - libgles2-mesa-dev
+      - mesa-common-dev
+      - libglvnd-dev
+      - libxcb1-dev
+    state: latest
+    update_cache: false
+
+- name: Install qt
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_qt.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "qt-5.12.9"
+    INSTALL_PREFIX: "/opt/apollo/sysroot"
+  when: ansible_architecture == 'x86_64'

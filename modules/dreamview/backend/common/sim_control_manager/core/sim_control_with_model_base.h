@@ -63,7 +63,7 @@ class SimControlWithModelBase : public SimControlBase {
    */
   void Start() override;
 
-  void Start(double x, double y) override;
+  void Start(double x, double y, double v = 0.0, double a = 0.0) override;
 
   /**
    * @brief Set vehicle position.
@@ -100,7 +100,7 @@ class SimControlWithModelBase : public SimControlBase {
   void PublishDummyPrediction();
 
   // Whether the sim control is initialized.
-  // bool start_auto_ = false;
+  bool start_auto_ = false;
   bool auto_car_is_moving_ = false;
   bool planning_command_is_arrival_ = false;
   bool control_command_is_arrival_ = false;

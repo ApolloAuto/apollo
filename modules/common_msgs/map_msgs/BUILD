@@ -96,6 +96,7 @@ proto_library(
         ":map_speed_bump_proto",
         ":map_stop_sign_proto",
         ":map_yield_sign_proto",
+        ":map_area_proto",
     ],
 )
 
@@ -155,6 +156,16 @@ proto_library(
 proto_library(
     name = "map_signal_proto",
     srcs = ["map_signal.proto"],
+    deps = [
+        ":map_geometry_proto",
+        ":map_id_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+    ],
+)
+
+proto_library(
+    name = "map_area_proto",
+    srcs = ["map_area.proto"],
     deps = [
         ":map_geometry_proto",
         ":map_id_proto",

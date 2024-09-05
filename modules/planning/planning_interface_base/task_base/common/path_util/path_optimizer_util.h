@@ -44,12 +44,9 @@ class PathOptimizerUtil {
 
   static std::vector<common::PathPoint>
   ConvertPathPointRefFromFrontAxeToRearAxe(const PathData& path_data);
-  static void CalculateVertexConstraints(
-      const SLState& init_state, const PathBoundary& path_boundary,
-      ADCVertexConstraints* adc_vertex_constraints);
   static void FormulateExtraConstraints(
       PathBound extra_path_bound, const PathBoundary& path_boundary,
-      InterPolatedPointVec* extra_constraints);
+      ObsCornerConstraints* extra_constraints);
   /**
    * @brief Piecewise jerk path optimizer.
    */

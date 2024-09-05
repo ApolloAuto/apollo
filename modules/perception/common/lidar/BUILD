@@ -19,6 +19,7 @@ apollo_cc_library(
         "common/lidar_frame_pool.cc",
         "common/lidar_object_util.cc",
         "common/object_sequence.cc",
+        "common/object_builder.cc",
     ], 
     hdrs = [
         "common/cloud_mask.h",
@@ -34,6 +35,7 @@ apollo_cc_library(
         "common/object_sequence.h",
         "common/pcl_util.h",
         "common/pointcloud_util.h",
+        "common/object_builder.h",
     ],
     deps = [
         "//cyber",

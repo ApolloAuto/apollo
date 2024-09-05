@@ -113,6 +113,11 @@ bool HDMapInput::GetRoiHDMapStruct(
     AERROR << "Failed to get road boundary, point: " << point.DebugString();
     return false;
   }
+  junctions_vec.clear();
+  if (hdmap_->GetJunctions(point, distance, &junctions_vec) != 0) {
+    AERROR << "Failed to get junctions, point: " << point.DebugString();
+    return false;
+  }
   if (hdmap_struct_ptr == nullptr) {
     return false;
   }

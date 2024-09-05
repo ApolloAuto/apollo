@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_cc_binary")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,7 +15,12 @@ apollo_cc_test(
 
 apollo_cc_library(
     name = "cyber_message",
+    srcs = [
+        "protobuf_factory.cc",
+    ],
     hdrs = [
+        "arena_manager_base.h",
+        "arena_message_wrapper.h",
         "message_header.h",
         "message_traits.h",
         "protobuf_factory.h",
@@ -24,9 +29,6 @@ apollo_cc_library(
         "py_message_traits.h",
         "raw_message.h",
         "raw_message_traits.h",
-    ],
-    srcs = [
-        "protobuf_factory.cc",
     ],
     deps = [
         "//cyber/common:cyber_common",
@@ -67,4 +69,5 @@ apollo_cc_test(
 )
 
 apollo_package()
+
 cpplint()

@@ -162,6 +162,14 @@ void ActionCommandProcessor::OnCommand(
   std::string module_name = "UNKNOWN";
   if (command->has_header()) {
     module_name = command->header().module_name();
+    double timestamp = apollo::cyber::Clock::NowInSeconds();
+    AINFO << std::setprecision(12) << "timestamp: " << timestamp << " "
+          << "request for " << command->header().timestamp_sec();
+    if (timestamp - command->header().timestamp_sec() > 2.0) {
+      AINFO << "request for " << command->header().module_name()
+            << " has been timeouted";
+      return;
+    }
   }
   status->set_status(CommandStatusType::RUNNING);
   status->set_command_id(command->command_id());

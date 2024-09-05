@@ -101,3 +101,13 @@ DECLARE_bool(is_control_ut_test_mode);
 DECLARE_bool(publish_control_debug_info);
 
 DECLARE_bool(query_forward_station_point_only);
+
+DECLARE_bool(use_speed_filter);
+
+DECLARE_bool(use_throttle_filter);
+
+DECLARE_double(speed_smoothing_factor);
+
+DECLARE_double(throttle_smoothing_factor);
+
+DECLARE_bool(use_calibration_dimension_equal_check);

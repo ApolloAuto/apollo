@@ -1,0 +1,2 @@
+apollo_channel_name: "/apollo/test1"
+ros_topic_name: "ros_test1"

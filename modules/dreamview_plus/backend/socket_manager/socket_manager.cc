@@ -23,8 +23,8 @@
 #include "cyber/message/protobuf_factory.h"
 #include "modules/common/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 #include "modules/dreamview_plus/backend/record_player/record_player_factory.h"
+#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 namespace apollo {
 namespace dreamview {
 
@@ -38,10 +38,12 @@ std::map<std::string, std::pair<std::string, std::string>> filter_info = {
     {"apollo.dreamview.PointCloud", {"PointCloud", "sensor"}}};
 
 SocketManager::SocketManager(WebSocketHandler *websocket,
-                             UpdaterManager *updater_manager)
+                             UpdaterManager *updater_manager,
+                             DvPluginManager *dv_plugin_manager)
     : enabled_(false),
       websocket_(websocket),
-      updater_manager_(updater_manager) {
+      updater_manager_(updater_manager),
+      dv_plugin_manager_(dv_plugin_manager) {
   RegisterDataHandlers();
   RegisterMessageHandlers();
   auto channel_manager =
@@ -61,6 +63,19 @@ void SocketManager::RegisterDataHandlers() {
     AERROR << "Unable to parse data handler configuration from file "
            << FLAGS_data_handler_config_path;
   }
+  for (auto &data_handler_iter :
+       dv_plugin_manager_->data_handler_conf_.data_handler_info()) {
+    if (data_handler_base_conf_.data_handler_info().find(
+            data_handler_iter.first) !=
+        data_handler_base_conf_.data_handler_info().end()) {
+      AERROR << "There are duplicate updater handlers between dv and plugins";
+      continue;
+    }
+    auto data_handler_info =
+        data_handler_base_conf_.mutable_data_handler_info();
+    (*data_handler_info)[data_handler_iter.first] = data_handler_iter.second;
+  }
+  AINFO << "data_handler_base_conf_: " << data_handler_base_conf_.DebugString();
 
   // 遍历 然后register
   // for (const auto& data_handler_iter :

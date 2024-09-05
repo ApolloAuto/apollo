@@ -62,8 +62,18 @@ double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
 double CalculateEquivalentEgoWidth(
     const apollo::hdmap::LaneInfoConstPtr lane_info, double s, bool* is_left);
 
-double left_arc_bound_with_heading(double delta_x, double r, double heading);
-double right_arc_bound_with_heading(double delta_x, double r, double heading);
+bool left_arc_bound_with_heading(double delta_x, double r, double heading,
+                                 double* result);
+bool right_arc_bound_with_heading(double delta_x, double r, double heading,
+                                  double* result);
+bool left_arc_bound_with_heading_with_reverse_kappa(double delta_x, double r,
+                                                    double heading,
+                                                    double kappa,
+                                                    double* result);
+bool right_arc_bound_with_heading_with_reverse_kappa(double delta_x, double r,
+                                                     double heading,
+                                                     double kappa,
+                                                     double* result);
 
 }  // namespace util
 }  // namespace planning

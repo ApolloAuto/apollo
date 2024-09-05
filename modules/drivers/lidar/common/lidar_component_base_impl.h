@@ -39,6 +39,8 @@ class LidarComponentBaseImpl : public apollo::cyber::Component<ComponentType> {
     virtual void ReadScanCallback(const std::shared_ptr<ScanType>& scan_message)
             = 0;
 
+    std::shared_ptr<ScanType> AcquireScanMessage();
+
  protected:
     bool InitConverter(const LidarConfigBase& lidar_config_base);
 
@@ -51,7 +53,8 @@ class LidarComponentBaseImpl : public apollo::cyber::Component<ComponentType> {
     virtual bool WritePointCloud(
             const std::shared_ptr<PointCloud>& point_cloud);
 
-    static std::shared_ptr<PointCloud> PcdDefaultAllocator();
+    static std::shared_ptr<PointCloud> PcdDefaultAllocator(
+            std::shared_ptr<cyber::Writer<PointCloud>>& pcd_writer);
 
     static void PcdDefaultCleaner(
             std::shared_ptr<PointCloud>& unused_pcd_frame);
@@ -88,7 +91,10 @@ bool LidarComponentBaseImpl<ScanType, ComponentType>::InitConverter(
     frame_id_ = lidar_config_base.frame_id();
 
     pcd_buffer_ = std::make_shared<SyncBuffering<PointCloud>>(
-            LidarComponentBaseImpl::PcdDefaultAllocator,
+            [this](){
+                return LidarComponentBaseImpl::PcdDefaultAllocator(
+                        this->pcd_writer_);
+            },
             LidarComponentBaseImpl::PcdDefaultCleaner);
     pcd_buffer_->SetBufferSize(lidar_config_base.buffer_size());
     pcd_buffer_->Init();
@@ -105,6 +111,15 @@ bool LidarComponentBaseImpl<ScanType, ComponentType>::InitPacket(
         RETURN_VAL_IF(scan_writer_ == nullptr, false);
     }
     return true;
+}
+
+template <typename ScanType, typename ComponentType>
+std::shared_ptr<ScanType> LidarComponentBaseImpl<
+        ScanType, ComponentType>::AcquireScanMessage() {
+    if (scan_writer_ == nullptr) {
+        return std::make_shared<ScanType>();
+    }
+    return scan_writer_->AcquireMessage();
 }
 
 template <typename ScanType, typename ComponentType>
@@ -133,9 +148,10 @@ bool LidarComponentBaseImpl<ScanType, ComponentType>::WritePointCloud(
 
 template <typename ScanType, typename ComponentType>
 std::shared_ptr<PointCloud>
-LidarComponentBaseImpl<ScanType, ComponentType>::PcdDefaultAllocator() {
+LidarComponentBaseImpl<ScanType, ComponentType>::PcdDefaultAllocator(
+                    std::shared_ptr<cyber::Writer<PointCloud>>& pcd_writer) {
     constexpr int default_point_cloud_reserve = 170000;
-    std::shared_ptr<PointCloud> new_pcd_object = std::make_shared<PointCloud>();
+    std::shared_ptr<PointCloud> new_pcd_object = pcd_writer->AcquireMessage();
     new_pcd_object->mutable_point()->Reserve(default_point_cloud_reserve);
     AINFO << "new pcd frame memory allocated, reserve point size = "
           << default_point_cloud_reserve;

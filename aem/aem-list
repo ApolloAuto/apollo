@@ -1,0 +1,129 @@
+#!/bin/bash
+#
+###############################################################################
+# Copyright 2024 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Flags
+#set -u
+#set -e
+#set -x
+if [[ ! "${AEM_INITED}" == 1 ]]; then
+  home_dir="$(dirname $(realpath $0))"
+  source "${home_dir}/run.sh"
+fi
+
+usage() {
+  echo "Usage: aem list [options]
+OPTIONS:
+    -h, --help                    Display this help and exit.
+    --user                        Filter environment by user.
+"
+}
+
+execute() {
+  [[ -f "${PWD}/.env" ]] && set -a && source "${PWD}/.env" && set +a
+
+  local owner="${USER}"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      --user)
+        shift
+        owner="$1"
+        shift
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  envs=()
+  declare -A env_meta
+
+  for env_container_name in $(docker ps -a --format "{{.Names}}" | grep "${APOLLO_ENV_CONTAINER_PREFIX}"); do
+    env_name="${env_container_name#${APOLLO_ENV_CONTAINER_PREFIX}}"
+    env_meta[${env_name}_found]=1
+    envs+=("${env_name}")
+
+    container_envs="$(docker inspect ${env_container_name} --format='{{join .Config.Env "\n"}}' | sed -e 's:=\(.*\):="\1":')"
+    workspace=$(source <(echo -e "${container_envs}") && echo "${APOLLO_ENV_WORKSPACE}")
+    worklocal=$(source <(echo -e "${container_envs}") && echo "${APOLLO_ENV_WORKLOCAL}")
+
+    if [[ -d "${APOLLO_ENVS_ROOT}/${env_name}" ]]; then
+      # new env
+      env_meta[${env_name}_legacy]=0
+      env_real_home="${APOLLO_ENVS_ROOT}/${env_name}"
+    elif [[ -d "${APOLLO_ENVS_ROOT}/${env_container_name}" ]]; then
+      # old env
+      env_meta[${env_name}_legacy]=1
+      env_real_home="${APOLLO_ENVS_ROOT}/${env_container_name}"
+    else
+      if [[ "${worklocal}" == 1 ]]; then
+        env_meta[${env_name}_legacy]=1
+        env_real_home="${workspace}/.aem"
+      else
+        env_meta[${env_name}_legacy]=2
+        env_real_home="notfound"
+      fi
+    fi
+    env_meta[${env_name}_real_home]="${env_real_home}"
+    env_meta[${env_name}_workspace]="${workspace}"
+  done
+
+  for entry in $(ls -d ${APOLLO_ENVS_ROOT}/*/ 2> /dev/null); do
+    env_name="$(basename ${entry})"
+    env_name="${env_name#${APOLLO_ENV_CONTAINER_PREFIX}}"
+    if [[ "${env_meta[${env_name}_found]}" == "1" ]]; then
+      continue
+    fi
+    config="${entry}/env.config"
+    envs+=("${env_name}")
+    env_meta[${env_name}_found]=1
+    env_meta[${env_name}_real_home]="${entry}"
+    if [[ ! -f "${config}" ]]; then
+      # old global envs without config file
+      env_meta[${env_name}_legacy]=1
+      env_container_name="${APOLLO_ENV_CONTAINER_PREFIX}${env_name}"
+      env_vol_opt_name="${env_container_name}_opt"
+      if docker_volume_exists "${env_container_name}_opt"; then
+        env_vol_opt_hostpath="$(docker volume inspect "${env_vol_opt_name}" --format '{{.Options.device}}')"
+        workspace="${env_vol_opt_hostpath%/envroot/opt}"
+        env_meta[${env_name}_workspace]="${workspace}"
+      else
+        env_meta[${env_name}_workspace]="notfound"
+      fi
+    else
+      env_meta[${env_name}_legacy]=0
+    fi
+  done
+
+  for env_name in "${envs[@]}"; do
+    if [[ "${env_meta[${env_name}_legacy]}" == 1 ]]; then
+      echo -e "${env_name}(legacy) ${env_meta[${env_name}_real_home]} ${env_meta[${env_name}_workspace]}"
+    elif [[ "${env_meta[${env_name}_legacy]}" == 2 ]]; then
+      echo -e "${env_name}(unknown) ${env_meta[${env_name}_real_home]} ${env_meta[${env_name}_workspace]}"
+    else
+      echo -e "${env_name} ${env_meta[${env_name}_real_home]} ${env_meta[${env_name}_workspace]}"
+    fi
+  done
+}
+
+execute "$@"

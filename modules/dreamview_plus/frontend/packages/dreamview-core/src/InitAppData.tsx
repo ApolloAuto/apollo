@@ -20,7 +20,7 @@ import { noop } from './util/similarFunctions';
 import useWebSocketServices from './services/hooks/useWebSocketServices';
 import { StreamDataNames } from './services/api/types';
 import { useUserInfoStore } from './store/UserInfoStore';
-import { initUserInfo } from './store/UserInfoStore/actions';
+import { updateSubscribe, initUserInfo } from './store/UserInfoStore/actions';
 import useComponentDisplay from './hooks/useComponentDisplay';
 import { menuStoreUtils, useMenuStore } from './store/MenuStore';
 
@@ -166,6 +166,7 @@ function useInitUserMixInfo() {
                 .catch(() => {
                     dispatch(ChangeCertStatusAction(ENUM_CERT_STATUS.FAIL));
                 });
+            dispatchUserInfo(updateSubscribe(pluginApi));
         }
     }, [isPluginConnected]);
 

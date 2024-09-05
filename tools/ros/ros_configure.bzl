@@ -203,7 +203,9 @@ def _ros_match_packages(repository_ctx, ros_dir = None):
     incompatible_pkg_removed = []
     for i in pkgs:
         # skip rtps for avoiding symbol conflict
-        if "fastrtps" in i or "fastcdr" in i:
+        if "fastrtps" in i or "fastcdr" in i \
+            or "qt" in i or "rviz" in i \
+            or i.endswith(".h") or i.endswith(".hpp"):
             continue
         incompatible_pkg_removed.append(i)
 
@@ -221,10 +223,13 @@ def _ros_match_libraries(repository_ctx, ros_dir = None, pkgs = [], ros_ws_match
             cmd = """ls -1 {}/lib/lib{}*.so | grep -E --color=never 'lib{}__[a-zA-Z0-9_]*\\.so$|lib{}\\.so$'""".format(ros_dir, pkg, pkg, pkg)
         result = execute(repository_ctx, ["sh", "-c", cmd],
             empty_stdout_fine = True, ignore_error = True).stdout.strip()
-        if result == "":
-            libraries[pkg] = []
-        else:
-            libraries[pkg] = result.split("\n")
+        libraries[pkg] = []
+        if result != "":
+            result_libs = result.split("\n")
+            for i in result_libs:
+                if "fastrtps" in i or "fastcdr" in i:
+                    continue
+                libraries[pkg].append(i)
     return libraries
 
 def _ros_configure_impl(repository_ctx):

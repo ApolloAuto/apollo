@@ -22,9 +22,9 @@
 #include "modules/perception/lidar_detection/proto/lidar_detection_component_config.pb.h"
 
 #include "cyber/component/component.h"
+#include "modules/perception/common/lidar/common/object_builder.h"
 #include "modules/perception/common/onboard/inner_component_messages/lidar_inner_component_messages.h"
 #include "modules/perception/lidar_detection/interface/base_lidar_detector.h"
-#include "modules/perception/lidar_detection/object_builder/object_builder.h"
 
 namespace apollo {
 namespace perception {

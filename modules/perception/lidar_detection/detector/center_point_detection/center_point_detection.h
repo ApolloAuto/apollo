@@ -31,6 +31,7 @@
 #include "modules/perception/common/inference/inference.h"
 #include "modules/perception/common/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar_detection/interface/base_lidar_detector.h"
+#include "modules/perception/lidar_detection/interface/base_down_sample.h"
 #include "modules/perception/lidar_detection/detector/center_point_detection/proto/model_param.pb.h"
 
 namespace apollo {
@@ -197,6 +198,8 @@ class CenterPointDetection : public BaseLidarDetector {
   std::vector<std::string> input_blob_names_;
 
   std::vector<std::string> output_blob_names_;
+
+  std::shared_ptr<BaseDownSample> down_sample_;
 };  // class CenterPointDetection
 
 }  // namespace lidar

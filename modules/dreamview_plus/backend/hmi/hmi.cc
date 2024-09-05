@@ -745,12 +745,6 @@ void HMI::PublishMessage(const std::string& channel_name) {
   hmi_ws_->BroadcastBinaryData(response_str);
 }
 
-bool HMI::UpdateScenarioSetToStatus(const std::string& scenario_set_id,
-                                    const std::string& scenario_set_name) {
-  return hmi_worker_->UpdateScenarioSetToStatus(scenario_set_id,
-                                                scenario_set_name);
-}
-
 bool HMI::UpdateDynamicModelToStatus(const std::string& dynamic_model_name) {
   return hmi_worker_->UpdateDynamicModelToStatus(dynamic_model_name);
 }
@@ -771,22 +765,6 @@ bool HMI::UpdateCameraChannelToStatus(const std::string& channel_name) {
 bool HMI::UpdatePointChannelToStatus(const std::string& channel_name) {
   hmi_worker_->UpdatePointCloudChannelToStatus(channel_name);
   return true;
-}
-
-Json HMI::GetCurrentScenarioExtremPoint() {
-  return hmi_worker_->GetCurrentScenarioExtremPoint();
-}
-
-bool HMI::StartSimObstacle() { return hmi_worker_->StartSimObstacle(); }
-
-bool HMI::StopSimObstacle() { return hmi_worker_->StopSimObstacle(); }
-
-bool HMI::StartScenarioSimulation() {
-  return hmi_worker_->StartScenarioSimulation();
-}
-
-bool HMI::StopScenarioSimulation() {
-  return hmi_worker_->StopScenarioSimulation();
 }
 
 bool HMI::isProcessRunning(const std::string& process_name) {

@@ -1,0 +1,130 @@
+---
+# tasks file for ansible/roles/gpu_support
+
+- name: ensure cuda apt source is added
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      distro_version={{ ansible_distribution_version }}
+      distro="{{ ansible_distribution|lower }}$(echo ${distro_version} | tr -d '.')}"
+      arch={{ ansible_architecture }}
+      if [[ "${arch}" == "aarch64" ]]; then
+        arch="arm64"
+      fi
+
+      wget https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/cuda-archive-keyring.gpg -O /usr/share/keyrings/cuda-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/ /" | tee /etc/apt/sources.list.d/cuda-${distro}-${arch}.list
+      wget https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/cuda-${distro}.pin -O /etc/apt/preferences.d/cuda-repository-pin-600
+      apt update
+    executable: /bin/bash
+
+- name: Install openblas atlas lapack
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libopenblas-dev
+      - libatlas-base-dev
+      - liblapack-dev
+    state: latest
+    update_cache: false
+
+# - name: Install magma
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_magma.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "magma-2.5.4"
+#     INSTALL_MODE: "source"
+#     INSTALL_PREFIX: "/opt/apollo/sysroot"
+#
+# - name: Install mkl
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_mkl.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "mkl-2021.1.1"
+
+#- name: Install libtorch
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_libtorch.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "libtorch-1.7.0-r2"
+#    INSTALL_PREFIX: "/opt/apollo/sysroot"
+#
+# - name: Install openmpi (with cuda)
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_openmpi.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "openmpi-4.0.5"
+#     INSTALL_PREFIX: "/opt/apollo/sysroot"
+#     INSTALL_MODE: "source"
+#     WORKHORSE: "gpu"
+
+- name: install flann
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libflann-dev
+    state: latest
+    update_cache: false
+
+- name: fix conflict between libflann and opencv
+  become: true
+  ansible.builtin.shell:
+    cmd: sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
+    executable: /bin/bash
+
+#
+# - name: Install pcl (with cuda)
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_pcl.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "pcl-1.10.1"
+#     INSTALL_PREFIX: "/opt/apollo/sysroot"
+#     INSTALL_MODE: "source"
+#     WORKHORSE: "gpu"
+#
+# - name: Install opencv (with cuda)
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_opencv.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "opencv-4.4.0"
+#     INSTALL_PREFIX: "/opt/apollo/sysroot"
+#     INSTALL_MODE: "source"
+#     WORKHORSE: "gpu"
+
+- name: Install cudnn nvinfer
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libnvinfer8=8.6.0.12-1+cuda11.8
+      - libnvonnxparsers8=8.6.0.12-1+cuda11.8
+      - libnvparsers8=8.6.0.12-1+cuda11.8
+      - libnvinfer-plugin8=8.6.0.12-1+cuda11.8
+      - libnvinfer-dev=8.6.0.12-1+cuda11.8
+      - libnvonnxparsers-dev=8.6.0.12-1+cuda11.8
+      - libnvparsers-dev=8.6.0.12-1+cuda11.8
+      - libnvinfer-plugin-dev=8.6.0.12-1+cuda11.8
+      - libnvinfer-headers-dev=8.6.0.12-1+cuda11.8
+      - libnvinfer-headers-plugin-dev=8.6.0.12-1+cuda11.8
+      - libcudnn8=8.*-1+cuda11.8
+      - libcudnn8-dev=8.*-1+cuda11.8
+    allow_downgrade: true
+    allow_change_held_packages: true
+  when: ansible_architecture == 'x86_64'

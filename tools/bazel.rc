@@ -24,7 +24,7 @@ common --color=yes
 build --show_timestamps
 
 # Work around the sandbox issue.
-build --spawn_strategy=standalone
+build --spawn_strategy=sandboxed
 # build --experimental_reuse_sandbox_directories
 # build --experimental_sandbox_async_tree_delete_idle_threads=1
 
@@ -35,6 +35,7 @@ build --cxxopt="-fdiagnostics-color=always"
 # build --output_filter="^//"
 
 build --per_file_copt=external/upb/.*@-Wno-sign-compare
+build --per_file_copt=external/upb/.*@-Wno-error=stringop-truncation
 # build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
 # build --copt="-Werror=unused-variable"
@@ -87,9 +88,9 @@ build:c++17 --cxxopt=-std=c++1z
 # build:c++17 --cxxopt=-stdlib=libc++
 build:c++1z --config=c++17
 
-# Enable C++14 (aka c++1y) by default
-build --cxxopt="-std=c++14"
-build --host_cxxopt="-std=c++14"
+# Enable C++17 (aka c++1z) by default
+build --cxxopt="-std=c++1z"
+build --host_cxxopt="-std=c++1z"
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |

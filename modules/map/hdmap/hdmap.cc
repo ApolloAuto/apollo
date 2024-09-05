@@ -39,6 +39,10 @@ JunctionInfoConstPtr HDMap::GetJunctionById(const Id& id) const {
   return impl_.GetJunctionById(id);
 }
 
+AreaInfoConstPtr HDMap::GetAreaById(const Id& id) const {
+  return impl_.GetAreaById(id);
+}
+
 SignalInfoConstPtr HDMap::GetSignalById(const Id& id) const {
   return impl_.GetSignalById(id);
 }
@@ -87,6 +91,11 @@ int HDMap::GetLanes(const apollo::common::PointENU& point, double distance,
 int HDMap::GetJunctions(const apollo::common::PointENU& point, double distance,
                         std::vector<JunctionInfoConstPtr>* junctions) const {
   return impl_.GetJunctions(point, distance, junctions);
+}
+
+int HDMap::GetAreas(const apollo::common::PointENU& point, double distance,
+                    std::vector<AreaInfoConstPtr>* areas) const {
+  return impl_.GetAreas(point, distance, areas);
 }
 
 int HDMap::GetSignals(const apollo::common::PointENU& point, double distance,

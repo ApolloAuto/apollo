@@ -46,19 +46,12 @@ class HMI : public UpdaterBase {
   void Stop();
   void StopStream(const std::string &channel_name = "") override;
   void OnTimer(const std::string &channel_name = "");
-  bool UpdateScenarioSetToStatus(const std::string &scenario_set_id,
-                                 const std::string &scenario_set_name);
   bool UpdateDynamicModelToStatus(const std::string &dynamic_model_name);
-  bool UpdateMapToStatus(const std::string &map_name);
+  bool UpdateMapToStatus(const std::string &map_name = "");
   bool UpdateRecordToStatus();
   bool UpdateVehicleToStatus();
   bool UpdateCameraChannelToStatus(const std::string &channel_name);
   bool UpdatePointChannelToStatus(const std::string &channel_name);
-  bool StartSimObstacle();
-  bool StopSimObstacle();
-  bool StartScenarioSimulation();
-  bool StopScenarioSimulation();
-  nlohmann::json GetCurrentScenarioExtremPoint();
   bool isProcessRunning(const std::string &process_name);
 
  private:

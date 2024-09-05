@@ -1,0 +1,4 @@
+name: "heading"
+apollo_channel_name_0: "/apollo/sensor/gnss/heading"
+ros_topic_name_0: "/gps/fix"
+ros_topic_name_1: "/odometry"

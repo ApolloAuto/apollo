@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/message/arena_message_wrapper.h"
 #include "cyber/message/raw_message.h"
 
 namespace apollo {
@@ -37,6 +38,16 @@ inline bool ParseFromArray(const void* data, int size, RawMessage* message) {
 }
 
 inline int ByteSize(const RawMessage& message) { return message.ByteSize(); }
+
+inline bool SerializeToArenaMessageWrapper(const RawMessage& message,
+                                           ArenaMessageWrapper* wrapper) {
+  return false;
+}
+
+inline bool ParseFromArenaMessageWrapper(ArenaMessageWrapper* wrapper,
+                                         RawMessage* message) {
+  return false;
+}
 
 }  // namespace message
 }  // namespace cyber

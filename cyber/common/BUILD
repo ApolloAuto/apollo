@@ -1,16 +1,13 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 apollo_cc_library(
     name = "cyber_common",
     srcs = [
-        "global_data.cc",
         "file.cc",
-    ],
-    data = [
-        "//cyber:cyber_conf",
+        "global_data.cc",
     ],
     hdrs = [
         "environment.h",
@@ -22,13 +19,17 @@ apollo_cc_library(
         "types.h",
         "util.h",
     ],
+    data = [
+        "//cyber:cyber_conf",
+    ],
     deps = [
         "//cyber:cyber_binary",
         "//cyber/base:cyber_base",
         "//cyber/proto:cyber_conf_cc_proto",
+        "//cyber/proto:transport_conf_cc_proto",
+        "@com_github_google_glog//:glog",
         "@com_github_nlohmann_json//:json",
         "@com_google_protobuf//:protobuf",
-        "@com_github_google_glog//:glog",
     ],
 )
 

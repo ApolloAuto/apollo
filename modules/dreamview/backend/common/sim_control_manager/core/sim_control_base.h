@@ -70,7 +70,7 @@ class SimControlBase {
    * @brief Starts running the simulated control algorithm with position, e.g.,
    * publish simulated localization and chassis messages triggered by timer.
    */
-  virtual void Start(double x, double y) = 0;
+  virtual void Start(double x, double y, double v = 0.0, double a = 0.0) = 0;
 
   /**
    * @brief Set vehicle position.

@@ -135,3 +135,14 @@ DEFINE_bool(publish_control_debug_info, false,
 
 DEFINE_bool(query_forward_station_point_only, false,
             "only use the trajectory point in future");
+
+DEFINE_bool(use_speed_filter, false, "use speed smooth filter");
+
+DEFINE_bool(use_throttle_filter, false, "use throttle smooth filter");
+
+DEFINE_double(speed_smoothing_factor, 0.05, "speed smooth factor");
+
+DEFINE_double(throttle_smoothing_factor, 0.05, "speed smooth factor");
+
+DEFINE_bool(use_calibration_dimension_equal_check, false,
+            "use calibration dimension equal check");

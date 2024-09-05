@@ -27,6 +27,7 @@ apollo_component(
         "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/common_msgs/external_command_msgs:lane_follow_command_cc_proto",
         "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
+        "//modules/common_msgs/control_msgs:control_interactive_msg_cc_proto",
         "//cyber",
     ],
 )

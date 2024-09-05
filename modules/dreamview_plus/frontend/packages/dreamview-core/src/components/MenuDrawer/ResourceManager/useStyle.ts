@@ -67,3 +67,39 @@ export const useTableHover = makeStylesWithProps<number>()((theme, activeIndex) 
         },
     },
 }));
+
+export const useTitleTrangle = makeStyles((theme) => ({
+    'title-operate': {
+        display: 'inline-flex',
+        alignItems: 'center',
+    },
+    'title-triangle': {
+        marginLeft: '8px',
+        // position: 'absolute',
+        width: 0,
+        height: 0,
+        // top: '6px',
+        // right: '-16px',
+        borderLeft: '5px solid transparent',
+        borderRight: '5px solid transparent',
+        borderBottom: '6px solid #D8D8D8',
+    },
+    'operate-container': {
+        margin: '-12px 0',
+    },
+    'operate-item': {
+        cursor: 'pointer',
+        textAlign: 'left',
+        height: '32px',
+        lineHeight: '32px',
+        whiteSpace: 'nowrap',
+        padding: '0 12px',
+        color: theme.tokens.colors.fontColor6,
+        '&:hover': {
+            color: theme.tokens.colors.brand3,
+        },
+    },
+    'operate-item-active': {
+        color: theme.tokens.colors.brand3,
+    },
+}));

@@ -1,0 +1,5 @@
+name: "odometry_parser"
+apollo_channel_name_0: "/apollo/sensor/gnss/odometry"
+ros_topic_name_0: "/imu"
+ros_topic_name_1: "/gps"
+ros_topic_name_2: "/odom"

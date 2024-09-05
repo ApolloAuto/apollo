@@ -14,10 +14,24 @@ message ShmMulticastLocator {
   optional uint32 port = 2;
 };
 
+message ArenaChannelConf {
+  optional string channel_name = 1;
+  // the acutal arena segment size is equal with max_msg_size * max_pool_size + meta,
+  // so max_msg_size * max_pool_size should be less than the limit of ArenaAddressAllocator:
+  // 2^31 - 128 * 1024 * 1024, which is hardcode in the underlying implementation
+  optional uint64 max_msg_size = 2 [default = 33554432];
+  optional uint64 max_pool_size = 3 [default = 32];
+};
+
+message ArenaShmConf {
+  repeated ArenaChannelConf arena_channel_conf = 1;
+};
+
 message ShmConf {
   optional string notifier_type = 1;
   optional string shm_type = 2;
   optional ShmMulticastLocator shm_locator = 3;
+  optional ArenaShmConf arena_shm_conf = 4;
 };
 
 message RtpsParticipantAttr {

@@ -22,6 +22,7 @@ limitations under the License.
 #include <unordered_set>
 
 #include "absl/strings/match.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
@@ -34,18 +35,18 @@ using apollo::common::PointENU;
 using apollo::common::math::AABoxKDTreeParams;
 using apollo::common::math::Vec2d;
 
-Id CreateHDMapId(const std::string& string_id) {
-  Id id;
-  id.set_id(string_id);
-  return id;
-}
-
 // default lanes search radius in GetForwardNearestSignalsOnLane
 constexpr double kLanesSearchRange = 10.0;
 // backward search distance in GetForwardNearestSignalsOnLane
 constexpr int kBackwardDistance = 4;
 
 }  // namespace
+
+Id HDMapImpl::CreateHDMapId(const std::string& string_id) const {
+  Id id;
+  id.set_id(string_id);
+  return id;
+}
 
 int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
@@ -81,6 +82,11 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   for (const auto& junction : map_.junction()) {
     junction_table_[junction.id().id()].reset(new JunctionInfo(junction));
   }
+
+  for (const auto& ad_area : map_.ad_area()) {
+    area_table_[ad_area.id().id()].reset(new AreaInfo(ad_area));
+  }
+
   for (const auto& signal : map_.signal()) {
     signal_table_[signal.id().id()].reset(new SignalInfo(signal));
   }
@@ -147,6 +153,10 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   for (const auto& stop_sign_ptr_pair : stop_sign_table_) {
     stop_sign_ptr_pair.second->PostProcess(*this);
   }
+  for (const auto& area_ptr_pair : area_table_) {
+    area_ptr_pair.second->PostProcess(*this);
+  }
+
   BuildLaneSegmentKDTree();
   BuildJunctionPolygonKDTree();
   BuildSignalSegmentKDTree();
@@ -157,6 +167,7 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   BuildSpeedBumpSegmentKDTree();
   BuildParkingSpacePolygonKDTree();
   BuildPNCJunctionPolygonKDTree();
+  BuildAreaPolygonKDTree();
   return 0;
 }
 
@@ -168,6 +179,11 @@ LaneInfoConstPtr HDMapImpl::GetLaneById(const Id& id) const {
 JunctionInfoConstPtr HDMapImpl::GetJunctionById(const Id& id) const {
   JunctionTable::const_iterator it = junction_table_.find(id.id());
   return it != junction_table_.end() ? it->second : nullptr;
+}
+
+AreaInfoConstPtr HDMapImpl::GetAreaById(const Id& id) const {
+  AreaTable::const_iterator it = area_table_.find(id.id());
+  return it != area_table_.end() ? it->second : nullptr;
 }
 
 SignalInfoConstPtr HDMapImpl::GetSignalById(const Id& id) const {
@@ -295,6 +311,29 @@ int HDMapImpl::GetJunctions(
   }
   for (const auto& id : ids) {
     junctions->emplace_back(GetJunctionById(CreateHDMapId(id)));
+  }
+  return 0;
+}
+
+int HDMapImpl::GetAreas(const PointENU& point, double distance,
+                        std::vector<AreaInfoConstPtr>* areas) const {
+  return GetAreas({point.x(), point.y()}, distance, areas);
+}
+
+int HDMapImpl::GetAreas(const Vec2d& point, double distance,
+                        std::vector<AreaInfoConstPtr>* areas) const {
+  if (areas == nullptr || area_polygon_kdtree_ == nullptr) {
+    return -1;
+  }
+  areas->clear();
+  std::vector<std::string> ids;
+  const int status =
+      SearchObjects(point, distance, *area_polygon_kdtree_, &ids);
+  if (status < 0) {
+    return status;
+  }
+  for (const auto& id : ids) {
+    areas->emplace_back(GetAreaById(CreateHDMapId(id)));
   }
   return 0;
 }
@@ -1239,9 +1278,9 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
 }
 
 int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
-                    double distance, double central_heading,
-                    double max_heading_difference,
-                    std::vector<RSUInfoConstPtr>* rsus) const {
+                                     double distance, double central_heading,
+                                     double max_heading_difference,
+                                     std::vector<RSUInfoConstPtr>* rsus) const {
   CHECK_NOTNULL(rsus);
 
   rsus->clear();
@@ -1250,13 +1289,9 @@ int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
 
   double nearest_s = 0.0;
   double nearest_l = 0.0;
-  if (GetNearestLaneWithHeading(target_point,
-                              distance,
-                              central_heading,
-                              max_heading_difference,
-                              &lane_ptr,
-                              &nearest_s,
-                              &nearest_l) == -1) {
+  if (GetNearestLaneWithHeading(target_point, distance, central_heading,
+                                max_heading_difference, &lane_ptr, &nearest_s,
+                                &nearest_l) == -1) {
     AERROR << "Fail to get nearest lanes";
     return -1;
   }
@@ -1285,8 +1320,8 @@ int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
 
         const auto junction_ptr = GetJunctionById(overlap_object.id());
         CHECK_NOTNULL(junction_ptr);
-        if (nearst_lane_id == lane_ptr->id().id()
-          && !junction_ptr->polygon().IsPointIn(target_point)) {
+        if (nearst_lane_id == lane_ptr->id().id() &&
+            !junction_ptr->polygon().IsPointIn(target_point)) {
           if (nearest_s > start_s) {
             continue;
           }
@@ -1323,12 +1358,12 @@ int HDMapImpl::GetForwardNearestRSUs(const apollo::common::PointENU& point,
       }
 
       if (!rsus->empty()) {
-          break;
+        break;
       }
     }
 
     if (!rsus->empty()) {
-        break;
+      break;
     }
 
     for (const auto suc_lane_id : lane_ptr->lane().successor_id()) {
@@ -1398,6 +1433,14 @@ void HDMapImpl::BuildJunctionPolygonKDTree() {
   params.max_leaf_size = 1;
   BuildPolygonKDTree(junction_table_, params, &junction_polygon_boxes_,
                      &junction_polygon_kdtree_);
+}
+
+void HDMapImpl::BuildAreaPolygonKDTree() {
+  AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 1;
+  BuildPolygonKDTree(area_table_, params, &area_polygon_boxes_,
+                     &area_polygon_kdtree_);
 }
 
 void HDMapImpl::BuildCrosswalkPolygonKDTree() {
@@ -1490,6 +1533,7 @@ void HDMapImpl::Clear() {
   map_.Clear();
   lane_table_.clear();
   junction_table_.clear();
+  area_table_.clear();
   signal_table_.clear();
   crosswalk_table_.clear();
   stop_sign_table_.clear();
@@ -1500,6 +1544,8 @@ void HDMapImpl::Clear() {
   lane_segment_kdtree_.reset(nullptr);
   junction_polygon_boxes_.clear();
   junction_polygon_kdtree_.reset(nullptr);
+  area_polygon_boxes_.clear();
+  area_polygon_kdtree_.reset(nullptr);
   crosswalk_polygon_boxes_.clear();
   crosswalk_polygon_kdtree_.reset(nullptr);
   signal_segment_boxes_.clear();

@@ -53,6 +53,8 @@ def _execute(
   """
     result = repository_ctx.execute(cmdline)
     if result.stderr or not (empty_stdout_fine or result.stdout):
+        if result.return_code == 0:
+            return result
         _fail("\n".join([
             error_msg.strip() if error_msg else "Repository command failed",
             result.stderr.strip(),
@@ -172,19 +174,36 @@ def _get_python_lib(repository_ctx, python_bin, lib_path_key):
     if python_lib != None:
         return python_lib
     print_lib = (
-        "<<END\n" + "from __future__ import print_function\n" +
-        "import site\n" + "import os\n" + "\n" + "try:\n" +
-        "  input = raw_input\n" + "except NameError:\n" + "  pass\n" + "\n" +
-        "python_paths = []\n" + "if os.getenv('PYTHONPATH') is not None:\n" +
-        "  python_paths = os.getenv('PYTHONPATH').split(':')\n" + "try:\n" +
+        "<<END\n" +
+        "from __future__ import print_function\n" +
+        "import site\n" +
+        "import os\n" +
+        "import platform\n" +
+        "\n" +
+        "try:\n" +
+        "  input = raw_input\n" +
+        "except NameError:\n" +
+        "  pass\n" +
+        "\n" +
+        "python_paths = []\n" +
+        "if os.getenv('PYTHONPATH') is not None:\n" +
+        "  python_paths = os.getenv('PYTHONPATH').split(':')\n" +
+        "try:\n" +
         "  library_paths = site.getsitepackages()\n" +
         "except AttributeError:\n" +
-        " from distutils.sysconfig import get_python_lib\n" +
-        " library_paths = [get_python_lib()]\n" +
-        "all_paths = set(python_paths + library_paths)\n" + "paths = []\n" +
-        "for path in all_paths:\n" + "  if os.path.isdir(path):\n" +
-        "    paths.append(path)\n" + "if len(paths) >=1:\n" +
-        "  print(paths[0])\n" + "END"
+        "  from sysconfig import get_path\n" +
+        "  if platform.freedesktop_os_release().get('ID') in ('debian', 'ubuntu'):\n" +
+        "    library_paths = [get_path('platlib', 'deb_system')]\n" +
+        "  else:\n" +
+        "    library_paths = [get_path('platlib')]\n" +
+        "all_paths = set(python_paths + library_paths)\n" +
+        "paths = []\n" +
+        "for path in all_paths:\n" +
+        "  if os.path.isdir(path):\n" +
+        "    paths.append(path)\n" +
+        "if len(paths) >=1:\n" +
+        "  print(paths[0])\n" +
+        "END"
     )
     cmd = "%s - %s" % (python_bin, print_lib)
     result = repository_ctx.execute([_get_bash_bin(repository_ctx), "-c", cmd])
@@ -212,9 +231,8 @@ def _get_python_include(repository_ctx, python_bin):
         [
             python_bin,
             "-c",
-            "from __future__ import print_function;" +
-            "from distutils import sysconfig;" +
-            "print(sysconfig.get_python_inc())",
+            "import sysconfig;import platform;" +
+            "print(sysconfig.get_path('include', 'deb_system') if platform.freedesktop_os_release().get('ID') in ('ubuntu', 'debian') else sysconfig.get_path('include'))",
         ],
         error_msg = "Problem getting python include path for {}.".format(python_bin),
         error_details = (

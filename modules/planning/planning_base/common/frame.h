@@ -112,7 +112,8 @@ class Frame {
 
   const Obstacle *CreateStopObstacle(
       ReferenceLineInfo *const reference_line_info,
-      const std::string &obstacle_id, const double obstacle_s);
+      const std::string &obstacle_id, const double obstacle_s,
+      double stop_wall_width = 4.0);
 
   const Obstacle *CreateStopObstacle(const std::string &obstacle_id,
                                      const std::string &lane_id,

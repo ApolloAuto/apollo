@@ -48,7 +48,12 @@ class RtpsTransmitter : public Transmitter<M> {
   void Enable() override;
   void Disable() override;
 
+  void Enable(const RoleAttributes& opposite_attr) override;
+  void Disable(const RoleAttributes& opposite_attr) override;
+
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
+
+  bool AcquireMessage(std::shared_ptr<M>& msg);
 
  private:
   bool Transmit(const M& msg, const MessageInfo& msg_info);
@@ -58,6 +63,11 @@ class RtpsTransmitter : public Transmitter<M> {
 };
 
 template <typename M>
+bool RtpsTransmitter<M>::AcquireMessage(std::shared_ptr<M>& msg) {
+  return false;
+}
+
+template <typename M>
 RtpsTransmitter<M>::RtpsTransmitter(const RoleAttributes& attr,
                                     const ParticipantPtr& participant)
     : Transmitter<M>(attr), participant_(participant), publisher_(nullptr) {}
@@ -65,6 +75,18 @@ RtpsTransmitter<M>::RtpsTransmitter(const RoleAttributes& attr,
 template <typename M>
 RtpsTransmitter<M>::~RtpsTransmitter() {
   Disable();
+}
+
+template <typename M>
+void RtpsTransmitter<M>::Enable(const RoleAttributes& opposite_attr) {
+  (void)opposite_attr;
+  this->Enable();
+}
+
+template <typename M>
+void RtpsTransmitter<M>::Disable(const RoleAttributes& opposite_attr) {
+  (void)opposite_attr;
+  this->Disable();
 }
 
 template <typename M>

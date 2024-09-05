@@ -531,6 +531,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetPNCJunctionById(object_map_id) != nullptr) {
         pnc_junctions_.emplace_back(overlap_ptr);
       }
+      if (map_instance.GetAreaById(object_map_id) != nullptr) {
+        areas_.emplace_back(overlap_ptr);
+      }
     }
   }
 }
@@ -582,6 +585,44 @@ void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
 
       if (object.has_stop_sign_overlap_info()) {
         overlap_stop_sign_ids_.push_back(object.id());
+      }
+    }
+  }
+}
+
+AreaInfo::AreaInfo(const Area &ad_area) : ad_area_(ad_area) { Init(); }
+
+void AreaInfo::Init() {
+  polygon_ = ConvertToPolygon2d(ad_area_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
+
+  for (const auto &overlap_id : ad_area_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
+}
+
+void AreaInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void AreaInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_area_overlap_info()) {
+        auto area =
+            map_instance.GetAreaById(map_instance.CreateHDMapId(object_id));
+        if (area->type() == Area::UnDriveable)
+          overlap_undriveable_areas_.push_back(area);
       }
     }
   }

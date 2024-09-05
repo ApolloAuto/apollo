@@ -150,39 +150,19 @@ void OpenSpacePreStopDecider::SetParkingSpotStopFence(
     ReferenceLineInfo* const reference_line_info) {
   const auto& nearby_path = reference_line_info->reference_line().map_path();
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  const double front_edge_to_center = common::VehicleConfigHelper::Instance()
+                                          ->GetConfig()
+                                          .vehicle_param()
+                                          .front_edge_to_center();
+  double ego_s = adc_front_edge_s - front_edge_to_center;
   const VehicleState& vehicle_state = frame->vehicle_state();
   double stop_line_s = 0.0;
   double stop_distance_to_target = config_.stop_distance_to_target();
   double static_linear_velocity_epsilon = 1.0e-2;
   static constexpr double kStopBuffer = 0.2;
   CHECK_GE(stop_distance_to_target, 1.0e-8);
-  double target_vehicle_offset = target_s - adc_front_edge_s;
-  if (target_vehicle_offset > stop_distance_to_target) {
-    stop_line_s = target_s - stop_distance_to_target;
-  } else if (target_vehicle_offset < stop_distance_to_target - kStopBuffer) {
-    stop_line_s = target_s + stop_distance_to_target;
-  } else if (target_vehicle_offset < -stop_distance_to_target) {
-    if (!frame->open_space_info().pre_stop_rightaway_flag()) {
-      // TODO(Jinyun) Use constant comfortable deacceleration rather than
-      // distance by config to set stop fence
-      stop_line_s = adc_front_edge_s + config_.rightaway_stop_distance();
-      if (std::abs(vehicle_state.linear_velocity()) <
-          static_linear_velocity_epsilon) {
-        stop_line_s = adc_front_edge_s;
-      }
-      *(frame->mutable_open_space_info()->mutable_pre_stop_rightaway_point()) =
-          nearby_path.GetSmoothPoint(stop_line_s);
-      frame->mutable_open_space_info()->set_pre_stop_rightaway_flag(true);
-    } else {
-      double stop_point_s = 0.0;
-      double stop_point_l = 0.0;
-      nearby_path.GetNearestPoint(
-          frame->open_space_info().pre_stop_rightaway_point(), &stop_point_s,
-          &stop_point_l);
-      stop_line_s = stop_point_s;
-    }
-  }
-
+  stop_line_s =
+      target_s + front_edge_to_center + config_.stop_buffer_to_target();
   const std::string stop_wall_id = OPEN_SPACE_STOP_ID;
   std::vector<std::string> wait_for_obstacles;
   frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(

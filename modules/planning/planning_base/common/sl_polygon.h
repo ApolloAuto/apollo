@@ -20,10 +20,12 @@
 
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <string>
 #include <vector>
 
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 
 #include "cyber/common/log.h"
@@ -34,6 +36,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::SLPoint;
+using apollo::perception::PerceptionObstacle;
 
 class SLPolygon {
  public:
@@ -42,10 +45,13 @@ class SLPolygon {
     RIGHT_NUDGE,
     UNDEFINED,
     BLOCKED,
+    IGNORE,
   };
   SLPolygon() = default;
-  explicit SLPolygon(SLBoundary sl_boundary, std::string id = "",
-                     bool print_log = false);
+  explicit SLPolygon(
+      SLBoundary sl_boundary, std::string id = "",
+      PerceptionObstacle::Type type = PerceptionObstacle::UNKNOWN,
+      bool print_log = false);
   virtual ~SLPolygon() = default;
   static double GetInterpolatedLFromBoundary(
       const std::vector<SLPoint>& boundary, const double s);
@@ -79,6 +85,23 @@ class SLPolygon {
   void PrintToLogBlock() const;
   std::string id() const { return id_; }
 
+  void SetOverlapeWithReferCenter(bool overlap) {
+    overlape_with_refer_center_ = overlap;
+  }
+  bool OverlapeWithReferCenter() const { return overlape_with_refer_center_; }
+  void SetOverlapeSizeWithReference(double abs_l) {
+    overlape_size_with_reference_ =
+        std::max(abs_l, overlape_size_with_reference_);
+  }
+  double OverlapeSizeWithReference() const {
+    return overlape_size_with_reference_;
+  }
+
+  std::array<bool, 2>& is_passable() { return is_passable_; }
+  void UpdatePassableInfo(double left_bound, double right_bound, double buffer);
+  double MinRadiusStopDistance(double check_l);
+  PerceptionObstacle::Type ObstacleType() const { return obstacle_type_; }
+
  private:
   std::vector<SLPoint> left_boundary_;
   std::vector<SLPoint> right_boundary_;
@@ -88,7 +111,12 @@ class SLPolygon {
   SLPoint min_l_point_;
   SLPoint max_l_point_;
   std::string id_;
+  bool overlape_with_refer_center_ = false;
+  double overlape_size_with_reference_ = 0.0;
   NudgeType nudge_type_ = NudgeType::UNDEFINED;
+  std::array<bool, 2> is_passable_ = {true, true};
+  double min_radius_stop_distance_ = -1.0;
+  PerceptionObstacle::Type obstacle_type_ = PerceptionObstacle::UNKNOWN;
 };
 
 }  // namespace planning

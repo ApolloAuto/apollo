@@ -44,6 +44,8 @@ class Transmitter : public Endpoint {
   virtual void Enable() = 0;
   virtual void Disable() = 0;
 
+  virtual bool AcquireMessage(std::shared_ptr<M>& msg) = 0;
+
   virtual void Enable(const RoleAttributes& opposite_attr);
   virtual void Disable(const RoleAttributes& opposite_attr);
 

@@ -6,12 +6,13 @@ licenses(["notice"])
 
 cc_library(
     name = "ncurses5",
+    hdrs = glob(["**/*"]),
     includes = [
         ".",
     ],
     linkopts = [
         "-lncurses",
+        "-ltinfo",
     ],
-    hdrs = glob(["**/*"]),
     linkstatic = False,
 )

@@ -195,7 +195,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       *(local_view_.chassis), vehicle_state, start_timestamp,
       planning_cycle_time, FLAGS_trajectory_stitching_preserved_length, true,
-      last_publishable_trajectory_.get(), &replan_reason);
+      last_publishable_trajectory_.get(), &replan_reason,
+      *local_view_.control_interactive_msg);
 
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);

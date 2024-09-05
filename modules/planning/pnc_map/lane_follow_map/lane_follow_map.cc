@@ -184,6 +184,7 @@ void LaneFollowMap::UpdateRoutingRange(int adc_index) {
 bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!IsValid(last_command_)) {
     AERROR << "The routing is invalid when updating vehicle state.";
+    route_segments_lane_ids_.clear();
     return false;
   }
   if (!adc_state_.has_x() ||
@@ -201,6 +202,7 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     AERROR << "Failed to get waypoint from routing with point: " << "("
            << vehicle_state.x() << ", " << vehicle_state.y() << ", "
            << vehicle_state.z() << ").";
+    route_segments_lane_ids_.clear();
     return false;
   }
   int route_index = GetWaypointIndex(adc_waypoint_);
@@ -475,9 +477,6 @@ bool LaneFollowMap::GetRouteSegments(
              << ", forward: " << forward_length;
       return false;
     }
-    AINFO << "before PrintSegmentsDebugInfo";
-    PrintSegmentsDebugInfo(&route_segments->back(), "origin");
-    AINFO << "after PrintSegmentsDebugInfo";
     if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
       route_segments->back().SetRouteEndWaypoint(last_waypoint);
     }
@@ -495,6 +494,7 @@ bool LaneFollowMap::GetRouteSegments(
       route_segments->back().SetPreviousAction(routing::LEFT);
     }
   }
+  UpdateRouteSegmentsLaneIds(route_segments);
   return !route_segments->empty();
 }
 
@@ -517,6 +517,11 @@ bool LaneFollowMap::GetNearestPointFromRouting(
   for (const auto &lane : valid_lanes) {
     if (range_lane_ids_.count(lane->id().id()) == 0) {
       ADEBUG << "not in range" << lane->id().id();
+      continue;
+    }
+    if (route_segments_lane_ids_.size() > 0 &&
+        route_segments_lane_ids_.count(lane->id().id()) == 0) {
+      ADEBUG << "not in last frame route_segments: " << lane->id().id();
       continue;
     }
     double s = 0.0;
@@ -760,34 +765,99 @@ void LaneFollowMap::AppendLaneToPoints(
   }
 }
 
-void LaneFollowMap::PrintSegmentsDebugInfo(
-    const apollo::hdmap::RouteSegments *segments, std::string debug_str) {
-  PrintCurves trans_left_pt_print_curve;
-  PrintCurves trans_right_pt_print_curve;
-  PrintCurves trans_center_print_curve;
-  for (size_t i = 0; i < segments->size(); ++i) {
-    for (const auto &seg :
-         segments->at(i).lane->lane().left_boundary().curve().segment()) {
-      for (const auto &pt : seg.line_segment().point()) {
-        trans_left_pt_print_curve.AddPoint(debug_str + "_left_pt_print", pt.x(),
-                                           pt.y());
+void LaneFollowMap::UpdateRouteSegmentsLaneIds(
+    const std::list<hdmap::RouteSegments> *route_segments) {
+  route_segments_lane_ids_.clear();
+  for (auto &route_seg : *route_segments) {
+    for (auto &lane_seg : route_seg) {
+      if (nullptr == lane_seg.lane) {
+        continue;
       }
-    }
-    for (const auto &seg :
-         segments->at(i).lane->lane().right_boundary().curve().segment()) {
-      for (const auto &pt : seg.line_segment().point()) {
-        trans_right_pt_print_curve.AddPoint(debug_str + "_right_pt_print",
-                                            pt.x(), pt.y());
-      }
-    }
-    for (const auto &pt : segments->at(i).lane->points()) {
-      trans_center_print_curve.AddPoint(debug_str + "_center_pt_print", pt.x(),
-                                        pt.y());
+      route_segments_lane_ids_.insert(lane_seg.lane->id().id());
     }
   }
-  trans_left_pt_print_curve.PrintToLog();
-  trans_right_pt_print_curve.PrintToLog();
-  trans_center_print_curve.PrintToLog();
+}
+
+apollo::hdmap::LaneWaypoint LaneFollowMap::GetAdcWaypoint() const {
+  return adc_waypoint_;
+}
+
+double LaneFollowMap::GetDistanceToDestination() const {
+  if (adc_route_index_ < 0 || adc_route_index_ >= route_indices_.size()) {
+    AERROR << "adc_route_index error, can not get distance to destination, "
+              "return 0.";
+    return 0.0;
+  }
+  const auto &routing = last_command_.lane_follow_command();
+  int adc_road_index = route_indices_[adc_route_index_].index[0];
+  int adc_passage_index = route_indices_[adc_route_index_].index[1];
+  int adc_lane_index = route_indices_[adc_route_index_].index[2];
+
+  bool get_adc_exit_waypoint =
+      routing.road(adc_road_index).passage(adc_passage_index).can_exit();
+  int start_passage_index = adc_passage_index;
+  int start_lane_index = adc_lane_index;
+  double start_lane_s = adc_waypoint_.s;
+
+  double dis_to_destination = 0.0;
+
+  for (int road_index = adc_road_index; road_index < routing.road_size();
+       ++road_index) {
+    const auto &road_segment = routing.road(road_index);
+    for (int passage_index = 0; passage_index < road_segment.passage_size();
+         ++passage_index) {
+      const auto &passage = road_segment.passage(passage_index);
+      if (!passage.can_exit()) {
+        continue;
+      }
+      // check this passsage is can_exit
+      if (!get_adc_exit_waypoint) {
+        get_adc_exit_waypoint = true;
+        // find adc waypoint in passage which can exit
+        for (int index = 0; index < passage.segment_size(); ++index) {
+          auto lane = hdmap_->GetLaneById(
+              hdmap::MakeMapId(passage.segment(index).id()));
+          double s = 0.0;
+          double l = 0.0;
+          if (!lane->GetProjection({adc_state_.x(), adc_state_.y()}, &s, &l)) {
+            continue;
+          }
+          static constexpr double kEpsilon = 0.5;
+          if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
+            continue;
+          }
+          start_passage_index = passage_index;
+          start_lane_index = index;
+          start_lane_s = s;
+        }
+      }
+
+      // add distance by lane in can_exit passage
+      if (get_adc_exit_waypoint) {
+        if (road_index == adc_road_index &&
+            passage_index == start_passage_index) {
+          for (int lane_index = start_lane_index;
+               lane_index < passage.segment_size(); ++lane_index) {
+            if (lane_index == start_lane_index) {
+              dis_to_destination +=
+                  passage.segment(lane_index).end_s() - start_lane_s;
+            } else {
+              dis_to_destination += passage.segment(lane_index).end_s() -
+                                    passage.segment(lane_index).start_s();
+            }
+          }
+        } else {
+          for (int lane_index = 0; lane_index < passage.segment_size();
+               ++lane_index) {
+            dis_to_destination += passage.segment(lane_index).end_s() -
+                                  passage.segment(lane_index).start_s();
+          }
+        }
+        break;
+      }
+    }
+  }
+  return dis_to_destination;
 }
 
 }  // namespace planning

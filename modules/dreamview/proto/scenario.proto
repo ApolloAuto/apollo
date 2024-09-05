@@ -32,4 +32,7 @@ message UserAdsGroup {
   optional string descripition = 8;
   optional double create_time = 9;
   optional double mod_time = 10;
+  optional string category = 11;
+  optional bool is_public = 12;
+  optional bool is_classic = 13;
 }

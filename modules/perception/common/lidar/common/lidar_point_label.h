@@ -42,10 +42,38 @@ enum class PointSemanticLabel {
 
 enum class PointMotionLabel {
   UNKNOWN = 0,
-  STATIC = 1,
-  DYNAMIC = 2,
+  MOVING = 1,
+  STATIONARY = 2,
   MAX_LABEL,
 };  // enum class PointMotionLabel
+
+// save semantic label in last four bits
+inline void SetSemanticLabel(PointSemanticLabel label, uint8_t* value) {
+    *value &= 240;  // 240: 11110000
+    *value |= static_cast<uint8_t>(label);
+}
+
+inline PointSemanticLabel GetSemanticLabel(uint8_t value) {
+    return static_cast<PointSemanticLabel>(value & 15);
+}
+
+inline bool IsSemanticLabelEqual(PointSemanticLabel label, uint8_t value) {
+    return (value & 15) == static_cast<uint8_t>(label);
+}
+
+// save motion label in first four bits
+inline void SetMotionLabel(PointMotionLabel label, uint8_t* value) {
+    *value &= 15;  // 15: 00001111
+    *value = (static_cast<uint8_t>(label) << 4) | (*value);
+}
+
+inline PointMotionLabel GetMotionLabel(uint8_t value) {
+    return static_cast<PointMotionLabel>(value >> 4);
+}
+
+inline bool IsMotionLabelEqual(PointMotionLabel label, uint8_t value) {
+    return (value >> 4) == static_cast<uint8_t>(label);
+}
 
 }  // namespace lidar
 }  // namespace perception

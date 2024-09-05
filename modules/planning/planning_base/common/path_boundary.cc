@@ -68,7 +68,7 @@ const std::string& PathBoundary::blocking_obstacle_id() const {
   return blocking_obstacle_id_;
 }
 
-bool PathBoundary::get_interpolated_s_weight(const double& s,
+bool PathBoundary::get_interpolated_s_weight(const double s,
                                              double* left_weight,
                                              double* right_weight,
                                              size_t* left_index,
@@ -120,6 +120,30 @@ double PathBoundary::get_upper_bound_by_s(const double s) {
   get_interpolated_s_weight(s, &l_weight, &r_weight, &l_index, &r_index);
 
   return at(l_index).l_upper.l * l_weight + at(r_index).l_upper.l * r_weight;
+}
+
+double PathBoundary::get_lower_bound_by_interpolated_index(
+    double left_weight, double right_weight, size_t left_index,
+    size_t right_index) const {
+  if (left_index < 0) {
+    return front().l_lower.l;
+  } else if (right_index >= size()) {
+    return back().l_lower.l;
+  }
+  return at(left_index).l_lower.l * left_weight +
+         at(right_index).l_lower.l * right_weight;
+}
+
+double PathBoundary::get_upper_bound_by_interpolated_index(
+    double left_weight, double right_weight, size_t left_index,
+    size_t right_index) const {
+  if (left_index < 0) {
+    return front().l_upper.l;
+  } else if (right_index >= size()) {
+    return back().l_upper.l;
+  }
+  return at(left_index).l_upper.l * left_weight +
+         at(right_index).l_upper.l * right_weight;
 }
 
 }  // namespace planning

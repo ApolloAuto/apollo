@@ -6,18 +6,18 @@ package(
 )
 
 cc_binary(
-    name = "libtf2.so",
+    name = "libapollo_tf2.so",
     srcs = [
         "src/buffer_core.cpp",
         "src/cache.cpp",
         "src/static_cache.cpp",
         "src/time.cpp",
     ],
-    deps = [
-        "@boost",
-        ":tf2_headers",
-    ],
     linkshared = True,
+    deps = [
+        ":tf2_headers",
+        "@boost",
+    ],
 )
 
 cc_library(
@@ -33,47 +33,47 @@ cc_library(
 cc_library(
     name = "tf2",
     srcs = [
-        ":libtf2.so",
+        ":libapollo_tf2.so",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@boost",
         ":tf2_headers",
+        "@boost",
     ],
 )
 
 install(
     name = "install",
+    data = [
+        ":3rd-tf2.BUILD",
+        ":cyberfile.xml",
+    ],
     data_dest = "3rd-tf2",
     library_dest = "3rd-tf2/lib",
     targets = [
-        ":libtf2.so"
-    ],
-    data = [
-        ":cyberfile.xml",
-        ":3rd-tf2.BUILD",
+        ":libapollo_tf2.so",
     ],
 )
 
 install_src_files(
     name = "install_src",
     deps = [
-        ":install_tf2_src",
         ":install_tf2_hdrs",
+        ":install_tf2_src",
     ],
 )
 
 install_src_files(
     name = "install_tf2_src",
-    src_dir = ["."],
     dest = "3rd-tf2/src",
     filter = "*",
+    src_dir = ["."],
 )
 
 install_src_files(
     name = "install_tf2_hdrs",
-    src_dir = ["include"],
     dest = "3rd-tf2/include",
     filter = "*",
+    src_dir = ["include"],
 )
 # apollo_package()

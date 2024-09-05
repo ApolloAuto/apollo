@@ -46,6 +46,11 @@ class State {
   uint32_t FetchAddSeq(uint32_t diff) { return seq_.fetch_add(diff); }
   uint32_t seq() { return seq_.load(); }
 
+  uint32_t FetchAddArenaSeq(uint32_t diff) {
+    return arena_seq_.fetch_add(diff);
+  }
+  uint32_t arena_seq() { return arena_seq_.load(); }
+
   void set_need_remap(bool need) { need_remap_.store(need); }
   bool need_remap() { return need_remap_; }
 
@@ -55,6 +60,7 @@ class State {
  private:
   std::atomic<bool> need_remap_ = {false};
   std::atomic<uint32_t> seq_ = {0};
+  std::atomic<uint32_t> arena_seq_ = {0};
   std::atomic<uint32_t> reference_count_ = {0};
   std::atomic<uint64_t> ceiling_msg_size_;
 };

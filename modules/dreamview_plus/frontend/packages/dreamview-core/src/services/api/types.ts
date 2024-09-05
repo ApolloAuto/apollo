@@ -225,6 +225,8 @@ export type ScenarioSet = {
             status: ENUM_DOWNLOAD_STATUS;
         };
     };
+    public: boolean;
+    category: string;
     percentage: number;
     resource_id: string;
     resource_type: 'scenario';

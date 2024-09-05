@@ -91,6 +91,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
       open_space_trajectory_optimizer_;
 
   size_t optimizer_thread_counter = 0;
+  apollo::common::TrajectoryPoint last_trajctory_point;
 
   OpenSpaceTrajectoryThreadData thread_data_;
   std::future<void> task_future_;

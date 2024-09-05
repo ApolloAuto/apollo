@@ -151,6 +151,7 @@ class ReferenceLineInfo {
 
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
+  void PrintReferenceSegmentDebugString();
 
   /**
    * Check if the current reference line is a change lane reference line, i.e.,
@@ -243,6 +244,7 @@ class ReferenceLineInfo {
     STOP_SIGN = 6,
     YIELD_SIGN = 7,
     JUNCTION = 8,
+    AREA = 9,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
@@ -253,6 +255,7 @@ class ReferenceLineInfo {
   int GetPnCJunction(const double s,
                      hdmap::PathOverlap* pnc_junction_overlap) const;
   int GetJunction(const double s, hdmap::PathOverlap* junction_overlap) const;
+  int GetArea(const double s, hdmap::PathOverlap* area_overlap) const;
   std::vector<common::SLPoint> GetAllStopDecisionSLPoint() const;
 
   void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
@@ -274,6 +277,14 @@ class ReferenceLineInfo {
 
   void set_id(std::string id) { id_ = id; }
   std::string id() const { return id_; }
+
+  void GetRangeOverlaps(std::vector<hdmap::PathOverlap>* path_overlaps,
+                        double start_s, double end_s);
+
+  const std::vector<double>& reference_line_towing_l() const;
+  std::vector<double>* mutable_reference_line_towing_l();
+  const PathBoundary& reference_line_towing_path_boundary() const;
+  PathBoundary* mutable_reference_line_towing_path_boundary();
 
  private:
   void InitFirstOverlaps();
@@ -326,6 +337,9 @@ class ReferenceLineInfo {
 
   std::vector<PathBoundary> candidate_path_boundaries_;
   std::vector<PathData> candidate_path_data_;
+
+  std::vector<double> reference_line_towing_l_;
+  PathBoundary reference_line_towing_path_boundary_;
 
   PathData path_data_;
   PathData fallback_path_data_;

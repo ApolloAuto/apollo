@@ -24,12 +24,22 @@ namespace apollo {
 namespace dreamview {
 
 std::map<std::string, WebSocketHandler *> DvPluginBase::GetWebSocketHandlers() {
-    return std::map<std::string, WebSocketHandler *>();
+  return std::map<std::string, WebSocketHandler *>();
 }
 
 std::map<std::string, CivetHandler *> DvPluginBase::GetHandlers() {
-    return std::map<std::string, CivetHandler *>();
+  return std::map<std::string, CivetHandler *>();
 }
+
+std::map<std::string, UpdaterBase *> DvPluginBase::GetUpdaterHandlers() {
+  return std::map<std::string, UpdaterBase *>();
+}
+
+apollo::dreamview::DataHandlerConf DvPluginBase::GetDataHandlerConf() {
+  return apollo::dreamview::DataHandlerConf();
+}
+
+void DvPluginBase::Stop() { return; }
 
 }  // namespace dreamview
 }  // namespace apollo

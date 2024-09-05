@@ -38,6 +38,7 @@
 #include "modules/perception/common/lidar/common/cloud_mask.h"
 #include "modules/perception/common/lidar/common/lidar_timer.h"
 #include "modules/perception/common/lidar/common/pcl_util.h"
+#include "modules/perception/common/lidar/common/config_util.h"
 #include "modules/perception/common/util.h"
 #include "modules/perception/lidar_detection/detector/center_point_detection/params.h"
 
@@ -104,6 +105,25 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
       model_param_.postprocess().small_mot_score_threshold();
   big_mot_score_threshold_ =
       model_param_.postprocess().big_mot_score_threshold();
+
+  if (model_param_.has_plugins()) {
+    const auto &plugin = model_param_.plugins();
+    const auto &name = plugin.name();
+    down_sample_ = apollo::cyber::plugin_manager::PluginManager::Instance()
+                       ->CreateInstance<BaseDownSample>(
+                           ConfigUtil::GetFullClassName(name));
+    if (!down_sample_) {
+      AINFO << "Failed to find down_sample plugin: " << name << ", skipped";
+      return false;
+    }
+    DownSampleInitOptions option;
+    option.config_path = plugin.config_path();
+    option.config_file = plugin.config_file();
+    if (!down_sample_->Init(option)) {
+      AINFO << "Failed to init down_sample plugin: " << name << ", skipped";
+      return false;
+    }
+  }
   // if (diff_class_nms_) {
   //   nms_strategy_table_ = {
   //     {base::ObjectType::BICYCLE, {base::ObjectType::PEDESTRIAN,
@@ -213,24 +233,12 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
 
   // down sample the point cloud through filtering voxel grid
   if (model_param_.preprocess().enable_downsample_pointcloud()) {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
-    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
-    TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
-    DownSampleCloudByVoxelGrid(
-        pcl_cloud_ptr, filtered_cloud_ptr,
-        model_param_.preprocess().downsample_voxel_size_x(),
-        model_param_.preprocess().downsample_voxel_size_y(),
-        model_param_.preprocess().downsample_voxel_size_z());
-
-    // transform pcl point cloud to apollo point cloud
-    base::PointFCloudPtr downsample_voxel_cloud_ptr(new base::PointFCloud());
-    TransformFromPCLXYZI(filtered_cloud_ptr, downsample_voxel_cloud_ptr);
-    cur_cloud_ptr_ = downsample_voxel_cloud_ptr;
+    DownSampleOptions down_sample_options;
+    ACHECK(down_sample_ != nullptr);
+    down_sample_->Process(down_sample_options, cur_cloud_ptr_);
   }
-  downsample_time_ = timer.toc(true);
 
+  downsample_time_ = timer.toc(true);
   num_points = cur_cloud_ptr_->size();
   AINFO << "num points before fusing: " << num_points;
 
@@ -1006,8 +1014,9 @@ void CenterPointDetection::FilterObjectsbySemanticType(
     std::vector<int> type_count(static_cast<int>(
         PointSemanticLabel::MAX_LABEL), 0);
     for (size_t k = 0; k < object->lidar_supplement.cloud.size(); k++) {
-      uint8_t value = object->lidar_supplement.cloud.points_semantic_label(k);
-      int index = static_cast<int>(value);
+      PointSemanticLabel label = GetSemanticLabel(
+          object->lidar_supplement.cloud.points_semantic_label(k));
+      int index = static_cast<int>(label);
       if (index >= 0 &&
           index < static_cast<int>(PointSemanticLabel::MAX_LABEL)) {
         type_count[index]++;
@@ -1022,7 +1031,7 @@ void CenterPointDetection::FilterObjectsbySemanticType(
         max_index = j;
       }
     }
-    if (max_index != 0) {
+    if (max_index != static_cast<int>(PointSemanticLabel::OBJECT)) {
       filter_flag.at(i) = true;
     }
   }

@@ -150,3 +150,5 @@ DECLARE_string(default_rtk_record_path);
 DECLARE_bool(dv_cpu_profile);
 
 DECLARE_bool(dv_heap_profile);
+
+DECLARE_double(monitor_timeout_threshold);
