@@ -38,16 +38,6 @@ bool CompensatorComponent::Init() {
 
     writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
     compensator_.reset(new Compensator(config));
-    compensator_pool_.reset(new CCObjectPool<PointCloud>(pool_size_));
-    compensator_pool_->ConstructAll();
-    for (int i = 0; i < pool_size_; ++i) {
-        auto point_cloud = compensator_pool_->GetObject();
-        if (point_cloud == nullptr) {
-            AERROR << "fail to getobject:" << i;
-            return false;
-        }
-        point_cloud->mutable_point()->Reserve(140000);
-    }
     return true;
 }
 
@@ -55,7 +45,7 @@ bool CompensatorComponent::Proc(
         const std::shared_ptr<PointCloud>& point_cloud) {
     const auto start_time = Time::Now();
     std::shared_ptr<PointCloud> point_cloud_compensated
-            = compensator_pool_->GetObject();
+            = writer_->AcquireMessage();
     if (point_cloud_compensated == nullptr) {
         AWARN << "compensator fail to getobject, will be new";
         point_cloud_compensated = std::make_shared<PointCloud>();
