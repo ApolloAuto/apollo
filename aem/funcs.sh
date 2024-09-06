@@ -652,7 +652,7 @@ apollo_container_created_post_action() {
   container_bin_path="/usr/local/bin/"
 
   ${DOCKER} cp "${aem_path}" "${APOLLO_ENV_CONTAINER_NAME}":"${container_bin_path}aem"
-  apollo_execute_cmd_in_container "ln -snf ${container_bin_path}/aem/aem ${container_bin_path}/aem" 
+  apollo_execute_cmd_in_container "ln -snf ${container_bin_path}/aem/run.sh /usr/bin/aem" 
   apollo_execute_cmd_in_container "[[ `uname -m` == "aarch64" ]] && [[ -e /sys/kernel/debug ]] && chmod +rx /sys/kernel/debug"
   apollo_execute_cmd_in_container "apt update && apt install --only-upgrade -y ${init_packages[@]}"
   apollo_execute_cmd_in_container "mkdir -pv /opt/apollo/neo/etc && chmod 777 -R /opt/apollo/neo/etc"
