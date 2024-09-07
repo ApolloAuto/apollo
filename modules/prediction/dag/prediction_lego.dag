@@ -26,6 +26,12 @@ module_config {
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
                 {
+                    channel:"/apollo/prediction/adccontainer"
+                    qos_profile: {
+                        depth : 1
+                    }
+                },
+                {
                     channel:"/apollo/prediction/container"
                     qos_profile: {
                         depth : 1
