@@ -80,10 +80,15 @@ def _pcl_match_version(repository_ctx, sysroot_dir = None):
         empty_stdout_fine = False,
     ).stdout.strip()
 
-    solib = result.rstrip("\n")
+    solibs = result.rstrip("\n").split("\n")
+    solib = ""
+    prefix_dirs = ["/usr", "/usr/local", "/opt/apollo/neo"]
+    for i in prefix_dirs:
+        for j in solibs:
+            if j.startswith(i):
+                solib = j
     lib_path = dirname(solib)
     prefix = solib[:solib.rfind("/lib/")]
-    prefix_dirs = ["/usr", "/usr/local", "/opt/apollo/neo"]
     if sysroot_dir:
         prefix_dirs.append(sysroot_dir)
     if prefix not in prefix_dirs:
