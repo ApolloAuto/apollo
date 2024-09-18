@@ -192,7 +192,11 @@ def _get_python_lib(repository_ctx, python_bin, lib_path_key):
         "  library_paths = site.getsitepackages()\n" +
         "except AttributeError:\n" +
         "  from sysconfig import get_path\n" +
-        "  if platform.freedesktop_os_release().get('ID') in ('debian', 'ubuntu'):\n" +
+        "  if 'freedesktop_os_release' in dir(platform):\n" + 
+        "    platform_id = platform.freedesktop_os_release().get('ID')\n" + 
+        "  else:\n" + 
+        "    platform_id = 'None'\n" + 
+        "  if platform_id in ('debian', 'ubuntu'):\n" +
         "    library_paths = [get_path('platlib', 'deb_system')]\n" +
         "  else:\n" +
         "    library_paths = [get_path('platlib')]\n" +
@@ -231,8 +235,9 @@ def _get_python_include(repository_ctx, python_bin):
         [
             python_bin,
             "-c",
-            "import sysconfig;import platform;" +
-            "print(sysconfig.get_path('include', 'deb_system') if platform.freedesktop_os_release().get('ID') in ('ubuntu', 'debian') else sysconfig.get_path('include'))",
+            "import sysconfig;import platform;import subprocess;" +
+            "os_release = platform.freedesktop_os_release().get('ID') if 'freedesktop_os_release' in dir(platform) else 'None';" + 
+            "print(sysconfig.get_path('include', 'deb_system') if os_release in ('ubuntu', 'debian') else sysconfig.get_path('include'))",
         ],
         error_msg = "Problem getting python include path for {}.".format(python_bin),
         error_details = (
@@ -330,3 +335,4 @@ python_configure(name = "local_config_python")
 Args:
   name: A unique name for this workspace rule.
 """
+
