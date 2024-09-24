@@ -102,9 +102,9 @@ class OdometryParser
   }
   ~OdometryParser() {}
 
-  void imuCallback(const RosImuMsg& msg);
+  void imuCallback(std::shared_ptr<RosImuMsg> msg);
 
-  void gpsCallback(const RosNavMsg& msg);
+  void gpsCallback(std::shared_ptr<RosNavMsg> msg);
 
   void publishOdometry();
 

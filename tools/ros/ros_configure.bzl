@@ -3,7 +3,7 @@ load("//tools/platform:common.bzl",
     "execute", "make_copy_dir_rule", "make_copy_files_rule", "get_copy_dir_files")
 
 _ROS_CODENAME = "ROS_DISTRO"
-
+ROS_FOUND = False
 CC_TPL='''
 cc_library(
     name = "{}",
@@ -18,7 +18,48 @@ ROS_TPL='''
 cc_library(
     name = "ros",
     deps = [{}],
+    hdrs = ["ros_distro.h"],
+    data = [":generate_ros_distro_header"],
+    includes = ["."],
     visibility = ["//visibility:public"],
+)
+'''
+
+ROS_DISTRO_TPL='''
+genrule(
+    name = "generate_ros_distro_header",
+    outs = ["ros_distro.h"],
+    cmd = """
+    if [ -d '/opt/ros' ]; then
+        if [ `ls /opt/ros | wc -l` == "1" ]; then
+            if [ `ls /opt/ros` == "foxy" ]; then
+                echo '#define ROS_DISTRO_FOXY 1' > $@
+            elif [ `ls /opt/ros` == "galactic" ]; then
+                echo '#define ROS_DISTRO_GALACTIC 1' > $@ 
+            elif [ `ls /opt/ros` == "humble" ]; then
+                echo '#define ROS_DISTRO_HUMBLE 1' > $@
+            elif [ `ls /opt/ros` == "iron" ]; then
+                echo '#define ROS_DISTRO_IRON 1' > $@
+            else
+                echo '// Unknown ROS distribution' > $@ 
+            fi
+        else
+            if [ "$$ROS_DISTRO" == "foxy" ]; then
+                echo '#define ROS_DISTRO_FOXY 1' > $@
+            elif [ "$$ROS_DISTRO" == "galactic" ]; then
+                echo '#define ROS_DISTRO_GALACTIC 1' > $@
+            elif [ "$$ROS_DISTRO" == "humble" ]; then
+                echo '#define ROS_DISTRO_HUMBLE 1' > $@
+            elif [ "$$ROS_DISTRO" == "iron" ]; then
+                echo '#define ROS_DISTRO_IRON 1' > $@
+            else
+                echo '// Unknown ROS distribution' > $@
+            fi
+        fi
+    else
+        echo '// No ROS distribution' > $@ 
+    fi
+    """,
 )
 '''
 
@@ -43,6 +84,7 @@ def find_ros_dir(repository_ctx):
         print("No ros2 repositories found, " + 
             "skip to import hdrs and libs.")
         return None
+    ROS_FOUND = True
     return "/opt/ros/{}".format(codename)
 
 def find_ros_workspace_dir(repository_ctx):
@@ -56,6 +98,8 @@ def find_ros_workspace_dir(repository_ctx):
     return "{}/install".format(ros_ws)
 
 def _create_ws_ros_repository(repository_ctx):
+    if not ROS_FOUND:
+        return ([], [], [])
     ros_ws_dir = find_ros_workspace_dir(repository_ctx)
     ros_ws_pkg = _ros_ws_match_package(repository_ctx, ros_ws_dir)
     # ros_ws_pkg_name = [i.split("/")[-1] for i in ros_ws_pkg]
@@ -220,7 +264,7 @@ def _ros_match_libraries(repository_ctx, ros_dir = None, pkgs = [], ros_ws_match
         if ros_ws_match:
             cmd = """find {}/lib -name lib*.so""".format(pkg)
         else:
-            cmd = """ls -1 {}/lib/lib{}*.so | grep -E --color=never 'lib{}__[a-zA-Z0-9_]*\\.so$|lib{}\\.so$'""".format(ros_dir, pkg, pkg, pkg)
+            cmd = """ls -1 {}/lib/lib{}*.so | grep -E --color=never 'lib{}__[a-zA-Z0-9_]*\\.so$|lib{}\\.so$' | grep -v 'connext_c'""".format(ros_dir, pkg, pkg, pkg)
         result = execute(repository_ctx, ["sh", "-c", cmd],
             empty_stdout_fine = True, ignore_error = True).stdout.strip()
         libraries[pkg] = []
@@ -245,6 +289,7 @@ def _ros_configure_impl(repository_ctx):
     # Set up BUILD file.
     build_tpl = repository_ctx.path(Label("//tools/ros:BUILD.tpl"))
     repository_ctx.template("BUILD", build_tpl, {
+        "%{ros_distro_gen_rules}": "%s" % (ROS_DISTRO_TPL),
         "%{copy_rules}": "\n".join(copy_rules),
         "%{ws_copy_rules}": "\n".join(ws_copy_rules), 
         "%{cc_libraries}": "\n".join(cc_libraries),
@@ -255,6 +300,7 @@ def _ros_configure_impl(repository_ctx):
 ros_configure = repository_rule(
     implementation = _ros_configure_impl,
     environ = [],
+    local = True,
 )
 
 """Detects and configures the local ros library.
