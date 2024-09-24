@@ -37,6 +37,7 @@
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/synchronizer.h"
 #include "rclcpp/rclcpp.hpp"
+#include "ros_distro.h"
 #endif
 
 namespace apollo {
@@ -46,12 +47,7 @@ class MessageConverter {
  public:
   MessageConverter() : init_(false) {}
 
-  virtual ~MessageConverter() {
-#ifdef RCLCPP__RCLCPP_HPP_
-    delete ros_node_;
-    delete ros_node_exec_;
-#endif
-  }
+  virtual ~MessageConverter() {}
 
   virtual bool Init() {
     if (init_.exchange(true)) {
@@ -61,9 +57,10 @@ class MessageConverter {
     cyber_node_ = std::move(
         CreateNode(node_name_ + "_" + converter_conf_.name() + "_apollo"));
 #ifdef RCLCPP__RCLCPP_HPP_
-    ros_node_ =
-        new ::rclcpp::Node(node_name_ + "_" + converter_conf_.name() + "_ros");
-    ros_node_exec_ = new ::rclcpp::executors::SingleThreadedExecutor();
+    ros_node_ = std::make_shared<::rclcpp::Node>(
+        node_name_ + "_" + converter_conf_.name() + "_ros");
+    ros_node_exec_ =
+        std::make_shared<::rclcpp::executors::SingleThreadedExecutor>();
 #endif
     return true;
   }
@@ -129,10 +126,15 @@ class MessageConverter {
 #ifdef RCLCPP__RCLCPP_HPP_
   std::vector<std::shared_ptr<::rclcpp::PublisherBase>> ros_publishers_;
   std::vector<std::shared_ptr<::rclcpp::SubscriptionBase>> ros_subscriptions_;
+#if defined(ROS_DISTRO_FOXY) || defined(ROS_DISTRO_GALACTIC)
+  std::vector<std::shared_ptr<::message_filters::SubscriberBase>>
+#else
   std::vector<std::shared_ptr<::message_filters::SubscriberBase<rclcpp::Node>>>
+#endif
       ros_msg_subs_;
-  ::rclcpp::Node* ros_node_ = nullptr;
-  ::rclcpp::executors::SingleThreadedExecutor* ros_node_exec_ = nullptr;
+  std::shared_ptr<::rclcpp::Node> ros_node_ = nullptr;
+  std::shared_ptr<::rclcpp::executors::SingleThreadedExecutor> ros_node_exec_ =
+      nullptr;
   std::shared_ptr<std::thread> ros_spin_thread_;
 #endif
   const std::string node_name_ = "converter_base";

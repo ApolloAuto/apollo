@@ -93,12 +93,13 @@ class RosApolloMessageConverter<
 
 #ifdef RCLCPP__RCLCPP_HPP_
  private:
-  void TopicCallback(const InType0& ros_msg0, const InType1& ros_msg1) {
+  void TopicCallback(std::shared_ptr<InType0> ros_msg0,
+                     std::shared_ptr<InType1> ros_msg1) {
     auto out = std::make_shared<OutType0>();
     typename InType0::SharedPtr internal_in_prt_0 =
-        std::make_shared<InType0>(ros_msg0);
+        std::make_shared<InType0>(*ros_msg0.get());
     typename InType1::SharedPtr internal_in_prt_1 =
-        std::make_shared<InType1>(ros_msg1);
+        std::make_shared<InType1>(*ros_msg1.get());
     auto in_container =
         InputTypes<std::shared_ptr<InType0>, std::shared_ptr<InType1>>{
             std::make_tuple(internal_in_prt_0, internal_in_prt_1)};
@@ -189,13 +190,14 @@ class RosApolloMessageConverter<
 
 #ifdef RCLCPP__RCLCPP_HPP_
  private:
-  void TopicCallback(const InType0& ros_msg0, const InType1& ros_msg1) {
+  void TopicCallback(std::shared_ptr<InType0> ros_msg0,
+                     std::shared_ptr<InType1> ros_msg1) {
     auto out_0 = std::make_shared<OutType0>();
     auto out_1 = std::make_shared<OutType1>();
     typename InType0::SharedPtr internal_in_prt_0 =
-        std::make_shared<InType0>(ros_msg0);
+        std::make_shared<InType0>(*ros_msg0.get());
     typename InType1::SharedPtr internal_in_prt_1 =
-        std::make_shared<InType1>(ros_msg1);
+        std::make_shared<InType1>(*ros_msg1.get());
     auto in_container =
         InputTypes<std::shared_ptr<InType0>, std::shared_ptr<InType1>>{
             std::make_tuple(internal_in_prt_0, internal_in_prt_1)};
@@ -295,14 +297,15 @@ class RosApolloMessageConverter<
 
 #ifdef RCLCPP__RCLCPP_HPP_
  private:
-  void TopicCallback(const InType0& ros_msg0, const InType1& ros_msg1) {
+  void TopicCallback(std::shared_ptr<InType0> ros_msg0,
+                     std::shared_ptr<InType1> ros_msg1) {
     auto out_0 = std::make_shared<OutType0>();
     auto out_1 = std::make_shared<OutType1>();
     auto out_2 = std::make_shared<OutType2>();
     typename InType0::SharedPtr internal_in_prt_0 =
-        std::make_shared<InType0>(ros_msg0);
+        std::make_shared<InType0>(*ros_msg0.get());
     typename InType1::SharedPtr internal_in_prt_1 =
-        std::make_shared<InType1>(ros_msg1);
+        std::make_shared<InType1>(*ros_msg1.get());
     auto in_container =
         InputTypes<std::shared_ptr<InType0>, std::shared_ptr<InType1>>{
             std::make_tuple(internal_in_prt_0, internal_in_prt_1)};
@@ -414,15 +417,16 @@ class RosApolloMessageConverter<
 
 #ifdef RCLCPP__RCLCPP_HPP_
  private:
-  void TopicCallback(const InType0& ros_msg0, const InType1& ros_msg1) {
+  void TopicCallback(std::shared_ptr<InType0> ros_msg0,
+                     std::shared_ptr<InType1> ros_msg1) {
     auto out_0 = std::make_shared<OutType0>();
     auto out_1 = std::make_shared<OutType1>();
     auto out_2 = std::make_shared<OutType2>();
     auto out_3 = std::make_shared<OutType3>();
     typename InType0::SharedPtr internal_in_prt_0 =
-        std::make_shared<InType0>(ros_msg0);
+        std::make_shared<InType0>(*ros_msg0.get());
     typename InType1::SharedPtr internal_in_prt_1 =
-        std::make_shared<InType1>(ros_msg1);
+        std::make_shared<InType1>(*ros_msg1.get());
     auto in_container =
         InputTypes<std::shared_ptr<InType0>, std::shared_ptr<InType1>>{
             std::make_tuple(internal_in_prt_0, internal_in_prt_1)};

@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+%{ros_distro_gen_rules}
+
 %{copy_rules}
 
 %{ws_copy_rules}
