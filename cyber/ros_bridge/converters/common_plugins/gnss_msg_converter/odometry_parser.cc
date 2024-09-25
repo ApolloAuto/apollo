@@ -20,10 +20,10 @@
 namespace apollo {
 namespace cyber {
 
-void OdometryParser::imuCallback(const RosImuMsg& msg) {
+void OdometryParser::imuCallback(std::shared_ptr<RosImuMsg> msg) {
 #ifdef ENABLE_ROS_MSG
   imu_received_.store(true);
-  auto current_time = msg.header.stamp.sec + msg.header.stamp.nanosec / 1e9;
+  auto current_time = msg->header.stamp.sec + msg->header.stamp.nanosec / 1e9;
   double dt = current_time - last_time_;
   last_time_ = current_time;
 
@@ -34,16 +34,16 @@ void OdometryParser::imuCallback(const RosImuMsg& msg) {
   X_ = F_ * X_;
   P_ = F_ * P_ * F_.transpose() + Q_;
 
-  X_(3) += msg.linear_acceleration.x * dt;
-  X_(4) += msg.linear_acceleration.y * dt;
-  X_(5) += msg.linear_acceleration.z * dt;
+  X_(3) += msg->linear_acceleration.x * dt;
+  X_(4) += msg->linear_acceleration.y * dt;
+  X_(5) += msg->linear_acceleration.z * dt;
 
   double euler_angles[3];
 
-  quaternion_[0] = msg.orientation.x;
-  quaternion_[1] = msg.orientation.y;
-  quaternion_[2] = msg.orientation.z;
-  quaternion_[3] = msg.orientation.w;
+  quaternion_[0] = msg->orientation.x;
+  quaternion_[1] = msg->orientation.y;
+  quaternion_[2] = msg->orientation.z;
+  quaternion_[3] = msg->orientation.w;
 
   QuaternionToEuler(quaternion_, euler_angles);
   auto roll = euler_angles[0];
@@ -56,14 +56,14 @@ void OdometryParser::imuCallback(const RosImuMsg& msg) {
 #endif
 }
 
-void OdometryParser::gpsCallback(const RosNavMsg& msg) {
+void OdometryParser::gpsCallback(std::shared_ptr<RosNavMsg> msg) {
 #ifdef ENABLE_ROS_MSG
   gps_received_.store(true);
   constexpr double DEG_TO_RAD_LOCAL = M_PI / 180.0;
   Eigen::VectorXd Z(9);
 
-  double lon = msg.longitude;
-  double lat = msg.latitude;
+  double lon = msg->longitude;
+  double lat = msg->latitude;
   double px = lon * DEG_TO_RAD_LOCAL;
   double py = lat * DEG_TO_RAD_LOCAL;
 
@@ -76,7 +76,7 @@ void OdometryParser::gpsCallback(const RosNavMsg& msg) {
   }
   pj_transform(wgs84pj_source_, utm_target_, 1, 1, &px, &py, NULL);
 
-  Z << px, py, msg.altitude, 0, 0, 0, 0, 0, 0;
+  Z << px, py, msg->altitude, 0, 0, 0, 0, 0, 0;
 
   Eigen::MatrixXd y = Z - H_ * X_;
   Eigen::MatrixXd S = H_ * P_ * H_.transpose() + R_;
@@ -137,3 +137,4 @@ bool OdometryParser::ConvertMsg(InputTypes<RosWrapMsgPtr>& in,
 
 }  // namespace cyber
 }  // namespace apollo
+
