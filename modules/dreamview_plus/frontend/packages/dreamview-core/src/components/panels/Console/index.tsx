@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { apollo } from '@dreamview/dreamview';
-import { IconIcErrorMessage, IconIcRegularMessage } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { timestampMsToTimeString } from '@dreamview/dreamview-core/src/util/misc';
 import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
@@ -28,11 +28,11 @@ const LEVEL_CLASS = {
 };
 
 const LEVEL_ICON = {
-    [CONSOLE_LEVEL.ERROR]: <IconIcErrorMessage />,
-    [CONSOLE_LEVEL.FATAL]: <IconIcErrorMessage />,
-    [CONSOLE_LEVEL.FAIL]: <IconIcErrorMessage />,
-    [CONSOLE_LEVEL.SUCCESS]: <IconIcRegularMessage />,
-    [CONSOLE_LEVEL.UNKNOWN]: <IconIcRegularMessage />,
+    [CONSOLE_LEVEL.ERROR]: <IconPark name='IcErrorMessage' />,
+    [CONSOLE_LEVEL.FATAL]: <IconPark name='IcErrorMessage' />,
+    [CONSOLE_LEVEL.FAIL]: <IconPark name='IcErrorMessage' />,
+    [CONSOLE_LEVEL.SUCCESS]: <IconPark name='IcRegularMessage' />,
+    [CONSOLE_LEVEL.UNKNOWN]: <IconPark name='IcRegularMessage' />,
 };
 
 interface IMonitorItem {
@@ -44,7 +44,7 @@ function MonitorItem(props: IMonitorItem) {
     const { classes, cx } = useStyle();
     const { level, text, time } = props;
 
-    const icon = LEVEL_ICON[level] || <IconIcRegularMessage />;
+    const icon = LEVEL_ICON[level] || <IconPark name='IcRegularMessage' />;
     const levelClass = LEVEL_CLASS[level] || 'warn';
     return (
         <li className={cx(classes['panel-console-monitor'], classes[levelClass])}>

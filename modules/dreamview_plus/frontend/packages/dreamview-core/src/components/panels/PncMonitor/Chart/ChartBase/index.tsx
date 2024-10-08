@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import Legend from '@dreamview/dreamview-core/src/components/panels/PncMonitor/Chart/Legend';
 import * as echarts from 'echarts';
 import { usePanelContext } from '@dreamview/dreamview-core/src/components/panels/base/store/PanelStore';
-import { IconIcResetView, IconRefresh, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { useThemeContext } from '@dreamview/dreamview-theme';
 import shortUUID from 'short-uuid';
 import useStyle from './useStyle';
@@ -49,11 +49,11 @@ function ChartBaseInner(props: {
                 <span className={classes['moniter-item-yaxis']}>{yAxisName}</span>
                 <div className={classes['moniter-item-operate']}>
                     <Popover trigger='hover' content='Clear view'>
-                        <IconIcResetView onClick={onReset} />
+                        <IconPark name='IcResetView' onClick={onReset} />
                     </Popover>
                     {!!onRefresh && (
                         <Popover trigger='hover' content='Refresh view'>
-                            <IconRefresh onClick={onRefresh} className={classes['refresh-ic']} />
+                            <IconPark name='Refresh' onClick={onRefresh} className={classes['refresh-ic']} />
                         </Popover>
                     )}
                 </div>

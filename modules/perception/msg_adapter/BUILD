@@ -1,7 +1,10 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
+
+PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 filegroup(
     name = "msg_adapter_files",
@@ -22,6 +25,7 @@ apollo_cc_library(
         "convert/convert.h",
         "msg_converter.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
@@ -41,6 +45,7 @@ apollo_component(
     name = "libmsg_adapter_component.so",
     srcs = ["msg_adapter_component.cc"],
     hdrs = ["msg_adapter_component.h"],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         ":apollo_perception_msg_adapter"

@@ -16,7 +16,7 @@ apollo_cc_library(
     name = "lib_bf",
     srcs = ["strategy_filter.cc"],
     hdrs = ["strategy_filter.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/perception/common:perception_common_util",

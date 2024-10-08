@@ -15,15 +15,16 @@
  *****************************************************************************/
 
 #include "modules/external_command/external_command_demo/external_command_wrapper_demo.h"
-
 #include <poll.h>
 
 #include <cctype>
+#include <algorithm>
 
 #include "modules/external_command/external_command_demo/proto/sweeper_custom_command.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+#include "cyber/time/clock.h"
 
 using apollo::external_command::CommandStatus;
 
@@ -271,13 +272,47 @@ void ExternalCommandWrapperDemo::SendPathFollowCommandWithPathRecord(
   std::shared_ptr<apollo::external_command::PathFollowCommand>
       path_follow_command =
           std::make_shared<apollo::external_command::PathFollowCommand>();
-  ReadPathFromPathRecord(record_path, path_follow_command->mutable_way_point());
+  std::vector<apollo::external_command::Point> left_boundary_points,
+      right_boundary_points;
+
+  std::vector<std::string> record_files =
+      apollo::cyber::common::ListSubPaths(record_path, DT_REG);
+  std::sort(record_files.begin(), record_files.end());
+  std::string dir_prefix = record_path + '/';
+  for (const auto file_name : record_files) {
+    ReadPathFromPathRecord(dir_prefix + file_name,
+                           path_follow_command->mutable_way_point(),
+                           left_boundary_points, right_boundary_points);
+  }
   // Set header and command id of PathFollowCommand.
   FillCommandHeader(path_follow_command);
   // Set path boundary of path.
-  auto path_boundary = path_follow_command->mutable_boundary_with_width();
-  path_boundary->set_left_path_width(demo_config_.left_path_width());
-  path_boundary->set_right_path_width(demo_config_.right_path_width());
+  if (left_boundary_points.size() == right_boundary_points.size() &&
+      right_boundary_points.size() == path_follow_command->way_point().size() &&
+      right_boundary_points.size() > 2) {
+    std::cout << "Get the left and right boundary Point!\n";
+    auto path_boundary = path_follow_command->mutable_path_boundary();
+    for (auto& left_boundary_point : left_boundary_points) {
+      auto left_boundary = path_boundary->add_left_boundary();
+      left_boundary->set_x(left_boundary_point.x());
+      left_boundary->set_y(left_boundary_point.y());
+    }
+    for (auto& right_boundary_point : right_boundary_points) {
+      auto right_boundary = path_boundary->add_right_boundary();
+      right_boundary->set_x(right_boundary_point.x());
+      right_boundary->set_y(right_boundary_point.y());
+    }
+    std::cout << "left_boundary size: " << path_boundary->left_boundary().size()
+              << ", right_boundary size"
+              << path_boundary->right_boundary().size()
+              << "reference size: " << path_follow_command->way_point().size();
+
+  } else {
+    std::cout << "Set the left and right boundary with width of config!\n";
+    auto path_boundary = path_follow_command->mutable_boundary_with_width();
+    path_boundary->set_left_path_width(demo_config_.left_path_width());
+    path_boundary->set_right_path_width(demo_config_.right_path_width());
+  }
   // Set target speed.
   path_follow_command->set_target_speed(demo_config_.target_speed());
   auto response = path_follow_command_client_->SendRequest(path_follow_command);
@@ -298,6 +333,7 @@ void ExternalCommandWrapperDemo::SendPathFollowCommandWithLocationRecord(
           std::make_shared<apollo::external_command::PathFollowCommand>();
   std::vector<std::string> record_files =
       apollo::cyber::common::ListSubPaths(record_dir, DT_REG);
+  std::sort(record_files.begin(), record_files.end());
   std::string dir_prefix = record_dir + '/';
   for (const auto file_name : record_files) {
     ReadPathFromLocationRecord(dir_prefix + file_name,
@@ -437,7 +473,9 @@ void ExternalCommandWrapperDemo::SendValetParkingCommand(
 void ExternalCommandWrapperDemo::ReadPathFromPathRecord(
     const std::string& record_file,
     google::protobuf::RepeatedPtrField<apollo::external_command::Point>*
-        waypoints) {
+        waypoints,
+    std::vector<apollo::external_command::Point>& left_boundary_points,
+    std::vector<apollo::external_command::Point>& right_boundary_points) {
   std::cout << "ReadPathFromPathRecord: " << record_file << std::endl;
   apollo::cyber::record::RecordReader reader(record_file);
   if (!reader.IsValid()) {
@@ -447,20 +485,52 @@ void ExternalCommandWrapperDemo::ReadPathFromPathRecord(
 
   apollo::planning::ADCTrajectory planning_trajectory;
   apollo::cyber::record::RecordMessage message;
+  double start_time = apollo::cyber::Clock::NowInSeconds();
+  double last_point_x = 0.0;
+  double last_point_y = 0.0;
+  //   waypoints->Clear();
+  //   left_boundary_points.clear();
+  //   right_boundary_points.clear();
   while (reader.ReadMessage(&message)) {
     if (message.channel_name == "/apollo/planning") {
       if (planning_trajectory.ParseFromString(message.content)) {
-        break;
+        const auto& location_pose = planning_trajectory.location_pose();
+        if ((abs(last_point_x - location_pose.vehice_location().x()) >
+                 demo_config_.min_distance_error() ||
+             abs(last_point_y - location_pose.vehice_location().y()) >
+                 demo_config_.min_distance_error())) {
+          if (location_pose.has_left_lane_boundary_point() &&
+              location_pose.has_right_lane_boundary_point()) {
+            apollo::external_command::Point left_boundary_point,
+                right_boundary_point;
+            left_boundary_point.set_x(
+                location_pose.left_lane_boundary_point().x());
+            left_boundary_point.set_y(
+                location_pose.left_lane_boundary_point().y());
+            right_boundary_point.set_x(
+                location_pose.right_lane_boundary_point().x());
+            right_boundary_point.set_y(
+                location_pose.right_lane_boundary_point().y());
+            left_boundary_points.emplace_back(left_boundary_point);
+            right_boundary_points.emplace_back(right_boundary_point);
+          }
+
+          auto output_point = waypoints->Add();
+          output_point->set_x(location_pose.vehice_location().x());
+          output_point->set_y(location_pose.vehice_location().y());
+          last_point_x = location_pose.vehice_location().x();
+          last_point_y = location_pose.vehice_location().y();
+        }
       }
+
+    } else {
+      std::cout << "Stop Parse message";
     }
   }
-  waypoints->Clear();
-  const auto& trajectory_points = planning_trajectory.trajectory_point();
-  for (const auto input_point : trajectory_points) {
-    auto output_point = waypoints->Add();
-    output_point->set_x(input_point.path_point().x());
-    output_point->set_y(input_point.path_point().y());
-  }
+  std::cout << "waypoints size: " << waypoints->size() << "\n";
+  std::cout << "Parse /apollo/planning message Time =: "
+            << (apollo::cyber::Clock::NowInSeconds() - start_time) * 1000
+            << "\n";
 }
 
 void ExternalCommandWrapperDemo::CheckCommandStatus(const uint64_t command_id) {

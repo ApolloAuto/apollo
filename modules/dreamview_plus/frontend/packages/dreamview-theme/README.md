@@ -3,16 +3,14 @@
 dreamview-theme是dreamview主题样式变量的全集，赋予每一个变量一种语义，在开发过程中避免直接使用css样式，以达到统一管理样式的目的
 ##### 2、Usage
 ```
-import {Provider as ThemeProvider, useMakeStyle} from '@dreamview/dreamview-theme';
+import {Provider as ThemeProvider, makeStyles} from '@dreamview/dreamview-theme';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => {
-        root: {
-            backgroundColor: theme.tokens.backgroundColor.main,
-            color: theme.tokens.font.color.main,
-        },
-    })
-}
+const useStyle = makeStyles((theme) => {
+    root: {
+        backgroundColor: theme.tokens.backgroundColor.main,
+        color: theme.tokens.font.color.main,
+    },
+});
 
 function ChildComponents() {
     const {classes} = useStyle();
@@ -31,17 +29,14 @@ function App(){
 ##### 3、自定义主题
 通过替换tokens的变量的值达到替换主题的效果
 ```
-import {Provider as ThemeProvider, useMakeStyle} from '@dreamview/dreamview-theme';
+import {Provider as ThemeProvider, makeStyles} from '@dreamview/dreamview-theme';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => {
-        root: {
-            backgroundColor: theme.tokens.backgroundColor.main,
-            color: theme.tokens.font.color.main,
-        },
-    })
-}
-
+const useStyle = makeStyles((theme) => {
+    root: {
+        backgroundColor: theme.tokens.backgroundColor.main,
+        color: theme.tokens.font.color.main,
+    },
+})
 function ChildComponents() {
     const {classes} = useStyle();
 
@@ -65,14 +60,12 @@ function App(){
 ```
 ##### 4、使用components，dremview-colors中提供了一部分定义好的样式的合集，包含了组件样式和部分功能样式，正在完善中，我们称为components
 ```
-import {Provider as ThemeProvider, useMakeStyle} from '@dreamview/dreamview-theme';
+import {Provider as ThemeProvider, makeStyles} from '@dreamview/dreamview-theme';
 
 // 这里以button组件样式为例
-function useStyle() {
-    const hoc = useMakeStyle((theme) => {
-        root: theme.components.button.primary,
-    })
-}
+const useStyle = makeStyles((theme) => {
+    root: theme.components.button.primary,
+})
 
 function ChildComponents() {
     const {classes} = useStyle();

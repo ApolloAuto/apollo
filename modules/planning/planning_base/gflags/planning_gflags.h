@@ -86,6 +86,7 @@ DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
 DECLARE_double(passed_destination_threshold);
+DECLARE_double(passed_referenceline_end_threshold);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
@@ -234,6 +235,8 @@ DECLARE_double(referfece_line_max_backward_heading_diff);
 
 // Nudge decisider
 DECLARE_bool(enable_nudge_decider);
+DECLARE_double(path_trim_destination_threshold);
+
 // park generic
 DECLARE_double(sqp_obstacle_weight);
 DECLARE_bool(enable_obstacle_potential_field);
@@ -260,5 +263,30 @@ DECLARE_double(open_space_max_reverse_acc);
 
 DECLARE_double(open_space_max_jerk);
 
+// Nudge decisider
+DECLARE_bool(enable_nudge_decider);
+DECLARE_double(max_nudge_check_distance);
+DECLARE_double(path_trim_destination_threshold);
+
 // Edge follow buffer
 DECLARE_double(edge_follow_buffer);
+DECLARE_bool(disable_perception_edge_info);
+DECLARE_bool(enable_edge_follow_curvature_buffer);
+DECLARE_bool(enable_smooth_edge_follow_buffer);
+DECLARE_bool(enable_print_edge_follow_log);
+
+DECLARE_double(normal_look_forward_short_distance);
+DECLARE_double(normal_look_forward_long_distance);
+DECLARE_double(normal_look_backward_distance);
+DECLARE_double(edge_follow_look_forward_short_distance);
+DECLARE_double(edge_follow_look_forward_long_distance);
+DECLARE_double(edge_follow_look_backward_distance);
+
+// lane escape
+DECLARE_bool(enable_lane_escape);
+
+// for path easy solution
+DECLARE_double(ego_front_slack_buffer);
+DECLARE_double(relax_ego_radius);
+DECLARE_bool(enable_corner_constraint);
+DECLARE_double(obstacle_lon_end_buffer_park);

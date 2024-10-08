@@ -46,7 +46,8 @@ namespace math {
 void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
                      const Eigen::MatrixXd &Q, const Eigen::MatrixXd &R,
                      const Eigen::MatrixXd &M, const double tolerance,
-                     const uint max_num_iteration, Eigen::MatrixXd *ptr_K);
+                     const uint max_num_iteration, Eigen::MatrixXd *ptr_K,
+                     uint *iterate_num, double *result_diff);
 
 /**
  * @brief Solver for discrete-time linear quadratic problem.
@@ -62,7 +63,8 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
 void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
                      const Eigen::MatrixXd &Q, const Eigen::MatrixXd &R,
                      const double tolerance, const uint max_num_iteration,
-                     Eigen::MatrixXd *ptr_K);
+                     Eigen::MatrixXd *ptr_K, uint *iterate_num,
+                     double *result_diff);
 
 }  // namespace math
 }  // namespace common

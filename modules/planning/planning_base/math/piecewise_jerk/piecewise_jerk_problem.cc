@@ -330,6 +330,16 @@ void PiecewiseJerkProblem::set_x_ref(std::vector<double> weight_x_ref_vec,
   has_x_ref_ = true;
 }
 
+void PiecewiseJerkProblem::set_towing_x_ref(
+    std::vector<double> weight_towing_x_ref_vec,
+    std::vector<double> towing_x_ref) {
+  CHECK_EQ(towing_x_ref.size(), num_of_knots_);
+  CHECK_EQ(weight_towing_x_ref_vec.size(), num_of_knots_);
+  weight_towing_x_ref_vec_ = std::move(weight_towing_x_ref_vec);
+  towing_x_ref_ = std::move(towing_x_ref);
+  has_towing_x_ref_ = true;
+}
+
 void PiecewiseJerkProblem::set_end_state_ref(
     const std::array<double, 3>& weight_end_state,
     const std::array<double, 3>& end_state_ref) {
@@ -352,8 +362,8 @@ void PiecewiseJerkProblem::FreeData(OSQPData* data) {
   delete[] data->A->x;
 }
 
-bool PiecewiseJerkProblem::CheckLowUpperBound(std::vector<c_float>& lower,
-                                              std::vector<c_float>& upper) {
+bool PiecewiseJerkProblem::CheckLowUpperBound(
+    const std::vector<c_float>& lower, const std::vector<c_float>& upper) {
   for (size_t i = 0; i < lower.size(); i++) {
     if (lower[i] > upper[i]) {
       return true;

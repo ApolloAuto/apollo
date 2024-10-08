@@ -12,7 +12,7 @@
     "**/node_modules"
   ],
   "compilerOptions": {
-    "typeRoots": ["src/@types", "./node_modules/@types"],
+    "typeRoots": ["./src/@types", "./node_modules/@types"],
     "sourceMap": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,

@@ -3,12 +3,31 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message SpatioTemporalGroundDetectorConfig {
-  optional uint32 grid_size = 1 [default = 16];
-  optional float ground_thres = 2 [default = 0.25];
+  optional uint32 big_grid_size = 1 [default = 256];
+  optional uint32 small_grid_size = 2 [default = 64];
   optional float roi_rad_x = 3 [default = 120.0];
   optional float roi_rad_y = 4 [default = 120.0];
   optional float roi_rad_z = 5 [default = 100.0];
-  optional uint32 nr_smooth_iter = 6 [default = 5];
-  optional bool use_roi = 7 [default = true];
-  optional bool use_ground_service = 8 [default = true];
+  optional float near_range = 6 [default = 32.0];
+  optional float near_z_min = 7 [default = -3.0];
+  optional float near_z_max = 8 [default = -1.0];
+  optional float z_compare_thres = 9 [default = 0.1];
+  optional float smooth_z_thres = 10 [default = 1.0];
+  optional float planefit_dist_thres_near = 11 [default = 0.10];
+  optional float planefit_dist_thres_far = 12 [default = 0.20];
+  optional float planefit_orien_threshold = 13 [default = 5.0];
+  optional uint32 inliers_min_threshold = 14 [default = 4];
+  optional uint32 nr_smooth_iter = 15 [default = 5];
+  optional bool use_roi = 16 [default = true];
+  optional bool use_semantic_ground = 17 [default = false];
+  optional bool single_ground_detect = 18 [default = false];
+  optional bool use_ground_service = 19 [default = true];
+  optional float ground_thres = 20 [default = 0.20];
+  optional float near_range_dist = 21 [default = 10.0];
+  optional float near_range_ground_thres = 22 [default = 0.10];
+  optional float middle_range_dist = 23 [default = 3.0];
+  optional float middle_range_ground_thres = 24 [default = 0.05];
+  optional bool use_math_optimize = 25 [default = false];
+  optional float parsing_height_buffer = 26 [default = 0.2];
+  optional bool debug_output = 27 [default = false];
 }

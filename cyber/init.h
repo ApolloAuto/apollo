@@ -17,14 +17,17 @@
 #ifndef CYBER_INIT_H_
 #define CYBER_INIT_H_
 
+#include <string>
+
 #include "cyber/common/log.h"
 #include "cyber/state.h"
 
 namespace apollo {
 namespace cyber {
 
-bool Init(const char* binary_name);
+bool Init(const char* binary_name, const std::string& dag_info = "");
 void Clear();
+void OnShutdown(int sig);
 
 }  // namespace cyber
 }  // namespace apollo

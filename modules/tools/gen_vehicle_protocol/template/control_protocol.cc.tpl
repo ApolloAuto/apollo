@@ -30,7 +30,7 @@ const int32_t %(classname)s::ID = 0x%(id_upper)s;
 %(classname)s::%(classname)s() { Reset(); }
 
 uint32_t %(classname)s::GetPeriod() const {
-  // TODO(All) :  modify every protocol's period manually
+  // TODO(All) : modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -41,7 +41,7 @@ void %(classname)s::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 void %(classname)s::UpdateData_Heartbeat(uint8_t* data) {
-   // TODO(All) :  you should add the heartbeat manually
+   // TODO(All) : you should add the heartbeat manually
 }
 
 void %(classname)s::UpdateData(uint8_t* data) {

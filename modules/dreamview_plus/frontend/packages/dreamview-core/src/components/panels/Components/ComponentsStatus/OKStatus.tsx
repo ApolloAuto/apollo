@@ -1,4 +1,4 @@
-import { IconIcSucceed } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import React from 'react';
 import useStyle from './useStyle';
 
@@ -7,7 +7,8 @@ export function OKStatus() {
 
     return (
         <div className={classes['status-ok']}>
-            <IconIcSucceed
+            <IconPark
+                name='IcSucceed'
                 style={{
                     fontSize: '16px',
                     marginRight: '6px',

@@ -1,13 +1,7 @@
 import React from 'react';
 import { ENUM_DOWNLOAD_STATUS } from '@dreamview/dreamview-core/src/services/api/types';
 import { useTranslation } from 'react-i18next';
-import {
-    IconIcToBeDownloaded,
-    IconIcSucceed,
-    IconIcLoading,
-    IconIcToBeUpdated,
-    IconIcErrorMessage,
-} from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import useStyle from './useStyle';
 
 interface IRenderDownLoadStatus {
@@ -23,7 +17,7 @@ function RenderDownLoadStatus(props: IRenderDownLoadStatus) {
     if (status === ENUM_DOWNLOAD_STATUS.DOWNLOADED) {
         return (
             <div className={cx(classes.downloaded, classes['download-status'], 'download-active')}>
-                <IconIcSucceed />
+                <IconPark name='IcSucceed' />
                 {t('downloaded')}
             </div>
         );
@@ -32,7 +26,7 @@ function RenderDownLoadStatus(props: IRenderDownLoadStatus) {
     if (status === ENUM_DOWNLOAD_STATUS.DOWNLOADING) {
         return (
             <div className={cx(classes.downloading, classes['download-status'])}>
-                <IconIcLoading />
+                <IconPark name='IcLoading' />
                 {t('downloading')}
                 &nbsp;
                 {percentage}
@@ -42,9 +36,9 @@ function RenderDownLoadStatus(props: IRenderDownLoadStatus) {
 
     if (status === ENUM_DOWNLOAD_STATUS.NOTDOWNLOAD) {
         return (
-            <div className={cx(classes.notdownload, classes['download-status'])}>
+            <div className={cx(classes['download-status'])}>
                 {' '}
-                <IconIcToBeDownloaded />
+                <IconPark name='IcToBeDownloaded' />
                 {t('notDownload')}
             </div>
         );
@@ -54,7 +48,7 @@ function RenderDownLoadStatus(props: IRenderDownLoadStatus) {
         return (
             <div className={cx(classes.tobeupdate, classes['download-status'])}>
                 {' '}
-                <IconIcToBeUpdated />
+                <IconPark name='IcToBeUpdated' />
                 {t('tobeUpdate')}
             </div>
         );
@@ -64,7 +58,7 @@ function RenderDownLoadStatus(props: IRenderDownLoadStatus) {
         return (
             <div className={cx(classes.downloadfail, classes['download-status'])}>
                 {' '}
-                <IconIcErrorMessage />
+                <IconPark name='IcErrorMessage' />
                 {t('downloadFail')}
             </div>
         );

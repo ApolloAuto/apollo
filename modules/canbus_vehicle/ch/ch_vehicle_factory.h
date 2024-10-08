@@ -26,9 +26,12 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus_vehicle/ch/proto/ch.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/ch/ch_controller.h"
+#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -91,6 +94,16 @@ class ChVehicleFactory : public AbstractVehicleFactory {
    */
   void PublishChassisDetail() override;
 
+  /**
+   * @brief publish chassis for apollo sender messages
+   */
+  void PublishChassisDetailSender() override;
+
+  /**
+   * @brief check chassis can receiver lost
+   */
+  bool CheckChassisCommunicationFault() override;
+
  private:
   /**
    * @brief create ch vehicle controller
@@ -114,6 +127,8 @@ class ChVehicleFactory : public AbstractVehicleFactory {
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Ch>>
       chassis_detail_writer_;
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Ch>>
+      chassis_detail_sender_writer_;
 };
 
 CYBER_REGISTER_VEHICLEFACTORY(ChVehicleFactory)

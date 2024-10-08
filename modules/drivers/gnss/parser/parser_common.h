@@ -21,6 +21,8 @@
 
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 
+#include "cyber/cyber.h"
+
 namespace apollo {
 namespace drivers {
 namespace gnss {
@@ -45,6 +47,24 @@ inline void rfu_to_flu(double r, double f, double u,
   flu->set_y(-r);
   flu->set_z(u);
 }
+
+constexpr uint64_t PERIOD_NS_1HZ = 900 * 1e6;
+class RateControl {
+ public:
+  explicit RateControl(uint64_t period_ns) : period_ns_(period_ns) {}
+  bool check() {
+    auto now = cyber::Time::Now().ToNanosecond();
+    if (now - latest_ns_ > period_ns_) {
+      latest_ns_ = now;
+      return true;
+    }
+    return false;
+  }
+
+ private:
+  uint64_t period_ns_;
+  uint64_t latest_ns_ = 0;
+};
 
 }  // namespace gnss
 }  // namespace drivers

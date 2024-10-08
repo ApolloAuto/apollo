@@ -1,5 +1,5 @@
 import React, { useCallback, useState, PropsWithChildren, useEffect } from 'react';
-import { IconIcAmplification, IconIcReduce, IconIcCopy, IconIcRanging, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { Nullable } from '@dreamview/dreamview-core/src/util/similarFunctions';
 import { Carviz, RoutingEditor } from '@dreamview/dreamview-carviz';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ function ViewMenu(props: IViewMenuProps) {
         <>
             <Popover trigger='hover' placement='left' content={t('RuleIcon')}>
                 <div className={classes['view-menu-btn-item-only']} onClick={handleClick(MutexToolNameEnum.RULE)}>
-                    <IconIcRanging
+                    <IconPark name='IcRanging'
                         style={{
                             fontSize: '16px',
                             color: checkedItem === MutexToolNameEnum.RULE ? '#3388FA' : '#96A5C1',
@@ -81,7 +81,7 @@ function ViewMenu(props: IViewMenuProps) {
 
             <Popover trigger='hover' placement='left' content={t('CopyIcon')}>
                 <div className={classes['view-menu-btn-item-only']} onClick={handleClick(MutexToolNameEnum.COPY)}>
-                    <IconIcCopy
+                    <IconPark name='IcCopy'
                         style={{
                             fontSize: '16px',
                             color: checkedItem === MutexToolNameEnum.COPY ? '#3388FA' : '#96A5C1',
@@ -92,10 +92,10 @@ function ViewMenu(props: IViewMenuProps) {
             {children && <>{children}</>}
             <div className={classes['view-menu-scale-btn-container']}>
                 <div className={classes['view-menu-btn-item']} onClick={handleClick('Magnify')}>
-                    <IconIcAmplification style={{ fontSize: '16px', color: '#96A5C1' }} />
+                    <IconPark name='IcAmplification' style={{ fontSize: '16px', color: '#96A5C1' }} />
                 </div>
                 <div className={classes['view-menu-btn-item']} onClick={handleClick('Shrink')}>
-                    <IconIcReduce style={{ fontSize: '16px', color: '#96A5C1' }} />
+                    <IconPark name='IcReduce' style={{ fontSize: '16px', color: '#96A5C1' }} />
                 </div>
             </div>
         </>

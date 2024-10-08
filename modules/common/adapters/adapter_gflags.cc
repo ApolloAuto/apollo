@@ -27,6 +27,9 @@ DEFINE_string(audio_detection_topic, "/apollo/audio_detection",
 DEFINE_string(chassis_topic, "/apollo/canbus/chassis", "chassis topic name");
 DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
+DEFINE_string(chassis_detail_sender_topic,
+              "/apollo/canbus/chassis_detail_sender",
+              "chassis detail sender_topic name");
 DEFINE_string(chassis_command_topic, "/apollo/chassis_control",
               "chassis command topic name");
 DEFINE_string(localization_topic, "/apollo/localization/pose",
@@ -46,6 +49,8 @@ DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
 DEFINE_string(control_debug_info_topic, "/apollo/control/debug",
               "control debug info topic name");
+DEFINE_string(control_interative_topic, "/apollo/control/interactive",
+              "control interactive info to others topic name");
 DEFINE_string(control_preprocessor_topic, "/apollo/control/preprocessor",
               "control preprocessor topic name");
 DEFINE_string(control_local_view_topic, "/apollo/control/localview",

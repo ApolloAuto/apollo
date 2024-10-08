@@ -1,24 +1,21 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useMakeStyle } from '@dreamview/dreamview-theme';
+import { makeStyles } from '@dreamview/dreamview-theme';
 
-function useStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'desc-container': {
-            padding: '25px 8px',
-        },
-        'desc-title': {
-            ...theme.tokens.typography.title,
-            color: theme.tokens.colors.fontColor5,
-            marginBottom: '6px',
-        },
-        'desc-content': {
-            ...theme.tokens.typography.title,
-        },
-    }));
-    return hoc();
-}
+const useStyle = makeStyles((theme) => ({
+    'desc-container': {
+        padding: '25px 8px',
+    },
+    'desc-title': {
+        ...theme.tokens.typography.title,
+        color: theme.tokens.colors.fontColor5,
+        marginBottom: '6px',
+    },
+    'desc-content': {
+        ...theme.tokens.typography.title,
+    },
+}));
 
 interface IPanelHelp {
     description: string;

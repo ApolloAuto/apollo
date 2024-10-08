@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>lslidar1v4</name>
+        <dag_conf>/apollo/modules/drivers/lidar/lslidar/dag/lslidar.dag</dag_conf>
+        <process_name>lslidar</process_name>
+    </module>
+</cyber>

@@ -3,7 +3,7 @@ import RcSwitch from 'rc-switch';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
-import { IconIcBackTheStartingPoint } from '../../icons';
+import IconPark from '../../IconPark';
 import './index.less';
 
 export type SwitchSize = 'small' | 'default';
@@ -51,7 +51,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         const prefixCls = getPrefixCls('switch', customizePrefixCls);
         const loadingIcon = (
             <div className={`${prefixCls}-handle`}>
-                {loading && <IconIcBackTheStartingPoint spin className={`${prefixCls}-loading-icon`} />}
+                {loading && <IconPark name='IcBackTheStartingPoint' spin className={`${prefixCls}-loading-icon`} />}
             </div>
         );
 

@@ -23,6 +23,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/planning_base/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/planning_base/common/planning_context.h"
@@ -108,8 +109,11 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     // path_bound.DebugString("after_neighbor_lane");
     // 3. Fine-tune the boundary based on static obstacles
     PathBound temp_path_bound = path_bound;
+    std::vector<SLPolygon> obs_sl_polygons;
+    PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_,
+                                         &obs_sl_polygons, init_sl_state_);
     if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-            *reference_line_info_, init_sl_state_, &path_bound,
+            &obs_sl_polygons, init_sl_state_, &path_bound,
             &blocking_obstacle_id, &path_narrowest_width)) {
       const std::string msg =
           "Failed to decide fine tune the boundaries after "
@@ -193,7 +197,10 @@ bool LaneBorrowPath::AssessPath(std::vector<PathData>* candidate_path_data,
     if (PathAssessmentDeciderUtil::IsValidRegularPath(*reference_line_info_,
                                                       curr_path_data)) {
       SetPathInfo(&curr_path_data);
-      PathAssessmentDeciderUtil::TrimTailingOutLanePoints(&curr_path_data);
+      if (reference_line_info_->SDistanceToDestination() <
+          FLAGS_path_trim_destination_threshold) {
+        PathAssessmentDeciderUtil::TrimTailingOutLanePoints(&curr_path_data);
+      }
       if (curr_path_data.Empty()) {
         AINFO << "lane borrow path is empty after trimed";
         continue;
@@ -272,13 +279,13 @@ bool LaneBorrowPath::GetBoundaryFromNeighborLane(
                 ReferenceLineInfo::LaneType::LeftForward, curr_s,
                 &neighbor_lane_id, &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow left forward neighbor lane."
-                << neighbor_lane_id.id();
+                 << neighbor_lane_id.id();
         } else if (reference_line_info_->GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::LeftReverse, curr_s,
                        &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow left reverse neighbor lane."
-                << neighbor_lane_id.id();
+                 << neighbor_lane_id.id();
         } else {
           ADEBUG << "There is no left neighbor lane.";
         }
@@ -288,13 +295,13 @@ bool LaneBorrowPath::GetBoundaryFromNeighborLane(
                 ReferenceLineInfo::LaneType::RightForward, curr_s,
                 &neighbor_lane_id, &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow right forward neighbor lane."
-                << neighbor_lane_id.id();
+                 << neighbor_lane_id.id();
         } else if (reference_line_info_->GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::RightReverse, curr_s,
                        &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow right reverse neighbor lane."
-                << neighbor_lane_id.id();
+                 << neighbor_lane_id.id();
         } else {
           ADEBUG << "There is no right neighbor lane.";
         }

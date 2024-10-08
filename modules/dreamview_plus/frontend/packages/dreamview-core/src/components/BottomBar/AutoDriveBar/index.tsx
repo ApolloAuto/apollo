@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { IconIcSissue, IconIcAuto } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { BusinessEventTypes, BusinessEventInfo } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
@@ -54,11 +54,11 @@ function AutoDriveBar(props: AutoDriveBarProps) {
                     behavior={{
                         [DynamicEffectButtonStatus.RUNNING]: {
                             text: t('Running'),
-                            icon: <IconIcAuto />,
+                            icon: <IconPark name='IcAuto' />,
                         },
                         [DynamicEffectButtonStatus.START]: {
                             text: t('StartAutoDraive'),
-                            icon: <IconIcAuto />,
+                            icon: <IconPark name='IcAuto' />,
                             clickHandler: handleStartAutoClick,
                         },
                     }}
@@ -69,12 +69,12 @@ function AutoDriveBar(props: AutoDriveBarProps) {
                     behavior={{
                         [DynamicEffectButtonStatus.START]: {
                             text: t('sendRouting'),
-                            icon: <IconIcSissue />,
+                            icon: <IconPark name='IcSissue' />,
                             clickHandler: routingManager.send,
                         },
                         [DynamicEffectButtonStatus.DISABLE]: {
                             text: t('sendRouting'),
-                            icon: <IconIcSissue />,
+                            icon: <IconPark name='IcSissue' />,
                             clickHandler: routingManager.send,
                             disabledMsg: routingManager.routingInfo.errorMessage,
                         },

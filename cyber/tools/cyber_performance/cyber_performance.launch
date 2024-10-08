@@ -1,0 +1,11 @@
+<cyber>
+    <module>
+        <name>cyber_performance</name>
+        <dag_conf></dag_conf>
+        <type>binary</type>
+        <process_name>
+            cyber_performance
+        </process_name>
+        <exception_handler>respawn</exception_handler>
+    </module>
+</cyber>

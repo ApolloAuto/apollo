@@ -102,6 +102,7 @@ class MlfMotionRefiner {
   double claping_acceleration_threshold_ = 10;
   double claping_speed_threshold_ = 1.0;
   double cyc_refine_speed_ = 1.2;
+  double car_refine_speed_ = 1.0;
   const double EPSION_TIME = 1e-3;
 };  // class MlfMotionRefiner
 

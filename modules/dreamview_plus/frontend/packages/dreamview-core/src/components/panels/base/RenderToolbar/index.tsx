@@ -8,18 +8,7 @@ import {
 } from 'react-mosaic-component';
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import { genereatePanelId } from '@dreamview/dreamview-core/src/util/layout';
-import {
-    IconIcFullscreen,
-    IconIcSplitDown,
-    IconIcSplitRight,
-    IconIcHelpNormal,
-    IconIcSettingNormal,
-    IconIcMoveHover,
-    IconIcEitFullScreen,
-    OperatePopover,
-    IconIcDelete,
-    Modal,
-} from '@dreamview/dreamview-ui';
+import { OperatePopover, IconPark, Modal } from '@dreamview/dreamview-ui';
 import { Popover } from '@dreamview/dreamview-ui/src/components/Popover';
 import { useTranslation } from 'react-i18next';
 import useStyle from './style';
@@ -111,15 +100,15 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
     const operate = (
         <div className={classes['mosaic-custom-toolbar-operate-popover']}>
             <div onClick={onSplitRow} className={classes['mosaic-custom-toolbar-operate-popover-select']}>
-                <IconIcSplitRight />
+                <IconPark name='IcSplitRight' />
                 {t('operateSplitRight')}
             </div>
             <div onClick={onSplitColumn} className={classes['mosaic-custom-toolbar-operate-popover-select']}>
-                <IconIcSplitDown />
+                <IconPark name='IcSplitDown' />
                 {t('operateSplitDown')}
             </div>
             <div onClick={enterFullScreen} className={classes['mosaic-custom-toolbar-operate-popover-select']}>
-                <IconIcFullscreen />
+                <IconPark name='IcFullscreen' />
                 {t('operateFullScreen')}
             </div>
             <div
@@ -129,7 +118,7 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
                     classes['mosaic-custom-toolbar-operate-popover-select-remove'],
                 )}
             >
-                <IconIcDelete />
+                <IconPark name='IcDelete' />
                 {t('operateRemovePanel')}
             </div>
         </div>
@@ -184,7 +173,7 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
             {!inFullScreen ? (
                 <div className={classes['mosaic-custom-toolbar-operate']}>
                     <div onClick={showModal} className={classes['mosaic-custom-toolbar-operate-item']}>
-                        <IconIcHelpNormal />
+                        <IconPark name='IcHelpNormal' />
                     </div>
                     <div className={classes['mosaic-custom-toolbar-operate-item']}>
                         <OperatePopover
@@ -192,7 +181,7 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
                             rootClassName={classes['mosaic-custom-toolbar-popover']}
                             content={operate}
                         >
-                            <IconIcSettingNormal />
+                            <IconPark name='IcSettingNormal' />
                         </OperatePopover>
                     </div>
                     <div className={classes['mosaic-custom-toolbar-operate-item']}>
@@ -201,13 +190,13 @@ function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
                             rootClassName={classes['mosaic-custom-toolbar-icmove']}
                             content={t('pressTips')}
                         >
-                            <IconIcMoveHover />
+                            <IconPark name='IcMoveHover' />
                         </Popover>
                     </div>
                 </div>
             ) : (
                 <div onClick={exitFullScreen} className={classes['mosaic-custom-toolbar-exit-fullscreen']}>
-                    <IconIcEitFullScreen />
+                    <IconPark name='IcEitFullScreen' />
                     &nbsp;Exit FullScreen
                 </div>
             )}

@@ -68,7 +68,7 @@ export const initState: IInitState = {
     currentDynamicModel: '',
     scenarioSet: {},
     otherComponents: {},
-
+    simOtherComponents: {},
     currentRecordStatus: undefined,
     operations: [],
     currentOperation: undefined,

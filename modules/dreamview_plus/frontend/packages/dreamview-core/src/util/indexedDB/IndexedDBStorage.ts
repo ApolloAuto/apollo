@@ -4,8 +4,10 @@ const DB_NAME = 'Dreamview_Plus';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageVersion = require('@dreamview/dreamview-core/package.json').version;
 
-// 提取主版本号
-const majorVersion = parseInt(packageVersion.split('.')[0], 10);
+// 通过版本号生成数据库版本号，考虑到版本号可能有多个小数点，需要所有版本号都转为整数
+const majorVersion = packageVersion
+    .split('.')
+    .reduce((acc: number, cur: string, index: number) => acc * 10 ** index + parseInt(cur, 10), 0);
 
 /**
  *  IndexedDBStorage types for each store

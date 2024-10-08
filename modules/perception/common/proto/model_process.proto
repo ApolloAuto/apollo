@@ -51,6 +51,11 @@ message PointCloudPostProcess {
   optional float top_enlarge_height = 5;
   optional float width_enlarge_value = 6;
   optional float length_enlarge_value = 7;
+  optional float cone_score_threshold = 8 [default = 0.35];
+  optional float ped_score_threshold = 9 [default = 0.25];
+  optional float cyc_score_threshold = 10 [default = 0.25];
+  optional float small_mot_score_threshold = 11 [default = 0.25];
+  optional float big_mot_score_threshold = 12 [default = 0.25];
 }
 
 message PaddleSettings {

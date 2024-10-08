@@ -38,50 +38,52 @@
 namespace apollo {
 namespace drivers {
 namespace lslidar {
+namespace parser {
 
 /** \brief correction values for a single laser**/
 
 struct LaserCorrection {
-  /** parameters in db.xml */
-  float rot_correction;
-  float vert_correction;
-  float dist_correction;
-  float dist_correction_x;
-  float dist_correction_y;
-  float vert_offset_correction;
-  float horiz_offset_correction;
-  int max_intensity;
-  int min_intensity;
-  float focal_distance;
-  float focal_slope;
-  float focal_offset;
+    /** parameters in db.xml */
+    float rot_correction;
+    float vert_correction;
+    float dist_correction;
+    float dist_correction_x;
+    float dist_correction_y;
+    float vert_offset_correction;
+    float horiz_offset_correction;
+    int max_intensity;
+    int min_intensity;
+    float focal_distance;
+    float focal_slope;
+    float focal_offset;
 
-  /** cached values calculated when the calibration file is read */
-  float cos_rot_correction;   ///< cached cosine of rot_correction
-  float sin_rot_correction;   ///< cached sine of rot_correction
-  float cos_vert_correction;  ///< cached cosine of vert_correction
-  float sin_vert_correction;  ///< cached sine of vert_correction
+    /** cached values calculated when the calibration file is read */
+    float cos_rot_correction;   ///< cached cosine of rot_correction
+    float sin_rot_correction;   ///< cached sine of rot_correction
+    float cos_vert_correction;  ///< cached cosine of vert_correction
+    float sin_vert_correction;  ///< cached sine of vert_correction
 
-  int laser_ring;  ///< ring number for this laser
+    int laser_ring;  ///< ring number for this laser
 };
 
 /** \brief Calibration class storing entire configuration for the Lslidar */
 class Calibration {
  public:
-  std::map<int, LaserCorrection> laser_corrections_;
-  int num_lasers_;
-  bool initialized_;
+    std::map<int, LaserCorrection> laser_corrections_;
+    int num_lasers_;
+    bool initialized_;
 
  public:
-  Calibration() : initialized_(false) {}
-  explicit Calibration(const std::string& calibration_file) {
-    read(calibration_file);
-  }
+    Calibration() : initialized_(false) {}
+    explicit Calibration(const std::string& calibration_file) {
+        read(calibration_file);
+    }
 
-  void read(const std::string& calibration_file);
-  void write(const std::string& calibration_file);
+    void read(const std::string& calibration_file);
+    void write(const std::string& calibration_file);
 };
 
+}  // namespace parser
 }  // namespace lslidar
 }  // namespace drivers
 }  // namespace apollo

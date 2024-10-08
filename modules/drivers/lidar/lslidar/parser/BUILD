@@ -6,25 +6,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     library_dest = "drivers/lib/lidar/lslidar/parser",
-#     targets = [
-#         ":liblslidar_convert_component.so",
-#     ],
-# )
-
-apollo_component(
-    name = "liblslidar_convert_component.so",
-    srcs = ["lslidar_convert_component.cc"],
-    hdrs = ["lslidar_convert_component.h"],
-    copts = ['-DMODULE_NAME=\\"lslidar\\"'],
-    deps = [
-        ":convert",
-        "//cyber",
-    ],
-)
-
 apollo_cc_library(
     name = "convert",
     srcs = [

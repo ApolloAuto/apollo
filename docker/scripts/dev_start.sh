@@ -30,10 +30,10 @@ CO_DEV_PATH=
 SUPPORTED_ARCHS=(x86_64 aarch64)
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20240326_1453"
+VERSION_X86_64="dev-x86_64-18.04-20240620_1444"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-VERSION_AARCH64="dev-aarch64-20.04-20231024_1054"
+VERSION_AARCH64="dev-aarch64-20.04-20240626_1642"
 USER_VERSION_OPT=
 
 ROCM_DOCKER_REPO="rocmapollo/apollo"
@@ -277,14 +277,16 @@ function check_target_arch() {
 function check_timezone_cn() {
   # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   # time_zone=$(timedatectl | grep "Time zone" | xargs)
-  time_zone=$(date +"%z")
+  # time_zone=$(date +"%z")
 
-  for tz in "${TIMEZONE_CN[@]}"; do
-    if [[ "${time_zone}" == "${tz}" ]]; then
-      GEOLOC="cn"
-      return 0
-    fi
-  done
+  # for tz in "${TIMEZONE_CN[@]}"; do
+  #   if [[ "${time_zone}" == "${tz}" ]]; then
+  #     GEOLOC="cn"
+  #     return 0
+  #   fi
+  # done
+  # disable docker.io image source
+  GEOLOC="cn" 
 }
 
 function setup_devices_and_mount_local_volumes() {

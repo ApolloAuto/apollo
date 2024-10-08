@@ -18,8 +18,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus_vehicle/devkit/devkit_controller.h"
-#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -84,6 +82,9 @@ bool DevkitVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   chassis_detail_writer_ =
       node_->CreateWriter<::apollo::canbus::Devkit>(FLAGS_chassis_detail_topic);
+
+  chassis_detail_sender_writer_ = node_->CreateWriter<::apollo::canbus::Devkit>(
+      FLAGS_chassis_detail_sender_topic);
 
   return true;
 }
@@ -153,10 +154,43 @@ Chassis DevkitVehicleFactory::publish_chassis() {
 }
 
 void DevkitVehicleFactory::PublishChassisDetail() {
-  Devkit chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
+  Devkit chassis_detail = vehicle_controller_->GetNewRecvChassisDetail();
+  ADEBUG << "latest chassis_detail is " << chassis_detail.ShortDebugString();
   chassis_detail_writer_->Write(chassis_detail);
+}
+
+void DevkitVehicleFactory::PublishChassisDetailSender() {
+  Devkit sender_chassis_detail =
+      vehicle_controller_->GetNewSenderChassisDetail();
+  ADEBUG << "latest sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  chassis_detail_sender_writer_->Write(sender_chassis_detail);
+}
+
+void DevkitVehicleFactory::UpdateHeartbeat() { can_sender_.Update_Heartbeat(); }
+
+bool DevkitVehicleFactory::CheckChassisCommunicationFault() {
+  if (vehicle_controller_->CheckChassisCommunicationError()) {
+    return true;
+  }
+  return false;
+}
+
+void DevkitVehicleFactory::AddSendProtocol() {
+  vehicle_controller_->AddSendMessage();
+}
+
+void DevkitVehicleFactory::ClearSendProtocol() { can_sender_.ClearMessage(); }
+
+bool DevkitVehicleFactory::IsSendProtocolClear() {
+  if (can_sender_.IsMessageClear()) {
+    return true;
+  }
+  return false;
+}
+
+Chassis::DrivingMode DevkitVehicleFactory::Driving_Mode() {
+  return vehicle_controller_->driving_mode();
 }
 
 std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>

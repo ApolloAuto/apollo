@@ -649,77 +649,10 @@
                   "options": {
                     "default": false
                   }
-                }
-              }
-            },
-            "CameraUpdate": {
-              "fields": {
-                "localization": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
                 },
-                "localization2cameraTf": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "image": {
-                  "type": "bytes",
-                  "id": 3
-                },
-                "imageAspectRatio": {
-                  "type": "double",
-                  "id": 4
-                },
-                "bbox2d": {
-                  "rule": "repeated",
-                  "type": "apollo.perception.BBox2D",
-                  "id": 5
-                },
-                "obstaclesId": {
-                  "rule": "repeated",
-                  "type": "int32",
-                  "id": 6,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "obstaclesSubType": {
-                  "rule": "repeated",
-                  "type": "SubType",
-                  "id": 7,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "kImageScale": {
-                  "type": "double",
-                  "id": 8
-                }
-              },
-              "nested": {
-                "SubType": {
-                  "values": {
-                    "ST_UNKNOWN": 0,
-                    "ST_UNKNOWN_MOVABLE": 1,
-                    "ST_UNKNOWN_UNMOVABLE": 2,
-                    "ST_CAR": 3,
-                    "ST_VAN": 4,
-                    "ST_TRUCK": 5,
-                    "ST_BUS": 6,
-                    "ST_CYCLIST": 7,
-                    "ST_MOTORCYCLIST": 8,
-                    "ST_TRICYCLIST": 9,
-                    "ST_PEDESTRIAN": 10,
-                    "ST_TRAFFICCONE": 11
-                  }
+                "vehicleParam": {
+                  "type": "apollo.common.VehicleParam",
+                  "id": 31
                 }
               }
             },
@@ -891,6 +824,409 @@
                 }
               }
             },
+            "CameraUpdate": {
+              "fields": {
+                "localization": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "localization2cameraTf": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "image": {
+                  "type": "bytes",
+                  "id": 3
+                },
+                "imageAspectRatio": {
+                  "type": "double",
+                  "id": 4
+                },
+                "bbox2d": {
+                  "rule": "repeated",
+                  "type": "apollo.perception.BBox2D",
+                  "id": 5
+                },
+                "obstaclesId": {
+                  "rule": "repeated",
+                  "type": "int32",
+                  "id": 6,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "obstaclesSubType": {
+                  "rule": "repeated",
+                  "type": "SubType",
+                  "id": 7,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "kImageScale": {
+                  "type": "double",
+                  "id": 8
+                }
+              },
+              "nested": {
+                "SubType": {
+                  "values": {
+                    "ST_UNKNOWN": 0,
+                    "ST_UNKNOWN_MOVABLE": 1,
+                    "ST_UNKNOWN_UNMOVABLE": 2,
+                    "ST_CAR": 3,
+                    "ST_VAN": 4,
+                    "ST_TRUCK": 5,
+                    "ST_BUS": 6,
+                    "ST_CYCLIST": 7,
+                    "ST_MOTORCYCLIST": 8,
+                    "ST_TRICYCLIST": 9,
+                    "ST_PEDESTRIAN": 10,
+                    "ST_TRAFFICCONE": 11
+                  }
+                }
+              }
+            },
+            "HMIAction": {
+              "values": {
+                "NONE": 0,
+                "SETUP_MODE": 1,
+                "RESET_MODE": 2,
+                "ENTER_AUTO_MODE": 3,
+                "DISENGAGE": 4,
+                "CHANGE_MODE": 5,
+                "CHANGE_MAP": 6,
+                "CHANGE_VEHICLE": 7,
+                "START_MODULE": 8,
+                "STOP_MODULE": 9,
+                "CHANGE_SCENARIO": 10,
+                "CHANGE_SCENARIO_SET": 11,
+                "LOAD_SCENARIOS": 12,
+                "DELETE_SCENARIO_SET": 13,
+                "LOAD_DYNAMIC_MODELS": 14,
+                "CHANGE_DYNAMIC_MODEL": 15,
+                "DELETE_DYNAMIC_MODEL": 16,
+                "CHANGE_RECORD": 17,
+                "DELETE_RECORD": 18,
+                "LOAD_RECORDS": 19,
+                "STOP_RECORD": 20,
+                "CHANGE_OPERATION": 21,
+                "DELETE_VEHICLE_CONF": 22,
+                "DELETE_V2X_CONF": 23,
+                "DELETE_MAP": 24,
+                "LOAD_RTK_RECORDS": 25,
+                "CHANGE_RTK_RECORD": 26,
+                "LOAD_RECORD": 27,
+                "LOAD_MAPS": 28
+              }
+            },
+            "HMIConfig": {
+              "fields": {
+                "modes": {
+                  "keyType": "string",
+                  "type": "string",
+                  "id": 1
+                },
+                "maps": {
+                  "keyType": "string",
+                  "type": "string",
+                  "id": 2
+                },
+                "vehicles": {
+                  "keyType": "string",
+                  "type": "string",
+                  "id": 3
+                }
+              }
+            },
+            "VehicleData": {
+              "fields": {
+                "dataFiles": {
+                  "rule": "repeated",
+                  "type": "DataFile",
+                  "id": 1
+                }
+              },
+              "nested": {
+                "DataFile": {
+                  "fields": {
+                    "sourcePath": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "destPath": {
+                      "type": "string",
+                      "id": 2
+                    }
+                  }
+                }
+              }
+            },
+            "ProcessMonitorConfig": {
+              "fields": {
+                "commandKeywords": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "ModuleMonitorConfig": {
+              "fields": {
+                "nodeName": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "ChannelMonitorConfig": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "delayFatal": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "mandatoryFields": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 3
+                },
+                "minFrequencyAllowed": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxFrequencyAllowed": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 1000
+                  }
+                }
+              }
+            },
+            "ResourceMonitorConfig": {
+              "fields": {
+                "diskSpaces": {
+                  "rule": "repeated",
+                  "type": "DiskSpace",
+                  "id": 1
+                },
+                "cpuUsages": {
+                  "rule": "repeated",
+                  "type": "CPUUsage",
+                  "id": 2
+                },
+                "memoryUsages": {
+                  "rule": "repeated",
+                  "type": "MemoryUsage",
+                  "id": 3
+                },
+                "diskLoadUsages": {
+                  "rule": "repeated",
+                  "type": "DiskLoad",
+                  "id": 4
+                }
+              },
+              "nested": {
+                "DiskSpace": {
+                  "fields": {
+                    "path": {
+                      "type": "string",
+                      "id": 1
+                    },
+                    "insufficientSpaceWarning": {
+                      "type": "int32",
+                      "id": 2
+                    },
+                    "insufficientSpaceError": {
+                      "type": "int32",
+                      "id": 3
+                    }
+                  }
+                },
+                "CPUUsage": {
+                  "fields": {
+                    "highCpuUsageWarning": {
+                      "type": "float",
+                      "id": 1
+                    },
+                    "highCpuUsageError": {
+                      "type": "float",
+                      "id": 2
+                    },
+                    "processDagPath": {
+                      "type": "string",
+                      "id": 3
+                    }
+                  }
+                },
+                "MemoryUsage": {
+                  "fields": {
+                    "highMemoryUsageWarning": {
+                      "type": "int32",
+                      "id": 1
+                    },
+                    "highMemoryUsageError": {
+                      "type": "int32",
+                      "id": 2
+                    },
+                    "processDagPath": {
+                      "type": "string",
+                      "id": 3
+                    }
+                  }
+                },
+                "DiskLoad": {
+                  "fields": {
+                    "highDiskLoadWarning": {
+                      "type": "int32",
+                      "id": 1
+                    },
+                    "highDiskLoadError": {
+                      "type": "int32",
+                      "id": 2
+                    },
+                    "deviceName": {
+                      "type": "string",
+                      "id": 3
+                    }
+                  }
+                }
+              }
+            },
+            "MonitoredComponent": {
+              "fields": {
+                "process": {
+                  "type": "ProcessMonitorConfig",
+                  "id": 1
+                },
+                "channel": {
+                  "type": "ChannelMonitorConfig",
+                  "id": 2
+                },
+                "resource": {
+                  "type": "ResourceMonitorConfig",
+                  "id": 3
+                },
+                "requiredForSafety": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "module": {
+                  "type": "ModuleMonitorConfig",
+                  "id": 5
+                }
+              }
+            },
+            "Module": {
+              "fields": {
+                "startCommand": {
+                  "type": "string",
+                  "id": 1
+                },
+                "stopCommand": {
+                  "type": "string",
+                  "id": 2
+                },
+                "processMonitorConfig": {
+                  "type": "ProcessMonitorConfig",
+                  "id": 3
+                },
+                "requiredForSafety": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
+            "CyberModule": {
+              "fields": {
+                "dagFiles": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 1
+                },
+                "requiredForSafety": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "processGroup": {
+                  "type": "string",
+                  "id": 3
+                }
+              }
+            },
+            "HMIMode": {
+              "fields": {
+                "cyberModules": {
+                  "keyType": "string",
+                  "type": "CyberModule",
+                  "id": 1
+                },
+                "modules": {
+                  "keyType": "string",
+                  "type": "Module",
+                  "id": 2
+                },
+                "monitoredComponents": {
+                  "keyType": "string",
+                  "type": "MonitoredComponent",
+                  "id": 3
+                },
+                "otherComponents": {
+                  "keyType": "string",
+                  "type": "ProcessMonitorConfig",
+                  "id": 4
+                },
+                "operations": {
+                  "rule": "repeated",
+                  "type": "HMIModeOperation",
+                  "id": 5,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "defaultOperation": {
+                  "type": "HMIModeOperation",
+                  "id": 6
+                },
+                "layout": {
+                  "type": "string",
+                  "id": 7
+                },
+                "globalComponents": {
+                  "keyType": "string",
+                  "type": "MonitoredComponent",
+                  "id": 8
+                }
+              }
+            },
             "ScenarioInfo": {
               "fields": {
                 "scenarioId": {
@@ -965,10 +1301,50 @@
                 "None": 0,
                 "SIM_DEBUG": 1,
                 "Sim_Control": 2,
-                "REAL_CAR_AUTO_DRIVING": 3,
+                "Auto_Drive": 3,
                 "TRACE": 4,
                 "Scenario_Sim": 5,
-                "Record": 6
+                "Record": 6,
+                "Waypoint_Follow": 7
+              }
+            },
+            "LoadRecordStatus": {
+              "values": {
+                "NOT_LOAD": 1,
+                "LOADING": 2,
+                "LOADED": 3
+              }
+            },
+            "LoadRecordInfo": {
+              "fields": {
+                "loadRecordStatus": {
+                  "type": "LoadRecordStatus",
+                  "id": 1,
+                  "options": {
+                    "default": "NOT_LOAD"
+                  }
+                },
+                "totalTimeS": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "recordFilePath": {
+                  "type": "string",
+                  "id": 3,
+                  "options": {
+                    "default": ""
+                  }
+                },
+                "downloadStatus": {
+                  "type": "int32",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                }
               }
             },
             "HMIStatus": {
@@ -1068,7 +1444,7 @@
                 },
                 "records": {
                   "keyType": "string",
-                  "type": "double",
+                  "type": "LoadRecordInfo",
                   "id": 21
                 },
                 "currentVehicleType": {
@@ -1103,7 +1479,8 @@
                   "type": "RecordStatus",
                   "id": 28
                 },
-                "dataRecorderComponent": {
+                "globalComponents": {
+                  "keyType": "string",
                   "type": "apollo.monitor.Component",
                   "id": 29
                 },
@@ -1124,6 +1501,18 @@
                   "id": 32,
                   "options": {
                     "default": false
+                  }
+                },
+                "rtkRecords": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 33
+                },
+                "currentRtkRecordId": {
+                  "type": "string",
+                  "id": 34,
+                  "options": {
+                    "default": ""
                   }
                 }
               }
@@ -2336,7 +2725,8 @@
                         "MOBILEYE": 18,
                         "DELPHI_ESR": 19,
                         "STORYTELLING": 20,
-                        "TASK_MANAGER": 21
+                        "TASK_MANAGER": 21,
+                        "NANO_RADAR": 22
                       }
                     },
                     "LogLevel": {
@@ -5494,6 +5884,10 @@
                 "steerMracEnableStatus": {
                   "type": "bool",
                   "id": 33
+                },
+                "lateralCentripetalAcceleration": {
+                  "type": "double",
+                  "id": 34
                 }
               }
             },
@@ -5847,6 +6241,32 @@
                   "type": "SimpleMPCDebug",
                   "id": 4
                 }
+              }
+            },
+            "ControlInteractiveMsg": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "replanRequest": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "replanReqReasonCode": {
+                  "type": "ReplanRequestReasonCode",
+                  "id": 3
+                },
+                "replanRequestReason": {
+                  "type": "string",
+                  "id": 4
+                }
+              }
+            },
+            "ReplanRequestReasonCode": {
+              "values": {
+                "REPLAN_REQ_REASON_CLEANING_SAFETY_TRIGGER": 1,
+                "REPLAN_REQ_REASON_LAT_ERR_EXCEED": 2
               }
             },
             "InputDebug": {
@@ -8963,6 +9383,266 @@
                 }
               }
             },
+            "NanoObjectListStatus_60A": {
+              "fields": {
+                "nofObjects": {
+                  "type": "int32",
+                  "id": 1,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "measCounter": {
+                  "type": "int32",
+                  "id": 2,
+                  "options": {
+                    "default": -1
+                  }
+                },
+                "interfaceVersion": {
+                  "type": "int32",
+                  "id": 3
+                }
+              }
+            },
+            "NanoRadarState_201": {
+              "fields": {
+                "maxDistance": {
+                  "type": "uint32",
+                  "id": 1
+                },
+                "radarPower": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "outputType": {
+                  "type": "OutputType",
+                  "id": 3
+                },
+                "rcsThreshold": {
+                  "type": "RcsThreshold",
+                  "id": 4
+                },
+                "sendQuality": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "sendExtInfo": {
+                  "type": "bool",
+                  "id": 6
+                }
+              },
+              "nested": {
+                "OutputType": {
+                  "values": {
+                    "OUTPUT_TYPE_NONE": 0,
+                    "OUTPUT_TYPE_OBJECTS": 1,
+                    "OUTPUT_TYPE_CLUSTERS": 2,
+                    "OUTPUT_TYPE_ERROR": 3
+                  }
+                },
+                "RcsThreshold": {
+                  "values": {
+                    "RCS_THRESHOLD_STANDARD": 0,
+                    "RCS_THRESHOLD_HIGH_SENSITIVITY": 1,
+                    "RCS_THRESHOLD_ERROR": 2
+                  }
+                }
+              }
+            },
+            "NanoSoftwareVersion_700": {
+              "fields": {
+                "softMajorRelease": {
+                  "type": "uint32",
+                  "id": 1
+                },
+                "softMinorRelease": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "softPatchLevel": {
+                  "type": "uint32",
+                  "id": 3
+                }
+              }
+            },
+            "NanoCollisionDetectionRegionState_402": {
+              "fields": {
+                "regionId": {
+                  "type": "uint32",
+                  "id": 1
+                },
+                "regionMaxOutputNumber": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "point1Longitude": {
+                  "type": "double",
+                  "id": 3
+                },
+                "point1Lateral": {
+                  "type": "double",
+                  "id": 4
+                },
+                "point2Longitude": {
+                  "type": "double",
+                  "id": 5
+                },
+                "point2Lateral": {
+                  "type": "double",
+                  "id": 6
+                },
+                "coordinatesValid": {
+                  "type": "bool",
+                  "id": 7
+                },
+                "activationValid": {
+                  "type": "bool",
+                  "id": 8
+                }
+              }
+            },
+            "NanoRadarObs": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "clusterortrack": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "obstacleId": {
+                  "type": "int32",
+                  "id": 3
+                },
+                "longitudeDist": {
+                  "type": "double",
+                  "id": 4
+                },
+                "lateralDist": {
+                  "type": "double",
+                  "id": 5
+                },
+                "longitudeVel": {
+                  "type": "double",
+                  "id": 6
+                },
+                "lateralVel": {
+                  "type": "double",
+                  "id": 7
+                },
+                "rcs": {
+                  "type": "double",
+                  "id": 8
+                },
+                "dynprop": {
+                  "type": "int32",
+                  "id": 9
+                },
+                "longitudeDistRms": {
+                  "type": "double",
+                  "id": 10
+                },
+                "lateralDistRms": {
+                  "type": "double",
+                  "id": 11
+                },
+                "longitudeVelRms": {
+                  "type": "double",
+                  "id": 12
+                },
+                "lateralVelRms": {
+                  "type": "double",
+                  "id": 13
+                },
+                "probexist": {
+                  "type": "double",
+                  "id": 14
+                },
+                "measState": {
+                  "type": "int32",
+                  "id": 15
+                },
+                "longitudeAccel": {
+                  "type": "double",
+                  "id": 16
+                },
+                "lateralAccel": {
+                  "type": "double",
+                  "id": 17
+                },
+                "oritationAngle": {
+                  "type": "double",
+                  "id": 18
+                },
+                "longitudeAccelRms": {
+                  "type": "double",
+                  "id": 19
+                },
+                "lateralAccelRms": {
+                  "type": "double",
+                  "id": 20
+                },
+                "oritationAngleRms": {
+                  "type": "double",
+                  "id": 21
+                },
+                "length": {
+                  "type": "double",
+                  "id": 22
+                },
+                "width": {
+                  "type": "double",
+                  "id": 23
+                },
+                "obstacleClass": {
+                  "type": "int32",
+                  "id": 24
+                },
+                "obstacleRange": {
+                  "type": "double",
+                  "id": 25
+                },
+                "obstacleVel": {
+                  "type": "double",
+                  "id": 26
+                },
+                "obstacleAngle": {
+                  "type": "double",
+                  "id": 27
+                }
+              }
+            },
+            "NanoRadar": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "contiobs": {
+                  "rule": "repeated",
+                  "type": "NanoRadarObs",
+                  "id": 2
+                },
+                "radarState": {
+                  "type": "NanoRadarState_201",
+                  "id": 3
+                },
+                "radarRegionState": {
+                  "type": "NanoCollisionDetectionRegionState_402",
+                  "id": 4
+                },
+                "objectListStatus": {
+                  "type": "NanoObjectListStatus_60A",
+                  "id": 6
+                },
+                "softwareVersion": {
+                  "type": "NanoSoftwareVersion_700",
+                  "id": 7
+                }
+              }
+            },
             "OculiiRawPointcloud": {
               "fields": {
                 "range": {
@@ -10154,7 +10834,9 @@
                 "CLEAR_PLANNING": 7,
                 "SWITCH_TO_MANUAL": 50,
                 "SWITCH_TO_AUTO": 51,
-                "VIN_REQ": 52
+                "VIN_REQ": 52,
+                "ENTER_MISSION": 53,
+                "EXIT_MISSION": 54
               }
             },
             "ActionCommand": {
@@ -12057,7 +12739,8 @@
                   "type": "ComponentStatus",
                   "id": 10
                 },
-                "dataRecorderComponent": {
+                "globalComponents": {
+                  "keyType": "string",
                   "type": "Component",
                   "id": 11
                 },
@@ -12653,6 +13336,10 @@
                 "v2xInfo": {
                   "type": "V2XInformation",
                   "id": 28
+                },
+                "semanticType": {
+                  "type": "SemanticType",
+                  "id": 29
                 }
               },
               "nested": {
@@ -12696,6 +13383,20 @@
                   "values": {
                     "HOST_VEHICLE": 0,
                     "V2X": 1
+                  }
+                },
+                "SemanticType": {
+                  "values": {
+                    "SM_UNKNOWN": 0,
+                    "SM_IGNORE": 1,
+                    "SM_GROUND": 2,
+                    "SM_OBJECT": 3,
+                    "SM_CURB": 4,
+                    "SM_VEGETATION": 5,
+                    "SM_FENCE": 6,
+                    "SM_NOISE": 7,
+                    "SM_WALL": 8,
+                    "SM_MAX_OBJECT_SEMANTIC_LABEL": 9
                   }
                 }
               }
@@ -12807,6 +13508,56 @@
                 "cipvInfo": {
                   "type": "CIPVInfo",
                   "id": 5
+                }
+              }
+            },
+            "PerceptionEdgeInfo": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "isUseable": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "edgePoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point3D",
+                  "id": 3
+                },
+                "edgeRelativePoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "deltaS": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "edgeLength": {
+                  "type": "double",
+                  "id": 6
+                },
+                "isSmootherSucc": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isCrossLocalization": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -12970,6 +13721,10 @@
                 "cameraId": {
                   "type": "CameraID",
                   "id": 5
+                },
+                "cameraName": {
+                  "type": "string",
+                  "id": 6
                 }
               },
               "nested": {
@@ -13502,8 +14257,38 @@
                     "PULL_OVER": 3,
                     "STOP": 4,
                     "RESUME_CRUISE": 5,
-                    "CLEAR_PLANNING": 6
+                    "CLEAR_PLANNING": 6,
+                    "ENTER_MISSION": 7,
+                    "EXIT_MISSION": 8
                   }
+                }
+              }
+            },
+            "Point": {
+              "fields": {
+                "x": {
+                  "type": "double",
+                  "id": 1
+                },
+                "y": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "LocationPose": {
+              "fields": {
+                "vehiceLocation": {
+                  "type": "Point",
+                  "id": 1
+                },
+                "leftLaneBoundaryPoint": {
+                  "type": "Point",
+                  "id": 2
+                },
+                "rightLaneBoundaryPoint": {
+                  "type": "Point",
+                  "id": 3
                 }
               }
             },
@@ -13689,6 +14474,10 @@
                 "carInDeadEnd": {
                   "type": "bool",
                   "id": 24
+                },
+                "locationPose": {
+                  "type": "LocationPose",
+                  "id": 25
                 },
                 "rssInfo": {
                   "type": "RSSInfo",
@@ -15947,6 +16736,14 @@
                     "default": 3,
                     "deprecated": true
                   }
+                },
+                "nearCar": {
+                  "type": "NearCar",
+                  "id": 19
+                },
+                "nearCrosswalk": {
+                  "type": "NearCrosswalk",
+                  "id": 22
                 }
               },
               "nested": {
@@ -15995,6 +16792,56 @@
                   "values": {
                     "DISTANCE": 0,
                     "TIME": 1
+                  }
+                },
+                "NearCar": {
+                  "fields": {
+                    "distance": {
+                      "type": "double",
+                      "id": 1,
+                      "options": {
+                        "default": 20
+                      }
+                    },
+                    "acceleration": {
+                      "type": "double",
+                      "id": 2,
+                      "options": {
+                        "default": -2
+                      }
+                    },
+                    "isSameLane": {
+                      "type": "bool",
+                      "id": 3,
+                      "options": {
+                        "default": false
+                      }
+                    },
+                    "onlyIncludeBehind": {
+                      "type": "bool",
+                      "id": 4,
+                      "options": {
+                        "default": true
+                      }
+                    }
+                  }
+                },
+                "NearCrosswalk": {
+                  "fields": {
+                    "distance": {
+                      "type": "double",
+                      "id": 1,
+                      "options": {
+                        "default": 15
+                      }
+                    },
+                    "acceleration": {
+                      "type": "double",
+                      "id": 2,
+                      "options": {
+                        "default": -1
+                      }
+                    }
                   }
                 }
               }

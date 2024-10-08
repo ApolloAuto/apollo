@@ -88,6 +88,7 @@ apollo_deps_library(
     name = "{}",
     srcs = ["{}"],
     deps = [{}],
+    linkopts = [{}],
     visibility = ["//visibility:public"],
     alwayslink = True,
 )
@@ -636,6 +637,7 @@ def meta_executor(package_path):
 
             # link_paths = []
             apollo_deps_list = []
+            system_deps_list = []
             for i in ld_path:
                 name = i["name"]
                 path = "/".join(i["path"].split("/")[0: len(i["path"].split("/"))-1])
@@ -698,6 +700,10 @@ def meta_executor(package_path):
                     # link_paths.append('"-L{}"'.format(i))
                     # link_paths.append('"-Wl,-rpath,{}"'.format(i))
 
+                # shared library installed in ld library path
+                if path.startswith("/usr/local/lib") and lib_name.endswith(".so"):
+                    system_deps_list.append('"-l{}"'.format(lib_name[3: len(lib_name)-3]))
+
             # link_opts = []
             # for so_lib in needed_so:
             #     if so_lib.startswith("lib") and so_lib.endswith(".so"):
@@ -716,7 +722,7 @@ def meta_executor(package_path):
             #    target_name = target_name[int(len(target_name) / 2):]
 
             package_build_content.append(
-                BUILD_TMP.format(target_name, dst, apollo_deps_str)
+                BUILD_TMP.format(target_name, dst, apollo_deps_str, ",".join(system_deps_list))
             )
 
             package_build_content.sort() 

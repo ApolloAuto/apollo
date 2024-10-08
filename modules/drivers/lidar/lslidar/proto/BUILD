@@ -20,6 +20,7 @@ proto_library(
     srcs = ["config.proto"],
     deps = [
         ":lslidar_proto",
+        "//modules/drivers/lidar/common/proto:lidar_config_base_proto",
     ],
 )
 

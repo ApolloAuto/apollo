@@ -39,14 +39,14 @@ class TimerComponent;
  * A module can have different types of communication by defining
  * read/write and/or service/client in a node.
  * @warning Duplicate name is not allowed in topo objects, such as node,
- * reader/writer, service/clinet in the topo.
+ * reader/writer, service/client in the topo.
  */
 class Node {
  public:
   template <typename M0, typename M1, typename M2, typename M3>
   friend class Component;
   friend class TimerComponent;
-  friend bool Init(const char*);
+  friend bool Init(const char*, const std::string&);
   friend std::unique_ptr<Node> CreateNode(const std::string&,
                                           const std::string&);
   virtual ~Node();

@@ -46,6 +46,7 @@ struct LocalView {
   std::shared_ptr<storytelling::Stories> stories;
   std::shared_ptr<PlanningCommand> planning_command;
   std::shared_ptr<routing::LaneWaypoint> end_lane_way_point;
+  std::shared_ptr<perception::PerceptionEdgeInfo> perception_road_edge;
 };
 
 }  // namespace planning

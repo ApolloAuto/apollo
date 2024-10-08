@@ -94,9 +94,39 @@ class AbstractVehicleFactory {
   virtual void PublishChassisDetail() = 0;
 
   /**
+   * @brief publish chassis for vehicle messages
+   */
+  virtual void PublishChassisDetailSender();
+
+  /**
    * @brief create cansender heartbeat
    */
   virtual void UpdateHeartbeat();
+
+  /**
+   * @brief check chassis detail communication fault
+   */
+  virtual bool CheckChassisCommunicationFault();
+
+  /**
+   * @brief add send protocol message
+   */
+  virtual void AddSendProtocol();
+
+  /**
+   * @brief clear send protocol message, make a sender can error
+   */
+  virtual void ClearSendProtocol();
+
+  /**
+   * @brief check send protocol message whether is clear or not
+   */
+  virtual bool IsSendProtocolClear();
+
+  /**
+   * @brief get chassis driving mode
+   */
+  virtual Chassis::DrivingMode Driving_Mode();
 
  private:
   VehicleParameter vehicle_parameter_;

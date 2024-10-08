@@ -17,6 +17,7 @@ import LengthLabel from '../../labels/LengthLabel';
 import CloseLabel from '../../labels/CloseLabel';
 import { eventBus, MouseEventType } from '../../EventBus';
 import { areVerticesValid } from '../../utils/common';
+import {scaleManager} from "../../utils/ScaleManager";
 
 interface IRulerMarkerContext extends IFunctionalClassContext {}
 
@@ -43,14 +44,15 @@ export default class RulerMarker extends BaseMarker {
     constructor(protected context: IRulerMarkerContext) {
         super(context);
         this.name = 'RulerMarker';
-        createToolMarker(0.5).then((marker) => {
-            this.marker = marker;
-        });
         // this.active();
     }
 
     public active() {
         super.active();
+        const radius = this.computeWorldSizeForPixelSize(10);
+        createToolMarker(radius).then((marker) => {
+            this.marker = marker;
+        });
         const { renderer } = this.context;
         this.eventHandler = new ContinuousMouseEvent(
             renderer.domElement,
@@ -121,7 +123,7 @@ export default class RulerMarker extends BaseMarker {
         this.currentDashedVertices = vertices.slice();
 
         const distance = vertices[0].distanceTo(vertices[1]);
-        const lineWidth = 0.2;
+        const lineWidth = this.computeWorldSizeForPixelSize(6);
         const color = 0x3288fa;
         const dashArray = (1 / distance) * 0.5;
 
@@ -144,7 +146,7 @@ export default class RulerMarker extends BaseMarker {
             this.fan = new FanMarker({
                 ...this.context,
                 fanColor: 0x1fcc4d,
-                borderWidth: 0.2,
+                borderWidth: this.computeWorldSizeForPixelSize(6),
                 borderColor: 0x1fcc4d,
                 borderType: 'dashed',
             });
@@ -387,12 +389,13 @@ export default class RulerMarker extends BaseMarker {
         if (lastPolyline.instance) {
             lastPolyline.instance.updateVertices(lastPolyline.coordinates).render();
         } else {
+            const marker = this.marker?.clone();
             lastPolyline.instance = new Polyline({
                 ...this.context,
                 polylineColor: 0x3288fa,
-                lineWidth: 0.2,
+                lineWidth: this.computeWorldSizeForPixelSize(6),
                 fanColor: 0x1fcc4d,
-                marker: this.marker?.clone(),
+                marker,
                 label: 'length',
             })
                 .updateVertices(lastPolyline.coordinates)

@@ -74,11 +74,19 @@ class StrategyFilter : public BaseObjectFilter {
 
     void MergeInclusiveObjects(LidarFrame* frame);
 
+    void FilterBelowGroundObjects(LidarFrame* frame);
+
+    void FilterSmallSizeObjects(LidarFrame* frame);
+
  private:
     bool is_merge_inclusive_ = false;
+    bool is_filter_below_objects_ = false;
+    bool is_filter_small_size_ = false;
     float expand_dist_ = 0.2;
     double merge_time_ = 0.0;
     bool allow_fore_merge_ = false;
+    float below_threshold_ = 0.5;
+    float small_size_threshold_ = 0.01;
 };  // class StrategyFilter
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(

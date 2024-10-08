@@ -26,6 +26,7 @@
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
 #include "cyber/message/message_traits.h"
+#include "cyber/statistics/statistics.h"
 #include "cyber/transport/shm/notifier_factory.h"
 #include "cyber/transport/shm/readable_info.h"
 #include "cyber/transport/shm/segment_factory.h"

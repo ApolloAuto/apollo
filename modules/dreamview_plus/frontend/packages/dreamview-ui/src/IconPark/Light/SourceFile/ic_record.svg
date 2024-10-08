@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/ic_record</title>
+    <g id="icon/ic_record" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形" fill="#D8D8D8" opacity="0" x="0" y="0" width="16" height="16"></rect>
+        <circle id="椭圆形" stroke="#282F3C" cx="8" cy="8" r="7"></circle>
+        <circle id="椭圆形" stroke="#282F3C" fill-rule="nonzero" cx="8" cy="8" r="3"></circle>
+    </g>
+</svg>

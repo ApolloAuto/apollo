@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconIcAmplification, IconIcReduce, IconIcCoverageHover } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { SubContent, SubHeader } from '../../base/PanelHelpContent';
 import useStyle from '../useStyle';
 
@@ -16,7 +16,7 @@ export function VehicleVizPanelHelpOrigin() {
             <div className={classes['panel-desc-item']}>
                 <div className={classes['panel-desc-item-left']}>
                     <span className={classes['viz-help-btn-item']}>
-                        <IconIcCoverageHover />
+                        <IconPark name='IcCoverageHover' />
                     </span>
                 </div>
                 <div className={classes['panel-desc-item-right']}>{t('layerMenuDescription')}</div>
@@ -32,8 +32,8 @@ export function VehicleVizPanelHelpOrigin() {
             <div className={classes['panel-desc-item']}>
                 <div className={classes['panel-desc-item-left']}>
                     <span className={cx(classes['viz-help-btn-item'], classes['viz-btn-item-flex'])}>
-                        <IconIcAmplification style={{ fontSize: '16px', marginBottom: '8px' }} />
-                        <IconIcReduce style={{ fontSize: '16px' }} />
+                        <IconPark name='IcAmplification' style={{ fontSize: '16px', marginBottom: '8px' }} />
+                        <IconPark name='IcReduce' style={{ fontSize: '16px' }} />
                     </span>
                 </div>
                 <div className={classes['panel-desc-item-right']}>{t('viewBtnDescription')}</div>

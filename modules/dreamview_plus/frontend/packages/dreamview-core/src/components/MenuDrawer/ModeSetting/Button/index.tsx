@@ -8,7 +8,7 @@ interface IButton {
 
 function Button(props: PropsWithChildren<IButton>) {
     const { width, onClick = () => true } = props;
-    const { classes } = useStyle()({ width });
+    const { classes } = useStyle({ width });
     return (
         <button onClick={onClick} type='button' className={classes['mode-setting-button']}>
             {props.children}

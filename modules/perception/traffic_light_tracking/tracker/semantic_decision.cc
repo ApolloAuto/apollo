@@ -248,6 +248,7 @@ bool SemanticReviser::Track(camera::TrafficLightFrame *frame) {
     return true;
   }
 
+  ADEBUG << "lights_ref size is  : " << lights_ref.size();
   for (size_t i = 0; i < lights_ref.size(); i++) {
     base::TrafficLightPtr light = lights_ref.at(i);
     int cur_semantic = light->semantic;
@@ -278,6 +279,7 @@ bool SemanticReviser::Track(camera::TrafficLightFrame *frame) {
     }
   }
 
+  ADEBUG << "semantic_table size is : " << semantic_table.size();
   for (size_t i = 0; i < semantic_table.size(); ++i) {
     SemanticTable cur_semantic_table = semantic_table.at(i);
     ReviseByTimeSeries(time_stamp, cur_semantic_table, &lights_ref);

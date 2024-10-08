@@ -159,10 +159,9 @@ void ChController::Stop() {
 Chassis ChController::chassis() {
   chassis_.Clear();
 
-  Ch chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
+  Ch chassis_detail = GetNewRecvChassisDetail();
 
-  // 21, 22, previously 1, 2
+  // 1, 2
   // if (driving_mode() == Chassis::EMERGENCY_MODE) {
   //   set_chassis_error_code(Chassis::NO_ERROR);
   // }
@@ -335,6 +334,16 @@ Chassis ChController::chassis() {
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "Chassis has some fault, please check the chassis_detail.");
+  }
+
+  // check the chassis detail lost
+  if (is_chassis_communication_error_) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ch chassis detail is lost! Please check the communication error.");
+    set_chassis_error_code(Chassis::CHASSIS_CAN_LOST);
+    set_driving_mode(Chassis::EMERGENCY_MODE);
   }
 
   return chassis_;
@@ -569,18 +578,11 @@ void ChController::ResetVin() {
 void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool ChController::CheckChassisError() {
-  Ch chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no ch vehicle info.";
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "ChassisDetail has no ch vehicle info.");
+  if (is_chassis_communication_error_) {
+    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
     return false;
-  } else {
-    chassis_.clear_engage_advice();
   }
+  Ch chassis_detail = GetNewRecvChassisDetail();
   // steer motor fault
   if (chassis_detail.has_steer_status__512()) {
     if (Steer_status__512::STEER_ERR_STEER_MOTOR_ERR ==
@@ -671,6 +673,13 @@ void ChController::SecurityDogThreadFunc() {
       message_manager_->ResetSendMessages();
       can_sender_->Update();
     }
+
+    // recove error code
+    if (!emergency_mode && !is_chassis_communication_error_ &&
+        mode == Chassis::EMERGENCY_MODE) {
+      set_chassis_error_code(Chassis::NO_ERROR);
+    }
+
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
@@ -690,10 +699,6 @@ bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
   bool is_esp_online = false;
 
   do {
-    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-      AERROR_EVERY(100) << "get chassis detail failed.";
-      return false;
-    }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
       is_eps_online = chassis_.has_check_response() &&
@@ -723,9 +728,14 @@ bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
     }
   } while (need_wait && retry_num);
 
-  AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+  if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
+    AERROR << "steer check_response fail: is_eps_online:" << is_eps_online;
+  }
+
+  if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
+    AERROR << "speed check_response fail: " << "is_vcu_online:" << is_vcu_online
+           << ", is_esp_online:" << is_esp_online;
+  }
 
   return false;
 }

@@ -6,6 +6,7 @@ apollo_cc_library(
     copts = [],
     hdrs = [
         "sync_buffering.h",
+        "sync_queue.h",
         "lidar_component_base_impl.h",
         "lidar_component_base.h",
         "util.h",
@@ -17,6 +18,7 @@ apollo_cc_library(
       "@boost",
       "//cyber",
       "//modules/drivers/lidar/common/proto:lidar_config_base_proto",
+      "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
     ],
 )
 

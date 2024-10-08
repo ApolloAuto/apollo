@@ -66,6 +66,26 @@ bool SetProtoToASCIIFile(const google::protobuf::Message &message,
   return SetProtoToASCIIFile(message, fd);
 }
 
+bool SetStringToASCIIFile(const std::string &content,
+                          const std::string &file_name) {
+  int fd = open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+  if (fd < 0) {
+    AERROR << "Unable to open file " << file_name << " to write.";
+    return false;
+  }
+  // Write the string data to the file
+  ssize_t bytes_written = write(fd, content.c_str(), content.size());
+  if (bytes_written < 0) {
+    AERROR << "Failed to write to file.";
+    close(fd);  // Ensure the file descriptor is closed even on error
+    return false;
+  }
+
+  close(fd);  // Close the file descriptor
+
+  return true;
+}
+
 bool GetProtoFromASCIIFile(const std::string &file_name,
                            google::protobuf::Message *message) {
   using google::protobuf::TextFormat;

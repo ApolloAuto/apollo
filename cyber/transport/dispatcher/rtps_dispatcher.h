@@ -26,10 +26,12 @@
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/message/message_traits.h"
+#include "cyber/time/time.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
 #include "cyber/transport/rtps/attributes_filler.h"
 #include "cyber/transport/rtps/participant.h"
 #include "cyber/transport/rtps/sub_listener.h"
+#include "cyber/statistics/statistics.h"
 
 namespace apollo {
 namespace cyber {
@@ -81,11 +83,22 @@ class RtpsDispatcher : public Dispatcher {
 template <typename MessageT>
 void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const MessageListener<MessageT>& listener) {
-  auto listener_adapter = [listener](
+  auto listener_adapter = [listener, self_attr](
                               const std::shared_ptr<std::string>& msg_str,
                               const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
+    uint64_t recv_time = Time::Now().ToMicrosecond();
+    uint64_t send_time = msg_info.send_time();
+    if (send_time > recv_time) {
+      AWARN << "The message is received earlier than the message is sent";
+    } else {
+      uint64_t diff = recv_time - send_time;
+      // sample transport latency in microsecond
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                          uint64_t>(self_attr, diff);
+    }
+    statistics::Statistics::Instance()->SetProcStatus(self_attr, recv_time);
     listener(msg, msg_info);
   };
 
@@ -97,11 +110,22 @@ template <typename MessageT>
 void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const RoleAttributes& opposite_attr,
                                  const MessageListener<MessageT>& listener) {
-  auto listener_adapter = [listener](
+  auto listener_adapter = [listener, self_attr](
                               const std::shared_ptr<std::string>& msg_str,
                               const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
+    uint64_t recv_time = Time::Now().ToMicrosecond();
+    uint64_t send_time = msg_info.send_time();
+    if (send_time > recv_time) {
+      AWARN << "The message is received earlier than the message is sent";
+    } else {
+      uint64_t diff = recv_time - send_time;
+      // sample transport latency in microsecond
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                        uint64_t>(self_attr, diff);
+    }
+    statistics::Statistics::Instance()->SetProcStatus(self_attr, recv_time);
     listener(msg, msg_info);
   };
 

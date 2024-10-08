@@ -153,7 +153,7 @@ ReferenceLineProvider::FutureRouteWaypoints() {
 }
 
 void ReferenceLineProvider::GetEndLaneWayPoint(
-    std::shared_ptr<routing::LaneWaypoint> &end_point) const {
+    std::shared_ptr<routing::LaneWaypoint> end_point) const {
   if (nullptr == current_pnc_map_) {
     end_point = nullptr;
     return;

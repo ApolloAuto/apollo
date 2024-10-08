@@ -1,11 +1,15 @@
 import * as process from 'process';
 
-declare interface Window {
-    SANDBOX_PATHNAME: string;
-    DREAMVIEW_VERSION: string;
-    __REDUX_DEVTOOLS_EXTENSION__: any;
-    self: Window;
-    dreamviewVersion: string;
+declare global {
+    interface Window {
+        SANDBOX_PATHNAME: string;
+        DREAMVIEW_VERSION: string;
+        __REDUX_DEVTOOLS_EXTENSION__: any;
+        self: Window;
+        dreamviewVersion: string;
+        addDreamviewEventListener: (type: string, listener: EventListener) => void;
+        removeDreamviewEventListener: (type: string, listener: EventListener) => void;
+    }
 }
 
 declare module '*.png' {

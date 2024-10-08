@@ -35,9 +35,9 @@
 #include "modules/planning/planning_base/common/dependency_injector.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_interface_base/task_base/common/decider.h"
 
 namespace apollo {
@@ -69,9 +69,7 @@ class OpenSpaceFallbackDecider : public Decider {
 
   void PathPointNormalizing(double rotate_angle,
                             const common::math::Vec2d& translate_origin,
-                            double* x,
-                            double* y,
-                            double* phi);
+                            double* x, double* y, double* phi);
 
  private:
   OpenSpaceFallBackDeciderConfig config_;

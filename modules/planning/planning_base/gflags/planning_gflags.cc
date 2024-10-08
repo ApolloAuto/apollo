@@ -159,6 +159,8 @@ DEFINE_double(destination_check_distance, 5.0,
               " it is considered to reach destination");
 DEFINE_double(passed_destination_threshold, 0.05,
               "check adc whether has passed destination");
+DEFINE_double(passed_referenceline_end_threshold, 1.5,
+              "check adc whether has passed reference line end");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
@@ -336,7 +338,7 @@ DEFINE_bool(
 
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
-DEFINE_double(path_bounds_horizon, 100, "path bounds horizon");
+
 DEFINE_bool(export_chart, false, "export chart in planning");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug info in chart format");
@@ -397,6 +399,7 @@ DEFINE_int32(min_past_history_points_len, 0,
 // Parameter for scenario or task process.
 DEFINE_double(path_bounds_decider_resolution, 0.5,
               "The distance along s direction.");
+DEFINE_double(path_bounds_horizon, 100, "path bounds horizon");
 DEFINE_double(num_extra_tail_bound_point, 20, "The extra tail point number.");
 DEFINE_bool(enable_pull_over_at_destination, false,
             "Whether to pull over at destination");
@@ -437,8 +440,83 @@ DEFINE_double(
     referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
     "max angle difference between the backward reference line and ego heading");
 
+// park generic
+DEFINE_double(sqp_obstacle_weight, 100, "sqp_obstacle_weight");
+
+DEFINE_bool(enable_obstacle_potential_field, true,
+            "enable_obstacle_potential_field");
+
+DEFINE_double(open_space_delta_t, 1.0,
+              "open space sample time for speed planning");
+
+DEFINE_double(open_space_acc_weight, 1.0,
+              "weight of open space acceleration in the cost function");
+
+DEFINE_double(open_space_jerk_weight, 10.0,
+              "weight of open space jerk in the cost function");
+
+DEFINE_double(open_space_kappa_weight, 1000.0,
+              "weight of open space kappa in the cost function");
+
+DEFINE_double(open_space_reference_s_weight, 10.0,
+              "weight of open space reference s in the cost function");
+
+DEFINE_double(open_space_reference_v_weight, 10.0,
+              "weight of open space reference v in the cost function");
+
+DEFINE_double(open_space_max_forward_v, 2.0,
+              "the max forward velocity for open space planning");
+
+DEFINE_double(open_space_max_reverse_v, 2.0,
+              "the max reverse velocity for open space planning");
+
+DEFINE_double(open_space_max_forward_acc, 3.0,
+              "the max forward acceleration for open space planning");
+
+DEFINE_double(open_space_max_reverse_acc, 2.0,
+              "the max reverse acceleration for open space planning");
+
+DEFINE_double(open_space_max_jerk, 4.0, "the max jerk for open space planning");
+
 // Nudge decisider
 DEFINE_bool(enable_nudge_decider, true, "Enable use nudge decider");
+DEFINE_double(max_nudge_check_distance, 15.0,
+              "Max nudge check distance in path boundary decider");
+DEFINE_double(path_trim_destination_threshold, 20.0,
+              "Distance threshold to destination in path trim operation");
 
 // Edge follow buffer
-DEFINE_double(edge_follow_buffer, 0.3, "the edge follow buffer");
+DEFINE_double(edge_follow_buffer, 0.3, "Edge follow buffer");
+DEFINE_bool(disable_perception_edge_info, false,
+            "Disable perception edge info");
+DEFINE_bool(enable_edge_follow_curvature_buffer, false,
+            "Enable add curvature buffer in edge follow map");
+DEFINE_bool(enable_smooth_edge_follow_buffer, false,
+            "Enable smooth edge follow buffer");
+DEFINE_bool(enable_print_edge_follow_log, false,
+            "Enable print edge follow log");
+
+DEFINE_double(normal_look_forward_short_distance, 180,
+              "normal look forward short distance in reference line");
+DEFINE_double(normal_look_forward_long_distance, 250,
+              "normal look forward long distance in reference line");
+DEFINE_double(normal_look_backward_distance, 50,
+              "normal look backward distance in reference line");
+DEFINE_double(edge_follow_look_forward_short_distance, 20,
+              "edge follow look forward short distance in reference line");
+DEFINE_double(edge_follow_look_forward_long_distance, 50,
+              "edge follow look forward long distance in reference line");
+DEFINE_double(edge_follow_look_backward_distance, 50,
+              "edge follow look backward distance in reference line");
+
+// lane escape
+DEFINE_bool(enable_lane_escape, true, "Enable lane escape");
+
+// for path easy solution
+DEFINE_double(ego_front_slack_buffer, 0.25,
+              "edge follow look backward distance in reference line");
+DEFINE_double(relax_ego_radius, 2.0, "relax_ego_radius");
+DEFINE_bool(enable_corner_constraint, false, "enable_corner_constraint");
+DEFINE_double(obstacle_lon_end_buffer_park, 0.6,
+              "obstacle longitudinal end buffer (meters) for deciding "
+              "path boundaries");

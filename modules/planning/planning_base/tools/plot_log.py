@@ -66,7 +66,6 @@ if __name__ == '__main__':
         line_st_num = 0
         line_ed_num = len(lines)
     else:
-        print(type(lines))
         line_st_num, line_ed_num, seq_id = log_util.search_current(
             lines, line_search_num)
     if line_st_num < 0 or line_ed_num < 0:
@@ -90,7 +89,7 @@ if __name__ == '__main__':
         else:
             ax[key] = axes[item["col"]][item["row"]]
     callback = log_util.Index(fig, ax, line_st_num,
-                              line_ed_num, lines, config)
+                              line_ed_num, lines, config,file_path)
     callback.plot_frame("frame:" + str(seq_id))
     prev1frame = plt.axes([0.2, 0.01, 0.1, 0.05])
     prev10frame = plt.axes([0.3, 0.01, 0.1, 0.05])

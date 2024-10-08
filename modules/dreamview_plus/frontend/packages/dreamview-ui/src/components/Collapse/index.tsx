@@ -2,7 +2,7 @@ import React from 'react';
 import { Collapse as InternalCollapse, CollapseProps } from 'antd';
 import './index.less';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
-import { IconIcPullDownExpansion } from '../../icons';
+import IconPark from '../../IconPark';
 
 export function Collapse(props: CollapseProps) {
     const { prefixCls: customizePrefixCls, ...rest } = props;
@@ -12,7 +12,8 @@ export function Collapse(props: CollapseProps) {
         <InternalCollapse
             // eslint-disable-next-line react/no-unstable-nested-components
             expandIcon={({ isActive }) => (
-                <IconIcPullDownExpansion
+                <IconPark
+                    name='IcPullDownExpansion'
                     style={{
                         fontSize: 16,
                     }}

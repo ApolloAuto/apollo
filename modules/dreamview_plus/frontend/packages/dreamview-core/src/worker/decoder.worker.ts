@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import Logger from '@dreamview/log';
-import { Subject } from 'rxjs';
+import { Subject, switchMap } from 'rxjs';
 import {
     MetadataItem,
     StreamMessage,
@@ -17,54 +17,96 @@ const protoLoader = new ProtoLoader();
 
 const subject = new Subject<TaskInternal<StreamMessage>>();
 
-function loadProtoAsPromise(data: any, protoPath: string, msgType: string, config?: any) {
-    return new Promise((resolve, reject) => {
-        protoLoader.loadAndCacheProto(protoPath, config).then((root) => {
-            try {
-                const message = root.lookupType(msgType);
-                const decodedData = message.decode(data);
-                const objectData = message.toObject(decodedData, {
-                    enums: String,
-                    longs: String,
-                });
-                resolve(objectData);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    });
+// 需要枚举转换的数据类型
+const ENUM_DATA_TYPES = [
+    'apollo.dreamview.CameraUpdate',
+    'apollo.dreamview.HMIStatus',
+    'apollo.dreamview.SimulationWorld',
+    'apollo.dreamview.Obstacles',
+    'apollo.hdmap.Map',
+];
+
+// 数据判断函数，需要包含缓存能力，不要每次遍历
+const isEnumDataType = (() => {
+    const cache = new Map<string, boolean>();
+    return (msgType: string) => {
+        if (cache.has(msgType)) {
+            return cache.get(msgType);
+        }
+        const result = ENUM_DATA_TYPES.includes(msgType);
+        cache.set(msgType, result);
+        return result;
+    };
+})();
+
+async function loadProtoAsPromise(data: any, protoPath: string, msgType: string, config?: any) {
+    try {
+        const root = await protoLoader.loadAndCacheProto(protoPath, config);
+
+        const message = root.lookupType(msgType);
+
+        let decodedData: any = message.decode(data);
+        if (isEnumDataType(msgType)) {
+            decodedData = message.toObject(decodedData, {
+                enums: String,
+            });
+        }
+        return decodedData;
+    } catch (e) {
+        console.error(e);
+        return Promise.reject(e);
+    }
 }
 
-const release = () =>
+const release = (id?: string) =>
     self.postMessage({
+        id,
         success: false,
         result: null,
     });
 
-subject.subscribe(
-    async (message) => {
-        try {
-            const storeManager = await indexedDBStorage.getStoreManager<MetadataItem[]>('DreamviewPlus');
+let storeManager: any;
 
-            const metadata: MetadataItem[] = (await storeManager.getItem('metadata')) || <MetadataItem[]>[];
+subject
+    .pipe(
+        switchMap(async (message) => {
+            if (!storeManager) {
+                storeManager = await indexedDBStorage.getStoreManager('DreamviewPlus');
+            }
+            return message; // Pass the message along with the initialized storeManager
+        }),
+    )
+    .subscribe(async (message) => {
+        try {
+            if (!storeManager) release();
+            const metadata: MetadataItem[] = (await storeManager?.getItem('metadata')) || <MetadataItem[]>[];
+
+            if (metadata.length === 0) release();
 
             const { id, payload } = message;
 
-            const { dataName, channelName, data } = payload || {};
+            const {
+                dataName,
+                channelName,
+                data,
+                // performance,
+            } = payload || {};
 
-            const dataNameInMetadata = metadata.some((item) => item.dataName === dataName);
-
-            if (!dataNameInMetadata) {
-                logger.error(`Data name ${dataName} not found in metadata`);
-                release();
-                throw new Error(`Data name ${dataName} not found in metadata`);
-            }
+            // if (performance) {
+            //     const now = Date.now();
+            //     const start = performance.startTimestamp;
+            //     console.log(`数据${dataName}${channelName}进入反序列化传输的数据：${now - start}ms`);
+            // }
 
             const dataNameMeta = metadata.find((item) => item.dataName === dataName);
 
+            if (!dataNameMeta) {
+                logger.error(`Data name ${dataName} not found in metadata`);
+                throw new Error(`Data name ${dataName} not found in metadata`);
+            }
+
             if (dataNameMeta.differentForChannels && !channelName) {
                 logger.error('Channel name not found in message payload');
-                release();
                 throw new Error('Channel name not found in message payload');
             }
 
@@ -77,29 +119,26 @@ subject.subscribe(
             const objectData = await loadProtoAsPromise(data, protoPath, msgType, {
                 dataName,
                 channelName,
+            }).catch(() => {
+                release(id);
+                throw new Error(`Failed to decode data for ${dataName} ${channelName}`);
             });
 
             self.postMessage({
                 id,
                 success: true,
-                result: { ...payload, data: objectData },
+                result: {
+                    ...payload,
+                    data: objectData,
+                    // performance: { startTimestamp: Date.now() }，
+                },
             });
         } catch (e) {
             const { id } = message;
-            self.postMessage({
-                id,
-                success: false,
-                result: null,
-            });
+            release(id);
             throw new Error(e as string);
         }
-    },
-    (error) => {
-        logger.error(error);
-        release();
-        throw new Error(error);
-    },
-);
+    });
 
 function isMessageType<T extends WorkerMessageType>(
     message: WorkerMessage<WorkerMessageType>,
@@ -112,9 +151,11 @@ self.onmessage = (event: MessageEvent<WorkerMessage<WorkerMessageType>>) => {
     const message = event.data;
     try {
         if (isMessageType(message, 'SOCKET_STREAM_MESSAGE')) {
+            // @ts-ignore
             subject.next(message);
         }
     } catch (e) {
+        // @ts-ignore
         const { id } = message;
         self.postMessage({
             id,

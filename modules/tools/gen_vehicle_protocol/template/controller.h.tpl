@@ -24,8 +24,8 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
+#include "modules/canbus/vehicle/vehicle_controller.h"
 %(control_protocol_include_list)s
 
 namespace apollo {
@@ -57,6 +57,11 @@ class %(car_type_cap)sController final : public VehicleController<::apollo::canb
    */
   Chassis chassis() override;
 
+  /**
+   * @brief add the sender message.
+   */
+  void AddSendMessage() override;
+
  private:
   // main logical function for operation the car enter or exit the auto driving
   void Emergency() override;
@@ -80,6 +85,10 @@ class %(car_type_cap)sController final : public VehicleController<::apollo::canb
   // drive with acceleration/deceleration
   // acc:-7.0~5.0 unit:m/s^2
   void Acceleration(double acc) override;
+
+  // drive with speed
+  // speed:-xx.0~xx.0 unit:m/s
+  void Speed(double speed);
 
   // steering with old angle speed
   // angle:-99.99~0.00~99.99, unit:, left:+, right:-

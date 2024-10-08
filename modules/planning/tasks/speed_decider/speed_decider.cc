@@ -277,6 +277,14 @@ Status SpeedDecider::MakeObjectDecision(
             mutable_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                       stop_decision);
           }
+        } else if (obstacle->IsStatic()) {
+          // stop for static obstacle
+          ObjectDecisionType stop_decision;
+          if (CreateStopDecision(*mutable_obstacle, &stop_decision,
+                                 -FLAGS_min_stop_distance_obstacle)) {
+            mutable_obstacle->AddLongitudinalDecision("dp_st_graph",
+                                                      stop_decision);
+          }
         } else if (CheckIsFollow(*obstacle, boundary)) {
           // stop for low_speed decelerating
           if (IsFollowTooClose(*mutable_obstacle)) {

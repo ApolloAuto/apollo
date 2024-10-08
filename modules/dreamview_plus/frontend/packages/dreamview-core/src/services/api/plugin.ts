@@ -59,7 +59,7 @@ export class PluginApi {
                     return Promise.resolve(res.data.info.data);
                 }
 
-                return Promise.reject(res.data.info.message);
+                return Promise.reject(res.data.info.message || res.data.info.error_msg);
             })
             .catch((err) => {
                 logger.error(
@@ -147,6 +147,70 @@ export class PluginApi {
             data: {
                 info: '',
                 name: PluginApiNames.GetRecordsList,
+            },
+        });
+    }
+
+    getAuthorizationInfo() {
+        return this.request<any, any>({
+            data: {
+                info: '',
+                name: 'FetchAuthorizationInfo',
+            },
+        });
+    }
+
+    checkInHwDevice(deviceId: string) {
+        return this.request<any, any>({
+            data: {
+                info: deviceId,
+                name: 'CheckInHwDevice',
+            },
+        });
+    }
+
+    getSubscribeList(options: { useCache?: boolean } = {}) {
+        const { useCache = false } = options;
+        return this.request<any, any>({
+            data: {
+                info: useCache ? '1' : '',
+                name: 'GetSubscriberList',
+            },
+        });
+    }
+
+    updateLiscence() {
+        return this.request<any, any>({
+            data: {
+                info: '',
+                name: 'CheckCertificateStatus',
+            },
+        });
+    }
+
+    getSubscribeAccountInfo() {
+        return this.request<any, any>({
+            data: {
+                info: '',
+                name: 'GetSubscriberInfo',
+            },
+        });
+    }
+
+    getCloudDeviceList() {
+        return this.request<any, any>({
+            data: {
+                info: JSON.stringify({ page_number: 1, page_size: 100 }),
+                name: 'GetSubscriberDevicesList',
+            },
+        });
+    }
+
+    changeSubscribe(id: string) {
+        return this.request<any, any>({
+            data: {
+                info: id,
+                name: 'GetSubscriberToken',
             },
         });
     }

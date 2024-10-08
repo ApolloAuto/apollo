@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include "modules/perception/lidar_tracking/tracker/common/mlf_track_data.h"
 #include "modules/perception/lidar_tracking/tracker/common/tracked_object.h"
 
 namespace apollo {
@@ -43,6 +44,9 @@ void MeasureBboxCenterVelocity(TrackedObjectPtr new_object,
                                const TrackedObjectConstPtr& old_object,
                                const double& time_diff);
 
+void MeasureBboxCenterHistoryVelocity(const MlfTrackDataConstPtr& track_data,
+    TrackedObjectPtr new_object);
+
 /**
  * @brief Measure bbox corner velocity
  *
@@ -53,6 +57,27 @@ void MeasureBboxCenterVelocity(TrackedObjectPtr new_object,
 void MeasureBboxCornerVelocity(TrackedObjectPtr new_object,
                                const TrackedObjectConstPtr& old_object,
                                const double& time_diff);
+
+void MeasureBboxCornerHistoryVelocity(const MlfTrackDataConstPtr& track_data,
+    TrackedObjectPtr new_object);
+
+void ComputeBboxCornerHistoryVelocity(TrackedObjectPtr new_object,
+    const TrackedObjectConstPtr& old_object, const double& time_diff,
+    TrackedObjectPtr curr_object);
+
+/**
+ * @brief Measure object-detection center and corner velocity
+ *
+ * @param new_object for current updating
+ * @param old_object for last updating
+ * @param time_diff time interval from last updating
+ */
+void MeasureObjectDetectionVelocity(TrackedObjectPtr new_object,
+    const TrackedObjectConstPtr& old_object, const double& time_diff);
+
+void MeasureObjectDetectionHistoryVelocity(
+    const MlfTrackDataConstPtr& track_data,
+    TrackedObjectPtr new_object);
 
 }  // namespace lidar
 }  // namespace perception

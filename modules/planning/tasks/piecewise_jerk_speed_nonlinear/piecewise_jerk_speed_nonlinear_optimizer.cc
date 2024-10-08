@@ -27,10 +27,10 @@
 #include "modules/planning/planning_base/proto/ipopt_return_status.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/tasks/piecewise_jerk_speed_nonlinear/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
@@ -243,18 +243,15 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
             s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
             break;
           case STBoundary::BoundaryType::FOLLOW:
-            s_upper_bound =
-                std::fmin(s_upper_bound, s_upper);
+            s_upper_bound = std::fmin(s_upper_bound, s_upper);
             if (!speed_data.EvaluateByTime(curr_t, &sp)) {
               const std::string msg =
                   "rough speed profile estimation for soft follow fence failed";
               AERROR << msg;
               return Status(ErrorCode::PLANNING_ERROR, msg);
             }
-            s_soft_upper_bound =
-                std::fmin(s_soft_upper_bound,
-                          s_upper -
-                              std::min(7.0, 2.5 * sp.v()));
+            s_soft_upper_bound = std::fmin(
+                s_soft_upper_bound, s_upper - std::min(7.0, 2.5 * sp.v()));
             break;
           case STBoundary::BoundaryType::OVERTAKE:
             s_lower_bound = std::fmax(s_lower_bound, s_lower);

@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <csignal>
 
 #include "cyber/common/file.h"
 #include "cyber/common/time_conversion.h"
@@ -29,6 +30,10 @@
 #include "cyber/tools/cyber_recorder/recorder.h"
 #include "cyber/tools/cyber_recorder/recoverer.h"
 #include "cyber/tools/cyber_recorder/spliter.h"
+
+#include "gperftools/profiler.h"
+#include "gperftools/heap-profiler.h"
+#include "gperftools/malloc_extension.h"
 
 using apollo::cyber::common::GetFileName;
 using apollo::cyber::common::StringToUnixSeconds;
@@ -42,7 +47,7 @@ using apollo::cyber::record::Recoverer;
 using apollo::cyber::record::Spliter;
 
 const char INFO_OPTIONS[] = "h";
-const char RECORD_OPTIONS[] = "o:ac:k:i:m:h";
+const char RECORD_OPTIONS[] = "o:ac:k:i:m:hCH";
 const char PLAY_OPTIONS[] = "f:ac:k:lr:b:e:s:d:p:h";
 const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
@@ -148,6 +153,13 @@ void DisplayUsage(const std::string& binary, const std::string& command,
       case 'h':
         std::cout << "\t-h, --help\t\t\t\tshow help message" << std::endl;
         break;
+      case 'H':
+        std::cout << "\t-H, --heap-profule\t\t\t\tprofile heap info" \
+          << std::endl;
+        break;
+      case 'C':
+        std::cout << "\t-C, --cpu-profule\t\t\t\tprofile cpu info" << std::endl;
+        break;
       case ':':
         break;
       default:
@@ -170,7 +182,7 @@ int main(int argc, char** argv) {
   }
 
   int long_index = 0;
-  const std::string short_opts = "f:c:k:o:alr:b:e:s:d:p:i:m:h";
+  const std::string short_opts = "f:c:k:o:alr:b:e:s:d:p:i:m:hCH";
   static const struct option long_opts[] = {
       {"files", required_argument, nullptr, 'f'},
       {"white-channel", required_argument, nullptr, 'c'},
@@ -186,12 +198,16 @@ int main(int argc, char** argv) {
       {"preload", required_argument, nullptr, 'p'},
       {"segment-interval", required_argument, nullptr, 'i'},
       {"segment-size", required_argument, nullptr, 'm'},
-      {"help", no_argument, nullptr, 'h'}};
+      {"help", no_argument, nullptr, 'h'},
+      {"cpu-profile", no_argument, nullptr, 'C'},
+      {"heap-profule", no_argument, nullptr, 'H'}};
 
   std::vector<std::string> opt_file_vec;
   std::vector<std::string> opt_output_vec;
   std::vector<std::string> opt_white_channels;
   std::vector<std::string> opt_black_channels;
+  static bool enable_cpu_profile = false;
+  static bool enable_heap_profile = false;
   bool opt_all = false;
   bool opt_loop = false;
   float opt_rate = 1.0f;
@@ -209,6 +225,12 @@ int main(int argc, char** argv) {
       break;
     }
     switch (opt) {
+      case 'C':
+        enable_cpu_profile = true;
+        break;
+      case 'H':
+        enable_heap_profile = true;
+        break;
       case 'f':
         opt_file_vec.emplace_back(std::string(optarg));
         for (int i = optind; i < argc; i++) {
@@ -426,6 +448,35 @@ int main(int argc, char** argv) {
     auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
                                                opt_white_channels,
                                                opt_black_channels, opt_header);
+    std::signal(SIGTERM, [](int sig){
+      apollo::cyber::OnShutdown(sig);
+      if (enable_cpu_profile) {
+        ProfilerStop();
+      }
+      if (enable_heap_profile) {
+        HeapProfilerDump("Befor shutdown");
+        HeapProfilerStop();
+      }
+    });
+
+    std::signal(SIGINT, [](int sig){
+      apollo::cyber::OnShutdown(sig);
+      if (enable_cpu_profile) {
+        ProfilerStop();
+      }
+      if (enable_heap_profile) {
+        HeapProfilerDump("Befor shutdown");
+        HeapProfilerStop();
+      }
+    });
+
+    auto base_name = std::string(argv[0]) + std::string(".prof");
+    if (enable_cpu_profile) {
+      ProfilerStart(base_name.c_str());
+    }
+    if (enable_heap_profile) {
+      HeapProfilerStart(base_name.c_str());
+    }
     bool record_result = recorder->Start();
     if (record_result) {
       while (!::apollo::cyber::IsShutdown()) {

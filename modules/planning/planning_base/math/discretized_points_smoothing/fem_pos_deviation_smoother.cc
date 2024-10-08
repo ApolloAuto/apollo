@@ -41,7 +41,7 @@ bool FemPosDeviationSmoother::Solve(
     std::vector<std::vector<common::math::Vec2d>> point_box) {
   if (config_.apply_curvature_constraint()) {
     if (config_.use_sqp()) {
-      return SqpWithOsqp(raw_point2d, bounds, opt_x, opt_y);
+      return SqpWithOsqp(raw_point2d, bounds, opt_x, opt_y, point_box);
     } else {
       return NlpWithIpopt(raw_point2d, bounds, opt_x, opt_y);
     }
@@ -87,7 +87,8 @@ bool FemPosDeviationSmoother::QpWithOsqp(
 bool FemPosDeviationSmoother::SqpWithOsqp(
     const std::vector<std::pair<double, double>>& raw_point2d,
     const std::vector<double>& bounds, std::vector<double>* opt_x,
-    std::vector<double>* opt_y) {
+    std::vector<double>* opt_y,
+    std::vector<std::vector<common::math::Vec2d>> point_box) {
   if (opt_x == nullptr || opt_y == nullptr) {
     AERROR << "opt_x or opt_y is nullptr";
     return false;
@@ -100,6 +101,7 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
   solver.set_weight_ref_deviation(config_.weight_ref_deviation());
   solver.set_weight_curvature_constraint_slack_var(
       config_.weight_curvature_constraint_slack_var());
+  solver.set_point_box(point_box);
 
   solver.set_curvature_constraint(config_.curvature_constraint());
 

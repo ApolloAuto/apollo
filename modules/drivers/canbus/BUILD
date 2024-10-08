@@ -13,7 +13,7 @@ apollo_cc_library(
         "can_client/hermes_can/hermes_can_client.cc",
         "can_client/socket/socket_can_client_raw.cc",
         "common/byte.cc",
-    ] + if_esd_can(["can_client/esd/esd_can_client.cc",]),
+    ],
     hdrs = [
         "sensor_gflags.h",
         "can_client/can_client.h",
@@ -30,8 +30,7 @@ apollo_cc_library(
         "common/byte.cc",
         "common/byte.h",
         "common/canbus_consts.h",
-    ] + if_esd_can(["can_client/esd/esd_can_client.h",]),
-    copts = copts_if_esd_can(),
+    ],
     deps = [
         "//cyber",
         "//modules/common/util:common_util",
@@ -41,9 +40,7 @@ apollo_cc_library(
         "//third_party/can_card_library/hermes_can",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_googletest//:gtest",
-    ] + if_esd_can([
-        "//third_party/can_card_library/esd_can",
-    ]),
+    ],
 )
 
 apollo_cc_test(

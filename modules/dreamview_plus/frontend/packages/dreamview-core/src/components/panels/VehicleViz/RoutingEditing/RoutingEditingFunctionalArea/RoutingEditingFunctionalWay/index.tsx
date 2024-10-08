@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IconIcBackToAstPoint, IconIcRemoveAllPoints, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 import { useVizStore } from '../../../VizStore';
@@ -46,7 +46,7 @@ export default function RoutingEditingFunctionalWay(props: RoutingEditingFunctio
                         )}
                         onClick={handleClickBack}
                     >
-                        <IconIcBackToAstPoint />
+                        <IconPark name='IcBackToAstPoint' />
                     </div>
                 </div>
             </Popover>
@@ -63,7 +63,7 @@ export default function RoutingEditingFunctionalWay(props: RoutingEditingFunctio
                         )}
                         onClick={handleClickRemove}
                     >
-                        <IconIcRemoveAllPoints />
+                        <IconPark name='IcRemoveAllPoints' />
                     </div>
                 </div>
             </Popover>

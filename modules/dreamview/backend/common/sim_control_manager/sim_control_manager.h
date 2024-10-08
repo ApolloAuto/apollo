@@ -75,7 +75,7 @@ class SimControlManager {
   void Stop();
 
  private:
-  SimControlBase *model_ptr_;
+  SimControlBase *model_ptr_ = nullptr;
   std::string current_dynamic_model_ = "";
   bool enabled_ = false;
 

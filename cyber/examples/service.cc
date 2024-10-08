@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
   while (apollo::cyber::OK()) {
     auto res = client->SendRequest(driver_msg);
     if (res != nullptr) {
-      AINFO << "client: responese: " << res->ShortDebugString();
+      AINFO << "client: response: " << res->ShortDebugString();
     } else {
       AINFO << "client: service may not ready.";
     }

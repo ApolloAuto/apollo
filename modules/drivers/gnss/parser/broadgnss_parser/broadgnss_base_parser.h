@@ -57,6 +57,8 @@ class BroadGnssBaseParser : public Parser {
   void FillHeading();
 
   GnssBestPose bestpos_;
+  // bestpos 1hz rate control
+  RateControl bestpos_ratecontrol_{PERIOD_NS_1HZ};
   Imu imu_;
   Heading heading_;
   Ins ins_;

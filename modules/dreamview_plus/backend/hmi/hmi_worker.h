@@ -204,6 +204,7 @@ class HMIWorker {
   void ClearScenarioInfo();
   void ClearRtkRecordInfo();
   void ClearInvalidRecordStatus(const HMIModeOperation& operation);
+  void ReloadMaps();
   /**
    * @brief clear invalid selected resource under different operations.
    * operation is strong associated with resources,for some resources are only

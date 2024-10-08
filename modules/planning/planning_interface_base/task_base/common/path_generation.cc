@@ -121,10 +121,10 @@ void PathGeneration::GetStartPointSLState() {
         front_to_rear_axe_distance *
             std::sin(planning_start_point.path_point().theta()));
   }
-  ADEBUG << std::fixed << "Plan at the starting point: x = "
-         << planning_start_point.path_point().x()
-         << ", y = " << planning_start_point.path_point().y()
-         << ", and angle = " << planning_start_point.path_point().theta();
+  AINFO << std::fixed << "Plan at the starting point: x = "
+        << planning_start_point.path_point().x()
+        << ", y = " << planning_start_point.path_point().y()
+        << ", and angle = " << planning_start_point.path_point().theta();
 
   // Initialize some private variables.
   // ADC s/l info.

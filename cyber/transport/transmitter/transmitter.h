@@ -22,6 +22,7 @@
 #include <string>
 
 #include "cyber/event/perf_event_cache.h"
+#include "cyber/statistics/statistics.h"
 #include "cyber/transport/common/endpoint.h"
 #include "cyber/transport/message/message_info.h"
 
@@ -56,6 +57,7 @@ class Transmitter : public Endpoint {
  protected:
   uint64_t seq_num_;
   MessageInfo msg_info_;
+  std::shared_ptr<::bvar::Adder<int>> msg_counter_;
 };
 
 template <typename M>
@@ -63,6 +65,8 @@ Transmitter<M>::Transmitter(const RoleAttributes& attr)
     : Endpoint(attr), seq_num_(0) {
   msg_info_.set_sender_id(this->id_);
   msg_info_.set_seq_num(this->seq_num_);
+  msg_counter_ =
+    statistics::Statistics::Instance()->CreateAdder<int>(Endpoint::attr_);
 }
 
 template <typename M>
@@ -70,7 +74,10 @@ Transmitter<M>::~Transmitter() {}
 
 template <typename M>
 bool Transmitter<M>::Transmit(const MessagePtr& msg) {
+  (*msg_counter_) << 1;
   msg_info_.set_seq_num(NextSeqNum());
+  msg_info_.set_msg_seq_num(msg_counter_->get_value());
+  msg_info_.set_send_time(Time::Now().ToNanosecond());
   PerfEventCache::Instance()->AddTransportEvent(
       TransPerf::TRANSMIT_BEGIN, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);

@@ -5,10 +5,10 @@
 The required hardware for each version of Apollo can be found at the following
 links:
 
-- [Hardware for Apollo 1.0](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_0_hardware_system_installation_guide.md)
-- [Hardware for Apollo 1.5](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_5_hardware_system_installation_guide.md)
-- [Hardware for Apollo 2.0](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_0_hardware_system_installation_guide_v1.md)
-- [Hardware for Apollo 2.5](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
+- [Hardware for Apollo 1.0](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_0_hardware_system_installation_guide.md)
+- [Hardware for Apollo 1.5](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_5_hardware_system_installation_guide.md)
+- [Hardware for Apollo 2.0](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_0_hardware_system_installation_guide_v1.md)
+- [Hardware for Apollo 2.5](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 ---
 
@@ -16,7 +16,7 @@ links:
 
 Currently, the Apollo control algorithm is configured for our default vehicle,
 which is a Lincoln MKZ. If you would like to use a different vehicle type,
-please visit [this](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%80%82%E9%85%8D/how_to_add_a_new_vehicle.md) page.
+please visit [this](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%80%82%E9%85%8D/how_to_add_a_new_vehicle.md) page.
 
 ---
 

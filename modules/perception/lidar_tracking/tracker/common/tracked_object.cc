@@ -20,6 +20,7 @@
 #include "modules/perception/common/base/point.h"
 #include "modules/perception/common/base/point_cloud.h"
 #include "modules/perception/common/algorithm/point_cloud_processing/common.h"
+#include "modules/perception/common/algorithm/geometry/common.h"
 #include "modules/perception/common/lidar/common/feature_descriptor.h"
 
 namespace apollo {
@@ -50,6 +51,31 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     barycenter = (algorithm::CalculateCentroid(cloud)).cast<double>();
     barycenter = pose * barycenter;
     anchor_point = barycenter;
+
+    // object-detection center
+    float detection_center_x = obj_ptr->lidar_supplement.detections[0];
+    float detection_center_y = obj_ptr->lidar_supplement.detections[1];
+    float detection_center_z = obj_ptr->lidar_supplement.detections[2];
+    float detection_size_x = obj_ptr->lidar_supplement.detections[3];
+    float detection_size_y = obj_ptr->lidar_supplement.detections[4];
+    float detection_size_z = obj_ptr->lidar_supplement.detections[5];
+    float detection_theta = obj_ptr->lidar_supplement.detections[6];
+    Eigen::Vector3d model_center_lidar = Eigen::Vector3d(detection_center_x,
+        detection_center_y, detection_center_z);
+    detection_center = pose * model_center_lidar;
+
+    // object-detection center/size/direction -> corners
+    Eigen::Matrix<float, 8, 1> corners;
+    algorithm::CalculateCornersFromCenter(
+        detection_center_x, detection_center_y, detection_center_z,
+        detection_size_x, detection_size_y, detection_size_z,
+        detection_theta, &corners);
+    for (size_t i = 0; i < 4; i++) {
+        Eigen::Vector3d detection_cor = Eigen::Vector3d(
+            static_cast<double>(corners[2 * i]),
+            static_cast<double>(corners[2 * i + 1]), detection_center_z);
+        detection_corners[i] = pose * detection_cor;
+    }
 
     Eigen::Matrix3d rotation = pose.rotation();
     direction = rotation * object_ptr->direction.cast<double>();
@@ -117,14 +143,22 @@ void TrackedObject::Reset() {
   // measurement reset
   for (int i = 0; i < 4; ++i) {
     corners[i] = Eigen::Vector3d::Zero();
+    detection_corners[i] = Eigen::Vector3d::Zero();
     measured_corners_velocity[i] = Eigen::Vector3d::Zero();
+    measured_history_corners_velocity[i] = Eigen::Vector3d::Zero();
+    measured_detection_history_corners_velocity[i] = Eigen::Vector3d::Zero();
   }
   center = Eigen::Vector3d::Zero();
   barycenter = Eigen::Vector3d::Zero();
   anchor_point = Eigen::Vector3d::Zero();
+  detection_center = Eigen::Vector3d::Zero();
   measured_barycenter_velocity = Eigen::Vector3d::Zero();
   measured_center_velocity = Eigen::Vector3d::Zero();
   measured_nearest_corner_velocity = Eigen::Vector3d::Zero();
+  measured_history_center_velocity = Eigen::Vector3d::Zero();
+  measured_detection_center_velocity = Eigen::Vector3d::Zero();
+  measured_detection_history_center_velocity = Eigen::Vector3d::Zero();
+  measured_big_velocity_age = 0;
   direction = Eigen::Vector3d::Zero();
   lane_direction = Eigen::Vector3d::Zero();
   size = Eigen::Vector3d::Zero();

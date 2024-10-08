@@ -36,9 +36,13 @@ uint32_t Adsdrivecommand50::GetPeriod() const {
 }
 
 void Adsdrivecommand50::Parse(const std::uint8_t* bytes, int32_t length,
-                             Neolix_edu* chassis) const {
+                              Neolix_edu* chassis) const {
   chassis->mutable_ads_drive_command_50()->set_drive_enable(
       drive_enable(bytes, length));
+  chassis->mutable_ads_drive_command_50()->set_auto_shift_command(
+      auto_shift_command(bytes, length));
+  chassis->mutable_ads_drive_command_50()->set_auto_drive_torque(
+      auto_drive_torque(bytes, length));
 }
 
 void Adsdrivecommand50::UpdateData(uint8_t* data) {
@@ -78,8 +82,8 @@ void Adsdrivecommand50::set_p_drive_enable(uint8_t* data, bool drive_enable) {
   to_set.set_value(x, 0, 1);
 }
 
-bool Adsdrivecommand50::drive_enable(
-    const std::uint8_t* bytes, int32_t length) const {
+bool Adsdrivecommand50::drive_enable(const std::uint8_t* bytes,
+                                     int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
@@ -108,6 +112,17 @@ void Adsdrivecommand50::set_p_auto_shift_command(
   to_set.set_value(x, 0, 2);
 }
 
+Ads_drive_command_50::Auto_shift_commandType
+Adsdrivecommand50::auto_shift_command(const std::uint8_t* bytes,
+                                      int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 2);
+
+  Ads_drive_command_50::Auto_shift_commandType ret =
+      static_cast<Ads_drive_command_50::Auto_shift_commandType>(x);
+  return ret;
+}
+
 Adsdrivecommand50* Adsdrivecommand50::set_auto_drive_torque(
     double auto_drive_torque) {
   auto_drive_torque_ = auto_drive_torque;
@@ -131,6 +146,20 @@ void Adsdrivecommand50::set_p_auto_drive_torque(uint8_t* data,
   t = x & 0xFF;
   Byte to_set1(data + 2);
   to_set1.set_value(t, 0, 8);
+}
+
+double Adsdrivecommand50::auto_drive_torque(const std::uint8_t* bytes,
+                                            int32_t length) const {
+  Byte t0(bytes + 2);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 3);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = (x * 0.020000) + -665.000000;
+  return ret;
 }
 
 Adsdrivecommand50* Adsdrivecommand50::set_auto_drivercmd_alivecounter(

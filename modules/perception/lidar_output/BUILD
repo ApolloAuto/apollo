@@ -1,5 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,7 +18,7 @@ apollo_component(
     name = "liblidar_output_component.so",
     srcs = ["lidar_output_component.cc"],
     hdrs = ["lidar_output_component.h"],
-    copts = PERCEPTION_COPTS,
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     linkopts = ["-lleveldb"],
     deps = [
         "//cyber",

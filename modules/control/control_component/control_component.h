@@ -21,6 +21,7 @@
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -85,6 +86,8 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::Status CheckPad();
   void ResetAndProduceZeroControlCommand(ControlCommand *control_command);
   void GetVehiclePitchAngle(ControlCommand *control_command);
+  void CheckAutoMode(const canbus::Chassis *chassis);
+  void PublishControlInteractiveMsg();
 
  private:
   apollo::cyber::Time init_time_;
@@ -124,6 +127,9 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   // when using control submodules
   std::shared_ptr<cyber::Writer<LocalView>> local_view_writer_;
 
+  std::shared_ptr<cyber::Writer<ControlInteractiveMsg>>
+      control_interactive_writer_;
+
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   LocalView local_view_;
@@ -131,6 +137,9 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   std::shared_ptr<DependencyInjector> injector_;
 
   double previous_steering_command_ = 0.0;
+
+  bool is_auto_ = false;
+  bool from_else_to_auto_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)

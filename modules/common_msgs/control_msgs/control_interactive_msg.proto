@@ -1,0 +1,17 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message ControlInteractiveMsg {
+  optional apollo.common.Header header = 1;   // common header
+  optional bool replan_request = 2;   // request replan. true: need replan, false: don't need replan
+  optional ReplanRequestReasonCode replan_req_reason_code = 3; // request replan reason code
+  optional string replan_request_reason = 4; // request replan reason
+}
+
+enum ReplanRequestReasonCode {
+  REPLAN_REQ_ALL_REPLAN = 1;
+  REPLAN_REQ_STATION_REPLAN = 2;
+  REPLAN_REQ_SPEED_REPLAN = 3;
+}

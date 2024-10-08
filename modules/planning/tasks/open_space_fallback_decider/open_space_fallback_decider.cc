@@ -25,8 +25,8 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
 
 bool OpenSpaceFallbackDecider::Init(
     const std::string& config_dir, const std::string& name,
@@ -335,13 +335,13 @@ void OpenSpaceFallbackDecider::BuildPredictedEnvironment(
 
 bool OpenSpaceFallbackDecider::IsCollisionFreeEgoBox() {
   // prediction time resolution: FLAGS_trajectory_time_resolution
-  const auto &vehicle_state = frame_->vehicle_state();
+  const auto& vehicle_state = frame_->vehicle_state();
   double x = vehicle_state.x();
   double y = vehicle_state.y();
   double heading = vehicle_state.heading();
 
   const auto& vehicle_config =
-    common::VehicleConfigHelper::Instance()->GetConfig();
+      common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
   Box2d ego_box({x, y}, heading, ego_length, ego_width);

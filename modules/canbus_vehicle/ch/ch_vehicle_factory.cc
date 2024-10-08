@@ -18,8 +18,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus_vehicle/ch/ch_controller.h"
-#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
@@ -84,6 +82,9 @@ bool ChVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   chassis_detail_writer_ =
       node_->CreateWriter<::apollo::canbus::Ch>(FLAGS_chassis_detail_topic);
+
+  chassis_detail_sender_writer_ = node_->CreateWriter<::apollo::canbus::Ch>(
+      FLAGS_chassis_detail_sender_topic);
 
   return true;
 }
@@ -153,10 +154,23 @@ Chassis ChVehicleFactory::publish_chassis() {
 }
 
 void ChVehicleFactory::PublishChassisDetail() {
-  Ch chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  ADEBUG << chassis_detail.ShortDebugString();
+  Ch chassis_detail = vehicle_controller_->GetNewRecvChassisDetail();
+  ADEBUG << "latest chassis_detail is " << chassis_detail.ShortDebugString();
   chassis_detail_writer_->Write(chassis_detail);
+}
+
+void ChVehicleFactory::PublishChassisDetailSender() {
+  Ch sender_chassis_detail = vehicle_controller_->GetNewSenderChassisDetail();
+  ADEBUG << "latest sender_chassis_detail is "
+         << sender_chassis_detail.ShortDebugString();
+  chassis_detail_sender_writer_->Write(sender_chassis_detail);
+}
+
+bool ChVehicleFactory::CheckChassisCommunicationFault() {
+  if (vehicle_controller_->CheckChassisCommunicationError()) {
+    return true;
+  }
+  return false;
 }
 
 std::unique_ptr<VehicleController<::apollo::canbus::Ch>>

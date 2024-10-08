@@ -94,9 +94,15 @@ void MlfTypeFilter::UpdateWithObject(
             AERROR << "Failed to fuse types, so continue.";
         }
     }
-    if (new_object->type == base::ObjectType::UNKNOWN &&
-        new_object->object_ptr->type == base::ObjectType::UNKNOWN) {
-        new_object->object_ptr->sub_type = base::ObjectSubType::TRAFFICCONE;
+
+    // model is unknown: final is unknown -> trafficcone, otherwise -> unknown
+    if (new_object->object_ptr->type == base::ObjectType::UNKNOWN) {
+        if (new_object->type == base::ObjectType::UNKNOWN) {
+            new_object->object_ptr->sub_type =
+                base::ObjectSubType::TRAFFICCONE;
+        } else {
+            new_object->object_ptr->sub_type = base::ObjectSubType::UNKNOWN;
+        }
     }
 
     if (print_type_filter_log_) {

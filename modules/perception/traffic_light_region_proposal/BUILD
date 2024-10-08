@@ -4,7 +4,7 @@ load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
-PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
+PERCEPTION_COPTS = ['-DMODULE_NAME=\\"trafficlight\\"']
 
 filegroup(
     name = "traffic_light_region_proposal_files",

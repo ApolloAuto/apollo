@@ -3,7 +3,8 @@ import { colors } from './base';
 export default {
     bgColor: '#282b36',
     headColor: colors.fontColor5,
-    headBorderColor: `1px solid ${colors.divider2}`,
+    headBorderColor: colors.divider2,
+    headBorder: `1px solid ${colors.divider2}`,
     headResetBtnColor: colors.fontColor6,
     headResetBtnBorderColor: '1px solid #7c8899',
 
@@ -17,4 +18,6 @@ export default {
 
     menuItemBg: colors.background2,
     menuItemBoxShadow: 'none',
+    menuItemColor: 'none',
+    menuItemHoverColor: 'none',
 };

@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "osqp/osqp.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -161,7 +161,7 @@ class FemPosDeviationSqpOsqpInterface {
   std::vector<double> slack_;
   double average_interval_length_ = 0.0;
 
-// park generic
+  // park generic
  public:
   void set_point_box(std::vector<std::vector<common::math::Vec2d>> point_box) {
     point_box_ = point_box;

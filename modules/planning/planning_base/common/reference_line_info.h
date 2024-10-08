@@ -76,6 +76,8 @@ class ReferenceLineInfo {
   ReferenceLine* mutable_reference_line();
 
   double SDistanceToDestination() const;
+  double SDistanceToRefEnd() const;
+
   bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
@@ -264,6 +266,15 @@ class ReferenceLineInfo {
   hdmap::PathOverlap* GetOverlapOnReferenceLine(
       const std::string& overlap_id, const OverlapType& overlap_type) const;
 
+  void set_key(std::size_t key) { key_ = key; }
+  std::size_t key() const { return key_; }
+
+  void set_index(std::size_t index) { index_ = index; }
+  std::size_t index() const { return index_; }
+
+  void set_id(std::string id) { id_ = id; }
+  std::string id() const { return id_; }
+
  private:
   void InitFirstOverlaps();
 
@@ -292,6 +303,8 @@ class ReferenceLineInfo {
 
   bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
                        hdmap::PathOverlap* path_overlap);
+
+  bool IsEgoOnRoutingLane() const;
 
  private:
   static std::unordered_map<std::string, bool> junction_right_of_way_map_;
@@ -366,6 +379,9 @@ class ReferenceLineInfo {
   double base_cruise_speed_ = 0.0;
 
   bool path_reusable_ = false;
+  std::string id_ = "";
+  std::size_t key_ = 0;
+  std::size_t index_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

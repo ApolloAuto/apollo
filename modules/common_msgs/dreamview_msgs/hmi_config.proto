@@ -34,6 +34,7 @@ enum HMIAction {
   LOAD_RTK_RECORDS = 25; // Load all rtk records
   CHANGE_RTK_RECORD = 26; // change rtk records
   LOAD_RECORD = 27;     // Load record
+  LOAD_MAPS  = 28;     // Load maps
 }
 
 message HMIConfig {

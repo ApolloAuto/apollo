@@ -23,6 +23,7 @@ gpu_library(
         "common/camera_tracking_frame.h",
         "common/similar.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         "//modules/perception/common/base:apollo_perception_common_base",
@@ -48,6 +49,7 @@ apollo_cc_library(
         "feature_extract/tracking_feat_extractor.cc",
         "tracking/omt_obstacle_tracker.cc",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     hdrs = [
         "base/frame_list.h",
         "base/obstacle_reference.h",

@@ -36,9 +36,13 @@ uint32_t Adsbrakecommand46::GetPeriod() const {
 }
 
 void Adsbrakecommand46::Parse(const std::uint8_t* bytes, int32_t length,
-                             Neolix_edu* chassis) const {
+                              Neolix_edu* chassis) const {
   chassis->mutable_ads_brake_command_46()->set_drive_enable(
       drive_enable(bytes, length));
+  chassis->mutable_ads_brake_command_46()->set_auto_brake_command(
+      auto_brake_command(bytes, length));
+  chassis->mutable_ads_brake_command_46()->set_auto_parking_command(
+      auto_parking_command(bytes, length));
 }
 
 void Adsbrakecommand46::UpdateData(uint8_t* data) {
@@ -80,8 +84,8 @@ void Adsbrakecommand46::set_p_drive_enable(uint8_t* data, bool drive_enable) {
   to_set.set_value(x, 0, 1);
 }
 
-bool Adsbrakecommand46::drive_enable(
-    const std::uint8_t* bytes, int32_t length) const {
+bool Adsbrakecommand46::drive_enable(const std::uint8_t* bytes,
+                                     int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 1);
 
@@ -107,6 +111,15 @@ void Adsbrakecommand46::set_p_auto_brake_command(uint8_t* data,
   to_set.set_value(x, 0, 8);
 }
 
+int32_t Adsbrakecommand46::auto_brake_command(const std::uint8_t* bytes,
+                                              int32_t length) const {
+  Byte t0(bytes + 2);
+  int32_t x = t0.get_byte(0, 8);
+
+  int32_t ret = x;
+  return ret;
+}
+
 Adsbrakecommand46* Adsbrakecommand46::set_auto_parking_command(
     bool auto_parking_command) {
   auto_parking_command_ = auto_parking_command;
@@ -123,6 +136,15 @@ void Adsbrakecommand46::set_p_auto_parking_command(uint8_t* data,
 
   Byte to_set(data + 3);
   to_set.set_value(x, 0, 1);
+}
+
+bool Adsbrakecommand46::auto_parking_command(const std::uint8_t* bytes,
+                                             int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 1);
+
+  bool ret = x;
+  return ret;
 }
 
 Adsbrakecommand46* Adsbrakecommand46::set_epb_rampauxiliarycommand(

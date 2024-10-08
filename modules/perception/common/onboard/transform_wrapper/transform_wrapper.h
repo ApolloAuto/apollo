@@ -80,6 +80,8 @@ class TransformWrapper {
 
   bool GetExtrinsics(Eigen::Affine3d* trans);
 
+  bool GetExtrinsics(double timestamp, Eigen::Affine3d* trans);
+
   // Attention: can be called without initlization
   bool GetTrans(double timestamp, Eigen::Affine3d* trans,
                 const std::string& frame_id, const std::string& child_frame_id);

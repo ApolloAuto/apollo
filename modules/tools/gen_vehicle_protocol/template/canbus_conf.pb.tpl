@@ -12,4 +12,4 @@ can_card_parameter {
 
 enable_debug_mode: false
 enable_receiver_log: false
-enable_sender_log: true
+enable_sender_log: false

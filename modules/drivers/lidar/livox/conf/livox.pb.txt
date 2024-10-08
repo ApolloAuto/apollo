@@ -1,0 +1,13 @@
+config_base {
+  scan_channel: "/apollo/sensor/livox/up/Scan"
+  point_cloud_channel: "/apollo/sensor/livox/up/PointCloud2"
+  frame_id: "livox"
+
+  # sample ONLINE_LIDAR, RAW_PACKET
+  source_type: ONLINE_LIDAR
+}
+
+lidar_config_file_path: "/apollo/modules/drivers/lidar/livox/conf/mid360_config.json"
+enable_sdk_console_log: false
+integral_time: 0.1
+lidar_ip: "192.168.10.238"

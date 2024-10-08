@@ -163,3 +163,20 @@
 # type: int
 # default: 1
 --hdmap_sample_step=1
+
+###################################################
+# Flags for judge front-critical
+--need_judge_front_critical=false
+--x_front=0.0
+--x_back=-0.0
+--y_front=0.0
+--y_back=0.0
+
+###################################################
+# Flags for reserve blind trafficcone
+--need_reserve_blind_cone=false
+--cone_x_front=0.0
+--cone_x_back=0.0
+--cone_y_front=0.0
+--cone_y_back=0.0
+--cone_reserve_time=0.0

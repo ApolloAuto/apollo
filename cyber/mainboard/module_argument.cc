@@ -19,6 +19,10 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#if __has_include("gperftools/profiler.h")
+#include "gperftools/profiler.h"
+#endif
+
 using apollo::cyber::common::GlobalData;
 
 namespace apollo {
@@ -38,6 +42,14 @@ void ModuleArgument::DisplayUsage() {
            "plugin\n"
         << "    --disable_plugin_autoload : default enable autoload "
            "mode of plugins, use disable_plugin_autoload to ingore autoload\n"
+        << "    -c, --cpuprofile: enable gperftools cpu profile\n"
+        << "    -o, --profile_filename=filename: the filename to dump the "
+           "profile to, default value is ${process_group}_cpu.prof. Only work "
+           "with -c option\n"
+        << "    -H, --heapprofile: enable gperftools heap profile\n"
+        << "    -O, --heapprofile_filename=filename: the filename to dump the "
+           "profile to, default value is ${process_group}_mem.prof. Only work "
+           "with -c option\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
         << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "
@@ -57,6 +69,14 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
     sched_name_ = DEFAULT_sched_name_;
   }
 
+  if (enable_cpuprofile_ && profile_filename_.empty()) {
+    profile_filename_ = process_group_ + std::string("_cpu.prof");
+  }
+
+  if (enable_heapprofile_ && heapprofile_filename_.empty()) {
+    heapprofile_filename_ = process_group_ + std::string("_mem.prof");
+  }
+
   GlobalData::Instance()->SetProcessGroup(process_group_);
   GlobalData::Instance()->SetSchedName(sched_name_);
   AINFO << "binary_name_ is " << binary_name_ << ", process_group_ is "
@@ -69,7 +89,7 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
 void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   opterr = 0;  // extern int opterr
   int long_index = 0;
-  const std::string short_opts = "hd:p:s:";
+  const std::string short_opts = "hd:p:s:co:HO:";
   static const struct option long_opts[] = {
       {"help", no_argument, nullptr, 'h'},
       {"dag_conf", required_argument, nullptr, 'd'},
@@ -78,6 +98,10 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
       {"plugin", required_argument, nullptr, ARGS_OPT_CODE_PLUGIN},
       {"disable_plugin_autoload", no_argument, nullptr,
        ARGS_OPT_CODE_DISABLE_PLUGIN_AUTOLOAD},
+      {"cpuprofile", no_argument, nullptr, 'c'},
+      {"profile_filename", required_argument, nullptr, 'o'},
+      {"heapprofile", no_argument, nullptr, 'H'},
+      {"heapprofile_filename", required_argument, nullptr, 'O'},
       {NULL, no_argument, nullptr, 0}};
 
   // log command for info
@@ -120,7 +144,25 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
         plugin_description_list_.emplace_back(std::string(optarg));
         break;
       case ARGS_OPT_CODE_DISABLE_PLUGIN_AUTOLOAD:
-          disable_plugin_autoload_ = true;
+        disable_plugin_autoload_ = true;
+        break;
+      case 'c':
+#ifndef BASE_PROFILER_H_
+        AWARN << "gperftools not installed, ignore perf parameters";
+#endif
+        enable_cpuprofile_ = true;
+        break;
+      case 'o':
+        profile_filename_ = std::string(optarg);
+        break;
+      case 'H':
+#ifndef BASE_PROFILER_H_
+        AWARN << "gperftools not installed, ignore perf parameters";
+#endif
+        enable_heapprofile_ = true;
+        break;
+      case 'O':
+        heapprofile_filename_ = std::string(optarg);
         break;
       case 'h':
         DisplayUsage();
