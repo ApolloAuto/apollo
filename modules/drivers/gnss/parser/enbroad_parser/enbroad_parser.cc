@@ -40,7 +40,7 @@ namespace drivers {
 namespace gnss {
 
 // Encoding and decoding protocol scaling factor setting
-#define Coder_Accel_Scale 12.0
+#define Coder_Accel_Scale 120.0
 #define Coder_Rate_Scale 300.0
 #define Coder_MAG_Scale 1.0
 #define Coder_IFof_Rate_Scale 600.0
@@ -53,6 +53,25 @@ namespace gnss {
 #define Coder_Pos_Scale 10000000000.0
 
 constexpr size_t BUFFER_SIZE = 256;
+uint16_t g_ENS_MSG_ID = 0;
+
+union {
+  char bd[8];
+  unsigned short iv;
+  short sv;
+  int lv;
+  unsigned int uv;
+  float fv;
+  double dv;
+} m_uMemory;
+
+float get_F32(char* msgbuff, int i) {
+  m_uMemory.bd[0] = msgbuff[i];
+  m_uMemory.bd[1] = msgbuff[i + 1];
+  m_uMemory.bd[2] = msgbuff[i + 2];
+  m_uMemory.bd[3] = msgbuff[i + 3];
+  return m_uMemory.fv;
+}
 
 class EnbroadParse : public Parser {
  public:
@@ -66,6 +85,7 @@ class EnbroadParse : public Parser {
   bool check_sum();
   bool HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData);
   bool HandleSINSData(const enbroad::NAV_SINS_TypeDef* pSinsData);
+  bool HandleExtendData(const enbroad::NAV_Extend_TypeDef* pExtendData);
   bool HandleIMUData(const enbroad::NAV_IMU_TypeDef* pImuData);
   bool HandleGNSSData(const enbroad::NAV_GNSS_TypeDef* pGnssData);
 
@@ -134,17 +154,34 @@ void EnbroadParse::GetMessages(MessageInfoVec* messages) {
       } else {
         buffer_.clear();
         total_length_ = 0;
-        messages->push_back(
-            MessageInfo{MessageType::BEST_GNSS_POS,
-                        reinterpret_cast<MessagePtr>(&bestpos_)});
-        messages->push_back(
-            MessageInfo{MessageType::IMU, reinterpret_cast<MessagePtr>(&imu_)});
-        messages->push_back(MessageInfo{
-            MessageType::HEADING, reinterpret_cast<MessagePtr>(&heading_)});
-        messages->push_back(
-            MessageInfo{MessageType::INS, reinterpret_cast<MessagePtr>(&ins_)});
-        messages->push_back(MessageInfo{
-            MessageType::INS_STAT, reinterpret_cast<MessagePtr>(&ins_stat_)});
+        if (enbroad::BIN_NAV_DATA == g_ENS_MSG_ID) {
+          messages->push_back(
+              MessageInfo{MessageType::BEST_GNSS_POS,
+                          reinterpret_cast<MessagePtr>(&bestpos_)});
+          messages->push_back(MessageInfo{MessageType::IMU,
+                                          reinterpret_cast<MessagePtr>(&imu_)});
+          messages->push_back(MessageInfo{
+              MessageType::HEADING, reinterpret_cast<MessagePtr>(&heading_)});
+          messages->push_back(MessageInfo{MessageType::INS,
+                                          reinterpret_cast<MessagePtr>(&ins_)});
+          messages->push_back(MessageInfo{
+              MessageType::INS_STAT, reinterpret_cast<MessagePtr>(&ins_stat_)});
+        } else if (enbroad::BIN_Extend_DATA ==
+                   g_ENS_MSG_ID) {  // ins=sins+extend
+          messages->push_back(MessageInfo{MessageType::INS,
+                                          reinterpret_cast<MessagePtr>(&ins_)});
+          messages->push_back(MessageInfo{
+              MessageType::INS_STAT, reinterpret_cast<MessagePtr>(&ins_stat_)});
+        } else if (enbroad::BIN_IMU_DATA == g_ENS_MSG_ID) {
+          messages->push_back(MessageInfo{MessageType::IMU,
+                                          reinterpret_cast<MessagePtr>(&imu_)});
+        } else if (enbroad::BIN_GNSS_DATA == g_ENS_MSG_ID) {
+          messages->push_back(
+              MessageInfo{MessageType::BEST_GNSS_POS,
+                          reinterpret_cast<MessagePtr>(&bestpos_)});
+          messages->push_back(MessageInfo{
+              MessageType::HEADING, reinterpret_cast<MessagePtr>(&heading_)});
+        }
       }
     }
   }
@@ -178,23 +215,23 @@ bool EnbroadParse::check_sum() {
 }
 
 bool EnbroadParse::PrepareMessage() {
+  static uint64_t msg_sum = 0;
+  static uint64_t msg_bad = 0;
+  g_ENS_MSG_ID = 0;
+  msg_sum++;
   if (!check_sum()) {
-    AWARN << "check sum failed. bad frame ratio";
+    msg_bad++;
+    AERROR << "check sum failed. bad frame ratio"
+           << static_cast<double>(msg_bad / msg_sum);
     return false;
   }
   uint8_t* message = nullptr;
   enbroad::MessageId message_id;
-  uint16_t message_length;
   auto header = reinterpret_cast<const enbroad::FrameHeader*>(buffer_.data());
   message = buffer_.data() + sizeof(enbroad::FrameHeader);
   message_id = header->message_id;
-  message_length = header->message_length;
   switch (message_id) {
     case enbroad::BIN_NAV_DATA:
-      if (message_length != sizeof(enbroad::NAV_DATA_TypeDef)) {
-        AWARN << "Incorrect message_length";
-        break;
-      }
       if (!HandleNavData(
               reinterpret_cast<enbroad::NAV_DATA_TypeDef*>(message))) {
         AWARN << "HandleNavData fail";
@@ -202,10 +239,6 @@ bool EnbroadParse::PrepareMessage() {
       }
       break;
     case enbroad::BIN_SINS_DATA:
-      if (message_length != sizeof(enbroad::NAV_SINS_TypeDef)) {
-        AWARN << "Incorrect message_length";
-        break;
-      }
       if (!HandleSINSData(
               reinterpret_cast<enbroad::NAV_SINS_TypeDef*>(message))) {
         AWARN << "HandleSINSData fail";
@@ -213,10 +246,6 @@ bool EnbroadParse::PrepareMessage() {
       }
       break;
     case enbroad::BIN_IMU_DATA:
-      if (message_length != sizeof(enbroad::NAV_IMU_TypeDef)) {
-        AWARN << "Incorrect message_length";
-        break;
-      }
       if (!HandleIMUData(
               reinterpret_cast<enbroad::NAV_IMU_TypeDef*>(message))) {
         AWARN << "HandleIMUData fail";
@@ -224,18 +253,22 @@ bool EnbroadParse::PrepareMessage() {
       }
       break;
     case enbroad::BIN_GNSS_DATA:
-      if (message_length != sizeof(enbroad::NAV_GNSS_TypeDef)) {
-        AWARN << "Incorrect message_length";
-        break;
-      }
       if (!HandleGNSSData(
               reinterpret_cast<enbroad::NAV_GNSS_TypeDef*>(message))) {
+        return false;
+      }
+      break;
+    case enbroad::BIN_Extend_DATA:
+      if (!HandleExtendData(
+              reinterpret_cast<enbroad::NAV_Extend_TypeDef*>(message))) {
         return false;
       }
       break;
     default:
       return false;
   }
+
+  g_ENS_MSG_ID = message_id;
   return true;
 }
 
@@ -255,49 +288,32 @@ bool EnbroadParse::HandleSINSData(const enbroad::NAV_SINS_TypeDef* pSinsData) {
   ins_.mutable_linear_velocity()->set_x(pSinsData->ve);
   ins_.mutable_linear_velocity()->set_y(pSinsData->vn);
   ins_.mutable_linear_velocity()->set_z(pSinsData->vu);
-  if (enbroad::E_NAV_STATUS_IN_NAV == pSinsData->navStatus) {
+  if (2 == static_cast<int>(pSinsData->navStatus)) {
     ins_.set_type(Ins::GOOD);
-  } else if (enbroad::E_NAV_STATUS_SYSTEM_STANDARD == pSinsData->navStatus) {
+  } else if (1 == static_cast<int>(pSinsData->navStatus)) {
     ins_.set_type(Ins::CONVERGING);
   } else {
     ins_.set_type(Ins::INVALID);
   }
 
-  bestpos_.set_measurement_time(seconds);
-  bestpos_.set_longitude(pSinsData->longitude);
-  bestpos_.set_latitude(pSinsData->latitude);
-  bestpos_.set_height_msl(pSinsData->altitude);
-  // bestpos_.set_undulation(0.0);//undulation = height_wgs84 - height_msl
-  // datum id number.WGS84
-  bestpos_.set_datum_id(
-      static_cast<apollo::drivers::gnss::DatumId>(enbroad::DatumId::WGS84));
-  // sins standard deviation
-  bestpos_.set_latitude_std_dev(pSinsData->xigema_lat);
-  bestpos_.set_longitude_std_dev(pSinsData->xigema_lon);
-  bestpos_.set_height_std_dev(pSinsData->xigema_alt);
-
   ins_stat_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
   // ins pos type define as follows
   // fusion GPS as INS_RTKFIXED,
   // fusion wheel as INS_RTKFLOAT,fusion motion as SINGLE,others as NONE
-  if (enbroad::E_FUNSION_GPS == pSinsData->fusion) {
+  if (enbroad::E_FUNSION_GPS == static_cast<int>(pSinsData->fusion)) {
     ins_stat_.set_pos_type(SolutionType::INS_RTKFIXED);
-    bestpos_.set_sol_type(SolutionType::INS_RTKFIXED);
   } else {
     ins_stat_.set_pos_type(SolutionType::NONE);
-    bestpos_.set_sol_type(SolutionType::NONE);
   }
 
-  if (enbroad::E_NAV_STATUS_IN_NAV == pSinsData->navStatus) {
+  if (2 == static_cast<int>(pSinsData->navStatus)) {
     ins_stat_.set_ins_status(SolutionStatus::SOL_COMPUTED);
-    bestpos_.set_sol_status(SolutionStatus::SOL_COMPUTED);
-  } else if (enbroad::E_NAV_STATUS_SYSTEM_STANDARD == pSinsData->navStatus) {
+  } else if (1 == static_cast<int>(pSinsData->navStatus)) {
     ins_stat_.set_ins_status(SolutionStatus::COLD_START);
-    bestpos_.set_sol_status(SolutionStatus::COLD_START);
   } else {
     ins_stat_.set_ins_status(SolutionStatus::INSUFFICIENT_OBS);
-    bestpos_.set_sol_status(SolutionStatus::INSUFFICIENT_OBS);
   }
+
   return true;
 }
 bool EnbroadParse::HandleIMUData(const enbroad::NAV_IMU_TypeDef* pImuData) {
@@ -318,47 +334,112 @@ bool EnbroadParse::HandleIMUData(const enbroad::NAV_IMU_TypeDef* pImuData) {
 bool EnbroadParse::HandleGNSSData(const enbroad::NAV_GNSS_TypeDef* pGnssData) {
   double seconds =
       pGnssData->gps_week * SECONDS_PER_WEEK + pGnssData->gpssecond * 1e-3;
+
+  bestpos_.set_measurement_time(seconds);
+  heading_.set_measurement_time(seconds);
   // bestpos_.set_base_station_id("0");  // base station id
-  bestpos_.set_solution_age(pGnssData->age);  // solution age (sec)
   bestpos_.set_num_sats_tracked(pGnssData->satsNum);
   bestpos_.set_num_sats_in_solution(pGnssData->satsNum);
   bestpos_.set_num_sats_in_solution(pGnssData->satsNum);
   bestpos_.set_num_sats_multi(pGnssData->satsNum);
-  // bestpos_.set_galileo_beidou_used_mask(0);
-  // bestpos_.set_gps_glonass_used_mask(0);
-
-  heading_.set_measurement_time(seconds);
-  heading_.set_heading(pGnssData->heading);
-  heading_.set_baseline_length(pGnssData->baseline);
-  heading_.set_reserved(0);
-  // heading_.set_heading_std_dev(0.0);
-  // heading_.set_pitch_std_dev(0.0);
-  // heading_.set_station_id("0");
   heading_.set_satellite_tracked_number(pGnssData->satsNum);
   heading_.set_satellite_soulution_number(pGnssData->satsNum);
   heading_.set_satellite_number_obs(pGnssData->satsNum);
   heading_.set_satellite_number_multi(pGnssData->satsNum);
-  // heading_.set_solution_source(0);
-  // heading_.set_extended_solution_status(0);
-  // heading_.set_galileo_beidou_sig_mask(0);
-  // heading_.set_gps_glonass_sig_mask(0);
-  if (enbroad::E_GPS_RTK_FIXED == pGnssData->headingStatus) {
+  // bestpos_.set_galileo_beidou_used_mask(0);
+  // bestpos_.set_gps_glonass_used_mask(0);
+  bestpos_.set_solution_age(pGnssData->age);  // solution age (sec)
+  if (enbroad::E_GPS_RTK_FIXED == static_cast<int>(pGnssData->rtkStatus)) {
+    bestpos_.set_sol_type(SolutionType::INS_RTKFIXED);
+  } else if (enbroad::E_GPS_RTK_FLOAT ==
+             static_cast<int>(pGnssData->rtkStatus)) {
+    bestpos_.set_sol_type(SolutionType::INS_RTKFLOAT);
+  } else if (enbroad::E_GPS_RTK_SPP == static_cast<int>(pGnssData->rtkStatus) ||
+             enbroad::E_GPS_RTK_DGPS ==
+                 static_cast<int>(pGnssData->rtkStatus)) {
+    bestpos_.set_sol_type(SolutionType::SINGLE);
+  } else {
+    bestpos_.set_sol_type(SolutionType::NONE);
+  }
+
+  bestpos_.set_latitude(pGnssData->latitude);
+  bestpos_.set_longitude(pGnssData->longitude);
+  bestpos_.set_height_msl(pGnssData->altitude);
+
+  if (enbroad::E_GPS_RTK_FIXED == static_cast<int>(pGnssData->headingStatus)) {
     heading_.set_position_type(SolutionType::INS_RTKFIXED);
-  } else if (enbroad::E_GPS_RTK_FLOAT == pGnssData->headingStatus) {
+  } else if (enbroad::E_GPS_RTK_FLOAT ==
+             static_cast<int>(pGnssData->headingStatus)) {
     heading_.set_position_type(SolutionType::INS_RTKFLOAT);
-  } else if (enbroad::E_GPS_RTK_SPP == pGnssData->headingStatus ||
-             enbroad::E_GPS_RTK_DGPS == pGnssData->headingStatus) {
+  } else if (enbroad::E_GPS_RTK_SPP ==
+                 static_cast<int>(pGnssData->headingStatus) ||
+             enbroad::E_GPS_RTK_DGPS ==
+                 static_cast<int>(pGnssData->headingStatus)) {
     heading_.set_position_type(SolutionType::SINGLE);
   } else {
     heading_.set_position_type(SolutionType::NONE);
   }
+  heading_.set_baseline_length(pGnssData->baseline);
+  heading_.set_heading(pGnssData->heading);
+  heading_.set_reserved(0);
+  heading_.set_heading_std_dev(pGnssData->xigema_heading);
+  // heading_.set_heading_std_dev(0.0);
+  // heading_.set_pitch_std_dev(0.0);
+  // heading_.set_station_id("0");
+
+  // heading_.set_solution_source(0);
+  // heading_.set_extended_solution_status(0);
+  // heading_.set_galileo_beidou_sig_mask(0);
+  // heading_.set_gps_glonass_sig_mask(0);
+
+  // AERROR << "pGnssData->xigema_lat=" << pGnssData->xigema_lat;
+  // AERROR << "pGnssData->xigema_lon=" << pGnssData->xigema_lon;
+  // AERROR << "ppGnssData->xigema_alt=" << pGnssData->xigema_alt;
+  // AERROR << "ppGnssData->xigema_heading=" << pGnssData->xigema_heading;
+
   return true;
 }
+
+// *Strongly recommend:
+// Do not place NAV_Extend_TypeDef in imu_, heading_, bestpos_
+// to avoid data anomalies
+bool EnbroadParse::HandleExtendData(
+    const enbroad::NAV_Extend_TypeDef* pExtendData) {
+  ins_.mutable_linear_acceleration()->set_x(
+      static_cast<double>(pExtendData->corrAccX));
+  ins_.mutable_linear_acceleration()->set_y(
+      static_cast<double>(pExtendData->corrAccY));
+  ins_.mutable_linear_acceleration()->set_z(
+      static_cast<double>(pExtendData->corrAccZ));
+  ins_.mutable_angular_velocity()->set_x(
+      static_cast<double>(pExtendData->corrGyroX * DEG_TO_RAD));
+  ins_.mutable_angular_velocity()->set_y(
+      static_cast<double>(pExtendData->corrGyroY * DEG_TO_RAD));
+  ins_.mutable_angular_velocity()->set_z(
+      static_cast<double>(pExtendData->corrGyroZ * DEG_TO_RAD));
+#if 0
+  AERROR << "pExtendData->corrAccX=" << pExtendData->corrAccX;
+  AERROR << "pExtendData->corrAccY=" << pExtendData->corrAccY;
+  AERROR << "pExtendData->corrAccZ=" << pExtendData->corrAccZ;
+
+  AERROR << "pExtendData->corrGyroX=" << pExtendData->corrGyroX;
+  AERROR << "pExtendData->corrGyroY=" << pExtendData->corrGyroY;
+  AERROR << "pExtendData->corrGyroZ=" << pExtendData->corrGyroZ;
+
+  AERROR << "pExtendData->gnssAttFromIMU=" << pExtendData->gnssAttFromIMU;
+  AERROR << "pExtendData->odsAttFromIMU=" << pExtendData->odsAttFromIMU;
+
+  AERROR << "pExtendData->Undulation=" << pExtendData->Undulation;
+#endif
+  return true;
+}
+
 bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData) {
   static uint16_t rtkStatus;
   static uint16_t Nav_Standard_flag;
   static uint16_t Sate_Num;
   static float baseline;
+  // char buff[8]={0};
   float imu_measurement_span = 1.0f / 100.0f;
   double seconds =
       pNavData->gps_week * SECONDS_PER_WEEK + pNavData->gps_millisecs * 1e-3;
@@ -412,6 +493,14 @@ bool EnbroadParse::HandleNavData(const enbroad::NAV_DATA_TypeDef* pNavData) {
       break;
     case enbroad::E_POLL_INS_STATE:
       Nav_Standard_flag = pNavData->poll_frame1;
+    case enbroad::E_POLL_INS_STANDARD_GNSS2:
+      // poll_frame1+poll_frame2×éfloat
+      // char *pAddr= static_cast<char *>(&pNavData->poll_frame1);
+      // buff[0]=pNavData->poll_frame1&0XFF00;
+      // buff[1]=pNavData->poll_frame1&0X00FF;
+      // buff[2]=pNavData->poll_frame2&0XFF00;
+      // buff[3]=pNavData->poll_frame2&0X00FF;
+      // AERROR << "E_POLL_INS_STANDARD_GNSS2=" << get_F32(pAddr,0);
       break;
     case enbroad::E_POLL_GNSS2_STATE:
       Sate_Num = pNavData->poll_frame1;
