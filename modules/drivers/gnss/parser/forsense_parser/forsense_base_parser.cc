@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2024 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ void ForsenseBaseParser::PrepareMessageStatus(const uint8_t& system_state,
 }
 
 void ForsenseBaseParser::FillGnssBestpos() {
-  bestpos_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  bestpos_.set_measurement_time(decode_message_.gps_timestamp_sec);
   bestpos_.set_sol_status(decode_message_.solution_status);
   bestpos_.set_sol_type(decode_message_.solution_type);
   bestpos_.set_latitude(decode_message_.Latitude);
@@ -163,13 +163,13 @@ void ForsenseBaseParser::FillImu() {
              imu_.mutable_linear_acceleration());
   rfu_to_flu(decode_message_.GyroX, decode_message_.GyroY,
              decode_message_.GyroZ, imu_.mutable_angular_velocity());
-  imu_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  imu_.set_measurement_time(decode_message_.gps_timestamp_sec);
 }
 
 void ForsenseBaseParser::FillHeading() {
   heading_.set_solution_status(decode_message_.solution_status);
   heading_.set_position_type(decode_message_.solution_type);
-  heading_.set_measurement_time(decode_message_.unix_timestamp_sec);
+  heading_.set_measurement_time(decode_message_.gps_timestamp_sec);
   heading_.set_heading(decode_message_.Heading);
   heading_.set_pitch(decode_message_.Pitch);
   heading_.set_heading_std_dev(decode_message_.yaw_std);

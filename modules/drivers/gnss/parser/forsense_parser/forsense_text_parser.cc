@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2024 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,8 +108,6 @@ void ForsenseTextParser::PrepareMessageGPYJ(
   decode_message_.GPSTime = std::stod(fields[2]);
   decode_message_.gps_timestamp_sec =
       decode_message_.GPSWeek * SECONDS_PER_WEEK + decode_message_.GPSTime;
-  decode_message_.unix_timestamp_sec =
-      apollo::drivers::util::gps2unix(decode_message_.gps_timestamp_sec);
   decode_message_.Heading = std::stod(fields[3]);
   decode_message_.Pitch = std::stod(fields[4]);
   decode_message_.Roll = std::stod(fields[5]);

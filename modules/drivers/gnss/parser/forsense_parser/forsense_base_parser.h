@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2024 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ struct ForsenseMessage {
   uint8_t wheel_speed_status = 0;
 
   double gps_timestamp_sec = 0;
-  double unix_timestamp_sec = 0;
+  
   // 数据标准差
   double lat_std = 0.0;
   double lon_std = 0.0;
