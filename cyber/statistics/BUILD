@@ -10,6 +10,7 @@ apollo_cc_library(
         "//cyber/common:cyber_common",
         "//cyber/proto:role_attributes_cc_proto",
         "//cyber/time:cyber_time",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
