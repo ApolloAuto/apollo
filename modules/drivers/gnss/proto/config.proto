@@ -29,6 +29,8 @@ message Stream {
     ENBROAD_TEXT = 40;
     ENBROAD_BINARY = 41;
 
+    CXZL_TEXT = 50;
+
   }
   optional Format format = 1;
 

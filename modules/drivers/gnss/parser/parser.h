@@ -83,6 +83,7 @@ class Parser {
   static Parser *CreateAsensing(const config::Config &config);
   static Parser *CreateBroadGnssText(const config::Config &config);
   static Parser *CreateEnbroad(const config::Config &config);
+  static Parser *CreateCxzlCfg(const config::Config &config);
 
   static Parser *CreateParser(const config::Config &config) {
     switch (config.data().format()) {
@@ -96,6 +97,8 @@ class Parser {
         return Parser::CreateBroadGnssText(config);
       case config::Stream::ENBROAD_BINARY:
         return Parser::CreateEnbroad(config);
+      case config::Stream::CXZL_TEXT:
+        return Parser::CreateCxzlCfg(config);
       default:
         return nullptr;
     }
