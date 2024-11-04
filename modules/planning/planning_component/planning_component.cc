@@ -117,7 +117,7 @@ bool PlanningComponent::Init() {
 }
 
 bool PlanningComponent::Proc(
-    const std::shared_ptr<prediction::PredictionObstacles>&
+    const std::shared_ptr<prediction::PredictionObstacles>&  //   // modules/common_msgs/prediction_msgs/prediction_obstacle.proto
         prediction_obstacles,
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
