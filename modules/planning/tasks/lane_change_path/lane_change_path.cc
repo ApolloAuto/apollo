@@ -124,9 +124,12 @@ bool LaneChangePath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   PathBound temp_path_bound = path_bound;
   std::string blocking_obstacle_id;
+  std::vector<SLPolygon> obs_sl_polygons;
+  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
+                                       init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          *reference_line_info_, init_sl_state_, &path_bound,
-          &blocking_obstacle_id, &path_narrowest_width)) {
+          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
+          &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
     return false;
@@ -200,7 +203,10 @@ bool LaneChangePath::AssessPath(std::vector<PathData>* candidate_path_data,
     if (PathAssessmentDeciderUtil::IsValidRegularPath(*reference_line_info_,
                                                       curr_path_data)) {
       SetPathInfo(&curr_path_data);
-      PathAssessmentDeciderUtil::TrimTailingOutLanePoints(&curr_path_data);
+      if (reference_line_info_->SDistanceToDestination() <
+          FLAGS_path_trim_destination_threshold) {
+        PathAssessmentDeciderUtil::TrimTailingOutLanePoints(&curr_path_data);
+      }
       if (curr_path_data.Empty()) {
         AINFO << "lane change path is empty after trimed";
         continue;

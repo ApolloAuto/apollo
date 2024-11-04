@@ -24,6 +24,7 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus_vehicle/devkit/protocol/gear_command_103.h"
@@ -62,6 +63,11 @@ class DevkitController final
   Chassis chassis() override;
 
   /**
+   * @brief add the sender message.
+   */
+  void AddSendMessage() override;
+
+  /**
    * for test
    */
   FRIEND_TEST(DevkitControllerTest, SetDrivingMode);
@@ -91,6 +97,10 @@ class DevkitController final
   // drive with acceleration/deceleration
   // acc:-7.0~5.0 unit:m/s^2
   void Acceleration(double acc) override;
+
+  // drive with speed
+  // speed:-xx.0~xx.0 unit:m/s
+  void Speed(double speed);
 
   // steering with old angle speed
   // angle:-99.99~0.00~99.99, unit:, left:+, right:-

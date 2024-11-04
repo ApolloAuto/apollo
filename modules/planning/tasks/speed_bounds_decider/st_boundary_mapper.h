@@ -104,15 +104,12 @@ class STBoundaryMapper {
                                      const ObjectDecisionType& decision) const;
 
   bool CheckOverlapWithTrajectoryPoint(
-    const DiscretizedPath& discretized_path,
-    const common::math::Polygon2d& obstacle_shape,
-    std::vector<STPoint>* upper_points,
-    std::vector<STPoint>* lower_points,
-    const double l_buffer,
-    int default_num_point,
-    const double obstacle_length,
-    const double obstacle_width,
-    const double trajectory_point_time) const;
+      const DiscretizedPath& discretized_path,
+      const common::math::Polygon2d& obstacle_shape,
+      std::vector<STPoint>* upper_points, std::vector<STPoint>* lower_points,
+      const double l_buffer, int default_num_point,
+      const double obstacle_length, const double obstacle_width,
+      const double trajectory_point_time) const;
 
  private:
   const SpeedBoundsDeciderConfig& speed_bounds_config_;

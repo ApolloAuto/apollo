@@ -34,6 +34,12 @@ export default function BottomBar() {
         };
     }, []);
 
+    useEffect(() => {
+        if (hmi.currentScenarioId) {
+            setRoutingInfo({});
+        }
+    }, [hmi.currentScenarioId]);
+
     if (hmi.currentOperation === HMIModeOperation.PLAY_RECORDER) {
         return <PlayerControlBar routingInfo={routingInfo} />;
     }

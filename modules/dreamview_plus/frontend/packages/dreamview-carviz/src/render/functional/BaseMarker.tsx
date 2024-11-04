@@ -1,18 +1,14 @@
 import React from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import {createRoot, Root} from 'react-dom/client';
 import FloatingLayer from '@dreamview/dreamview-carviz/src/EventBus/eventListeners/FloatingLayer';
-import type { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import type {CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as THREE from 'three';
-import { message } from '@dreamview/dreamview-ui/src/components/Message';
-import { FunctionalClass } from './FunctionalClass';
-import { eventBus, MouseEventType } from '../../EventBus';
-import transScreenPositionToWorld from '../../utils/transScreenPositionToWorld';
-import { IThreeContext } from '../type';
+import {FunctionalClass} from './FunctionalClass';
+import {eventBus, MouseEventType} from '../../EventBus';
+import {IThreeContext} from '../type';
 import type Coordinates from '../coordinates';
 import CopyMessage from '../../EventBus/eventListeners/CopyMessage';
-import {
-    disposeMesh,
-} from '../../utils/common';
+import {disposeMesh,} from '../../utils/common';
 
 export interface IFunctionalClassContext extends IThreeContext {
     coordinates: Coordinates;
@@ -56,6 +52,16 @@ export class BaseMarker implements FunctionalClass {
         if (this.floatLayer && this.floatLayer.parentNode) {
             this.floatLayer.parentNode.removeChild(this.floatLayer);
         }
+    }
+
+    computeWorldSizeForPixelSize(pixelSize: number) {
+        // 摄像机距离地平面的距离
+        const camera = this.context.camera;
+        const distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+        const vFOV = THREE.MathUtils.degToRad(camera.fov);  // 将视角转换为弧度
+        const visibleHeight = 2 * Math.tan(vFOV / 2) * distance;
+        const worldUnitPerPixel = visibleHeight / window.innerHeight;
+        return pixelSize * worldUnitPerPixel;
     }
 
     hiddenCurrentMovePosition() {
@@ -127,18 +133,12 @@ export class BaseMarker implements FunctionalClass {
         const { x: nx, y: ny } = this.computeNormalizationPosition(x, y);
         this.raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
 
-        // 计算与射线相交的对象
-        const intersects = this.raycaster.intersectObjects(scene.children, true);
-
-        // 如果与物体有交点，返回第一个交点的坐标
-        if (intersects.length > 0) {
-            return intersects[0].point;
-        }
-        // 如果没有交点，则计算与xy平面的交点
+        // 设置 xy 平面（地面）交点
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
         const planeIntersect = new THREE.Vector3();
         this.raycaster.ray.intersectPlane(plane, planeIntersect);
 
+        // 返回地面平面的交点
         return planeIntersect;
     }
 

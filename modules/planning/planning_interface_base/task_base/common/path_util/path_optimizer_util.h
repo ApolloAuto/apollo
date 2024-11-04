@@ -50,13 +50,22 @@ class PathOptimizerUtil {
   static void FormulateExtraConstraints(
       PathBound extra_path_bound, const PathBoundary& path_boundary,
       InterPolatedPointVec* extra_constraints);
-
   /**
    * @brief Piecewise jerk path optimizer.
    */
   static bool OptimizePath(
       const SLState& init_state, const std::array<double, 3>& end_state,
       std::vector<double> l_ref, std::vector<double> l_ref_weight,
+      const PathBoundary& path_boundary,
+      const std::vector<std::pair<double, double>>& ddl_bounds,
+      double dddl_bound, const PiecewiseJerkPathConfig& config,
+      std::vector<double>* x, std::vector<double>* dx,
+      std::vector<double>* ddx);
+
+  static bool OptimizePathWithTowingPoints(
+      const SLState& init_state, const std::array<double, 3>& end_state,
+      std::vector<double> l_ref, std::vector<double> l_ref_weight,
+      std::vector<double> towing_l_ref, std::vector<double> towing_l_ref_weight,
       const PathBoundary& path_boundary,
       const std::vector<std::pair<double, double>>& ddl_bounds,
       double dddl_bound, const PiecewiseJerkPathConfig& config,
@@ -70,6 +79,13 @@ class PathOptimizerUtil {
   static void UpdatePathRefWithBound(const PathBoundary& path_boundary,
                                      double weight, std::vector<double>* ref_l,
                                      std::vector<double>* weight_ref_l);
+
+  static void UpdatePathRefWithBound(const PathBoundary& path_boundary,
+                                     double weight,
+                                     const std::vector<double>& towing_ref_l,
+                                     std::vector<double>* ref_l,
+                                     std::vector<double>* weight_ref_l);
+
   static void UpdatePathRefWithBoundInSidePassDirection(
       const PathBoundary& path_boundary, double weight,
       std::vector<double>* ref_l, std::vector<double>* weight_ref_l,

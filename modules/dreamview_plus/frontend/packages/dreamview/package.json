@@ -22,7 +22,7 @@
         "protobufjs-cli": "^1.1.1"
     },
     "devDependencies": {
-        "@dreamview/eslint-config-dreamview": "1.1.4",
-        "@dreamview/tslint-config-dreamview": "1.1.4"
+        "@dreamview/eslint-config-dreamview": "^1.1.4",
+        "@dreamview/tslint-config-dreamview": "^1.1.4"
     }
 }

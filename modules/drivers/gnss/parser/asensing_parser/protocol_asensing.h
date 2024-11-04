@@ -46,13 +46,17 @@ typedef struct {
 
   uint8_t ModeStatus;
 
-  int16_t data1;
-  int16_t data2;
-  int16_t data3;
+  uint8_t LoopType;
+  float data1;
+  float data2;
+  float data3;
 
   int64_t SysTime_ms; /*时间戳 系统时间*/
 
   uint8_t flag_pos;
+
+  // rtk age
+  float differential_age;
 } InsType;
 
 template <typename T>

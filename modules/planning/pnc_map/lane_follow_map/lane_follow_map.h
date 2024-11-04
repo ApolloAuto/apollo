@@ -168,6 +168,8 @@ class LaneFollowMap : public PncMapBase {
       int start, const apollo::hdmap::LaneWaypoint &waypoint) const;
 
   void UpdateRoutingRange(int adc_index);
+  void PrintSegmentsDebugInfo(const apollo::hdmap::RouteSegments *segments,
+                              std::string debug_str);
 
  private:
   struct RouteIndex {

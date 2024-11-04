@@ -77,10 +77,12 @@ class ExternalCommandWrapperDemo final : public apollo::cyber::TimerComponent {
       const std::vector<apollo::external_command::Point>& way_points,
       const apollo::external_command::Pose& end);
 
-  static void ReadPathFromPathRecord(
+  void ReadPathFromPathRecord(
       const std::string& record_file,
       google::protobuf::RepeatedPtrField<apollo::external_command::Point>*
-          waypoints);
+          waypoints,
+      std::vector<apollo::external_command::Point>& left_boundary_points,
+      std::vector<apollo::external_command::Point>& right_boundary_points);
 
   void ReadPathFromLocationRecord(
       const std::string& record_file,

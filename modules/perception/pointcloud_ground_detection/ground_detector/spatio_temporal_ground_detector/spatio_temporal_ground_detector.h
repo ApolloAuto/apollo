@@ -18,6 +18,9 @@
 
 #include <string>
 #include <vector>
+#include <utility>
+#include <limits>
+#include <list>
 
 #include "modules/perception/common/algorithm/i_lib/pc/i_ground.h"
 #include "modules/perception/common/lidar/scene_manager/ground_service/ground_service.h"
@@ -70,13 +73,31 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   std::vector<float> data_;
   std::vector<float> ground_height_signed_;
   std::vector<int> point_indices_temp_;
+  std::vector<std::pair<int, int>> point_attribute_;
 
   bool use_roi_ = true;
   bool use_ground_service_ = false;
+  bool use_semantic_ground_ = false;
   float ground_thres_ = 0.25f;
+  float near_range_dist_ = 15.0;
+  float near_range_ground_thres_ = 0.10;
+  float middle_range_dist_ = 15.0;
+  float middle_range_ground_thres_ = 0.10;
+  int grid_size_ = 256;
+
+  float ori_sample_z_lower_ = -3.0;
+  float ori_sample_z_upper_ = -1.0;
+  float parsing_height_buffer_ = 0.2;
+  bool debug_output_ = false;
+  bool single_ground_detect_ = true;
+
   size_t default_point_size_ = 320000;
   Eigen::Vector3d cloud_center_ = Eigen::Vector3d(0.0, 0.0, 0.0);
   GroundServiceContent ground_service_content_;
+
+  // average ground z
+  std::list<float> origin_ground_z_array_;
+  const size_t ground_z_average_frame = 5;
 };  // class SpatioTemporalGroundDetector
 
 }  // namespace lidar

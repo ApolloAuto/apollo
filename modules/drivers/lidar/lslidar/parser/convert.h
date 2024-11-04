@@ -29,6 +29,7 @@
 namespace apollo {
 namespace drivers {
 namespace lslidar {
+namespace parser {
 
 using apollo::drivers::PointCloud;
 using apollo::drivers::lslidar::LslidarScan;
@@ -36,26 +37,28 @@ using apollo::drivers::lslidar::LslidarScan;
 // convert lslidar data to pointcloud and republish
 class Convert {
  public:
-  Convert() = default;
-  virtual ~Convert() = default;
+    Convert() = default;
+    virtual ~Convert() = default;
 
-  // init lslidar config struct from private_nh
-  void init(const Config& lslidar_config);
+    // init lslidar config struct from private_nh
+    void init(const Config& lslidar_config);
 
-  // convert lslidar data to pointcloud and public
-  void ConvertPacketsToPointcloud(
-      const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out);
+    // convert lslidar data to pointcloud and public
+    void ConvertPacketsToPointcloud(
+            const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>&
+                    scan_msg,
+            std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out);
 
  private:
-  // RawData class for converting data to point cloud
-  std::unique_ptr<LslidarParser> parser_;
-  std::string channel_pointcloud_;
+    // RawData class for converting data to point cloud
+    std::unique_ptr<LslidarParser> parser_;
+    std::string channel_pointcloud_;
 
-  /// configuration parameters, get config struct from lslidar_parser.h
-  Config config_;
+    /// configuration parameters, get config struct from lslidar_parser.h
+    Config config_;
 };
 
+}  // namespace parser
 }  // namespace lslidar
 }  // namespace drivers
 }  // namespace apollo

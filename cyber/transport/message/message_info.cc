@@ -24,7 +24,9 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-const std::size_t MessageInfo::kSize = 2 * ID_SIZE + sizeof(uint64_t);
+const std::size_t MessageInfo::kSize = 2 * ID_SIZE + sizeof(uint64_t) + \
+                                        sizeof(uint64_t) + sizeof(int32_t) + \
+                                        sizeof(uint64_t);
 
 MessageInfo::MessageInfo() : sender_id_(false), spare_id_(false) {}
 
@@ -67,9 +69,15 @@ bool MessageInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
   dst->assign(sender_id_.data(), ID_SIZE);
-  dst->append(reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
+  dst->append(
+    reinterpret_cast<const char*>(&channel_id_), sizeof(channel_id_));
+  dst->append(
+    reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   dst->append(spare_id_.data(), ID_SIZE);
-
+  dst->append(reinterpret_cast<const char*>(
+    &msg_seq_num_), sizeof(msg_seq_num_));
+  dst->append(reinterpret_cast<const char*>(
+    &send_time_), sizeof(send_time_));
   return true;
 }
 
@@ -81,10 +89,19 @@ bool MessageInfo::SerializeTo(char* dst, std::size_t len) const {
   char* ptr = dst;
   std::memcpy(ptr, sender_id_.data(), ID_SIZE);
   ptr += ID_SIZE;
-  std::memcpy(ptr, reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
+  std::memcpy(ptr,
+    reinterpret_cast<const char*>(&channel_id_), sizeof(channel_id_));
+  ptr += sizeof(channel_id_);
+  std::memcpy(ptr,
+    reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   ptr += sizeof(seq_num_);
   std::memcpy(ptr, spare_id_.data(), ID_SIZE);
-
+  ptr += ID_SIZE;
+  std::memcpy(ptr,
+    reinterpret_cast<const char*>(&msg_seq_num_), sizeof(msg_seq_num_));
+  ptr += sizeof(msg_seq_num_);
+  std::memcpy(ptr,
+    reinterpret_cast<const char*>(&send_time_), sizeof(send_time_));
   return true;
 }
 
@@ -102,10 +119,19 @@ bool MessageInfo::DeserializeFrom(const char* src, std::size_t len) {
   char* ptr = const_cast<char*>(src);
   sender_id_.set_data(ptr);
   ptr += ID_SIZE;
-  std::memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
+  std::memcpy(
+    reinterpret_cast<char*>(&channel_id_), ptr, sizeof(channel_id_));
+  ptr += sizeof(channel_id_);
+  std::memcpy(
+    reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
   ptr += sizeof(seq_num_);
   spare_id_.set_data(ptr);
-
+  ptr += ID_SIZE;
+  std::memcpy(
+    reinterpret_cast<char*>(&msg_seq_num_), ptr, sizeof(msg_seq_num_));
+  ptr += sizeof(msg_seq_num_);
+  std::memcpy(
+    reinterpret_cast<char*>(&send_time_), ptr, sizeof(send_time_));
   return true;
 }
 

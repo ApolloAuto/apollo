@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "modules/perception/lidar_tracking/tracker/measurement/measurement_collection.h"
 #include "modules/perception/lidar_tracking/tracker/multi_lidar_fusion/mlf_motion_measurement.h"
@@ -52,14 +53,23 @@ void MlfMotionMeasurement::ComputeMotionMeasurment(
   MeasureAnchorPointVelocity(new_object, latest_object, time_diff);
   MeasureBboxCenterVelocity(new_object, latest_object, time_diff);
   MeasureBboxCornerVelocity(new_object, latest_object, time_diff);
-  MeasurementSelection(track_data, latest_object, new_object);
+  MeasureBboxCenterHistoryVelocity(track_data, new_object);
+  bool spec_condition =
+      new_object->object_ptr->sub_type == base::ObjectSubType::BIGMOT;
+  if (spec_condition) {
+      MeasureBboxCornerHistoryVelocity(track_data, new_object);
+      MeasureObjectDetectionHistoryVelocity(track_data, new_object);
+      MeasureObjectDetectionVelocity(new_object, latest_object, time_diff);
+  }
+  MeasurementSelection(track_data, latest_object, new_object, spec_condition);
   MeasurementQualityEstimation(latest_object, new_object);
   MeasurementRefine(track_data, latest_object, new_object, time_diff);
 }
 
 void MlfMotionMeasurement::MeasurementSelection(
     const MlfTrackDataConstPtr& track_data,
-    const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object) {
+    const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object,
+    bool condition) {
   // Select measured velocity among candidates according motion consistency
   int64_t corner_index = 0;
   float corner_velocity_gain = 0.0f;
@@ -76,7 +86,7 @@ void MlfMotionMeasurement::MeasurementSelection(
   corner_velocity_gain = *corener_min_gain;
   corner_index = corener_min_gain - corner_velocity_gain_norms.begin();
 
-  std::vector<float> velocity_gain_norms(3);
+  std::vector<float> velocity_gain_norms(4);
   velocity_gain_norms[0] = corner_velocity_gain;
   velocity_gain_norms[1] =
       static_cast<float>((new_object->measured_barycenter_velocity -
@@ -85,6 +95,9 @@ void MlfMotionMeasurement::MeasurementSelection(
   velocity_gain_norms[2] = static_cast<float>(
       (new_object->measured_center_velocity - latest_object->belief_velocity)
           .norm());
+  velocity_gain_norms[3] = static_cast<float>(
+      (new_object->measured_history_center_velocity -
+          latest_object->belief_velocity).norm());
   std::vector<float>::iterator min_gain = std::min_element(
       std::begin(velocity_gain_norms), std::end(velocity_gain_norms));
   int64_t min_gain_pos = min_gain - velocity_gain_norms.begin();
@@ -100,6 +113,103 @@ void MlfMotionMeasurement::MeasurementSelection(
     new_object->selected_measured_velocity =
         new_object->measured_center_velocity;
   }
+  if (min_gain_pos == 3) {
+    new_object->selected_measured_velocity =
+        new_object->measured_history_center_velocity;
+  }
+  if (condition) {
+    // object-detection-corner-history-observation
+    std::vector<float> condition_velocity_norm(10);
+    for (int i = 0; i < 4; ++i) {
+        condition_velocity_norm[i] = static_cast<float>(
+            (new_object->measured_detection_history_corners_velocity[i] -
+                latest_object->belief_velocity).norm());
+    }
+    // object-detection-center-observation
+    condition_velocity_norm[4] = static_cast<float>(
+        (new_object->measured_detection_history_center_velocity -
+            latest_object->belief_velocity).norm());
+    condition_velocity_norm[5] = static_cast<float>(
+        (new_object->measured_detection_center_velocity -
+            latest_object->belief_velocity).norm());
+    // corners-history-observation
+    for (int i = 0; i < 4; ++i) {
+        condition_velocity_norm[i + 6] = static_cast<float>(
+            (new_object->measured_history_corners_velocity[i] -
+                latest_object->belief_velocity).norm());
+    }
+    std::vector<float>::iterator condition_min_diff =
+        std::min_element(std::begin(condition_velocity_norm),
+            std::end(condition_velocity_norm));
+    int min_pos = condition_min_diff - condition_velocity_norm.begin();
+    if (*condition_min_diff < *min_gain) {
+        if (min_pos <= 3 && min_pos >= 0) {
+            new_object->selected_measured_velocity =
+              new_object->measured_detection_history_corners_velocity[min_pos];
+        }
+        if (min_pos == 4) {
+            new_object->selected_measured_velocity =
+                new_object->measured_detection_history_center_velocity;
+        }
+        if (min_pos == 5) {
+            new_object->selected_measured_velocity =
+                new_object->measured_detection_center_velocity;
+        }
+        if (min_pos <= 9 && min_pos >= 6) {
+            new_object->selected_measured_velocity =
+                new_object->measured_history_corners_velocity[min_pos - 6];
+        }
+    }
+  }
+  ADEBUG << "[Measurement] track_id: " << track_data->track_id_
+    << " belief_velocity: " << latest_object->belief_velocity(0)
+    << ", " << latest_object->belief_velocity(1)
+    << " corner_velocity[0]: " << new_object->measured_corners_velocity[0](0)
+    << ", " << new_object->measured_corners_velocity[0](1)
+    << " corner_velocity[1]: " << new_object->measured_corners_velocity[1](0)
+    << ", " << new_object->measured_corners_velocity[1](1)
+    << " corner_velocity[2]: " << new_object->measured_corners_velocity[2](0)
+    << ", " << new_object->measured_corners_velocity[2](1)
+    << " corner_velocity[3]: " << new_object->measured_corners_velocity[3](0)
+    << ", " << new_object->measured_corners_velocity[3](1)
+    << " barycenter_velocity: " << new_object->measured_barycenter_velocity(0)
+    << ", " << new_object->measured_barycenter_velocity(1)
+    << " center_velocity: " << new_object->measured_center_velocity(0)
+    << ", " << new_object->measured_center_velocity(1)
+    << " history_velocity: "<< new_object->measured_history_center_velocity(0)
+    << ", " << new_object->measured_history_center_velocity(1)
+    << " detection_history_corner_velocity[0]: "
+    << new_object->measured_detection_history_corners_velocity[0](0) << ", "
+    << new_object->measured_detection_history_corners_velocity[0](1)
+    << " detection_history_corner_velocity[1]: "
+    << new_object->measured_detection_history_corners_velocity[1](0) << ", "
+    << new_object->measured_detection_history_corners_velocity[1](1)
+    << " detection_history_corner_velocity[2]: "
+    << new_object->measured_detection_history_corners_velocity[2](0) << ", "
+    << new_object->measured_detection_history_corners_velocity[2](1)
+    << " detection_history_corner_velocity[3]: "
+    << new_object->measured_detection_history_corners_velocity[3](0) << ", "
+    << new_object->measured_detection_history_corners_velocity[3](1)
+    << " detection_center_velocity: "
+    << new_object->measured_detection_center_velocity(0) << ", "
+    << new_object->measured_detection_center_velocity(1)
+    << " detection_history_center_velocity: "
+    << new_object->measured_detection_history_center_velocity(0) << ", "
+    << new_object->measured_detection_history_center_velocity(1)
+    << " history_corner_velocity[0]: "
+    << new_object->measured_history_corners_velocity[0](0) << ", "
+    << new_object->measured_history_corners_velocity[0](1)
+    << " history_corner_velocity[1]: "
+    << new_object->measured_history_corners_velocity[1](0) << ", "
+    << new_object->measured_history_corners_velocity[1](1)
+    << " history_corner_velocity[2]: "
+    << new_object->measured_history_corners_velocity[2](0) << ", "
+    << new_object->measured_history_corners_velocity[2](1)
+    << " history_corner_velocity[3]: "
+    << new_object->measured_history_corners_velocity[3](0) << ", "
+    << new_object->measured_history_corners_velocity[3](1)
+    << " selected: " << new_object->selected_measured_velocity(0) << ", "
+    << new_object->selected_measured_velocity(1);
 }
 
 void MlfMotionMeasurement::MeasurementQualityEstimation(
@@ -126,7 +236,7 @@ void MlfMotionMeasurement::MeasurementRefine(
         TrackedObjectPtr new_object,
         const double& time_diff) {
     const Eigen::Vector3d cur_vel = new_object->selected_measured_velocity;
-    const int get_history_size = 3;
+    const int get_history_size = 4;
     // get hisroty objects
     std::vector<TrackedObjectConstPtr> history_objects;
     track_data->GetLatestKObjects(get_history_size, &history_objects);
@@ -138,6 +248,17 @@ void MlfMotionMeasurement::MeasurementRefine(
     float velocity_threshold = 2.0;
     velocity_threshold =
         latest_object->type == base::ObjectType::VEHICLE ? 3.0 : 2.0;
+
+    float small_velocity_threshold = 2.0;
+    small_velocity_threshold =
+        latest_object->type == base::ObjectType::PEDESTRIAN ? 0.1 : 0.5;
+    if (cur_vel.head<2>().norm() > velocity_threshold) {
+        ++new_object->measured_big_velocity_age;
+    }
+    if (cur_vel.head<2>().norm() < small_velocity_threshold) {
+        new_object->measured_big_velocity_age = 0;
+    }
+
     // Condition 1: size < 3 and latest is static and new velocity is big
     if (history_objects.size() < get_history_size) {
         if (latest_object->output_velocity.head<2>().norm() < STATIC_VELOCITY
@@ -162,6 +283,11 @@ void MlfMotionMeasurement::MeasurementRefine(
         if (obj->output_velocity.head<2>().norm() > 0.1) {
             keep_small_velocity = false;
         }
+    }
+    if (new_object->measured_big_velocity_age >= get_history_size) {
+        AINFO << "[Velocity-Measurement] Continuous big velocity. track_id: "
+              << track_data->track_id_;
+        return;
     }
     if (keep_small_velocity && cur_vel.head<2>().norm() > velocity_threshold) {
         // new_object->selected_measured_velocity =

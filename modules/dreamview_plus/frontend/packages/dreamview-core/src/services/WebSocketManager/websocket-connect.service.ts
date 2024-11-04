@@ -3,6 +3,7 @@ import { BehaviorSubject, delay, Observable, retryWhen, Subject, take } from 'rx
 import Logger from '@dreamview/log';
 import MessageQueue from '@dreamview/dreamview-core/src/util/MessageQueue';
 import { ConnectionStatusEnum, RequestMessage, RequestStreamMessage, ResponseMessage } from './type';
+import { baseURL } from './constant';
 
 const requestIdleCallbackTimeout = 2000;
 
@@ -23,7 +24,12 @@ export class WebSocketConnection {
     });
 
     constructor(url: string) {
-        this.url = url;
+        // 如果url是相对路径，baseUrl
+        if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+            this.url = `${baseURL}${url}`;
+        } else {
+            this.url = url;
+        }
         // 监听连接状态 一旦连接成功，就开始消费消息队列
         this.connectionStatus$.subscribe((status) => {
             if (status === ConnectionStatusEnum.CONNECTED) {
@@ -92,9 +98,9 @@ export class WebSocketConnection {
 
     private consumeMessageQueue() {
         // 用requestIdleCallback排队执行的函数
-        const idleConsume = (deadline: IdleDeadline) => {
+        const idleConsume = () => {
             // 仅当浏览器空闲时，才开始处理队列中的消息
-            while (deadline.timeRemaining() > 0 && !this.messageQueue.isEmpty() && this.isConnected()) {
+            while (!this.messageQueue.isEmpty() && this.isConnected()) {
                 const message = this.messageQueue.dequeue();
                 if (message) {
                     logger.debug(
@@ -102,11 +108,6 @@ export class WebSocketConnection {
                     );
                     this.socket.next(message);
                 }
-            }
-
-            // 如果队列中还有消息，并且连接仍然打开，再次调用requestIdleCallback
-            if (!this.messageQueue.isEmpty() && this.isConnected()) {
-                requestIdleCallback(idleConsume, { timeout: requestIdleCallbackTimeout });
             }
         };
 

@@ -58,22 +58,17 @@ std::string GetLogFileName() {
 }
 
 void WriteHeaders(std::ofstream &file_stream) {
-  file_stream << "current_lateral_error,"
-              << "current_ref_heading,"
-              << "current_heading,"
-              << "current_heading_error,"
-              << "heading_error_rate,"
-              << "lateral_error_rate,"
-              << "current_curvature,"
-              << "steer_angle,"
+  file_stream << "current_lateral_error," << "current_ref_heading,"
+              << "current_heading," << "current_heading_error,"
+              << "heading_error_rate," << "lateral_error_rate,"
+              << "current_curvature," << "steer_angle,"
               << "steer_angle_feedforward,"
               << "steer_angle_lateral_contribution,"
               << "steer_angle_lateral_rate_contribution,"
               << "steer_angle_heading_contribution,"
               << "steer_angle_heading_rate_contribution,"
-              << "steer_angle_feedback,"
-              << "steering_position,"
-              << "v" << std::endl;
+              << "steer_angle_feedback," << "steering_position," << "v"
+              << std::endl;
 }
 }  // namespace
 
@@ -162,11 +157,8 @@ void LatController::ProcessLogs(const SimpleLateralDebug *debug,
 
 void LatController::LogInitParameters() {
   AINFO << name_ << " begin.";
-  AINFO << "[LatController parameters]"
-        << " mass_: " << mass_ << ","
-        << " iz_: " << iz_ << ","
-        << " lf_: " << lf_ << ","
-        << " lr_: " << lr_;
+  AINFO << "[LatController parameters]" << " mass_: " << mass_ << ","
+        << " iz_: " << iz_ << "," << " lf_: " << lf_ << "," << " lr_: " << lr_;
 }
 
 void LatController::InitializeFilters() {
@@ -470,6 +462,8 @@ Status LatController::ComputeControlCommand(
     }
   }
 
+  uint num_iteration;
+  double result_diff;
   // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
@@ -480,12 +474,16 @@ Status LatController::ComputeControlCommand(
                               std::fabs(vehicle_state->linear_velocity()));
     common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_updated_,
                                   matrix_r_, lqr_eps_, lqr_max_iteration_,
-                                  &matrix_k_);
+                                  &matrix_k_, &num_iteration, &result_diff);
   } else {
     common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_,
                                   matrix_r_, lqr_eps_, lqr_max_iteration_,
-                                  &matrix_k_);
+                                  &matrix_k_, &num_iteration, &result_diff);
   }
+
+  ADEBUG << "LQR num_iteration is " << num_iteration
+        << ", max iteration threshold is " << lqr_max_iteration_
+        << "; result_diff is " << result_diff;
 
   // feedback = - K * state
   // Convert vehicle steer angle from rad to degree and then to steer degree

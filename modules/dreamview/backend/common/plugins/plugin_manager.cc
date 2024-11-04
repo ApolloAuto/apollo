@@ -358,7 +358,14 @@ bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
   response["action"] = "response";
   Json info = Json::parse(msg.info());
   response["data"]["info"] = info;
-  plugin_ws_->BroadcastData(response.dump());
+  bool broadcast;
+  if (!JsonUtil::GetBooleanByPath(response, "data.broadcast", &broadcast)) {
+    // default true,broadcast to websocket
+    broadcast = true;
+  }
+  if (broadcast) {
+    plugin_ws_->BroadcastData(response.dump());
+  }
   return true;
 }
 

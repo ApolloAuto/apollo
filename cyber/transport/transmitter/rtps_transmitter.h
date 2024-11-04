@@ -22,6 +22,8 @@
 
 #include "cyber/common/log.h"
 #include "cyber/message/message_traits.h"
+#include "cyber/statistics/statistics.h"
+#include "cyber/time/time.h"
 #include "cyber/transport/rtps/attributes_filler.h"
 #include "cyber/transport/rtps/participant.h"
 #include "cyber/transport/transmitter/transmitter.h"
@@ -105,6 +107,11 @@ bool RtpsTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
 
   UnderlayMessage m;
   RETURN_VAL_IF(!message::SerializeToString(msg, &m.data()), false);
+
+  uint64_t send_time = msg_info.send_time();
+
+  m.timestamp(0x0fffffff & send_time);
+  m.seq(msg_info.msg_seq_num());
 
   eprosima::fastrtps::rtps::WriteParams wparams;
 

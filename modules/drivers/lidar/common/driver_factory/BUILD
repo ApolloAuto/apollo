@@ -11,7 +11,6 @@ apollo_cc_library(
         "//cyber",
         "//modules/common/util:util_tool",
         "//modules/common/util:common_util",
-        "//modules/drivers/lidar/hesai/driver:apollo_hesai_driver",
         "//modules/drivers/lidar/proto:config_cc_proto",
         "//modules/drivers/lidar/proto:lidar_parameter_cc_proto",
         "//modules/drivers/lidar/velodyne/driver:velodyne_driver_lib",

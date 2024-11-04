@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 import * as TYPES from './actionTypes';
-import { MainApi, PluginApi, StreamApi } from '../../services/api';
+import { MainApi, OtherApi, PluginApi, StreamApi } from '../../services/api';
 import { webSocketManager, WebSocketManager } from '../../services/WebSocketManager';
 import { MetadataItem } from '../../services/WebSocketManager/type';
 
@@ -9,6 +9,7 @@ export interface IInitState {
     mainApi: MainApi;
     pluginApi: PluginApi;
     streamApi: StreamApi;
+    otherApi: OtherApi;
     webSocketManager: WebSocketManager;
 }
 
@@ -17,6 +18,7 @@ export const initState: IInitState = {
     mainApi: new MainApi(),
     pluginApi: new PluginApi(),
     streamApi: new StreamApi(),
+    otherApi: new OtherApi(),
     webSocketManager,
 };
 

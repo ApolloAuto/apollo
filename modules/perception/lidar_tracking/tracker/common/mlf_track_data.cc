@@ -33,6 +33,8 @@ void MlfTrackData::Reset() {
   latest_cached_time_ = 0.0;
   first_tracked_time_ = 0.0;
   is_current_state_predicted_ = true;
+  is_front_critical_track_ = false;
+  is_reserve_blind_cone_ = false;
   sensor_history_objects_.clear();
   cached_objects_.clear();
   predict_.Reset();
@@ -92,7 +94,7 @@ void MlfTrackData::PushTrackedObjectToCache(TrackedObjectPtr obj) {
 }
 
 bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
-                            double timestamp, base::ObjectPtr object) const {
+          double timestamp, base::ObjectPtr object, bool update_time) const {
   if (history_objects_.empty()) {
     return false;
   }
@@ -120,10 +122,12 @@ bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
   object->anchor_point(0) += offset_x;
   object->anchor_point(1) += offset_y;
   object->anchor_point(2) += offset_z;
-  // d). update tracking timestamp
-  object->tracking_time += time_diff;
-  // e). update latest track timestamp
-  object->latest_tracked_time += time_diff;
+  if (update_time) {
+      // d). update tracking timestamp
+      object->tracking_time += time_diff;
+      // e). update latest track timestamp
+      object->latest_tracked_time += time_diff;
+  }
   // f). update cloud world in lidar supplement
   for (auto& pt : object->lidar_supplement.cloud_world) {
     pt.x += offset_x;

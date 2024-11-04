@@ -157,20 +157,20 @@ void GetFilesByPath(const boost::filesystem::path& path,
  * @brief: get path equivalent ego width
  */
 double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
-                                   double s) {
+                                   double s, bool* is_left) {
   const auto& vehicle_param =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   double max_kappa = 1.0 / vehicle_param.min_turn_radius();
   double half_wb = 0.5 * vehicle_param.wheel_base();
   double front_l = vehicle_param.front_edge_to_center() - half_wb;
   double half_w = 0.5 * vehicle_param.width();
-  double current_heading = reference_line_info.reference_line()
-                               .GetReferencePoint(s - front_l)
-                               .heading();
-  double heading_f =
+  double current_heading =
       reference_line_info.reference_line().GetReferencePoint(s).heading();
+  double heading_f = reference_line_info.reference_line()
+                         .GetReferencePoint(s + front_l)
+                         .heading();
   double heading_b = reference_line_info.reference_line()
-                         .GetReferencePoint(s - front_l - half_wb)
+                         .GetReferencePoint(s - half_wb)
                          .heading();
   // average kappa from front edge to center
   double kappa_f =
@@ -180,6 +180,7 @@ double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
   double kappa_b =
       apollo::common::math::NormalizeAngle(current_heading - heading_b) /
       half_wb;
+  *is_left = (kappa_b < 0.0);
   // prevent devide by 0, and quit if lane bends to difference direction
   if (kappa_f * kappa_b < 0.0 || fabs(kappa_f) < 1e-6) {
     return half_w;
@@ -200,16 +201,16 @@ double CalculateEquivalentEgoWidth(const ReferenceLineInfo& reference_line_info,
 }
 
 double CalculateEquivalentEgoWidth(
-    const apollo::hdmap::LaneInfoConstPtr lane_info, double s) {
+    const apollo::hdmap::LaneInfoConstPtr lane_info, double s, bool* is_left) {
   const auto& vehicle_param =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   double max_kappa = 1.0 / vehicle_param.min_turn_radius();
   double half_wb = 0.5 * vehicle_param.wheel_base();
   double front_l = vehicle_param.front_edge_to_center() - half_wb;
   double half_w = 0.5 * vehicle_param.width();
-  double current_heading = lane_info->Heading(s - front_l);
-  double heading_f = lane_info->Heading(s);
-  double heading_b = lane_info->Heading(s - front_l - half_wb);
+  double current_heading = lane_info->Heading(s);
+  double heading_f = lane_info->Heading(s + front_l);
+  double heading_b = lane_info->Heading(s - half_wb);
   // average kappa from front edge to center
   double kappa_f =
       apollo::common::math::NormalizeAngle(heading_f - current_heading) /
@@ -218,6 +219,7 @@ double CalculateEquivalentEgoWidth(
   double kappa_b =
       apollo::common::math::NormalizeAngle(current_heading - heading_b) /
       half_wb;
+  *is_left = (kappa_b < 0.0);
   // prevent devide by 0, and quit if lane bends to difference direction
   if (kappa_f * kappa_b < 0.0 || fabs(kappa_f) < 1e-6) {
     return half_w;
@@ -235,6 +237,32 @@ double CalculateEquivalentEgoWidth(
           .Length() -
       r_f;
   return std::max(eq_half_w, half_w);
+}
+
+double left_arc_bound_with_heading(double delta_x, double r, double heading) {
+  // calculate △L(positive or negative) with an arc with given radius, and given
+  // init_heading the circle can be written as (x-Rsin)^2 + (y+Rcos)^2 = R^2 the
+  // upper side of the circel = (sqrt(R^2 - (x-Rsin)^2) - Rcos) is what we need
+  if (delta_x > r * (1.0 + std::sin(heading)) - 1e-6) {
+    return std::numeric_limits<double>::lowest();
+  }
+  // return std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) - r
+  // * std::cos(heading);
+  return r * std::cos(heading) -
+         std::sqrt(r * r - std::pow(delta_x + r * std::sin(heading), 2));
+}
+
+double right_arc_bound_with_heading(double delta_x, double r, double heading) {
+  // calculate △L(positive or negative) with an arc with given radius, and given
+  // init_heading the circle can be written as (x+Rsin)^2 + (y-Rcos)^2 = R^2 the
+  // upper side of the circel = (Rcos - sqrt(R^2 - (x+Rsin)^2) )is what we need
+  if (delta_x > r * (1.0 - std::sin(heading)) - 1e-6) {
+    return std::numeric_limits<double>::max();
+  }
+  // return r * std::cos(heading) - std::sqrt(r * r - std::pow(delta_x + r *
+  // std::sin(heading), 2));
+  return std::sqrt(r * r - std::pow(delta_x - r * std::sin(heading), 2)) -
+         r * std::cos(heading);
 }
 
 }  // namespace util

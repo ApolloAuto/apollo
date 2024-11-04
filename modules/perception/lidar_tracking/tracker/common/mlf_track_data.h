@@ -88,7 +88,7 @@ class MlfTrackData : public TrackData {
    * @return false
    */
   bool ToObject(const Eigen::Vector3d& local_to_global_offset, double timestamp,
-                base::ObjectPtr object) const;
+                base::ObjectPtr object, bool update_time = true) const;
 
   /**
    * @brief Remove stale history data
@@ -173,6 +173,8 @@ class MlfTrackData : public TrackData {
   double first_tracked_time_ = 0.0;
 
   bool is_current_state_predicted_ = true;
+  bool is_front_critical_track_ = false;
+  bool is_reserve_blind_cone_ = false;
 
   static const double kMaxHistoryTime;
 };

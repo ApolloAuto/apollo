@@ -61,6 +61,16 @@ bool SetProtoToASCIIFile(const google::protobuf::Message &message,
                          const std::string &file_name);
 
 /**
+ * @brief Sets the content of the file specified by the file_name to be the
+ *        ascii representation of the input string.
+ * @param content The string to output to the specified file.
+ * @param file_name The name of the target file to set the content.
+ * @return If the action is successful.
+ */
+bool SetStringToASCIIFile(const std::string &content,
+                          const std::string &file_name);
+
+/**
  * @brief Parses the content of the file specified by the file_name as ascii
  *        representation of protobufs, and merges the parsed content to the
  *        proto.

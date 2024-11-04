@@ -1,0 +1,21 @@
+diff --git a/node_modules/csstype/index.d.ts b/node_modules/csstype/index.d.ts
+index b466d21..2da177d 100644
+--- a/node_modules/csstype/index.d.ts
++++ b/node_modules/csstype/index.d.ts
+@@ -1,5 +1,7 @@
+ export {};
+ 
++import { WithImportant } from './withImportant.d';
++
+ export type PropertyValue<TValue> = TValue extends Array<infer AValue>
+   ? Array<AValue extends infer TUnpacked & {} ? TUnpacked : AValue>
+   : TValue extends infer TUnpacked & {}
+@@ -3865,7 +3867,7 @@ export interface StandardLonghandProperties<TLength = (string & {}) | 0, TTime =
+    *
+    * @see https://developer.mozilla.org/docs/Web/CSS/position
+    */
+-  position?: Property.Position | undefined;
++  position?: WithImportant<Property.Position> | undefined;
+   /**
+    * The **`print-color-adjust`** CSS property sets what, if anything, the user agent may do to optimize the appearance of the element on the output device. By default, the browser is allowed to make any adjustments to the element's appearance it determines to be necessary and prudent given the type and capabilities of the output device.
+    *

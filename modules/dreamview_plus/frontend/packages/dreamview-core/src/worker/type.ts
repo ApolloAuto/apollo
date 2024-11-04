@@ -1,10 +1,13 @@
 // task type
+import { DispatchTaskOption } from '../services/WebSocketManager';
+
 export interface TaskInternal<TPayload> {
     id: string;
     type: string;
     payload: TPayload;
     transferList?: Transferable[];
     priority: number;
+    option?: DispatchTaskOption;
 }
 
 export type Task<TPayload> = Omit<TaskInternal<TPayload>, 'id' | 'priority'> & {

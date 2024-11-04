@@ -139,6 +139,9 @@ struct TrackedObject {
   Eigen::Vector3d center;
   Eigen::Vector3d barycenter;
   Eigen::Vector3d anchor_point;
+  // center and corner points in object-detection original output
+  Eigen::Vector3d detection_center;
+  Eigen::Vector3d detection_corners[4];
 
   // oriented
   Eigen::Vector3d direction;
@@ -159,6 +162,12 @@ struct TrackedObject {
   Eigen::Vector3d measured_center_velocity;
   Eigen::Vector3d measured_nearest_corner_velocity;  // no projection
   Eigen::Vector3d measured_corners_velocity[4];
+  Eigen::Vector3d measured_history_corners_velocity[4];
+  Eigen::Vector3d measured_history_center_velocity;
+  Eigen::Vector3d measured_detection_center_velocity;
+  Eigen::Vector3d measured_detection_history_center_velocity;
+  Eigen::Vector3d measured_detection_history_corners_velocity[4];
+  int measured_big_velocity_age;
 
   // ***************************************************
   // filter correlative information

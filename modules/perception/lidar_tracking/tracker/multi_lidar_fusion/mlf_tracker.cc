@@ -50,6 +50,8 @@ void MlfTracker::InitializeTrack(MlfTrackDataPtr new_track_data,
                                  TrackedObjectPtr new_object) {
   new_track_data->Reset(new_object, GetNextTrackId());
   new_track_data->is_current_state_predicted_ = false;
+  new_track_data->is_front_critical_track_ =
+      new_object->object_ptr->is_front_critical;
 }
 
 void MlfTracker::UpdateTrackDataWithObject(MlfTrackDataPtr track_data,
@@ -61,6 +63,8 @@ void MlfTracker::UpdateTrackDataWithObject(MlfTrackDataPtr track_data,
   // 2. push new_obect to track_data
   track_data->PushTrackedObjectToTrack(new_object);
   track_data->is_current_state_predicted_ = false;
+  track_data->is_front_critical_track_ =
+      new_object->object_ptr->is_front_critical;
 }
 
 void MlfTracker::UpdateTrackDataWithoutObject(double timestamp,

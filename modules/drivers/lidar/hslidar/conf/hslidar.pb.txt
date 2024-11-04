@@ -1,0 +1,33 @@
+config_base {
+  scan_channel: "/apollo/sensor/hesaiAT128/Scan"
+  point_cloud_channel: "/apollo/sensor/hesaiAT128/PointCloud2"
+  frame_id: "hesai_AT128"
+
+  # sample ONLINE_LIDAR, RAW_PACKET
+  source_type: ONLINE_LIDAR
+}
+
+udp_port: 2368
+ptc_port: 9347
+device_ip: "192.168.1.12"
+host_ip: "0.0.0.0"
+correction_file_path: "/apollo/modules/drivers/lidar/hslidar/correction/angle_correction/AT128_test_angle_correction.dat"
+firetimes_path: "/apollo/modules/drivers/lidar/hslidar/correction/firetime_correction/AT128_test_firetime_correction.dat"
+source_type: 1 # The type of data source, 1: real-time lidar connection, 2: pcap, 3: from apollo record
+pcap_path: "/media/apollo_record/at128/0205.pcap"
+frame_start_azimuth: -1
+convert_thread_nums: 2
+
+# AT128 AT128E2X AT128E3X Pandar128E3X Pandar128 Pandar40S Pandar40E3X
+# Pandar60S Pandar64E3X Pandar90 Pandar90E3X PandarXT
+# PandarXT16 PandarXT-16
+# PandarXT32 PandarXT-32
+# PandarXTM XT32M2X
+# PandarQT
+# PandarQT128 QT128C2X
+# Pandar64
+# Pandar40 Pandar40P
+# PandarFT120 FT120C1X
+# ET25-E1X
+# ET25-E2X ET25 ET
+lidar_type: "AT128"

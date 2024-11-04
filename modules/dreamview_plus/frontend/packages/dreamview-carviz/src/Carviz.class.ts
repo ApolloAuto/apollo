@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import noop from 'lodash/noop';
-import { LocalStorage, KEY_MANAGER } from '@dreamview/dreamview-core/src/util/storageManager';
+import { DreamviewAnalysis, perfMonitor } from '@dreamview/dreamview-analysis';
 import View from './render/view';
 import Map from './render/map';
 import Adc from './render/adc';
@@ -23,6 +23,7 @@ import PathwayMarker from './render/functional/PathwayMarker';
 import CopyMarker from './render/functional/CopyMarker';
 import RulerMarker from './render/functional/RulerMarker';
 import Follow from './render/follow';
+import { checkWebGLSupport, checkWebGPUSupport } from './utils/checkSupport';
 
 enum PREVDATA_STATUS {
     EXIT = 'EXIT',
@@ -176,16 +177,55 @@ export class Carviz {
     }
 
     render() {
+        perfMonitor.mark('carvizRenderStart');
         if (this.initialized) {
             this.view?.setView();
             this.renderer.render(this.scene, this.camera);
+
+            DreamviewAnalysis.logData('renderer', {
+                // 渲染次数
+                calls: this.renderer.info.render.calls,
+                // 帧数
+                frame: this.renderer.info.render.frame,
+            });
+            DreamviewAnalysis.logData(
+                'renderer',
+                {
+                    // 三角面片数
+                    triangles: this.renderer.info.render.triangles,
+                    // 几何体数量
+                    geometries: this.renderer.info.memory.geometries,
+                    // 纹理数量
+                    textures: this.renderer.info.memory.textures,
+                },
+                {
+                    useStatistics: {
+                        useMax: true,
+                    },
+                },
+            );
+            DreamviewAnalysis.logData(
+                'scene',
+                {
+                    // 场景对象数量
+                    objects: this.scene.children.length,
+                },
+                {
+                    useStatistics: {
+                        useMax: true,
+                    },
+                },
+            );
+
             this.CSS2DRenderer.render(this.scene, this.camera);
         }
+        perfMonitor.mark('carvizRenderEnd');
+        perfMonitor.measure('carvizRender', 'carvizRenderStart', 'carvizRenderEnd');
     }
 
     updateDimention() {
         this.camera.aspect = this.width / this.height;
-        this.camera.updateProjectionMatrix();
+        this.camera?.updateProjectionMatrix();
         this.renderer.setSize(this.width, this.height);
         this.CSS2DRenderer.setSize(this.width, this.height);
         this.render();
@@ -218,18 +258,26 @@ export class Carviz {
     initThree() {
         this.scene = new THREE.Scene();
 
-        this.renderer = new THREE.WebGLRenderer({
-            alpha: true,
-            antialias: true,
-        });
-        // 启用场景中的阴影自动更新。默认是true,如果不需要动态光照/阴影, 则可以在实例化渲染器时将之设为false
-        this.renderer.shadowMap.autoUpdate = false;
-        // 如果为true，定义是否检查材质着色器程序 编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
-        this.renderer.debug.checkShaderErrors = false;
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(this.width, this.height);
-        this.renderer.setClearColor(this.colors.bgColor);
-        this.canvasDom.appendChild(this.renderer.domElement);
+        const webgpuAvailable = checkWebGPUSupport();
+        const webglAvailable = checkWebGLSupport();
+
+        if (webglAvailable) {
+            this.renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true,
+            });
+            // 启用场景中的阴影自动更新。默认是true,如果不需要动态光照/阴影, 则可以在实例化渲染器时将之设为false
+            this.renderer.shadowMap.autoUpdate = false;
+            // 如果为true，定义是否检查材质着色器程序 编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
+            this.renderer.debug.checkShaderErrors = false;
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.setSize(this.width, this.height);
+            this.renderer.setClearColor(this.colors.bgColor);
+            this.canvasDom.appendChild(this.renderer.domElement);
+        } else {
+            this.renderer = {};
+            this.handleNoSupport(); // 处理不支持的情况
+        }
 
         this.camera = new THREE.PerspectiveCamera(
             cameraParams.Default.fov,
@@ -551,5 +599,23 @@ export class Carviz {
         this.pathwayMarker.deactive();
         this.copyMarker.deactive();
         this.rulerMarker.deactive();
+    }
+
+    handleNoSupport() {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.position = 'absolute';
+        errorDiv.style.top = '50%';
+        errorDiv.style.left = '50%';
+        errorDiv.style.transform = 'translate(-50%, -50%)';
+        errorDiv.style.fontSize = '20px';
+        errorDiv.style.color = 'red';
+        errorDiv.innerText =
+            'Your browser may not support WebGL or WebGPU. If you are using Firefox, to enable WebGL, please type webgl.disabled into the search box on the about:config page and set it to false.';
+        document.body.appendChild(errorDiv);
+
+        // 可能还需要禁用或移除画布等
+        if (this.canvasDom) {
+            this.canvasDom.style.display = 'none';
+        }
     }
 }

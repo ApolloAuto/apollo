@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconIcOverUsable } from '@dreamview/dreamview-ui';
+import { IconPark } from '@dreamview/dreamview-ui';
 import { BusinessEventTypes, BusinessEventInfo } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
 import { useTranslation } from 'react-i18next';
 import { useSendRouting } from '../util';
@@ -37,7 +37,7 @@ function SimControlBar(props: ScenarioBarProps) {
     return (
         <div
             className={cx(classes['record-controlbar-container'], {
-                [classes.disabled]: routing.routingInfo.errorMessage,
+                [classes.disabled]: !!routing.routingInfo.errorMessage,
             })}
         >
             <div id='guide-simulation-record' className='ic-play-container'>
@@ -63,7 +63,7 @@ function SimControlBar(props: ScenarioBarProps) {
                         },
                         [DynamicEffectButtonStatus.DISABLE]: {
                             text: tBottomBar('Stop'),
-                            icon: <IconIcOverUsable />,
+                            icon: <IconPark name='IcOverUsable' />,
                             disabledMsg: routing.routingInfo.errorMessage,
                         },
                     }}

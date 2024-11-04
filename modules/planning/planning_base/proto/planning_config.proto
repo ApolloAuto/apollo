@@ -16,6 +16,7 @@ message TopicConfig {
   optional string traffic_light_detection_topic = 11;
   optional string planning_learning_data_topic = 12;
   optional string planning_command_topic = 13;
+  optional string perception_edge_info_topic = 14;
 }
 
 // Config of reference line provider.

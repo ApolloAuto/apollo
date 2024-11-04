@@ -76,7 +76,8 @@ message NovatelConfig {
   optional int32 imu_orientation = 1 [default = 5];
 }
 
-message UbloxConfig {}
+message UbloxConfig {
+}
 
 enum ImuType {
   // We currently use the following IMUs. We'll extend this list when a new IMU
@@ -136,4 +137,5 @@ message Config {
   // If given, the driver will send velocity info to novatel with command stream
   optional string wheel_parameters = 13;
   optional string gpsbin_folder = 14;
+  optional bool use_gnss_time = 15 [default = true];
 }

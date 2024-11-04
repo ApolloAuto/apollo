@@ -46,8 +46,10 @@ void BroadGnssBaseParser::GetMessages(MessageInfoVec* messages) {
   FillIns();
   FillInsStat();
 
-  messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
-                                  reinterpret_cast<MessagePtr>(&bestpos_)});
+  if (bestpos_ratecontrol_.check()) {
+    messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
+                                    reinterpret_cast<MessagePtr>(&bestpos_)});
+  }
   messages->push_back(
       MessageInfo{MessageType::IMU, reinterpret_cast<MessagePtr>(&imu_)});
   messages->push_back(MessageInfo{MessageType::HEADING,
@@ -97,7 +99,7 @@ void BroadGnssBaseParser::PrepareMessageStatus(const uint8_t& solution_status,
 }
 
 void BroadGnssBaseParser::FillGnssBestpos() {
-  bestpos_.set_measurement_time(broadgnss_message_.unix_timestamp_sec);
+  bestpos_.set_measurement_time(broadgnss_message_.gps_timestamp_sec);
   bestpos_.set_sol_status(broadgnss_message_.solution_status);
   bestpos_.set_sol_type(broadgnss_message_.solution_type);
   bestpos_.set_latitude(broadgnss_message_.latitude);
@@ -156,13 +158,13 @@ void BroadGnssBaseParser::FillImu() {
              broadgnss_message_.acc_z, imu_.mutable_linear_acceleration());
   rfu_to_flu(broadgnss_message_.gyro_x, broadgnss_message_.gyro_y,
              broadgnss_message_.gyro_z, imu_.mutable_angular_velocity());
-  imu_.set_measurement_time(broadgnss_message_.unix_timestamp_sec);
+  imu_.set_measurement_time(broadgnss_message_.gps_timestamp_sec);
 }
 
 void BroadGnssBaseParser::FillHeading() {
   heading_.set_solution_status(broadgnss_message_.solution_status);
   heading_.set_position_type(broadgnss_message_.solution_type);
-  heading_.set_measurement_time(broadgnss_message_.unix_timestamp_sec);
+  heading_.set_measurement_time(broadgnss_message_.gps_timestamp_sec);
   heading_.set_heading(broadgnss_message_.heading);
   heading_.set_pitch(broadgnss_message_.pitch);
   heading_.set_heading_std_dev(broadgnss_message_.yaw_std);

@@ -25,10 +25,10 @@
 #include <vector>
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/speed_profile_generator.h"
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/tasks/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
@@ -89,7 +89,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   print_debug.AddPoint("optimize_vt_curve", 0, init_s[1]);
   print_debug.AddPoint("optimize_at_curve", 0, init_s[2]);
   // Update STBoundary
-  const double kEpsilon = 0.1;
+  const double kEpsilon = 0.01;
   std::vector<std::pair<double, double>> s_bounds;
   for (int i = 0; i < num_of_knots; ++i) {
     double curr_t = i * delta_t;

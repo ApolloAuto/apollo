@@ -59,6 +59,15 @@ class Neolix_eduController final
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+
+  /**
+   * @brief add the sender message.
+   */
+  void AddSendMessage() override;
+
+  /**
+   * for test
+   */
   FRIEND_TEST(Neolix_eduControllerTest, SetDrivingMode);
   FRIEND_TEST(Neolix_eduControllerTest, Status);
   FRIEND_TEST(Neolix_eduControllerTest, UpdateDrivingMode);

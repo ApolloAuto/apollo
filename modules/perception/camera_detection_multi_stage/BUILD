@@ -74,6 +74,7 @@ gpu_library(
     hdrs = [
         "detector/yolo/postprocess.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//modules/perception/camera_detection_multi_stage/detector/yolo/proto:model_param_cc_proto",
         "//modules/perception/common/base:apollo_perception_common_base",

@@ -24,6 +24,7 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/ch/protocol/brake_command_111.h"
 #include "modules/canbus_vehicle/ch/protocol/gear_command_114.h"
@@ -59,6 +60,7 @@ class ChController final : public VehicleController<::apollo::canbus::Ch> {
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+
   FRIEND_TEST(ChControllerTest, SetDrivingMode);
   FRIEND_TEST(ChControllerTest, Status);
   FRIEND_TEST(ChControllerTest, UpdateDrivingMode);

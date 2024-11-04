@@ -45,10 +45,11 @@ class MlfMotionMeasurement {
    * @param track_data track data
    * @param latest_object latest object in track
    * @param new_object new object for storing selection
+   * @param condition some special condition for selection
    */
   void MeasurementSelection(const MlfTrackDataConstPtr& track_data,
-                            const TrackedObjectConstPtr& latest_object,
-                            TrackedObjectPtr new_object);
+        const TrackedObjectConstPtr& latest_object,
+        TrackedObjectPtr new_object, bool condition = true);
   /**
    * @brief Estimate measurement quality
    *

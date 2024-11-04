@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>logo_34x34</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="34" height="34" rx="8"></rect>
+    </defs>
+    <g id="控件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="菜单栏/侧边栏收起无描边" transform="translate(-15.000000, -18.000000)">
+            <g id="logo_34x34" transform="translate(15.000000, 18.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="矩形" fill="#055FE7" fill-rule="nonzero" xlink:href="#path-1"></use>
+                <path d="M17,22.399539 C14.0184403,22.399539 11.5993085,19.9827123 11.5993085,16.9988475 C11.5993085,14.0172877 14.0184403,11.5993085 17,11.5993085 C19.9827123,11.5993085 22.4006915,14.0172877 22.4006915,16.9988475 C22.4006915,19.9827123 19.9827123,22.399539 17,22.399539 M17,8 C12.0303496,8 8,12.0291971 8,16.9988475 C8,21.9696504 12.0303496,26 17,26 C19.0261237,26 20.8955052,25.3292355 22.4006915,24.1997695 L22.4006915,26 L26,26 L26,16.9988475 C26,12.0291971 21.9708029,8 17,8" id="Fill-3" fill="#FFFFFF" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

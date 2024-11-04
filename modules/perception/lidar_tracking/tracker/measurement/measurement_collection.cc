@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <limits>
+
 #include "modules/perception/lidar_tracking/tracker/measurement/measurement_collection.h"
 
 #include "modules/perception/common/algorithm/geometry/basic.h"
@@ -62,6 +64,41 @@ void MeasureBboxCenterVelocity(TrackedObjectPtr new_object,
     measured_bbox_center_velocity = Eigen::Vector3d::Zero();
   }
   new_object->measured_center_velocity = measured_bbox_center_velocity;
+}
+
+void MeasureBboxCenterHistoryVelocity(const MlfTrackDataConstPtr& track_data,
+    TrackedObjectPtr new_object) {
+    const int history_size = 10;
+    auto history_objs = track_data->GetHistoryObjects();
+    if (history_objs.empty() || history_objs.size() == 1) {
+        new_object->measured_history_center_velocity = Eigen::Vector3d::Zero();
+        return;
+    }
+    if (history_objs.size() <= history_size) {
+        auto new_obj = history_objs.rbegin();
+        auto old_obj = history_objs.cbegin();
+        double time_diff = new_obj->first - old_obj->first;
+        if (time_diff < std::numeric_limits<double>::epsilon()) {
+            return;
+        }
+        if (new_obj->second == nullptr || old_obj->second == nullptr) {
+            return;
+        }
+        new_object->measured_history_center_velocity =
+            (new_obj->second->center - old_obj->second->center) / time_diff;
+        return;
+    }
+    auto new_obj = history_objs.rbegin();
+    auto old_obj = track_data->GetHistoryObject(1 - history_size);
+    double time_diff = new_obj->first - old_obj.first;
+    if (time_diff < std::numeric_limits<double>::epsilon()) {
+        return;
+    }
+    if (new_obj->second == nullptr || old_obj.second == nullptr) {
+        return;
+    }
+    new_object->measured_history_center_velocity =
+        (new_obj->second->center - old_obj.second->center) / time_diff;
 }
 
 void MeasureBboxCornerVelocity(TrackedObjectPtr new_object,
@@ -157,6 +194,185 @@ void MeasureBboxCornerVelocity(TrackedObjectPtr new_object,
     new_object->measured_corners_velocity[i] =
         bbox_corner_velocity_on_project_dir;
   }
+}
+
+void MeasureBboxCornerHistoryVelocity(const MlfTrackDataConstPtr& track_data,
+    TrackedObjectPtr new_object) {
+    const int history_size = 10;
+    auto history_objs = track_data->GetHistoryObjects();
+    if (history_objs.empty() || history_objs.size() == 1) {
+        for (size_t i = 0; i < 4; ++i) {
+            new_object->measured_history_corners_velocity[i] =
+                Eigen::Vector3d::Zero();
+        }
+        return;
+    }
+    if (history_objs.size() <= history_size) {
+        auto new_obj = history_objs.rbegin();
+        auto old_obj = history_objs.cbegin();
+        double time_diff = new_obj->first - old_obj->first;
+        if (time_diff < std::numeric_limits<double>::epsilon()) {
+            return;
+        }
+        if (new_obj->second == nullptr || old_obj->second == nullptr) {
+            return;
+        }
+        ComputeBboxCornerHistoryVelocity(
+            new_obj->second, old_obj->second, time_diff, new_object);
+        return;
+    }
+    auto new_obj = history_objs.rbegin();
+    auto old_obj = track_data->GetHistoryObject(1 - history_size);
+    double time_diff = new_obj->first - old_obj.first;
+    if (time_diff < std::numeric_limits<double>::epsilon()) {
+        return;
+    }
+    if (new_obj->second == nullptr || old_obj.second == nullptr) {
+        return;
+    }
+    ComputeBboxCornerHistoryVelocity(
+        new_obj->second, old_obj.second, time_diff, new_object);
+}
+
+void ComputeBboxCornerHistoryVelocity(TrackedObjectPtr new_object,
+    const TrackedObjectConstPtr& old_object, const double& time_diff,
+    TrackedObjectPtr curr_object) {
+    // Compute 2D bbxo corner velocity measurement
+    Eigen::Vector3f old_dir_tmp = old_object->output_direction.cast<float>();
+    Eigen::Vector3d old_size = old_object->output_size;
+    Eigen::Vector3d old_center = old_object->output_center;
+    Eigen::Vector3f new_size_tmp;
+    Eigen::Vector3d new_center;
+    float minimum_edge_length = 0.01f;
+    base::PointDCloud& cloud =
+        (new_object->object_ptr->lidar_supplement).cloud_world;
+    algorithm::CalculateBBoxSizeCenter2DXY(
+        cloud, old_dir_tmp, &new_size_tmp, &new_center, minimum_edge_length);
+    Eigen::Vector3d old_dir = old_dir_tmp.cast<double>();
+    Eigen::Vector3d new_size = new_size_tmp.cast<double>();
+    Eigen::Vector3d ortho_old_dir(-old_dir(1), old_dir(0), 0.0);
+    Eigen::Vector3d old_bbox_corner_list[4];
+    Eigen::Vector3d new_bbox_corner_list[4];
+    Eigen::Vector3d old_bbox_corner = old_center + old_dir * old_size(0) * 0.5
+                                    + ortho_old_dir * old_size(1) * 0.5;
+    Eigen::Vector3d new_bbox_corner = new_center + old_dir * new_size(0) * 0.5
+                                    + ortho_old_dir * new_size(1) * 0.5;
+    old_bbox_corner_list[0] = old_bbox_corner;
+    new_bbox_corner_list[0] = new_bbox_corner;
+    old_bbox_corner = old_center - old_dir * old_size(0) * 0.5 +
+                      ortho_old_dir * old_size(1) * 0.5;
+    new_bbox_corner = new_center - old_dir * new_size(0) * 0.5 +
+                      ortho_old_dir * new_size(1) * 0.5;
+    old_bbox_corner_list[1] = old_bbox_corner;
+    new_bbox_corner_list[1] = new_bbox_corner;
+    old_bbox_corner = old_center + old_dir * old_size(0) * 0.5 -
+                      ortho_old_dir * old_size(1) * 0.5;
+    new_bbox_corner = new_center + old_dir * new_size(0) * 0.5 -
+                      ortho_old_dir * new_size(1) * 0.5;
+    old_bbox_corner_list[2] = old_bbox_corner;
+    new_bbox_corner_list[2] = new_bbox_corner;
+    old_bbox_corner = old_center - old_dir * old_size(0) * 0.5 -
+                      ortho_old_dir * old_size(1) * 0.5;
+    new_bbox_corner = new_center - old_dir * new_size(0) * 0.5 -
+                      ortho_old_dir * new_size(1) * 0.5;
+    old_bbox_corner_list[3] = old_bbox_corner;
+    new_bbox_corner_list[3] = new_bbox_corner;
+
+    // select project_dir by change of size
+    Eigen::Vector3d direct_old_size = old_object->size;
+    Eigen::Vector3d direct_new_size = new_object->size;
+    double length_change =
+        fabs(direct_old_size(0) - direct_new_size(0)) / direct_old_size(0);
+    double width_change =
+        fabs(direct_old_size(1) - direct_new_size(1)) / direct_old_size(1);
+
+    const double max_change_thres = 0.1;
+    Eigen::Vector3d project_dir;
+    if (length_change < max_change_thres && width_change < max_change_thres) {
+      project_dir = new_object->center - old_object->center;
+    } else {
+      project_dir = new_object->anchor_point - old_object->belief_anchor_point;
+    }
+    for (size_t i = 0; i < 4; ++i) {
+        old_bbox_corner = old_bbox_corner_list[i];
+        new_bbox_corner = new_bbox_corner_list[i];
+        Eigen::Vector3d bbox_corner_velocity =
+            ((new_bbox_corner - old_bbox_corner) / time_diff);
+        Eigen::Vector3d bbox_corner_velocity_on_project_dir =
+            algorithm::Calculate2DXYProjectVector<double>(bbox_corner_velocity,
+                                                    project_dir);
+        // set velocity as 0 when conflict
+        if (bbox_corner_velocity_on_project_dir.dot(project_dir) <= 0) {
+            bbox_corner_velocity_on_project_dir = Eigen::Vector3d::Zero();
+        }
+        curr_object->measured_history_corners_velocity[i] =
+            bbox_corner_velocity_on_project_dir;
+    }
+}
+
+void MeasureObjectDetectionVelocity(TrackedObjectPtr new_object,
+    const TrackedObjectConstPtr& old_object, const double& time_diff) {
+    Eigen::Vector3d mea_single_model_velocity =
+      new_object->detection_center - old_object->detection_center;
+    mea_single_model_velocity /= time_diff;
+    mea_single_model_velocity(2) = 0.0;
+    new_object->measured_detection_center_velocity = mea_single_model_velocity;
+}
+
+void MeasureObjectDetectionHistoryVelocity(
+    const MlfTrackDataConstPtr& track_data, TrackedObjectPtr new_object) {
+    const int history_size = 10;
+    auto history_objs = track_data->GetHistoryObjects();
+    if (history_objs.empty() || history_objs.size() == 1) {
+        for (size_t i = 0; i < 4; i++) {
+            new_object->measured_detection_history_corners_velocity[i] =
+                Eigen::Vector3d::Zero();
+        }
+        new_object->measured_detection_history_center_velocity =
+                Eigen::Vector3d::Zero();
+        return;
+    }
+    if (history_objs.size() <= history_size) {
+        auto new_obj = history_objs.rbegin();
+        auto old_obj = history_objs.cbegin();
+        double time_diff = new_obj->first - old_obj->first;
+        if (time_diff < std::numeric_limits<double>::epsilon()) {
+            return;
+        }
+        if (new_obj->second == nullptr || old_obj->second == nullptr) {
+            return;
+        }
+        Eigen::Vector3d center_diff = new_obj->second->detection_center
+            - old_obj->second->detection_center;
+        new_object->measured_detection_history_center_velocity =
+            center_diff / time_diff;
+        for (size_t i = 0; i < 4; i++) {
+            Eigen::Vector3d corner_diff = new_obj->second->detection_corners[i]
+                - old_obj->second->detection_corners[i];
+            new_object->measured_detection_history_corners_velocity[i] =
+                corner_diff / time_diff;
+        }
+        return;
+    }
+    auto new_obj = history_objs.rbegin();
+    auto old_obj = track_data->GetHistoryObject(1 - history_size);
+    double time_diff = new_obj->first - old_obj.first;
+    if (time_diff < std::numeric_limits<double>::epsilon()) {
+        return;
+    }
+    if (new_obj->second == nullptr || old_obj.second == nullptr) {
+        return;
+    }
+    Eigen::Vector3d center_diff =
+        new_obj->second->detection_center - old_obj.second->detection_center;
+    new_object->measured_detection_history_center_velocity =
+        center_diff / time_diff;
+    for (size_t i = 0; i < 4; i++) {
+        Eigen::Vector3d cor_diff = new_obj->second->detection_corners[i]
+            - old_obj.second->detection_corners[i];
+        new_object->measured_detection_history_corners_velocity[i] =
+            cor_diff / time_diff;
+    }
 }
 
 }  // namespace lidar

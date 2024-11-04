@@ -30,6 +30,14 @@ export const baseURL = process.env.NODE_ENV === 'production' ? getOnlineWsURL() 
 export const baseHttpURL =
     process.env.NODE_ENV === 'production' ? window.location.origin : `${window.location.protocol}//localhost:8888`;
 
+// 获取协议
+export const getProtocol = () => `${window.location.protocol}//`;
+
+// 获取ws协议
+export const getWsProtocol = () => (getProtocol() === 'http://' ? 'ws://' : 'wss://');
+
+// 获取host
+export const getHost = () => window.location.hostname;
 export const config = {
     baseURL,
     baseHttpURL,

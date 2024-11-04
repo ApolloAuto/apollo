@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconIcBottomRailDelete, Popover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import useStyle from './useStyle';
@@ -44,7 +44,7 @@ function ResetBtn(props: { disabled: boolean }) {
     return (
         <Popover rootClassName={classes[resetPopoverStatus]} placement='topRight' trigger='hover' content={reset}>
             <div onClick={onReset} className={cx({ disabled }, classes['player-reset-btn'])}>
-                <IconIcBottomRailDelete />
+                <IconPark name='IcBottomRailDelete' />
                 <span className={classes['player-download-reset-text']}>{t('reset')}</span>
             </div>
         </Popover>

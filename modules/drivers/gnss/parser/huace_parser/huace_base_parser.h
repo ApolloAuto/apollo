@@ -66,7 +66,6 @@ struct HuaCeMessage {
   uint8_t wheel_speed_status = 0;
 
   double gps_timestamp_sec = 0;
-  double unix_timestamp_sec = 0;
   // 数据标准差
   double lat_std = 0.0;
   double lon_std = 0.0;
@@ -103,6 +102,8 @@ class HuaCeBaseParser : public Parser {
   void FillHeading();
 
   GnssBestPose bestpos_;
+  // bestpos 1hz rate control
+  RateControl bestpos_ratecontrol_{PERIOD_NS_1HZ};
   Imu imu_;
   Heading heading_;
   Ins ins_;

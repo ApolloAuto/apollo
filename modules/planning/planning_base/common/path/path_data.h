@@ -59,8 +59,8 @@ class PathData {
 
   const FrenetFramePath &frenet_frame_path() const;
 
-  const std::vector<std::tuple<double, PathPointType, double>> &
-  path_point_decision_guide() const;
+  const std::vector<std::tuple<double, PathPointType, double>>
+      &path_point_decision_guide() const;
 
   common::PathPoint GetPathPointWithPathS(const double s) const;
 

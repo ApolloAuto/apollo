@@ -18,4 +18,5 @@ message ModelParam {
   optional float diff_class_iou = 10 [default = 0.25];
   optional bool nms_strategy = 11 [default = true];
   optional bool filter_by_semantic_type = 12 [default = false];
+  optional bool filter_ground_points = 13 [default = false];
 }

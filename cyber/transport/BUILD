@@ -48,6 +48,7 @@ apollo_cc_library(
         "//cyber/proto:qos_profile_cc_proto",
         "//cyber/base:cyber_base",
         "//cyber/event:cyber_event",
+        "//cyber/statistics:apollo_statistics",
     ],
 )
 

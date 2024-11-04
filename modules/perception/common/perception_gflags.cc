@@ -93,5 +93,22 @@ DEFINE_string(roi_service_file, "roi_service.conf", "roi service config file");
 DEFINE_string(ground_service_file, "ground_service.conf",
               "ground service config file");
 
+// front critical judgement (in NOVATEL system)
+DEFINE_bool(need_judge_front_critical, false,
+        "True if should short-miss-detection-but-track-output");
+DEFINE_double(x_front, 3.0, "reserve range smaller than X");
+DEFINE_double(x_back, -3.0, "reserve range bigger than X");
+DEFINE_double(y_front, 8.0, "reserve range smaller than Y");
+DEFINE_double(y_back, 0.0, "reserve range bigger than Y");
+
+// blind TrafficCone (in NOVATEL system)
+DEFINE_bool(need_reserve_blind_cone, false,
+        "True if reserve trafficCone when in host-car-blind-zone");
+DEFINE_double(cone_x_front, 2.0, "cone reserve range smaller than X");
+DEFINE_double(cone_x_back, -2.0, "cone reserve range bigger than X");
+DEFINE_double(cone_y_front, 5.0, "cone reserve range smaller than Y");
+DEFINE_double(cone_y_back, 0.0, "cone reserve range bigger than Y");
+DEFINE_double(cone_reserve_time, 10000.0, "cone reserve time");
+
 }  // namespace perception
 }  // namespace apollo

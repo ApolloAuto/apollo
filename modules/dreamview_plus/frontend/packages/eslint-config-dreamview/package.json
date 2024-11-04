@@ -6,7 +6,7 @@
   "scripts": {},
   "license": "Apache-2.0",
   "dependencies": {
-    "@dreamview/tslint-config-dreamview": "1.1.4",
+    "@dreamview/tslint-config-dreamview": "^1.1.4",
     "@types/react-dom": "^18.2.4",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-prettier": "^4.2.1"

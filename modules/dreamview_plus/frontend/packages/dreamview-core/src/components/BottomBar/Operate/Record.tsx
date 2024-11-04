@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Input, Modal } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
-import { useMakeStyle, useThemeContext } from '@dreamview/dreamview-theme';
+import { makeStyles, useThemeContext } from '@dreamview/dreamview-theme';
 import showModal, { WithModalComponentProps } from '@dreamview/dreamview-core/src/util/modal';
 import {
     usePickHmiStore,
@@ -33,48 +33,45 @@ function usePending(callback: () => Promise<any>): [boolean, () => void] {
     return [pendding, onDo];
 }
 
-function useModalStyle() {
-    const hoc = useMakeStyle((theme) => ({
-        'record-modal': {
-            '& .dreamview-modal-footer': {
-                textAlign: 'center',
-            },
-            '& .dreamview-modal-footer button': {
-                padding: '9px 18px',
-                height: 'auto',
-                borderRadius: '8px',
-                '&:first-of-type': {
-                    marginRight: theme.tokens.margin.speace3,
-                },
+const useModalStyle = makeStyles((theme) => ({
+    'record-modal': {
+        '& .dreamview-modal-footer': {
+            textAlign: 'center',
+        },
+        '& .dreamview-modal-footer button': {
+            padding: '9px 18px',
+            height: 'auto',
+            borderRadius: '8px',
+            '&:first-of-type': {
+                marginRight: theme.tokens.margin.speace3,
             },
         },
-        'record-modal-item': {
-            display: 'flex',
-            alignItems: 'center',
-            position: 'relative',
+    },
+    'record-modal-item': {
+        display: 'flex',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    'record-modal-label': {
+        color: theme.tokens.colors.fontColor5,
+        whiteSpace: 'nowrap',
+        ...theme.tokens.typography.content,
+        paddingRight: theme.tokens.margin.speace,
+        width: 100,
+        '&::after': {
+            content: '":"',
         },
-        'record-modal-label': {
-            color: theme.tokens.colors.fontColor5,
-            whiteSpace: 'nowrap',
-            ...theme.tokens.typography.content,
-            paddingRight: theme.tokens.margin.speace,
-            width: 100,
-            '&::after': {
-                content: '":"',
-            },
-        },
-        'record-error': {
-            color: theme.tokens.colors.error2,
-            fontSize: theme.tokens.font.size.sm,
-            paddingLeft: '100px',
-            marginTop: '4px',
-            marginBottom: '-16px',
-            minHeight: '12px',
-            lineHeight: '12px',
-        },
-    }));
-    return hoc();
-}
+    },
+    'record-error': {
+        color: theme.tokens.colors.error2,
+        fontSize: theme.tokens.font.size.sm,
+        paddingLeft: '100px',
+        marginTop: '4px',
+        marginBottom: '-16px',
+        minHeight: '12px',
+        lineHeight: '12px',
+    },
+}));
 
 interface ConfirmModalProps {
     onConfirmSave: (name: string) => Promise<any>;

@@ -1,11 +1,27 @@
 import * as THREE from 'three';
-import { without } from 'lodash';
-import { drawSegmentsFromPointsClone, drawDashedLineFromPointsClone } from '../../utils/line';
 import { colorMapping, zOffset } from '../../constant/common';
-import { disposeGroup, disposeMesh } from '../../utils/common';
+import { disposeMesh } from '../../utils/common';
 
 export default class Lane {
-    public laneGroupMap;
+    private laneWhiteDashedLine;
+
+    private MAX_POINTS = 10000;
+
+    private laneYellowDashedLine;
+
+    private laneSolidLine;
+
+    private laneYellowDashedGeometry;
+
+    private laneWhiteDashedGeometry;
+
+    private laneSolidGeometry;
+
+    private laneWhiteDashMaterial;
+
+    private laneYellowDashMaterial;
+
+    private laneSolidMaterial;
 
     private laneIdMeshMap;
 
@@ -14,8 +30,6 @@ export default class Lane {
     private text;
 
     private option;
-
-    private drawedLaneIds;
 
     private currentLaneIds;
 
@@ -35,33 +49,15 @@ export default class Lane {
 
     private coordinates;
 
-    private dottedYellowLineDashedMaterialTemplate;
-
-    private dottedWhiteLineDashedMaterialTemplate;
-
-    private solidYellowLineBasicMaterialTemplate;
-
-    private solidWhiteLineBasicMaterialTemplate;
-
-    private curbLineBasicMaterialTemplate;
-
-    private defaultLineBasicMaterialTemplate;
-
-    private centerLineBasicMaterialTemplate;
-
     private colors;
-
-    DOTTED_YELLOW;
 
     constructor(scene, text, option, coordinates, colors?) {
         this.colors = colors?.colorMapping || colorMapping;
         this.scene = scene;
         this.option = option;
         this.coordinates = coordinates;
-        this.laneGroupMap = {};
         this.laneIdMeshMap = {};
         this.text = text;
-        this.drawedLaneIds = [];
         this.currentLaneIds = [];
         this.width = 0;
         this.height = 0;
@@ -69,64 +65,23 @@ export default class Lane {
         this.xmin = Infinity;
         this.ymin = Infinity;
         this.ymax = -Infinity;
-        this.center = new THREE.Vector3(0, 0, 0);
-        this.dottedYellowLineDashedMaterialTemplate = new THREE.LineDashedMaterial({
-            color: this.colors.YELLOW,
-            dashSize: 3,
-            gapSize: 3,
-            transparent: true,
-            opacity: 1,
-        });
-        this.dottedWhiteLineDashedMaterialTemplate = new THREE.LineDashedMaterial({
-            color: this.colors.WHITE,
-            dashSize: 0.5,
-            gapSize: 0.25,
-            transparent: true,
-            opacity: 0.4,
-        });
-        this.solidYellowLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: this.colors.YELLOW,
-            transparent: true,
-            opacity: 1,
-        });
-        this.solidWhiteLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: this.colors.WHITE,
-            opacity: 1,
-            transparent: true,
-        });
-        this.curbLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: this.colors.CORAL,
-            opacity: 1,
-            transparent: true,
-        });
-        this.centerLineBasicMaterialTemplate = new THREE.LineBasicMaterial({
-            color: this.colors.GREEN,
-            opacity: 1,
-            transparent: true,
-        });
+        this.MAX_POINTS = 10000;
+        this.initLineGeometry();
+        this.initLineMaterial();
     }
 
-    drawLaneMesh(laneType, points) {
-        let left = null;
-        let right = null;
+    getLaneLineColor(laneType) {
         switch (laneType) {
             case 'DOTTED_YELLOW':
-                return drawDashedLineFromPointsClone(points, this.dottedYellowLineDashedMaterialTemplate);
+                return new THREE.Color(this.colors.YELLOW);
             case 'DOTTED_WHITE':
-                return drawDashedLineFromPointsClone(points, this.dottedWhiteLineDashedMaterialTemplate);
+                return new THREE.Color(this.colors.WHITE);
             case 'SOLID_YELLOW':
-                return drawSegmentsFromPointsClone(points, this.solidYellowLineBasicMaterialTemplate);
+                return new THREE.Color(this.colors.YELLOW);
             case 'SOLID_WHITE':
-                return drawSegmentsFromPointsClone(points, this.solidWhiteLineBasicMaterialTemplate);
-            case 'DOUBLE_YELLOW':
-                left = drawSegmentsFromPointsClone(points, this.solidYellowLineBasicMaterialTemplate);
-                right = drawSegmentsFromPointsClone(points, this.solidYellowLineBasicMaterialTemplate);
-                left.add(right);
-                return left;
-            case 'CURB':
-                return drawSegmentsFromPointsClone(points, this.curbLineBasicMaterialTemplate);
+                return new THREE.Color(this.colors.WHITE);
             default:
-                return drawSegmentsFromPointsClone(points, this.defaultLineBasicMaterialTemplate);
+                return new THREE.Color(this.colors.BLACK);
         }
     }
 
@@ -138,6 +93,13 @@ export default class Lane {
             return;
         }
         this.currentLaneIds = [];
+        const whiteDashPaths: THREE.Vector3[] = [];
+        const whiteDashColors: number[] = [];
+        const yellowDashPaths: THREE.Vector3[] = [];
+        const yellowDashColors: number[] = [];
+        const solidPaths: THREE.Vector3[] = [];
+        const solidColors: number[] = [];
+
         lanes.forEach((lane) => {
             const id = lane.id.id;
             this.currentLaneIds.push(id);
@@ -145,54 +107,89 @@ export default class Lane {
             if (this.option.layerOption.Map.laneId && !this.laneIdMeshMap[id]) {
                 this.drawLaneId(lane);
             }
-            if (this.laneGroupMap[id]) {
-                return;
-            }
-            const group = new THREE.Group();
-            group.name = id;
             const centralLine = lane.centralCurve.segment;
+            const { r: centerR, g: centerG, b: centerB } = new THREE.Color(this.colors.GREEN);
             centralLine.forEach((segment) => {
                 const points = this.coordinates.applyOffsetToArray(segment.lineSegment.point);
-                points.forEach((p) => {
+                points.forEach((p, index) => {
                     this.xmin = Math.min(p.x, this.xmin);
                     this.xmax = Math.max(p.x, this.xmax);
                     this.ymin = Math.min(p.y, this.ymin);
                     this.ymax = Math.max(p.y, this.ymax);
+                    if (index !== points.length - 1) {
+                        solidPaths.push(
+                            new THREE.Vector3(p.x, p.y, p.z),
+                            new THREE.Vector3(points[index + 1].x, points[index + 1].y, points[index + 1].z),
+                        );
+                        solidColors.push(centerR, centerG, centerB, centerR, centerG, centerB);
+                    }
                 });
-                const centerLine = drawSegmentsFromPointsClone(points, this.centerLineBasicMaterialTemplate);
-                centerLine.name = `CentralLine-${id}`;
-                group.children.push(centerLine);
-                // group.add(centerLine);
-                this.scene.add(centerLine);
             });
             const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
+            const { r: rLaneLineR, g: rLaneLineG, b: rLaneLineB } = this.getLaneLineColor(rightLaneType);
+            const rightIsSolid = rightLaneType.indexOf('SOLID') > -1;
+            const isYellow = rightLaneType.indexOf('YELLOW') > -1;
+            // @ts-nocheck
+            const rightPushPaths = rightIsSolid ? solidPaths : isYellow ? yellowDashPaths : whiteDashPaths;
+            const rightPushColors = rightIsSolid ? solidColors : isYellow ? yellowDashColors : whiteDashColors;
             lane.rightBoundary.curve.segment.forEach((segment) => {
                 const points = this.coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const boundary = this.drawLaneMesh(rightLaneType, points);
-                boundary.name = `RightBoundary-${id}`;
-                boundary.position.z = zOffset.lane;
-                group.children.push(boundary);
-                // group.add(boundary);
-                this.scene.add(boundary);
+                points.forEach((p, index) => {
+                    if (index !== points.length - 1) {
+                        rightPushPaths.push(
+                            new THREE.Vector3(p.x, p.y, p.z),
+                            new THREE.Vector3(points[index + 1].x, points[index + 1].y, points[index + 1].z),
+                        );
+                        rightPushColors.push(rLaneLineR, rLaneLineG, rLaneLineB, rLaneLineR, rLaneLineG, rLaneLineB);
+                    }
+                });
             });
-
             const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
+            const { r: lLaneLineR, g: lLaneLineG, b: lLaneLineB } = this.getLaneLineColor(leftLaneType);
+            const leftIsSolid = leftLaneType.indexOf('SOLID') > -1;
+            const leftPushPaths = leftIsSolid ? solidPaths : isYellow ? yellowDashPaths : whiteDashPaths;
+            const leftPushColors = leftIsSolid ? solidColors : isYellow ? yellowDashColors : whiteDashColors;
             lane.leftBoundary.curve.segment.forEach((segment) => {
                 const points = this.coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const boundary = this.drawLaneMesh(leftLaneType, points);
-                boundary.name = `LeftBoundary-${id}`;
-                boundary.position.z = zOffset.lane;
-                group.children.push(boundary);
-                // group.add(boundary);
-                this.scene.add(boundary);
+                points.forEach((p, index) => {
+                    if (index !== points.length - 1) {
+                        leftPushPaths.push(
+                            new THREE.Vector3(p.x, p.y, p.z),
+                            new THREE.Vector3(points[index + 1].x, points[index + 1].y, points[index + 1].z),
+                        );
+                        leftPushColors.push(lLaneLineR, lLaneLineG, lLaneLineB, lLaneLineR, lLaneLineG, lLaneLineB);
+                    }
+                });
             });
-            this.laneGroupMap[id] = group;
-            this.drawedLaneIds.push(id);
         });
+
+        this.laneSolidLine = this.updateLaneLineGeometry(
+            this.laneSolidGeometry,
+            this.laneSolidMaterial,
+            this.laneSolidLine,
+            solidPaths,
+            solidColors,
+        );
+
+        this.laneYellowDashedLine = this.updateLaneLineGeometry(
+            this.laneYellowDashedGeometry,
+            this.laneYellowDashMaterial,
+            this.laneYellowDashedLine,
+            yellowDashPaths,
+            yellowDashColors,
+        );
+
+        this.laneWhiteDashedLine = this.updateLaneLineGeometry(
+            this.laneWhiteDashedGeometry,
+            this.laneWhiteDashMaterial,
+            this.laneWhiteDashedLine,
+            whiteDashPaths,
+            whiteDashColors,
+        );
+
         this.width = this.xmax - this.xmin;
         this.height = this.ymax - this.ymin;
         this.center = new THREE.Vector3((this.xmax + this.xmin) / 2, (this.ymax + this.ymin) / 2, 0);
-        this.removeOldLanes();
     }
 
     drawLaneId(lane) {
@@ -223,6 +220,93 @@ export default class Lane {
         }
     }
 
+    initLineGeometry() {
+        this.laneYellowDashedGeometry = new THREE.BufferGeometry();
+        this.laneYellowDashedGeometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+        this.laneYellowDashedGeometry.setAttribute(
+            'color',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+        this.laneWhiteDashedGeometry = new THREE.BufferGeometry();
+        this.laneWhiteDashedGeometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+        this.laneWhiteDashedGeometry.setAttribute(
+            'color',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+
+        this.laneSolidGeometry = new THREE.BufferGeometry();
+        this.laneSolidGeometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+        this.laneSolidGeometry.setAttribute(
+            'color',
+            new THREE.BufferAttribute(new Float32Array(this.MAX_POINTS * 3), 3),
+        );
+    }
+
+    initLineMaterial() {
+        this.laneSolidMaterial = new THREE.LineBasicMaterial({
+            transparent: true,
+            vertexColors: true,
+        });
+        this.laneWhiteDashMaterial = new THREE.LineDashedMaterial({
+            dashSize: 0.5,
+            gapSize: 0.25,
+            transparent: true,
+            opacity: 0.4,
+            vertexColors: true,
+        });
+        this.laneYellowDashMaterial = new THREE.LineDashedMaterial({
+            dashSize: 3,
+            gapSize: 3,
+            transparent: true,
+            opacity: 1,
+            vertexColors: true,
+        });
+    }
+
+    updateLaneLineGeometry(
+        geometry: THREE.BufferGeometry,
+        material: THREE.LineBasicMaterial | THREE.LineDashedMaterial,
+        lineSegments: THREE.LineSegments,
+        updatePaths: THREE.Vector3[],
+        updateColors: number[],
+    ): THREE.LineSegments {
+        if (!updatePaths.length || !updateColors.length) {
+            return null;
+        }
+        if (updatePaths.length > this.MAX_POINTS) {
+            this.dispose();
+            this.MAX_POINTS = updatePaths.length;
+            this.initLineGeometry();
+            this.initLineMaterial();
+        }
+        const positions = geometry.attributes.position;
+        const colors = geometry.attributes.color;
+        updatePaths.forEach((_item, i) => {
+            positions.setXYZ(i, updatePaths[i].x, updatePaths[i].y, updatePaths[i].z);
+            colors.setXYZ(i, updateColors[i * 3], updateColors[i * 3 + 1], updateColors[i * 3 + 2]);
+        });
+        geometry.setDrawRange(0, updatePaths.length);
+        geometry.getAttribute('color').needsUpdate = true;
+        geometry.getAttribute('position').needsUpdate = true;
+        if (!lineSegments) {
+            const line = new THREE.LineSegments(geometry, material);
+            lineSegments = line;
+            this.scene.add(line);
+        }
+        lineSegments.computeLineDistances();
+        lineSegments.position.z = zOffset.lane;
+        return lineSegments;
+    }
+
     dispose() {
         this.xmax = -Infinity;
         this.xmin = Infinity;
@@ -236,27 +320,16 @@ export default class Lane {
     }
 
     disposeLanes() {
-        this.drawedLaneIds = [];
         this.currentLaneIds = [];
-        Object.keys(this.laneGroupMap).forEach((id) => {
-            const group = this.laneGroupMap[id];
-            while (group.children.length) {
-                const child = group.children[0];
-                group.remove(child);
-                if (child.material) {
-                    child.material.dispose();
-                }
-                if (child.geometry) {
-                    child.geometry.dispose();
-                }
-                this.scene.remove(child);
-            }
-        });
-        this.laneGroupMap = {};
+        disposeMesh(this.laneSolidLine);
+        disposeMesh(this.laneWhiteDashedLine);
+        disposeMesh(this.laneYellowDashedLine);
+        this.laneSolidLine = null;
+        this.laneWhiteDashedLine = null;
+        this.laneYellowDashedLine = null;
     }
 
     disposeLaneIds() {
-        this.drawedLaneIds = [];
         this.currentLaneIds = [];
         this.text?.reset();
         Object.keys(this.laneIdMeshMap).forEach((id) => {
@@ -264,26 +337,5 @@ export default class Lane {
             this.scene.remove(text);
         });
         this.laneIdMeshMap = {};
-    }
-
-    removeOldLanes() {
-        const needRemovedLaneIds = without(this.drawedLaneIds, ...this.currentLaneIds);
-        if (needRemovedLaneIds && needRemovedLaneIds.length) {
-            needRemovedLaneIds.forEach((id) => {
-                const removedGroup = this.laneGroupMap[id];
-                disposeGroup(removedGroup);
-                this.scene.remove(removedGroup);
-                delete this.laneGroupMap[id];
-                this.drawedLaneIds = [...this.currentLaneIds];
-
-                const textMesh = this.laneIdMeshMap[id];
-
-                if (textMesh) {
-                    disposeMesh(textMesh);
-                    this.scene.remove(textMesh);
-                    delete this.laneIdMeshMap[id];
-                }
-            });
-        }
     }
 }

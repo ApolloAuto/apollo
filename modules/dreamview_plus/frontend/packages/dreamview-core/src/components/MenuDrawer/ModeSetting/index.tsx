@@ -1,15 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
-import {
-    IconIcLoading,
-    IconIcSucceed,
-    message,
-    Select,
-    SwitchLoading,
-    Tabs,
-    LightButton,
-    useImagePrak,
-} from '@dreamview/dreamview-ui';
+import React, { PropsWithChildren, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { IconPark, message, Select, SwitchLoading, Tabs, LightButton, useImagePrak } from '@dreamview/dreamview-ui';
 import {
     changeDynamic,
     changeMap,
@@ -25,6 +16,7 @@ import {
     IScenarioInfo,
     RECORDER_LOAD_STATUS,
     THROTTLE_TIME,
+    updateStatus,
     usePickHmiStore,
 } from '@dreamview/dreamview-core/src/store/HmiStore';
 import throttle from 'lodash/throttle';
@@ -42,21 +34,24 @@ import {
     ENUM_ENVIORMENT_MANAGER_TAB_KEY,
     useMenuStore,
 } from '@dreamview/dreamview-core/src/store/MenuStore';
+import { finalize, Subscription } from 'rxjs';
 import MenuDrawerTitle from '../Common/MenuDrawerTitle';
 import ModeSettingTitle from './Title';
 import useStyle, { useCurrentResourceStyle, useGuideContainerStyle } from './useStyle';
 import Divider from './Divider';
-import Button from './Button';
 import { SourceList1, SourceList2 } from './SourceList';
 import CustomScroll from '../../CustomScroll';
+import { StreamDataNames } from '../../../services/api/types';
 
 const logger = Logger.getInstance('ModeSetting');
+
+const nillObj = {};
 
 function Mode() {
     const { isMainConnected, mainApi } = useWebSocketServices();
 
     const [hmi, dispatch] = usePickHmiStore();
-    const { classes } = useStyle()();
+    const { classes } = useStyle(nillObj);
 
     const { t } = useTranslation('modeSettings');
 
@@ -88,11 +83,37 @@ function Mode() {
 const ModeMemo = React.memo(Mode);
 
 function Operations() {
-    const { isMainConnected, mainApi } = useWebSocketServices();
+    const { isMainConnected, metadata, mainApi, streamApi } = useWebSocketServices();
     const [hmi, dispatch] = usePickHmiStore();
-    const { classes } = useStyle()();
+    const { classes } = useStyle(nillObj);
 
     const { t } = useTranslation('modeSettings');
+
+    const simHMISubscriptionRef = useRef<Subscription | null>(null);
+
+    useEffect(() => {
+        if (hmi.currentOperation === HMIModeOperation.SCENARIO) {
+            simHMISubscriptionRef.current = streamApi
+                ?.subscribeToData(StreamDataNames.SIM_HMI_STATUS)
+                .pipe(
+                    finalize(() => {
+                        dispatch(
+                            updateStatus({
+                                currentScenarioId: '',
+                                currentScenarioSetId: '',
+                            } as any),
+                        );
+                    }),
+                )
+                .subscribe((data) => {
+                    dispatch(updateStatus(data as any));
+                });
+        }
+
+        return () => {
+            simHMISubscriptionRef.current?.unsubscribe();
+        };
+    }, [dispatch, hmi.currentOperation, streamApi]);
 
     const options = useMemo(
         () => hmi.operations?.map((item) => ({ label: item, value: `${item}` })) || [],
@@ -106,6 +127,9 @@ function Operations() {
                 hmi.currentOperation === HMIModeOperation.WAYPOINT_FOLLOW
             ) {
                 mainApi.stopAutoDrive();
+            }
+            if (hmi.currentOperation === HMIModeOperation.SCENARIO) {
+                simHMISubscriptionRef.current?.unsubscribe();
             }
             dispatch(changeOperate(mainApi, operate));
         },
@@ -176,7 +200,15 @@ function CustomSwitch(props: { moduleName: string }) {
 
     const getLoadingIcon = useCallback(() => {
         if (isModuleLocked) {
-            return <IconIcLoading spin className='switch-inner-loading-icon' />;
+            return (
+                <IconPark
+                    name='IcLoading'
+                    spin
+                    className='switch-inner-loading-icon'
+                    onPointerOverCapture={undefined}
+                    onPointerOutCapture={undefined}
+                />
+            );
         }
         return null;
     }, [mainApi, moduleName, isModuleLocked]);
@@ -196,7 +228,7 @@ function CustomSwitch(props: { moduleName: string }) {
 const CustomSwitchMemo = React.memo(CustomSwitch);
 
 function Modules() {
-    const { classes } = useStyle()();
+    const { classes } = useStyle(nillObj);
 
     const { isMainConnected, mainApi } = useWebSocketServices();
     const [hmi] = usePickHmiStore();
@@ -279,7 +311,7 @@ function Recorders() {
     const onChange = useCallback(
         (recorderId: string, currentPreLoadStatus?: RECORDER_LOAD_STATUS) => {
             if (currentPreLoadStatus === RECORDER_LOAD_STATUS.NOT_LOAD) {
-                mainApi.loadRecord(recorderId).then((r) => logger.debug(`loadRecord ${recorderId} success`));
+                mainApi.loadRecord(recorderId).then(() => logger.debug(`loadRecord ${recorderId} success`));
             }
             if (currentPreLoadStatus === RECORDER_LOAD_STATUS.LOADING) {
                 return;
@@ -328,20 +360,20 @@ const RTKRecordersMemo = React.memo(RTKRecorders);
 
 function Scenarios() {
     const [hmi, dispatch] = usePickHmiStore();
-    const { isMainConnected, mainApi } = useWebSocketServices();
-    const onChange = useCallback(
-        (scenariosSet: any, scenarios: any) => {
-            if (isMainConnected) {
-                dispatch(
-                    changeScenarios(mainApi, {
-                        scenariosSetId: scenariosSet.id,
-                        scenarioId: scenarios.scenarioId,
-                    }),
-                );
-            }
-        },
-        [isMainConnected],
-    );
+    const { otherApi, mainApi } = useWebSocketServices();
+
+    useLayoutEffect(() => {
+        otherApi.loadScenarios();
+    }, []);
+
+    const onChange = useCallback((scenariosSet: any, scenarios: any) => {
+        dispatch(
+            changeScenarios(otherApi, mainApi, {
+                scenariosSetId: scenariosSet.id,
+                scenarioId: scenarios.scenarioId,
+            }),
+        );
+    }, []);
 
     const items = useMemo(
         () =>
@@ -428,7 +460,7 @@ function DynamicModels() {
 const DynamicModelsMemo = React.memo(DynamicModels);
 
 function EnviormentResources() {
-    const { classes } = useStyle()();
+    const { classes } = useStyle(nillObj);
     const { t } = useTranslation('modeSettings');
     const [{ activeEnviormentResourceTab }, dispatch] = useMenuStore();
 
@@ -482,6 +514,7 @@ function EnviormentResources() {
                         children: <MapMemo />,
                     },
                 ],
+                [HMIModeOperation.None]: [],
             }[hmi.currentOperation]),
         [t, hmi.currentOperation],
     );
@@ -523,7 +556,7 @@ function EnviormentResources() {
 const EnviormentResourcesMemo = React.memo(EnviormentResources);
 
 function AdsResource() {
-    const { classes } = useStyle()();
+    const { classes } = useStyle(nillObj);
     const [{ activeAdsResourceTab }, dispatch] = useMenuStore();
     const { t } = useTranslation('modeSettings');
     const [{ isDynamicalModelsShow }] = useComponentDisplay();
@@ -595,7 +628,12 @@ function CurrentResource() {
             {values.map((item) => (
                 <div title={item} className={classes['current-resource-item']} key={item}>
                     <span className={classes.name}>{item}</span>
-                    <IconIcSucceed className='' />
+                    <IconPark
+                        name='IcSucceed'
+                        className=''
+                        onPointerOverCapture={undefined}
+                        onPointerOutCapture={undefined}
+                    />
                 </div>
             ))}
         </>
@@ -627,13 +665,13 @@ function GudieContainer(props: PropsWithChildren<{ id: string }>) {
 function ModeSetting() {
     const [hmi] = usePickHmiStore();
     const [, { bottomBarHeightString }] = useComponentDisplay();
-    const height = useMemo(
+    const styles = useMemo(
         () => ({
             height: `calc(100vh - 78px - ${bottomBarHeightString})`,
         }),
         [bottomBarHeightString],
     );
-    const { classes } = useStyle()(height);
+    const { classes } = useStyle(styles);
     const { t } = useTranslation('modeSettings');
 
     const modeDisplay = () => hmi.modules?.size > 0;

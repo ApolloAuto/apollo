@@ -68,7 +68,6 @@ struct BraodGnss101BMessage {
 
 struct BroadGnssMessage {
   double gps_timestamp_sec = 0;
-  double unix_timestamp_sec = 0;
   double heading;
   double pitch;
   double roll;

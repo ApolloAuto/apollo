@@ -82,6 +82,7 @@ apollo_cc_library(
         "interface/base_tracker.h",
         "interface/base_type_fusion.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/common/math",
@@ -112,7 +113,7 @@ apollo_component(
     name = "libmulti_sensor_fusion.so",
     srcs = ["multi_sensor_fusion_component.cc"],
     hdrs = ["multi_sensor_fusion_component.h"],
-    copts = PERCEPTION_COPTS + if_profiler(),
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         ":apollo_perception_multi_sensor_fusion",

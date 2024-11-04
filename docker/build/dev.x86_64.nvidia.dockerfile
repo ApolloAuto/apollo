@@ -25,13 +25,13 @@ RUN bash /opt/apollo/installers/install_release_deps.sh
 
 RUN bash /opt/apollo/installers/post_install.sh dev
 
-RUN mkdir -p /opt/apollo/neo/data/log && chmod -R 777 /opt/apollo/neo
+RUN bash /opt/apollo/installers/install_pkg_repo.sh
 
-COPY rcfiles/setup.sh /opt/apollo/neo/   
+COPY rcfiles/setup.sh /opt/apollo/neo/
 
-RUN echo "source /opt/apollo/neo/setup.sh" >> /etc/skel/.bashrc
-
-RUN sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
-
-RUN echo "deb https://apollo-pkg-beta.bj.bcebos.com/apollo/core bionic main" >> /etc/apt/sources.list.d/apolloauto.list
 RUN bash /opt/apollo/installers/install_rsdriver.sh
+RUN bash /opt/apollo/installers/install_livox_driver.sh
+RUN bash /opt/apollo/installers/install_hesai2_driver.sh
+RUN bash /opt/apollo/installers/install_vanjee_driver.sh
+
+RUN pip3 install tensorflow==2.3.0

@@ -221,6 +221,7 @@ StageResult Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
             << time_diff_ms << " ms.";
       return stage_result;
     }
+
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
     AINFO << "Planning Perf: task name [" << task->Name() << "], "

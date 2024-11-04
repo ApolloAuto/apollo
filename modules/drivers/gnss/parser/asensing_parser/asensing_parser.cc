@@ -35,6 +35,7 @@
 #include "modules/drivers/gnss/parser/asensing_parser/protocol_asensing.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/parser_common.h"
+#include "modules/drivers/gnss/util/time_conversion.h"
 
 namespace apollo {
 namespace drivers {
@@ -58,9 +59,11 @@ class AsensingParser : public Parser {
 
   SolutionStatus solution_status_ = SolutionStatus::INSUFFICIENT_OBS;
   SolutionType solution_type_ = SolutionType::NONE;
-  double measurement_time_;
+  double gps_sec_;
 
   GnssBestPose bestpos_;
+  // bestpos 1hz rate control
+  RateControl bestpos_ratecontrol_{PERIOD_NS_1HZ};
   Imu imu_;
   Heading heading_;
   Ins ins_;
@@ -94,8 +97,10 @@ void AsensingParser::GetMessages(MessageInfoVec *messages) {
   FillIns();
   FillInsStat();
 
-  messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
-                                  reinterpret_cast<MessagePtr>(&bestpos_)});
+  if (bestpos_ratecontrol_.check()) {
+    messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
+                                    reinterpret_cast<MessagePtr>(&bestpos_)});
+  }
   messages->push_back(
       MessageInfo{MessageType::IMU, reinterpret_cast<MessagePtr>(&imu_)});
   messages->push_back(MessageInfo{MessageType::HEADING,
@@ -107,7 +112,7 @@ void AsensingParser::GetMessages(MessageInfoVec *messages) {
 }
 
 void AsensingParser::PrepareMessage() {
-  if (decode_b.insdata.InsStatus == 0xFF) {
+  if ((decode_b.insdata.InsStatus & 0x0F) == 0x0F) {
     solution_status_ = SolutionStatus::SOL_COMPUTED;
   } else {
     solution_status_ = SolutionStatus::INSUFFICIENT_OBS;
@@ -117,20 +122,24 @@ void AsensingParser::PrepareMessage() {
   } else {
     solution_type_ = SolutionType::NONE;
   }
-  measurement_time_ = decode_b.insdata.SysTime_ms / 1000.0;
+  gps_sec_ =
+      apollo::drivers::util::unix2gps(decode_b.insdata.SysTime_ms / 1000.0);
 }
 
 void AsensingParser::FillGnssBestpos() {
-  bestpos_.set_measurement_time(measurement_time_);
+  bestpos_.set_measurement_time(gps_sec_);
   bestpos_.set_sol_status(solution_status_);
   bestpos_.set_sol_type(solution_type_);
   bestpos_.set_latitude(decode_b.insdata.Lat_deg);
   bestpos_.set_longitude(decode_b.insdata.Lon_deg);
   bestpos_.set_height_msl(decode_b.insdata.Alt_m);
 
-  bestpos_.set_latitude_std_dev(exp(decode_b.insdata.data1 / 100));
-  bestpos_.set_longitude_std_dev(exp(decode_b.insdata.data2 / 100));
-  bestpos_.set_height_std_dev(exp(decode_b.insdata.data3 / 100));
+  if (decode_b.insdata.LoopType == 0) {
+    bestpos_.set_latitude_std_dev(exp(decode_b.insdata.data1 / 100));
+    bestpos_.set_longitude_std_dev(exp(decode_b.insdata.data2 / 100));
+    bestpos_.set_height_std_dev(exp(decode_b.insdata.data3 / 100));
+  }
+  bestpos_.set_differential_age(decode_b.insdata.differential_age);
   // bestpos_.set_num_sats_tracked(0);
   // bestpos_.set_num_sats_in_solution(0);
   // bestpos_.set_num_sats_l1(0);
@@ -152,7 +161,7 @@ void AsensingParser::FillIns() {
              decode_b.insdata.AccZ_g, ins_.mutable_linear_acceleration());
   rfu_to_flu(decode_b.insdata.GyroX, decode_b.insdata.GyroY,
              decode_b.insdata.GyroZ, ins_.mutable_angular_velocity());
-  ins_.set_measurement_time(measurement_time_);
+  ins_.set_measurement_time(gps_sec_);
   ins_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
 
   switch (solution_type_) {
@@ -181,18 +190,21 @@ void AsensingParser::FillImu() {
              decode_b.insdata.AccZ_g, imu_.mutable_linear_acceleration());
   rfu_to_flu(decode_b.insdata.GyroX, decode_b.insdata.GyroY,
              decode_b.insdata.GyroZ, imu_.mutable_angular_velocity());
-  imu_.set_measurement_time(measurement_time_);
+  imu_.set_measurement_time(gps_sec_);
 }
 
 void AsensingParser::FillHeading() {
   heading_.set_solution_status(solution_status_);
   heading_.set_position_type(solution_type_);
-  heading_.set_measurement_time(measurement_time_);
+  heading_.set_measurement_time(gps_sec_);
   heading_.set_heading(decode_b.insdata.Yaw_deg);
   heading_.set_pitch(decode_b.insdata.Pitch_deg);
 
-  heading_.set_heading_std_dev(exp(decode_b.insdata.data3 / 100));
-  heading_.set_pitch_std_dev(exp(decode_b.insdata.data2 / 100));
+  if (decode_b.insdata.LoopType == 2) {
+    heading_.set_heading_std_dev(exp(decode_b.insdata.data3 / 100));
+    heading_.set_pitch_std_dev(exp(decode_b.insdata.data2 / 100));
+  }
+
   // heading_.set_station_id("0");
   // heading_.set_satellite_number_multi(0);
   // heading_.set_satellite_soulution_number(0);

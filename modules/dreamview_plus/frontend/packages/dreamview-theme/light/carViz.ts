@@ -1,18 +1,18 @@
 export default {
     bgColor: '#F5F7FA',
     textColor: '#232A33',
-    gridColor: '#232A33',
+    gridColor: 'black',
     colorMapping: {
         YELLOW: '#daa520',
-        WHITE: '#cccccc',
+        WHITE: 'blue',
         CORAL: '#ff7f50',
-        RED: '#ff6666',
+        RED: 'red',
         GREEN: '#006400',
         BLUE: '#0AA7CF',
-        PURE_WHITE: '#6E7277',
+        PURE_WHITE: '#3131e4',
         DEFAULT: '#c0c0c0',
         MIDWAY: '#ff7f50',
-        END: '#ffdab9',
+        END: 'blue',
         PULLOVER: '#006aff',
     },
     obstacleColorMapping: {
@@ -35,19 +35,19 @@ export default {
     },
     pointCloudHeightColorMapping: {
         0.5: {
-            r: 245,
-            g: 49,
-            b: 69,
+            r: 0,
+            g: 0,
+            b: 0,
         },
         1.0: {
-            r: 255,
-            g: 127,
+            r: 200,
+            g: 0,
             b: 0,
         },
         1.5: {
-            r: 243,
-            g: 215,
-            b: 54,
+            r: 255,
+            g: 0,
+            b: 0,
         },
         2.0: {
             r: 51,

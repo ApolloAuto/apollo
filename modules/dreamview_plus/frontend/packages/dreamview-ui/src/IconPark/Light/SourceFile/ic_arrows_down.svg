@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/ic_arrows_down</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="icon/ic_arrows_down" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="矩形" fill="#D8D8D8" opacity="0" xlink:href="#path-1"></use>
+        <path d="M5.5,3.04974747 L5.5,8.54974747 L5.5,8.54974747 L11,8.54974747 C11.2761424,8.54974747 11.5,8.77360509 11.5,9.04974747 C11.5,9.32588984 11.2761424,9.54974747 11,9.54974747 L5,9.54974747 C4.72385763,9.54974747 4.5,9.32588984 4.5,9.04974747 L4.5,3.04974747 C4.5,2.77360509 4.72385763,2.54974747 5,2.54974747 C5.27614237,2.54974747 5.5,2.77360509 5.5,3.04974747 Z" id="Path" fill="#A0A3A7" fill-rule="nonzero" mask="url(#mask-2)" transform="translate(8.000000, 6.049747) rotate(-45.000000) translate(-8.000000, -6.049747) "></path>
+    </g>
+</svg>

@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+import "modules/drivers/lidar/hslidar/proto/hesai.proto";
+import "modules/drivers/lidar/common/proto/lidar_config_base.proto";
+
+// message Config {
+//   optional Model model = 1;
+//   optional string ip = 2 [default = "192.168.20.13"];
+//   optional uint32 lidar_recv_port = 3;
+//   optional uint32 gps_recv_port = 4;
+//   optional uint32 start_angle = 5;
+//   optional string pointcloud_channel = 6;
+//   optional uint32 time_zone = 7;
+//   optional string frame_id = 8;
+//   optional string scan_channel = 9;
+//   optional bool is_online_calibration = 11 [default = true];
+//   optional string calibration_file = 12;
+//   optional uint32 tcp_cmd_port = 13 [default = 9347];
+// }
+
+message HesaiConfig {
+  required apollo.drivers.lidar.LidarConfigBase config_base = 33;
+
+//  optional string frame_id = 1 [default = "hesai_lidar"];
+//  optional string pointcloud_channel = 2;
+//  optional string scan_channel = 3;
+  optional int32 worker_nums = 4;
+
+  optional uint32 udp_port = 5 [default = 2368];
+  optional uint32 ptc_port = 6 [default = 9347];
+  optional string device_ip = 7 [default = "192.168.1.201"];
+  optional string host_ip = 8 [default = "0.0.0.0"];
+  optional string pcap_path = 9 [default = ""];
+  optional string correction_file_path = 10;
+  optional string firetimes_path = 11;
+  optional uint32 source_type = 12; // The type of data source, 1: real-time lidar connection, 2: pcap
+  optional int32 frame_start_azimuth = 13 [default = -1]; // Frame azimuth for Pandar128, range from 1 to 359, set it less than 0 if you do not want to use it.
+  optional int32 convert_thread_nums = 14;
+
+  optional string lidar_type = 15 [default = "AT128"];
+}

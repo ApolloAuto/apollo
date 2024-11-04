@@ -69,6 +69,8 @@ export enum SocketNameEnum {
     MAIN = 'websocket',
     /** 插件 WebSocket */
     PLUGIN = 'plugin',
+    /** 仿真 WebSocket */
+    SIMULATION = '/plugins/sim/sim_websocket',
 }
 
 /**
@@ -160,6 +162,8 @@ export type ResponseDataField<T> = {
     code: number;
     /** 消息 */
     message: string;
+    /** 消息 */
+    error_msg: string;
     /** 数据 */
     data: T;
 };
@@ -188,6 +192,11 @@ export interface StreamMessage {
     channelName?: string;
     /** 数据 */
     data: Uint8Array;
+    /** 性能分析 */
+    performance?: {
+        startTimestamp?: number;
+        endTimestamp?: number;
+    };
 }
 
 // 二次反序列化数据类型
@@ -274,3 +283,8 @@ export function isMessageType<T extends WorkerMessageType>(
 }
 
 export type SocketState = 'OPEN' | 'CLOSED' | 'ERROR' | 'PENDING';
+
+export type DispatchTaskOption = {
+    // 分发任务执行后的回调
+    callback?: () => void;
+};

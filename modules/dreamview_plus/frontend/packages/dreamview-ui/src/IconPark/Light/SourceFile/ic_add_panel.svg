@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic_add_ panel</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+        <rect id="path-3" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="ic_add_-panel" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="矩形" fill="#000000" opacity="0" xlink:href="#path-1"></use>
+        <g mask="url(#mask-2)">
+            <mask id="mask-4" fill="white">
+                <use xlink:href="#path-3"></use>
+            </mask>
+            <use id="矩形" fill="#000000" opacity="0" xlink:href="#path-3"></use>
+            <path d="M8,1 C11.8659932,1 15,4.13400675 15,8 C15,11.8659932 11.8659932,15 8,15 C4.13400675,15 1,11.8659932 1,8 C1,4.13400675 4.13400675,1 8,1 Z M8,2 C4.6862915,2 2,4.6862915 2,8 C2,11.3137085 4.6862915,14 8,14 C11.3137085,14 14,11.3137085 14,8 C14,4.6862915 11.3137085,2 8,2 Z M8.3,3.9 C8.41045695,3.9 8.5,3.98954305 8.5,4.1 L8.5,7.4 L11.8,7.4 C11.9104569,7.4 12,7.48954305 12,7.6 L12,8.2 C12,8.31045695 11.9104569,8.4 11.8,8.4 L8.5,8.4 L8.5,11.7 C8.5,11.8104569 8.41045695,11.9 8.3,11.9 L7.7,11.9 C7.58954305,11.9 7.5,11.8104569 7.5,11.7 L7.5,8.4 L4.2,8.4 C4.08954305,8.4 4,8.31045695 4,8.2 L4,7.6 C4,7.48954305 4.08954305,7.4 4.2,7.4 L7.5,7.4 L7.5,4.1 C7.5,3.98954305 7.58954305,3.9 7.7,3.9 L8.3,3.9 Z" id="形状结合" fill="#A6B5CC" fill-rule="nonzero" mask="url(#mask-4)"></path>
+        </g>
+    </g>
+</svg>

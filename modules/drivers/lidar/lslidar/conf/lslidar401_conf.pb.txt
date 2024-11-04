@@ -1,3 +1,12 @@
+config_base {
+  scan_channel: "/apollo/sensor/lslidar401/Scan"
+  point_cloud_channel: "/apollo/sensor/lslidar401/PointCloud2"
+  frame_id: "lslidar401"
+
+  # sample ONLINE_LIDAR, RAW_PACKET
+  source_type: ONLINE_LIDAR
+}
+
 model: LSLIDAR401
 device_ip: "192.168.1.222"
 msop_port: 2368
@@ -6,9 +15,7 @@ time_synchronization: false
 add_multicast: false
 group_ip: "224.1.1.2"
 rpm: 600
-convert_channel_name: "/apollo/sensor/lslidar401/PointCloud2"
 frame_id: "lslidar401"
-scan_channel: "/apollo/sensor/lslidar401/Scan"
 min_range: 0.3
 max_range: 100.0
 scan_start_angle: 0.0

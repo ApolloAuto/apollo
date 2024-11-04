@@ -31,7 +31,7 @@ function MenuDrawer() {
         };
     }, [activeMenu, menuDrawerWidthString, tokens]);
 
-    const { classes, cx } = useStyle()(style);
+    const { classes, cx } = useStyle(style);
 
     const memo = useRef<Record<string, boolean>>({});
 

@@ -20,6 +20,14 @@ proto_library(
 )
 
 proto_library(
+    name = "control_interactive_msg_proto",
+    srcs = ["control_interactive_msg.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+proto_library(
     name = "control_pad_msg_proto",
     srcs = ["pad_msg.proto"],
     deps = [

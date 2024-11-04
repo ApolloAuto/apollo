@@ -3,7 +3,7 @@ import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/Pane
 import { useMosaicId, usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
 import useDragPanel from '@dreamview/dreamview-core/src/util/useDragPanel';
-import { IconIcMove, IconReset, Popover, OperatePopover } from '@dreamview/dreamview-ui';
+import { IconPark, Popover, OperatePopover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import { resetLayoutByMode, addPanelFromOutside } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
 import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
@@ -58,7 +58,7 @@ function DragItem(props: { panel: IPanelMetaInfo }) {
             <OperatePopover title={<PanelThumbnailMemo panel={props.panel} />} trigger='hover' placement='right'>
                 <div className={classes['add-panel-item']}>
                     {props.panel.title}
-                    <IconIcMove />
+                    <IconPark name='IcMove' />
                 </div>
             </OperatePopover>
         </div>
@@ -81,7 +81,7 @@ function AddPanel() {
     const extra = (
         <Popover trigger='hover' content={t('resetLayout')}>
             <span>
-                <IconReset onClick={onResetLayout} />
+                <IconPark name='Reset' onClick={onResetLayout} />
             </span>
         </Popover>
     );

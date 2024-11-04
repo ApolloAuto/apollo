@@ -107,32 +107,33 @@ const mainConfig = (params) => (env, argv) => {
                 new MiniCssExtractPlugin({
                     filename: isProd ? '[name].[contenthash].css' : '[name].css',
                 }),
-            isProd &&
-                new GenerateSW({
-                    clientsClaim: true,
-                    skipWaiting: true,
-                    runtimeCaching: [
-                        {
-                            // 匹配 localhost:3000 下的所有请求
-                            urlPattern: new RegExp(
-                                '^http://apollo-studio-staging-public.cdn.bcebos.com/dreamview/panel.*',
-                            ),
-                            handler: 'NetworkFirst', // 或者使用 'CacheFirst', 'StaleWhileRevalidate' 等策略
-                            options: {
-                                cacheName: 'localhost-resources',
-                                networkTimeoutSeconds: 3, // 可选，设置网络请求超时时间
-                                cacheableResponse: {
-                                    statuses: [0, 200], // 缓存状态码为 0 和 200 的响应
-                                },
-                                expiration: {
-                                    // 可选，配置缓存过期策略
-                                    maxEntries: 100, // 缓存的最大条目数
-                                    maxAgeSeconds: 30 * 24 * 60 * 60, // 缓存的最大周期（例如，30天）
-                                },
-                            },
-                        },
-                    ],
-                }),
+            // todo： 暂时去除service worker注册
+            // isProd &&
+            //     new GenerateSW({
+            //         clientsClaim: true,
+            //         skipWaiting: true,
+            //         runtimeCaching: [
+            //             {
+            //                 // 匹配 localhost:3000 下的所有请求
+            //                 urlPattern: new RegExp(
+            //                     '^http://apollo-studio-staging-public.cdn.bcebos.com/dreamview/panel.*',
+            //                 ),
+            //                 handler: 'NetworkFirst', // 或者使用 'CacheFirst', 'StaleWhileRevalidate' 等策略
+            //                 options: {
+            //                     cacheName: 'localhost-resources',
+            //                     networkTimeoutSeconds: 3, // 可选，设置网络请求超时时间
+            //                     cacheableResponse: {
+            //                         statuses: [0, 200], // 缓存状态码为 0 和 200 的响应
+            //                     },
+            //                     expiration: {
+            //                         // 可选，配置缓存过期策略
+            //                         maxEntries: 100, // 缓存的最大条目数
+            //                         maxAgeSeconds: 30 * 24 * 60 * 60, // 缓存的最大周期（例如，30天）
+            //                     },
+            //                 },
+            //             },
+            //         ],
+            //     }),
             new ModuleFederationPlugin({
                 // 基座应用
                 name: 'host',

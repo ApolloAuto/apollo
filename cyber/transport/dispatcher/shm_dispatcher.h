@@ -27,6 +27,8 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
+#include "cyber/statistics/statistics.h"
+#include "cyber/time/time.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
 #include "cyber/transport/shm/notifier_factory.h"
@@ -82,11 +84,32 @@ template <typename MessageT>
 void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const MessageListener<MessageT>& listener) {
   // FIXME: make it more clean
-  auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
+  auto listener_adapter = [listener, self_attr](
+                                     const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromArray(
         rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
+
+    auto send_time = msg_info.send_time();
+    auto msg_seq_num = msg_info.msg_seq_num();
+
+    statistics::Statistics::Instance()->AddRecvCount(
+      self_attr, msg_info.msg_seq_num());
+    statistics::Statistics::Instance()->SetTotalMsgsStatus(
+      self_attr, msg_seq_num);
+
+    auto recv_time = Time::Now().ToNanosecond();
+
+    // sampling in microsecond
+    auto tran_diff = (recv_time - send_time) / 1000;
+    if (tran_diff > 0) {
+      // sample transport latency in microsecond
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                    uint64_t>(self_attr, tran_diff);
+    }
+    statistics::Statistics::Instance()->SetProcStatus(
+                                    self_attr, recv_time / 1000);
     listener(msg, msg_info);
   };
 
@@ -99,11 +122,32 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const RoleAttributes& opposite_attr,
                                 const MessageListener<MessageT>& listener) {
   // FIXME: make it more clean
-  auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
+  auto listener_adapter = [listener, self_attr](
+                                     const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromArray(
         rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
+
+    auto send_time = msg_info.send_time();
+    auto msg_seq_num = msg_info.msg_seq_num();
+
+    statistics::Statistics::Instance()->AddRecvCount(
+      self_attr, msg_info.msg_seq_num());
+    statistics::Statistics::Instance()->SetTotalMsgsStatus(
+      self_attr, msg_seq_num);
+
+    auto recv_time = Time::Now().ToNanosecond();
+
+    // sampling in microsecond
+    auto tran_diff = (recv_time - send_time) / 1000;
+    if (tran_diff > 0) {
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                        uint64_t>(self_attr, tran_diff);
+    }
+    statistics::Statistics::Instance()->SetProcStatus(
+                                        self_attr, recv_time / 1000);
+
     listener(msg, msg_info);
   };
 

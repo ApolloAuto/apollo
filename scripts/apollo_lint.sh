@@ -154,6 +154,7 @@ function parse_cmdline_args() {
 
 function main() {
   # site_restore
+  sed -i 's/STATUS = 2/STATUS = 0/g' /apollo/tools/package/dynamic_deps.bzl
   [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE" 
   # env_prepare
   parse_cmdline_args "$@"

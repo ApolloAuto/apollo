@@ -62,5 +62,20 @@ DECLARE_string(scene_manager_file);
 DECLARE_string(roi_service_file);
 DECLARE_string(ground_service_file);
 
+// front critical judgement (in NOVATEL system)
+DECLARE_bool(need_judge_front_critical);
+DECLARE_double(x_front);
+DECLARE_double(x_back);
+DECLARE_double(y_front);
+DECLARE_double(y_back);
+
+// blind TrafficCone (in NOVATEL system)
+DECLARE_bool(need_reserve_blind_cone);
+DECLARE_double(cone_x_front);
+DECLARE_double(cone_x_back);
+DECLARE_double(cone_y_front);
+DECLARE_double(cone_y_back);
+DECLARE_double(cone_reserve_time);
+
 }  // namespace perception
 }  // namespace apollo

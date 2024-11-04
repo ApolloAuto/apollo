@@ -78,6 +78,9 @@ struct Object {
   // @brief existence confidence, required
   float confidence = 1.0f;
 
+  // @brief: attention on car-front-critical objects
+  bool is_front_critical = false;
+
   // tracking information
   // @brief track id, required
   int track_id = -1;

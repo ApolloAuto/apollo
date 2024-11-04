@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
@@ -43,6 +44,16 @@ const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 bool emergency_brake = false;
 }  // namespace
+
+void DevkitController::AddSendMessage() {
+  can_sender_->AddMessage(Throttlecommand100::ID, throttle_command_100_, false);
+  can_sender_->AddMessage(Brakecommand101::ID, brake_command_101_, false);
+  can_sender_->AddMessage(Gearcommand103::ID, gear_command_103_, false);
+  can_sender_->AddMessage(Parkcommand104::ID, park_command_104_, false);
+  can_sender_->AddMessage(Steeringcommand102::ID, steering_command_102_, false);
+  can_sender_->AddMessage(Vehiclemodecommand105::ID, vehicle_mode_command_105_,
+                          false);
+}
 
 ErrorCode DevkitController::Init(
     const VehicleParameter& params,
@@ -116,15 +127,8 @@ ErrorCode DevkitController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  can_sender_->AddMessage(Throttlecommand100::ID, throttle_command_100_, false);
-  can_sender_->AddMessage(Brakecommand101::ID, brake_command_101_, false);
-  can_sender_->AddMessage(Gearcommand103::ID, gear_command_103_, false);
-  can_sender_->AddMessage(Parkcommand104::ID, park_command_104_, false);
-  can_sender_->AddMessage(Steeringcommand102::ID, steering_command_102_, false);
-  can_sender_->AddMessage(Vehiclemodecommand105::ID, vehicle_mode_command_105_,
-                          false);
+  AddSendMessage();
 
-  // need sleep to ensure all messages received
   AINFO << "DevkitController is initialized.";
 
   is_initialized_ = true;
@@ -160,10 +164,9 @@ void DevkitController::Stop() {
 Chassis DevkitController::chassis() {
   chassis_.Clear();
 
-  Devkit chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
+  Devkit chassis_detail = GetNewRecvChassisDetail();
 
-  // 21, 22, previously 1, 2
+  // 1, 2
   // if (driving_mode() == Chassis::EMERGENCY_MODE) {
   //   set_chassis_error_code(Chassis::NO_ERROR);
   // }
@@ -301,15 +304,16 @@ Chassis DevkitController::chassis() {
       chassis_detail.bms_report_512().has_battery_soc_percentage()) {
     chassis_.set_battery_soc_percentage(
         chassis_detail.bms_report_512().battery_soc_percentage());
+    // 15 give engage_advice based on battery low soc warn
+    if (chassis_detail.bms_report_512().is_battery_soc_low()) {
+      chassis_.mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      chassis_.mutable_engage_advice()->set_reason(
+          "Battery soc percentage is lower than 15%, please charge it "
+          "quickly!");
+    }
   } else {
     chassis_.set_battery_soc_percentage(0);
-  }
-  // 15 give engage_advice based on battery low soc warn
-  if (chassis_.battery_soc_percentage() <= 15) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "Battery soc percentage is lower than 15%, please charge it quickly!");
   }
   // 16 sonor list
   // to do(ALL):check your vehicle type, confirm your sonar position because of
@@ -441,6 +445,16 @@ Chassis DevkitController::chassis() {
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
         "Chassis has some fault, please check the chassis_detail.");
+  }
+
+  // check the chassis detail lost
+  if (is_chassis_communication_error_) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "devkit chassis detail is lost! Please check the communication error.");
+    set_chassis_error_code(Chassis::CHASSIS_CAN_LOST);
+    set_driving_mode(Chassis::EMERGENCY_MODE);
   }
 
   return chassis_;
@@ -606,6 +620,19 @@ void DevkitController::Acceleration(double acc) {
   // None
 }
 
+// confirm the car is driven by speed command
+// speed:-xx.0~xx.0, unit:m/s
+void DevkitController::Speed(double speed) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "The current drive mode does not need to set speed.";
+    return;
+  }
+  /* ADD YOUR OWN CAR CHASSIS OPERATION
+  // TODO(ALL): CHECK YOUR VEHICLE WHETHER SUPPORT THIS DRIVE MODE
+  */
+}
+
 // devkit default, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with default angle speed, 25-250 (default:250)
@@ -722,19 +749,12 @@ void DevkitController::ResetProtocol() {
 }
 
 bool DevkitController::CheckChassisError() {
-  Devkit chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_.has_check_response()) {
+  if (is_chassis_communication_error_) {
     AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "ChassisDetail has no devkit vehicle info.");
     return false;
-  } else {
-    chassis_.clear_engage_advice();
   }
 
+  Devkit chassis_detail = GetNewRecvChassisDetail();
   // steer fault
   if (chassis_detail.has_steering_report_502()) {
     if (Steering_report_502::STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT ==
@@ -858,6 +878,13 @@ void DevkitController::SecurityDogThreadFunc() {
       can_sender_->Update();
       emergency_brake = false;
     }
+
+    // recove error code
+    if (!emergency_mode && !is_chassis_communication_error_ &&
+        mode == Chassis::EMERGENCY_MODE) {
+      set_chassis_error_code(Chassis::NO_ERROR);
+    }
+
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
@@ -878,10 +905,6 @@ bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
   bool is_esp_online = false;
 
   do {
-    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-      AERROR_EVERY(100) << "get chassis detail failed.";
-      return false;
-    }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
       is_eps_online = chassis_.has_check_response() &&
@@ -911,9 +934,14 @@ bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
     }
   } while (need_wait && retry_num);
 
-  AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+  if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
+    AERROR << "steer check_response fail: is_eps_online:" << is_eps_online;
+  }
+
+  if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
+    AERROR << "speed check_response fail: " << "is_vcu_online:" << is_vcu_online
+           << ", is_esp_online:" << is_esp_online;
+  }
 
   return false;
 }

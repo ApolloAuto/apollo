@@ -148,11 +148,6 @@ function WelcomeGuide(props: WelcomeGuideProps) {
                 />
             ),
         },
-        // {
-        //     key: CURRENT_MODE.MAP_COLLECTION,
-        //     label: 'Map Collection Mode',
-        //     children: <WelcomeGuideTabsContent contentImageUrl='' clickEnterThisMode={clickEnterThisMode} />,
-        // },
     ];
 
     return (

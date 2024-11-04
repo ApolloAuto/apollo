@@ -74,6 +74,7 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   int InitConfig();
   int InitAlgorithmPlugin();
   int InitCameraListeners();
+  int InitCameraFrame();
 
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image> image,
                       const std::string& camera_name);
@@ -105,8 +106,6 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
       std::vector<base::TrafficLightPtr>* traffic_lights);
 
  private:
-  std::shared_ptr<camera::DataProvider> GetDataProvider(
-      const std::string& camera_name);
   std::mutex mutex_;
 
   std::shared_ptr<trafficlight::BaseTLPreprocessor> preprocessor_;
@@ -131,6 +130,10 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
   // camera_name -> image_border_size
   std::map<std::string, int> image_border_sizes_;
   std::map<std::string, double> last_sub_camera_image_ts_;
+
+  // pre-allocated-mem data_provider; camera_id -> data_provider
+  std::map<std::string, std::shared_ptr<camera::DataProvider>>
+      data_providers_map_;
 
   double query_tf_interval_seconds_ = 0.0;
   double image_timestamp_offset_ = 0.0;

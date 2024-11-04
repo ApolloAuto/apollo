@@ -123,7 +123,9 @@ void EvaluatorManager::Init(const PredictionConf& config) {
   if (FLAGS_enable_semantic_map) {
     semantic_map_.reset(new SemanticMap());
     semantic_map_->Init();
-    ADEBUG << "Init SemanticMap instance.";
+    AINFO << "Init SemanticMap instance.";
+  } else {
+    AINFO << "SemanticMap is not enabled.";
   }
 
   RegisterEvaluators();

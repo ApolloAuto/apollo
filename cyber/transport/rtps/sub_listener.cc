@@ -18,6 +18,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -60,6 +61,15 @@ void SubListener::onNewDataMessage(eprosima::fastrtps::Subscriber* sub) {
   // fetch message string
   std::shared_ptr<std::string> msg_str =
       std::make_shared<std::string>(m.data());
+
+  uint64_t recv_time = Time::Now().ToNanosecond();
+  uint64_t base_time = recv_time & 0xfffffff0000000;
+  int32_t send_time_low = m.timestamp();
+  uint64_t send_time = base_time | send_time_low;
+  int32_t msg_seq_num = m.seq();
+
+  msg_info_.set_msg_seq_num(msg_seq_num);
+  msg_info_.set_send_time(send_time);
 
   // callback
   callback_(channel_id, msg_str, msg_info_);

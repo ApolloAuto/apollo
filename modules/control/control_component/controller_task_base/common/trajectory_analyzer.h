@@ -147,15 +147,16 @@ class TrajectoryAnalyzer {
    */
   const std::vector<common::TrajectoryPoint> &trajectory_points() const;
 
- private:
-  common::PathPoint FindMinDistancePoint(const common::TrajectoryPoint &p0,
-                                         const common::TrajectoryPoint &p1,
-                                         const double x, const double y) const;
-
+ protected:
   std::vector<common::TrajectoryPoint> trajectory_points_;
 
   double header_time_ = 0.0;
   unsigned int seq_num_ = 0;
+
+ private:
+  common::PathPoint FindMinDistancePoint(const common::TrajectoryPoint &p0,
+                                         const common::TrajectoryPoint &p1,
+                                         const double x, const double y) const;
 };
 
 }  // namespace control

@@ -69,6 +69,7 @@ file_formater = logging.Formatter(
     '%(levelname)s [%(asctime)s] %(lineno)s: %(message)s')
 file_hd = logging.FileHandler(filename=log_file_path)
 file_hd.setFormatter(file_formater)
+file_hd.setLevel(logging.INFO)
 logger.addHandler(file_hd)
 link_log_file = os.path.join(log_dir_path, 'cyber_launch.INFO')
 try:
@@ -137,10 +138,14 @@ def module_monitor(mod):
 
 class ProcessWrapper(object):
 
-    def __init__(self, binary_path, dag_num, dag_list, plugin_list, process_name, process_type,
-                 sched_name, extra_args_list, exception_handler='', respawn_limit=g_default_respawn_limit):
+    def __init__(self, binary_path, dag_num, dag_list, plugin_list,
+                 process_name, process_type, sched_name, extra_args_list,
+                 exception_handler='', respawn_limit=g_default_respawn_limit,
+                 cpu_profile_file='', mem_profile_file=''):
         self.time_of_death = None
         self.started = False
+        self.cpu_profile = False
+        self.mem_profile = False
         self.binary_path = binary_path
         self.dag_num = dag_num
         self.dag_list = dag_list
@@ -156,6 +161,12 @@ class ProcessWrapper(object):
         self.exception_handler = exception_handler
         self.respawn_limit = respawn_limit
         self.respawn_cnt = 0
+        self.cpu_profile_file = cpu_profile_file
+        self.mem_profile_file = mem_profile_file
+        if self.cpu_profile_file != '':
+            self.cpu_profile = True
+        if self.mem_profile_file != '':
+            self.mem_profile = True
 
     def wait(self, timeout_secs=None):
         """
@@ -196,11 +207,19 @@ class ProcessWrapper(object):
                 args_list.append(self.sched_name)
             if len(self.extra_args_list) != 0:
                 args_list.extend(self.extra_args_list)
+            if self.cpu_profile:
+                args_list.append('-c')
+                args_list.append('-o')
+                args_list.append(self.cpu_profile_file)
+            if self.mem_profile:
+                args_list.append('-H')
+                args_list.append('-O')
+                args_list.append(self.mem_profile_file)
 
         self.args = args_list
 
         try:
-            self.popen = subprocess.Popen(args_list, stdout=subprocess.PIPE,
+            self.popen = subprocess.Popen(args_list, stdout=None,
                                           stderr=subprocess.STDOUT)
         except Exception as err:
             logger.error('Subprocess Popen exception: ' + str(err))
@@ -210,9 +229,9 @@ class ProcessWrapper(object):
                 logger.error('Start process [%s] failed.', self.name)
                 return 2
 
-        th = threading.Thread(target=module_monitor, args=(self, ))
-        th.setDaemon(True)
-        th.start()
+        # th = threading.Thread(target=module_monitor, args=(self, ))
+        # th.setDaemon(True)
+        # th.start()
         self.started = True
         self.pid = self.popen.pid
         logger.info(
@@ -422,6 +441,8 @@ def start(launch_file=''):
             module, 'process_name', 'mainboard_default_' + str(os.getpid()))
         sched_name = get_param_value(module, 'sched_name', 'CYBER_DEFAULT')
         process_type = get_param_value(module, 'type', 'library')
+        cpu_profile_file = get_param_value(module, 'cpuprofile')
+        mem_profile_file = get_param_value(module, 'memprofile')
         exception_handler = get_param_value(module, 'exception_handler')
         respawn_limit_txt = get_param_value(module, 'respawn_limit')
         if respawn_limit_txt.isnumeric():
@@ -450,8 +471,10 @@ def start(launch_file=''):
             extra_args = module.attrib.get('extra_args')
             if extra_args is not None:
                 extra_args_list = extra_args.split()
-            pw = ProcessWrapper(g_binary_name, 0, dag_list, plugin_list, process_name, process_type,
-                                sched_name, extra_args_list, exception_handler, respawn_limit)
+            pw = ProcessWrapper(g_binary_name, 0, dag_list, plugin_list,
+                                process_name, process_type, sched_name,
+                                extra_args_list, exception_handler,
+                                respawn_limit, cpu_profile_file, mem_profile_file)
         result = pw.start()
         if result != 0:
             logger.error('Start manager [%s] failed. Stop all!', process_name)

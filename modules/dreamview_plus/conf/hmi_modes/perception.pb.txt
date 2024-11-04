@@ -61,7 +61,17 @@ modules {
   }
 }
 modules {
-  key: "Lidar"
+  key: "CameraDriver"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/drivers/camera/launch/camera.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/drivers/camera/launch/camera.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/drivers/camera/launch/camera.launch"
+    }
+  }
+}
+modules {
+  key: "LidarPerception"
   value: {
     start_command: "nohup cyber_launch start /apollo/modules/perception/launch/perception_lidar.launch &"
     stop_command: "nohup cyber_launch stop /apollo/modules/perception/launch/perception_lidar.launch &"
@@ -70,7 +80,16 @@ modules {
     }
   }
 }
-
+modules {
+  key: "LidarDriver"
+  value: {
+    start_command: "nohup cyber_launch start /apollo/modules/drivers/lidar/launch/driver.launch &"
+    stop_command: "nohup cyber_launch stop /apollo/modules/drivers/lidar/launch/driver.launch &"
+    process_monitor_config {
+      command_keywords: "start /apollo/modules/drivers/lidar/launch/driver.launch"
+    }
+  }
+}
 modules {
   key: "Radar"
   value: {

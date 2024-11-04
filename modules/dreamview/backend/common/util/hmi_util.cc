@@ -61,7 +61,7 @@ Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
 }
 
 // List subdirs and return a dict of {subdir_title: subdir_path}.
-Map<std::string, std::string> ListDirAsDict(const std::string &dir) {
+Map<std::string, std::string> HMIUtil::ListDirAsDict(const std::string &dir) {
   Map<std::string, std::string> result;
   const auto subdirs = cyber::common::ListSubPaths(dir);
   for (const auto &subdir : subdirs) {

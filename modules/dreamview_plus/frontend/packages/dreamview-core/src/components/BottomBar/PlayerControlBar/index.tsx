@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import Logger from '@dreamview/log';
-import { Popover, IconIcPlay, IconIcStopPlaying, IconIcSissue } from '@dreamview/dreamview-ui';
+import { Popover, IconPark } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
@@ -97,9 +97,9 @@ function PlayerControlBar(props: PlayerControlBarProps) {
     }, [mainApi, isMainConnected, recordInfo.disabled, recordInfo.playRecordStatus, recordInfo.currTimeS]);
 
     const playIc = isInPlaying ? (
-        <IconIcPlay disabled={recordInfo.disabled} onClick={onEnd} className='ic-play-btn' />
+        <IconPark name='IcPlay' disabled={recordInfo.disabled} onClick={onEnd} className='ic-play-btn' />
     ) : (
-        <IconIcStopPlaying onClick={onStart} className='ic-play-btn' />
+        <IconPark name='IcStopPlaying' onClick={onStart} className='ic-play-btn' />
     );
 
     const popoverPlayIc = recordInfo.disabled ? (
@@ -117,11 +117,11 @@ function PlayerControlBar(props: PlayerControlBarProps) {
                 trigger='hover'
                 content={recordInfo.disabled ? t('recordMsg') : routingManager.routingInfo.errorMessage}
             >
-                <IconIcSissue className='ic-routing-btn' />
+                <IconPark name='IcSissue' className='ic-routing-btn' />
             </Popover>
         ) : (
             <Popover placement='topLeft' trigger='hover' content={t('routing')}>
-                <IconIcSissue onClick={routingManager.send} className='ic-routing-btn' />
+                <IconPark name='IcSissue' onClick={routingManager.send} className='ic-routing-btn' />
             </Popover>
         );
 
@@ -131,7 +131,7 @@ function PlayerControlBar(props: PlayerControlBarProps) {
         <div className={cx(classes['player-controlbar-container'], { [classes.disabled]: recordInfo.disabled })}>
             <span
                 className={cx({
-                    [classes.disabled]: routingManager.routingInfo.errorMessage,
+                    [classes.disabled]: !!routingManager.routingInfo.errorMessage,
                 })}
                 id='guide-simulation-record'
             >
@@ -150,7 +150,7 @@ function PlayerControlBar(props: PlayerControlBarProps) {
                 className='player-progress'
             />
             <Record />
-            <DumpBtn disabled={recordInfo.disabled} />
+            <DumpBtn disabled={false} />
             <ResetBtn disabled={recordInfo.disabled} />
         </div>
     );

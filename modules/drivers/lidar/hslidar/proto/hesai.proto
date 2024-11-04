@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+// field		size(byte)
+// SOB 		2
+// angle		2
+// measure	5
+// block		SOB + angle + measure * 40
+// timestamp	4
+// factory	2
+// reserve	8
+// rpm		2
+// tail		timestamp + factory + reserve + rpm
+// packet	block * 6 + tail
+message HesaiUdpPacket {
+  optional double timestamp_sec = 1;
+  optional bytes data = 2;
+  optional uint32 size = 3;
+}
+
+message HesaiUdpFrame {
+  optional apollo.common.Header header = 1;
+  repeated HesaiUdpPacket packets = 2;
+}

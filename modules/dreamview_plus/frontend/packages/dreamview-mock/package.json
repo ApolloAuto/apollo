@@ -23,7 +23,7 @@
         "dreamview-replay": "node ./scripts/replay.js"
     },
     "dependencies": {
-        "@dreamview/dreamview": "1.1.4",
+        "@dreamview/dreamview": "^1.1.4",
         "flatted": "^3.2.7",
         "mock-socket": "^9.2.1",
         "nodemon": "^2.0.22",

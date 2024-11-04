@@ -20,11 +20,15 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <map>
 
+#include <google/protobuf/util/message_differencer.h>
+#include <pcl/common/transforms.h>
+#include <Eigen/Dense>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
@@ -33,13 +37,16 @@
 
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 #include "modules/dreamview_plus/proto/data_handler.pb.h"
-#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "modules/transform/buffer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/handlers/websocket_handler.h"
+#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
+
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -82,7 +89,6 @@ class PointCloudUpdater : public UpdaterWithChannelsBase {
   ~PointCloudUpdater();
   // dreamview callback function
   // using DvCallback = std::function<bool(const std::string &string)>;
-  static void LoadLidarHeight(const std::string &file_path);
 
   /**
    * @brief Starts to push PointCloud to frontend.
@@ -113,10 +119,14 @@ class PointCloudUpdater : public UpdaterWithChannelsBase {
       const std::shared_ptr<apollo::localization::LocalizationEstimate>
           &localization);
   pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertPCLPointCloud(
-      const std::shared_ptr<drivers::PointCloud> &point_cloud);
+      const std::shared_ptr<drivers::PointCloud> &point_cloud,
+      const std::string &channel_name);
 
   PointCloudChannelUpdater* GetPointCloudChannelUpdater(
     const std::string &channel_name);
+
+  void TransformPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &point_cloud,
+                           const std::string &frame_id);
 
   constexpr static float kDefaultLidarHeight = 1.91f;
 

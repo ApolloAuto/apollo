@@ -55,6 +55,11 @@ bool TrafficLightsPerceptionComponent::Init() {
     return false;
   }
 
+  if (InitCameraFrame() != cyber::SUCC) {
+    AERROR << "TrafficLightsPerceptionComponent InitCameraFrame failed.";
+    return false;
+  }
+
   if (InitCameraListeners() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitCameraListeners failed.";
     return false;
@@ -193,9 +198,7 @@ int TrafficLightsPerceptionComponent::InitCameraListeners() {
   return cyber::SUCC;
 }
 
-std::shared_ptr<camera::DataProvider>
-TrafficLightsPerceptionComponent::GetDataProvider(
-    const std::string& camera_name) {
+int TrafficLightsPerceptionComponent::InitCameraFrame() {
   data_provider_init_options_.image_height = image_height_;
   data_provider_init_options_.image_width = image_width_;
 
@@ -204,14 +207,20 @@ TrafficLightsPerceptionComponent::GetDataProvider(
         << data_provider_init_options_.device_id;
   data_provider_init_options_.do_undistortion = enable_undistortion_;
 
-  data_provider_init_options_.sensor_name = camera_name;
-  std::shared_ptr<camera::DataProvider> data_provider(new camera::DataProvider);
-  if (!data_provider->Init(data_provider_init_options_)) {
-    AERROR << "trafficlights init data_provider failed. "
-           << " camera_name: " << camera_name;
+  // init data_providers for each camrea
+  for (const auto& camera_name : camera_names_) {
+    data_provider_init_options_.sensor_name = camera_name;
+    std::shared_ptr<camera::DataProvider> data_provider(
+        new camera::DataProvider);
+    if (!data_provider->Init(data_provider_init_options_)) {
+      AERROR << "trafficlights init data_provider failed. "
+             << " camera_name: " << camera_name;
+      return cyber::FAIL;
+    }
+    data_providers_map_[camera_name] = data_provider;
   }
 
-  return data_provider;
+  return cyber::SUCC;
 }
 
 void TrafficLightsPerceptionComponent::OnReceiveImage(
@@ -271,8 +280,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   // Fill camera frame
   camera::DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::RGB;
-  auto frame_data_provider = GetDataProvider(camera_name);
-  frame->data_provider = frame_data_provider;
+  frame->data_provider = data_providers_map_.at(camera_name);
   frame->data_provider->FillImageData(
       image_height_, image_width_,
       reinterpret_cast<const uint8_t*>(msg->data().data()), msg->encoding());

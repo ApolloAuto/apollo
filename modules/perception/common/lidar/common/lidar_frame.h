@@ -37,6 +37,10 @@ struct LidarFrame {
   std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
   // timestamp
   double timestamp = 0.0;
+  // parsing ground height
+  float parsing_ground_height = 10.0f;
+  // lidar-origin ground z-value
+  float original_ground_z = 10.0f;
   // lidar to world pose
   Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
   // lidar to world pose
@@ -68,6 +72,8 @@ struct LidarFrame {
       world_cloud->clear();
     }
     timestamp = 0.0;
+    parsing_ground_height = 10.0f;
+    original_ground_z = 10.0f;
     lidar2world_pose = Eigen::Affine3d::Identity();
     novatel2world_pose = Eigen::Affine3d::Identity();
     if (hdmap_struct) {

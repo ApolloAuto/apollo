@@ -54,6 +54,13 @@ class HMIUtil {
    * @return the string after convert
    */
   static std::string TitleCase(std::string_view origin);
+  /**
+   * @brief List all directory as a dict in a directory.
+   * @param dir: the directory to be listed.
+   * @return the listed result.
+   */
+  static google::protobuf::Map<std::string, std::string> ListDirAsDict(
+      const std::string& dir);
 };
 
 }  // namespace util

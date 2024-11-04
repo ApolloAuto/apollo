@@ -19,7 +19,9 @@
 # -*- coding:utf-8 -*-
 import sys
 import re
+import math
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 
 def get_string_between(string, st, ed=''):
@@ -60,18 +62,20 @@ def search_next(lines, line_search_num):
     """search forward, return frame start and end line number"""
     start_line_num = -1
     seq_id = '-1'
+    seq_time = "NULL"
     for i in range(line_search_num, len(lines)):
         if 'Planning start frame sequence id' in lines[i]:
+            seq_time = get_time(lines[i])
             seq_id = get_string_between(lines[i], 'sequence id = [', ']')
             start_line_num = i
             break
     if start_line_num < 0:
-        return -1, -1, seq_id
+        return -1, -1, seq_id, seq_time
 
     for i in range(start_line_num, len(lines)):
         if 'Planning end frame sequence id = [' + seq_id in lines[i]:
-            return start_line_num, i, seq_id
-    return start_line_num, -1, seq_id
+            return start_line_num, i, seq_id, seq_time
+    return start_line_num, -1, seq_id, seq_time
 
 
 def search_current(lines, line_search_num):
@@ -79,7 +83,7 @@ def search_current(lines, line_search_num):
     start_line_num = -1
     end_line_num = -1
     seq_id = '-1'
-    for i in range(line_search_num, 0, -1):
+    for i in range(line_search_num, len(lines) - 1):
         if 'Planning start frame sequence id' in lines[i]:
             seq_id = get_string_between(lines[i], 'sequence id = [', ']')
             start_line_num = i
@@ -94,18 +98,20 @@ def search_current(lines, line_search_num):
 def search_last(lines, line_search_num):
     end_line_num = -1
     seq_id = '-1'
+    seq_time = "NULL"
     for i in range(line_search_num, 0, -1):
         if 'Planning end frame sequence id' in lines[i]:
+            seq_time = get_time(lines[i])
             seq_id = get_string_between(lines[i], 'sequence id = [', ']')
             end_line_num = i
             break
     if end_line_num < 0:
-        return -1, -1, seq_id
+        return -1, -1, seq_id, seq_time
 
     for i in range(end_line_num, 0, -1):
         if 'Planning start frame sequence id = [' + seq_id in lines[i]:
-            return i, end_line_num, seq_id
-    return -1, end_line_num, seq_id
+            return i, end_line_num, seq_id, seq_time
+    return -1, end_line_num, seq_id, seq_time
 
 
 def search_time_line(lines, search_time):
@@ -115,9 +121,18 @@ def search_time_line(lines, search_time):
             return i + 1
     return 0
 
+def search_seq_line(lines, search_seq):
+    """search line with seq num"""
+    for i in range(len(lines)):
+        if 'Planning start frame sequence id' in lines[i]:
+            seq_id = get_string_between(lines[i], 'sequence id = [', ']')
+            if search_seq == seq_id:
+                print(f"line num: {search_seq}, {seq_id}")
+                return i
+    return 0
 
 def search_keyword_line(lines, keyword):
-    """search line with time"""
+    """search line with keyword"""
     for i in range(len(lines)):
         if keyword in lines[i]:
             return i
@@ -137,8 +152,24 @@ def get_data_from_line(line, data):
     str_list = re.findall(pat, line)
     for string in str_list:
         num = string.split(",")
-        data[0].append(float(num[0]))
-        data[1].append(float(num[1]))
+        if len(data) == 0:
+            for i in range(len(num)):
+                data.append([])
+        for i in range(len(num)):
+            data[i].append(float(num[i]))
+
+
+def calc_box(x, y, heading, length, width):
+    # print("box" , x, y, heading, length, width)
+    heading_deg = heading / math.pi * 180
+    cos_heading = math.cos(heading)
+    sin_heading = math.sin(heading)
+    x1 = x - length / 2.0 * cos_heading + width / 2.0 * sin_heading
+    y1 = y - length / 2.0 * sin_heading - width / 2.0 * cos_heading
+    # print("new", x1, y1, heading_deg)
+    rectangle = Rectangle((x1, y1), length, width, edgecolor='blue',
+                          facecolor='none', lw=2, angle=heading_deg, alpha=0.5)
+    return rectangle
 
 
 class MouseEventManager(object):
@@ -174,7 +205,7 @@ class MouseEventManager(object):
 class Index(object):
     """button callback function"""
 
-    def __init__(self, fig, ax, line_st_num, line_ed_num, lines, config):
+    def __init__(self, fig, ax, line_st_num, line_ed_num, lines, config, file_path):
         self.ax = ax
         self.fig = fig
         self.line_st_num = line_st_num
@@ -182,6 +213,8 @@ class Index(object):
         self.lines = lines
         self.config = config
         self.line_map = {}
+        self.file_path = file_path
+        self.ego_xy = {}
         for line in config["line"]:
             self.line_map[line["label"]] = line
         self.reset_mouse_event()
@@ -194,7 +227,7 @@ class Index(object):
     def next(self, step):
         """next button callback function"""
         for i in range(step):
-            line_st_num, line_ed_num, seq_id = search_next(
+            line_st_num, line_ed_num, seq_id, seq_time = search_next(
                 self.lines, self.line_ed_num + 1)
             # check whether found frame log is complete
             if line_st_num < 0 or line_ed_num < 0:
@@ -202,8 +235,9 @@ class Index(object):
                 return
             self.line_st_num = line_st_num
             self.line_ed_num = line_ed_num
-        self.plot_frame("frame: " + seq_id)
+        self.plot_frame("frame: " + seq_id + "   time: " + seq_time)
         self.reset_mouse_event()
+        self.write_frame_temp_log()
 
     def next1(self, event):
         self.next(1)
@@ -214,7 +248,7 @@ class Index(object):
     def prev(self, step):
         """prev button callback function"""
         for i in range(step):
-            line_st_num, line_ed_num, seq_id = search_last(
+            line_st_num, line_ed_num, seq_id, seq_time = search_last(
                 self.lines, self.line_st_num - 1)
             # check whether found frame log is complete
             if line_st_num < 0 or line_ed_num < 0:
@@ -222,8 +256,9 @@ class Index(object):
                 return
             self.line_st_num = line_st_num
             self.line_ed_num = line_ed_num
-        self.plot_frame("frame: " + seq_id)
+        self.plot_frame("frame: " + seq_id + "   time: " + seq_time)
         self.reset_mouse_event()
+        self.write_frame_temp_log()
 
     def prev1(self, event):
         self.prev(1)
@@ -246,6 +281,11 @@ class Index(object):
             self.ax[key].set_xlabel(item["x_label"])
             self.ax[key].set_ylabel(item["y_label"])
             self.ax[key].set_title(item["title"])
+
+            if key == "xy" and self.ego_xy != {}:
+                self.ax[key].set_xlim(self.ego_xy['x'] - 40, self.ego_xy['x'] + 40)
+                self.ax[key].set_ylim(self.ego_xy['y'] - 40, self.ego_xy['y'] + 40)
+
         for i in range(self.line_st_num, self.line_ed_num):
             line = self.lines[i]
             for key in self.line_map:
@@ -257,30 +297,49 @@ class Index(object):
                 if len(matched) > 0:
                     origin_key = matched[0].strip(
                         "] print").strip("_").strip(":")
-                    data[origin_key] = ([], [], key)
-                    print("key", key)
-                    print("matched[0]", matched[0])
-                    print("name", name)
-                    print("origin_key", origin_key)
-                    get_data_from_line(line, data[origin_key])
+                    # key ,data
+                    data[origin_key] = dict()
+                    data[origin_key]["key"] = key
+                    data[origin_key]["data"] = []
+                    # print("key", key)
+                    # print("matched[0]", matched[0])
+                    # print("name", name)
+                    # print("origin_key", origin_key)
+                    get_data_from_line(line, data[origin_key]["data"])
         for name in data:
-            print("name", name)
-            key = data[name][2]
+            # print("name", name)
+            key = data[name]["key"]
             subplot_name = self.line_map[key]["subplot"]
             if not subplot_name in self.ax:
                 continue
-            if len(data[name]) > 0:
-                line, = self.ax[subplot_name].plot(
-                    data[name][0], data[name][1], self.line_map[key]["marker"], label=name)
-                self.ax[subplot_name].grid(True)
-                self.graphs[name] = line
+            if len(data[name]["data"]) > 0:
+                if "type" in self.line_map[key] and self.line_map[key]["type"] == "box":
+                    # x,y,heading,length,width
+                    for i in range(len(data[name]["data"][0])):
+                        # print(data[name]["data"][0][i] , data[name]["data"][1][i], data[name]
+                        #       ["data"][2][i], data[name]["data"][3][i], data[name]["data"][4][i])
+                        rect = calc_box(data[name]["data"][0][i], data[name]["data"][1][i], data[name]
+                                        ["data"][2][i], data[name]["data"][3][i], data[name]["data"][4][i])
+                        self.ax[subplot_name].add_patch(rect)
+                        
+                        if "ego_box" in name:
+                            self.ego_xy['x'] = data[name]["data"][0][i]
+                            self.ego_xy['y'] = data[name]["data"][1][i]
+
+                else:
+                    line, = self.ax[subplot_name].plot(
+                        data[name]["data"][0], data[name]["data"][1], self.line_map[key]["marker"], label=name)
+                    self.ax[subplot_name].grid(True)
+                    self.graphs[name] = line
+
         for item in self.config["subplot"]:
             key = item["title"]
             legend = self.ax[key].legend()
             for legend_line in legend.get_lines():
                 legend_line.set_picker(True)
                 legend_line.set_pickradius(10)
-            # self.ax[key].set_aspect(1)
+            # if "set_aspect" in item:
+            #     self.ax[key].set_aspect('equal')
         plt.connect('pick_event', self.on_pick)
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         plt.draw()
@@ -293,3 +352,16 @@ class Index(object):
         self.graphs[legend._label].set_visible(not isVisible)
         legend.set_visible(not isVisible)
         self.fig.canvas.draw()
+
+    def write_frame_temp_log(self):
+        """write lines to file"""
+        if self.line_st_num < 0:
+            return
+        if self.line_ed_num >= 0:
+            end_index = self.line_ed_num + 1
+        start_index = self.line_st_num
+        file_path = self.file_path + "_frame_log.temp"
+        fout = open(file_path, "w+")
+        for line in self.lines[start_index: end_index]:
+            fout.write(line)
+        fout.close()

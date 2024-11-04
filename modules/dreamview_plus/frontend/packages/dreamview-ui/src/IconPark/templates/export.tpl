@@ -1,0 +1,4 @@
+{importFile}
+export default {
+    {exportFile}
+};

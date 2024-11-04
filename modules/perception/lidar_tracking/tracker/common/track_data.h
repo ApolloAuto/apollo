@@ -101,6 +101,10 @@ class TrackData {
    */
   std::pair<double, TrackedObjectConstPtr> GetHistoryObject(int idx) const;
 
+  std::map<double, TrackedObjectPtr> GetHistoryObjects() const {
+      return history_objects_;
+  }
+
   /**
    * @brief Reset
    *

@@ -31,7 +31,7 @@
 #include "cyber/cyber.h"
 #include "modules/common/util/factory.h"
 #include "modules/drivers/lidar/common/driver_factory/driver_base.h"
-#include "modules/drivers/lidar/hesai/parser/parser.h"
+// #include "modules/drivers/lidar/hesai/parser/parser.h"
 
 /**
  * @namespace apollo::drivers::lidar

@@ -30,6 +30,17 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+static const float kEpsilon = 1e-6f;
+static const float kEpsilonForSize = 1e-2f;
+static const float kEpsilonForLine = 1e-3f;
+
+using apollo::perception::base::PointD;
+using apollo::perception::base::PointF;
+
+using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using PointFCloud = apollo::perception::base::PointCloud<PointF>;
+using PolygonDType = apollo::perception::base::PointCloud<PointD>;
+
 struct ObjectBuilderInitOptions {};
 
 struct ObjectBuilderOptions {
@@ -77,7 +88,7 @@ class ObjectBuilder {
    */
   std::string Name() const { return "ObjectBuilder"; }
 
- private:
+ public:
   // @brief: calculate 2d polygon.
   //         and fill the convex hull vertices in object->polygon.
   // @param [in/out]: ObjectPtr.
@@ -93,6 +104,12 @@ class ObjectBuilder {
   // @param [in/out]: ObjectPtr.
   void ComputeOtherObjectInformation(
       std::shared_ptr<apollo::perception::base::Object> object);
+
+  // @brief: calculate and fill front-critical.
+  // @param [in/out]: ObjectPtr and pose
+  void JudgeFrontCritical(
+      std::shared_ptr<apollo::perception::base::Object> object,
+      Eigen::Affine3d& lidar2novatel_pose);
 
   // @brief: calculate and fill default polygon value.
   // @param [in]: min and max point.

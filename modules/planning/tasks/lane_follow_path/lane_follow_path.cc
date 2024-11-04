@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 #include "modules/planning/planning_interface_base/task_base/common/path_generation.h"
@@ -108,17 +109,19 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     const auto& sl_bound = obs->PerceptionSLBoundary();
     for (int i = 0; i < sl_bound.boundary_point_size(); i++) {
       std::string name = obs->Id() + "_obs_sl_boundary";
-      print_curve.AddPoint(
-          name, sl_bound.boundary_point(i).s(),
-          sl_bound.boundary_point(i).l());
+      print_curve.AddPoint(name, sl_bound.boundary_point(i).s(),
+                           sl_bound.boundary_point(i).l());
     }
   }
   print_curve.PrintToLog();
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = path_bound;
+  std::vector<SLPolygon> obs_sl_polygons;
+  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
+                                       init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          *reference_line_info_, init_sl_state_, &path_bound,
-          &blocking_obstacle_id, &path_narrowest_width)) {
+          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
+          &path_narrowest_width)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
         "taking into consideration all static obstacles.";
@@ -136,8 +139,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   // lane_follow_status update
   auto* lane_follow_status = injector_->planning_context()
-                                    ->mutable_planning_status()
-                                    ->mutable_lane_follow();
+                                 ->mutable_planning_status()
+                                 ->mutable_lane_follow();
   if (!blocking_obstacle_id.empty()) {
     double current_time = ::apollo::cyber::Clock::NowInSeconds();
     lane_follow_status->set_block_obstacle_id(blocking_obstacle_id);
@@ -159,16 +162,11 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   }
 
   ADEBUG << "Completed generating path boundaries.";
-  if (is_include_adc) {
-    CHECK_LE(init_sl_state_.second[0], path_bound[0].l_upper.l);
-    CHECK_GE(init_sl_state_.second[0], path_bound[0].l_lower.l);
-  }
   if (init_sl_state_.second[0] > path_bound[0].l_upper.l ||
       init_sl_state_.second[0] < path_bound[0].l_lower.l) {
-    AINFO << "not in self lane maybe lane borrow , init l : "
+    AINFO << "not in self lane maybe lane borrow or out of road. init l : "
           << init_sl_state_.second[0] << ", path_bound l: [ "
-          << path_bound[0].l_lower.l << ","
-          << path_bound[0].l_upper.l << " ]";
+          << path_bound[0].l_lower.l << "," << path_bound[0].l_upper.l << " ]";
     return false;
   }
   // std::vector<std::pair<double, double>> regular_path_bound_pair;
@@ -203,16 +201,18 @@ bool LaneFollowPath::OptimizePath(
       double s = static_cast<double>(i) * path_boundary.delta_s() +
                  path_boundary.start_s();
       double kappa = reference_line.GetNearestReferencePoint(s).kappa();
-      print_debug.AddPoint(
-          "ref_kappa", static_cast<double>(i) * path_boundary.delta_s(), kappa);
+      print_debug.AddPoint("ref_kappa", s, kappa);
     }
     print_debug.PrintToLog();
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
         std::fmax(init_sl_state_.first[1], 1e-12));
+    std::vector<double> towing_l(path_boundary_size, 0);
     std::vector<double> ref_l(path_boundary_size, 0);
     std::vector<double> weight_ref_l(path_boundary_size, 0);
-    PathOptimizerUtil::UpdatePathRefWithBound(
-        path_boundary, config.path_reference_l_weight(), &ref_l, &weight_ref_l);
+
+    PathOptimizerUtil::UpdatePathRefWithBound(path_boundary,
+                                              config.path_reference_l_weight(),
+                                              towing_l, &ref_l, &weight_ref_l);
     bool res_opt = PathOptimizerUtil::OptimizePath(
         init_sl_state_, end_state, ref_l, weight_ref_l, path_boundary,
         ddl_bounds, jerk_bound, config, &opt_l, &opt_dl, &opt_ddl);
@@ -232,6 +232,12 @@ bool LaneFollowPath::OptimizePath(
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data->push_back(std::move(path_data));
+      PrintCurves print_path_kappa;
+      for (const auto& p : candidate_path_data->back().discretized_path()) {
+        print_path_kappa.AddPoint(path_boundary.label() + "_path_kappa",
+                                  p.s() + init_sl_state_.first[0], p.kappa());
+      }
+      print_path_kappa.PrintToLog();
     }
   }
   if (candidate_path_data->empty()) {

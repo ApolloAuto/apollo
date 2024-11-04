@@ -149,11 +149,13 @@ bool TrafficLightTrackComponent::InternalProc(
   PERF_BLOCK_END
 
   auto frame = message->traffic_light_frame_;
+  AINFO << "Enter SyncV2XTrafficLights founction.";
   SyncV2XTrafficLights(frame.get());
   stoplines_ = message->stoplines_;
 
   std::shared_ptr<TrafficLightDetection> out_msg(new TrafficLightDetection);
   auto& camera_name = frame->data_provider->sensor_name();
+  AINFO << "Enter TransformOutputMessage founction.";
   if (!TransformOutputMessage(frame.get(), camera_name, &out_msg, message)) {
     AERROR << "transform_output_message failed, msg_time: "
            << message->timestamp_;
@@ -162,6 +164,7 @@ bool TrafficLightTrackComponent::InternalProc(
 
   // send msg
   writer_->Write(out_msg);
+  AINFO << "Send trafficlight tracking output message.";
 
   return true;
 }
@@ -277,17 +280,10 @@ bool TrafficLightTrackComponent::TransformOutputMessage(
     camera::TrafficLightFrame* frame, const std::string& camera_name,
     std::shared_ptr<TrafficLightDetection>* out_msg,
     const std::shared_ptr<TrafficDetectMessage const>& message) {
-  const std::map<std::string, TLCamID> CAMERA_ID_TO_TLCAMERA_ID = {
-      {"front_24mm", TrafficLightDetection::CAMERA_FRONT_LONG},
-      {"front_12mm", TrafficLightDetection::CAMERA_FRONT_NARROW},
-      {"front_6mm", TrafficLightDetection::CAMERA_FRONT_SHORT},
-      {"front_fisheye", TrafficLightDetection::CAMERA_FRONT_WIDE}};
-
   auto& lights = frame->traffic_lights;
   auto* header = (*out_msg)->mutable_header();
   double publish_time = Clock::NowInSeconds();
   header->set_timestamp_sec(publish_time);  // message publishing time
-  // AINFO << "set header time sec:" << FORMAT_TIMESTAMP(frame->timestamp);
 
   // Set traffic light color to unknown before the process
   detected_trafficlight_color_ = base::TLColor::TL_UNKNOWN_COLOR;
@@ -296,12 +292,7 @@ bool TrafficLightTrackComponent::TransformOutputMessage(
   uint64_t ts_int64 = static_cast<uint64_t>(frame->timestamp * 1e9);
   header->set_camera_timestamp(ts_int64);
 
-  if (CAMERA_ID_TO_TLCAMERA_ID.find(camera_name) ==
-      CAMERA_ID_TO_TLCAMERA_ID.end()) {
-    AERROR << "unknown camera_name: " << camera_name;
-    return false;
-  }
-  (*out_msg)->set_camera_id(CAMERA_ID_TO_TLCAMERA_ID.at(camera_name));
+  (*out_msg)->set_camera_name(camera_name);
 
   // Do voting from multiple traffic light detections
   cnt_r_ = 0;
@@ -405,6 +396,8 @@ bool TrafficLightTrackComponent::TransformOutputMessage(
     (*out_msg)->set_contain_lights(lights.size() > 0);
     detected_trafficlight_color_ = lights.at(0)->status.color;
   }
+
+  AINFO << "Enter TransformDebugMessage founction.";
   // add traffic light debug info
   if (!TransformDebugMessage(frame, out_msg, message)) {
     AERROR << "ProcComponent::Proc failed to transform debug msg.";
@@ -463,7 +456,8 @@ bool TrafficLightTrackComponent::TransformDebugMessage(
   if (lights.size() > 0) {
     auto& pose_ptr = in_message->carpose_;
     Eigen::Matrix4d cam_pose;
-    cam_pose = pose_ptr->c2w_poses_.at("front_6mm");
+    auto& camera_name = frame->data_provider->sensor_name();
+    cam_pose = pose_ptr->c2w_poses_.at(camera_name);
     light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
   }
 

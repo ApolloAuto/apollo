@@ -223,6 +223,27 @@ bool TransformWrapper::GetExtrinsics(Eigen::Affine3d* trans) {
   return true;
 }
 
+bool TransformWrapper::GetExtrinsics(double timestamp, Eigen::Affine3d* trans) {
+  if (sensor2novatel_extrinsics_ == nullptr) {
+    StampedTransform trans_sensor2novatel;
+    if (!QueryTrans(timestamp, &trans_sensor2novatel,
+                    sensor2novatel_tf2_frame_id_,
+                    sensor2novatel_tf2_child_frame_id_)) {
+      return false;
+    }
+    sensor2novatel_extrinsics_.reset(new Eigen::Affine3d);
+    *sensor2novatel_extrinsics_ =
+        trans_sensor2novatel.translation * trans_sensor2novatel.rotation;
+    AINFO << "Get sensor2novatel extrinsics successfully.";
+  }
+  if (!inited_ || trans == nullptr || sensor2novatel_extrinsics_ == nullptr) {
+    AERROR << "TransformWrapper get extrinsics failed";
+    return false;
+  }
+  *trans = *sensor2novatel_extrinsics_;
+  return true;
+}
+
 bool TransformWrapper::GetTrans(double timestamp, Eigen::Affine3d* trans,
                                 const std::string& frame_id,
                                 const std::string& child_frame_id) {

@@ -40,6 +40,7 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.cc",
         "tracker/multi_lidar_fusion/mlf_tracker.cc",
         "tracker/multi_lidar_fusion/mlf_type_filter.cc",
+        "tracker/multi_lidar_fusion/util.cc",
         "tracker/type_fusion/ccrf_type_fusion.cc",
         "tracker/type_fusion/util.cc"
     ],
@@ -69,10 +70,12 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.h",
         "tracker/multi_lidar_fusion/mlf_tracker.h",
         "tracker/multi_lidar_fusion/mlf_type_filter.h",
+        "tracker/multi_lidar_fusion/util.h",
         "tracker/type_fusion/ccrf_type_fusion.h",
         "tracker/type_fusion/type_fusion_interface.h",
         "tracker/type_fusion/util.h"
     ],
+    copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",

@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-
+#include <limits>
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -34,6 +34,8 @@ using apollo::hdmap::HDMapUtil;
 
 constexpr double kAdcDistanceThreshold = 35.0;  // unit: m
 constexpr double kObstaclesDistanceThreshold = 15.0;
+constexpr double kIntersectionClearanceDist = 20.0;
+constexpr double kJunctionClearanceDist = 15.0;
 
 bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
                           const Obstacle& obstacle) {
@@ -227,6 +229,166 @@ bool IsParkedVehicle(const ReferenceLine& reference_line,
 
   bool is_parked = is_on_parking_lane || is_at_road_edge;
   return is_parked && obstacle->IsStatic();
+}
+
+bool IsBlockingObstacleFarFromIntersection(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id) {
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  // Get blocking obstacle's s.
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().end_s();
+  ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
+  // Get intersection's s and compare with threshold.
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap : first_encountered_overlaps) {
+    ADEBUG << overlap.first << ", " << overlap.second.DebugString();
+    if (overlap.first != ReferenceLineInfo::SIGNAL &&
+        overlap.first != ReferenceLineInfo::STOP_SIGN) {
+      continue;
+    }
+
+    auto distance = overlap.second.start_s - blocking_obstacle_s;
+    if (overlap.first == ReferenceLineInfo::SIGNAL ||
+        overlap.first == ReferenceLineInfo::STOP_SIGN) {
+      if (distance < kIntersectionClearanceDist) {
+        ADEBUG << "Too close to signal intersection (" << distance
+               << "m); don't SIDE_PASS.";
+        return false;
+      }
+    } else {
+      if (distance < kJunctionClearanceDist) {
+        ADEBUG << "Too close to overlap_type[" << overlap.first << "] ("
+               << distance << "m); don't SIDE_PASS";
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+double DistanceBlockingObstacleToIntersection(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id) {
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  // Get blocking obstacle's s.
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().end_s();
+  double min_distance = std::numeric_limits<double>::max();
+  ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
+  // Get intersection's s and compare with threshold.
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap : first_encountered_overlaps) {
+    ADEBUG << overlap.first << ", " << overlap.second.DebugString();
+    if (overlap.first != ReferenceLineInfo::SIGNAL &&
+        overlap.first != ReferenceLineInfo::STOP_SIGN) {
+      continue;
+    }
+    min_distance =
+        std::min(min_distance, overlap.second.start_s - blocking_obstacle_s);
+  }
+
+  return min_distance;
+}
+
+double DistanceBlockingObstacleToJunction(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id) {
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  // Get blocking obstacle's s.
+  double blocking_obstacle_start_s =
+      blocking_obstacle->PerceptionSLBoundary().start_s();
+  double blocking_obstacle_end_s =
+      blocking_obstacle->PerceptionSLBoundary().end_s();
+  double min_distance = std::numeric_limits<double>::max();
+  AINFO << "Blocking obstacle start s = " << blocking_obstacle_start_s
+        << ", end_s: " << blocking_obstacle_end_s;
+  // Get intersection's s and compare with threshold.
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap :
+       reference_line_info.reference_line().map_path().junction_overlaps()) {
+    AINFO << overlap.DebugString();
+    double distance = std::numeric_limits<double>::max();
+    if ((blocking_obstacle_start_s >= overlap.start_s &&
+         blocking_obstacle_start_s <= overlap.end_s) ||
+        (blocking_obstacle_end_s >= overlap.start_s &&
+         blocking_obstacle_end_s <= overlap.end_s)) {
+      distance = 0.0;
+    } else if (blocking_obstacle_end_s < overlap.start_s) {
+      distance = overlap.start_s - blocking_obstacle_end_s;
+    } else {
+      distance = blocking_obstacle_start_s - overlap.end_s;
+    }
+    min_distance = std::min(min_distance, distance);
+  }
+
+  return min_distance;
+}
+
+bool IsBlockingObstacleWithinDestination(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id, const double threshold) {
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().start_s();
+  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+  ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
+  ADEBUG << "ADC is at s = " << adc_end_s;
+  ADEBUG << "Destination is at s = "
+         << reference_line_info.SDistanceToDestination() + adc_end_s;
+  if (blocking_obstacle_s - adc_end_s + threshold >
+      reference_line_info.SDistanceToDestination()) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning

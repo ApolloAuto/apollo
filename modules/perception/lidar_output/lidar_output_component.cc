@@ -71,6 +71,15 @@ bool LidarOutputComponent::Init() {
             this, std::placeholders::_1);
   lidar_frame_reader_ = this->node_->CreateReader<LidarFrameMessage>(
       reader_config, model_call);
+
+  // Attention:
+  // For DKIT-2024 Part2 benchmark-data: timestamp is just two-decimal-places
+  // But in apollo-benchmark, the timestamp diff is set to 1e-4
+  // So this should also save timestamp to two-decimal-places
+  // Trick-action: WE should modify apollo-benchmark code
+  // PS: part1 is RIGHT, completely equal to pointcloud-timestamp)
+  timestamp_two_decimal_format_ = comp_config.timestamp_two_decimal_format();
+
   AINFO << "Register LidarFrameMessage for benchmark";
   return true;
 }
@@ -156,8 +165,15 @@ bool LidarOutputComponent::SaveBenchmarkFrame(
     return false;
   }
 
-  std::string pb_name = GetAbsolutePath(
-      benchmark_frame_output_dir_, std::to_string(timestamp) + ".pb");
+  double two_demical_time = round(timestamp * 100) / 100.0;
+  std::string pb_name = "";
+  if (timestamp_two_decimal_format_) {
+      pb_name = GetAbsolutePath(benchmark_frame_output_dir_,
+          std::to_string(two_demical_time) + ".pb");
+  } else {
+      pb_name = GetAbsolutePath(benchmark_frame_output_dir_,
+          std::to_string(timestamp) + ".pb");
+  }
   SetProtoToASCIIFile(*out_message, pb_name);
 
   return true;
@@ -210,8 +226,15 @@ bool LidarOutputComponent::SaveBenchmarkLidarFrame(
         AERROR << "Create dir " << lidar_frame_output_dir_ << " error.";
         return false;
     }
-    std::string pb_name = GetAbsolutePath(
-        lidar_frame_output_dir_, std::to_string(timestamp) + ".pb");
+    double two_demical_time = round(timestamp * 100) / 100.0;
+    std::string pb_name = "";
+    if (timestamp_two_decimal_format_) {
+        pb_name = GetAbsolutePath(lidar_frame_output_dir_,
+            std::to_string(two_demical_time) + ".pb");
+    } else {
+        pb_name = GetAbsolutePath(lidar_frame_output_dir_,
+            std::to_string(timestamp) + ".pb");
+    }
     SetProtoToASCIIFile(*out_message, pb_name);
 
     AINFO << "SaveBenchmarkLidarFrame Success: time is "

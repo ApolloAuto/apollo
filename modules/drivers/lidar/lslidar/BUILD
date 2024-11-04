@@ -28,6 +28,19 @@ filegroup(
     ]),
 )
 
+apollo_component(
+    name = "liblslidar_component.so",
+    srcs = ["component/lslidar_component.cpp"],
+    hdrs = ["component/lslidar_component.h"],
+    copts = ['-DMODULE_NAME=\\"lslidar\\"'],
+    deps = [
+        "//modules/drivers/lidar/lslidar/parser:convert",
+        "//modules/drivers/lidar/lslidar/driver:driver",
+        "//modules/drivers/lidar/common:lidar_common",
+        "//cyber",
+    ],
+)
+
 apollo_package()
 
 cpplint()

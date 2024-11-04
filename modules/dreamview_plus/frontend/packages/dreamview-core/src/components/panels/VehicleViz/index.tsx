@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback, useContext } from 'react';
-import { Popover, IconIcCoverageHover } from '@dreamview/dreamview-ui';
+import { Popover, IconPark } from '@dreamview/dreamview-ui';
 import type { apollo } from '@dreamview/dreamview';
 import { SimpleRouter, KeepAlive, Route, RouterContext } from '@dreamview/dreamview-core/src/util/SimpleRouter';
 import { usePickHmiStore, HMIModeOperation } from '@dreamview/dreamview-core/src/store/HmiStore';
@@ -77,7 +77,41 @@ function Viz() {
     }>(null);
     const pointCloudSubscriptionRef = useRef<Subscription>(null);
 
+    const [fps, setFps] = useState<number>(0);
+    const [triangles, setTriangles] = useState<number>(0);
+    let frameCount = 0;
+    let lastTime = performance.now();
+
+    const [fpsTextClickCount, setFpsTextClickCount] = useState(0);
+    const [isFpsTextVisible, setIsFpsTextVisible] = useState(true);
+    const customToolbarTitleClick = () => {
+        setFpsTextClickCount((prevCount) => {
+            const newCount = prevCount + 1;
+            if (newCount === 5) {
+                setIsFpsTextVisible(!isFpsTextVisible);
+                console.log(`change fps text visible : ${isFpsTextVisible}`);
+                return 0;
+            }
+            return newCount;
+        });
+    };
+
+    const rendFps = () => {
+        if (!isFpsTextVisible) return;
+
+        const currentTime = performance.now();
+        // eslint-disable-next-line no-plusplus
+        frameCount++;
+        if (currentTime - lastTime >= 1000) {
+            setFps(frameCount);
+            frameCount = 0;
+            lastTime = currentTime;
+        }
+        setTriangles(carviz?.renderer.info.render.triangles);
+    };
+
     const render = () => {
+        rendFps();
         carviz?.render();
         animationFrameIdRef.current = requestIdleCallback(
             () => {
@@ -452,11 +486,24 @@ function Viz() {
     return (
         <div className={classes['viz-container']}>
             <div id={uid} className={classes['web-gl']} />
+            <div className={classes['viz-rend-fps-item-hide']} onClick={customToolbarTitleClick}>
+                {}
+            </div>
+            {!isFpsTextVisible && (
+                <div className={classes['viz-rend-fps-item']}>
+                    <header className='FPS-display'>
+                        <p>
+                            fps: {fps} &nbsp;
+                            triangles: {triangles}
+                        </p>
+                    </header>
+                </div>
+            )}
             <div className={classes['viz-btn-container']}>
                 <ViewBtn carviz={carviz}>
                     <Popover placement='leftTop' content={layerMenu} trigger='click'>
                         <span className={classes['viz-btn-item']}>
-                            <IconIcCoverageHover />
+                            <IconPark name='IcCoverageHover' />
                         </span>
                     </Popover>
                     <Popover

@@ -36,4 +36,8 @@
   <depend repo_name="tinyxml2" lib_names="tinyxml2">libtinyxml2-dev</depend>
   <depend>bazel-extend-tools</depend>
 
+  <depend>libunwind-dev</depend>
+  <depend>gperftools</depend>
+  <depend>bvar</depend>
+
 </package>

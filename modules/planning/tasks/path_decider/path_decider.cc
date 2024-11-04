@@ -22,12 +22,14 @@
 
 #include <algorithm>
 #include <memory>
+
 #include "modules/common_msgs/planning_msgs/decision.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -205,25 +207,29 @@ bool PathDecider::MakeStaticObstacleDecision(
                                         object_decision);
     } else if (sl_boundary.end_l() >= curr_l - min_nudge_l &&
                sl_boundary.start_l() <= curr_l + min_nudge_l) {
-      // 2. STOP if laterally too overlapping.
-      *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
-
-      if (path_decision->MergeWithMainStop(
-              object_decision.stop(), obstacle->Id(),
-              reference_line_info_->reference_line(),
-              reference_line_info_->AdcSlBoundary())) {
-        path_decision->AddLongitudinalDecision("PathDecider/nearest-stop",
-                                               obstacle->Id(), object_decision);
+      if (config_.skip_overlap_stop_check()) {
+        AINFO << "skip_overlap_stop_check";
       } else {
-        ObjectDecisionType object_decision;
-        object_decision.mutable_ignore();
-        path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",
-                                               obstacle->Id(), object_decision);
+        // 2. STOP if laterally too overlapping.
+        *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
+
+        if (path_decision->MergeWithMainStop(
+                object_decision.stop(), obstacle->Id(),
+                reference_line_info_->reference_line(),
+                reference_line_info_->AdcSlBoundary())) {
+          path_decision->AddLongitudinalDecision(
+              "PathDecider/nearest-stop", obstacle->Id(), object_decision);
+        } else {
+          ObjectDecisionType object_decision;
+          object_decision.mutable_ignore();
+          path_decision->AddLongitudinalDecision(
+              "PathDecider/not-nearest-stop", obstacle->Id(), object_decision);
+        }
+        AINFO << "Add stop decision for static obs " << obstacle->Id()
+              << "start l" << sl_boundary.start_l() << "end l"
+              << sl_boundary.end_l() << "curr_l" << curr_l << "min_nudge_l"
+              << min_nudge_l;
       }
-      AINFO << "Add stop decision for static obs " << obstacle->Id()
-            << "start l" << sl_boundary.start_l() << "end l"
-            << sl_boundary.end_l() << "curr_l" << curr_l << "min_nudge_l"
-            << min_nudge_l;
     } else {
       // 3. NUDGE if laterally very close.
       if (sl_boundary.end_l() < curr_l - min_nudge_l) {  // &&
