@@ -97,7 +97,7 @@ bool ForsenseTextParser::PrepareMessage() {
     }
     PrepareMessageGPYJ(fields);
     return true;
-  } 
+  }
   return false;
 }
 

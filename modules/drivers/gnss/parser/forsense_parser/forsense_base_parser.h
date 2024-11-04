@@ -64,9 +64,7 @@ struct ForsenseMessage {
   std::string WarningCs;
   uint8_t satellites_num = 0;
   uint8_t wheel_speed_status = 0;
-
   double gps_timestamp_sec = 0;
-  
   // 数据标准差
   double lat_std = 0.0;
   double lon_std = 0.0;
