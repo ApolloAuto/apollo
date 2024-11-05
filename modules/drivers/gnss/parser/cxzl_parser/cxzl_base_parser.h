@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <string>
+#include <vector>
 
 #include "modules/common_msgs/sensor_msgs/gnss.pb.h"
 #include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
@@ -70,7 +71,7 @@ struct CxzlMessage {
   double Age;
   int NSVD1;
   int NSVD2;
-  
+
   double Altitude;
 
   double Pe_std = 0.0;

@@ -24,7 +24,6 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <vector>
 
 namespace apollo {
 namespace drivers {
@@ -33,10 +32,7 @@ namespace gnss {
 #define G_EARTH 9.806665
 // #define DEG_TO_RAD 0.0174532925
 
-
-CxzlBaseParser::CxzlBaseParser(const config::Config& config) 
-{
-
+CxzlBaseParser::CxzlBaseParser(const config::Config& config) {
 }
 
 void CxzlBaseParser::GetMessages(MessageInfoVec* messages) {
@@ -71,10 +67,8 @@ Parser *Parser::CreateCxzlCfg(const config::Config &config) {
   return new CxzlBaseParser(config);
 }
 
-
 void CxzlBaseParser::PrepareMessageStatus(const uint8_t& system_state,
                                            const uint8_t& satellite_status) {
-
 }
 
 void CxzlBaseParser::FillGnssBestpos() {
@@ -94,7 +88,8 @@ void CxzlBaseParser::FillGnssBestpos() {
 void CxzlBaseParser::FillIns() {
   ins_.mutable_euler_angles()->set_x(decode_message_.Roll * DEG_TO_RAD);
   ins_.mutable_euler_angles()->set_y(decode_message_.Pitch * DEG_TO_RAD);
-  ins_.mutable_euler_angles()->set_z(decode_message_.Heading * DEG_TO_RAD);
+  ins_.mutable_euler_angles()->set_z(M_PI_2 -
+                        decode_message_.Heading * DEG_TO_RAD);
   ins_.mutable_position()->set_lon(decode_message_.Longitude);
   ins_.mutable_position()->set_lat(decode_message_.Latitude);
   ins_.mutable_position()->set_height(decode_message_.Altitude);
@@ -129,8 +124,7 @@ void CxzlBaseParser::FillIns() {
 }
 
 void CxzlBaseParser::FillInsStat() {
-  switch(decode_message_.Solution_status)
-  {
+  switch (decode_message_.Solution_status) {
     case CxzlSoluStatusT::INIT_STATUS:
       ins_stat_.set_ins_status(SolutionStatus::SOL_COMPUTED);
       bestpos_.set_sol_status(SolutionStatus::SOL_COMPUTED);
@@ -155,10 +149,8 @@ void CxzlBaseParser::FillInsStat() {
       break;
   }
   if ((decode_message_.Solution_status == INTEGRATED_NAVIGATION)
-    || (decode_message_.Solution_status == INERTIAL_NAVIGATION))
-  {
-    switch(decode_message_.Satellite_status)
-    {
+    || (decode_message_.Solution_status == INERTIAL_NAVIGATION)) {
+    switch (decode_message_.Satellite_status) {
       case CxzlSatelliteStatusT::POS_NONE:
         ins_stat_.set_pos_type(SolutionType::NONE);
         bestpos_.set_sol_type(SolutionType::NONE);
@@ -195,11 +187,8 @@ void CxzlBaseParser::FillInsStat() {
         heading_.set_position_type(SolutionType::NONE);
         break;
     }
-  }
-  else
-  {
-    switch(decode_message_.Satellite_status)
-    {
+  } else {
+    switch (decode_message_.Satellite_status) {
       case CxzlSatelliteStatusT::POS_NONE:
         ins_stat_.set_pos_type(SolutionType::NONE);
         bestpos_.set_sol_type(SolutionType::NONE);
@@ -249,15 +238,14 @@ void CxzlBaseParser::FillImu() {
 
 void CxzlBaseParser::FillHeading() {
   heading_.set_measurement_time(decode_message_.gps_timestamp_sec);
+  // TODO(NieKK816): This heanding is different from FillIns euler_angles
   heading_.set_heading(decode_message_.Heading);
   heading_.set_pitch(decode_message_.Pitch);
   heading_.set_heading_std_dev(decode_message_.heading_std);
   heading_.set_pitch_std_dev(decode_message_.pitch_std);
-  // heading_.set_station_id("0");
   heading_.set_satellite_number_multi(decode_message_.NSV1);
   heading_.set_satellite_soulution_number(decode_message_.NSV1);
 }
-
 
 bool CxzlBaseParser::PrepareMessage() {
 //   ADEBUG << "CXZL ASCII is: " << data_;
@@ -288,9 +276,10 @@ bool CxzlBaseParser::PrepareMessage() {
   }
 
   std::vector<std::string> fields;
-  std::string checknum = input_str.substr(input_str.find('*')+1, input_str.find(0x0D));
+  std::string checknum = input_str.substr(input_str.find('*')+1,
+          input_str.find(0x0D));
 
-  std::stringstream ss(input_str.substr(0, input_str.rfind('*')));
+  std::stringstream ss(input_str.substr(0, input_str.find('*')));
   for (std::string field; std::getline(ss, field, ',');) {
     fields.push_back(field);
   }
@@ -324,8 +313,8 @@ bool CxzlBaseParser::PrepareMessage() {
   return false;
 }
 
-void CxzlBaseParser::PrepareMessageCxzl(const std::vector<std::string> &fields) {
-
+void CxzlBaseParser::PrepareMessageCxzl(
+          const std::vector<std::string> &fields) {
   decode_message_.GPSWeek = std::stoi(fields[1]);
   decode_message_.GPSTime = std::stod(fields[2]);
   decode_message_.gps_timestamp_sec =
@@ -339,8 +328,7 @@ void CxzlBaseParser::PrepareMessageCxzl(const std::vector<std::string> &fields) 
   decode_message_.AccZ = std::stod(fields[8]) * G_EARTH;
 
   int sys_status = std::stoi(fields[9]);
-  switch(sys_status)
-  {
+  switch (sys_status) {
     case 0:
       decode_message_.Solution_status = CxzlSoluStatusT::INIT_STATUS;
       break;
@@ -359,37 +347,46 @@ void CxzlBaseParser::PrepareMessageCxzl(const std::vector<std::string> &fields) 
   decode_message_.NSV1 = std::stoi(fields[10]);
 
   int satel_status = std::stoi(fields[11]);
-  switch(satel_status)
-  {
+  switch (satel_status) {
     case 0:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_NONE;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_NONE;
       break;
     case 1:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATEDIRECT_SINGLE;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATEDIRECT_SINGLE;
       break;
     case 2:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATEDIRECT_DIFF;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATEDIRECT_DIFF;
       break;
     case 3:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATEDIRECT_COMB;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATEDIRECT_COMB;
       break;
     case 4:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATEDIRECT_FIXED;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATEDIRECT_FIXED;
       break;
     case 5:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATEDIRECT_FLOAT;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATEDIRECT_FLOAT;
       break;
     case 6:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATE_SINGLE;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATE_SINGLE;
       break;
     case 7:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATE_DIFF;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATE_DIFF;
       break;
     case 8:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATE_FIXED;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATE_FIXED;
       break;
     case 9:
-      decode_message_.Satellite_status = CxzlSatelliteStatusT::POS_LOCATE_FLOAT;
+      decode_message_.Satellite_status =
+          CxzlSatelliteStatusT::POS_LOCATE_FLOAT;
       break;
     default:
       break;
