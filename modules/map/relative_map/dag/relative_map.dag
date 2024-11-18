@@ -4,7 +4,7 @@ module_config {
         class_name : "RelativeMapComponent"
         config {
             name: "relative_map"
-            flag_file_path:  "/apollo/modules/map/relative_map/conf/relative_map.conf"
+            flag_file_path:  "modules/map/relative_map/conf/relative_map.conf"
             interval: 100
       }
    }

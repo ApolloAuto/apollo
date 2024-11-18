@@ -61,7 +61,6 @@ Options:
     start : start the created container.
     bootstrap : run dreamview and monitor module.
     start_gpu : start a created gpu container.
-    init : init single workspace.
     build : build package in workspace.
     create : create a new container with apollo development image.
     setup_host : setup host
@@ -72,10 +71,18 @@ Options:
 
 本段内容主要介绍`aem`工具使用流程及规范。
 
-### 1.创建挂载文件夹
+### 1.克隆工程目录
+Apollo9.0不再通过aem init的方式初始化工作空间，推荐按照教程克隆github的工程
 
-Apollo需要在容器内编译和运行，为了在宿主机上进行开发和代码管理，在进入容器前，需要提前创建挂载文件夹
-mkdir workspace && cd workspace (文件夹名称无特别要求，按开发者喜好设置即可)
+Apollo 目前提供了3个示例工程，您可以根据需要选择其一
+
+- [application-core](https://github.com/ApolloAuto/application-core) , 包含 Apollo 所有开源软件包，可以基于此工程搭建自己的应用
+
+- [application-pnc](https://github.com/ApolloAuto/application-pnc) , 仅包含规划控制相关的软件包，适合仅关注规划控制方向的用户
+
+- [application-perception](https://github.com/ApolloAuto/application-perception) , 仅包含感知相关的软件包，适合仅关注感知方向的用户
+
+注：在克隆工程目录时如遇网络问题，可参考 [拉取工程目录FAQ](https://apollo.baidu.com/community/article/1158)
 
 ### 2.启动一个Apollo容器
 
@@ -99,22 +106,18 @@ aem start -f
 aem enter
 进入容器后，会进入到apollo_workspace目录下，此目录常作为apollo的工作空间，之后的操作都位于此目录下
 
-### 4.初始化工作空间
+### 4.下载安装源码
 
-在容器内执行aem init,将当前目录初始化为apollo的工作空间,初始化完毕后，当前目录下会多出一个 WORKSPACE 文件
-
-### 5.下载安装源码
-
-初始化工作空间后，仅是生成了一个空的工作空间，里面没有任何源码，因此，要对模块进行二次开发，还需要通过以下命令下载模块的源码及依赖：
+对模块进行二次开发还需要通过以下命令下载模块的源码及依赖：
 aem install xx(模块名称)
 下载模块源码,下载完毕后，工作空间会自动创建一些文件夹，其中，xx源码位于工作空间的 module/xx 路径下
 
-### 6.编译安装源码
+### 5.编译安装源码
 
-修改模块源码后，需要对修改厚的模块进行编译安装
+修改模块源码后，需要对修改后的模块进行编译安装
 aem build -p modules/xx
 
-### 7.运行和调试
+### 6.运行和调试
 
 编译安装成功后，启动dreamview进行调试
 aem bootstrap start
@@ -122,11 +125,11 @@ aem bootstrap start
 注：首次启动需下载dreamview和monitor模块
 aem install dreamview-plus monitor
 
-### 8.停止容器
+### 7.停止容器
 
 在宿主机执行aem stopall可停止Apollo容器，停止后的容器可通过aem enter再次启动
 
-### 9.删除容器
+### 8.删除容器
 
 在宿主机执行aem remove可删除Apollo容器，容器删除后，容器内挂载的工程配置依然会存在于宿主机workspace目录中。再次执行aem start启动命令后，当前目录下所有配置会重新挂载到新容器中。如不需要挂载当前配置，请先手动删除。
 
@@ -363,19 +366,15 @@ aem profile use sample
 
 这个子命令是 buildtool install action的一个简单包装。详细用法请参考 [buildtool 文档](docs/框架设计/命令行工具/buildtool.md)。
 
-### init
-
-这个子命令是 buildtool init action的一个简单包装。详细用法请参考 [buildtool 文档](docs/框架设计/命令行工具/buildtool.md)。
-
 ### 环境变量
 
 aem 在执行子命令的时候会使用到一些环境变量，部分不支持参数控制的功能也可以通用修改这些环境变量来实现，aem 运行时，如果当前目录下有 `.env` 文件，则会加载该文件
 
-| 变量                        | 说明                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `APOLLO_ENVS_ROOT`          | 容器相关目录创建位置，默认为 `$HOME/.aem/envs`                                                              |
-| `APOLLO_ENV_NAME`           | 容器名，默认是当前用户的用户名                                                                              |
-| `APOLLO_ENV_WORKROOT`       | 容器内的工作目录路径，默认是 `/apollo_workspace`                                                            |
+| 变量                        | 说明                                                                           |
+| --------------------------- |------------------------------------------------------------------------------|
+| `APOLLO_ENVS_ROOT`          | 容器相关目录创建位置，默认为 `$HOME/.aem/envs`                                             |
+| `APOLLO_ENV_NAME`           | 容器名，默认是当前用户的用户名                                                              |
+| `APOLLO_ENV_WORKROOT`       | 容器内的工作目录路径，默认是 `/apollo_workspace`                                           |
 | `APOLLO_ENV_WORKLOCAL`      | 创建容器相关的目录是存放在当前目录下，`1` 为是 `0` 为否，否，则创建在 `$APOLLO_ENVS_ROOT` 下                |
 | `APOLLO_ENV_CONTAINER_REPO` | 创建容器使用的镜像 repo ，默认为 `registry.baidubce.com/apollo/apollo-env-gpu` 可以通过这个修为改自定义镜像 |
-| `APOLLO_ENV_CONTAINER_TAG`  | 创建容器使用的镜像 tag ，默认为 `latest`                                                                    |
+| `APOLLO_ENV_CONTAINER_TAG`  | 创建容器使用的镜像 tag ，默认为 `latest`                                                  |

@@ -28,11 +28,11 @@ const double SHAPE_FUSION_PI = 3.1415926;
 
 /* TODO(all): not compiling. to be fixed
 TEST(MotionFusionTest, lidar_test) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root = "modules/perception/testdata/"
       "fusion/kalman_motion_fusion";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/kalman_motion_fusion/params";
+      "modules/perception/testdata/fusion/kalman_motion_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   std::shared_ptr<base::SensorInfo> lidar_sensor_info(new base::SensorInfo);
@@ -193,11 +193,11 @@ TEST(MotionFusionTest, lidar_test) {
 
 /* TODO(all): Initialize() not compiling. to be fixed
 TEST(MotionFusionTest, radar_test) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root = "modules/perception/testdata/"
       "fusion/kalman_motion_fusion";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/kalman_motion_fusion/params";
+      "modules/perception/testdata/fusion/kalman_motion_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   std::shared_ptr<base::SensorInfo> lidar_sensor_info(new base::SensorInfo);
@@ -344,11 +344,11 @@ TEST(MotionFusionTest, radar_test) {
 
 /* TODO(all): Initialize() not compiling. to be fixed
 TEST(MotionFusionTest, get_history_test) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root = "modules/perception/testdata/"
       "fusion/kalman_motion_fusion";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/testdata/fusion/kalman_motion_fusion/params";
+      "modules/perception/testdata/fusion/kalman_motion_fusion/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   std::shared_ptr<base::SensorInfo> lidar_sensor_info(new base::SensorInfo);

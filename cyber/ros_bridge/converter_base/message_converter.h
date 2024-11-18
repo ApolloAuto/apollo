@@ -17,8 +17,6 @@
 #ifndef CYBER_MESSAGE_CONVERTER_H_
 #define CYBER_MESSAGE_CONVERTER_H_
 
-#include <cxxabi.h>  // NOLINT
-
 #include <atomic>   // NOLINT
 #include <memory>   // NOLINT
 #include <string>   // NOLINT
@@ -26,18 +24,22 @@
 #include <utility>  // NOLINT
 #include <vector>   // NOLINT
 
+#include <cxxabi.h>  // NOLINT
+
 #include "cyber/ros_bridge/proto/converter_conf.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/node/reader_base.h"
 #include "cyber/node/writer_base.h"
 #include "cyber/plugin_manager/plugin_manager.h"
+#include "cyber/ros_bridge/common/macros.h"
 
 #if __has_include("rclcpp/rclcpp.hpp")
 #include "message_filters/subscriber.h"
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/synchronizer.h"
 #include "rclcpp/rclcpp.hpp"
-#include "ros_distro.h"
+#include "ros_adapter/ros_distro.h"
 #endif
 
 namespace apollo {

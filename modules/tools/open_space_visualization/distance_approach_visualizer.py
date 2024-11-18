@@ -24,7 +24,7 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from distance_approach_python_interface import *
+from modules.tools.open_space_visualization.distance_approach_python_interface import *
 
 
 result_file = "/tmp/open_space_osqp_ipopt.csv"

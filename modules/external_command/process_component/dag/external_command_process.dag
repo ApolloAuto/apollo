@@ -5,8 +5,8 @@ module_config {
       class_name : "ExternalCommandProcessComponent"
       config {
         name : "external_command_process"
-        config_file_path : "/apollo/modules/external_command/process_component/conf/config.pb.txt"
-        flag_file_path: "/apollo/modules/common/data/global_flagfile.txt"
+        config_file_path : "modules/external_command/process_component/conf/config.pb.txt"
+        flag_file_path: "modules/common/data/global_flagfile.txt"
       }
     }
 }

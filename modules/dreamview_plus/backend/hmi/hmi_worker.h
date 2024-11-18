@@ -162,6 +162,17 @@ class HMIWorker {
    * @return True if the process exists
    */
   bool isProcessRunning(const std::string& process_name);
+  /**
+   * @brief Get dv current mode default layout.
+   * @return the default layout.
+   */
+  std::string GetCurrentModeDefaultLayout();
+
+  /**
+   * @brief Get dv plugin panels json of frontend.
+   * @return the plugin panels json.
+   */
+  std::string GetDvPluginPanelsJsonStr();
 
  private:
   void InitReadersAndWriters();
@@ -206,8 +217,8 @@ class HMIWorker {
   // Delete the v2x configuration file from the corresponding
   // vehicle configuration file.
   void DeleteV2xConfig(const std::string& vehicle_name);
-  void GetScenarioResourcePath(std::string* scenario_resource_path);
-  void GetRecordPath(std::string* record_path);
+  bool GetScenarioResourcePath(std::string* scenario_resource_path);
+  bool GetRecordPath(std::string* record_path);
   void GetRtkRecordPath(std::string* record_path);
 
   // Start / stop a module.
@@ -255,6 +266,10 @@ class HMIWorker {
    * @brief Check if the package has been installed
    */
   bool PackageExist(const std::string& package_name);
+  /**
+   * @brief Load dv plugin panels json of frontend.
+   */
+  void LoadDvPluginPanelsJson();
 
   HMIConfig config_;
 
@@ -293,6 +308,7 @@ class HMIWorker {
   DvCallback callback_api_;
   std::unique_ptr<cyber::Timer> monitor_timer_;
   apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
+  nlohmann::json plugin_panels_json_;
 };
 
 }  // namespace dreamview

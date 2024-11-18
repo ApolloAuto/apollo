@@ -38,6 +38,7 @@ export const colorMapping = {
     MIDWAY: 0xff7f50,
     END: 0xffdab9,
     PULLOVER: 0x006aff,
+    DEEP_RED: 0x8b0000,
 };
 export const zOffset = {
     lane: 0.04,
@@ -52,6 +53,7 @@ export const zOffset = {
     pullover: 0.12,
     routing: 0.6,
     prediction: 0.04,
+    area: 0.04,
 };
 
 export const obstacleColorMapping = {

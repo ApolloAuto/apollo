@@ -312,13 +312,14 @@ apollo_create_hostenv() {
   if [[ ${UID} == 0 ]]; then
     # running as root
     pip3 install pipx jinja2 requests
-    apt install -y python3-apt
+    apt install -y python3-apt python3-venv rsync tree
   else
     pip3 install --user pipx jinja2 requests
-    sudo apt install -y python3-apt
+    sudo apt install -y python3-apt python3-venv rsync tree
   fi
-  pipx install --include-deps ansible
-  pipx ensurepath
+  python3 -m pipx install --include-deps ansible
+  python3 -m pipx ensurepath
+  # TODO: support other shells
   source "${HOME}/.bashrc"
   pushd "${AEM_HOME}" > /dev/null
   # update ansible scripts
@@ -349,12 +350,23 @@ apollo_create_hostenv() {
 
   # install buildtool
   # TODO: fetch from remote
-  dpkg -x "/apollo_workspace/apollo-neo-buildtool_9.0.0-rc1-r19_amd64.deb" "${APOLLO_ENV_ROOT}"
-  subenv "${AEM_HOME}/buildtool.conf.tpl" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/9.0.0-rc1-r19/config/module.conf"
-  ln -snf "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/9.0.0-rc1-r19" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest"
+  local buildtool_version="10.0.0-beta-r1"
+  # dpkg -x "/apollo_workspace/apollo-neo-buildtool_${buildtool_version}_amd64.deb" "${APOLLO_ENV_ROOT}"
+  install -d -m 755 "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}"
+  wget -c "https://apollo-system.cdn.bcebos.com/archive/10.0/buildtool-${buildtool_version}.tar.gz" -O - | tar -zx -C "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}" --strip-components=1
+  subenv "${AEM_HOME}/buildtool.conf.tpl" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}/config/module.conf"
+  ln -snf "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest"
   install -d -m 755 "${APOLLO_ENV_ROOT}/opt/apollo/neo/bin"
   ln -snf "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest/bin/mainboard.py" "${APOLLO_ENV_ROOT}/opt/apollo/neo/bin/buildtool"
-  install -D -m 755 "${AEM_HOME}/update_dylib.sh" "${APOLLO_ENV_ROOT}/opt/apollo/neo/update_dylib.sh"
+
+  # install -D -m 755 "${AEM_HOME}/update_dylib.sh" "${APOLLO_ENV_ROOT}/opt/apollo/neo/update_dylib.sh"
+  ln -snf "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest/scripts/update_dylib.sh" "${APOLLO_ENV_ROOT}/opt/apollo/neo/update_dylib.sh"
+  # # overwrite update_dylib.sh in buildtool
+  # install -D -m 755 "${AEM_HOME}/update_dylib.sh" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest/scripts/update_dylib.sh"
+
+  # create bazel-extended-tools symbol link
+  install -d -m 755 "${APOLLO_ENV_ROOT}/opt/apollo/neo/src"
+  ln -snf "/opt/apollo/neo/packages/bazel-extend-tools/latest/src" "${APOLLO_ENV_ROOT}/opt/apollo/neo/src/tools"
 
   touch "${APOLLO_ENV_HOME}/inited"
 
@@ -548,13 +560,13 @@ apollo_create_container_volume_options() {
   # tegrastats
   tegrastats="/usr/bin/tegrastats"
   if [[ -x ${tegrastats} ]]; then
-    volume_opts+=('-v' "${tegrastats}:${tegrastats}") 
+    volume_opts+=('-v' "${tegrastats}:${tegrastats}")
   fi
 
   # arm igpu kernel data
-  [[ `uname -m` == aarch64 ]] && [[ -e "/sys/kernel/debug" ]] && \
+  [[ $(uname -m) == aarch64 ]] && [[ -e "/sys/kernel/debug" ]] &&
     volume_opts+=('-v' '/sys/kernel/debug:/sys/kernel/debug')
-  
+
   volume_opts+=('-v' '/dev/null:/dev/raw1394')
 
   # volume for apollo packages and configurations
@@ -594,6 +606,9 @@ apollo_create_container_volume_options() {
   # TODO: will be removed in the future
   fix_mounts=(
     "${APOLLO_ENV_WORKSPACE}/data:/apollo/data"
+    "${APOLLO_ENV_WORKSPACE}/data:/opt/apollo/neo/data"
+    "${APOLLO_ENV_WORKSPACE}/data/log:/opt/apollo/neo/data/log"
+    "${APOLLO_ENV_WORKSPACE}/data/log:/apollo/data/log"
     "${APOLLO_ENV_WORKSPACE}/output:/apollo/output"
     "${APOLLO_ENV_WORKSPACE}/log:/apollo/log"
     "${APOLLO_ENV_WORKSPACE}/data/calibration_data:/apollo/modules/calibration/data"
@@ -632,11 +647,11 @@ export -f apollo_container_created_start_user
 
 apollo_container_download_arm_lib() {
   if [[ -n "${APOLLO_ENV_CROSS_PLATFORM}" ]]; then
-    if [[ `uname -m` == "x86_64" ]]; then
+    if [[ $(uname -m) == "x86_64" ]]; then
       if [[ "${APOLLO_ENV_CROSS_PLATFORM}" == "aarch64" ]]; then
         info "download external library for cross-compilation..."
         local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
-        apollo_execute_cmd_in_container  "cd ~ && wget -nv ${tegra_lib_url} && \
+        apollo_execute_cmd_in_container "cd ~ && wget -nv ${tegra_lib_url} && \
                   tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null"
       fi
     fi
@@ -652,12 +667,14 @@ apollo_container_created_post_action() {
   container_bin_path="/usr/local/bin/"
 
   ${DOCKER} cp "${aem_path}" "${APOLLO_ENV_CONTAINER_NAME}":"${container_bin_path}aem"
-  apollo_execute_cmd_in_container "ln -snf ${container_bin_path}/aem/run.sh /usr/bin/aem" 
-  apollo_execute_cmd_in_container "[[ `uname -m` == "aarch64" ]] && [[ -e /sys/kernel/debug ]] && chmod +rx /sys/kernel/debug"
+  apollo_execute_cmd_in_container "ln -snf ${container_bin_path}/aem/run.sh /usr/bin/aem"
+  apollo_execute_cmd_in_container "[[ $(uname -m) == "aarch64" ]] && [[ -e /sys/kernel/debug ]] && chmod +rx /sys/kernel/debug"
   apollo_execute_cmd_in_container "apt update && apt install --only-upgrade -y ${init_packages[@]}"
   apollo_execute_cmd_in_container "mkdir -pv /opt/apollo/neo/etc && chmod 777 -R /opt/apollo/neo/etc"
   apollo_container_created_start_user
-  apollo_container_download_arm_lib 
+  apollo_execute_cmd_in_container "mkdir -pv /apollo_workspace/data/{log,bag,record} &&
+          chown -R ${APOLLO_ENV_CONTAINER_USER}:${APOLLO_ENV_CONTAINER_GROUP} /apollo_workspace/data/"
+  apollo_container_download_arm_lib
 }
 export -f apollo_container_created_post_action
 
@@ -837,8 +854,8 @@ apollo_remove_envhome() {
     done
   fi
 
-  rm -rf "${env_home_global}"
-  rm -rf "${env_home_local}"
+  sudo rm -rf "${env_home_global}"
+  sudo rm -rf "${env_home_local}"
 }
 export -f apollo_remove_envhome
 

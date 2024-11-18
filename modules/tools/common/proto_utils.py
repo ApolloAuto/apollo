@@ -27,7 +27,7 @@ def write_pb_to_text_file(topic_pb, file_path):
 
 def get_pb_from_text_file(filename, pb_value):
     """Get a proto from given text file."""
-    with open(filename, 'r') as file_in:
+    with open(filename, 'r', encoding='utf-8') as file_in:
         return text_format.Merge(file_in.read(), pb_value)
 
 

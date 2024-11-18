@@ -109,6 +109,17 @@ class Polygon2d {
   double DistanceTo(const Vec2d &point) const;
 
   /**
+   * @brief Compute the distance from a point to the polygon. If the point is
+   *        within the polygon, return 0. Otherwise, this distance is
+   *        the minimal distance from the point to the edges of the polygon.
+   * @param point The point to compute whose distance to the polygon.
+   * @param closest_point An output parameter that returns the coordinates of
+   *                      the closest point on the polygon to the input point
+   * @return The distance from the point to the polygon.
+   */
+  double DistanceTo(const Vec2d &point, Vec2d& closest_point) const;
+
+  /**
    * @brief Compute the distance from a line segment to the polygon.
    *        If the line segment is within the polygon, or it has intersect with
    *        the polygon, return 0. Otherwise, this distance is
@@ -119,6 +130,24 @@ class Polygon2d {
    * @return The distance from the line segment to the polygon.
    */
   double DistanceTo(const LineSegment2d &line_segment) const;
+
+  /**
+   * @brief Compute the distance from a line segment to the polygon.
+   *        If the line segment is within the polygon, or it has intersect with
+   *        the polygon, return 0. Otherwise, this distance is
+   *        the minimal distance between the distances from the two ends
+   *        of the line segment to the polygon.
+   * @param line_segment The line segment to compute whose distance to
+   *        the polygon.
+   * @param polygon_closest_point Output parameter that returns the closest point on the polygon
+   *        to the line segment.
+   * @param segment_closest_point Output parameter that returns the closest point on the line
+   *        segment to the polygon. If the line segment is within the polygon,
+   * @return The distance from the line segment to the polygon.
+   */
+  double DistanceTo(const LineSegment2d &line_segment,
+                    Vec2d& polygon_closest_point,
+                    Vec2d& segment_closest_point) const;
 
   /**
    * @brief Compute the distance from a box to the polygon.
@@ -141,6 +170,23 @@ class Polygon2d {
    * @return The distance from the other polygon to this polygon.
    */
   double DistanceTo(const Polygon2d &polygon) const;
+
+  /**
+   * @brief Compute the distance from another polygon to the polygon.
+   *        If the other polygon is within this polygon, or it has overlap with
+   *        this polygon, return 0. Otherwise, this distance is
+   *        the minimal distance among the distances from the edges
+   *        of the other polygon to this polygon.
+   * @param polygon The polygon to compute whose distance to this polygon.
+   * @param self_closest_point Output parameter that returns the closest point on this polygon
+   *        to the other polygon.
+   * @param other_closest_point Output parameter that returns the closest point on the other polygon
+   *        to this polygon.
+   * @return The distance from the other polygon to this polygon.
+   */
+  double DistanceTo(const Polygon2d& polygon,
+                    Vec2d& self_closest_point,
+                    Vec2d& other_closest_point) const;
 
   /**
    * @brief Compute the square of distance from a point to the polygon.

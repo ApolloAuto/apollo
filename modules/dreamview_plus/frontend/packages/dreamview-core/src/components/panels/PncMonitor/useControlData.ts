@@ -191,9 +191,12 @@ export default function useControlData() {
     }
 
     function setCurrentTargetPoint(trajectoryPoint: any) {
-        data.current.currentTargetPoint = [];
+        data.current.trajectory.currentTargetPoint = [];
         if (trajectoryPoint && trajectoryPoint.pathPoint) {
-            pushIfChange(data.current.currentTargetPoint, [trajectoryPoint.pathPoint.x, trajectoryPoint.pathPoint.y]);
+            pushIfChange(data.current.trajectory.currentTargetPoint, [
+                trajectoryPoint.pathPoint.x,
+                trajectoryPoint.pathPoint.y,
+            ]);
         }
     }
 

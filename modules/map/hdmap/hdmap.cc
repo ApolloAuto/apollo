@@ -47,6 +47,10 @@ SignalInfoConstPtr HDMap::GetSignalById(const Id& id) const {
   return impl_.GetSignalById(id);
 }
 
+BarrierGateInfoConstPtr HDMap::GetBarrierGateById(const Id& id) const {
+  return impl_.GetBarrierGateById(id);
+}
+
 CrosswalkInfoConstPtr HDMap::GetCrosswalkById(const Id& id) const {
   return impl_.GetCrosswalkById(id);
 }
@@ -101,6 +105,12 @@ int HDMap::GetAreas(const apollo::common::PointENU& point, double distance,
 int HDMap::GetSignals(const apollo::common::PointENU& point, double distance,
                       std::vector<SignalInfoConstPtr>* signals) const {
   return impl_.GetSignals(point, distance, signals);
+}
+
+int HDMap::GetBarrierGates(
+  const apollo::common::PointENU& point, double distance,
+  std::vector<BarrierGateInfoConstPtr>* barrier_gates) const {
+  return impl_.GetBarrierGates(point, distance, barrier_gates);
 }
 
 int HDMap::GetCrosswalks(const apollo::common::PointENU& point, double distance,
@@ -208,6 +218,12 @@ int HDMap::GetForwardNearestSignalsOnLane(
     const apollo::common::PointENU& point, const double distance,
     std::vector<SignalInfoConstPtr>* signals) const {
   return impl_.GetForwardNearestSignalsOnLane(point, distance, signals);
+}
+
+int HDMap::GetForwardNearestBarriersOnLane(
+    const apollo::common::PointENU& point, const double distance,
+    std::vector<BarrierGateInfoConstPtr>* barrier_gates) const {
+  return impl_.GetForwardNearestBarriersOnLane(point, distance, barrier_gates);
 }
 
 int HDMap::GetStopSignAssociatedStopSigns(

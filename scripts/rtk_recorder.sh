@@ -17,7 +17,6 @@
 ###############################################################################
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function setup() {
   bash ${TOP_DIR}/scripts/canbus.sh start
@@ -35,7 +34,7 @@ function start() {
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"
   if [[ ! -z "$(which rtk_recorder)" ]]; then
-    rtk_recorder_binary="rtk_recorder" 
+    rtk_recorder_binary="rtk_recorder"
   elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
     rtk_recorder_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder"
   else

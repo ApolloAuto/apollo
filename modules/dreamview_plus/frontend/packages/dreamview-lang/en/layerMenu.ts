@@ -6,6 +6,7 @@ export const layerMenu = {
 
     perception: 'Perception',
     pointCloud: 'Point Cloud',
+    curbPointCloud: 'Curb Point Cloud',
     pedestrian: 'Pedestrian',
     vehicle: 'Vehicle',
     bicycle: 'Bicycle',
@@ -60,6 +61,8 @@ export const layerMenu = {
     yieldSign: 'Yield Sign',
     speedBump: 'Speed Bump',
     parkingSpace: 'Parking Space',
+    barrierGate: 'Barrier Gate',
+    area: 'Area',
     parkingSpaceId: 'ParkingSpace Id',
     laneId: 'Lane Id',
     egoBoudingBox: 'Ego BoudingBox',

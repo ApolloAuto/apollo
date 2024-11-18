@@ -53,7 +53,7 @@ export default function RoutingEditingOperationArea() {
                 routeInfo.initialPoint = res;
             });
         }
-        const currentRouteMixValue = { currentRouteLoop: { currentRouteLoopState: false } };
+        const currentRouteMixValue = { currentRouteLoop: { currentRouteLoopState: true } };
         routeManager.currentRouteMix.setCurrentRouteMix(currentRouteMixValue);
         EE.emit(BusinessEventTypes.SimControlRoute, { panelId, routeInfo });
         navigate('/');

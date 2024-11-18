@@ -41,7 +41,7 @@ using TrajectoryPb = planning::ADCTrajectory;
 using apollo::common::VehicleStateProvider;
 
 const char data_path[] =
-    "/apollo/modules/control/controllers/lon_based_pid_controller/"
+    "modules/control/controllers/lon_based_pid_controller/"
     "longitudinal_controller_test/";
 
 class LonControllerTest : public ::testing::Test, LonController {
@@ -49,7 +49,7 @@ class LonControllerTest : public ::testing::Test, LonController {
   virtual void SetUp() {
     FLAGS_v = 3;
     std::string controllers_dir =
-        "/apollo/modules/control/controllers/lon_based_pid_controller/";
+        "modules/control/controllers/lon_based_pid_controller/";
     std::string control_conf_file =
         controllers_dir +
         "longitudinal_controller_test/conf/controller_conf.pb.txt";

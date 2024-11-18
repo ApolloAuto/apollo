@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package apollo.perception;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message BarrierGate {
+  enum Status {
+    UNKNOWN = 0;
+    CLOSED = 1;
+    CLOSING = 2;
+    OPENED = 3;
+    OPENING = 4;
+  };
+  optional Status status = 1;
+
+  // Barrier gate string-ID in the map data.
+  optional string id = 2;
+
+  // Barrier gate type in the map data.
+  optional string type = 3;
+
+  // Wheter the barrier recognition is activated.
+  optional bool is_useable = 4 [default = false];
+
+  // Open percentage.
+  optional double open_percent = 5;
+}
+
+message PerceptionBarrierGate {
+  optional apollo.common.Header header = 1;
+  repeated BarrierGate barrier_gates = 2;
+}

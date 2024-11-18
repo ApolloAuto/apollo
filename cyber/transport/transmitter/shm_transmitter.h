@@ -21,6 +21,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
@@ -37,6 +38,9 @@
 namespace apollo {
 namespace cyber {
 namespace transport {
+
+template <typename T, typename U>
+struct type_check : std::is_same<typename std::decay<T>::type, U>::type {};
 
 template <typename M>
 class ShmTransmitter : public Transmitter<M> {
@@ -98,7 +102,9 @@ ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
       arena_receiver_count_(0) {
   host_id_ = common::Hash(attr.host_ip());
   arena_transmit_ = common::GlobalData::Instance()->IsChannelEnableArenaShm(
-      this->attr_.channel_id());
+                        this->attr_.channel_id()) &&
+                    !type_check<M, message::RawMessage>::value &&
+                    !type_check<M, message::PyMessageWrap>::value;
 }
 
 template <typename M>

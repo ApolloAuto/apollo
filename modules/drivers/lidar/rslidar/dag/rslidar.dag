@@ -4,7 +4,7 @@ module_config {
         class_name : "RslidarComponent"
         config {
           name : "RSHELIOS_Driver"
-          config_file_path : "/apollo/modules/drivers/lidar/rslidar/conf/rslidar.pb.txt"
+          config_file_path : "modules/drivers/lidar/rslidar/conf/rslidar.pb.txt"
         }
     }
 }

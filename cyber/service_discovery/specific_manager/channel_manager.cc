@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2024 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 
 #include <algorithm>
-#include <set>
 #include <utility>
 
 #include "cyber/common/global_data.h"
@@ -25,8 +24,6 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/message/py_message.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/state.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {

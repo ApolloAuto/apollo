@@ -23,10 +23,10 @@
       include_role:
         name: apolloauto.dev_env.cyber_deps
 
-#    - name: Install Modules Base Dependencies
-#      include_role:
-#        name: apolloauto.dev_env.modules_base
-#
+    - name: Install Modules Base Dependencies
+      include_role:
+        name: apolloauto.dev_env.modules_base
+
     - name: Install Oridinary Modules Dependencies
       include_role:
         name: apolloauto.dev_env.ordinary_modules

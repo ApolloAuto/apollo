@@ -62,10 +62,12 @@ function pathappend() {
 }
 
 function generate_ld_library_path() {
-  cat ${APOLLO_ENV_ROOT}/etc/ld.so.conf.d/apollo.conf |
-    grep -v -E '^\s*$' |
-    grep -v -E '^\s*#.*$' |
-    tr '\n' ':'
+  if [[ -e "${APOLLO_ENV_ROOT}/etc/ld.so.conf.d/apollo.conf" ]]; then
+    cat ${APOLLO_ENV_ROOT}/etc/ld.so.conf.d/apollo.conf |
+      grep -v -E '^\s*$' |
+      grep -v -E '^\s*#.*$' |
+      tr '\n' ':'
+  fi
 }
 
 deactivate() {
@@ -99,11 +101,11 @@ restore_env() {
 
 deactivate
 
-# export APOLLO_ENV_WORKROOT="${APOLLO_ENV_ROOT}"
+export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
 
 # paths
 export APOLLO_MODEL_PATH="${APOLLO_ENV_ROOT}/apollo/modules/perception/data/models"
-export APOLLO_LIB_PATH="${APOLLO_ENV_ROOT}/lib"
+export APOLLO_LIB_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo/lib"
 export APOLLO_DAG_PATH="${APOLLO_ENV_ROOT}/apollo"
 export APOLLO_FLAG_PATH="${APOLLO_ENV_ROOT}/apollo"
 export APOLLO_CONF_PATH="${APOLLO_ENV_ROOT}/apollo"
@@ -112,10 +114,11 @@ export APOLLO_RUNTIME_PATH="${APOLLO_ENV_ROOT}/apollo"
 # TODO: set `/apollo/apollo/neo` as prefix
 export APOLLO_PLUGIN_INDEX_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo/share/cyber_plugin_index"
 export APOLLO_PLUGIN_LIB_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo/lib"
-export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo/share"
+export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo"
 
 # runtime variables
 export AEM_HOST_VIRTUALENV=1
+export APOLLO_DISTRIBUTION_VERSION="${APOLLO_DISTRIBUTION_VERSION:-9.0}"
 export APOLLO_DISTRIBUTION_HOME="${APOLLO_DISTRIBUTION_HOME:-${APOLLO_ENV_ROOT}/opt/apollo/neo}"
 export APOLLO_SYSROOT_DIR="${APOLLO_SYSROOT_DIR:-/opt/apollo/sysroot}"
 export APOLLO_CACHE_DIR="${APOLLO_CACHE_DIR:-./.cache}"
@@ -130,7 +133,9 @@ export APOLLO_CONFIG_HOME="${APOLLO_CONFIG_HOME:-${HOME}/.apollo}"
 
 # TODO: detect automatically
 backup_env TENSORRT_VERSION
-export TENSORRT_VERSION=7.2.1
+export TENSORRT_VERSION=8.6.1.6
+backup_env CUDNN_VERSION
+export CUDNN_VERSION=8.9.7.29
 
 backup_env LD_LIBRARY_PATH
 # pathprepend "${APOLLO_LIB_PATH}" LD_LIBRARY_PATH
@@ -138,6 +143,7 @@ backup_env LD_LIBRARY_PATH
 # # TODO: move to APOLLO_ENV_ROOT
 # pathprepend "/usr/local/fast-rtps/lib" LD_LIBRARY_PATH
 # pathprepend "/usr/local/libtorch_gpu/lib" LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="$(generate_ld_library_path)"
 
 backup_env PYTHONPATH
 pathprepend "${APOLLO_ENV_ROOT}/opt/apollo/neo/python" PYTHONPATH
@@ -151,6 +157,7 @@ PS1="\[\e[31m\][\[\e[m\]\[\e[32m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[35m\]\h\[\e[
 
 alias ls='ls --color=auto'
 alias buildtool='_abt() {
+    export LD_LIBRARY_PATH="$(generate_ld_library_path)"
     command buildtool "$@"
     export LD_LIBRARY_PATH="$(generate_ld_library_path)"
 };_abt'
@@ -161,3 +168,4 @@ mkdir -p "${CYBER_PATH}"
 mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/log"
 mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/core"
 mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/bag"
+mkdir -p "${APOLLO_ENV_ROOT}/apollo/modules/map/data"

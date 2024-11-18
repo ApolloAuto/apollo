@@ -11,7 +11,7 @@ apollo_open_maps_api_entrypoint = https://apollo.baidu.com/open-maps/api/v1
 [cache]
 offline_metadata_prefix=${APOLLO_ENV_ROOT}/opt/apollo/neo/share/buildtool/namespaces
 installed_package=${APOLLO_ENV_ROOT}/opt/apollo/neo/share/buildtool/installed_package
-user_installed_package=$buildtool/install/user
+user_installed_package=buildtool/install/user
 mock_install_target_file=buildtool/mock/BUILD
 offline_packages_filename=Packages
 ld_cache=ld.cache

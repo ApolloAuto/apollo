@@ -6,7 +6,7 @@ module_config {
         class_name: "UDPBridgeReceiverComponent<canbus::Chassis>"
         config {
             name: "bridge_receiver_Chassis"
-            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_receiver_chassis.pb.txt"
+            config_file_path: "modules/bridge/conf/udp_bridge_receiver_chassis.pb.txt"
       }
    }
 }

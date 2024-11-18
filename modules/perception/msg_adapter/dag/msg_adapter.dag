@@ -5,7 +5,7 @@ module_config {
       class_name : "MsgAdapterComponent"
       config {
         name : "MsgAdapterComponent"
-        flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+        flag_file_path: "modules/perception/data/flag/perception_common.flag"
       }
     }
 }

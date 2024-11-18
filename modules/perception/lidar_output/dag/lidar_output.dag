@@ -4,8 +4,8 @@ module_config {
     class_name : "PointCloudPreprocessComponent"
     config {
       name : "PointCloudPreprocess"
-      config_file_path : "/apollo/modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
       }
@@ -19,8 +19,8 @@ module_config {
     class_name : "PointCloudMapROIComponent"
     config {
       name : "PointCloudMapROI"
-      config_file_path : "/apollo/modules/perception/pointcloud_map_based_roi/conf/pointcloud_map_based_roi_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/pointcloud_map_based_roi/conf/pointcloud_map_based_roi_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/pointcloud_preprocess"
       }
@@ -34,8 +34,8 @@ module_config {
     class_name : "PointCloudGroundDetectComponent"
     config {
       name : "PointCloudGroundDetect"
-      config_file_path : "/apollo/modules/perception/pointcloud_ground_detection/conf/pointcloud_ground_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/pointcloud_ground_detection/conf/pointcloud_ground_detection_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/pointcloud_map_based_roi"
       }
@@ -49,8 +49,8 @@ module_config {
     class_name : "LidarDetectionComponent"
     config {
       name : "LidarDetection"
-      config_file_path : "/apollo/modules/perception/lidar_detection/conf/lidar_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/lidar_detection/conf/lidar_detection_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/pointcloud_ground_detection"
       }
@@ -64,8 +64,8 @@ module_config {
     class_name : "LidarDetectionFilterComponent"
     config {
       name : "LidarDetectionFilter"
-      config_file_path : "/apollo/modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/detection"
       }
@@ -79,8 +79,8 @@ module_config {
     class_name : "LidarTrackingComponent"
     config {
       name : "LidarTracking"
-      config_file_path : "/apollo/modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/detection_filter"
       }
@@ -94,8 +94,8 @@ module_config {
     class_name : "LidarOutputComponent"
     config {
       name : "LidarOutput"
-      config_file_path : "/apollo/modules/perception/lidar_output/conf/lidar_output_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/lidar_output/conf/lidar_output_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/inner/PrefusedObjects"
       }

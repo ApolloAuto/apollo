@@ -16,25 +16,27 @@
 
 #include <vector>
 
+#include "cyber/ros_bridge/common/macros.h"
+
+#include "cyber/ros_bridge/proto/ros_bridge_conf.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "cyber/ros_bridge/common/utils.h"
-#include "cyber/ros_bridge/common/ros_bridge_gflags.h"
 #include "cyber/ros_bridge/common/bridge_argument.h"
-#include "cyber/ros_bridge/proto/ros_bridge_conf.pb.h"
+#include "cyber/ros_bridge/common/ros_bridge_gflags.h"
+#include "cyber/ros_bridge/common/utils.h"
 #include "cyber/ros_bridge/converter_base/message_converter.h"
 
-#include "gperftools/profiler.h"
 #include "gperftools/heap-profiler.h"
 #include "gperftools/malloc_extension.h"
+#include "gperftools/profiler.h"
 
 #if __has_include("rclcpp/rclcpp.hpp")
 #include "rclcpp/rclcpp.hpp"
 #endif
 
-using apollo::cyber::plugin_manager::PluginManager;
 using apollo::cyber::BridgeArgument;
 using apollo::cyber::MessageConverter;
+using apollo::cyber::plugin_manager::PluginManager;
 using namespace apollo::cyber::common;  // NOLINT
 
 int main(int argc, char** argv) {
@@ -52,20 +54,20 @@ int main(int argc, char** argv) {
 
   PluginManager::Instance()->LoadInstalledPlugins();
 
-  auto config_path = GetAbsolutePath(
-    WorkRoot(), apollo::cyber::FLAGS_bridge_conf_path);
+  auto config_path =
+      GetAbsolutePath(WorkRoot(), apollo::cyber::FLAGS_bridge_conf_path);
   if (!GetProtoFromFile(config_path, &bridge_conf)) {
     AERROR << "parse ros bridge config failed!";
     return 1;
   }
 
   for (int i = 0; i < bridge_conf.converter_size(); i++) {
-    auto converter = PluginManager::Instance()
-      ->CreateInstance<MessageConverter>(
-        apollo::cyber::GetFullConverterClassName(
-          bridge_conf.converter(i).type()));
+    auto converter =
+        PluginManager::Instance()->CreateInstance<MessageConverter>(
+            apollo::cyber::GetFullConverterClassName(
+                bridge_conf.converter(i).type()));
     ACHECK(converter->Init())
-      << "Can not init converter " << bridge_conf.converter(i).type();
+        << "Can not init converter " << bridge_conf.converter(i).type();
     converter_list_.push_back(converter);
   }
 

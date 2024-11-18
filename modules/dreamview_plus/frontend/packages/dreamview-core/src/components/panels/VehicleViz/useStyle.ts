@@ -90,8 +90,14 @@ export default makeStyles((theme) => ({
         '&:nth-of-type(2n + 1)': {
             minWidth: '150px',
         },
-        '&:nth-of-type(2n + 2)': {
+        '&[data-width="max"]': {
             width: '216px',
+        },
+        '&[data-width="min"]': {
+            width: '150px',
+        },
+        '&[data-width="minMax"]': {
+            minWidth: '150px',
         },
         height: '34px',
         lineHeight: '34px',

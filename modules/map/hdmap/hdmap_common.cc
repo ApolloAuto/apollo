@@ -507,6 +507,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetSignalById(object_map_id) != nullptr) {
         signals_.emplace_back(overlap_ptr);
       }
+      if (map_instance.GetBarrierGateById(object_map_id) != nullptr) {
+        barrier_gates_.emplace_back(overlap_ptr);
+      }
       if (map_instance.GetYieldSignById(object_map_id) != nullptr) {
         yield_signs_.emplace_back(overlap_ptr);
       }
@@ -632,6 +635,24 @@ SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
+    SegmentsFromCurve(stop_line, &segments_);
+  }
+  ACHECK(!segments_.empty());
+  std::vector<Vec2d> points;
+  for (const auto &segment : segments_) {
+    points.emplace_back(segment.start());
+    points.emplace_back(segment.end());
+  }
+  CHECK_GT(points.size(), 0U);
+}
+
+BarrierGateInfo::BarrierGateInfo(const BarrierGate &barrier_gate)
+    : barrier_gate_(barrier_gate) {
+  Init();
+}
+
+void BarrierGateInfo::Init() {
+  for (const auto &stop_line : barrier_gate_.stop_line()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
   ACHECK(!segments_.empty());

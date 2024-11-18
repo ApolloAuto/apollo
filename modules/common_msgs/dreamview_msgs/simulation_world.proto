@@ -197,6 +197,8 @@ message MapElementIds {
   repeated string parking_space = 10;
   repeated string speed_bump = 11;
   repeated string pnc_junction = 12;
+  repeated string ad_area = 13;
+  repeated string barrier_gate = 14;
 }
 
 message ControlData {

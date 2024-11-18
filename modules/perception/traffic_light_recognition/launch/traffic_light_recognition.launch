@@ -3,7 +3,7 @@
     <version>1.0.0</version>
     <module>
         <name>traffic_light_recognition</name>
-        <dag_conf>/apollo/modules/perception/traffic_light_recognition/dag/traffic_light_recognition.dag</dag_conf>
+        <dag_conf>modules/perception/traffic_light_recognition/dag/traffic_light_recognition.dag</dag_conf>
         <process_name>traffic_light_recognition</process_name>
         <version>1.0.0</version>
     </module>

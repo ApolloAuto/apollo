@@ -21,11 +21,12 @@
 #include <memory>
 #include <string>
 
+#include "cyber/ros_bridge/converter_base/converter_interface.h"
+
 #include "cyber/proto/simple.pb.h"
 #include "modules/common_msgs/localization_msgs/gps.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "cyber/ros_bridge/converter_base/converter_interface.h"
 
 #if __has_include("nav_msgs/msg/odometry.hpp")
 #include "nav_msgs/msg/odometry.hpp"

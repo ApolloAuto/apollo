@@ -31,7 +31,7 @@ export PKGS_DIR="/opt/apollo/pkgs"
 export SYSROOT_DIR="/opt/apollo/sysroot"
 
 export APOLLO_PROFILE="/etc/profile.d/apollo.sh"
-export APOLLO_LD_FILE="/etc/ld.so.conf.d/apollo.conf"
+export APOLLO_LD_FILE="/etc/ld.so.conf.d/apolloauto.conf"
 export DOWNLOAD_LOG="/opt/apollo/build.log"
 export LOCAL_HTTP_ADDR="http://172.17.0.1:8388"
 

@@ -1,0 +1,115 @@
+info {
+  name: "apollo_bevnet_onnx"
+  version: ""
+  dataset: "nuScenes"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: Onnx
+
+  proto_file {
+    file: "apollo_bevnet.onnx"
+  }
+  weight_file {
+    file: "apollo_bevnet.onnx"
+  }
+
+  inputs {
+    name: "image"
+    shape: 1
+    shape: 6
+    shape: 3
+    shape: 480
+    shape: 800
+  }
+  inputs {
+    name: "prev_bev"
+    shape: 2500
+    shape: 1
+    shape: 256
+  }
+  inputs {
+    name: "use_prev_bev"
+    shape: 1
+  }
+  inputs {
+    name: "can_bus"
+    shape: 18
+  }
+  inputs {
+    name: "lidar2img"
+    shape: 1
+    shape: 6
+    shape: 4
+    shape: 4
+  }
+  inputs {
+    name: "no_pad_image_shape"
+    shape: 2
+  }
+  outputs {
+    name: "bev_embed"
+    shape: 2500
+    shape: 1
+    shape: 256
+  }
+  outputs {
+    name: "outputs_classes"
+    shape: 6
+    shape: 1
+    shape: 900
+    shape: 10
+  }
+  outputs {
+    name: "outputs_coords"
+    shape: 6
+    shape: 1
+    shape: 900
+    shape: 8
+  }
+  outputs {
+    name: "outputs_occupancy"
+    shape: 1
+    shape: 640000
+    shape: 16
+  }
+  class_names: "car"
+  class_names: "truck"
+  class_names: "construction_vehicle"
+  class_names: "bus"
+  class_names: "trailer"
+  class_names: "barrier"
+  class_names: "motorcycle"
+  class_names: "bicycle"
+  class_names: "pedestrian"
+  class_names: "traffic_cone"
+}
+resize {
+  width: 800
+  height: 480
+}
+normalize {
+  mean: 103.530
+  mean: 116.280
+  mean: 123.675
+  std: 57.375
+  std: 57.120
+  std: 58.395
+}
+score_threshold: 0.3
+img_scale: 0.5
+
+no_pad_image_width: 450
+no_pad_image_height: 800
+
+occ_xmin: -50
+occ_xmax: 50
+occ_ymin: -50
+occ_ymax: 50
+occ_zmin: -5.0
+occ_zmax: 3.0
+voxel_size: 0.5
+
+location_dist_threshold: 10.0
+save_occ_result: false 
+occ_save_path: "data/occ_results"
+occ_threshold: 0.25

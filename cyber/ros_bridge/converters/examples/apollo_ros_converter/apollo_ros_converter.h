@@ -18,10 +18,11 @@
 
 #include <memory>
 
+#include "cyber/ros_bridge/converter_base/converter_interface.h"
+
 #include "cyber/proto/simple.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "cyber/ros_bridge/converter_base/convert_apollo_single.h"
 
 #if __has_include("std_msgs/msg/string.hpp")
 #include "std_msgs/msg/int32.hpp"

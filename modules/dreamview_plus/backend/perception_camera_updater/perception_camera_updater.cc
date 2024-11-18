@@ -65,7 +65,8 @@ void ConstructTransformationMatrix(const Quaternion &quaternion,
 }  // namespace
 
 PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler *websocket)
-    : websocket_(websocket),
+    : UpdaterWithChannelsBase({"drivers.Image"}, {""}),
+      websocket_(websocket),
       node_(cyber::CreateNode("perception_camera_updater")) {
   InitReaders();
 }
@@ -383,7 +384,7 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update,
 }
 void PerceptionCameraUpdater::GetChannelMsg(
     std::vector<std::string> *channels) {
-  GetChannelMsgWithFilter(channels, "drivers.Image", "");
+  GetChannelMsgWithFilter(channels);
 }
 
 std::shared_ptr<cyber::Reader<apollo::perception::PerceptionObstacles>>

@@ -33,9 +33,9 @@ namespace ndt {
 
 TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
   const std::string map_folder =
-      "/apollo/modules/localization/ndt/test_data/ndt_map";
+      "modules/localization/ndt/test_data/ndt_map";
   const std::string poses_file =
-      "/apollo/modules/localization/ndt/test_data/pcds/poses.txt";
+      "modules/localization/ndt/test_data/pcds/poses.txt";
   LidarLocatorNdt locator;
 
   // Locator settings.
@@ -66,7 +66,7 @@ TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
     std::stringstream ss;
     ss << frame_idx + 1;
     std::string pcd_file_path =
-        "/apollo/modules/localization/ndt/test_data/pcds/" + ss.str() + ".pcd";
+        "modules/localization/ndt/test_data/pcds/" + ss.str() + ".pcd";
     msf::velodyne::LoadPcds(pcd_file_path, frame_idx, poses[frame_idx], &pt3ds,
                             &intensities);
     LidarFrame lidar_frame;

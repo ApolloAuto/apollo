@@ -2,15 +2,15 @@
 # tasks file for ansible/roles/ordinary_modules
 
 # support for modules/common
-- name: Install osqp (for modules/common)
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_osqp.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "osqp-0.5.0"
-    INSTALL_PREFIX: "/opt/apollo/sysroot"
+#- name: Install osqp (for modules/common)
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_osqp.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "osqp-0.5.0"
+#    INSTALL_PREFIX: "/opt/apollo/sysroot"
 
 - name: Install libsqlite3-dev (for modules/common)
   become: true
@@ -34,25 +34,25 @@
 
 # support for modules/predictioh
 # already installed in modules_base
-- name: Install opencv (for modules/prediction)
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_opencv.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "opencv-4.4.0"
-    INSTALL_PREFIX: "/opt/apollo/sysroot"
+#- name: Install opencv (for modules/prediction)
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_opencv.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "opencv-4.4.0"
+#    INSTALL_PREFIX: "/opt/apollo/sysroot"
 
 # support for modules/planning
-- name: Install adolc (for modules/planning)
-  become: true
-  ansible.builtin.apt:
-    name:
-      - libcolpack-dev
-      - libadolc-dev
-    state: latest
-    update_cache: false
+#- name: Install adolc (for modules/planning)
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - libcolpack-dev
+#      - libadolc-dev
+#    state: latest
+#    update_cache: false
 
 - name: Install ipopt (for modules/planning)
   become: true
@@ -114,13 +114,13 @@
     INSTALL_PREFIX: "/opt/apollo/sysroot"
 
 # support for modules/audio
-- name: Install fftw3 (for modules/audio)
-  become: true
-  ansible.builtin.apt:
-    name:
-      - libfftw3-dev
-    state: latest
-    update_cache: false
+#- name: Install fftw3 (for modules/audio)
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - libfftw3-dev
+#    state: latest
+#    update_cache: false
 
 - name: Install openssl
   become: true

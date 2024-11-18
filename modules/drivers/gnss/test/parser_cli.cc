@@ -65,7 +65,7 @@ void Parse(const char* filename, const char* file_type,
   std::string type = std::string(file_type);
   config::Config config;
   if (!apollo::cyber::common::GetProtoFromFile(
-          std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"),
+          std::string("modules/drivers/gnss/conf/gnss_conf.pb.txt"),
           &config)) {
     std::cout << "Unable to load gnss conf file";
   }

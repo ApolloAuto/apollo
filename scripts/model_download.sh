@@ -33,6 +33,7 @@ dic=([3d-r4-half_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/
      [point_pillars_radar4d_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/point_pillars_radar4d_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-12-07T08%3A11%3A00Z/-1/host/2275614dd6c8999c7cb6b171b889bd0d637997fac52e826597cfe76309efb4ac" \
      [point_pillars_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/point_pillars_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-11-02T09%3A28%3A04Z/-1/host/8c5356cf4f38c3590017fe552acb9764dac8696f92324aee414ce7eaa029b57a" \
      [mask_pillars_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/mask_pillars_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-11-02T09%3A28%3A22Z/-1/host/129833d8aacecc3a95e729f73d73d6b44bfcb5c8a23eb1e5051b71b4b9f8a075" \
+     [apollo_bevnet_onnx.zip]="https://apollo-perception.bj.bcebos.com/core_model/apollo_bevnet_onnx.zip?authorization=bce-auth-v1/ALTAKg5yEiU4seODUEbcZVtvIv/2024-10-22T13%3A01%3A45Z/-1/host/20d8d79aedbf84a29b52e05348d783dc5094164618346de3d665c0b2f0f94861" \
     )
 
 cd "/apollo"

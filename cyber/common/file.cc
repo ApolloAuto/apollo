@@ -247,10 +247,24 @@ bool CopyFile(const std::string &from, const std::string &to) {
   return true;
 }
 
+bool IsValidPath(const std::string &path) {
+  const std::string illegal_chars = "\0<>:\"|?*;";
+  for (char ch : path) {
+    if (illegal_chars.find(ch) != std::string::npos) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool CopyDir(const std::string &from, const std::string &to) {
   DIR *directory = opendir(from.c_str());
   if (directory == nullptr) {
     AERROR << "Cannot open directory " << from;
+    return false;
+  }
+  if (!IsValidPath(from) || !IsValidPath(to)) {
+    AERROR << "invalid path format: " << from << " to " << to;
     return false;
   }
 

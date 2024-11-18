@@ -4,8 +4,8 @@ module_config {
         class_name : "CanbusComponent"
         config {
             name: "canbus"
-            config_file_path:  "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
-            flag_file_path:  "/apollo/modules/canbus/conf/canbus.conf"
+            config_file_path:  "modules/canbus/conf/canbus_conf.pb.txt"
+            flag_file_path:  "modules/canbus/conf/canbus.conf"
             interval: 10
         }
     }

@@ -22,7 +22,7 @@ DEFINE_string(cmd, "start", "command corresponding to stage");
 DEFINE_string(record_path, "", "record path");
 DEFINE_string(
     client_conf_yaml,
-    "/apollo/modules/map/tools/map_datachecker/client/conf/client.yaml",
+    "modules/map/tools/map_datachecker/client/conf/client.yaml",
     "client configurations");
 }  // namespace hdmap
 }  // namespace apollo

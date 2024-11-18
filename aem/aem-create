@@ -125,6 +125,9 @@ parse_arguments() {
         ;;
       -b | --backend)
         export APOLLO_ENV_BACKEND="$1"
+        if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+          export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+        fi
         shift
         ;;
       -c | --cross-platform)
@@ -170,6 +173,9 @@ parse_arguments() {
         ;;
       -w | --workspace)
         export APOLLO_ENV_WORKSPACE="$1"
+        if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+          export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+        fi
         shift
         ;;
       --image)

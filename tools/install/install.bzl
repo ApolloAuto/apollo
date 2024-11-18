@@ -51,9 +51,11 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
         return path
 
     owner = input_file.owner
-    if owner.workspace_name != "":
+    if owner.workspace_name != "" and owner.workspace_name != "apollo_src":
         dest = join_paths("third_party", owner.workspace_name, owner.package, input_file.basename)
     else:
+        if owner.workspace_name == "apollo_src":
+            return input_file.basename
         dest = join_paths(owner.package, input_file.basename)
 
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
@@ -96,8 +98,8 @@ def _install_action(
         strip_prefixes = [],
         rename = {},
         warn_foreign = True,
-        py_runfiles = False,
-        py_runfiles_path = None,
+        py_bin = False,
+        py_path = None,
         plugin = False):
     """Compute install action for a single file.
 
@@ -126,10 +128,10 @@ def _install_action(
         )
     else:
         strip_prefix = strip_prefixes
-    if py_runfiles:
+    if py_bin:
         file_dest = join_paths(
             dest,
-            py_runfiles_path,
+            py_path,
         )
     else:
         if "@" not in dest:     
@@ -283,33 +285,41 @@ def _install_cc_actions(ctx, target):
 # Compute install actions for a py_library or py_binary.
 # TODO(jamiesnape): Install native shared libraries that the target may use.
 def _install_py_actions(ctx, target):
-    actions = _install_actions(
-        ctx,
-        [target],
-        ctx.attr.py_dest,
-        ctx.attr.py_strip_prefix,
-        rename = ctx.attr.rename,
-    )
-
-    runfile_actions = []
-    runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
-    runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
-
-    for f in _depset_to_list(target.default_runfiles.files):
-        runfile_actions.append(
+    actions = []
+    for f in _depset_to_list(target.files):
+        if not f.basename.endswith("py"):
+            continue
+        actions.append(
             _install_action(
                 ctx,
                 f,
-                runfiles_dest,
+                ctx.attr.py_dest,
                 ctx.attr.py_strip_prefix,
-                ctx.attr.rename,
-                True,
-                True,
-                join_paths("%s" % ctx.workspace_name, f.short_path),
-            ),
+                rename = ctx.attr.rename,
+                py_bin = True,
+                py_path = f.basename.replace(".py", "")
+            )
         )
 
-    actions += runfile_actions
+    # runfile_actions = []
+    # runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
+    # runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
+
+    # for f in _depset_to_list(target.default_runfiles.files):
+    #     runfile_actions.append(
+    #         _install_action(
+    #             ctx,
+    #             f,
+    #             runfiles_dest,
+    #             ctx.attr.py_strip_prefix,
+    #             ctx.attr.rename,
+    #             True,
+    #             True,
+    #             join_paths("%s" % ctx.workspace_name, f.short_path),
+    #         ),
+    #     )
+
+    # actions += runfile_actions
 
     return actions
 

@@ -22,15 +22,17 @@
 
 #include "cyber/transport/rtps/underlay_message.h"
 
-#include "fastcdr/exceptions/BadParamException.h"
-
 namespace apollo {
 namespace cyber {
 namespace transport {
 
+#define UnderlayMessage_max_cdr_typesize 276ULL;
+#define UnderlayMessage_max_key_cdr_typesize 0ULL;
+
 UnderlayMessage::UnderlayMessage() {
   m_timestamp = 0;
   m_seq = 0;
+  m_data = "";
 }
 
 UnderlayMessage::~UnderlayMessage() {}
@@ -39,21 +41,18 @@ UnderlayMessage::UnderlayMessage(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = x.m_data;
-  m_datatype = x.m_datatype;
 }
 
 UnderlayMessage::UnderlayMessage(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = std::move(x.m_data);
-  m_datatype = std::move(x.m_datatype);
 }
 
 UnderlayMessage& UnderlayMessage::operator=(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = x.m_data;
-  m_datatype = x.m_datatype;
 
   return *this;
 }
@@ -62,27 +61,12 @@ UnderlayMessage& UnderlayMessage::operator=(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = std::move(x.m_data);
-  m_datatype = std::move(x.m_datatype);
 
   return *this;
 }
 
 size_t UnderlayMessage::getMaxCdrSerializedSize(size_t current_alignment) {
-  size_t initial_alignment = current_alignment;
-
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-
-  current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
-
-  return current_alignment - initial_alignment;
+  return UnderlayMessage_max_cdr_typesize;
 }
 
 size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage& data,
@@ -90,41 +74,32 @@ size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage& data,
   size_t initial_alignment = current_alignment;
 
   current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+      8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
   current_alignment +=
-      4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
+      8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
   current_alignment += 4 +
                        eprosima::fastcdr::Cdr::alignment(current_alignment, 4) +
                        data.data().size() + 1;
-
-  current_alignment += 4 +
-                       eprosima::fastcdr::Cdr::alignment(current_alignment, 4) +
-                       data.datatype().size() + 1;
 
   return current_alignment - initial_alignment;
 }
 
 void UnderlayMessage::serialize(eprosima::fastcdr::Cdr& scdr) const {
   scdr << m_timestamp;
-
   scdr << m_seq;
-
   scdr << m_data;
-  scdr << m_datatype;
 }
 
 void UnderlayMessage::deserialize(eprosima::fastcdr::Cdr& dcdr) {
   dcdr >> m_timestamp;
   dcdr >> m_seq;
   dcdr >> m_data;
-  dcdr >> m_datatype;
 }
 
 size_t UnderlayMessage::getKeyMaxCdrSerializedSize(size_t current_alignment) {
-  size_t current_align = current_alignment;
-  return current_align;
+  return UnderlayMessage_max_key_cdr_typesize;
 }
 
 bool UnderlayMessage::isKeyDefined() { return false; }

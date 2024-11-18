@@ -6,6 +6,7 @@ import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/
 import { createDymaticPanel } from '../../components/panels/base/PanelFactory';
 import { getPanelTypeByPanelId } from '../../util/layout';
 import { getAllPanels } from '../../components/panels';
+import useWebSocketServices from '../../services/hooks/useWebSocketServices';
 
 export interface IPanelCatalogContext {
     allPanel: IPanelMetaInfo[];
@@ -28,6 +29,7 @@ export function usePanelCatalogContext() {
 
 export function PanelCatalogProvider(props: PropsWithChildren) {
     const { t } = useTranslation('panels');
+    const { mainApi, isMainConnected } = useWebSocketServices();
 
     const imgSrc = useImagePrak([
         'console_hover_illustrator',
@@ -45,10 +47,19 @@ export function PanelCatalogProvider(props: PropsWithChildren) {
     const [allPanel, setAllPanel] = useState([]);
 
     useEffect(() => {
-        getAllPanels(t, imgSrc).then((panels) => {
-            setAllPanel(panels);
-        });
-    }, [t, imgSrc]);
+        if (isMainConnected) {
+            mainApi
+                .getPanelPluginInitData()
+                .then((remotePanels) =>
+                    remotePanels.reduce((result: any, panels: any) => [...result, ...panels.value], []),
+                )
+                .then((remotePanels) => getAllPanels(remotePanels, t, imgSrc))
+                .catch(() => getAllPanels([], t, imgSrc))
+                .then((panels) => {
+                    setAllPanel(panels);
+                });
+        }
+    }, [isMainConnected, mainApi, t, imgSrc]);
 
     const panelUtils = useMemo(() => {
         const panelComponents = new Map( // 新增字段 panelInfo.originType 面板类型 remote | local

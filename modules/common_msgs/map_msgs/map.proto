@@ -16,6 +16,7 @@ import "modules/common_msgs/map_msgs/map_speed_bump.proto";
 import "modules/common_msgs/map_msgs/map_stop_sign.proto";
 import "modules/common_msgs/map_msgs/map_yield_sign.proto";
 import "modules/common_msgs/map_msgs/map_area.proto";
+import "modules/common_msgs/map_msgs/map_barrier_gate.proto";
 
 // This message defines how we project the ellipsoidal Earth surface to a plane.
 message Projection {
@@ -57,4 +58,5 @@ message Map {
   repeated PNCJunction pnc_junction = 13;
   repeated RSU rsu = 14;
   repeated Area ad_area = 15;
+  repeated BarrierGate barrier_gate = 16;
 }

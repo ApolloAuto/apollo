@@ -15,29 +15,29 @@
     update_cache: false
 
 # required by cyber_core
-- name: Install uuid
-  become: true
-  ansible.builtin.apt:
-    name:
-      - libuuid1
-      - uuid-dev
-    state: latest
-    update_cache: false
-
-- name: Install perftools
-  become: true
-  ansible.builtin.apt:
-    name:
-      - gperftools
-      - bvar
-      - libunwind-dev
-    state: latest
-    update_cache: false
+#- name: Install uuid
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - libuuid1
+#      - uuid-dev
+#    state: latest
+#    update_cache: false
+#
+#- name: Install perftools
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - gperftools
+#      - bvar
+#      - libunwind-dev
+#    state: latest
+#    update_cache: false
 
 - name: Add sysroot to ldconfig
   become: true
   ansible.builtin.lineinfile:
-    path: /etc/ld.so.conf.d/apollo.conf
+    path: /etc/ld.so.conf.d/apolloauto.conf
     line: /opt/apollo/sysroot/lib
     create: yes
 
@@ -64,14 +64,14 @@
     INSTALL_ATOM: "protobuf-3.14.0"
     PROTOBUF_INSTALL_PREFIX: "/usr"
 
-- name: Install fast-rtps
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_fast-rtps.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "fast-rtps-1.5.0"
+# - name: Install fast-rtps
+#   become: true
+#   ansible.builtin.shell:
+#     cmd: /opt/apollo/installers/install_fast-rtps.sh
+#     executable: /bin/bash
+#   args: []
+#   environment:
+#     INSTALL_ATOM: "fast-rtps-1.5.0"
 
 # - name: Install fast-rtps deps
 #   become: true
@@ -112,33 +112,33 @@
 #   ansible.builtin.command:
 #     cmd: ldconfig
 
-- name: Install abseil
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_abseil.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "abseil-cpp-20220623.1"
-    INSTALL_PREFIX: "/opt/apollo/absl"
+#- name: Install abseil
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_abseil.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "abseil-cpp-20220623.1"
+#    INSTALL_PREFIX: "/opt/apollo/absl"
 
-- name: Install gflags
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_gflags.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "gflags-2.2.2"
+#- name: Install gflags
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_gflags.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "gflags-2.2.2"
 
-- name: Install glog
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_glog.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "glog-0.4.0"
+#- name: Install glog
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_glog.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "glog-0.4.0"
 
 # - name: Install gflags and glog
 #   become: true

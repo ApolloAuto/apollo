@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include "cyber/base/macros.h"
+
 #include "cyber/proto/qos_profile.pb.h"
 #include "fastrtps/attributes/PublisherAttributes.h"
 #include "fastrtps/attributes/SubscriberAttributes.h"

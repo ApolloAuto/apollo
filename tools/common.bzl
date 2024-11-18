@@ -225,3 +225,28 @@ def output_path(ctx, input_file, strip_prefix, package_root = None):
             return output_path
 
     return input_path
+
+def select2dict(select_str):
+    result = dict()
+    cxt_str = select_str[:-2].replace("select({","")
+    for kv_str in cxt_str.split("],"):
+      k_str, v_str = kv_str.strip().split(": [")
+      if "" == v_str.strip() or "]" == v_str.strip():
+        result[k_str.strip()[1:-1]] = []
+      else:
+        v_list = []
+        v_cxt = v_str.strip()
+        if v_cxt[-1] == "]":
+          v_cxt = v_str.strip()[:-1]
+        for v_v in v_cxt.split(","):
+          v_list.append(v_v.strip()[1:-1])
+        result[k_str.strip()[1:-1]] = v_list
+
+    return result
+
+def list_str2list(list_str):
+    result = []
+    cxt = list_str[1:-1]
+    for l_str in cxt.strip().split(","):
+      result.append(l_str.strip()[1:-1])
+    return result

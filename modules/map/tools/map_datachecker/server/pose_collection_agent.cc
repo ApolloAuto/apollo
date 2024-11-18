@@ -67,7 +67,11 @@ void PoseCollectionAgent::OnBestgnssposCallback(
   sp_pj_transformer_->LatlongToUtm(1, 1, &pose.tx, &pose.ty, &pose.tz);
 
   std::lock_guard<std::mutex> mutex_locker(mutex_);
-  static FILE *pose_file = fopen("poses.txt", "w");
+  if (pose_file == nullptr) pose_file = fopen("poses.txt", "w");
+  if (pose_file == nullptr) {
+    AERROR << "open poses.txt failed";
+    return;
+  }
   static int count = 0;
   fprintf(stderr, "%d:%lf %lf %lf %lf 0.0 0.0 0.0 0.0\n", ++count,
           pose.time_stamp, pose.tx, pose.ty, pose.tz);
@@ -82,6 +86,13 @@ std::shared_ptr<std::vector<FramePose>> PoseCollectionAgent::GetPoses() const {
     return nullptr;
   }
   return sp_pose_collection_->GetPoses();
+}
+
+PoseCollectionAgent::~PoseCollectionAgent() {
+  if (pose_file != nullptr) {
+    fclose(pose_file);
+    pose_file = nullptr;
+  }
 }
 
 }  // namespace hdmap

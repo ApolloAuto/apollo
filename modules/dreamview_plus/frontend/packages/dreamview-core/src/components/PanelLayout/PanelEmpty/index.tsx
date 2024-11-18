@@ -4,7 +4,7 @@ import { IconPark } from '@dreamview/dreamview-ui';
 import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
 import { usePanelLayoutStore } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { update } from '@dreamview/dreamview-core/src/store/PanelLayoutStore/actions';
-import { getPanelTypeByPanelId } from '@dreamview/dreamview-core/src/util/layout';
+import { genereatePanelId } from '@dreamview/dreamview-core/src/util/layout';
 import { useMenuStore, ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { useThemeContext } from '@dreamview/dreamview-theme';
 import CustomScroll from '@dreamview/dreamview-core/src/components/CustomScroll';
@@ -41,7 +41,7 @@ function PanelEmpty() {
 
     const { classes, cx } = useStyle();
     const onAddPanel = (type: string) => {
-        dispatch(update({ mode: hmi.currentMode, layout: getPanelTypeByPanelId(type) }));
+        dispatch(update({ mode: hmi.currentMode, layout: genereatePanelId(type) }));
     };
     const flexFillElem = useMemo(
         () => new Array(4).fill(0).map((_, index: number) => <div style={aotuWith} key={`${index + 1}`} />),

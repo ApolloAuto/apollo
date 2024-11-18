@@ -22,10 +22,11 @@
 #include <memory>
 #include <string>
 
+#include "cyber/ros_bridge/converter_base/converter_interface.h"
+
 #include "cyber/proto/simple.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "cyber/ros_bridge/converter_base/converter_interface.h"
 
 #define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
 #include <proj_api.h>  // NOLINT

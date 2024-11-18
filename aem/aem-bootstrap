@@ -21,7 +21,7 @@
 #set -x
 
 # global variables
-DV_URL="http://localhost1"
+DV_URL="http://localhost"
 DV_ORIG_PORT=8899
 DV_PLUS_PORT=8888
 

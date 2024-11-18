@@ -36,8 +36,8 @@
 #include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_gflags.h"
 #include "modules/dreamview/backend/common/fuel_monitor/fuel_monitor_manager.h"
 #include "modules/dreamview/backend/common/fuel_monitor/preprocess_monitor.h"
-#include "modules/dreamview/backend/common/vehicle_manager/vehicle_manager.h"
 #include "modules/dreamview/backend/common/util/hmi_util.h"
+#include "modules/dreamview/backend/common/vehicle_manager/vehicle_manager.h"
 
 namespace apollo {
 namespace dreamview {
@@ -54,8 +54,8 @@ using apollo::cyber::proto::DagConfig;
 using apollo::dreamview::SimTicket;
 using apollo::dreamview::UserAdsGroup;
 using apollo::external_command::ActionCommand;
-using apollo::external_command::LaneFollowCommand;
 using apollo::external_command::CommandStatus;
+using apollo::external_command::LaneFollowCommand;
 using apollo::localization::LocalizationEstimate;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
@@ -69,8 +69,8 @@ constexpr char kNavigationModeName[] = "Navigation";
 template <class FlagType, class ValueType>
 void SetGlobalFlag(std::string_view flag_name, const ValueType &value,
                    FlagType *flag) {
-  constexpr char kGlobalFlagfile[] =
-      "/apollo/modules/common/data/global_flagfile.txt";
+  // change to relative path for portability
+  constexpr char kGlobalFlagfile[] = "modules/common/data/global_flagfile.txt";
   if (*flag != value) {
     *flag = value;
     // Overwrite global flagfile.
@@ -123,8 +123,7 @@ bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
   const std::string mode_file_name =
       cyber::common::GetFileName(mode_config_path);
   const std::string vehicle_mode_config_path =
-      current_vehicle_path + "/dreamview_conf/hmi_modes/" +
-      mode_file_name;
+      current_vehicle_path + "/dreamview_conf/hmi_modes/" + mode_file_name;
   if (!cyber::common::PathExists(vehicle_mode_config_path)) {
     return false;
   }
@@ -419,14 +418,14 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
 
 void HMIWorker::SensorCalibrationPreprocess(const std::string &task_type) {
   std::string start_command = absl::StrCat(
-      "nohup bash /apollo/modules/tools/sensor_calibration/extract_data.sh -t ",
+      "nohup bash modules/tools/sensor_calibration/extract_data.sh -t ",
       task_type, " &");
   System(start_command);
 }
 
 void HMIWorker::VehicleCalibrationPreprocess() {
   std::string start_command = absl::StrCat(
-      "nohup bash /apollo/modules/tools/vehicle_calibration/preprocess.sh "
+      "nohup bash modules/tools/vehicle_calibration/preprocess.sh "
       "--vehicle_type=\"",
       status_.current_vehicle(), "\" --record_num=", record_count_, " &");
   System(start_command);
@@ -458,12 +457,13 @@ bool HMIWorker::ChangeDrivingMode(const Chassis::DrivingMode mode) {
       return false;
   }
 
-  static constexpr int kMaxTries = 3;
+  static constexpr int kMaxTries = 1;
   static constexpr auto kTryInterval = std::chrono::milliseconds(500);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
     common::util::FillHeader("HMI", command.get());
-    action_command_client_->SendRequest(command);
+    // Shorten the timeout period to prevent users from waiting too long
+    action_command_client_->SendRequest(command, std::chrono::seconds(1));
 
     std::this_thread::sleep_for(kTryInterval);
 
@@ -564,8 +564,8 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
   // before reset mode
   HMIMode vehicle_defined_mode;
   const std::string mode_config_path = config_.modes().at(current_mode);
-  if (LoadVehicleDefinedMode(mode_config_path,
-                             *vehicle_dir, &vehicle_defined_mode)) {
+  if (LoadVehicleDefinedMode(mode_config_path, *vehicle_dir,
+                             &vehicle_defined_mode)) {
     MergeToCurrentMode(&vehicle_defined_mode);
   } else {
     // modules may have been modified the last time selected a vehicle
@@ -779,18 +779,24 @@ void HMIWorker::ChangeScenarioSet(const std::string &scenario_set_id) {
   return;
 }
 
-void HMIWorker::GetScenarioResourcePath(std::string *scenario_resource_path) {
+bool HMIWorker::GetScenarioResourcePath(std::string *scenario_resource_path) {
   CHECK_NOTNULL(scenario_resource_path);
   const std::string home = cyber::common::GetEnv("HOME");
+  if (home.empty()) {
+    return false;
+  }
   *scenario_resource_path = home + FLAGS_resource_scenario_path;
+  return true;
 }
 
-void HMIWorker::GetScenarioSetPath(const std::string &scenario_set_id,
+bool HMIWorker::GetScenarioSetPath(const std::string &scenario_set_id,
                                    std::string *scenario_set_path) {
   CHECK_NOTNULL(scenario_set_path);
-  GetScenarioResourcePath(scenario_set_path);
+  if (!GetScenarioResourcePath(scenario_set_path)) {
+    return false;
+  }
   *scenario_set_path = *scenario_set_path + scenario_set_id;
-  return;
+  return true;
 }
 
 bool HMIWorker::StopModuleByCommand(const std::string &stop_command) const {
@@ -833,7 +839,10 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     scenario_set_id = status_.current_scenario_set_id();
   }
   std::string scenario_set_path;
-  GetScenarioSetPath(scenario_set_id, &scenario_set_path);
+  if (!GetScenarioSetPath(scenario_set_id, &scenario_set_path)) {
+    AERROR << "Failed to get scenario set path!";
+    return false;
+  }
   const std::string scenario_path =
       scenario_set_path + "/scenarios/" + cur_scenario_id + ".json";
   AINFO << "scenario path : " << scenario_path;
@@ -1056,7 +1065,10 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
                                   const std::string &scenario_set_name,
                                   ScenarioSet *new_scenario_set) {
   std::string scenario_set_directory_path;
-  GetScenarioSetPath(scenario_set_id, &scenario_set_directory_path);
+  if (!GetScenarioSetPath(scenario_set_id, &scenario_set_directory_path)) {
+    AERROR << "Cannot get scenario set path!";
+    return false;
+  }
   scenario_set_directory_path = scenario_set_directory_path + "/scenarios/";
   new_scenario_set->set_scenario_set_name(scenario_set_name);
   if (!cyber::common::PathExists(scenario_set_directory_path)) {
@@ -1146,7 +1158,10 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
 
 bool HMIWorker::LoadScenarios() {
   std::string directory_path;
-  GetScenarioResourcePath(&directory_path);
+  if (!GetScenarioResourcePath(&directory_path)) {
+    AERROR << "Failed to get scenario resource path!";
+    return false;
+  }
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
     return false;
@@ -1231,7 +1246,18 @@ void HMIWorker::DeleteScenarioSet(const std::string &scenario_set_id) {
     return;
   }
   std::string directory_path;
-  GetScenarioResourcePath(&directory_path);
+  if (!GetScenarioResourcePath(&directory_path)) {
+    AERROR << "Failed to get scenario resource path!";
+    return;
+  }
+  // check scenario set id is valid to avoid path traversal
+  if (scenario_set_id.find('/') != std::string::npos ||
+      scenario_set_id.find("..") != std::string::npos ||
+      scenario_set_id.find("~") != std::string::npos ||
+      scenario_set_id.find(' ') != std::string::npos) {
+    AERROR << "Scenario set id should not contain '/' ,' ',~ and ..";
+    return;
+  }
   directory_path = directory_path + scenario_set_id;
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
@@ -1313,15 +1339,23 @@ void HMIWorker::DeleteDynamicModel(const std::string &dynamic_model_name) {
   return;
 }
 
-void HMIWorker::GetRecordPath(std::string *record_path) {
+bool HMIWorker::GetRecordPath(std::string *record_path) {
   CHECK_NOTNULL(record_path);
   const std::string home = cyber::common::GetEnv("HOME");
+  if (home.empty()) {
+    // Failed to get environment variable HOME
+    return false;
+  }
   *record_path = home + FLAGS_resource_record_path;
+  return true;
 }
 
 bool HMIWorker::RePlayRecord(const std::string &record_id) {
   std::string record_path;
-  GetRecordPath(&record_path);
+  if (!GetRecordPath(&record_path)) {
+    AERROR << "Failed to get record path!";
+    return false;
+  }
   record_path = record_path + record_id + ".record";
 
   if (!cyber::common::PathExists(record_path)) {
@@ -1366,7 +1400,10 @@ void HMIWorker::ChangeRecord(const std::string &record_id) {
 }
 bool HMIWorker::LoadRecords() {
   std::string directory_path;
-  GetRecordPath(&directory_path);
+  if (!GetRecordPath(&directory_path)) {
+    AERROR << "Failed to get record path!";
+    return false;
+  }
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find records!";
     return false;
@@ -1390,7 +1427,7 @@ bool HMIWorker::LoadRecords() {
     // Skip format that dv cannot parse: record not ending in record
     size_t record_suffix_length = 7;
     if (record_id.length() - index != record_suffix_length) {
-        continue;
+      continue;
     }
     if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
@@ -1418,7 +1455,18 @@ void HMIWorker::DeleteRecord(const std::string &record_id) {
     return;
   }
   std::string record_path;
-  GetRecordPath(&record_path);
+  if (!GetRecordPath(&record_path)) {
+    AERROR << "Failed to get record path!";
+    return;
+  }
+  // check record id for security
+  if (record_id.find('/') != std::string::npos ||
+      record_id.find("..") != std::string::npos ||
+      record_id.find(' ') != std::string::npos ||
+      record_id.find("~") != std::string::npos) {
+    AERROR << "Record id should not contain '/' ,' ',~ and ..";
+    return;
+  }
   record_path = record_path + record_id + ".record";
   if (!cyber::common::PathExists(record_path)) {
     return;

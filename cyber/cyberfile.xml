@@ -26,7 +26,8 @@
   <depend expose="False">3rd-bazel-skylib</depend>
 
   <depend repo_name="com_google_protobuf" lib_names="protobuf">3rd-protobuf</depend>
-  <depend repo_name="fastrtps">3rd-fastrtps</depend>
+  <!-- <depend repo_name="fastdds">3rd-fastdds</depend> -->
+  <depend repo_name="fastdds" lib_names="fastdds">3rd-fastdds-wrap</depend>
   <depend repo_name="proj">3rd-proj</depend>
   <depend repo_name="eigen">3rd-eigen3</depend>
   <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog</depend>

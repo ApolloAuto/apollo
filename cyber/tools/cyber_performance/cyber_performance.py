@@ -357,11 +357,6 @@ def sample_task():
           match_result = gpu_usage_pattern.findall(stdout)
           if len(match_result) > 0:
               system_gpu = float(match_result[0])
-            
-          memory_pattern = re.compile(r'RAM (\d+/\d+MB)')
-          match_result = memory_pattern.findall(stdout)
-          if len(match_result) > 0:
-              system_memory = float(match_result[0].split("/")[0])
 
           p = subprocess.run(
               "vmstat 1 2 | awk '{print $16}' | tail -n 1", shell=True, 
@@ -376,12 +371,6 @@ def sample_task():
           time_format = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
           system_cpu = 100 - float(stdout) 
 
-          p = subprocess.run(
-              "free -m | grep Mem | awk '{print $3}'", shell=True, 
-              stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
-          stdout = p.stdout.decode("utf-8").strip()
-          system_memory = stdout 
-
           system_gpu = 0 
 
           p = subprocess.run(
@@ -389,6 +378,28 @@ def sample_task():
               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
           stdout = p.stdout.decode("utf-8").strip()
           system_io_usage = float(stdout)
+      p = subprocess.run("cat /proc/meminfo",
+          shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      stdout = p.stdout.decode("utf-8").strip().splitlines()
+      meminfo = {}
+      for i in stdout:
+          k, v = i.split(":")[0].strip().lower(), i.split(":")[1].strip()
+          value = round(int(v.strip().split(' ')[0]) / 1024, 2)
+          meminfo[k] = value
+      
+      total = meminfo["memtotal"]
+      buffers = meminfo["buffers"]
+      cached = meminfo["cached"]
+      sreclaimable = meminfo["sreclaimable"]
+      free = meminfo["memfree"]
+      shm = meminfo["shmem"]
+      if "memavailable" not in meminfo:
+          used_without_shm = total - buffers - cached - sreclaimable
+          used = used_without_shm + shm
+      else:
+          available = meminfo["memavailable"]
+          used = total - available
+      system_memory = used 
           
       if system_cpu is not None \
             and system_gpu is not None \

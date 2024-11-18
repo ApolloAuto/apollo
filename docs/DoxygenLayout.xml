@@ -20,6 +20,7 @@
     <tab type="usergroup" visible="yes" title="安装指南" intro="" url="[none]">
       <tab type="user" visible="yes" title="源码安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE6_xBA_x90_xE7_xA0_x81_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
       <tab type="user" visible="yes" title="包管理安装方式" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_xE5_xAE_x89_xE8_xA3_x85_xE6_x96_xB9_xE5_xBC_x8F" />
+      <tab type="user" visible="yes" title="安装指南" intro="" url="@ref md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97" />
     </tab>
     <tab type="usergroup" visible="yes" title="应用实践" intro="" url="[none]">
       <tab type="usergroup" visible="yes" title="开发调试教程" intro="" url="[none]">
@@ -58,6 +59,7 @@
           <tab type="usergroup" visible="yes" title="感知模型部署训练" intro="" url="[none]">
             <tab type="user" visible="yes" title="点云模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE7_x82_xB9_xE4_xBA_x91_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
             <tab type="user" visible="yes" title="视觉模型二次开发" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE8_xA7_x86_xE8_xA7_x89_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBA_x8C_xE6_xAC_xA1_xE5_xBC_x80_xE5_x8F_x91" />
+            <tab type="user" visible="yes" title="视觉检测与占据栅格模型介绍及教程" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x84_x9F_xE7_x9F_xA5_xE6_xA8_xA1_xE5_x9E_x8B_xE9_x83_xA8_xE7_xBD_xB2_xE8_xAE_xAD_xE7_xBB_x83_2_xE8_xA7_x86_xE8_xA7_x89_xE6_xA3_x80_xE6_xB5_x8B_xE4_xB8_x8E_xE5_x8D_xA0_xE6_x8D_xAE_xE6_xA0_x85_xE6_xA0_xBC_xE6_xA8_xA1_xE5_x9E_x8B_xE4_xBB_x8B_xE7_xBB_x8D_xE5_x8F_x8A_xE6_x95_x99_xE7_xA8_x8B" />
           </tab>
           <tab type="usergroup" visible="yes" title="基于配置参数开发" intro="" url="[none]">
             <tab type="user" visible="yes" title="激光雷达参数介绍" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2Apollo_xE6_x84_x9F_xE7_x9F_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_x9F_xBA_xE4_xBA_x8E_xE9_x85_x8D_xE7_xBD_xAE_xE5_x8F_x82_xE6_x95_xB0_xE5_xBC_x80_xE5_x8F_x91_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE5_x8F_x82_xE6_x95_xB0_xE4_xBB_x8B_xE7_xBB_x8D" />
@@ -86,6 +88,9 @@
         <tab type="usergroup" visible="yes" title="传感器接入实践" intro="" url="[none]">
           <tab type="user" visible="yes" title="组合惯导接入Apollo" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2_xE4_xBC_xA0_xE6_x84_x9F_xE5_x99_xA8_xE6_x8E_xA5_xE5_x85_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE7_xBB_x84_xE5_x90_x88_xE6_x83_xAF_xE5_xAF_xBC_xE6_x8E_xA5_xE5_x85_xA5Apollo" />
           <tab type="user" visible="yes" title="新lidar接入Apollo" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2_xE4_xBC_xA0_xE6_x84_x9F_xE5_x99_xA8_xE6_x8E_xA5_xE5_x85_xA5_xE5_xAE_x9E_xE8_xB7_xB5_2_xE6_x96_xB0lidar_xE6_x8E_xA5_xE5_x85_xA5Apollo" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="开发工具使用实践" intro="" url="[none]">
+          <tab type="user" visible="yes" title="使用gdb工具调试" intro="" url="@ref md_docs_2_xE5_xBA_x94_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE5_xBC_x80_xE5_x8F_x91_xE8_xB0_x83_xE8_xAF_x95_xE6_x95_x99_xE7_xA8_x8B_2_xE5_xBC_x80_xE5_x8F_x91_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_xE5_xAE_x9E_xE8_xB7_xB5_2_xE4_xBD_xBF_xE7_x94_xA8gdb_xE5_xB7_xA5_xE5_x85_xB7_xE8_xB0_x83_xE8_xAF_x95" />
         </tab>
       </tab>
       <tab type="usergroup" visible="yes" title="车辆集成教程" intro="" url="[none]">
@@ -128,6 +133,8 @@
           <tab type="user" visible="yes" title="Cyber RT 组件机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE7_xBB_x84_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6" />
           <tab type="user" visible="yes" title="Cyber RT 插件机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE6_x8F_x92_xE4_xBB_xB6_xE6_x9C_xBA_xE5_x88_xB6" />
           <tab type="user" visible="yes" title="Cyber RT 调度机制" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE8_xB0_x83_xE5_xBA_xA6_xE6_x9C_xBA_xE5_x88_xB6" />
+          <tab type="user" visible="yes" title="Cyber RT 性能分析工具" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE6_x80_xA7_xE8_x83_xBD_xE5_x88_x86_xE6_x9E_x90_xE5_xB7_xA5_xE5_x85_xB7" />
+          <tab type="user" visible="yes" title="Cyber RT 与 ROS 通信" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE8_xBD_xAF_xE4_xBB_xB6_xE6_xA0_xB8_xE5_xBF_x83_2CyberRT_2Cyber_01RT_01_xE4_xB8_x8E_01ROS_01_xE9_x80_x9A_xE4_xBF_xA1" />
         </tab>
         <tab type="usergroup" visible="yes" title="核心模块" intro="" url="[none]">
           <tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2_xE6_xA1_x86_xE6_x9E_xB6_xE8_xAE_xBE_xE8_xAE_xA1_2_xE6_xA0_xB8_xE5_xBF_x83_xE6_xA8_xA1_xE5_x9D_x97_2_xE6_xA6_x82_xE8_xBF_xB0" />
@@ -216,6 +223,8 @@
                 <tab type="user" visible="yes" title="control-controller-demo-control-task" intro="" url="@ref md_modules_2control_2controllers_2demo__control__task_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-mpc-controller" intro="" url="@ref md_modules_2control_2controllers_2mpc__controller_2README__cn" />
                 <tab type="user" visible="yes" title="control-controller-lon-based-pid-controller" intro="" url="@ref md_modules_2control_2controllers_2lon__based__pid__controller_2README__cn" />
+                <tab type="user" visible="yes" title="control-controller-mpc-controller" intro="" url="@ref md_modules_2control_2controllers_2mpc__controller_2README__cn" />
+                <tab type="user" visible="yes" title="control" intro="" url="@ref md_modules_2control_2control__component_2README__cn" />
               </tab>
               <tab type="usergroup" visible="yes" title="canbus" intro="" url="[none]">
                 <tab type="user" visible="yes" title="canbus" intro="" url="@ref md_modules_2canbus_2README__cn" />
@@ -233,6 +242,7 @@
                 <tab type="user" visible="yes" title="perception-camera-detection-single-stage" intro="" url="@ref md_modules_2perception_2camera__detection__single__stage_2README" />
                 <tab type="user" visible="yes" title="perception-traffic-light-recognition" intro="" url="@ref md_modules_2perception_2traffic__light__recognition_2README" />
                 <tab type="user" visible="yes" title="perception-camera-detection-multi-stage" intro="" url="@ref md_modules_2perception_2camera__detection__multi__stage_2README" />
+                <tab type="user" visible="yes" title="perception-camera-detection-occupancy" intro="" url="@ref md_modules_2perception_2camera__detection__occupancy_2README" />
                 <tab type="user" visible="yes" title="perception-pointcloud-map-based-roi" intro="" url="@ref md_modules_2perception_2pointcloud__map__based__roi_2README" />
                 <tab type="user" visible="yes" title="perception-common" intro="" url="@ref md_modules_2perception_2common_2README" />
                 <tab type="user" visible="yes" title="perception-traffic-light-tracking" intro="" url="@ref md_modules_2perception_2traffic__light__tracking_2README" />
@@ -254,6 +264,7 @@
                 <tab type="user" visible="yes" title="prediction" intro="" url="@ref md_modules_2prediction_2README__cn" />
               </tab>
               <tab type="usergroup" visible="yes" title="drivers" intro="" url="[none]">
+                <tab type="user" visible="yes" title="drivers-image-decompress" intro="" url="@ref md_modules_2drivers_2tools_2image__decompress_2README" />
                 <tab type="user" visible="yes" title="drivers-video" intro="" url="@ref md_modules_2drivers_2video_2README" />
                 <tab type="user" visible="yes" title="drivers-lidar" intro="" url="@ref md_modules_2drivers_2lidar_2README" />
                 <tab type="user" visible="yes" title="drivers-canbus" intro="" url="@ref md_modules_2drivers_2canbus_2README" />
@@ -356,20 +367,57 @@
       <tab type="usergroup" visible="yes" title="标定工具" intro="" url="[none]">
         <tab type="user" visible="yes" title="功能概述" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_x8A_x9F_xE8_x83_xBD_xE6_xA6_x82_xE8_xBF_xB0" />
         <tab type="user" visible="yes" title="开通标定工具" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_xBC_x80_xE9_x80_x9A_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7" />
-        <tab type="user" visible="yes" title="准备工作" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_x87_x86_xE5_xA4_x87_xE5_xB7_xA5_xE4_xBD_x9C" />
         <tab type="user" visible="yes" title="环境配置" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE7_x8E_xAF_xE5_xA2_x83_xE9_x85_x8D_xE7_xBD_xAE" />
         <tab type="user" visible="yes" title="激光雷达标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE6_xBF_x80_xE5_x85_x89_xE9_x9B_xB7_xE8_xBE_xBE_xE6_xA0_x87_xE5_xAE_x9A" />
         <tab type="user" visible="yes" title="相机标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE7_x9B_xB8_xE6_x9C_xBA_xE6_xA0_x87_xE5_xAE_x9A" />
+        <tab type="user" visible="yes" title="动力学标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_x8A_xA8_xE5_x8A_x9B_xE5_xAD_xA6_xE6_xA0_x87_xE5_xAE_x9A" />
+        <tab type="user" visible="yes" title="底盘标定" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE5_xBA_x95_xE7_x9B_x98_xE6_xA0_x87_xE5_xAE_x9A" />
         <tab type="user" visible="yes" title="附录" intro="" url="@ref md_docs_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2_xE6_xA0_x87_xE5_xAE_x9A_xE5_xB7_xA5_xE5_x85_xB7_2_xE9_x99_x84_xE5_xBD_x95" />
       </tab>
     </tab>
     <tab type="usergroup" visible="yes" title="故障排查" intro="" url="[none]">
       <tab type="usergroup" visible="yes" title="安装编译" intro="" url="[none]">
         <tab type="user" visible="yes" title="安装及编译问题FAQ" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xAE_x89_xE8_xA3_x85_xE5_x8F_x8A_xE7_xBC_x96_xE8_xAF_x91_xE9_x97_xAE_xE9_xA2_x98FAQ" />
+        <tab type="user" visible="yes" title="容器启动失败 failed to mount local volume" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xAE_xB9_xE5_x99_xA8_xE5_x90_xAF_xE5_x8A_xA8_xE5_xA4_xB1_xE8_xB4_xA5_01failed_01to_01mount_01local_01volume" />
+        <tab type="user" visible="yes" title="启动容器报错 docker setting cgroup config for prochooks process caused" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_x90_xAF_xE5_x8A_xA8_xE5_xAE_xB9_xE5_x99_xA8_xE6_x8A_xA5_xE9_x94_x99_01docker_01setting_01cgroup_01config_01for_01prochooks_01process_01caused" />
+        <tab type="user" visible="yes" title="启动容器后移动了工程目录 导致容器内许多文件丢失" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_x90_xAF_xE5_x8A_xA8_xE5_xAE_xB9_xE5_x99_xA8_xE5_x90_x8E_xE7_xA7_xBB_xE5_x8A_xA8_xE4_xBA_x86_xE5_xB7_xA5_xE7_xA8_x8B_xE7_x9B_xAE_xE5_xBD_x95_01_xE5_xAF_xBC_xE8_x87_xB4_xE5_xAE_xB9_xE5_x99_xA8_xE5_x86_x85_xE8_xAE_xB8_xE5_xA4_x9A_xE6_x96_x87_xE4_xBB_xB6_xE4_xB8_xA2_xE5_xA4_xB1" />
+        <tab type="user" visible="yes" title="编译过程中下载bazel相关依赖失败" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE8_xBF_x87_xE7_xA8_x8B_xE4_xB8_xAD_xE4_xB8_x8B_xE8_xBD_xBDbazel_xE7_x9B_xB8_xE5_x85_xB3_xE4_xBE_x9D_xE8_xB5_x96_xE5_xA4_xB1_xE8_xB4_xA5" />
+        <tab type="user" visible="yes" title="模块编译后未找到依赖模块源码" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE6_xA8_xA1_xE5_x9D_x97_xE7_xBC_x96_xE8_xAF_x91_xE5_x90_x8E_xE6_x9C_xAA_xE6_x89_xBE_xE5_x88_xB0_xE4_xBE_x9D_xE8_xB5_x96_xE6_xA8_xA1_xE5_x9D_x97_xE6_xBA_x90_xE7_xA0_x81" />
+        <tab type="user" visible="yes" title="编译报错 cannot find bazel" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01cannot_01find_01bazel" />
+        <tab type="user" visible="yes" title="编译报错 gcc internal compiler error killed program cc1plus" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01gcc_01internal_01compiler_01error_01killed_01program_01cc1plus" />
+        <tab type="user" visible="yes" title="编译报错 gcc error unrecognized command  line option -mavx2" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01gcc_01error_01unrecognized_01command_01_01line_01option_01-mavx2" />
+        <tab type="user" visible="yes" title="编译过程中ld报错 显示缺少glibc的符号" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE8_xBF_x87_xE7_xA8_x8B_xE4_xB8_xADld_xE6_x8A_xA5_xE9_x94_x99_01_xE6_x98_xBE_xE7_xA4_xBA_xE7_xBC_xBA_xE5_xB0_x91glibc_xE7_x9A_x84_xE7_xAC_xA6_xE5_x8F_xB7" />
+        <tab type="user" visible="yes" title="编译报错 nvcc fatal unsupported gpu architecture compute89" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01nvcc_01fatal_01unsupported_01gpu_01architecture_01compute89" />
+        <tab type="user" visible="yes" title="编译报错 server terminated abruptly error code 14 error message socket closed" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01server_01terminated_01abruptly_01error_01code_0114_01error_01message_01socket_01closed" />
+        <tab type="user" visible="yes" title="编译报错 Do not run the install target which is not auto generated" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE6_x8A_xA5_xE9_x94_x99_01Do_01not_01run_01the_01install_01target_01which_01is_01not_01auto_01generated" />
+        <tab type="user" visible="yes" title="编译过程中下载bazel依赖失败 提示 an error occurred during the fetch of repository six" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xBC_x96_xE8_xAF_x91_xE8_xBF_x87_xE7_xA8_x8B_xE4_xB8_xAD_xE4_xB8_x8B_xE8_xBD_xBDbazel_xE4_xBE_x9D_xE8_xB5_x96_xE5_xA4_xB1_xE8_xB4_xA5_01_xE6_x8F_x90_xE7_xA4_xBA_01an_01error_01occurred_01during_01the_01fetch_01of_01repository_01six" />
+        <tab type="user" visible="yes" title="如何下载planning所有模块源码" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xA6_x82_xE4_xBD_x95_xE4_xB8_x8B_xE8_xBD_xBDplanning_xE6_x89_x80_xE6_x9C_x89_xE6_xA8_xA1_xE5_x9D_x97_xE6_xBA_x90_xE7_xA0_x81" />
+        <tab type="user" visible="yes" title="容器内目录说明" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xAE_xB9_xE5_x99_xA8_xE5_x86_x85_xE7_x9B_xAE_xE5_xBD_x95_xE8_xAF_xB4_xE6_x98_x8E" />
+        <tab type="user" visible="yes" title="强制断电后编译 运行模块错误" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE5_xBC_xBA_xE5_x88_xB6_xE6_x96_xAD_xE7_x94_xB5_xE5_x90_x8E_xE7_xBC_x96_xE8_xAF_x91_01_xE8_xBF_x90_xE8_xA1_x8C_xE6_xA8_xA1_xE5_x9D_x97_xE9_x94_x99_xE8_xAF_xAF" />
+        <tab type="user" visible="yes" title="系统时间错误" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE7_xB3_xBB_xE7_xBB_x9F_xE6_x97_xB6_xE9_x97_xB4_xE9_x94_x99_xE8_xAF_xAF" />
+        <tab type="user" visible="yes" title="下载包没有反映" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xAE_x89_xE8_xA3_x85_xE7_xBC_x96_xE8_xAF_x91_2_xE4_xB8_x8B_xE8_xBD_xBD_xE5_x8C_x85_xE6_xB2_xA1_xE6_x9C_x89_xE5_x8F_x8D_xE6_x98_xA0" />
       </tab>
-      <tab type="usergroup" visible="yes" title="Dreamview" intro="" url="[none]">
-        <tab type="user" visible="yes" title="dreamview faq" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2Dreamview_2dreamview_01faq" />
+      <tab type="usergroup" visible="yes" title="工具使用" intro="" url="[none]">
+        <tab type="usergroup" visible="yes" title="aem" intro="" url="[none]">
+          <tab type="user" visible="yes" title="aem enter报错 error retrieving current directory getcwd cannot access parent directories no such file or directory" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2aem_2aem_01enter_xE6_x8A_xA5_xE9_x94_x99_01error_01retrieving_01current_01directory_01getcwd_01cannot_01access_01parent_01directories_01no_01such_01file_01or_01directory" />
+          <tab type="user" visible="yes" title="aem init outside from Apollo container env" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2aem_2aem_01init_01outside_01from_01Apollo_01container_01env" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="dreamview" intro="" url="[none]">
+          <tab type="user" visible="yes" title="dreamviewFAQ" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2dreamview_2dreamviewFAQ" />
+        </tab>
+        <tab type="usergroup" visible="yes" title="mainboard和cyber_lanuch" intro="" url="[none]">
+          <tab type="user" visible="yes" title="mainboard和cyber_lanuch报错 this process will be terminated due to duplicated node 模块名 please ensure that each node has a unique name" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE5_xB7_xA5_xE5_x85_xB7_xE4_xBD_xBF_xE7_x94_xA8_2mainboard_xE5_x92_x8Ccyber__lanuch_2mainboard_xE5_x92_x8Ccyber__lanuch_xE6_x8A_xA5_xE9_x94_x99_01this_01process_01will_01be_01terminated_01due_01to_01duplicated_01node_01_xE6_xA8_xA1_xE5_x9D_x97_xE5_x90_x8D_01please_01ensure_01that_01each_01node_01has_01a_01unique_01name" />
+        </tab>
       </tab>
+      <tab type="usergroup" visible="yes" title="模块调试" intro="" url="[none]">
+        <tab type="usergroup" visible="yes" title="相机驱动" intro="" url="[none]">
+          <tab type="user" visible="yes" title="camera的driver launch文件运行时报出segemation fault" intro="" url="@ref md_docs_2_xE6_x95_x85_xE9_x9A_x9C_xE6_x8E_x92_xE6_x9F_xA5_2_xE6_xA8_xA1_xE5_x9D_x97_xE8_xB0_x83_xE8_xAF_x95_2_xE7_x9B_xB8_xE6_x9C_xBA_xE9_xA9_xB1_xE5_x8A_xA8_2camera_xE7_x9A_x84driver_01launch_xE6_x96_x87_xE4_xBB_xB6_xE8_xBF_x90_xE8_xA1_x8C_xE6_x97_xB6_xE6_x8A_xA5_xE5_x87_xBAsegemation_01fault" />
+        </tab>
+      </tab>
+    </tab>
+    <tab type="usergroup" visible="yes" title="附录" intro="" url="[none]">
+      <tab type="user" visible="yes" title="外部接口使用指南" intro="" url="@ref md_docs_2_xE9_x99_x84_xE5_xBD_x95_2_xE5_xA4_x96_xE9_x83_xA8_xE6_x8E_xA5_xE5_x8F_xA3_xE4_xBD_xBF_xE7_x94_xA8_xE6_x8C_x87_xE5_x8D_x97" />
+      <tab type="user" visible="yes" title="CyberRT 性能报告" intro="" url="@ref md_docs_2_xE9_x99_x84_xE5_xBD_x95_2CyberRT_01_xE6_x80_xA7_xE8_x83_xBD_xE6_x8A_xA5_xE5_x91_x8A" />
     </tab>
 
     <tab type="usergroup" visible="yes" title="源代码文档" intro="" url="[none]">

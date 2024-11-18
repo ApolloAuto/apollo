@@ -21,7 +21,6 @@ namespace cyber {
 
 bool RosApolloConverter::ConvertMsg(InputTypes<InputMsgPtr>& in,
                                     OutputTypes<OutputMsgPtr>& out) {
-  AERROR << "123";
 #ifdef ENABLE_ROS_MSG
   auto in_msg = std::get<0>(in.values);
   auto out_msg = std::get<0>(out.values);

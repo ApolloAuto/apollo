@@ -21,6 +21,8 @@
 #include <string>
 #include <utility>
 
+#include "cyber/ros_bridge/common/macros.h"
+
 #include "cyber/cyber.h"
 #include "cyber/ros_bridge/converter_base/converter_base.h"
 #include "cyber/ros_bridge/converter_base/message_converter.h"

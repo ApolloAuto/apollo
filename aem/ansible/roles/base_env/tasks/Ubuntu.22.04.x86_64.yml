@@ -128,27 +128,27 @@
     name:
       - gdb
       - libtool
-      - valgrind
+      # - valgrind
       - pkg-config
       - autoconf
       - automake
       - cmake
-      - strace
-      - ltrace
-      - python3-dbg
+      # - strace
+      # - ltrace
+      # - python3-dbg
       - python3-dev
-      - iproute2
+      # - iproute2
       - iputils-ping
-      - net-tools
-      - silversearcher-ag
-      - tcpdump
+      # - net-tools
+      # - silversearcher-ag
+      # - tcpdump
       - traceroute
-      - iperf3
+      # - iperf3
       - libexpat1-dev
       - linux-libc-dev
       - graphviz
       # qa tools
-      - lcov
+      # - lcov
     state: latest
     update_cache: false
   when: "'apt' in ansible_facts.packages"

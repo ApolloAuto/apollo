@@ -1,8 +1,8 @@
 import { produce } from 'immer';
 import { CombineAction, IInitState } from './actions';
-import { INIT_USER_INFO, ACTIONS } from './actionTypes';
+import { ACTIONS } from './actionTypes';
 
-export const initState: IInitState = {
+export const initState: Partial<IInitState> = {
     userInfo: {
         avatar_url: '',
         displayname: '',

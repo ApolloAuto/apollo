@@ -37,7 +37,7 @@ DEFINE_string(
     "Traffic rule config filename");
 
 DEFINE_string(smoother_config_filename,
-              "/apollo/modules/planning/planning_component/conf/"
+              "modules/planning/planning_component/conf/"
               "qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
@@ -313,7 +313,7 @@ DEFINE_bool(enable_planning_pad_msg, false,
 
 // TODO(all): open space planner, merge with planning conf
 DEFINE_string(planner_open_space_config_filename,
-              "/apollo/modules/planning/planning_component/conf/"
+              "modules/planning/planning_component/conf/"
               "planner_open_space_config.pb.txt",
               "The open space planner configuration file");
 
@@ -378,7 +378,7 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
 
 DEFINE_bool(planning_offline_learning, false,
             "offline learning. read record files and dump learning_data");
-DEFINE_string(planning_data_dir, "/apollo/modules/planning/planning_base/data/",
+DEFINE_string(planning_data_dir, "modules/planning/planning_base/data/",
               "Prefix of files to store feature data");
 DEFINE_string(planning_offline_bags, "",
               "a list of source files or directories for offline mode. "
@@ -388,7 +388,7 @@ DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
 DEFINE_string(planning_birdview_img_feature_renderer_config_file,
-              "/apollo/modules/planning/planning_component/conf/"
+              "modules/planning/planning_component/conf/"
               "planning_semantic_map_config.pb.txt",
               "config file for renderer singleton");
 

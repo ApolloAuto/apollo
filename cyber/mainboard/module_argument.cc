@@ -16,6 +16,8 @@
 
 #include "cyber/mainboard/module_argument.h"
 
+#include "cyber/common/environment.h"
+
 #include <getopt.h>
 #include <libgen.h>
 
@@ -70,11 +72,24 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   }
 
   if (enable_cpuprofile_ && profile_filename_.empty()) {
-    profile_filename_ = process_group_ + std::string("_cpu.prof");
+    auto pwd = common::GetEnv("PWD");
+    profile_filename_ = pwd + "/" + process_group_ + std::string("_cpu.prof");
+  }
+
+  if (profile_filename_[0] != '/') {
+    auto pwd = common::GetEnv("PWD");
+    profile_filename_ = pwd + "/" + profile_filename_;
   }
 
   if (enable_heapprofile_ && heapprofile_filename_.empty()) {
-    heapprofile_filename_ = process_group_ + std::string("_mem.prof");
+    auto pwd = common::GetEnv("PWD");
+    heapprofile_filename_ =
+        pwd + "/" + process_group_ + std::string("_mem.prof");
+  }
+
+  if (heapprofile_filename_[0] != '/') {
+    auto pwd = common::GetEnv("PWD");
+    heapprofile_filename_ = pwd + "/" + heapprofile_filename_;
   }
 
   GlobalData::Instance()->SetProcessGroup(process_group_);

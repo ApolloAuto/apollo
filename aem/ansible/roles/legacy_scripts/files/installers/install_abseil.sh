@@ -43,7 +43,7 @@ src_configure() {
   pushd "${WORKDIR}/${PF}_build"
   cmake "${WORKDIR}/${PF}" \
     -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_CXX_STANDARD=14 \
+    -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}
   popd
 }

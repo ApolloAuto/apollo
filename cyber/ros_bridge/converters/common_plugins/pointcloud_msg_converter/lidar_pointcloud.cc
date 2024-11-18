@@ -19,6 +19,154 @@
 namespace apollo {
 namespace cyber {
 
+#ifdef ENABLE_ROS_MSG
+void ParseField(sensor_msgs::msg::PointField field,
+                std::shared_ptr<apollo::drivers::PointCloud> point_clouds,
+                std::string field_name,
+                sensor_msgs::msg::PointCloud2& raw_message) {
+  switch (field.datatype) {
+    case sensor_msgs::msg::PointField::INT8: {
+      sensor_msgs::PointCloud2ConstIterator<int8_t> iter(raw_message,
+                                                         field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::UINT8: {
+      sensor_msgs::PointCloud2ConstIterator<int8_t> iter(raw_message,
+                                                         field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::INT16: {
+      sensor_msgs::PointCloud2ConstIterator<int16_t> iter(raw_message,
+                                                          field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::UINT16: {
+      sensor_msgs::PointCloud2ConstIterator<int16_t> iter(raw_message,
+                                                          field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::INT32: {
+      sensor_msgs::PointCloud2ConstIterator<int32_t> iter(raw_message,
+                                                          field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::UINT32: {
+      sensor_msgs::PointCloud2ConstIterator<uint32_t> iter(raw_message,
+                                                           field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::FLOAT32: {
+      sensor_msgs::PointCloud2ConstIterator<float> iter(raw_message,
+                                                        field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    case sensor_msgs::msg::PointField::FLOAT64: {
+      sensor_msgs::PointCloud2ConstIterator<double> iter(raw_message,
+                                                         field_name);
+      int index = 0;
+      for (; iter != iter.end(); ++iter) {
+        if (field_name == "intensity") {
+          point_clouds->mutable_point(index)->set_intensity(
+              static_cast<uint32_t>(*iter));
+        } else {
+          point_clouds->mutable_point(index)->set_timestamp(
+              static_cast<uint64_t>(*iter));
+          AERROR << *iter;
+        }
+        index++;
+      }
+      break;
+    }
+    default:
+      throw std::runtime_error("Unsupported PointField datatype");
+  }
+}
+#endif
+
 bool LidarPointcloud::ConvertMsg(InputTypes<InputMsgPtr>& in,
                                  OutputTypes<OutputMsgPtr>& out) {
 #ifdef ENABLE_ROS_MSG
@@ -29,121 +177,50 @@ bool LidarPointcloud::ConvertMsg(InputTypes<InputMsgPtr>& in,
   double timestamp = 0.0;
   auto& cloud_msg = (*in_msg);
 
-  out_msg->set_frame_id(cloud_msg.header.frame_id);
-  out_msg->set_is_dense(cloud_msg.is_dense);
-  out_msg->set_width(cloud_msg.width);
-  out_msg->set_height(cloud_msg.height);
-  // out_msg -> set_measurement_time();
-
-  for (size_t i = 0; i < cloud_msg.height * cloud_msg.width; ++i) {
-    size_t point_offset = i * cloud_msg.point_step;
-
-    x = ReadAsHostEndian<float>(
-        cloud_msg.is_bigendian,
-        &cloud_msg.data[point_offset + cloud_msg.fields[0].offset]);
-    y = ReadAsHostEndian<float>(
-        cloud_msg.is_bigendian,
-        &cloud_msg.data[point_offset + cloud_msg.fields[1].offset]);
-    z = ReadAsHostEndian<float>(
-        cloud_msg.is_bigendian,
-        &cloud_msg.data[point_offset + cloud_msg.fields[2].offset]);
-    int intensity_index = FindFieldIndex("intensity", *in_msg);
-    if (intensity_index != -1) {
-      switch (cloud_msg.fields[intensity_index].datatype) {
-        case sensor_msgs::msg::PointField::INT8:
-        case sensor_msgs::msg::PointField::UINT8: {
-          intensity = static_cast<float>(ReadAsHostEndian<uint8_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[intensity_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::INT16:
-        case sensor_msgs::msg::PointField::UINT16: {
-          intensity = static_cast<float>(ReadAsHostEndian<uint16_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[intensity_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::INT32:
-        case sensor_msgs::msg::PointField::UINT32: {
-          intensity = static_cast<float>(ReadAsHostEndian<uint32_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[intensity_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::FLOAT32: {
-          intensity = static_cast<float>(ReadAsHostEndian<float>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[intensity_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::FLOAT64: {
-          intensity = static_cast<float>(ReadAsHostEndian<double>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[intensity_index].offset]));
-          break;
-        }
-        default:
-          throw std::runtime_error("Unsupported PointField datatype");
-      }
+  bool has_x = false, has_y = false, has_z = false, has_intensity = false,
+       has_time = false;
+  std::string time_field_name;
+  sensor_msgs::msg::PointField time_field_type;
+  sensor_msgs::msg::PointField intensity_field_type;
+  for (const auto& field : cloud_msg.fields) {
+    if (field.name == "x") has_x = true;
+    if (field.name == "y") has_y = true;
+    if (field.name == "z") has_z = true;
+    if (field.name == "intensity") {
+      has_intensity = true;
+      intensity_field_type = field;
     }
-
-    int timestamp_index = FindFieldIndex("timestamp", *in_msg);
-    if (timestamp_index != -1) {
-      switch (cloud_msg.fields[timestamp_index].datatype) {
-        case sensor_msgs::msg::PointField::INT8:
-        case sensor_msgs::msg::PointField::UINT8: {
-          timestamp = static_cast<double>(ReadAsHostEndian<uint8_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[timestamp_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::INT16:
-        case sensor_msgs::msg::PointField::UINT16: {
-          timestamp = static_cast<double>(ReadAsHostEndian<uint16_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[timestamp_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::INT32:
-        case sensor_msgs::msg::PointField::UINT32: {
-          timestamp = static_cast<double>(ReadAsHostEndian<uint32_t>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[timestamp_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::FLOAT32: {
-          timestamp = static_cast<double>(ReadAsHostEndian<float>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[timestamp_index].offset]));
-          break;
-        }
-        case sensor_msgs::msg::PointField::FLOAT64: {
-          timestamp = static_cast<double>(ReadAsHostEndian<double>(
-              cloud_msg.is_bigendian,
-              &cloud_msg.data[point_offset +
-                              cloud_msg.fields[timestamp_index].offset]));
-          break;
-        }
-        default:
-          throw std::runtime_error("Unsupported PointField datatype");
-      }
+    if (field.name == "t" || field.name == "time" ||
+        field.name == "timestamp") {
+      has_time = true;
+      time_field_type = field;
+      time_field_name = field.name;
     }
+  }
+  if (!(has_x && has_y && has_z)) {
+    AERROR << "PointCloud2 does not contain x, y, z fields.";
+    return false;
+  }
+
+  sensor_msgs::PointCloud2ConstIterator<float> iter_x(cloud_msg, "x");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_y(cloud_msg, "y");
+  sensor_msgs::PointCloud2ConstIterator<float> iter_z(cloud_msg, "z");
+
+  for (; iter_x != iter_x.end(); ++iter_x, ++iter_y, ++iter_z) {
+    x = *iter_x;
+    y = *iter_y;
+    z = *iter_z;
+
     auto pointcloud = out_msg->add_point();
     pointcloud->set_x(x);
     pointcloud->set_y(y);
     pointcloud->set_z(z);
-    pointcloud->set_intensity(static_cast<uint32_t>(std::round(intensity)));
-    pointcloud->set_timestamp(static_cast<uint64_t>(timestamp * 10e9));
+  }
+  if (has_time) {
+    ParseField(time_field_type, out_msg, time_field_name, cloud_msg);
+  }
+  if (has_intensity) {
+    ParseField(intensity_field_type, out_msg, "intensity", cloud_msg);
   }
 #endif
   return true;

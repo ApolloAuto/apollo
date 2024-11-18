@@ -21,11 +21,12 @@
 #include <memory>
 #include <string>
 
+#include "cyber/ros_bridge/converter_base/converter_interface.h"
+
 #include "cyber/proto/simple.pb.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "cyber/ros_bridge/converter_base/convert_ros_single.h"
 
 #if __has_include("sensor_msgs/point_cloud2_iterator.hpp")
 #include "sensor_msgs/point_cloud2_iterator.hpp"
@@ -62,11 +63,6 @@ class LidarPointcloud
    */
   virtual bool ConvertMsg(InputTypes<InputMsgPtr>&, OutputTypes<OutputMsgPtr>&);
 
-  inline bool IsSystemBigEndian() {
-    const uint32_t one = 0x01;
-    return reinterpret_cast<const uint8_t*>(&one)[0] == 0;
-  }
-
 #ifdef ENABLE_ROS_MSG
   inline int FindFieldIndex(
       std::string name, sensor_msgs::msg::PointCloud2& cloud_msg) {  // NOLINT
@@ -78,20 +74,6 @@ class LidarPointcloud
     return -1;
   }
 #endif
-
-  template <typename T>
-  T ReadAsHostEndian(const bool is_bigendian, const uint8_t* data) {
-    T value;
-    std::memcpy(&value, data, sizeof(T));
-
-    if ((is_bigendian && !IsSystemBigEndian()) ||
-        (!is_bigendian && IsSystemBigEndian())) {
-      std::reverse(reinterpret_cast<uint8_t*>(&value),
-                   reinterpret_cast<uint8_t*>(&value) + sizeof(T));
-    }
-
-    return value;
-  }
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::cyber::LidarPointcloud,

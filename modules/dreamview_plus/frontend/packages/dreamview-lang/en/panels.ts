@@ -71,6 +71,7 @@ export const panels = {
     simworld: 'simworld',
     map: 'map',
     pointcloud: 'pointcloud',
+    curbpointcloud: 'curb pointcloud',
     camera: 'camera',
     messages: ' messages',
     selectChannel: 'Please select a channel',

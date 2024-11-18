@@ -243,6 +243,16 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
             currentVisible: false,
             vizKey: 'parkingSpace',
         },
+        barrierGate: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'barrierGate',
+        },
+        area: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'area',
+        },
         parkingSpaceId: {
             defaultVisible: false,
             currentVisible: false,

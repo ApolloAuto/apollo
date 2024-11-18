@@ -37,6 +37,8 @@ message RSUOverlapInfo {}
 
 message AreaOverlapInfo {}
 
+message BarrierGateOverlapInfo {}
+
 message RegionOverlapInfo {
   optional Id id = 1;
   repeated Polygon polygon = 2;
@@ -59,6 +61,7 @@ message ObjectOverlapInfo {
     PNCJunctionOverlapInfo pnc_junction_overlap_info = 12;
     RSUOverlapInfo rsu_overlap_info = 13;
     AreaOverlapInfo area_overlap_info = 14;
+    BarrierGateOverlapInfo barrier_gate_overlap_info = 15;
   }
 }
 

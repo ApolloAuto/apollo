@@ -8,6 +8,22 @@ import { useTranslation } from 'react-i18next';
 import lodashCloneDeep from 'lodash/cloneDeep';
 import { initChartValue, IChartListItem } from '../const';
 
+/**
+ * @description
+ * 使用hooks管理图表配置，包括添加新图表、删除图表、更新图表列表等操作。
+ *
+ * @param {string} panelId - 面板ID，用于区分不同的面板。
+ * @param {Function} onInit - 初始化时调用，传入一个数组参数，包含当前面板上所有的图表配置项。
+ *
+ * @returns {object} 返回一个对象，包含以下属性：
+ * - {Function} onDeleteChart - 删除指定图表的函数，接收一个图表配置项作为参数。
+ * - {Function} onAddNewChart - 添加新图表的函数，无参数。
+ * - {IChartListItem} activeChartConfig - 当前选中的图表配置项。
+ * - {Function} changeActiveChartConfig - 切换选中的图表配置项的函数，接收一个图表配置项作为参数。
+ * - {Function} resetActiveChartConfig - 重置选中的图表配置项的函数，无参数。
+ * - {Array<IChartListItem>} chartConfigList - 当前面板上所有的图表配置项列表。
+ * - {Function} updateChartConfigList - 更新图表配置项列表的函数，接收一个图表配置项数组作为参数。
+ */
 export function useChartConfigManager(panelId: string, onInit: (data: Array<IChartListItem>) => void) {
     const [chartConfigList, setChartConfigList] = useState<Array<IChartListItem>>([]);
     const [activeChartConfig, setActiveChartConfig] = useState<IChartListItem>({
@@ -20,7 +36,8 @@ export function useChartConfigManager(panelId: string, onInit: (data: Array<ICha
 
     const putObjectStore = useCallback(
         debounce(
-            (value: Array<IChartListItem>) => mainApi.putObjectStore({ type: OBJECT_STORE_TYPE.CHART, panelId, value }),
+            (value: Array<IChartListItem>) =>
+                mainApi.putChartObjectStore({ type: OBJECT_STORE_TYPE.CHART, panelId, value }),
             300,
         ),
         [],
@@ -53,7 +70,7 @@ export function useChartConfigManager(panelId: string, onInit: (data: Array<ICha
                     const nextChartConfigList = chartConfigList.filter((item) => item.uid !== chart.uid);
                     setChartConfigList(nextChartConfigList);
                     resetActiveChartConfig();
-                    return mainApi.putObjectStore({
+                    return mainApi.putChartObjectStore({
                         type: OBJECT_STORE_TYPE.CHART,
                         panelId,
                         value: nextChartConfigList,
@@ -77,7 +94,7 @@ export function useChartConfigManager(panelId: string, onInit: (data: Array<ICha
     );
 
     const initChartConfig = () => {
-        mainApi.getObjectStore<Array<IChartListItem>>({ type: OBJECT_STORE_TYPE.CHART, panelId }).then((r) => {
+        mainApi.getChartObjectStore<Array<IChartListItem>>({ type: OBJECT_STORE_TYPE.CHART, panelId }).then((r) => {
             setChartConfigList(r);
             if (onInit) {
                 onInit(r);

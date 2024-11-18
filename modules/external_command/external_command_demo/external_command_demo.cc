@@ -61,7 +61,7 @@ bool ExternalCommandDemo::Init() {
                           CommandStatus>(
           "/apollo/external_command/command_status");
   apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/external_command/external_command_demo/conf/"
+      "modules/external_command/external_command_demo/conf/"
       "demo_config.pb.txt",
       &demo_config_);
   return true;

@@ -10,9 +10,6 @@ filegroup(
     ]),
 )
 
-# import ros repository is new feature of cyber 2.0
-# depend on the env configuration provided by the apollo tool
-# currently under development
 apollo_cc_library(
     name = "converter_base",
     hdrs = [
@@ -26,11 +23,12 @@ apollo_cc_library(
         "converter_base/convert_apollo_triple.h",
         "converter_base/convert_apollo_double.h",
         "converter_base/convert_apollo_single.h",
-	"converter_base/converter_interface.h",
+	    "converter_base/converter_interface.h",
 
         "common/bridge_argument.h",
         "common/ros_bridge_gflags.h",
-        "common/utils.h"
+        "common/utils.h",
+        "common/macros.h",
     ],
     srcs = [
         "common/ros_bridge_gflags.cc",

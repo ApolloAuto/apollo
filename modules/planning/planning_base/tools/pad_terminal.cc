@@ -40,7 +40,7 @@ class PadTerminal {
   PadTerminal() : node_(CreateNode("planning_pad_terminal")) {}
   void init() {
     const std::string planning_config_file =
-        "/apollo/modules/planning/planning_component/conf/"
+        "modules/planning/planning_component/conf/"
         "planning_config.pb.txt";
     PlanningConfig planning_config;
     ACHECK(GetProtoFromFile(planning_config_file, &planning_config))

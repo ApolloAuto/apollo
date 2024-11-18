@@ -1,6 +1,6 @@
 {
     "name": "@dreamview/dreamview-core",
-    "version": "5.0.8",
+    "version": "5.0.13",
     "description": "The core package of dreamview.",
     "keywords": [
         "dreamview"

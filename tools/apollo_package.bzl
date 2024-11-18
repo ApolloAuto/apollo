@@ -1,6 +1,8 @@
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files", "install_plugin")
 load("//tools:apollo.bzl", "cyber_plugin_description")
+load("//tools:common.bzl", "select2dict", "list_str2list")
 load("//tools/package:dynamic_deps.bzl", "STATUS", "SOURCE", "BINARY")
+load("//tools/proto:proto.bzl", "fix_proto_cc_binary_wrap", "fix_proto_cc_library_wrap", "fix_proto_cc_test_wrap")
 load("@rules_cc//cc:defs.bzl", legacy_cc_library = "cc_library", legacy_cc_binary = "cc_binary", legacy_cc_test = "cc_test")
 
 
@@ -23,34 +25,9 @@ PLUGIN_RULE = "cyber_plugin_description"
 
 APOLLO_COMPONENT_LIBRARY_PREFIX = "DO_NOT_IMPORT_"
 
-CC_LIBRARY = native.cc_library if STATUS == 2 else legacy_cc_library
-CC_BINARY = native.cc_binary if STATUS == 2 else legacy_cc_binary
-CC_TEST = native.cc_test if STATUS == 2 else legacy_cc_test
-
-def _select2dict(select_str):
-    result = dict()
-    cxt_str = select_str[:-2].replace("select({","")
-    for kv_str in cxt_str.split("],"):
-      k_str, v_str = kv_str.strip().split(": [")
-      if "" == v_str.strip() or "]" == v_str.strip():
-        result[k_str.strip()[1:-1]] = []
-      else:
-        v_list = []
-        v_cxt = v_str.strip()
-        if v_cxt[-1] == "]":
-          v_cxt = v_str.strip()[:-1]
-        for v_v in v_cxt.split(","):
-          v_list.append(v_v.strip()[1:-1])
-        result[k_str.strip()[1:-1]] = v_list
-
-    return result
-
-def _list_str2list(list_str):
-    result = []
-    cxt = list_str[1:-1]
-    for l_str in cxt.strip().split(","):
-      result.append(l_str.strip()[1:-1])
-    return result
+CC_LIBRARY = fix_proto_cc_library_wrap if STATUS == 2 else legacy_cc_library
+CC_BINARY = fix_proto_cc_binary_wrap if STATUS == 2 else legacy_cc_binary
+CC_TEST = fix_proto_cc_test_wrap if STATUS == 2 else legacy_cc_test
 
 def _is_lib(name):
     if name.startswith("lib") and name.endswith(".so"):
@@ -291,7 +268,8 @@ def apollo_package(enable_source=True):
             package_install_target.append(install_action_instance)
         elif rule["kind"] == CPP_PROTO_RULE:
             install_action_instance["type"] = "neo"
-            install_action_instance["data"] = [":%s" % rule["name"]]
+            # install_action_instance["data"] = [":%s" % rule["name"]]
+            install_action_instance["data"] = ["@apollo_src//%s:%s" % (package_name, rule["name"])]
             install_action_instance["data_dest"] = "include/%s" % package_name 
             package_install_target.append(install_action_instance)
         elif rule["kind"] == DEFAULT_LIB_RULE:
@@ -419,7 +397,7 @@ def _auto_padding_deps(registered_deps, auto_deps=False):
     if source_pkg == None:
         ret_deps = []
         for i in registered_deps:
-            if (i.startswith("@") and "_C" not in i) or i.startswith(":"):
+            if (i.startswith("@") and "_C" not in i) or i.startswith(":") or len(i.split("//:")) <= 1:
                 continue
             dep_path = (i.split("//:")[1].replace("_S", "/")).split("_C")[0]
             depend_binary = None
@@ -500,7 +478,7 @@ def dynamic_fill_deps(attrs):
     if type(deps) == "select":
         for group_str in str(deps).strip().split(" + "):
             if "select({" in group_str.strip():
-                s_deps_dict = _select2dict(group_str.strip())
+                s_deps_dict = select2dict(group_str.strip())
                 for k, v in s_deps_dict.items():
                     if type(v) == "list":
                         s_deps_dict[k] = _replace_deps(v)
@@ -511,7 +489,7 @@ def dynamic_fill_deps(attrs):
                 ret_deps_list.append(select(s_deps_dict))
             else:
                 l_deps_str = group_str.strip()
-                l_deps_list = _list_str2list(l_deps_str)
+                l_deps_list = list_str2list(l_deps_str)
                 ret_deps = _replace_deps(l_deps_list)
 
                 for dep in ret_deps:
@@ -619,11 +597,11 @@ def apollo_cc_library(**kwargs):
         merge_src_list = []
         for group_str in str(merge_src).strip().split(" + "):
             if "select({" in group_str.strip():
-                select_dict_list.append(_select2dict(group_str))
+                select_dict_list.append(select2dict(group_str))
             elif group_str.strip() == "[]":
                 continue
             else:
-                merge_src_list += _list_str2list(group_str.strip())
+                merge_src_list += list_str2list(group_str.strip())
         merge_src = merge_src_list
 
     for s in merge_src:

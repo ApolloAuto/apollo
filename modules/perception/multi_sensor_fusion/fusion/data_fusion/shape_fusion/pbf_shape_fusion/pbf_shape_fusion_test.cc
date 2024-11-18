@@ -32,10 +32,10 @@ using FramePtr = std::shared_ptr<perception::base::Frame>;
 
 TEST(PbfShapeFusion, lidar_track) {
   FLAGS_work_root =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
@@ -166,10 +166,10 @@ TEST(PbfShapeFusion, lidar_track) {
 
 TEST(PbfShapeFusion, radar_track) {
   FLAGS_work_root =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
@@ -342,10 +342,10 @@ TEST(PbfShapeFusion, radar_track) {
 
 TEST(PbfShapeFusion, camera_track) {
   FLAGS_work_root =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "/apollo/modules/perception/data/params";
+      "modules/perception/data/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 

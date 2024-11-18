@@ -25,7 +25,7 @@ DEFINE_int32(
     "Dreamview profiling duration in ms. Negative value will not restrict the "
     "profiling time");
 
-DEFINE_string(static_file_dir, "/apollo/modules/dreamview/frontend/dist",
+DEFINE_string(static_file_dir, "modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");
 
@@ -84,7 +84,7 @@ DEFINE_double(system_status_lifetime_seconds, 30,
               "the status change.");
 
 DEFINE_string(lidar_height_yaml,
-              "/apollo/modules/localization/msf/params/velodyne_params/"
+              "modules/localization/msf/params/velodyne_params/"
               "velodyne64_height.yaml",
               "The yaml file for reading height of lidar w.r.t. ground.");
 
@@ -92,14 +92,14 @@ DEFINE_int32(monitor_msg_pending_queue_size, 10,
              "Max monitor message pending queue size");
 
 DEFINE_string(default_data_collection_config_path,
-              "/apollo/modules/dreamview/conf/data_collection_table.pb.txt",
+              "modules/dreamview/conf/data_collection_table.pb.txt",
               "Data collection table config path.");
 
 DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
              "Loop routing distance threshold: start to end");
 
 DEFINE_string(default_preprocess_config_path,
-              "/apollo/modules/dreamview/conf/preprocess_table.pb.txt",
+              "modules/dreamview/conf/preprocess_table.pb.txt",
               "Sensor calibration preprocess table config path.");
 
 DEFINE_string(vehicle_calibration_mode, "Vehicle Calibration",
@@ -153,7 +153,7 @@ DEFINE_string(sim_obstacle_path,
               "sim obstacle binary placement.");
 
 DEFINE_string(gflag_command_arg,
-              " --flagfile=/apollo/modules/common/data/global_flagfile.txt",
+              " --flagfile=modules/common/data/global_flagfile.txt",
               "sim obstacle need use gflag!");
 
 DEFINE_string(sim_perfect_control, "Simulation Perfect Control",
@@ -162,13 +162,13 @@ DEFINE_string(sim_perfect_control, "Simulation Perfect Control",
 DEFINE_string(resource_record_path, "/.apollo/resources/records/",
               "Records placement");
 
-DEFINE_string(resource_rtk_record_path, "/apollo/data/log",
+DEFINE_string(resource_rtk_record_path, "data/log",
               "Waypoint Follow Records placement");
 
 DEFINE_string(cyber_recorder_stop_command, "pkill -9 cyber_recorder",
               "stop play recorder");
 
-DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
+DEFINE_string(vehicles_config_path, "modules/calibration/data",
               "Vehicles config path.");
 
 DEFINE_bool(
@@ -193,23 +193,20 @@ DEFINE_string(data_recorder_command_keyword, "cyber_recorder record",
 DEFINE_string(data_record_default_name, "default_record_name",
               "Data record default name");
 
-DEFINE_double(threshold_for_destination_check, 1.0,
-              "meters, which is 100 feet.  This threshold is used to check if"
-              "the vehicle reaches the destination");
 DEFINE_string(dv_hmi_modes_config_path,
-              "/apollo/modules/dreamview/conf/hmi_modes",
+              "modules/dreamview/conf/hmi_modes",
               "Dreamview HMI modes config path.");
 DEFINE_string(dv_plus_hmi_modes_config_path,
-              "/apollo/modules/dreamview_plus/conf/hmi_modes",
+              "modules/dreamview_plus/conf/hmi_modes",
               "Dreamview Plus HMI modes config path.");
-DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
+DEFINE_string(maps_data_path, "modules/map/data", "Maps data path.");
 DEFINE_string(global_components_config_path,
-              "/apollo/modules/dreamview/conf/global_components_config.pb.txt",
+              "modules/dreamview/conf/global_components_config.pb.txt",
               "Global components config path.");
 
 DEFINE_string(
     terminal_start_cmd,
-    "nohup /apollo/modules/dreamview_plus/backend/third_party_lib/cyber_shell "
+    "nohup modules/dreamview_plus/backend/third_party_lib/cyber_shell "
     "&",
     "Terminal start cmd");
 
@@ -219,7 +216,7 @@ DEFINE_string(terminal_stop_cmd, "pkill -9 -f \"cyber_shell\" ",
 DEFINE_string(cyber_channels_key, "apollo.dreamview.Cyber",
               "Cyber channels key");
 DEFINE_string(vehicle_data_config_filename,
-              "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
+              "modules/dreamview/conf/vehicle_data.pb.txt",
               "Vehicle data config file.");
             
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
@@ -230,10 +227,10 @@ DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
 DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
               "Default HMI Mode when there is no cache.");
 
-DEFINE_string(default_rtk_record_file, "/apollo/data/log/garage.csv",
+DEFINE_string(default_rtk_record_file, "data/log/garage.csv",
               "Default rtk record file.");
 
-DEFINE_string(default_rtk_record_path, "/apollo/data/log/",
+DEFINE_string(default_rtk_record_path, "data/log/",
               "Default rtk record path.");
 
 DEFINE_bool(dv_cpu_profile, false, "enable cpu profile");
@@ -244,3 +241,9 @@ DEFINE_double(
     monitor_timeout_threshold, 2.5,
     "Monitor the maximum tolerable time from the last message sent. If "
     "it exceeds the time, the autonomous driving will be exited.");
+
+DEFINE_string(perception_edge_info_topic, "/apollo/perception/edge",
+              "Perception edge info topic name.");
+
+DEFINE_string(dv_plugin_panels_path, "/apollo/modules/dreamview_plus_plugin_panels",
+              "dreamview plugin panels path of frontend.");

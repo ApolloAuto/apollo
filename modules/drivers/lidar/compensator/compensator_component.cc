@@ -30,54 +30,52 @@ namespace drivers {
 namespace compensator {
 
 bool CompensatorComponent::Init() {
-    CompensatorConfig config;
-    if (!GetProtoConfig(&config)) {
-        AWARN << "Load config failed, config file" << ConfigFilePath();
-        return false;
-    }
+  CompensatorConfig config;
+  if (!GetProtoConfig(&config)) {
+    AWARN << "Load config failed, config file" << ConfigFilePath();
+    return false;
+  }
 
-    writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
-    compensator_.reset(new Compensator(config));
-    return true;
+  writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
+  compensator_.reset(new Compensator(config));
+  return true;
 }
 
 bool CompensatorComponent::Proc(
-        const std::shared_ptr<PointCloud>& point_cloud) {
-    const auto start_time = Time::Now();
-    std::shared_ptr<PointCloud> point_cloud_compensated
-            = writer_->AcquireMessage();
-    if (point_cloud_compensated == nullptr) {
-        AWARN << "compensator fail to getobject, will be new";
-        point_cloud_compensated = std::make_shared<PointCloud>();
-        point_cloud_compensated->mutable_point()->Reserve(140000);
-    }
-    if (point_cloud_compensated == nullptr) {
-        AWARN << "compensator point_cloud is nullptr";
-        return false;
-    }
-    point_cloud_compensated->Clear();
-    if (compensator_->MotionCompensation(
-                point_cloud, point_cloud_compensated)) {
-        const auto end_time = Time::Now();
-        const auto diff = end_time - start_time;
-        const auto meta_diff = end_time
-                - Time(point_cloud_compensated->header().lidar_timestamp());
-        AINFO << "compenstator diff (ms):" << (diff.ToNanosecond() / 1e6)
-              << ";meta (ns):"
-              << point_cloud_compensated->header().lidar_timestamp()
-              << ";meta diff (ms): " << (meta_diff.ToNanosecond() / 1e6);
-        static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
-        latency_recorder.AppendLatencyRecord(
-                point_cloud_compensated->header().lidar_timestamp(),
-                start_time,
-                end_time);
+    const std::shared_ptr<PointCloud>& point_cloud) {
+  const auto start_time = Time::Now();
+  std::shared_ptr<PointCloud> point_cloud_compensated =
+      writer_->AcquireMessage();
+  if (point_cloud_compensated == nullptr) {
+    AWARN << "compensator fail to getobject, will be new";
+    point_cloud_compensated = std::make_shared<PointCloud>();
+    point_cloud_compensated->mutable_point()->Reserve(140000);
+  }
+  if (point_cloud_compensated == nullptr) {
+    AWARN << "compensator point_cloud is nullptr";
+    return false;
+  }
+  point_cloud_compensated->Clear();
+  if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
+    const auto end_time = Time::Now();
+    const auto diff = end_time - start_time;
+    const auto meta_diff =
+        end_time - Time(point_cloud_compensated->header().lidar_timestamp());
+    AINFO << "compenstator diff (ms):" << (diff.ToNanosecond() / 1e6)
+          << ";meta (ns):"
+          << point_cloud_compensated->header().lidar_timestamp()
+          << ";meta diff (ms): " << (meta_diff.ToNanosecond() / 1e6);
+    static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
+    latency_recorder.AppendLatencyRecord(
+        point_cloud_compensated->header().lidar_timestamp(), start_time,
+        end_time);
 
-        point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
-        writer_->Write(point_cloud_compensated);
-        seq_++;
-    }
+    point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
+    writer_->Write(point_cloud_compensated);
+    seq_++;
+  }
 
-    return true;
+  return true;
 }
 
 }  // namespace compensator

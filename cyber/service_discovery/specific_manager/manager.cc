@@ -21,15 +21,12 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/time/time.h"
 #include "cyber/transport/qos/qos_profile_conf.h"
-#include "cyber/transport/rtps/attributes_filler.h"
 #include "cyber/transport/rtps/underlay_message.h"
-#include "cyber/transport/rtps/underlay_message_type.h"
 
 namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
-using transport::AttributesFiller;
 using transport::QosProfileConf;
 
 Manager::Manager()
@@ -39,15 +36,14 @@ Manager::Manager()
       change_type_(proto::ChangeType::CHANGE_PARTICIPANT),
       channel_name_(""),
       publisher_(nullptr),
-      subscriber_(nullptr),
-      listener_(nullptr) {
+      subscriber_(nullptr) {
   host_name_ = common::GlobalData::Instance()->HostName();
   process_id_ = common::GlobalData::Instance()->ProcessId();
 }
 
 Manager::~Manager() { Shutdown(); }
 
-bool Manager::StartDiscovery(RtpsParticipant* participant) {
+bool Manager::StartDiscovery(const ParticipantPtr& participant) {
   if (participant == nullptr) {
     return false;
   }
@@ -59,30 +55,13 @@ bool Manager::StartDiscovery(RtpsParticipant* participant) {
     StopDiscovery();
     return false;
   }
+  participant_ = participant;
   return true;
 }
 
 void Manager::StopDiscovery() {
   if (!is_discovery_started_.exchange(false)) {
     return;
-  }
-
-  {
-    std::lock_guard<std::mutex> lg(lock_);
-    if (publisher_ != nullptr) {
-      eprosima::fastrtps::Domain::removePublisher(publisher_);
-      publisher_ = nullptr;
-    }
-  }
-
-  if (subscriber_ != nullptr) {
-    eprosima::fastrtps::Domain::removeSubscriber(subscriber_);
-    subscriber_ = nullptr;
-  }
-
-  if (listener_ != nullptr) {
-    delete listener_;
-    listener_ = nullptr;
   }
 }
 
@@ -137,28 +116,16 @@ void Manager::RemoveChangeListener(const ChangeConnection& conn) {
   local_conn.Disconnect();
 }
 
-bool Manager::CreatePublisher(RtpsParticipant* participant) {
-  RtpsPublisherAttr pub_attr;
-  RETURN_VAL_IF(
-      !AttributesFiller::FillInPubAttr(
-          channel_name_, QosProfileConf::QOS_PROFILE_TOPO_CHANGE, &pub_attr),
-      false);
-  publisher_ =
-      eprosima::fastrtps::Domain::createPublisher(participant, pub_attr);
+bool Manager::CreatePublisher(const ParticipantPtr& participant) {
+  publisher_ = participant->CreatePublisher(
+      this->channel_name_, QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
   return publisher_ != nullptr;
 }
 
-bool Manager::CreateSubscriber(RtpsParticipant* participant) {
-  RtpsSubscriberAttr sub_attr;
-  RETURN_VAL_IF(
-      !AttributesFiller::FillInSubAttr(
-          channel_name_, QosProfileConf::QOS_PROFILE_TOPO_CHANGE, &sub_attr),
-      false);
-  listener_ = new SubscriberListener(
+bool Manager::CreateSubscriber(const ParticipantPtr& participant) {
+  subscriber_ = participant->CreateSubscriber(
+      this->channel_name_, QosProfileConf::QOS_PROFILE_TOPO_CHANGE,
       std::bind(&Manager::OnRemoteChange, this, std::placeholders::_1));
-
-  subscriber_ = eprosima::fastrtps::Domain::createSubscriber(
-      participant, sub_attr, listener_);
   return subscriber_ != nullptr;
 }
 
@@ -185,14 +152,14 @@ void Manager::Convert(const RoleAttributes& attr, RoleType role,
 
 void Manager::Notify(const ChangeMsg& msg) { signal_(msg); }
 
-void Manager::OnRemoteChange(const std::string& msg_str) {
+void Manager::OnRemoteChange(const std::shared_ptr<std::string>& msg_str) {
   if (is_shutdown_.load()) {
     ADEBUG << "the manager has been shut down.";
     return;
   }
 
   ChangeMsg msg;
-  RETURN_IF(!message::ParseFromString(msg_str, &msg));
+  RETURN_IF(!message::ParseFromString(*msg_str, &msg));
   if (IsFromSameProcess(msg)) {
     return;
   }
@@ -211,7 +178,7 @@ bool Manager::Publish(const ChangeMsg& msg) {
   {
     std::lock_guard<std::mutex> lg(lock_);
     if (publisher_ != nullptr) {
-      return publisher_->write(reinterpret_cast<void*>(&m));
+      return publisher_->Write(m);
     }
   }
   return true;

@@ -7,13 +7,13 @@ global_components {
     resource {
         disk_spaces {
         # For logs.
-        path: "/apollo/data"
+        path: "data"
         insufficient_space_warning: 8
         insufficient_space_error: 2
         }
         disk_spaces {
         # For records.
-        path: "/apollo/data/bag"
+        path: "data/bag"
         insufficient_space_warning: 128
         insufficient_space_error: 32
         }
@@ -25,7 +25,7 @@ global_components {
   key: "Terminal"
   value: {
     process {
-        command_keywords: "/apollo/modules/dreamview_plus/backend/third_party_lib/cyber_shell"
+        command_keywords: "modules/dreamview_plus/backend/third_party_lib/cyber_shell"
     }
   }
 }

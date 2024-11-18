@@ -1,21 +1,19 @@
 ---
 # tasks file for ansible/roles/gpu_support
-
 - name: ensure cuda apt source is added
   become: true
   ansible.builtin.shell:
     cmd: |
       distro_version={{ ansible_distribution_version }}
-      distro="{{ ansible_distribution|lower }}$(echo ${distro_version} | tr -d '.')}"
+      distro="{{ ansible_distribution|lower }}$(echo ${distro_version} | tr -d '.')"
       arch={{ ansible_architecture }}
       if [[ "${arch}" == "aarch64" ]]; then
         arch="arm64"
       fi
-
-      wget https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/cuda-archive-keyring.gpg -O /usr/share/keyrings/cuda-archive-keyring.gpg
-      echo "deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/ /" | tee /etc/apt/sources.list.d/cuda-${distro}-${arch}.list
-      wget https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/cuda-${distro}.pin -O /etc/apt/preferences.d/cuda-repository-pin-600
+      wget --no-check-certificate "https://developer.download.nvidia.com/compute/cuda/repos/${distro}/${arch}/cuda-keyring_1.1-1_all.deb" -O cuda-keyring_1.1-1_all.deb
+      dpkg -i cuda-keyring_1.1-1_all.deb
       apt update
+      rm -rf cuda-keyring_1.1-1_all.deb
     executable: /bin/bash
 
 - name: Install openblas atlas lapack
@@ -109,22 +107,25 @@
 #     INSTALL_MODE: "source"
 #     WORKHORSE: "gpu"
 
+# # the latedt version of nvinfer for cuda11.8 so far is 8.6.0.12-1+cuda11.8
+# the latest version of nvinfer for cuda11.8 so far is 8.6.1.6-1+cuda11.8
+# the latest version of cudnn for cuda11.8 so far is 8.9.7.29-1+cuda11.8
 - name: Install cudnn nvinfer
   become: true
   ansible.builtin.apt:
     name:
-      - libnvinfer8=8.6.0.12-1+cuda11.8
-      - libnvonnxparsers8=8.6.0.12-1+cuda11.8
-      - libnvparsers8=8.6.0.12-1+cuda11.8
-      - libnvinfer-plugin8=8.6.0.12-1+cuda11.8
-      - libnvinfer-dev=8.6.0.12-1+cuda11.8
-      - libnvonnxparsers-dev=8.6.0.12-1+cuda11.8
-      - libnvparsers-dev=8.6.0.12-1+cuda11.8
-      - libnvinfer-plugin-dev=8.6.0.12-1+cuda11.8
-      - libnvinfer-headers-dev=8.6.0.12-1+cuda11.8
-      - libnvinfer-headers-plugin-dev=8.6.0.12-1+cuda11.8
-      - libcudnn8=8.*-1+cuda11.8
-      - libcudnn8-dev=8.*-1+cuda11.8
+      - libnvinfer8=8.6.1.6-1+cuda11.8
+      - libnvonnxparsers8=8.6.1.6-1+cuda11.8
+      - libnvparsers8=8.6.1.6-1+cuda11.8
+      - libnvinfer-plugin8=8.6.1.6-1+cuda11.8
+      - libnvinfer-dev=8.6.1.6-1+cuda11.8
+      - libnvonnxparsers-dev=8.6.1.6-1+cuda11.8
+      - libnvparsers-dev=8.6.1.6-1+cuda11.8
+      - libnvinfer-plugin-dev=8.6.1.6-1+cuda11.8
+      - libnvinfer-headers-dev=8.6.1.6-1+cuda11.8
+      - libnvinfer-headers-plugin-dev=8.6.1.6-1+cuda11.8
+      - libcudnn8=8.9.7.29-1+cuda11.8
+      - libcudnn8-dev=8.9.7.29-1+cuda11.8
     allow_downgrade: true
     allow_change_held_packages: true
   when: ansible_architecture == 'x86_64'

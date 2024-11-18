@@ -22,6 +22,7 @@
 
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common_msgs/map_msgs/map_area.pb.h"
+#include "modules/common_msgs/map_msgs/map_barrier_gate.pb.h"
 #include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
 #include "modules/common_msgs/map_msgs/map_junction.pb.h"
@@ -80,6 +81,7 @@ class HDMap {
   PNCJunctionInfoConstPtr GetPNCJunctionById(const Id& id) const;
   RSUInfoConstPtr GetRSUById(const Id& id) const;
   AreaInfoConstPtr GetAreaById(const Id& id) const;
+  BarrierGateInfoConstPtr GetBarrierGateById(const Id& id) const;
 
   /**
    * @brief get all areas in certain range
@@ -118,6 +120,15 @@ class HDMap {
    */
   int GetSignals(const apollo::common::PointENU& point, double distance,
                  std::vector<SignalInfoConstPtr>* signals) const;
+  /**
+   * @brief get all barrier_gates in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param barrier_gates store all barrier_gates in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetBarrierGates(const apollo::common::PointENU& point, double distance,
+                 std::vector<BarrierGateInfoConstPtr>* barrier_gates) const;
   /**
    * @brief get all crosswalks in certain range
    * @param point the central point of the range
@@ -293,6 +304,17 @@ class HDMap {
   int GetForwardNearestSignalsOnLane(
       const apollo::common::PointENU& point, const double distance,
       std::vector<SignalInfoConstPtr>* signals) const;
+
+  /**
+   * @brief get forward nearest barrier_gates within certain range on the lane
+   * @param point the target position
+   * @param distance the forward search distance
+   * @param barrier_gates all barrier_gates match conditions
+   * @return 0:success, otherwise failed
+   */
+  int GetForwardNearestBarriersOnLane(
+      const apollo::common::PointENU& point, const double distance,
+      std::vector<BarrierGateInfoConstPtr>* barrier_gates) const;
 
   /**
    * @brief get all other stop signs associated with a stop sign

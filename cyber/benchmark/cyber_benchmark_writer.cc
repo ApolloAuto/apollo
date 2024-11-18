@@ -16,20 +16,22 @@
 
 #include <getopt.h>
 #include <libgen.h>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "cyber/cyber.h"
 #include "cyber/benchmark/benchmark_msg.pb.h"
+#include "cyber/cyber.h"
+#include "cyber/time/duration.h"
+#include "cyber/time/time.h"
 
 #if __has_include("gperftools/profiler.h")
-#include "gperftools/profiler.h"
 #include "gperftools/heap-profiler.h"
 #include "gperftools/malloc_extension.h"
+#include "gperftools/profiler.h"
 #endif
 
-std::string BINARY_NAME = "cyber_benchmark_writer"; // NOLINT
+std::string BINARY_NAME = "cyber_benchmark_writer";  // NOLINT
 
 int message_size = -1;
 int transport_freq = -1;
@@ -38,28 +40,31 @@ int data_type = 0;
 int running_time = 10;
 bool enable_cpuprofile = false;
 bool enable_heapprofile = false;
-std::string profile_filename = "cyber_benchmark_writer_cpu.prof"; // NOLINT
-std::string heapprofile_filename = "cyber_benchmark_writer_mem.prof"; // NOLINT
+std::string profile_filename = "cyber_benchmark_writer_cpu.prof";      // NOLINT
+std::string heapprofile_filename = "cyber_benchmark_writer_mem.prof";  // NOLINT
 
 void DisplayUsage() {
   AINFO << "Usage: \n    " << BINARY_NAME << " [OPTION]...\n"
         << "Description: \n"
         << "    -h, --help: help information \n"
         << "    -s, --message_size=message_size: transport message size\n"
-        << "    -t, --transport_freq=transmission_frequency: transmission frequency\n" // NOLINT
+        << "    -t, --transport_freq=transmission_frequency: transmission "
+           "frequency\n"  // NOLINT
         << "    -q, --qos_policy=qos_reliable_policy: set qos reliable policy, "
-            "0 is Reliable, 1 is Best effort, default value is 0\n"
+           "0 is Reliable, 1 is Best effort, default value is 0\n"
         << "    -d, --data_type=data_type: transport data type, "
-            "0 is bytes, 1 is repeated field, default value is 0\n"
+           "0 is bytes, 1 is repeated field, default value is 0\n"
         << "    -T, --time=time: running time, default value is 10 seconds\n"
         << "    -c, --cpuprofile: enable gperftools cpu profile\n"
         << "    -o, --profile_filename=filename: the filename to dump the "
-            "profile to, default value is cyber_benchmark_writer_cpu.prof. Only work " // NOLINT
-            "with -c option\n"
+           "profile to, default value is cyber_benchmark_writer_cpu.prof. Only "
+           "work "  // NOLINT
+           "with -c option\n"
         << "    -H, --heapprofile: enable gperftools heap profile\n"
         << "    -O, --heapprofile_filename=filename: the filename to dump the "
-            "profile to, default value is cyber_benchmark_writer_mem.prof. Only work " // NOLINT
-            "with -H option\n"
+           "profile to, default value is cyber_benchmark_writer_mem.prof. Only "
+           "work "  // NOLINT
+           "with -H option\n"
         << "Example:\n"
         << "    " << BINARY_NAME << " -h\n"
         << "    " << BINARY_NAME << " -s 64K -t 10\n"
@@ -107,7 +112,10 @@ void GetOptions(const int argc, char* const argv[]) {
     switch (opt) {
       case 's':
         arg = std::string(optarg);
-        switch (arg[arg.length()-1]) {
+        switch (arg[arg.length() - 1]) {
+          case 'B':
+            base_size = 1;
+            break;
           case 'K':
             base_size = 1024;
             break;
@@ -118,7 +126,7 @@ void GetOptions(const int argc, char* const argv[]) {
             AERROR << "Invalid identifier. It should be 'K' or 'M' or 'B'";
             exit(-1);
         }
-        message_size = std::stoi(arg.substr(0, arg.length()-1)) * base_size;
+        message_size = std::stoi(arg.substr(0, arg.length() - 1)) * base_size;
         if (message_size < 0 || message_size % 4 != 0) {
           AERROR << "Invalid message size.";
           exit(-1);
@@ -126,10 +134,6 @@ void GetOptions(const int argc, char* const argv[]) {
         break;
       case 't':
         transport_freq = std::stoi(std::string(optarg));
-        if (transport_freq < 0) {
-          AERROR << "Invalid transport frequency. It should greater than 0";
-          exit(-1);
-        }
         break;
       case 'T':
         running_time = std::stoi(std::string(optarg));
@@ -184,8 +188,8 @@ void GetOptions(const int argc, char* const argv[]) {
     exit(1);
   }
 
-  if (message_size == -1 || transport_freq == -1) {
-    AINFO << "-s and -t parameters must be specified";
+  if (message_size == -1) {
+    AINFO << "-s parameters must be specified";
     DisplayUsage();
     exit(1);
   }
@@ -193,28 +197,35 @@ void GetOptions(const int argc, char* const argv[]) {
 
 int main(int argc, char** argv) {
   GetOptions(argc, argv);
+  google::SetCommandLineOption("bvar_dump_interval", "1");
 
   apollo::cyber::Init(argv[0], BINARY_NAME);
 
   auto node = apollo::cyber::CreateNode(BINARY_NAME);
-
+  auto test_time =
+      std::make_shared<::bvar::Status<double>>(BINARY_NAME + "-test-time", 0);
+  auto test_message_size = std::make_shared<::bvar::Status<uint64_t>>(
+      BINARY_NAME + "-message-size", 0);
   apollo::cyber::proto::RoleAttributes attrs;
   attrs.set_channel_name("/apollo/cyber/benchmark");
   auto qos = attrs.mutable_qos_profile();
+  qos->set_depth(10);
 
   if (qos_policy == 1) {
     qos->set_reliability(
-      apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_BEST_EFFORT);
+        apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_BEST_EFFORT);
   } else {
     qos->set_reliability(
-      apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+        apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
   }
-  auto writer = node->CreateWriter<
-    apollo::cyber::benchmark::BenchmarkMsg>(attrs);
+  auto writer =
+      node->CreateWriter<apollo::cyber::benchmark::BenchmarkMsg>(attrs);
 
   // sleep a while for initialization, aboout 2 seconds
   apollo::cyber::Rate rate_init(0.5);
+
   apollo::cyber::Rate rate_ctl(static_cast<float>(transport_freq));
+
   rate_init.Sleep();
 
   uint64_t send_msg_total = transport_freq * running_time;
@@ -252,41 +263,86 @@ int main(int argc, char** argv) {
 #endif
 #endif
 
-std::vector<uint32_t> trans_vec;
-int num_of_instance = message_size / 4;
-for (int i = 0; i < num_of_instance; i++) {
-  trans_vec.push_back(rand());  // NOLINT
-}
-
-char* data = (char*)malloc(message_size); // NOLINT
-
-  while (send_msg < send_msg_total) {
-    auto trans_unit = std::make_shared<
-      apollo::cyber::benchmark::BenchmarkMsg>();
-    int base = rand();          // NOLINT
-
-    for (int i = 0; i < num_of_instance; i++) {
-      trans_vec[i] = base * i;
-    }
-
-    for (int i = 0; i < num_of_instance; i++) {
-      *(uint32_t*)(data + i * 4) = base * i;  // NOLINT
-    }
-
-    if (data_type == 0) {
-      trans_unit->set_data_bytes(data, message_size);
-    } else {
-      for (int i = 0; i < num_of_instance; i++) {
-        trans_unit->add_data(trans_vec[i]);
-      }
-    }
-
-    writer->Write(trans_unit);
-    ++send_msg;
-    rate_ctl.Sleep();
+  std::vector<uint32_t> trans_vec;
+  int num_of_instance = message_size / 4;
+  for (int i = 0; i < num_of_instance; i++) {
+    trans_vec.push_back(rand());  // NOLINT
   }
 
-free(data);
+  char* data = (char*)malloc(message_size);  // NOLINT
+
+  if (transport_freq > 0) {
+    auto start_time = apollo::cyber::Time::Now();
+    while (send_msg < send_msg_total) {
+      auto trans_unit = writer->AcquireMessage();
+      int base = rand();  // NOLINT
+
+      for (int i = 0; i < num_of_instance; i++) {
+        trans_vec[i] = base * i;
+      }
+
+      for (int i = 0; i < num_of_instance; i++) {
+        *(uint32_t*)(data + i * 4) = base * i;  // NOLINT
+      }
+
+      if (data_type == 0) {
+        trans_unit->set_data_bytes(data, message_size);
+      } else {
+        for (int i = 0; i < num_of_instance; i++) {
+          trans_unit->add_data(trans_vec[i]);
+        }
+      }
+
+      writer->Write(trans_unit);
+      ++send_msg;
+
+      rate_ctl.Sleep();
+    }
+    auto end_time = apollo::cyber::Time::Now();
+    test_time->set_value((end_time - start_time).ToSecond());
+  } else {
+    auto start_time = apollo::cyber::Time::Now();
+    auto current = start_time;
+    auto endtime = apollo::cyber::Time::Now() +
+                   apollo::cyber::Duration(static_cast<double>(running_time));
+    while (current < endtime) {
+      auto trans_unit = writer->AcquireMessage();
+      int base = rand();  // NOLINT
+
+      for (int i = 0; i < num_of_instance; i++) {
+        trans_vec[i] = base * i;
+      }
+
+      for (int i = 0; i < num_of_instance; i++) {
+        *(uint32_t*)(data + i * 4) = base * i;  // NOLINT
+      }
+
+      if (data_type == 0) {
+        trans_unit->set_data_bytes(data, message_size);
+      } else {
+        for (int i = 0; i < num_of_instance; i++) {
+          trans_unit->add_data(trans_vec[i]);
+        }
+      }
+
+      writer->Write(trans_unit);
+      ++send_msg;
+      current = apollo::cyber::Time::Now();
+    }
+    test_time->set_value((current - start_time).ToSecond());
+  }
+
+  auto m = writer->AcquireMessage();
+  if (data_type == 0) {
+    m->set_data_bytes(data, message_size);
+  } else {
+    for (int i = 0; i < num_of_instance; i++) {
+      m->add_data(trans_vec[i]);
+    }
+  }
+  test_message_size->set_value(m->ByteSizeLong());
+
+  free(data);
 
 #ifndef NO_TCMALLOC
 #ifdef BASE_PROFILER_H_
@@ -299,7 +355,7 @@ free(data);
   }
 #endif
 #endif
-
+  std::this_thread::sleep_for(std::chrono::milliseconds(1200));
   apollo::cyber::Clear();
 
   return 0;

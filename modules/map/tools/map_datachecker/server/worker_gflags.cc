@@ -25,7 +25,7 @@ DEFINE_string(map_datachecker_port, "50100", "the grpc server port");
 DEFINE_string(topic_bestgnsspos, "/apollo/sensor/gnss/best_pose", "");
 // configure file
 DEFINE_string(conf_json,
-              "/apollo/modules/map/tools/map_datachecker/server/conf/"
+              "modules/map/tools/map_datachecker/server/conf/"
               "map-datachecker.json",
               "configure file");
 

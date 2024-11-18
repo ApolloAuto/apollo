@@ -26,7 +26,7 @@ export default function RoutingEditingFunctionalLoop(props: RoutingEditingFuncti
             });
         } else {
             routeManagerMix.setCurrentRouteMix({
-                currentRouteLoop: { currentRouteLoopState: false },
+                currentRouteLoop: { currentRouteLoopState: true },
             });
         }
         setChecked(switchVal);
@@ -37,38 +37,6 @@ export default function RoutingEditingFunctionalLoop(props: RoutingEditingFuncti
             currentRouteLoop: { currentRouteLoopState: true, currentRouteLoopTimes: inputVal },
         });
     };
-
-    // useEffect(() => {
-    //     const wayCount = routingEditor.pathwayMarker.positionsCount;
-    //     if (wayCount > 0) {
-    //         if (isMainConnected) {
-    //             mainApi.getStartPoint().then((res) => {
-    //                 const startPoint = { x: res.x, y: res.y, heading: res?.heading };
-    //                 const endPoint = routingEditor.pathwayMarker.lastPosition;
-    //                 mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
-    //                     if (cycle.isCycle) {
-    //                         setLoopDisable(false);
-    //                         if (routeManagerMix.getCurrentRouteMix().currentRouteLoop.currentRouteLoopState) {
-    //                             setChecked(true);
-    //                             setInputDisplay(true);
-    //                         }
-    //                     } else {
-    //                         const currentRouteMixValue = { currentRouteLoop: { currentRouteLoopState: false } };
-    //                         routeManagerMix.setCurrentRouteMix(currentRouteMixValue);
-    //                         setChecked(false);
-    //                         setLoopDisable(true);
-    //                         message({
-    //                             type: 'error',
-    //                             content: t('NoLoopMessage'),
-    //                         });
-    //                     }
-    //                 });
-    //             });
-    //         }
-    //     } else {
-    //         message({ type: 'error', content: t('NoWayPointMessage') });
-    //     }
-    // }, [isMainConnected]);
 
     return (
         <div className={classes['functional-loop-con']}>

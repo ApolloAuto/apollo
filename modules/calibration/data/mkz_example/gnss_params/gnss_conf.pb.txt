@@ -46,7 +46,7 @@ tf {
 
 # If given, the driver will send velocity info into novatel one time per second
 wheel_parameters: "SETWHEELPARAMETERS 100 1 1\r\n"
-gpsbin_folder: "/apollo/data/gpsbin"
+gpsbin_folder: "data/gpsbin"
 
 # login_commands: "UNLOGALL THISPORT\r\n"
 # login_commands: "SETIMUTOANTOFFSET 0 0.71 1.080 0.05 0.05 0.08\r\n"

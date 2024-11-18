@@ -1,25 +1,25 @@
 cyber_modules {
   key: "GPS"
   value: {
-    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    dag_files: "modules/drivers/gnss/dag/gnss.dag"
   }
 }
 cyber_modules {
   key: "Localization"
   value: {
-    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    dag_files: "modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
 cyber_modules {
   key: "Lidar"
   value: {
-    dag_files: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+    dag_files: "modules/drivers/lidar/dag/lidar.dag"
   }
 }
 cyber_modules {
   key: "Camera"
   value: {
-    dag_files: "/apollo/modules/drivers/camera/dag/dev_kit_camera.dag"
+    dag_files: "modules/drivers/camera/dag/dev_kit_camera.dag"
     required_for_safety: false
   }
 }
@@ -42,7 +42,7 @@ monitored_components {
     resource {
       disk_spaces {
         # For logs.
-        path: "/apollo/data"
+        path: "data"
         insufficient_space_warning: 8
         insufficient_space_error: 2
       }
@@ -60,7 +60,7 @@ monitored_components {
   value: {
     process {
       command_keywords: "mainboard"
-      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+      command_keywords: "modules/drivers/gnss/dag/gnss.dag"
     }
     # We also have a special GPSMonitor to check message status.
   }
@@ -70,7 +70,7 @@ monitored_components {
   value: {
     process {
       command_keywords: "mainboard"
-      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+      command_keywords: "modules/localization/dag/dag_streaming_rtk_localization.dag"
     }
     channel {
       name: "/apollo/localization/pose"
@@ -82,7 +82,7 @@ monitored_components {
   value: {
     process {
       command_keywords: "mainboard"
-      command_keywords: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+      command_keywords: "modules/drivers/lidar/dag/lidar.dag"
     }
   }
 }

@@ -119,7 +119,7 @@ class HybridAResultContainer {
 extern "C" {
 HybridAStar* CreatePlannerPtr() {
   FLAGS_planner_open_space_config_filename
-    = "/apollo/modules/planning/planning_component/"
+    = "modules/planning/planning_component/"
       "conf/planner_hybrid_a_star_config.pb.txt";
   apollo::planning::WarmStartConfig planner_open_space_config_;
 

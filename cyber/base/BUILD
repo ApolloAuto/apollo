@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 apollo_cc_library(
     name = "cyber_base",
     hdrs = [
+        # "arena_queue.h",
         "atomic_hash_map.h",
         "atomic_rw_lock.h",
         "bounded_queue.h",

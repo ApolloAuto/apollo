@@ -30,7 +30,7 @@ APOLLO_DISTRIBUTION_HOME = os.environ.get(
     'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
 
 # init vars
-if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo'):
+if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo') or APOLLO_DISTRIBUTION_HOME.startswith('/home'):
     wrapper_lib_path = os.path.join(
         APOLLO_DISTRIBUTION_HOME, "lib", "cyber/python/internal")
         

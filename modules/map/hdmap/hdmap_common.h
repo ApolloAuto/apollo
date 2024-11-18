@@ -21,6 +21,7 @@ limitations under the License.
 #include <vector>
 
 #include "modules/common_msgs/map_msgs/map_area.pb.h"
+#include "modules/common_msgs/map_msgs/map_barrier_gate.pb.h"
 #include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
@@ -89,6 +90,7 @@ class ParkingSpaceInfo;
 class PNCJunctionInfo;
 class RSUInfo;
 class AreaInfo;
+class BarrierGateInfo;
 class HDMapImpl;
 
 struct LineBoundary {
@@ -141,6 +143,7 @@ using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
 using RSUInfoConstPtr = std::shared_ptr<const RSUInfo>;
 using AreaInfoConstPtr = std::shared_ptr<const AreaInfo>;
+using BarrierGateInfoConstPtr = std::shared_ptr<const BarrierGateInfo>;
 
 class LaneInfo {
  public:
@@ -168,6 +171,9 @@ class LaneInfo {
     return cross_lanes_;
   }
   const std::vector<OverlapInfoConstPtr> &signals() const { return signals_; }
+  const std::vector<OverlapInfoConstPtr> &barrier_gates() const {
+    return barrier_gates_;
+  }
   const std::vector<OverlapInfoConstPtr> &yield_signs() const {
     return yield_signs_;
   }
@@ -254,6 +260,7 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> overlaps_;
   std::vector<OverlapInfoConstPtr> cross_lanes_;
   std::vector<OverlapInfoConstPtr> signals_;
+  std::vector<OverlapInfoConstPtr> barrier_gates_;
   std::vector<OverlapInfoConstPtr> yield_signs_;
   std::vector<OverlapInfoConstPtr> stop_signs_;
   std::vector<OverlapInfoConstPtr> crosswalks_;
@@ -360,6 +367,28 @@ using SignalSegmentBox =
     ObjectWithAABox<SignalInfo, apollo::common::math::LineSegment2d>;
 using SignalSegmentKDTree =
     apollo::common::math::AABoxKDTree2d<SignalSegmentBox>;
+
+class BarrierGateInfo {
+ public:
+  explicit BarrierGateInfo(const BarrierGate &barrier_gate);
+
+  const Id &id() const { return barrier_gate_.id(); }
+  const BarrierGate &barrier_gate() const { return barrier_gate_; }
+  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
+    return segments_;
+  }
+
+ private:
+  void Init();
+
+ private:
+  const BarrierGate &barrier_gate_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
+};
+using BarrierGateSegmentBox =
+    ObjectWithAABox<BarrierGateInfo, apollo::common::math::LineSegment2d>;
+using BarrierGateSegmentKDTree =
+    apollo::common::math::AABoxKDTree2d<BarrierGateSegmentBox>;
 
 class CrosswalkInfo {
  public:

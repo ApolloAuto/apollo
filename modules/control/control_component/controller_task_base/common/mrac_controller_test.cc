@@ -36,7 +36,7 @@ class MracControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string controllers_dir =
-        "/apollo/modules/control/control_component/testdata/conf/";
+        "modules/control/control_component/testdata/conf/";
     std::string control_conf_file = controllers_dir + "mrac_conf.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &mrac_conf_));
     steering_latency_param_.set_dead_time(0.0);

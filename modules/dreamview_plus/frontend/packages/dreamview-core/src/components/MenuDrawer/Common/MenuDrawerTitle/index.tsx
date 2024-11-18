@@ -13,6 +13,8 @@ interface IMenuDrawerTitle {
 function MenuDrawerTitle(props: IMenuDrawerTitle) {
     const { title, border = true, extra } = props;
 
+    const isArr = Array.isArray(extra);
+
     const { classes, cx } = useStyle();
 
     const [, dispatch] = useMenuStore();
@@ -25,8 +27,23 @@ function MenuDrawerTitle(props: IMenuDrawerTitle) {
         <div className={cx(classes['menu-drawer-title'], { [classes['menu-drawer-title-border']]: border })}>
             <span>{title}</span>
             <div className={classes['menu-drawer-title-ic-container']}>
-                <span className={classes['menu-drawer-title-ic']}>{extra}</span>
-                &nbsp;&nbsp;&nbsp;
+                {isArr ? (
+                    <>
+                        {extra.map((item, index) => (
+                            <>
+                                <span key={`${index + 1}`} className={classes['menu-drawer-title-ic']}>
+                                    {item}
+                                </span>
+                                &nbsp;&nbsp;&nbsp;
+                            </>
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <span className={classes['menu-drawer-title-ic']}>{extra}</span>
+                        &nbsp;&nbsp;&nbsp;
+                    </>
+                )}
                 <span className={classes['menu-drawer-title-ic']} onClick={onClose}>
                     <IconPark name='IcClose' />
                 </span>

@@ -71,6 +71,7 @@ apollo_cc_library(
         "//modules/common_msgs/map_msgs:map_id_cc_proto",
         "//modules/common_msgs/map_msgs:map_lane_cc_proto",
         "//modules/common_msgs/map_msgs:map_area_proto",
+        "//modules/common_msgs/map_msgs:map_barrier_gate_proto",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_command_cc_proto",

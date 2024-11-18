@@ -4,7 +4,7 @@ module_config {
         class_name: "UltrasonicRadarCanbusComponent"
         config {
             name: "ultrasonic_radar"
-            config_file_path: "/apollo/modules/drivers/radar/ultrasonic_radar/conf/ultrasonic_radar_conf.pb.txt"
+            config_file_path: "modules/drivers/radar/ultrasonic_radar/conf/ultrasonic_radar_conf.pb.txt"
         }
     }
 }

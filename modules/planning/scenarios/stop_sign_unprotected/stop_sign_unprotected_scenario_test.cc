@@ -38,7 +38,7 @@ class StopSignUnprotectedScenarioTest : public ::testing::Test {
 
 TEST_F(StopSignUnprotectedScenarioTest, Init) {
   std::string scenario_stop_sign_unprotected_config_file =
-      "/apollo/modules/planning/scenarios/stop_sign_unprotected/conf/"
+      "modules/planning/scenarios/stop_sign_unprotected/conf/"
       "scenario_conf.pb.txt";
 
   ScenarioStopSignUnprotectedConfig config;

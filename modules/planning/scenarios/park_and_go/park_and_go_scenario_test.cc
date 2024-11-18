@@ -38,7 +38,7 @@ class ParkAndGoTest : public ::testing::Test {
 TEST_F(ParkAndGoTest, VerifyConf) {
   ScenarioParkAndGoConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/scenarios/park_and_go/conf/"
+      "modules/planning/scenarios/park_and_go/conf/"
       "scenario_conf.pb.txt",
       &config));
 }

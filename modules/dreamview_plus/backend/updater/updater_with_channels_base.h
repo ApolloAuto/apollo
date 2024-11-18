@@ -39,15 +39,25 @@ namespace dreamview {
  */
 class UpdaterWithChannelsBase : public UpdaterBase {
  public:
+  UpdaterWithChannelsBase(const std::vector<std::string> &filter_message_types,
+                          const std::vector<std::string> &filter_channels);
+
   /**
    * @brief GetChannelMsg
    */
   virtual void GetChannelMsg(std::vector<std::string> *channels) = 0;
-  void GetChannelMsgWithFilter(std::vector<std::string>* channels,
-                               const std::string& filter_message_type,
-                               const std::string& filter_channel);
+  void GetChannelMsgWithFilter(std::vector<std::string> *channels);
 
+  /**
+   * @brief Check if the channel belongs to current updater.
+   * @param message_type The type of message in channel.
+   * @param channel_name The name of channel.
+   */
+  bool IsChannelInUpdater(const std::string &message_type,
+                          const std::string &channel_name);
   std::vector<std::string> channels_;
+  std::vector<std::string> filter_message_types_;
+  std::vector<std::string> filter_channels_;
 };
 
 }  // namespace dreamview

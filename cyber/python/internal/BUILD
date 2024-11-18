@@ -86,7 +86,7 @@ apollo_cc_library(
     hdrs = ["py_time.h"],
     deps = [
         "//cyber",
-        "@fastrtps",
+        "@fastdds",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],

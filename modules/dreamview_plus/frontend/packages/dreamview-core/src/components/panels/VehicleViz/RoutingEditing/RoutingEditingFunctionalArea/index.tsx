@@ -154,31 +154,41 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                     changeActiveName?.(MutexToolNameEnum.WAYPOINT);
                     carviz?.pathwayMarker.active(routeChange);
                     break;
+                // case FunctionalNameEnum.LOOP:
+                //     // eslint-disable-next-line no-case-declarations
+                //     const wayCount = routingEditor.pathwayMarker.positionsCount;
+                //     if (wayCount > 0) {
+                //         if (isMainConnected) {
+                //             mainApi.getStartPoint().then((res) => {
+                //                 const startPoint = { x: res.x, y: res.y, heading: res?.heading };
+                //                 const endPoint = routingEditor.pathwayMarker.lastPosition;
+                //                 mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
+                //                     if (cycle.isCycle) {
+                //                         setCheckedItem(name);
+                //                         carviz?.deactiveAll();
+                //                     } else {
+                //                         const currentRouteMixValue = {
+                //                             currentRouteLoop: { currentRouteLoopState: false },
+                //                         };
+                //                         routeManagerMix.setCurrentRouteMix(currentRouteMixValue);
+                //                         message({
+                //                             type: 'error',
+                //                             content: t('NoLoopMessage'),
+                //                         });
+                //                     }
+                //                 });
+                //             });
+                //         }
+                //     } else {
+                //         message({ type: 'error', content: t('NoWayPointMessage') });
+                //     }
+                //     break;
                 case FunctionalNameEnum.LOOP:
                     // eslint-disable-next-line no-case-declarations
                     const wayCount = routingEditor.pathwayMarker.positionsCount;
                     if (wayCount > 0) {
-                        if (isMainConnected) {
-                            mainApi.getStartPoint().then((res) => {
-                                const startPoint = { x: res.x, y: res.y, heading: res?.heading };
-                                const endPoint = routingEditor.pathwayMarker.lastPosition;
-                                mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
-                                    if (cycle.isCycle) {
-                                        setCheckedItem(name);
-                                        carviz?.deactiveAll();
-                                    } else {
-                                        const currentRouteMixValue = {
-                                            currentRouteLoop: { currentRouteLoopState: false },
-                                        };
-                                        routeManagerMix.setCurrentRouteMix(currentRouteMixValue);
-                                        message({
-                                            type: 'error',
-                                            content: t('NoLoopMessage'),
-                                        });
-                                    }
-                                });
-                            });
-                        }
+                        setCheckedItem(name);
+                        carviz?.deactiveAll();
                     } else {
                         message({ type: 'error', content: t('NoWayPointMessage') });
                     }

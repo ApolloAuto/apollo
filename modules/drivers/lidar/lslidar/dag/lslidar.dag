@@ -5,7 +5,7 @@ module_config {
       class_name : "LslidarComponent"
       config {
         name : "lslidar_driver_c1_v4"
-        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidar1v4_conf.pb.txt"
+        config_file_path : "modules/drivers/lidar/lslidar/conf/lslidar1v4_conf.pb.txt"
       }
     }
 }

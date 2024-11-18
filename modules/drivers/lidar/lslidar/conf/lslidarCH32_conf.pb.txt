@@ -21,7 +21,7 @@ frame_id: "lslidarCH32"
 min_range: 0.15
 max_range: 150.0
 calibration: false
-calibration_file: "/apollo/modules/drivers/lidar/lslidar/params/LSCH32_calibration.yaml"
+calibration_file: "modules/drivers/lidar/lslidar/params/LSCH32_calibration.yaml"
 
 #要屏蔽的矩形区域参数
 bottom_left_x: 0.0             #左下 x值
