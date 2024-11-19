@@ -21,6 +21,7 @@ message ArenaChannelConf {
   // 2^31 - 128 * 1024 * 1024, which is hardcode in the underlying implementation
   optional uint64 max_msg_size = 2 [default = 33554432];
   optional uint64 max_pool_size = 3 [default = 32];
+  optional uint64 shared_buffer_size = 4 [default = 0];
 };
 
 message ArenaShmConf {

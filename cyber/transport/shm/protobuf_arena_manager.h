@@ -16,16 +16,17 @@
 #ifndef CYBER_TRANSPORT_SHM_PROTOBUF_ARENA_MANAGER_H_
 #define CYBER_TRANSPORT_SHM_PROTOBUF_ARENA_MANAGER_H_
 
-#include <vector>
+#include <functional>
 #include <memory>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 
 #include <google/protobuf/arena.h>
 
+#include "cyber/base/arena_queue.h"
 #include "cyber/base/pthread_rw_lock.h"
-#include "cyber/common/macros.h"
 #include "cyber/common/global_data.h"
+#include "cyber/common/macros.h"
 #include "cyber/message/arena_manager_base.h"
 #include "cyber/message/arena_message_wrapper.h"
 #include "cyber/transport/shm/arena_address_allocator.h"
@@ -113,6 +114,8 @@ class ArenaSegment {
   uint64_t key_id_;
   void* base_address_;
   void* shm_address_;
+  std::shared_ptr<google::protobuf::Arena> shared_buffer_arena_;
+  void* arena_buffer_address_ = nullptr;
 
   uint64_t message_capacity_;
 };
@@ -175,10 +178,61 @@ class ProtobufArenaManager : public message::ArenaManagerBase {
                    const void* message) override;
   void* GetMessage(message::ArenaMessageWrapper* wrapper) override;
 
-  template<typename M,
-    typename std::enable_if<
-      google::protobuf::Arena::is_arena_constructable<M>::value,
-      M>::type* = nullptr>
+  void* GetAvailableBuffer(uint64_t channel_id) {
+    auto segment = this->GetSegment(channel_id);
+    if (!segment) {
+      if (non_arena_buffers_.find(channel_id) == non_arena_buffers_.end()) {
+        return nullptr;
+      }
+      return non_arena_buffers_[channel_id];
+    }
+    if (segment->arena_buffer_address_ != nullptr) {
+      return segment->arena_buffer_address_;
+    }
+    return non_arena_buffers_[channel_id];
+  }
+
+  template <typename T>
+  bool RegisterQueue(uint64_t channel_id, uint64_t size) {
+    if (non_arena_buffers_.find(channel_id) == non_arena_buffers_.end() ||
+        arena_buffer_callbacks_.find(channel_id) ==
+            arena_buffer_callbacks_.end()) {
+      auto non_arena_buffer_ptr = new apollo::cyber::base::ArenaQueue<T>();
+      non_arena_buffer_ptr->Init(size);
+      non_arena_buffers_[channel_id] = non_arena_buffer_ptr;
+      arena_buffer_callbacks_[channel_id] = [this, channel_id, size]() {
+        auto segment = this->GetSegment(channel_id);
+        if (!segment) {
+          ADEBUG << "channel id '" << channel_id << "' not enable";
+          ADEBUG << "fallback to use nomarl queue";
+          return;
+        }
+        if (segment->shared_buffer_arena_ == nullptr) {
+          ADEBUG << "Not enable arena shared buffer in channel id '"
+                 << channel_id << "'";
+          ADEBUG << "fallback to use nomarl queue";
+          return;
+        }
+        if (segment->arena_buffer_address_ == nullptr) {
+          auto ptr = google::protobuf::Arena::Create<base::ArenaQueue<T>>(
+              segment->shared_buffer_arena_.get());
+          ptr->Init(size, segment->shared_buffer_arena_.get());
+          segment->arena_buffer_address_ = reinterpret_cast<void*>(ptr);
+        }
+      };
+    }
+    // try enable arena buffer
+    auto segment = GetSegment(channel_id);
+    if (segment) {
+      arena_buffer_callbacks_[channel_id]();
+    }
+    return true;
+  }
+
+  template <typename M,
+            typename std::enable_if<
+                google::protobuf::Arena::is_arena_constructable<M>::value,
+                M>::type* = nullptr>
   void AcquireArenaMessage(uint64_t channel_id, std::shared_ptr<M>& ret_msg) {
     auto arena_conf =
         cyber::common::GlobalData::Instance()->GetChannelArenaConf(channel_id);
@@ -199,32 +253,33 @@ class ProtobufArenaManager : public message::ArenaManagerBase {
     if (!segment->AcquireBlockToWrite(size, &wb)) {
       return;
     }
-    options.initial_block = reinterpret_cast<char*>(
-              segment->arena_block_address_[wb.block_index_]);
+    options.initial_block =
+        reinterpret_cast<char*>(segment->arena_block_address_[wb.block_index_]);
     options.initial_block_size = segment->message_capacity_;
     if (segment->arenas_[wb.block_index_] != nullptr) {
       segment->arenas_[wb.block_index_] = nullptr;
     }
-    segment->arenas_[wb.block_index_] = \
+    segment->arenas_[wb.block_index_] =
         std::make_shared<google::protobuf::Arena>(options);
 
     // deconstructor do nothing to avoid proto
     // instance deconstructed before arena allocator
-    ret_msg = std::shared_ptr<M>(google::protobuf::Arena::CreateMessage<M>(
-          segment->arenas_[wb.block_index_].get()), [segment, wb](M* ptr){
-            int32_t lock_num = segment->blocks_[
-                  wb.block_index_].lock_num_.load();
-            if (lock_num < ArenaSegmentBlock::kRWLockFree) {
-              segment->ReleaseWrittenBlock(wb);
-            }
-    });
+    ret_msg = std::shared_ptr<M>(
+        google::protobuf::Arena::CreateMessage<M>(
+            segment->arenas_[wb.block_index_].get()),
+        [segment, wb](M* ptr) {
+          int32_t lock_num = segment->blocks_[wb.block_index_].lock_num_.load();
+          if (lock_num < ArenaSegmentBlock::kRWLockFree) {
+            segment->ReleaseWrittenBlock(wb);
+          }
+        });
     return;
   }
 
-  template<typename M,
-    typename std::enable_if<
-      !google::protobuf::Arena::is_arena_constructable<M>::value,
-      M>::type* = nullptr>
+  template <typename M,
+            typename std::enable_if<
+                !google::protobuf::Arena::is_arena_constructable<M>::value,
+                M>::type* = nullptr>
   void AcquireArenaMessage(uint64_t channel_id, std::shared_ptr<M>& ret_msg) {
     return;
   }
@@ -232,6 +287,8 @@ class ProtobufArenaManager : public message::ArenaManagerBase {
  private:
   bool init_;
   std::unordered_map<uint64_t, std::shared_ptr<ArenaSegment>> segments_;
+  std::unordered_map<uint64_t, void*> non_arena_buffers_;
+  std::unordered_map<uint64_t, std::function<void()>> arena_buffer_callbacks_;
   std::mutex segments_mutex_;
 
   std::shared_ptr<ArenaAddressAllocator> address_allocator_;

@@ -72,9 +72,12 @@ bool ArenaSegment::Init(uint64_t message_size, uint64_t block_num) {
 }
 
 bool ArenaSegment::OpenOrCreate(uint64_t message_size, uint64_t block_num) {
+  auto arena_conf =
+      cyber::common::GlobalData::Instance()->GetChannelArenaConf(channel_id_);
+  auto shared_buffer_size = arena_conf.shared_buffer_size();
   auto size = sizeof(ArenaSegmentState) +
               sizeof(ArenaSegmentBlockDescriptor) * block_num +
-              message_size * block_num;
+              message_size * block_num + shared_buffer_size;
   auto shmid =
       shmget(static_cast<key_t>(key_id_), size, 0644 | IPC_CREAT | IPC_EXCL);
   if (shmid == -1) {
@@ -96,6 +99,18 @@ bool ArenaSegment::OpenOrCreate(uint64_t message_size, uint64_t block_num) {
   }
 
   arenas_.resize(block_num, nullptr);
+  if (shared_buffer_size == 0) {
+    shared_buffer_arena_ = nullptr;
+  } else {
+    google::protobuf::ArenaOptions options;
+    options.start_block_size = shared_buffer_size;
+    options.max_block_size = shared_buffer_size;
+    options.initial_block = reinterpret_cast<char*>(
+        reinterpret_cast<uint64_t>(shm_address_) + sizeof(ArenaSegmentState) +
+        block_num * sizeof(ArenaSegmentBlock) + block_num * message_size);
+    options.initial_block_size = shared_buffer_size;
+    shared_buffer_arena_ = std::make_shared<google::protobuf::Arena>(options);
+  }
   for (size_t i = 0; i < block_num; i++) {
     arena_block_address_.push_back(
         reinterpret_cast<uint64_t>(shm_address_) + sizeof(ArenaSegmentState) +
@@ -120,6 +135,9 @@ bool ArenaSegment::OpenOrCreate(uint64_t message_size, uint64_t block_num) {
 }
 
 bool ArenaSegment::Open(uint64_t message_size, uint64_t block_num) {
+  auto arena_conf =
+      cyber::common::GlobalData::Instance()->GetChannelArenaConf(channel_id_);
+  auto shared_buffer_size = arena_conf.shared_buffer_size();
   auto shmid = shmget(static_cast<key_t>(key_id_), 0, 0644);
   if (shmid == -1) {
     // shm not exist
@@ -137,6 +155,18 @@ bool ArenaSegment::Open(uint64_t message_size, uint64_t block_num) {
       reinterpret_cast<uint64_t>(shm_address_) + sizeof(ArenaSegmentState));
 
   arenas_.resize(block_num, nullptr);
+  if (shared_buffer_size == 0) {
+    shared_buffer_arena_ = nullptr;
+  } else {
+    google::protobuf::ArenaOptions options;
+    options.start_block_size = shared_buffer_size;
+    options.max_block_size = shared_buffer_size;
+    options.initial_block = reinterpret_cast<char*>(
+        reinterpret_cast<uint64_t>(shm_address_) + sizeof(ArenaSegmentState) +
+        block_num * sizeof(ArenaSegmentBlock) + block_num * message_size);
+    options.initial_block_size = shared_buffer_size;
+    shared_buffer_arena_ = std::make_shared<google::protobuf::Arena>(options);
+  }
   for (size_t i = 0; i < block_num; i++) {
     arena_block_address_.push_back(
         reinterpret_cast<uint64_t>(shm_address_) + sizeof(ArenaSegmentState) +
@@ -170,10 +200,9 @@ bool ArenaSegment::AddBlockWriteLock(uint64_t block_index) {
   // blocks_[block_index].writing_ref_count_.fetch_add(1);
   auto& block = blocks_[block_index];
   int32_t rw_lock_free = ArenaSegmentBlock::kRWLockFree;
-  if (!block.lock_num_.compare_exchange_weak(rw_lock_free,
-                          ArenaSegmentBlock::kWriteExclusive,
-                          std::memory_order_acq_rel,
-                          std::memory_order_relaxed)) {
+  if (!block.lock_num_.compare_exchange_weak(
+          rw_lock_free, ArenaSegmentBlock::kWriteExclusive,
+          std::memory_order_acq_rel, std::memory_order_relaxed)) {
     ADEBUG << "lock num: " << block.lock_num_.load();
     return false;
   }
@@ -204,8 +233,8 @@ bool ArenaSegment::AddBlockReadLock(uint64_t block_index) {
 
   int32_t try_times = 0;
   while (!block.lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
-                                          std::memory_order_acq_rel,
-                                          std::memory_order_relaxed)) {
+                                                std::memory_order_acq_rel,
+                                                std::memory_order_relaxed)) {
     ++try_times;
     if (try_times == ArenaSegmentBlock::kMaxTryLockTimes) {
       AINFO << "fail to add read lock num, curr num: " << lock_num;
@@ -416,6 +445,10 @@ bool ProtobufArenaManager::Enable() {
 
 bool ProtobufArenaManager::EnableSegment(uint64_t channel_id) {
   if (segments_.find(channel_id) != segments_.end()) {
+    if (arena_buffer_callbacks_.find(channel_id) !=
+        arena_buffer_callbacks_.end()) {
+      arena_buffer_callbacks_[channel_id]();
+    }
     return true;
   }
 
@@ -443,6 +476,10 @@ bool ProtobufArenaManager::EnableSegment(uint64_t channel_id) {
       channel_id, arena_conf.max_msg_size(), arena_conf.max_pool_size(),
       reinterpret_cast<void*>(segment_shm_address));
   segments_[channel_id] = segment;
+  if (arena_buffer_callbacks_.find(channel_id) !=
+      arena_buffer_callbacks_.end()) {
+    arena_buffer_callbacks_[channel_id]();
+  }
   return true;
 }
 
@@ -453,6 +490,9 @@ bool ProtobufArenaManager::Destroy() {
 
   for (auto& segment : segments_) {
     address_allocator_->Deallocate(segment.first);
+  }
+  for (auto& buffer : non_arena_buffers_) {
+    delete buffer.second;
   }
   segments_.clear();
 

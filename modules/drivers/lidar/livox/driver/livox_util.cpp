@@ -19,21 +19,21 @@ namespace apollo {
 namespace drivers {
 namespace lidar {
 
-uint64_t GetEthPacketTimestamp(
-        uint8_t timestamp_type,
-        uint8_t* time_stamp,
-        uint8_t size) {
+uint64_t GetEthPacketTimestamp(const uint8_t& timestamp_type,
+                               const uint8_t* time_stamp, const uint8_t& size,
+                               const uint32_t& point_size,
+                               const bool use_lidar_clock) {
+  if (use_lidar_clock && (timestamp_type == kTimestampTypeGptpOrPtp ||
+                          timestamp_type == kTimestampTypeGps)) {
     LdsStamp time;
     memcpy(time.stamp_bytes, time_stamp, size);
-
-    if (timestamp_type == kTimestampTypeGptpOrPtp
-        || timestamp_type == kTimestampTypeGps) {
-        return time.stamp;
-        AERROR_EVERY(1000000) << "use package timestamp";
-    } else {
-        AERROR_EVERY(1000000) << "use system timestamp";
-    }
-    return cyber::Time::Now().ToNanosecond();
+    AERROR_EVERY(1000000) << "use package timestamp";
+    return time.stamp;
+  } else {
+    AERROR_EVERY(1000000) << "use system timestamp";
+  }
+  // 0.1us a point
+  return cyber::Time::Now().ToNanosecond() - 100 * point_size;
 }
 
 }  // namespace lidar

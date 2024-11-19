@@ -15,28 +15,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 declare -A dic
-models_dir="/apollo/modules/perception/data/models/"
+models_dir="${TOP_DIR}/modules/perception/data/models/"
 
-dic=([3d-r4-half_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/3d-r4-half_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T09%3A39%3A46Z/-1/host/35f44fc343144e9a6f2d9f19a1daef32ab32bdbdb21f9bfab13ba235e3118c97" \
-     [cnnseg128_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/cnnseg128_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T10%3A49%3A05Z/-1/host/17850b8a5f73333291bbdedcb0103222a70b143516d86f8af79649f4f4100543" \
-     [cnnseg64_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/cnnseg64_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T10%3A49%3A21Z/-1/host/390c40b2946bfba35910c6c3de738eaafdc1b11b15c9131c4a437f72a026deb4" \
-     [cnnseg16_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/cnnseg16_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T10%3A49%3A40Z/-1/host/a8996774dd80355a16e47949d1488b785faf8d2093252d2ccd41263a0a74a44b" \
-     [horizontal_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/horizontal_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T10%3A51%3A41Z/-1/host/c1c84568d35ac87f99f4a27a00baf00e0a19a5034be32a02b0e4cd584ace4ef0" \
-     [quadrate_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/quadrate_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T11%3A03%3A53Z/-1/host/7aa8d34acdc71de4acae2fa7ee46267b7e504751f36c0fcff8978d292322bde3" \
-     [vertical_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/vertical_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T11%3A04%3A55Z/-1/host/6762735da1dbd5095efc72b3e32ee46d9d25671c3bc68dc8930c9f10eed865d9" \
-     [tl_detection_caffe.zip]="https://apollo-perception.bj.bcebos.com/core_model/tl_detection_caffe.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T11%3A04%3A40Z/-1/host/f00446d0d66465d7aa55723605a29c6061f1ff7dec34e7d926b6f5d63592106b" \
-     [smoke_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/smoke_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-27T11%3A04%3A22Z/-1/host/b9aed27fd7480add4225a7fe8f83b3f81aecde39035b057837ef3ff9ccc93055" \
-     [yolox3d_onnx.zip]="https://apollo-perception.bj.bcebos.com/core_model/yolox3d_onnx.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-12-07T08%3A13%3A44Z/-1/host/49df2b47683c2f9666005c556a858ff44df08e53d98257909b116e621b76a220" \
-     [center_point_paddle.zip]="https://apollo-perception.bj.bcebos.com/core_model/center_point_paddle.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-10-31T09%3A29%3A10Z/-1/host/8f45ff099aa79c6043c744cf9ff72fb432335ac60aa3fe9235b9ec275e003aab" \
-     [point_pillars_radar4d_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/point_pillars_radar4d_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-12-07T08%3A11%3A00Z/-1/host/2275614dd6c8999c7cb6b171b889bd0d637997fac52e826597cfe76309efb4ac" \
-     [point_pillars_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/point_pillars_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-11-02T09%3A28%3A04Z/-1/host/8c5356cf4f38c3590017fe552acb9764dac8696f92324aee414ce7eaa029b57a" \
-     [mask_pillars_torch.zip]="https://apollo-perception.bj.bcebos.com/core_model/mask_pillars_torch.zip?authorization=bce-auth-v1/e3384375161a482d8fa77e1ef2d32e05/2023-11-02T09%3A28%3A22Z/-1/host/129833d8aacecc3a95e729f73d73d6b44bfcb5c8a23eb1e5051b71b4b9f8a075" \
-     [apollo_bevnet_onnx.zip]="https://apollo-perception.bj.bcebos.com/core_model/apollo_bevnet_onnx.zip?authorization=bce-auth-v1/ALTAKg5yEiU4seODUEbcZVtvIv/2024-10-22T13%3A01%3A45Z/-1/host/20d8d79aedbf84a29b52e05348d783dc5094164618346de3d665c0b2f0f94861" \
+dic=([3d-r4-half_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/3d-r4-half_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A05%3A17Z%2F-1%2Fhost%2F5575ba1e6b5c33e5e989b3b379e16aa9e6546ab28e6f45a54162fadc5dce0ffa" \
+     [cnnseg128_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/cnnseg128_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A06%3A36Z%2F-1%2Fhost%2Faec61e93a98ba3a70edfde89fbc5635294df057dc2f5774a59060332f182067a" \
+     [cnnseg64_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/cnnseg64_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A07%3A45Z%2F-1%2Fhost%2F4c567da65ebd7e3a20bbb4b9419db6e17f5f233c5867de6d17e70d4bd9f07057" \
+     [cnnseg16_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/cnnseg16_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A07%3A59Z%2F-1%2Fhost%2F05cda136284eea1ba84c552c2e5cdd4d6d054c9b23ef209fa87623b746bed185" \
+     [horizontal_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/horizontal_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A08%3A14Z%2F-1%2Fhost%2Ffafa1d10174f763828b10ec251b0359da311e8bb4b37824c56e03fcdea61f9f7" \
+     [quadrate_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/quadrate_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A08%3A29Z%2F-1%2Fhost%2F10bc4ce80bd0497ea92188aff6d28a9c35dbbd12ae12cd836e9b19e4ab0a79d3" \
+     [vertical_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/vertical_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A08%3A41Z%2F-1%2Fhost%2F6ea0744dbc5b5e83a673e241c07ad8d3f5930763b1bc9c05084cac5c16b07d02" \
+     [tl_detection_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/tl_detection_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A08%3A55Z%2F-1%2Fhost%2F524a2c191d2a332d500232600fd0dd30db21591adc83f728dc8ae5daef4ef335" \
+     [smoke_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/smoke_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A09%3A10Z%2F-1%2Fhost%2Ffb046eae4495ef593e8cc468e6b62c9a504223d862c27596a878a8b250b756c5" \
+     [yolox3d_onnx.zip]="http://apollo-perception.bj.bcebos.com/core_model/yolox3d_onnx.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A09%3A24Z%2F-1%2Fhost%2F16ce6949d86c2521e4ac1d4e3f3d6d6d266b7aece8d68e18d12ee295a77de5fa" \
+     [center_point_paddle.zip]="http://apollo-perception.bj.bcebos.com/core_model/center_point_paddle.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A09%3A36Z%2F-1%2Fhost%2F109777339cc3fab17f5f54760711e04139dcdba62f2aa75e955d91d8d21cd963" \
+     [point_pillars_radar4d_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/point_pillars_radar4d_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A09%3A49Z%2F-1%2Fhost%2Ff7bfb72f9cdbb866d5965a16828fa42275d97844b9f546237bfa000de252063d" \
+     [point_pillars_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/point_pillars_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A10%3A07Z%2F-1%2Fhost%2F4d0ad2d272b36fcccb7c0a8280e3af1d665cc1dff393a877ce90b7ca0ea5a5ff" \
+     [mask_pillars_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/mask_pillars_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A10%3A20Z%2F-1%2Fhost%2Feb4e3afe11c4a58be4421cb5271d780e4f648feb2c18b1b9d022aed04da1d838" \
+     [apollo_bevnet_onnx.zip]="http://apollo-perception.bj.bcebos.com/core_model/apollo_bevnet_onnx.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A19%3A47Z%2F-1%2Fhost%2Fcff6ed21d22bb27395182790e07582b95edbed4059f611211db1224aad93acc7" \
     )
 
-cd "/apollo"
+pushd "${TOP_DIR}"
 
 for key in $(echo ${!dic[*]}); do
     download_link=${dic[$key]}
@@ -48,3 +49,5 @@ for key in $(echo ${!dic[*]}); do
     done
     rm -rf ${key::-4} ${key}
   done
+
+popd

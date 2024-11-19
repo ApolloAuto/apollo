@@ -4,12 +4,22 @@ package apollo.drivers.livox;
 
 import "modules/drivers/lidar/common/proto/lidar_config_base.proto";
 
+message CustomIntegral {
+  required double integral_time = 1;
+  optional double min_x = 2;
+  optional double max_x = 3;
+  optional double min_y = 4;
+  optional double max_y = 5;
+}
+
 message Config {
   required apollo.drivers.lidar.LidarConfigBase config_base = 1;
   required string lidar_ip = 2;
   optional string lidar_config_file_path = 3;
   optional double integral_time = 4 [default = 0.1];
   optional bool enable_sdk_console_log = 5 [default = false];
+  optional bool use_lidar_clock = 6 [default = false];
+  optional CustomIntegral custom_integral = 7;
 }
 
 message LivoxScan {

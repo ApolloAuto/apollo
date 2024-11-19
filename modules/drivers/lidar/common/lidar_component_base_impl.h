@@ -22,7 +22,9 @@
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/common/proto/lidar_config_base.pb.h"
 
+#include "cyber/base/arena_queue.h"
 #include "cyber/cyber.h"
+#include "cyber/transport/shm/protobuf_arena_manager.h"
 #include "modules/drivers/lidar/common/sync_buffering.h"
 
 namespace apollo {
@@ -52,6 +54,8 @@ class LidarComponentBaseImpl : public apollo::cyber::Component<ComponentType> {
 
   virtual bool WritePointCloud(const std::shared_ptr<PointCloud>& point_cloud);
 
+  virtual std::shared_ptr<apollo::cyber::base::ArenaQueue<PointXYZIT>>
+  GetPointQueue();
   // static std::shared_ptr<PointCloud> PcdDefaultAllocator(
   //         std::shared_ptr<cyber::Writer<PointCloud>>& pcd_writer);
 
@@ -122,6 +126,29 @@ template <typename ScanType, typename ComponentType>
 bool LidarComponentBaseImpl<ScanType, ComponentType>::WriteScan(
     const std::shared_ptr<ScanType>& scan_message) {
   return scan_writer_->Write(scan_message);
+}
+
+template <typename ScanType, typename ComponentType>
+std::shared_ptr<apollo::cyber::base::ArenaQueue<PointXYZIT>>
+LidarComponentBaseImpl<ScanType, ComponentType>::GetPointQueue() {
+  std::shared_ptr<apollo::cyber::base::ArenaQueue<PointXYZIT>> ret;
+  auto channel_id = pcd_writer_->GetChannelId();
+
+  auto arena_manager =
+      apollo::cyber::transport::ProtobufArenaManager::Instance();
+  if (!arena_manager->Enable()) {
+    ADEBUG << "arena manager enable failed.";
+  } else {
+    apollo::cyber::base::ArenaQueue<PointXYZIT>* p;
+    arena_manager->RegisterQueue<apollo::drivers::PointXYZIT>(channel_id,
+                                                              170000);
+    ret = std::shared_ptr<apollo::cyber::base::ArenaQueue<PointXYZIT>>(
+        reinterpret_cast<
+            apollo::cyber::base::ArenaQueue<apollo::drivers::PointXYZIT>*>(
+            arena_manager->GetAvailableBuffer(channel_id)),
+        [](apollo::cyber::base::ArenaQueue<PointXYZIT>* ptr) {});
+  }
+  return ret;
 }
 
 template <typename ScanType, typename ComponentType>

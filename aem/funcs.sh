@@ -712,6 +712,10 @@ apollo_create_container_env_options() {
   # shell history
   env_opts+=('-e' "HISTFILE=${APOLLO_ENV_WORKROOT}/.cache/.bash_history")
 
+  # eplite
+  cat /etc/bash.bashrc | grep AIPE_WITH_UNIX_DOMAIN_SOCKET >/dev/null 2>&1
+  [[ $? == 0 ]] && env_opts+=('-e' "AIPE_WITH_UNIX_DOMAIN_SOCKET=ON")
+
   echo "${env_opts[*]}"
 }
 export -f apollo_create_container_env_options

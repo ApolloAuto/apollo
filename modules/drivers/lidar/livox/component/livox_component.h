@@ -36,36 +36,30 @@ namespace lidar {
 
 class LivoxLidarComponent final : public LidarComponentBase<livox::LivoxScan> {
  public:
-    void BinaryDataProcess(
-            const unsigned char* data,
-            int data_type,
-            int point_size,
-            uint64_t pkt_timestamp,
-            uint32_t time_interval);
+  void BinaryDataProcess(const unsigned char* data, const int& data_type,
+                         const int& point_size, const uint64_t& pkt_timestamp,
+                         const uint32_t& time_interval);
 
-    void PointCloudCallback(
-            uint32_t handle,
-            const uint8_t dev_type,
-            LivoxLidarEthernetPacket* data,
-            void* client_data);
+  void PointCloudCallback(uint32_t handle, const uint8_t dev_type,
+                          LivoxLidarEthernetPacket* data, void* client_data);
 
-    size_t GetEthPacketByteSize(LivoxLidarEthernetPacket* data);
+  size_t GetEthPacketByteSize(LivoxLidarEthernetPacket* data);
 
-    void PreparePointsMsg(PointCloud& msg);
+  void PreparePointsMsg(PointCloud& msg);
 
-    bool Init() override;
+  bool Init() override;
 
-    void ReadScanCallback(
-            const std::shared_ptr<livox::LivoxScan>& scan_message) override;
+  void ReadScanCallback(
+      const std::shared_ptr<livox::LivoxScan>& scan_message) override;
 
-    void CheckTimestampAndPublishPointCloud();
+  void CheckTimestampAndPublishPointCloud();
 
-    livox::Config config_;
-    std::deque<PointXYZIT> integral_queue_;
+  livox::Config config_;
+  std::deque<PointXYZIT> integral_queue_;
 
-    uint64_t last_pointcloud_pub_timestamp_{0};
-    double pointcloud_freq_ = {10.0};  // Hz
-    double integral_time_ = {0.4};     // second
+  uint64_t last_pointcloud_pub_timestamp_{0};
+  double pointcloud_freq_ = {10.0};  // Hz
+  double integral_time_ = {0.1};     // second
 };
 CYBER_REGISTER_COMPONENT(LivoxLidarComponent)
 

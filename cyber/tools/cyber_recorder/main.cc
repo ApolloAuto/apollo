@@ -15,13 +15,15 @@
  *****************************************************************************/
 
 #include <getopt.h>
+#include <csignal>
 #include <cstddef>
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <csignal>
 
+#include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/common/time_conversion.h"
 #include "cyber/init.h"
@@ -31,9 +33,10 @@
 #include "cyber/tools/cyber_recorder/recoverer.h"
 #include "cyber/tools/cyber_recorder/spliter.h"
 
-#include "gperftools/profiler.h"
+#include "gflags/gflags.h"
 #include "gperftools/heap-profiler.h"
 #include "gperftools/malloc_extension.h"
+#include "gperftools/profiler.h"
 
 using apollo::cyber::common::GetFileName;
 using apollo::cyber::common::StringToUnixSeconds;
@@ -154,8 +157,8 @@ void DisplayUsage(const std::string& binary, const std::string& command,
         std::cout << "\t-h, --help\t\t\t\tshow help message" << std::endl;
         break;
       case 'H':
-        std::cout << "\t-H, --heap-profule\t\t\t\tprofile heap info" \
-          << std::endl;
+        std::cout << "\t-H, --heap-profule\t\t\t\tprofile heap info"
+                  << std::endl;
         break;
       case 'C':
         std::cout << "\t-C, --cpu-profule\t\t\t\tprofile cpu info" << std::endl;
@@ -232,10 +235,30 @@ int main(int argc, char** argv) {
         enable_heap_profile = true;
         break;
       case 'f':
-        opt_file_vec.emplace_back(std::string(optarg));
+        if (apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
+          auto opt_file_abs_path =
+              apollo::cyber::common::GetEnv("PWD") + "/" + std::string(optarg);
+          if (apollo::cyber::common::PathExists(opt_file_abs_path)) {
+            opt_file_vec.emplace_back(opt_file_abs_path);
+          } else {
+            opt_file_vec.emplace_back(std::string(optarg));
+          }
+        } else {
+          opt_file_vec.emplace_back(std::string(optarg));
+        }
         for (int i = optind; i < argc; i++) {
           if (*argv[i] != '-') {
-            opt_file_vec.emplace_back(std::string(argv[i]));
+            if (apollo::cyber::common::PathIsAbsolute(std::string(argv[i]))) {
+              auto opt_file_abs_path = apollo::cyber::common::GetEnv("PWD") +
+                                       "/" + std::string(argv[i]);
+              if (apollo::cyber::common::PathExists(opt_file_abs_path)) {
+                opt_file_vec.emplace_back(opt_file_abs_path);
+              } else {
+                opt_file_vec.emplace_back(std::string(argv[i]));
+              }
+            } else {
+              opt_file_vec.emplace_back(std::string(argv[i]));
+            }
           } else {
             break;
           }
@@ -262,7 +285,13 @@ int main(int argc, char** argv) {
         }
         break;
       case 'o':
-        opt_output_vec.push_back(std::string(optarg));
+        if (apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
+          auto opt_output_file_abs_path =
+              apollo::cyber::common::GetEnv("PWD") + "/" + std::string(optarg);
+          opt_output_vec.push_back(opt_output_file_abs_path);
+        } else {
+          opt_output_vec.push_back(std::string(optarg));
+        }
         break;
       case 'a':
         opt_all = true;
@@ -382,6 +411,13 @@ int main(int argc, char** argv) {
       std::cout << "usage: cyber_recorder info file" << std::endl;
       return -1;
     }
+    if (apollo::cyber::common::PathIsAbsolute(file_path)) {
+      auto file_path_abs =
+          apollo::cyber::common::GetEnv("PWD") + "/" + std::string(file_path);
+      if (std::filesystem::exists(file_path_abs)) {
+        file_path = file_path_abs;
+      }
+    }
     ::apollo::cyber::Init(argv[0]);
     Info info;
     bool info_result = info.Display(file_path);
@@ -410,7 +446,7 @@ int main(int argc, char** argv) {
       std::cout << "MUST specify file option (-f)." << std::endl;
       return -1;
     }
-    ::apollo::cyber::Init(argv[0]);
+    ::apollo::cyber::Init(argv[0], "cyber_recorder");
     PlayParam play_param;
     play_param.is_play_all_channels = opt_all || opt_white_channels.empty();
     play_param.is_loop_playback = opt_loop;
@@ -441,6 +477,7 @@ int main(int argc, char** argv) {
     }
     if (opt_output_vec.empty()) {
       std::string default_output_file =
+          apollo::cyber::common::GetEnv("PWD") + "/" +
           UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + ".record";
       opt_output_vec.push_back(default_output_file);
     }
@@ -448,7 +485,7 @@ int main(int argc, char** argv) {
     auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
                                                opt_white_channels,
                                                opt_black_channels, opt_header);
-    std::signal(SIGTERM, [](int sig){
+    std::signal(SIGTERM, [](int sig) {
       apollo::cyber::OnShutdown(sig);
       if (enable_cpu_profile) {
         ProfilerStop();
@@ -459,7 +496,7 @@ int main(int argc, char** argv) {
       }
     });
 
-    std::signal(SIGINT, [](int sig){
+    std::signal(SIGINT, [](int sig) {
       apollo::cyber::OnShutdown(sig);
       if (enable_cpu_profile) {
         ProfilerStop();

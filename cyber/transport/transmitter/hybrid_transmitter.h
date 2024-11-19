@@ -168,9 +168,9 @@ bool HybridTransmitter<M>::Transmit(const MessagePtr& msg,
   history_->Add(msg, msg_info);
   bool return_val = false;
   for (auto& item : transmitters_) {
-    return_val |= item.second->Transmit(msg, msg_info);
+    item.second->Transmit(msg, msg_info);
   }
-  return return_val;
+  return true;
 }
 
 template <typename M>
