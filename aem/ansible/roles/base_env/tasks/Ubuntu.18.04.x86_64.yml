@@ -32,6 +32,7 @@
       - wget
       - xz-utils
       - zip
+      - bash-completion
     state: latest
     update_cache: false
   when: "'apt' in ansible_facts.packages"

@@ -133,34 +133,38 @@ def _install_action(
             dest,
             py_path,
         )
+    elif "@" not in dest:
+        file_dest = join_paths(
+            dest,
+            _output_path(ctx, artifact, strip_prefix, warn_foreign),
+        )
     else:
-        if "@" not in dest:     
-            file_dest = join_paths(
-                dest,
-                _output_path(ctx, artifact, strip_prefix, warn_foreign),
-            )
-        else:
-            file_dest = dest
+        file_dest = dest
     file_dest = _rename(file_dest, rename)
 
     target_name = None
     if hasattr(ctx.attr, "tags") and len(ctx.attr.tags) >= 2 and "export_library" in ctx.attr.tags:
         for i in ctx.attr.tags:
-            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library":
+            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library" or i == "exclude":
                 continue
             else:
                 target_name = i
     package_path = "None"
     if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
-        package_path = ctx.attr.package_path 
+        package_path = ctx.attr.package_path
     if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
         install_type = ctx.attr.type
     else:
-        install_type = "NONE" 
+        install_type = "NONE"
     if plugin:
         install_type = "neo"
-    return struct(src = artifact, dst = file_dest, 
-        target_name = target_name, package_path = package_path, type = install_type)
+    return struct(
+        src = artifact,
+        dst = file_dest,
+        target_name = target_name,
+        package_path = package_path,
+        type = install_type,
+    )
 
 #------------------------------------------------------------------------------
 def _install_actions(
@@ -297,8 +301,8 @@ def _install_py_actions(ctx, target):
                 ctx.attr.py_strip_prefix,
                 rename = ctx.attr.rename,
                 py_bin = True,
-                py_path = f.basename.replace(".py", "")
-            )
+                py_path = f.basename.replace(".py", ""),
+            ),
         )
 
     # runfile_actions = []
@@ -341,15 +345,24 @@ def _install_code(action, ctx):
         if hasattr(action, "package_path") and action.package_path != "NONE":
             if action.target_name != None:
                 return "install(%r, %r, %r, %r, %r, %r)" % (
-                    action.src.short_path, action.dst, action.type,
-                    action.package_path, "export_library", action.target_name)
-            else: 
+                    action.src.short_path,
+                    action.dst,
+                    action.type,
+                    action.package_path,
+                    "export_library",
+                    action.target_name,
+                )
+            else:
                 return "install(%r, %r, %r, %r)" % (
-                    action.src.short_path, action.dst, action.type, action.package_path)
+                    action.src.short_path,
+                    action.dst,
+                    action.type,
+                    action.package_path,
+                )
         else:
             fail("Dont't run the install target which is not auto generated!")
     else:
-        return "install(%r, %r)" % (action.src.short_path, action.dst) 
+        return "install(%r, %r)" % (action.src.short_path, action.dst)
 
 #------------------------------------------------------------------------------
 # Generate install code for an install_src action.
@@ -696,6 +709,7 @@ def _install_src_files_impl(ctx):
         else:
             files.append(a.src)
     files = ctx.runfiles(files)
+
     # files = ctx.runfiles(
     #     files = [a.src for a in actions],
     # )

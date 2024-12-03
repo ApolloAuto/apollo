@@ -36,7 +36,8 @@ fi
 # Note: use for replacing boringssl in grpc
 
 PV_NUM=$(echo "${PV}" | sed 's/[^0-9.]*//g')
-SRC_URI="${SRC_URI:-https://www.openssl.org/source/old/${PV_NUM}/${PN}-${PV}.tar.gz}"
+#SRC_URI="${SRC_URI:-https://www.openssl.org/source/old/${PV_NUM}/${PN}-${PV}.tar.gz}"
+SRC_URI="${SRC_URI:-https://apollo-system.cdn.bcebos.com/archive/10.0/${PN}-${PV}.tar.gz}"
 
 src_configure() {
   pushd "${WORKDIR}/${PF}"
@@ -45,6 +46,9 @@ src_configure() {
 }
 
 pkg_install_post() {
+  if [[ -d "${INSTALL_PREFIX}/lib64" ]] && [[ ! -e "${INSTALL_PREFIX}/lib" ]]; then
+    ln -snf lib64 "${INSTALL_PREFIX}/lib"
+  fi
   ok "Done installing ${PN}-${PV}"
 }
 

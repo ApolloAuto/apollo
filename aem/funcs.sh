@@ -138,8 +138,13 @@ docker_pull() {
   fi
   info "pulling docker image ${img} ..."
   if ! docker pull "${img}"; then
-    error "failed to pull image: ${img}"
-    return 1
+    if docker_image_exists "${img}"; then
+      warn "failed to pull image: ${img}, fallback to local image"
+      return 0
+    else
+      error "failed to pull image: ${img}"
+      return 1
+    fi
   fi
 }
 export -f docker_pull
@@ -543,9 +548,6 @@ apollo_create_container_volume_options() {
   volume_opts+=('-v' '/dev:/dev')
   # shared directories
   volume_opts+=('-v' '/media:/media')
-  # local time and timezone
-  volume_opts+=('-v' '/etc/localtime:/etc/localtime:ro')
-  volume_opts+=('-v' '/etc/timezone:/etc/timezone:ro')
   # X
   volume_opts+=('-v' '/tmp/.X11-unix:/tmp/.X11-unix:rw')
   # kernel modules
@@ -635,12 +637,17 @@ apollo_execute_cmd_in_container() {
 }
 export -f apollo_execute_cmd_in_container
 
+apollo_container_execute_cmd() {
+  "${DOCKER}" exec -u "${APOLLO_ENV_CONTAINER_USER}" "${APOLLO_ENV_CONTAINER_NAME}" bash -c "$*"
+}
+export -f apollo_container_execute_cmd
+
 apollo_container_created_start_user() {
   user="${SUDO_USER-$USER}"
-  container_bin_path="/usr/local/bin/"
+  container_aem_path="/opt/apollo/aem"
 
   if [ "${user}" != "root" ]; then
-    apollo_execute_cmd_in_container "bash -c ${container_bin_path}/aem/docker_start_user.sh"
+    apollo_execute_cmd_in_container "bash -c ${container_aem_path}/docker_start_user.sh"
   fi
 }
 export -f apollo_container_created_start_user
@@ -664,16 +671,22 @@ apollo_container_created_post_action() {
     'apollo-neo-buildtool'
   )
   aem_path="${AEM_HOME}"
-  container_bin_path="/usr/local/bin/"
+  container_aem_path="/opt/apollo/aem"
 
-  ${DOCKER} cp "${aem_path}" "${APOLLO_ENV_CONTAINER_NAME}":"${container_bin_path}aem"
-  apollo_execute_cmd_in_container "ln -snf ${container_bin_path}/aem/run.sh /usr/bin/aem"
+  ${DOCKER} cp "${aem_path}" "${APOLLO_ENV_CONTAINER_NAME}":"${container_aem_path}"
+  apollo_execute_cmd_in_container "ln -snf ${container_aem_path}/aem /usr/bin/aem"
+  apollo_execute_cmd_in_container "ln -snf ${container_aem_path}/auto_complete.bash /etc/bash_completion.d/aem"
+  apollo_execute_cmd_in_container "ln -snf ${container_aem_path}/auto_complete.zsh /usr/share/zsh/functions/Completion/Unix/_aem"
   apollo_execute_cmd_in_container "[[ $(uname -m) == "aarch64" ]] && [[ -e /sys/kernel/debug ]] && chmod +rx /sys/kernel/debug"
   apollo_execute_cmd_in_container "apt update && apt install --only-upgrade -y ${init_packages[@]}"
+  apollo_execute_cmd_in_container "chmod 777 /opt/apollo/neo/packages/buildtool/latest/setup.sh"
   apollo_execute_cmd_in_container "mkdir -pv /opt/apollo/neo/etc && chmod 777 -R /opt/apollo/neo/etc"
   apollo_container_created_start_user
   apollo_execute_cmd_in_container "mkdir -pv /apollo_workspace/data/{log,bag,record} &&
           chown -R ${APOLLO_ENV_CONTAINER_USER}:${APOLLO_ENV_CONTAINER_GROUP} /apollo_workspace/data/"
+  apollo_container_execute_cmd "buildtool -v"
+  # TODO: migrate to active script like host env
+  apollo_container_execute_cmd "echo [[ -e /opt/apollo/neo/setup.sh ]] \&\& source /opt/apollo/neo/setup.sh >> /home/${APOLLO_ENV_CONTAINER_USER}/.bashrc"
   apollo_container_download_arm_lib
 }
 export -f apollo_container_created_post_action
@@ -713,7 +726,7 @@ apollo_create_container_env_options() {
   env_opts+=('-e' "HISTFILE=${APOLLO_ENV_WORKROOT}/.cache/.bash_history")
 
   # eplite
-  cat /etc/bash.bashrc | grep AIPE_WITH_UNIX_DOMAIN_SOCKET >/dev/null 2>&1
+  cat /etc/bash.bashrc | grep AIPE_WITH_UNIX_DOMAIN_SOCKET > /dev/null 2>&1
   [[ $? == 0 ]] && env_opts+=('-e' "AIPE_WITH_UNIX_DOMAIN_SOCKET=ON")
 
   echo "${env_opts[*]}"
@@ -749,6 +762,10 @@ export -f apollo_save_envconfig
 apollo_create_container() {
 
   image="$(apollo_determine_image)"
+  if ! docker_pull "${image}"; then
+    error "failed to pull docker image ${DEV_IMAGE}"
+    exit 1
+  fi
 
   options=(
     '-itd'

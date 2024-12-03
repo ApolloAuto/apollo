@@ -74,6 +74,7 @@ message Lane {
     SIDEWALK = 4;
     PARKING = 5;
     SHOULDER = 6;
+    SHARED = 7;
   };
   optional LaneType type = 12;
 

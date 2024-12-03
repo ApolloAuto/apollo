@@ -240,7 +240,19 @@ execute() {
   check_agreement
 
   # load custom environment variables
+  local _old_apollo_env_name="${APOLLO_ENV_NAME}"
+  local _old_apollo_env_container_name="${APOLLO_ENV_CONTAINER_NAME}"
   [[ -f "${PWD}/.env" ]] && set -a && source "${PWD}/.env" && set +a
+  # fix related environment variables
+  if [[ "${_old_apollo_env_name}" != "${APOLLO_ENV_NAME}" ]]; then
+    if [[ "${_old_apollo_env_container_name}" == "${APOLLO_ENV_CONTAINER_NAME}" ]]; then
+      # container name is not set in .env
+      export APOLLO_ENV_CONTAINER_NAME="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"
+    fi
+  fi
+  if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+    export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+  fi
 
   parse_arguments "$@"
 

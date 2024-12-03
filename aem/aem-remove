@@ -55,10 +55,7 @@ execute() {
   parse_arguments "$@"
 
   if [[ ! -d "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}" ]]; then
-    if [[ ! -d "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}" ]]; then
-      error "env ${APOLLO_ENV_NAME} not found"
-      return 1
-    elif ! docker_container_exists "${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"; then
+    if [[ ! -d "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}" ]] && ! docker_container_exists "${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"; then
       error "env ${APOLLO_ENV_NAME} not found"
       return 1
     fi

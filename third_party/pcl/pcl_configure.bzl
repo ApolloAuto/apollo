@@ -81,6 +81,16 @@ def _pcl_match_version(repository_ctx, sysroot_dir = None):
     ).stdout.strip()
 
     solibs = result.rstrip("\n").split("\n")
+
+    if len(solibs) == 0 or solibs[0] == "":
+        cmd = """ldconfig -p | awk -F'=>' '/libpcl_common.so/ {print $2}'"""
+        result = execute(
+            repository_ctx,
+            ["sh", "-c", cmd],
+            empty_stdout_fine = False,
+        ).stdout.strip()  
+        solibs = result.rstrip("\n").split("\n")
+
     solib = ""
     prefix_dirs = ["/usr", "/usr/local", "/opt/apollo/neo"]
     for i in prefix_dirs:

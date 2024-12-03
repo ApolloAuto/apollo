@@ -257,7 +257,12 @@ function useInitHmiStatus() {
         if (!isMainConnected) return noop;
 
         const subscription = streamApi?.subscribeToData(StreamDataNames.HMI_STATUS).subscribe((data) => {
-            dispatch(updateStatus(data as any));
+            dispatch(
+                updateStatus({
+                    ...(data as any),
+                    frontendIsFromHmi: true,
+                } as any),
+            );
         });
         return () => {
             subscription?.unsubscribe();

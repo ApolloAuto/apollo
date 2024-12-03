@@ -82,7 +82,7 @@ export const reducerHander = {
     },
     updateStatusSimp: (originHmi: any, draftHmi: any, newStatus: any) => {
         const prevStatus = originHmi?.prevStatus;
-        const isFromSimHmi = 'currentScenarioId' in newStatus;
+        const isFromSimHmi = newStatus.frontendIsFromSimHmi;
         if (isFromSimHmi) {
             simHmiKeys = Object.keys(newStatus);
         }

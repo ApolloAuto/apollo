@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
         enable_heap_profile = true;
         break;
       case 'f':
-        if (apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
+        if (!apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
           auto opt_file_abs_path =
               apollo::cyber::common::GetEnv("PWD") + "/" + std::string(optarg);
           if (apollo::cyber::common::PathExists(opt_file_abs_path)) {
@@ -248,7 +248,7 @@ int main(int argc, char** argv) {
         }
         for (int i = optind; i < argc; i++) {
           if (*argv[i] != '-') {
-            if (apollo::cyber::common::PathIsAbsolute(std::string(argv[i]))) {
+            if (!apollo::cyber::common::PathIsAbsolute(std::string(argv[i]))) {
               auto opt_file_abs_path = apollo::cyber::common::GetEnv("PWD") +
                                        "/" + std::string(argv[i]);
               if (apollo::cyber::common::PathExists(opt_file_abs_path)) {
@@ -285,7 +285,7 @@ int main(int argc, char** argv) {
         }
         break;
       case 'o':
-        if (apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
+        if (!apollo::cyber::common::PathIsAbsolute(std::string(optarg))) {
           auto opt_output_file_abs_path =
               apollo::cyber::common::GetEnv("PWD") + "/" + std::string(optarg);
           opt_output_vec.push_back(opt_output_file_abs_path);
@@ -411,7 +411,7 @@ int main(int argc, char** argv) {
       std::cout << "usage: cyber_recorder info file" << std::endl;
       return -1;
     }
-    if (apollo::cyber::common::PathIsAbsolute(file_path)) {
+    if (!apollo::cyber::common::PathIsAbsolute(file_path)) {
       auto file_path_abs =
           apollo::cyber::common::GetEnv("PWD") + "/" + std::string(file_path);
       if (std::filesystem::exists(file_path_abs)) {

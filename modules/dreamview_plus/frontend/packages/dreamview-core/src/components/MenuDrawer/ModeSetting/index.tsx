@@ -98,14 +98,24 @@ function Operations() {
                 ?.subscribeToData(StreamDataNames.SIM_HMI_STATUS)
                 .pipe(
                     finalize(() => {
-                        dispatch(updateStatus(initState as any));
+                        dispatch(
+                            updateStatus({
+                                ...(initState as any),
+                                frontendIsFromSimHmi: true,
+                            } as any),
+                        );
                     }),
                 )
                 .subscribe((data) => {
                     Object.keys(data).forEach((key) => {
                         initState[key] = undefined;
                     });
-                    dispatch(updateStatus(data as any));
+                    dispatch(
+                        updateStatus({
+                            ...(data as any),
+                            frontendIsFromSimHmi: true,
+                        }),
+                    );
                 });
         }
 

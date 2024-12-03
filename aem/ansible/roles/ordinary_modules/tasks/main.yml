@@ -113,6 +113,26 @@
     INSTALL_ATOM: "openh264-2.1.1"
     INSTALL_PREFIX: "/opt/apollo/sysroot"
 
+- name: install GeographicLib
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_GeographicLib.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "GeographicLib-2.3"
+    INSTALL_PREFIX: "/usr"
+
+- name: install gtsam
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_gtsam.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "gtsam-4.2"
+    INSTALL_PREFIX: "/usr"
+
 # support for modules/audio
 #- name: Install fftw3 (for modules/audio)
 #  become: true
@@ -122,12 +142,16 @@
 #    state: latest
 #    update_cache: false
 
-- name: Install openssl
-  become: true
-  ansible.builtin.shell:
-    cmd: /opt/apollo/installers/install_openssl.sh
-    executable: /bin/bash
-  args: []
-  environment:
-    INSTALL_ATOM: "openssl-1.1.1w"
-    INSTALL_PREFIX: "/opt/apollo/pkgs/openssl"
+- name: install packages by OS
+  ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "default.yaml"
+      paths:
+        - 'tasks'

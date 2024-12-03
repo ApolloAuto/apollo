@@ -164,7 +164,7 @@ Apollo Open Source Platform 9.0 further focuses on enhancing the development and
 
 ![](docs/02_Quick%20Start/demo_guide/images/Apollo_9_0.png)
 
-[**Apollo 10.0:**](http://172.20.102.14:8802/docs/apollo/latest/md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE6_x96_xB0_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E.html)
+[**Apollo 10.0:**](https://apollo.baidu.com/docs/apollo/latest/md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE6_x96_xB0_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E.html)
 
 In Apollo 8.0, the concept of package management tailored for user learning scenarios was introduced to enable users to deploy and use Apollo more conveniently and efficiently. In Apollo 9.0, the package management tool was updated to Version 2.0, making it easier for users to conduct secondary development and effortlessly build their own autonomous driving applications based on Apollo. In Apollo 10.0, we realize that autonomous driving cannot remain at the stage of local validation. Instead, it requires a comprehensive upgrade, and needs to be applied to scenarios on a large scale. In terms of performance, the performance and stability of various layers and modules are optimied, and extensive tools are provided to improve optimization efficiency. At the cost level, the hardware costs are recuded by enriching the hardware ecosystem which provides users with more options. Besides, the software development costs are lowered by upgrading the operating system, establishing communication with other frameworks, and reusing ecological software capabilities. Regarding safety, functional safety strategies and functional safety framework capabilities are reinforced. See [Release Notes](./RELEASE.md) for more details.
 
@@ -193,7 +193,7 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 ## Quick Starts:
 
-- [Apollo 10.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/10.x/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_410bb1324792103828eeacd86377c551.html)
+- [Apollo 10.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/10.x/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97.html)
 
 - [Apollo 9.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/9.x/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_410bb1324792103828eeacd86377c551.html)
 

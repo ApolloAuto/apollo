@@ -486,9 +486,9 @@ def install(src, dst, action_type=None, package_path=None,
         copy_or_link(src, dst_full)
         # py binary
         if dst.startswith("bin") and not os.access(dst_full, os.X_OK):
-            os.chmod(dst_full, 
+            os.chmod(dst_full,
                 os.stat(dst_full).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-            
+
     else:
         # TODO(eric.cousineau): Unclear how RPath-patched file can be deemed
         # "up-to-date" by comparison?
