@@ -20,12 +20,12 @@ Here, we mainly introduce three typical predictors，extrapolation predictor, mo
 
 # Where is the code
 
-Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules/prediction/predictor).
+Please refer [prediction predictor](../../../apollo/modules/prediction/predictor/).
 
 # Code Reading
 
 ## Extrapolation predictor
-1. This predictor is used to extend the Semantic LSTM evaluator's results to creat a long-term trajectroy(which is 8 sec).
+1. This predictor is used to extend the Semantic LSTM evaluator's results to creat a long-term trajectory(which is 8 sec).
 
 2. There are two main kinds of extrapolation, extrapolate by lane and extrapolate by free move.
      1. Base on a search radium and an angle threshold, which can be changed in perdiction config, we get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator.
@@ -67,7 +67,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
 ## Move sequence predictor
 1. Obstacle moves along the lanes by its kinetic pattern.
 
-2. Ingore those lane sequences with lower probability.
+2. Ignore those lane sequences with lower probability.
  ```cpp  
     void FilterLaneSequences(
         const Feature& feature, const std::string& lane_id,
@@ -107,14 +107,14 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
  ```
     total_cost = w_acc * cost_acc + w_centri * cost_centri + w_collision * cost_collision
  ```
-Note that, the collsion cost is calucalated by the distance between ADC and obstacles.
+Note that, the collsion cost is calculated by the distance between ADC and obstacles.
  ```cpp
     double ComputeTrajectoryCost(
         const Obstacle& obstacle, const LaneSequence& lane_sequence,
         const double acceleration,
         const ADCTrajectoryContainer* adc_trajectory_container);
  ```
-4. We use the following equration to compute the likelihood for each short-term predicted trajectory.
+4. We use the following equation to compute the likelihood for each short-term predicted trajectory.
 
  ```
     likelihood = exp (-alpha * total_cost), the alpha can be changed in prediction gflag file.

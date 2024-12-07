@@ -8,7 +8,7 @@ Open space decider is used to process related infomation and provide information
 
 # Where is the code
 
-Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.cc).
+Please refer [open space decider](../../../apollo/modules/planning/tasks/open_space_roi_decider/open_space_roi_decider.cc).
 
 # Code Reading
 

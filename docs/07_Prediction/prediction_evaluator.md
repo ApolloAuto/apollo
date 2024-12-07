@@ -27,7 +27,7 @@ The list of available evaluators include:
 
 # Where is the code
 
-Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator).
+Please refer [prediction evaluator](../../../apollo/modules/prediction/evaluator/).
 
 # Code Reading
 
