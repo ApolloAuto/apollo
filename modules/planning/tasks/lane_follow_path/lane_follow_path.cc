@@ -71,12 +71,18 @@ apollo::common::Status LaneFollowPath::Process(
 
   return Status::OK();
 }
-
+/// @brief 
+/// @param boundary 一个指向 std::vector<PathBoundary> 的指针，boundary 用来存储计算出的路径边界
+/// @return 
 bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
+  // 在 boundary 向量的末尾添加一个新的空 PathBoundary
   boundary->emplace_back();
   auto& path_bound = boundary->back();
+  // 存储障碍物ID
   std::string blocking_obstacle_id = "";
+  // 车道类型
   std::string lane_type = "";
+  // 路径最窄宽度
   double path_narrowest_width = 0;
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!PathBoundsDeciderUtil::InitPathBoundary(*reference_line_info_,
@@ -86,25 +92,31 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   std::string borrow_lane_type;
+  // 将自动驾驶车辆（ADC）包括在车道边界内
   bool is_include_adc = config_.is_extend_lane_bounds_to_include_adc() &&
                         !injector_->planning_context()
                              ->planning_status()
                              .path_decider()
                              .is_in_path_lane_borrow_scenario();
   // 2. Decide a rough boundary based on lane info and ADC's position
+  // 根据车道信息和车辆的位置来决定一个粗略的路径边界
   if (!PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
           *reference_line_info_, init_sl_state_, &path_bound)) {
     AERROR << "Failed to decide a rough boundary based on self lane.";
     return false;
   }
+  // 要扩展边界以包括自动驾驶车辆
   if (is_include_adc) {
     PathBoundsDeciderUtil::ExtendBoundaryByADC(
         *reference_line_info_, init_sl_state_, config_.extend_buffer(),
         &path_bound);
   }
   PrintCurves print_curve;
+  // 获取路径决策中的障碍物列表
   auto indexed_obstacles = reference_line_info_->path_decision()->obstacles();
+  // 遍历每个障碍物
   for (const auto* obs : indexed_obstacles.Items()) {
+    // 对每个障碍物，提取其在路径坐标系中的边界
     const auto& sl_bound = obs->PerceptionSLBoundary();
     for (int i = 0; i < sl_bound.boundary_point_size(); i++) {
       std::string name = obs->Id() + "_obs_sl_boundary";
@@ -116,6 +128,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   print_curve.PrintToLog();
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = path_bound;
+  // 根据静态障碍物进一步微调路径边界
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           *reference_line_info_, init_sl_state_, &path_bound,
           &blocking_obstacle_id, &path_narrowest_width)) {
@@ -126,10 +139,11 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   // 4. Append some extra path bound points to avoid zero-length path data.
+  // 向路径边界中添加一些额外的边界点，以避免生成零长度的路径数据
   int counter = 0;
   while (!blocking_obstacle_id.empty() &&
          path_bound.size() < temp_path_bound.size() &&
-         counter < FLAGS_num_extra_tail_bound_point) {
+         counter < FLAGS_num_extra_tail_bound_point) {  // 20
     path_bound.push_back(temp_path_bound[path_bound.size()]);
     counter++;
   }
@@ -139,6 +153,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
                                     ->mutable_planning_status()
                                     ->mutable_lane_follow();
   if (!blocking_obstacle_id.empty()) {
+    // 如果有阻塞的障碍物，记录阻塞的障碍物ID，并更新阻塞持续时间
     double current_time = ::apollo::cyber::Clock::NowInSeconds();
     lane_follow_status->set_block_obstacle_id(blocking_obstacle_id);
     if (lane_follow_status->lane_follow_block()) {
@@ -150,7 +165,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
       lane_follow_status->set_lane_follow_block(true);
     }
     lane_follow_status->set_last_block_timestamp(current_time);
-  } else {
+  } else { // 如果没有障碍物，则重置相关状态
     if (lane_follow_status->lane_follow_block()) {
       lane_follow_status->set_block_duration(0);
       lane_follow_status->set_lane_follow_block(false);
@@ -159,6 +174,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   }
 
   ADEBUG << "Completed generating path boundaries.";
+  // 如果需要包括 ADC，检查初始化时车辆的横向位置是否在路径边界内。如果不在边界内，表示可能发生了车道借道，返回 false
   if (is_include_adc) {
     CHECK_LE(init_sl_state_.second[0], path_bound[0].l_upper.l);
     CHECK_GE(init_sl_state_.second[0], path_bound[0].l_lower.l);
@@ -176,6 +192,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   //   regular_path_bound_pair.emplace_back(std::get<1>(path_bound[i]),
   //                                        std::get<2>(path_bound[i]));
   // }
+  // 设置路径边界的标签，并记录调试信息（包括边界标签和阻塞障碍物ID）
   path_bound.set_label(absl::StrCat("regular/", "self"));
   path_bound.set_blocking_obstacle_id(blocking_obstacle_id);
   RecordDebugInfo(path_bound, path_bound.label(), reference_line_info_);

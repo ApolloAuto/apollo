@@ -265,7 +265,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
 }
 
 void ReferenceLineProvider::GenerateThread() {
-  while (!is_stop_) {
+  while (!is_stop_) { // 执行的定时任务，每隔50ms提供一次参考线
     static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();

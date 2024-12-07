@@ -345,42 +345,56 @@ void LaneBorrowPath::UpdateSelfPathInfo() {
   }
   blocking_obstacle_id_ = cur_path.blocking_obstacle_id();
 }
+/// @brief 判断当前是否有必要借用邻车道（lane borrowing）
+/// @return 
 bool LaneBorrowPath::IsNecessaryToBorrowLane() {
+  // mutable_path_decider_status 是一个指针，指向当前路径决策器的可变状态
   auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
+  // 判断当前是否已经处于借用邻车道的场景中。如果是，进入接下来的逻辑                                       
   if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
+    // 更新车辆自身的路径信息
     UpdateSelfPathInfo();
     // If originally borrowing neighbor lane:
     if (use_self_lane_ >= 6) {
       // If have been able to use self-lane for some time, then switch to
       // non-lane-borrowing.
+      // 这里判断 use_self_lane_ 的值是否大于等于6。如果是，说明车辆已经使用了自车道足够长的时间，可以考虑切换到不借用邻车道的状态
+      // 如果条件满足，就更新状态为不借道，并清空已决定的侧向通过方向 (decided_side_pass_direction_)，输出日志
       mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(false);
       decided_side_pass_direction_.clear();
       AINFO << "Switch from LANE-BORROW path to SELF-LANE path.";
     }
   } else {
     // If originally not borrowing neighbor lane:
+    // 如果当前不在借道状态中，输出阻塞障碍物的ID
     AINFO << "Blocking obstacle ID["
           << mutable_path_decider_status->front_static_obstacle_id() << "]";
     // ADC requirements check for lane-borrowing:
+    // 只有一条参考线，才能借道
     if (!HasSingleReferenceLine(*frame_)) {
-      return false;
+      return false;  // 不可以借道
     }
+    // 起点速度小于最大借道允许速度
     if (!IsWithinSidePassingSpeedADC(*frame_)) {
       return false;
     }
 
     // Obstacle condition check for lane-borrowing:
+    // 阻塞障碍物是否远离路口
     if (!IsBlockingObstacleFarFromIntersection(*reference_line_info_)) {
       return false;
     }
+    // 阻塞障碍物长期存在
     if (!IsLongTermBlockingObstacle()) {
       return false;
     }
+    // 阻塞障碍物是否在终点位置与自车间距之内
     if (!IsBlockingObstacleWithinDestination(*reference_line_info_)) {
       return false;
     }
+     // 为可侧面通过的障碍物
     if (!IsSidePassableObstacle(*reference_line_info_)) {
       return false;
     }
@@ -388,6 +402,7 @@ bool LaneBorrowPath::IsNecessaryToBorrowLane() {
     // switch to lane-borrowing
     if (decided_side_pass_direction_.empty()) {
       // first time init decided_side_pass_direction
+      // 如果 decided_side_pass_direction_ 为空，说明这是第一次判断是否需要借道，需要进行初始化
       bool left_borrowable;
       bool right_borrowable;
       CheckLaneBorrow(*reference_line_info_, &left_borrowable,
@@ -408,9 +423,11 @@ bool LaneBorrowPath::IsNecessaryToBorrowLane() {
         }
       }
     }
+    // 将 use_self_lane_ 重置为0，并输出日志，表示从自车道路径切换到借道路径
     use_self_lane_ = 0;
     AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
   }
+  // 最后返回当前是否处于借道场景的状态
   return mutable_path_decider_status->is_in_path_lane_borrow_scenario();
 }
 
@@ -421,13 +438,14 @@ bool LaneBorrowPath::HasSingleReferenceLine(const Frame& frame) {
 bool LaneBorrowPath::IsWithinSidePassingSpeedADC(const Frame& frame) {
   return frame.PlanningStartPoint().v() < config_.lane_borrow_max_speed();
 }
-
+/// @brief 判断是否存在长期阻塞障碍物
+/// @return 
 bool LaneBorrowPath::IsLongTermBlockingObstacle() {
   if (injector_->planning_context()
           ->planning_status()
           .path_decider()
           .front_static_obstacle_cycle_counter() >=
-      config_.long_term_blocking_obstacle_cycle_threshold()) {
+      config_.long_term_blocking_obstacle_cycle_threshold()) {   // 3
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {
@@ -435,91 +453,115 @@ bool LaneBorrowPath::IsLongTermBlockingObstacle() {
     return false;
   }
 }
-
+/// @brief 判断一个阻塞障碍物是否位于目标区域内
+/// @param reference_line_info 
+/// @return 
 bool LaneBorrowPath::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
+  // 获取路径决策器（path_decider_status）的状态信息
   const auto& path_decider_status =
       injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
+  // 如果 blocking_obstacle_id 为空，意味着没有检测到任何阻塞障碍物
   if (blocking_obstacle_id.empty()) {
     ADEBUG << "There is no blocking obstacle.";
     return true;
   }
+  // 在路径决策中的障碍物集合中查找指定 ID 的障碍物，结果存储在 blocking_obstacle 指针中
   const Obstacle* blocking_obstacle =
       reference_line_info.path_decision().obstacles().Find(
           blocking_obstacle_id);
+ // 如果 blocking_obstacle 为 nullptr，意味着找不到该障碍物，可能它已经被移除或者不再存在
   if (blocking_obstacle == nullptr) {
     ADEBUG << "Blocking obstacle is no longer there.";
     return true;
   }
-
+// 获取该阻塞障碍物的起始位置 s 坐标（通常用于表示障碍物在参考线上的位置）
   double blocking_obstacle_s =
       blocking_obstacle->PerceptionSLBoundary().start_s();
+// 获取自动驾驶车辆（ADC）的末端位置 s 坐标
   double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
   ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
   ADEBUG << "ADC is at s = " << adc_end_s;
   ADEBUG << "Destination is at s = "
          << reference_line_info.SDistanceToDestination() + adc_end_s;
+  // blocking_obstacle_s - adc_end_s 计算的是障碍物起始位置到 ADC 末端的距离
+  // reference_line_info.SDistanceToDestination() 是目标点距离 ADC 末端的距离
   if (blocking_obstacle_s - adc_end_s >
       reference_line_info.SDistanceToDestination()) {
+        // 障碍物的起始位置超出了目标区域，则表示该障碍物不在目标区域
     return false;
   }
   return true;
 }
-
+/// @brief 判断一个静态障碍物是否阻挡了前方交叉口，如果阻挡物距离交叉口过近，就不允许车辆侧向通过
+/// @param reference_line_info 
+/// @return 
 bool LaneBorrowPath::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
       injector_->planning_context()->planning_status().path_decider();
+  // 获取前方静态障碍物的ID
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
+  // 如果 blocking_obstacle_id 为空，说明没有阻挡物
   if (blocking_obstacle_id.empty()) {
     ADEBUG << "There is no blocking obstacle.";
     return true;
   }
+  // 查找阻挡物
   const Obstacle* blocking_obstacle =
       reference_line_info.path_decision().obstacles().Find(
           blocking_obstacle_id);
+  // 如果 blocking_obstacle 为 nullptr，表示阻挡物已经不存在了，输出调试信息并返回 true
   if (blocking_obstacle == nullptr) {
     ADEBUG << "Blocking obstacle is no longer there.";
     return true;
   }
 
   // Get blocking obstacle's s.
+  // 获取阻挡物的感知边界，并获取其结束位置的s坐标（end_s()）
   double blocking_obstacle_s =
       blocking_obstacle->PerceptionSLBoundary().end_s();
   ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
   // Get intersection's s and compare with threshold.
+  // 获取 reference_line_info 中首次遇到的交叉口信息。overlaps 应该包含与路径重叠的其他道路设施（如交通信号、停车标志等）
   const auto& first_encountered_overlaps =
       reference_line_info.FirstEncounteredOverlaps();
+  // 遍历 first_encountered_overlaps，对每个重叠物体（交叉口或其他设施）进行处理。overlap.first 是设施类型，overlap.second 是设施的具体信息（可能包含位置、大小等数据）
   for (const auto& overlap : first_encountered_overlaps) {
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
+  // 如果设施不是信号灯或停车标志，跳过当前迭代，继续处理下一个设施
     if (overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
     }
-
+  // 计算从阻挡物的s坐标到设施开始位置的距离 distance
     auto distance = overlap.second.start_s - blocking_obstacle_s;
     if (overlap.first == ReferenceLineInfo::SIGNAL ||
         overlap.first == ReferenceLineInfo::STOP_SIGN) {
-      if (distance < kIntersectionClearanceDist) {
+          // 根据计算出的距离判断，若距离小于预设的阈值
+      if (distance < kIntersectionClearanceDist) {   // 20
+        // 表示阻挡物离交叉口太近，无法执行“侧向通过”操作
         ADEBUG << "Too close to signal intersection (" << distance
                << "m); don't SIDE_PASS.";
         return false;
       }
     } else {
-      if (distance < kJunctionClearanceDist) {
+      if (distance < kJunctionClearanceDist) {   // 15
         ADEBUG << "Too close to overlap_type[" << overlap.first << "] ("
                << distance << "m); don't SIDE_PASS";
         return false;
       }
     }
   }
-
+ // 如果所有检查通过，说明阻挡物距离交叉口足够远，可以继续侧向通过操作
   return true;
 }
-
+/// @brief 
+/// @param reference_line_info 
+/// @return 
 bool LaneBorrowPath::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
@@ -540,7 +582,10 @@ bool LaneBorrowPath::IsSidePassableObstacle(
 
   return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
 }
-
+/// @brief 
+/// @param reference_line_info 
+/// @param left_neighbor_lane_borrowable 
+/// @param right_neighbor_lane_borrowable 
 void LaneBorrowPath::CheckLaneBorrow(
     const ReferenceLineInfo& reference_line_info,
     bool* left_neighbor_lane_borrowable, bool* right_neighbor_lane_borrowable) {
@@ -548,18 +593,22 @@ void LaneBorrowPath::CheckLaneBorrow(
 
   *left_neighbor_lane_borrowable = true;
   *right_neighbor_lane_borrowable = true;
-
+  // 定义一个常量kLookforwardDistance，表示检查时需要向前查看的距离
   static constexpr double kLookforwardDistance = 100.0;
+  // 返回车辆所在位置的s坐标
   double check_s = reference_line_info.AdcSlBoundary().end_s();
+  // 计算实际需要查看的最大前进距离，取当前位置check_s加上kLookforwardDistance和参考线总长度reference_line.Length()中的较小值
   const double lookforward_distance =
       std::min(check_s + kLookforwardDistance, reference_line.Length());
   while (check_s < lookforward_distance) {
+    // 获取参考线中与当前s坐标最近的参考点ref_point
     auto ref_point = reference_line.GetNearestReferencePoint(check_s);
     if (ref_point.lane_waypoints().empty()) {
       *left_neighbor_lane_borrowable = false;
       *right_neighbor_lane_borrowable = false;
       return;
     }
+    // 通过check_s查找当前参考点对应的车道信息ptr_lane_info
     auto ptr_lane_info = reference_line_info.LocateLaneInfo(check_s);
     if (ptr_lane_info->lane().left_neighbor_forward_lane_id().empty() &&
         ptr_lane_info->lane().left_neighbor_reverse_lane_id().empty()) {
@@ -569,15 +618,17 @@ void LaneBorrowPath::CheckLaneBorrow(
         ptr_lane_info->lane().right_neighbor_reverse_lane_id().empty()) {
       *right_neighbor_lane_borrowable = false;
     }
+    // 获取当前参考点车道的第一个路标点waypoint
     const auto waypoint = ref_point.lane_waypoints().front();
+    // 存储当前路标点的车道边界类型，初始化为UNKNOWN
     hdmap::LaneBoundaryType::Type lane_boundary_type =
         hdmap::LaneBoundaryType::UNKNOWN;
 
     if (*left_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
-      if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
-          lane_boundary_type == hdmap::LaneBoundaryType::DOUBLE_YELLOW ||
-          lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+      if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||  // 实黄线
+          lane_boundary_type == hdmap::LaneBoundaryType::DOUBLE_YELLOW ||  // 双黄线
+          lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {    // 实白线
         *left_neighbor_lane_borrowable = false;
       }
       ADEBUG << "s[" << check_s << "] left_lane_boundary_type["
@@ -592,6 +643,7 @@ void LaneBorrowPath::CheckLaneBorrow(
       ADEBUG << "s[" << check_s << "] right_neighbor_lane_borrowable["
              << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
     }
+    // 每次检查完一个位置后，check_s增加2.0米，继续向前检查
     check_s += 2.0;
   }
 }

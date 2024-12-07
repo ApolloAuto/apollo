@@ -36,7 +36,11 @@ Task::Task()
       config_path_(""),
       default_config_path_(""),
       name_("") {}
-
+/// @brief 
+/// @param config_dir 一个字符串，表示配置文件所在的目录路径
+/// @param name 一个字符串，表示任务的名称
+/// @param injector 一个智能指针，指向 DependencyInjector 对象，用于依赖注入 
+/// @return 
 bool Task::Init(const std::string& config_dir, const std::string& name,
                 const std::shared_ptr<DependencyInjector>& injector) {
   injector_ = injector;

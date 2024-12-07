@@ -116,7 +116,7 @@ void PlanningBase::LoadPlanner() {
   if ("" != config_.planner()) {
     planner_name = config_.planner();
     planner_name = ConfigUtil::GetFullPlanningClassName(planner_name);
-  }
+  }  // 单例模式
   planner_ =
       cyber::plugin_manager::PluginManager::Instance()->CreateInstance<Planner>(
           planner_name);

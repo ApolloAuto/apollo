@@ -105,7 +105,9 @@ OnLanePlanning::~OnLanePlanning() {
 }
 
 std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
-
+/// @brief 分配具体的Planner，启动参考线提供器(reference_line_provider_)
+/// @param config 
+/// @return 
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -376,7 +378,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
             << " traffic decider failed";
     }
   }
-
+ //  开始正在的规划 planner 开始规划
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
   // print trajxy

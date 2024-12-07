@@ -16,8 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-APOLLO_ROOT_DIR="${TOP_DIR}"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)" #当前脚本所在目录的上一级目录的绝对路径
+APOLLO_ROOT_DIR="${TOP_DIR}"  # Apollo 项目的根目录被设置为当前脚本所在目录的上一级目录
 APOLLO_IN_DOCKER=false
 # If inside docker container
 if [ -f /.dockerenv ]; then

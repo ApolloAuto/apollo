@@ -28,7 +28,7 @@
 
 namespace apollo {
 namespace planning {
-
+// https://blog.csdn.net/sinat_52032317/article/details/132612308
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
@@ -41,7 +41,9 @@ bool PathTimeHeuristicOptimizer::Init(
   // Load the config_ this task.
   return SpeedOptimizer::LoadConfig<SpeedHeuristicOptimizerConfig>(&config_);
 }
-
+/// @brief 
+/// @param speed_data 
+/// @return 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
     SpeedData* speed_data) const {
   const auto& dp_st_speed_optimizer_config =
@@ -59,7 +61,11 @@ bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
   }
   return true;
 }
-
+/// @brief 通过动态规划（Dynamic Programming，DP）方法来优化路径的时间分配，并生成对应的速度数据
+/// @param path_data 包含路径信息的结构体，通常包括离散化的路径（路径上的多个点）、参考线等
+/// @param init_point 初始轨迹点，通常包含车辆的初始位置和速度
+/// @param speed_data 存储计算后的速度数据，通常是车辆在路径上每个点的速度信息
+/// @return 
 Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     SpeedData* const speed_data) {

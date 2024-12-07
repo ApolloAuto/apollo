@@ -91,15 +91,19 @@ GriddedPathTimeGraph::GriddedPathTimeGraph(
       std::min(std::abs(vehicle_param_.max_deceleration()),
                std::abs(gridded_path_time_graph_config_.max_deceleration()));
 }
-
+/// @brief 通过动态规划方法搜索最优的速度轨迹。这个函数会计算路径上的每个点的最优速度，同时考虑障碍物和速度限制等约束条件。
+/// @param speed_data 输出参数，存储了最终计算出的速度数据，表示路径上每个时刻的速度
+/// @return 
 Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
   static constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     // KeepClear obstacles not considered in Dp St decision
+    // 判断当前边界是否为 KEEP_CLEAR 类型的障碍物，这种障碍物不会被纳入动态规划计算中
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
     // If init point in collision with obstacle, return speed fallback
+    // 检查初始化点（通常是 (0, 0) 代表起始位置）是否与当前障碍物发生碰撞
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {

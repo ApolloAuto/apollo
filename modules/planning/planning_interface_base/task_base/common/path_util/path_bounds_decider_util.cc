@@ -34,18 +34,25 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::VehicleConfigHelper;
-
+/// @brief 初始化路径边界
+/// @param reference_line_info 包含参考线的信息（如参考线的路径、速度等）
+/// @param path_bound 指向 PathBoundary 对象的指针，用来存储路径边界
+/// @param init_sl_state 起始状态，表示路径坐标系中的起始位置和状态
+/// @return 
 bool PathBoundsDeciderUtil::InitPathBoundary(
     const ReferenceLineInfo& reference_line_info,
     PathBoundary* const path_bound, SLState init_sl_state) {
   // Sanity checks.
+  // 确保 path_bound 指针不为空
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
   const auto& reference_line = reference_line_info.reference_line();
+  // 设置路径边界的分辨率 delta_s ： 0.5
   path_bound->set_delta_s(FLAGS_path_bounds_decider_resolution);
-
+  // 获取车辆配置 vehicle_config，从中获取与车辆相关的参数
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
+  // 车辆前端到后轴中心的距离    
   const double ego_front_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();
 
@@ -462,21 +469,30 @@ PathBoundsDeciderUtil::InferFrontAxeCenterFromRearAxeCenter(
       front_to_rear_axe_distance * std::sin(traj_point.path_point().theta()));
   return ret;
 }
-
+/// @brief 根据车辆（自动驾驶车辆，ADC）所在的车道信息和车辆位置，更新路径边界（PathBoundary）。其具体步骤包括获取当前车道的宽度、计算相应的路径边界，并更新路径边界数据
+/// @param reference_line_info 
+/// @param init_sl_state 
+/// @param path_bound 
+/// @return 
 bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
     const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
     PathBoundary* const path_bound) {
   // Sanity checks.
+  // 确保 path_bound 指针不为空
   CHECK_NOTNULL(path_bound);
+  // path_bound 内的边界数据不为空
   ACHECK(!path_bound->empty());
   const ReferenceLine& reference_line = reference_line_info.reference_line();
+  // 根据车辆起始位置（init_sl_state.first[0]）计算出车辆所在车道的宽度 adc_lane_width
   double adc_lane_width =
       GetADCLaneWidth(reference_line, init_sl_state.first[0]);
   // Go through every point, update the boundary based on lane info and
   // ADC's position.
   double past_lane_left_width = adc_lane_width / 2.0;
   double past_lane_right_width = adc_lane_width / 2.0;
+  // 记录路径上被阻塞的点的索引，初始值设为 -1
   int path_blocked_idx = -1;
+  // 开始循环遍历路径边界中的每个点，curr_s 是当前路径点在参考线上的位置
   for (size_t i = 0; i < path_bound->size(); ++i) {
     double curr_s = (*path_bound)[i].s;
     // 1. Get the current lane width at current point.
@@ -498,6 +514,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
 
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
+    // 计算当前路径点的实际左右边界。首先计算从参考线坐标系到地图坐标系的偏移量 offset_to_map
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 

@@ -50,6 +50,11 @@ double PtSegDistance(double query_x, double query_y, double start_x,
 
 }  // namespace
 
+/// @brief 初始化一个有中心、旋转角度、长宽属性的矩形盒子，并确保输入合法
+/// @param center 设置矩形的中心位置
+/// @param heading 设置矩形的旋转角度
+/// @param length 设置矩形的长度
+/// @param width 设置矩形的宽度
 Box2d::Box2d(const Vec2d &center, const double heading, const double length,
              const double width)
     : center_(center),
@@ -60,8 +65,10 @@ Box2d::Box2d(const Vec2d &center, const double heading, const double length,
       heading_(heading),
       cos_heading_(cos(heading)),
       sin_heading_(sin(heading)) {
+  // 检查矩形的长度和宽度是否大于一个非常小的常量kMathEpsilon，以防负值或无效输入
   CHECK_GT(length_, -kMathEpsilon);
   CHECK_GT(width_, -kMathEpsilon);
+  // 初始化矩形的四个角的坐标
   InitCorners();
 }
 
@@ -95,7 +102,7 @@ Box2d::Box2d(const LineSegment2d &axis, const double width)
   CHECK_GT(width_, -kMathEpsilon);
   InitCorners();
 }
-
+/// @brief 初始化矩形盒子的四个角点，并计算出矩形在二维空间中的最大和最小 x、y 坐标
 void Box2d::InitCorners() {
   const double dx1 = cos_heading_ * half_length_;
   const double dy1 = sin_heading_ * half_length_;
@@ -344,19 +351,20 @@ bool Box2d::HasOverlap(const Box2d &box) const {
       box.min_y() > max_y()) {
     return false;
   }
-
+  // 相对位移
   const double shift_x = box.center_x() - center_.x();
   const double shift_y = box.center_y() - center_.y();
-
+  // 当前矩形四个角点相对于中心的偏移量
   const double dx1 = cos_heading_ * half_length_;
   const double dy1 = sin_heading_ * half_length_;
   const double dx2 = sin_heading_ * half_width_;
   const double dy2 = -cos_heading_ * half_width_;
+  // box矩形的四个角相对于中心的偏移
   const double dx3 = box.cos_heading() * box.half_length();
   const double dy3 = box.sin_heading() * box.half_length();
   const double dx4 = box.sin_heading() * box.half_width();
   const double dy4 = -box.cos_heading() * box.half_width();
-
+  // SAT：如果存在一条轴使得两个形状在该轴上没有重叠，那么两个形状就不相交
   return std::abs(shift_x * cos_heading_ + shift_y * sin_heading_) <=
              std::abs(dx3 * cos_heading_ + dy3 * sin_heading_) +
                  std::abs(dx4 * cos_heading_ + dy4 * sin_heading_) +

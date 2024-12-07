@@ -12,6 +12,7 @@ import "modules/common_msgs/basic_msgs/vehicle_signal.proto";
 
 // next id :31
 message Chassis {
+  // 驾驶模式
   enum DrivingMode {
     COMPLETE_MANUAL = 0;  // human drive
     COMPLETE_AUTO_DRIVE = 1;
@@ -43,7 +44,7 @@ message Chassis {
 
     UNKNOWN_ERROR = 5;
   }
-
+ // 档位情况
   enum GearPosition {
     GEAR_NEUTRAL = 0;
     GEAR_DRIVE = 1;
@@ -63,21 +64,26 @@ message Chassis {
   optional bool engine_started = 3;
 
   // Engine speed in RPM.
+  // 引擎转速
   optional float engine_rpm = 4 [default = nan];
 
   // Vehicle Speed in meters per second.
+  // 车辆速度
   optional float speed_mps = 5 [default = nan];
 
   // Vehicle odometer in meters.
+  // 里程表
   optional float odometer_m = 6 [default = nan];
 
   // Fuel range in meters.
   optional int32 fuel_range_m = 7;
 
   // Real throttle location in [%], ranging from 0 to 100.
+  // 油门开度
   optional float throttle_percentage = 8 [default = nan];
 
   // Real brake location in [%], ranging from 0 to 100.
+  // 刹车开度
   optional float brake_percentage = 9 [default = nan];
 
   // Real steering location in [%], ranging from -100 to 100.

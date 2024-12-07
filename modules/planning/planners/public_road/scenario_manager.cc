@@ -29,7 +29,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::cyber::plugin_manager::PluginManager;
-
+/// @brief 场景注册
+/// @param injector 
+/// @param planner_config 
+/// @return 
 bool ScenarioManager::Init(const std::shared_ptr<DependencyInjector>& injector,
                            const PlannerPublicRoadConfig& planner_config) {
   if (init_) {
@@ -48,22 +51,30 @@ bool ScenarioManager::Init(const std::shared_ptr<DependencyInjector>& injector,
     }
   }
   AINFO << "Load scenario list:" << planner_config.DebugString();
+  // 默认为LANE_FOLLOW
   current_scenario_ = default_scenario_type_;
   init_ = true;
   return true;
 }
-
+/// @brief 更新场景状态
+/// @param ego_point 自车规划的起始点
+/// @param frame 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              Frame* frame) {
+  // 如果frame为空指针，程序将触发断言失败，终止执行
   CHECK_NOTNULL(frame);
   for (auto scenario : scenario_list_) {
+    // current_scenario_是一个智能指针，get()方法返回原始指针
     if (current_scenario_.get() == scenario.get() &&
         current_scenario_->GetStatus() ==
             ScenarioStatusType::STATUS_PROCESSING) {
       // The previous scenario has higher priority
+      // 如果当前场景与遍历到的场景相同，并且当前场景正在处理中，则返回，意味着不需要切换场景
       return;
     }
+    // 如果当前场景不是在正在处理状态，接着判断场景是否可以切换
     if (scenario->IsTransferable(current_scenario_.get(), *frame)) {
+      // 如果场景切换可行，退出当前场景
       current_scenario_->Exit(frame);
       AINFO << "switch scenario from" << current_scenario_->Name() << " to "
             << scenario->Name();

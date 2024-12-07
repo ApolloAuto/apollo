@@ -68,7 +68,10 @@ STBoundary::STBoundary(
 
   obstacle_road_right_ending_t_ = std::numeric_limits<double>::lowest();
 }
-
+/// @brief 
+/// @param lower_points 
+/// @param upper_points 
+/// @return 
 STBoundary STBoundary::CreateInstance(
     const std::vector<STPoint>& lower_points,
     const std::vector<STPoint>& upper_points) {
@@ -259,7 +262,9 @@ bool STBoundary::IsPointInBoundary(const STPoint& st_point) const {
 
   return (check_upper * check_lower < 0);
 }
-
+/// @brief 根据输入的扩展值 s，调整 STBoundary 的上下边界点（lower_points_ 和 upper_points_），使得边界向左右各自扩展 s 单位，最终返回一个新的扩展后的 STBoundary 对象
+/// @param s 
+/// @return 
 STBoundary STBoundary::ExpandByS(const double s) const {
   if (lower_points_.empty()) {
     return STBoundary();

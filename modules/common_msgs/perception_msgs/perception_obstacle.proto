@@ -62,15 +62,19 @@ message DebugMessage {
 }
 
 message PerceptionObstacle {
+  // 障碍物id
   optional int32 id = 1;  // obstacle ID.
 
   // obstacle position in the world coordinate system.
+  // 三维坐标
   optional apollo.common.Point3D position = 2;
-
+  // 世界坐标系下的朝向
   optional double theta = 3;  // heading in the world coordinate system.
+  // 速度
   optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
 
   // Size of obstacle bounding box.
+  // 长宽高
   optional double length = 5;  // obstacle length.
   optional double width = 6;   // obstacle width.
   optional double height = 7;  // obstacle height.
@@ -79,7 +83,7 @@ message PerceptionObstacle {
 
   // duration of an obstacle since detection in s.
   optional double tracking_time = 9;
-
+  // 类型
   enum Type {
     UNKNOWN = 0;
     UNKNOWN_MOVABLE = 1;

@@ -39,8 +39,8 @@ using apollo::storytelling::Stories;
 
 bool PlanningComponent::Init() {
   injector_ = std::make_shared<DependencyInjector>();
-
-  if (FLAGS_use_navigation_mode) {
+// 规划模式的选择
+  if (FLAGS_use_navigation_mode) {   // 默认是false
     planning_base_ = std::make_unique<NaviPlanning>(injector_);
   } else {
     planning_base_ = std::make_unique<OnLanePlanning>(injector_);
@@ -59,7 +59,7 @@ bool PlanningComponent::Init() {
   }
 
   planning_base_->Init(config_);
-
+// 完成相应的消息订阅
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -102,6 +102,7 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
+  // 消息发布
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 
@@ -115,7 +116,11 @@ bool PlanningComponent::Init() {
       FLAGS_planning_command_status);
   return true;
 }
-
+/// @brief 检查数据，并且执行注册好的Planning，生成路线并且发布
+/// @param prediction_obstacles 预测模块
+/// @param chassis 来自总线CanBus,主要是汽车底盘所给出的机械状态信息
+/// @param localization_estimate 定位信息
+/// @return 
 bool PlanningComponent::Proc(
     const std::shared_ptr<prediction::PredictionObstacles>&  //   // modules/common_msgs/prediction_msgs/prediction_obstacle.proto
         prediction_obstacles,
@@ -125,9 +130,13 @@ bool PlanningComponent::Proc(
   ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
+  // 1.检查是否需要重新规划线路
   CheckRerouting();
 
   // process fused input data
+  // 2.数据放入local_view_中，并且检查输入数据
+  // std::mutex: 互斥锁，用于保护共享资源的访问
+  // 当多个线程需要同时访问共享资源时，为了避免出现数据竞争等问题，需要使用互斥锁进行同步控制
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
@@ -200,6 +209,7 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
+  // 3. 执行注册好的Planning，生成线路
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
@@ -209,6 +219,7 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
+  // 4.发布消息
   planning_writer_->Write(adc_trajectory_pb);
 
   // Send command execution feedback.
@@ -236,6 +247,7 @@ bool PlanningComponent::Proc(
 
   // record in history
   auto* history = injector_->history();
+  // 5.最后记录
   history->Add(adc_trajectory_pb);
 
   return true;

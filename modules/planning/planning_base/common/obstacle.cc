@@ -770,16 +770,22 @@ void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear) {
 
 // input: obstacle trajectory point
 // ouput: obstacle polygon
+/// @brief 
+/// @param point 障碍物路径点
+/// @return 
 common::math::Polygon2d Obstacle::GetObstacleTrajectoryPolygon(
     const common::TrajectoryPoint& point) const {
+  // 从当前障碍物的姿态到目标路径点的姿态差异（旋转角度差）
   double delta_heading =
       point.path_point().theta() - perception_obstacle_.theta();
   double cos_delta_heading = cos(delta_heading);
   double sin_delta_heading = sin(delta_heading);
+  // 存储障碍物轨迹多边形顶点
   std::vector<common::math::Vec2d> polygon_point;
   polygon_point.reserve(perception_polygon_.points().size());
-
+  // perception_polygon_.points() 获取障碍物的多边形顶点
   for (auto& iter : perception_polygon_.points()) {
+    // 计算当前顶点相对于障碍物中心位置的偏移量
     double relative_x = iter.x() - perception_obstacle_.position().x();
     double relative_y = iter.y() - perception_obstacle_.position().y();
     double x = relative_x * cos_delta_heading - relative_y * sin_delta_heading +

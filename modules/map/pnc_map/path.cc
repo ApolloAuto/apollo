@@ -859,9 +859,11 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
 
 bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
                          double* lateral, double* min_distance) const {
+  // 如果路径的所有线段为空（即没有路径），则返回 false，表示投影计算失败                        
   if (segments_.empty()) {
     return false;
   }
+  // 判断参数不为空指针
   if (accumulate_s == nullptr || lateral == nullptr ||
       min_distance == nullptr) {
     return false;
@@ -870,8 +872,11 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
     return approximation_.GetProjection(*this, point, accumulate_s, lateral,
                                         min_distance);
   }
+  // 确保路径中至少有两个点，否则该断言会触发错误
   CHECK_GE(num_points_, 2);
+  // 初始化最小距离为正无穷大（infinity）
   *min_distance = std::numeric_limits<double>::infinity();
+  // 初始化 min_index 变量，用于记录距离最近的线段的索引
   int min_index = 0;
   for (int i = 0; i < num_segments_; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
@@ -880,27 +885,33 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
       *min_distance = distance;
     }
   }
+  // 计算最小距离的平方根，得到实际的最小距离
   *min_distance = std::sqrt(*min_distance);
+  //  获取距离最近的线段（nearest_seg）
   const auto& nearest_seg = segments_[min_index];
+  // 计算点 point 在 nearest_seg 这条线段的单位向量上的投影积（即点到线段的垂直投影距离的标量值）
   const auto prod = nearest_seg.ProductOntoUnit(point);
+  // 计算点 point 投影到 nearest_seg 单位向量上的值，表示点到线段的投影位置
   const auto proj = nearest_seg.ProjectOntoUnit(point);
-  if (min_index == 0) {
+  
+  if (min_index == 0) {// 如果距离最近的线段是路径的第一个线段
+    // *accumulate_s 设为投影值和当前线段长度的最小值
     *accumulate_s = std::min(proj, nearest_seg.length());
     if (proj < 0) {
-      *lateral = prod;
+      *lateral = prod; // 表示投影在该线段的延长线上，此时侧向距离 lateral 等于投影积 prod
     } else {
-      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance; // 根据投影积 prod 的符号来设置，表示点与路径的侧向距离
     }
-  } else if (min_index == num_segments_ - 1) {
-    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+  } else if (min_index == num_segments_ - 1) { // 如果距离最近的线段是路径的最后一个线段
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj); // *accumulate_s 设为累积的路径长度加上投影值与 0 的最大值
     if (proj > 0) {
       *lateral = prod;
     } else {
       *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
     }
-  } else {
+  } else { // 如果距离最近的线段是路径的中间部分
     *accumulate_s = accumulated_s_[min_index] +
-                    std::max(0.0, std::min(proj, nearest_seg.length()));
+                    std::max(0.0, std::min(proj, nearest_seg.length())); // *accumulate_s 设为累积的路径长度加上投影值与当前线段长度的最小值与 0 的最大值
     *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
   }
   return true;

@@ -41,13 +41,17 @@ SpeedLimitDecider::SpeedLimitDecider(const SpeedBoundsDeciderConfig& config,
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
 }
-
+/// @brief 
+/// @param obstacles 
+/// @param speed_limit_data 存储每个路径点的计算出的速度限制（类型为 SpeedLimit）
+/// @return 
 Status SpeedLimitDecider::GetSpeedLimits(
     const IndexedList<std::string, Obstacle>& obstacles,
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
-
+  // 路径已经离散化为多个小段，每个段表示一个路径点
   const auto& discretized_path = path_data_.discretized_path();
+  // 路径在 Frenet 坐标系下的表示形式，通常用于规划和跟踪
   const auto& frenet_path = path_data_.frenet_frame_path();
   PrintCurves print_curve;
   for (uint32_t i = 0; i < discretized_path.size(); ++i) {
@@ -61,12 +65,14 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
 
     // (1) speed limit from map
+    // 根据参考线的当前位置获取速度限制，通常参考线会记录道路的限速信息
     double speed_limit_from_reference_line =
         reference_line_.GetSpeedLimitFromS(reference_line_s);
     print_curve.AddPoint("speed_limit_from_ref", path_s,
                          speed_limit_from_reference_line);
     // (2) speed limit from path curvature
     //  -- 2.1: limit by centripetal force (acceleration)
+    // 根据路径曲率（kappa，即路径的弯曲程度）计算速度限制，主要考虑离心加速度对速度的影响。较大的曲率会导致较小的安全速度限制
     const double speed_limit_from_centripetal_acc =
         std::sqrt(speed_bounds_config_.max_centric_acceleration_limit() /
                   std::fmax(std::fabs(discretized_path.at(i).kappa()),
@@ -97,6 +103,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
 
       // TODO(all): potential problem here;
       // frenet and cartesian coordinates are mixed.
+      // // 判断障碍物和车辆的前后位置关系
       const double vehicle_front_s =
           reference_line_s + vehicle_param_.front_edge_to_center();
       const double vehicle_back_s =
@@ -110,7 +117,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
           vehicle_back_s > obstacle_front_s) {
         continue;
       }
-
+     // // 判断障碍物是否在车辆左右侧，并且是否在安全范围内
       const auto& nudge_decision = ptr_obstacle->LateralDecision().nudge();
 
       // Please notice the differences between adc_l and frenet_point_l

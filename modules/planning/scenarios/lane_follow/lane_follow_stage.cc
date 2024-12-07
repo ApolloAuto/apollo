@@ -92,6 +92,7 @@ StageResult LaneFollowStage::Process(
 
   unsigned int count = 0;
   StageResult result;
+  // 遍历所有的参考线，直到找到可用来规划的参考线后退出
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     // TODO(SHU): need refactor
     if (count++ == frame->mutable_reference_line_info()->size()) {
@@ -99,21 +100,23 @@ StageResult LaneFollowStage::Process(
     }
     ADEBUG << "No: [" << count << "] Reference Line.";
     ADEBUG << "IsChangeLanePath: " << reference_line_info.IsChangeLanePath();
-
+  // 找到可用来行驶的参考线，退出循环
     if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);
       break;
     }
-
+  // 执行LaneFollow的规划
     result =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
-
+  // 判断规划结果是否OK
     if (!result.HasError()) {
+      // 不是变道的参考线，则为可行驶参考线
       if (!reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is NOT lane change ref.";
         has_drivable_reference_line = true;
         continue;
       }
+      // 如果是变道参考线，则对参考线的cost进行判断
       if (reference_line_info.Cost() < kStraightForwardLineCost) {
         // If the path and speed optimization succeed on target lane while
         // under smart lane-change or IsClearToChangeLane under older version
@@ -132,17 +135,22 @@ StageResult LaneFollowStage::Process(
              ? result.SetStageStatus(StageStatusType::RUNNING)
              : result.SetStageStatus(StageStatusType::ERROR);
 }
-
+/// @brief 
+/// @param planning_start_point 
+/// @param frame 
+/// @param reference_line_info 
+/// @return 
 StageResult LaneFollowStage::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
+ // 判断是否有lanechange意图，如果否增加当前参考线的cost？有点疑问，增加了变道的可能
   if (!reference_line_info->IsChangeLanePath()) {
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   ADEBUG << "Current reference_line_info is IsChangeLanePath: "
          << reference_line_info->IsChangeLanePath();
-
+  // 顺序执行stage中的任务
   StageResult ret;
   for (auto task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
@@ -150,7 +158,8 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
         std::chrono::duration<double>(
             std::chrono::system_clock::now().time_since_epoch())
             .count();
-
+  // 执行每个task的具体逻辑
+  //依次调用task_list中的task
     ret.SetTaskStatus(task->Execute(frame, reference_line_info));
 
     const double end_timestamp = Clock::NowInSeconds();
@@ -168,7 +177,7 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
         (end_planning_perf_timestamp - start_planning_perf_timestamp) * 1000;
     AINFO << "Planning Perf: task name [" << task->Name() << "], "
           << plnning_perf_ms << " ms.";
-
+  // 如果task执行失败，退出task执行序列，并且记录失败信息
     if (ret.IsTaskError()) {
       AERROR << "Failed to run tasks[" << task->Name()
              << "], Error message: " << ret.GetTaskStatus().error_message();
@@ -187,10 +196,11 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
 
   // check path and speed results for path or speed fallback
   reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  // 如果task执行失败，则使用备用的规划轨迹
   if (ret.IsTaskError()) {
     fallback_task_->Execute(frame, reference_line_info);
   }
-
+  // 对规划的轨迹进行合成，如果合成失败，返回失败状态
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
@@ -212,7 +222,7 @@ StageResult LaneFollowStage::PlanOnReferenceLine(
       dest_stop_s = dest_sl.s();
     }
   }
-
+// 增加障碍物的代价
   for (const auto* obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual()) {

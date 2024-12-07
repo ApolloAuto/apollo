@@ -34,11 +34,16 @@ using apollo::hdmap::HDMapUtil;
 
 constexpr double kAdcDistanceThreshold = 35.0;  // unit: m
 constexpr double kObstaclesDistanceThreshold = 15.0;
-
+/// @brief 判断一个障碍物（obstacle）是否为不可移动的障碍物
+/// @param reference_line_info 包含参考线信息的对象
+/// @param obstacle 当前障碍物的对象
+/// @return 
 bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
                           const Obstacle& obstacle) {
   // Obstacle is far away.
+  // 自动驾驶车辆的当前边界，用于后续判断障碍物的位置
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  // 如果障碍物的起始位置（start_s()）距离参考线边界的结束位置（end_s()）加上一个阈值（kAdcDistanceThreshold）还远，那么认为该障碍物太远，系统无法确定其状态，返回 false
   if (obstacle.PerceptionSLBoundary().start_s() >
       adc_sl_boundary.end_s() + kAdcDistanceThreshold) {
     ADEBUG << " - It is too far ahead and we are not so sure of its status.";
@@ -52,32 +57,41 @@ bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
   }
 
   // Obstacle is blocked by others too.
+  // 遍历参考线信息中所有的障碍物，检查是否有其他障碍物可能阻挡当前障碍物
   for (const auto* other_obstacle :
        reference_line_info.path_decision().obstacles().Items()) {
+  // 如果当前障碍物是正在检查的障碍物自身，跳过此次循环
     if (other_obstacle->Id() == obstacle.Id()) {
       continue;
     }
+  // 如果其他障碍物是虚拟障碍物（如由算法模拟出来的障碍物），则跳过此次循环
     if (other_obstacle->IsVirtual()) {
       continue;
     }
+  // 如果其他障碍物不是车辆类型的障碍物，则跳过此次循环
     if (other_obstacle->Perception().type() !=
         apollo::perception::PerceptionObstacle::VEHICLE) {
       continue;
     }
+    // 获取当前检查的障碍物和其他障碍物的感知边界
     const auto& other_boundary = other_obstacle->PerceptionSLBoundary();
     const auto& this_boundary = obstacle.PerceptionSLBoundary();
+    // 如果其他障碍物的左右边界（start_l() 和 end_l()）没有与当前障碍物的边界重叠，即它们不在相邻的车道内，则认为它们不构成阻挡，跳过此次循环
     if (other_boundary.start_l() > this_boundary.end_l() ||
         other_boundary.end_l() < this_boundary.start_l()) {
       // not blocking the backside vehicle
       continue;
     }
+    // 计算当前障碍物与其他障碍物的纵向距离（delta_s）。如果这个距离小于零或大于一个预设的阈值（kObstaclesDistanceThreshold），则认为其他障碍物不构成阻挡，跳过此次循环
     double delta_s = other_boundary.start_s() - this_boundary.end_s();
     if (delta_s < 0.0 || delta_s > kObstaclesDistanceThreshold) {
       continue;
     }
+    // 如果以上条件都满足，说明当前障碍物被其他障碍物阻挡
     return false;
   }
   ADEBUG << "IT IS NON-MOVABLE!";
+  // 如果没有其他障碍物阻挡，且障碍物满足不可移动条件，输出日志并返回 true，表示当前障碍物不可移动
   return true;
 }
 

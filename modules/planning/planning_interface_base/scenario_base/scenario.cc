@@ -100,7 +100,7 @@ ScenarioResult Scenario::Process(
     scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_DONE);
     return scenario_result_;
   }
-  auto ret = current_stage_->Process(planning_init_point, frame);
+  auto ret = current_stage_->Process(planning_init_point, frame);  // lane_follow_stage.cc
   scenario_result_.SetStageResult(ret);
   switch (ret.GetStageStatus()) {
     case StageStatusType::ERROR: {
