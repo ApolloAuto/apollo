@@ -3,21 +3,20 @@ open_space_trajectory_optimizer_config {
     warm_start_config {
         xy_grid_resolution: 0.3
         phi_grid_resolution: 0.1
-        traj_kappa_contraint_ratio: 0.8
+        traj_kappa_contraint_ratio: 0.7
         next_node_num: 16
         step_size: 0.1
         traj_forward_penalty: 1.0
         traj_back_penalty: 1.0
         traj_gear_switch_penalty: 3.0
-        max_explored_num:10000
-        traj_short_length_penalty:20
-        traj_expected_shortest_length:2.0
+        traj_short_length_penalty:2.0
+        traj_expected_shortest_length:1.0
         traj_steer_penalty: 3.0
         traj_steer_change_penalty: 1.0
         grid_a_star_xy_resolution: 0.25
         node_radius: 0.2
         astar_max_search_time: 20
-        desired_explored_num: 1000
+        desired_explored_num: 100
     }
     dual_variable_warm_start_config {
         weight_d: 1.0
@@ -104,13 +103,14 @@ open_space_trajectory_optimizer_config {
         weight_path_length: 0.0
         weight_ref_deviation: 1e3
         apply_curvature_constraint: true
-        weight_curvature_constraint_slack_var: 1e8
+        weight_curvature_constraint_slack_var: 1e3
         curvature_constraint: 0.18
         max_iter: 500
         time_limit: 0.0
         verbose: false
         scaled_termination: true
         warm_start: true
+        sqp_ftol: 1e-2
         }
         s_curve_config {
         acc_weight: 1.0

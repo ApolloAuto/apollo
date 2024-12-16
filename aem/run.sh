@@ -203,6 +203,7 @@ aem_usage() {
   echo "Usage:
     $0 <subcommand> [...args]
 Subcommands:
+  version           Show aem version
   create|start      Create and start a new environment
   remove            Remove and stop an existing environment
   list              List all available environments
@@ -258,6 +259,11 @@ aem() {
     return 0
   fi
 
+  if [[ "${cmd}" == "version" ]]; then
+    colorize ${AEM_VERSION} ${CSI_SGR_PARAM_BOLD} ${CSI_SGR_PARAM_FG_BLUE} 
+    return 0
+  fi
+
   cmd_path="$(command -v "aem-${cmd}" || true)"
   if [[ -z "${cmd_path}" ]]; then
     if [[ -x "${SCRIPT_DIR}/aem-${cmd}" ]]; then
@@ -290,7 +296,7 @@ aem() {
   #   return "${ret}"
   # fi
 }
-export -f aem
+# export -f aem
 
 main() {
   if [[ (-L "$0") && ("$(type -t $(basename $0))" == "function") ]]; then

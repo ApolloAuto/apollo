@@ -26,7 +26,7 @@ export default function RoutingEditingFunctionalLoop(props: RoutingEditingFuncti
             });
         } else {
             routeManagerMix.setCurrentRouteMix({
-                currentRouteLoop: { currentRouteLoopState: true },
+                currentRouteLoop: { currentRouteLoopState: false },
             });
         }
         setChecked(switchVal);

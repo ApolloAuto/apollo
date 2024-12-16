@@ -2146,8 +2146,16 @@ bool HMIWorker::isProcessRunning(const std::string &process_name) {
 }
 
 bool HMIWorker::PackageExist(const std::string &package_name) {
+  std::string package_path_prefix;
+  if (!apollo::cyber::common::GetFilePathWithEnv(
+          FLAGS_apollo_package_meta_info_path_prefix, "APOLLO_DISTRIBUTION_HOME",
+          &package_path_prefix)) {
+    AERROR << FLAGS_apollo_package_meta_info_path_prefix
+           << " No such package meta info path prefix";
+    return false;
+  }
   std::string package_meta_info_path =
-      FLAGS_apollo_package_meta_info_path_prefix + package_name +
+      package_path_prefix + package_name +
       "/cyberfile.xml";
   AINFO << "package_meta_info_path: " << package_meta_info_path;
   return (cyber::common::PathExists(package_meta_info_path));

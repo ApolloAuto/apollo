@@ -31,7 +31,7 @@ FORMAT = '[%(levelname)s] %(asctime)s [line:%(lineno)s] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 logger = logging.getLogger('apollo')
 
-APOLLO_CONF_ROOT = '/apollo'
+APOLLO_CONF_ROOT = os.getenv("APOLLO_RUNTIME_PATH", '/apollo')
 
 
 def quit(signum, _):

@@ -819,7 +819,13 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     cur_scenario_id = scenario_id;
   }
 
-  std::string absolute_path = FLAGS_sim_obstacle_path;
+  std::string absolute_path;
+  if (!apollo::cyber::common::GetFilePathWithEnv(
+          FLAGS_sim_obstacle_path, "APOLLO_DISTRIBUTION_HOME", &absolute_path)) {
+    AERROR << "Failed to find agent server from file: " +
+                  FLAGS_sim_obstacle_path;
+    return false;
+  }
 
   // found sim_obstacle binary
   const std::string command = "which sim_obstacle";

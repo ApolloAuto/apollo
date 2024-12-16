@@ -4,17 +4,21 @@
 The goal of htbrid_a_star is to generate the coarse trajectory in the open space. Hybrid_a_star contains node3d， grid_search， reeds_shepp_path and hybrid_a_star. hybrid_a_star is the most important component generating the coarse trajectory and call the grid_search and reeds_shepp_path.
 
 # Where is the code
-Please refer to [hybrid a star.cc](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.cc)
+Please refer to [hybrid a star.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_open_space/coarse_trajectory_generator/hybrid_a_star.cc)
 
 # Code Reading
-1. Input: current point(planned start point), goal point(planned end point), ROI_xy_boundary(the maximum and minimum boundary value of x and y), obstacles vertices vector(the corner position information). The function is follow:
+1. Input: current point(planned start point), goal point(planned end point), ROI_xy_boundary(the maximum and minimum boundary value of x and y), obstacles vertices vector(the corner position information). Optional, soft_boundary_vertices_vec (vectors which want to far away), reeds_sheep_last_straight (is the rs curve straight). The function is follow:
    ```  cpp
-        bool HybridAStar::Plan(double sx, double sy, double sphi, 
-                              double ex, double ey, double ephi,
-                              const std::vector<double>& XYbounds,
-                              const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,HybridAStartResult* result)
+        bool HybridAStar::Plan(
+            double sx, double sy, double sphi, double ex, double ey, double ephi,
+            const std::vector<double>& XYbounds,
+            const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+            HybridAStartResult* result,
+            const std::vector<std::vector<common::math::Vec2d>>&
+                soft_boundary_vertices_vec,
+            bool reeds_sheep_last_straight)
    ```
-The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc, please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.cc)
+The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc, please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/open_space_trajectory_provider/open_space_trajectory_provider.cc)
 
 2. Construct obstacles_linesegment_vector. The main method is to form a line segment from a single obstacle point in order; then, each obstacle line segment is stored in obstacles_linesegment_vector that will be used to generate the DP map.
     ``` cpp
@@ -32,7 +36,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
         }
         obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
     ```
-3. Construct the planned point same as Node3d, please refer to [node3d.h](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/open_space/coarse_trajectory_generator/node3d.h). The planned starting point and the ending point are constructed in the form of Node3d that will be save to open set and will be checked by the ValidityCheck() function.
+3. Construct the planned point same as Node3d, please refer to [node3d.h](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_open_space/coarse_trajectory_generator/node3d.h). The planned starting point and the ending point are constructed in the form of Node3d that will be save to open set and will be checked by the ValidityCheck() function.
     ``` cpp
         start_node_.reset(
         new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
@@ -68,19 +72,24 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
    2. Boundary overlap judgment. If the bounding box of vehicle overlaps any line segment, then return false. Judge the overlap by          whether the line and box intersect.
 
     ``` cpp
-    bool GridSearch::GenerateDpMap(const double ex, const double ey, 
-                                   const std::vector<double>& XYbounds,
-                                   const std::vector<std::vector<common::math::LineSegment2d>> &obstacles_linesegments_vec) 
+    bool GridSearch::GenerateDpMap(
+        const double ex,
+        const double ey,
+        const std::vector<double>& XYbounds,
+        const std::vector<std::vector<common::math::LineSegment2d>>&
+            obstacles_linesegments_vec,
+        const std::vector<std::vector<common::math::LineSegment2d>>&
+            soft_boundary_linesegments_vec) 
     ```
-    the function is used to generate dp map by dynamic programming, please refer (https://github.com/ApolloAuto/apollo/blob/master/modules/planning/open_space/coarse_trajectory_generator/grid_search.cc)
-1. Parameter: ex and ey are the postion of goal point, XYbounds_ is the boundary of x and y, obstacles_linesegments_ is the line            segments which is composed of boundary point.
+    the function is used to generate dp map by dynamic programming, please refer  [grid_search.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_open_space/coarse_trajectory_generator/grid_search.cc)
+1. Parameter: ex and ey are the postion of goal point, XYbounds_ is the boundary of x and y, obstacles_linesegments_ is the line segments which is composed of boundary point.
 2. Introduction: the function is used to generate the dp map
 3. Process detail: 
    1. Grid the XYbounds_ according to grid resolution, then get the max grid.
    2. Dp map store the cost of node.
 
     ``` cpp
-    bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node)
+    bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d>* candidate_final_node)
     ```
     The function is used to check if an analystic curve could be connected from current configuration to the end configuration without collision. if so, search ends.
 1. Parameter: current node is start point of planning.
@@ -91,7 +100,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
    3. Load the whole reeds shepp path as nodes and add nodes to the close set.
 
     ``` cpp
-    bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node)
+    bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d>* candidate_final_node)
     ```
     The funtion is used to generate next node based on the current node.
 1. Parameter: the current node of the search and the next node serial number 

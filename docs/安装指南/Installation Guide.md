@@ -1,3 +1,11 @@
+## Note
+Since Apollo 10.0, both host and Docker container deployment modes are supported.
+
+In host deployment mode, we recommend using the Ubuntu 22.04 system with x86_64 architecture or the Ubuntu 20.04 system with aarch64 architecture.
+
+In Docker container deployment mode, you can use Ubuntu 18.04, 20.04, 22.04 system with x86_64 architecture or Ubuntu 20.04 system with aarch64 architecture.
+
+
 ## Step 1: Install basic software
 
 ### 1. Install Ubuntu Linux
@@ -14,6 +22,8 @@ sudo apt-get upgrade
 > Attention: To complete the update, it is necessary to ensure a network connection.
 
 ### 2. Install Docker Engine
+
+> Tip: If you are using host deployment mode, please skip this step.
 
 Apollo relies on Docker 19.03+. To install the Docker engine, you can follow the official documentation for installation:
 
@@ -43,14 +53,14 @@ Compatibility between graphics card drivers and CUDA versions. Due to Nvidia's f
 
 > TODO: CUDA has been updated and is no longer applicable here. The recommended version should be installed instead
 
-| Graphics card series  | Tested graphics card   | Driver version           | Minimum supported driver version | CUDA version        |
-| --------------------- | ---------------------- | ------------------------ | -------------------------------- | ------------------- |
-| GeForce 10 Series     | GeForce GTX 1080       | nvidia-driver-470.160.03 | nvidia-driver-391.35             | CUDA Version ：11.4 |
-| GeForce RTX 20 Series | GeForce RTX 2070 SUPER | nvidia-driver-470.63.01  | nvidia-driver-456.38             | CUDA Version ：11.4 |
-| GeForce RTX 30 Series | GeForce RTX 3090       | nvidia-driver-515.86.01  | nvidia-driver-460.89             | CUDA Version ：11.6 |
-| GeForce RTX 30 Series | GeForce RTX 3060       | nvidia-driver-470.63.01  | nvidia-driver-460.89             | CUDA Version ：11.4 |
-| Tesla V-Series        | Tesla V100             | nvidia-driver-418.67     | nvidia-driver-410.129            | CUDA Version ：10.1 |
-| AMD                   | MI100 dGPU             | ROCm™ 3.10 driver       |                                  |                     |
+| Graphics card series  | Tested graphics card   | Driver version            | CUDA version        |
+| --------------------- | ---------------------- | ------------------------ | ------------------- |
+| GeForce 10 Series     | GeForce GTX 1080       | nvidia-driver-535.183.01 | CUDA Version ：11.8 |
+| GeForce RTX 20 Series | GeForce RTX 2070 SUPER | nvidia-driver-550.127.05 | CUDA Version ：11.8 |
+| GeForce RTX 30 Series | GeForce RTX 3090       | nvidia-driver-525.147.05 | CUDA Version ：11.8 |
+| GeForce RTX 30 Series | GeForce RTX 3060       | nvidia-driver-550.127.05 | CUDA Version ：11.8 |
+| GeForce RTX 40 Series | GeForce RTX 4080       | nvidia-driver-550.127.05 | CUDA Version ：11.8 |
+| AMD                   | MI100 dGPU             | ROCm™ 3.10 driver       |                     |
 
 The recommended driver for the 10, 20 and 30 series graphics cards is version 470.63.01. You can download the driver from the [Nvidia official website](https://www.nvidia.cn/Download/driverResults.aspx/179605/cn/).
 
@@ -92,6 +102,8 @@ Tue Jan  3 12:04:21 2023
 
 ### 2. Install Nvidia container toolkit
 
+> Tip: If you are using host deployment mode, please skip this step.
+
 In order to obtain GPU support within the container, NVIDIA Container Toolkit needs to be installed after installing Docker. You can refer to the official installation documentation or follow the following instructions to install NVIDIA Container Toolkit:
 
 ```shell
@@ -113,6 +125,21 @@ Restart Docker after configuration is complete
 
 ```shell
 sudo systemctl restart docker
+```
+
+### 3. Install cuda-toolkit
+
+If you wish to run Apollo directly on the host instead of in a container, you need to install the CUDA toolkit to support the compilation and operation of Apollo. For detailed information, please refer to [Nvidia cuda Document](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#network-repo-installation-for-ubuntu)。
+
+Taking Ubuntu 22.04 as an example, install CUDA Toolkit 11.8
+
+```shell
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+
+sudo apt-get update
+
+sudo apt-get install -y cuda-toolkit-11-8
 ```
 
 ## Step 3: Install Apollo Environment Management Tool
@@ -142,13 +169,9 @@ echo \
 sudo apt-get update
 ```
 
-> 注：如果之前已经安装过8.0版本的apollo的话，在宿主机上的/etc/apt/sources.list文件中会有形如 `deb https://apollo-pkg-beta.cdn.bcebos.com/neo/beta bionic main` 的配置，可以直接删除，宿主机上的apollo源配置仅用于安装aem工具
+> Note: If you have installed Apollo 8.0 before, the content like `deb https://apollo-pkg-beta.cdn.bcebos.com/neo/beta bionic main` may be found in the /etc/apt/sources.list file on the host, you can delete it directly. The apollo source configuration on the host only serves to install aem tool.
 
 ### 3. Install AEM：
-
-> TODO: 新版本的 aem 暂时未发布到源上，所以不能通过这个方式安装，请直接使用代码中的 aem 脚本
-> `./aem/aem -h`
-> 使用代码中的aem脚本需要手动安装一下依赖的软件包 `sudo apt install rsync tree sudo python3-dev python3-pip python3-venv python3-apt`
 
 ```shell
 sudo apt install apollo-neo-env-manager-dev --reinstall
@@ -172,9 +195,12 @@ Apollo currently offers 3 sample projects, you can choose one according to your 
 
 Additionally, Apollo's full source code project [apollo](https://github.com/ApolloAuto/apollo) can also be used
 
+> Tip: Since Apollo 10.0, the source code mode and package mode use the same compilation tool, we recommend that you use the following command for compilation and operation, this dev_start.sh, dev_into.sh, apollo.sh scripts are no longer recommended.
+
+
 ### 2. Cloning Project
 
-Taking x86 architecture application core as an example
+Taking application core as an example
 
 ```shell
 git clone https://github.com/ApolloAuto/application-core.git application-core
@@ -185,11 +211,19 @@ git clone https://github.com/ApolloAuto/application-core.git application-core
 ```shell
 # enter the project directory
 cd application-core
+
+# switching the environment configuration: it will automatically recognize your host's environment and change . env and. workspace. json configurations
+# if you use apollo source code mode, you don't need to execute this step. aem will automatically recognize the startup environment
+bash setup.sh
+
 # start and enter into the apollo environment
 aem start
+
+# if you use host mode, execute this command:
+aem start -b host
 ```
 
-> use aem start -b hostto start an env in host instead of docker
+> Note: you can use the same operation in the container or host mode. use aem enter command to enter the environment, container mode will enter into a docker container, and host mode will enter into an apollo bash space.
 
 ### 4. Install software packages
 
@@ -197,9 +231,14 @@ The example project includes a directory called core, where the core/cyberfile.x
 
 ```shell
 buildtool build -p core
+
+# Note: If you want to compile and install all the code and packages under the working directory, please execute
+buildtool build
 ```
 
 > The true meaning of this operation is to compile the core package in the project, but the `core` itself does not have any code that needs to be compiled, so this operation will only install dependencies package declared in `core/cyberfile.xml`
+
+> Tip: the latest buildtool will auto add --opt --gpu compile parameters by default, if you want to use gdb debug please execute buildtool with --dbg parameter.
 
 ### 5. Select vehicle configuration
 

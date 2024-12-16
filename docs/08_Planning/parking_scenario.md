@@ -14,7 +14,7 @@ There are three scenairos, park and go, pull over and valet parking, which relat
 
 # Where is the code
 
-Please refer [park](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park/) & [park and go](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park_and_go/).
+Please refer [park](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/scenarios/valet_parking) & [park and go](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/scenarios/park_and_go).
 
 # Code Reading
 

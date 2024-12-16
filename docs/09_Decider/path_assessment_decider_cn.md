@@ -28,7 +28,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 本节说明path assessment decider的代码流程。
 
-请参考代码[Apollo r6.0.0 path_assessment_decider](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/deciders/path_assessment_decider)
+请参考代码[Apollo 10.0 path_assessment_decider_util](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_interface_base/task_base/common/path_util/path_assessment_decider_util.cc)
 
 - 输入
 

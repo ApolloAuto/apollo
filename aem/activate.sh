@@ -19,6 +19,9 @@
 #set -e
 #set -x
 
+source /etc/profile
+source $HOME/.bashrc
+
 if [[ "${BASH_SOURCE-}" == "$0" ]]; then
   echo "this script should be sourced, e.g. source $0" >&2
   exit 1
@@ -118,14 +121,14 @@ export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ENV_ROOT}/opt/apollo/neo"
 
 # runtime variables
 export AEM_HOST_VIRTUALENV=1
-export APOLLO_DISTRIBUTION_VERSION="${APOLLO_DISTRIBUTION_VERSION:-9.0}"
+export APOLLO_DISTRIBUTION_VERSION="${APOLLO_DISTRIBUTION_VERSION:-10.0}"
 export APOLLO_DISTRIBUTION_HOME="${APOLLO_DISTRIBUTION_HOME:-${APOLLO_ENV_ROOT}/opt/apollo/neo}"
 export APOLLO_SYSROOT_DIR="${APOLLO_SYSROOT_DIR:-/opt/apollo/sysroot}"
 export APOLLO_CACHE_DIR="${APOLLO_CACHE_DIR:-./.cache}"
 export APOLLO_BAZEL_DIST_DIR="${APOLLO_BAZEL_DIST_DIR:-${APOLLO_CACHE_DIR}/distdir}"
 export APOLLO_ROOT_DIR="${APOLLO_ROOT_DIR:-${APOLLO_ENV_ROOT}/apollo}"
 export APOLLO_PATH="${APOLLO_PATH:-${APOLLO_ENV_ROOT}/opt/apollo/neo}"
-export GLOG_log_dir="${GLOG_log_dir:-${APOLLO_ENV_ROOT}/apollo/data/log}"
+export GLOG_log_dir="${GLOG_log_dir:-${APOLLO_ENV_WORKROOT}/data/log}"
 export CYBER_PATH="${CYBER_PATH:-${APOLLO_ROOT_DIR}/cyber}"
 export CYBER_IP="${CYBER_IP:-127.0.0.1}"
 export CYBER_DOMAIN_ID="${CYBER_DOMAIN_ID:-80}"
@@ -165,7 +168,7 @@ alias buildtool='_abt() {
 # ensure directorys exists
 mkdir -p "${APOLLO_CONFIG_HOME}"
 mkdir -p "${CYBER_PATH}"
-mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/log"
-mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/core"
-mkdir -p "${APOLLO_ENV_ROOT}/apollo/data/bag"
+mkdir -p "${APOLLO_ENV_WORKROOT}/data/log"
+mkdir -p "${APOLLO_ENV_WORKROOT}/data/core"
+mkdir -p "${APOLLO_ENV_WORKROOT}/data/bag"
 mkdir -p "${APOLLO_ENV_ROOT}/apollo/modules/map/data"

@@ -6,7 +6,7 @@ This document describes the process of speed bounds decider. Speed bounds decide
 
 # Where is the code
 
-Please refer [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.cc)
+Please refer [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/speed_bounds_decider/speed_bounds_decider.cc)
 
 # Code Reading
 

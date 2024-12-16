@@ -358,7 +358,7 @@ apollo_create_hostenv() {
   local buildtool_version="10.0.0-beta-r1"
   # dpkg -x "/apollo_workspace/apollo-neo-buildtool_${buildtool_version}_amd64.deb" "${APOLLO_ENV_ROOT}"
   install -d -m 755 "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}"
-  wget -c "https://apollo-system.cdn.bcebos.com/archive/10.0/buildtool-${buildtool_version}.tar.gz" -O - | tar -zx -C "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}" --strip-components=1
+  wget --no-check-certificate -c "https://apollo-system.cdn.bcebos.com/archive/10.0/buildtool-${buildtool_version}.tar.gz" -O - | tar -zx -C "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}" --strip-components=1
   subenv "${AEM_HOME}/buildtool.conf.tpl" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}/config/module.conf"
   ln -snf "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/${buildtool_version}" "${APOLLO_ENV_ROOT}/opt/apollo/neo/packages/buildtool/latest"
   install -d -m 755 "${APOLLO_ENV_ROOT}/opt/apollo/neo/bin"
@@ -552,6 +552,8 @@ apollo_create_container_volume_options() {
   volume_opts+=('-v' '/tmp/.X11-unix:/tmp/.X11-unix:rw')
   # kernel modules
   volume_opts+=('-v' '/lib/modules:/lib/modules')
+  # localtime
+  volume_opts+=('-v' '/etc/localtime:/etc/localtime:ro')
 
   # auca
   auca_sdk_so="/usr/lib/libapollo-auca-sdk.so.1"
@@ -572,10 +574,13 @@ apollo_create_container_volume_options() {
   volume_opts+=('-v' '/dev/null:/dev/raw1394')
 
   # volume for apollo packages and configurations
-  for x in {apollo,opt}; do
-    local volume_name="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}_${x}"
-    volume_opts+=('-v' "${volume_name}:/${x}")
-  done
+  if [[ ${APOLLO_NO_MOUNT_ENV} -ne 1 ]]; then
+    for x in {apollo,opt}; do
+      local volume_name="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}_${x}"
+      volume_opts+=('-v' "${volume_name}:/${x}")
+    done
+  fi
+
 
   # volume of user shared configurations' and resources' directories
   volume_opts+=('-v' "${HOME}/.apollo:/home/${APOLLO_ENV_CONTAINER_USER}/.apollo")
@@ -658,7 +663,7 @@ apollo_container_download_arm_lib() {
       if [[ "${APOLLO_ENV_CROSS_PLATFORM}" == "aarch64" ]]; then
         info "download external library for cross-compilation..."
         local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
-        apollo_execute_cmd_in_container "cd ~ && wget -nv ${tegra_lib_url} && \
+        apollo_execute_cmd_in_container "cd ~ && wget --no-check-certificate -nv ${tegra_lib_url} && \
                   tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null"
       fi
     fi

@@ -21,15 +21,15 @@
 
 ![总体流程图](images/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。这里只说明主体的流程，不涉及到所有细节。task的主要功能位于`Process`函数中。
+总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/scenarios/lane_follow)场景为例子进行说明。这里只说明主体的流程，不涉及到所有细节。task的主要功能位于`Process`函数中。
 
-第一，规划模块的入口函数是PlanningComponent的[Proc](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/planning_component.cc#L118)。
+第一，规划模块的入口函数是PlanningComponent的[Proc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_component/planning_component.cc#L118)。
 
-第二，以规划模式OnLanePlanning，执行[RunOnce](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/on_lane_planning.cc#L205)。在RunOnce中先执行交通规则，再规划轨迹。规划轨迹的函数是[Plan](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/on_lane_planning.cc#L487)。
+第二，以规划模式OnLanePlanning，执行[RunOnce](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_component/on_lane_planning.cc#L231)。在RunOnce中先执行交通规则，再规划轨迹。规划轨迹的函数是[Plan](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_component/on_lane_planning.cc#L487)。
 
-第三，进入到PublicRoadPlanner中的[Plan](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/planner/public_road/public_road_planner.cc#L33)函数，进行轨迹规划。ScenarioManager的[Update](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/scenarios/scenario_manager.cc#L798)函数根据当前的scenario_type选择合适的场景。这里的流程图是以lane follow为例。
+第三，进入到PublicRoadPlanner中的[Plan](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planners/public_road/public_road_planner.cc#L33)函数，进行轨迹规划。ScenarioManager的[Update](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planners/public_road/scenario_manager.cc#L56)函数根据当前的scenario_type选择合适的场景。这里的流程图是以lane follow为例。
 
-第四，选择lane follow的场景后，执行[Process](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/scenarios/scenario.cc#L66)函数。然后，执行LaneFollowStage中的[Process](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L93)函数，在[PlanOnReferenceLine](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L153)中执行LaneFollowStage中的所有的task。通过调用[Excute](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L167)函数执行task，Excute调用了task的[Process](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/tasks/deciders/decider.cc#L37)（以decider为例子）函数。最后一个图中，TaskType指的不是具体的类名称，代表所有的task类型。虚线的箭头，表示在LaneFollowStage中按照vector中的顺序执行所有的任务。
+第四，选择lane follow的场景后，执行[Process](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_interface_base/scenario_base/scenario.cc#L86)函数。然后，执行LaneFollowStage中的[Process](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L93)函数，在[PlanOnReferenceLine](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L136)中执行LaneFollowStage中的所有的task。通过调用[Excute](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/scenarios/lane_follow/lane_follow_stage.cc#L154)函数执行task，Excute调用了task的[Process](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/lane_follow_path/lane_follow_path.cc#L47)（以lane_follow_path为例子）函数。最后一个图中，TaskType指的不是具体的类名称，代表所有的task类型。虚线的箭头，表示在LaneFollowStage中按照vector中的顺序执行所有的任务。
 
 最后，Task的流程都在Process函数中。之后对task的讲解都从Process函数开始。
 

@@ -138,18 +138,18 @@ DEFINE_string(dynamic_model_library_path,
               "Dynamic Model libs placement");
 
 DEFINE_string(dynamic_model_package_library_path,
-              "/opt/apollo/neo/lib/modules/dynamic_model/",
+              "modules/dynamic_model/",
               "Dynamic Model package lib path");
 
 DEFINE_string(apollo_package_meta_info_path_prefix,
-              "/opt/apollo/neo/share/packages/",
+              "share/packages/",
               "apollo package meta info path prefix");
 
 DEFINE_string(sim_obstacle_stop_command, "pkill -9 -f \"sim_obstacle\" ",
               "Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,
-              "/opt/apollo/neo/bin/sim_obstacle",
+              "bin/sim_obstacle",
               "sim obstacle binary placement.");
 
 DEFINE_string(gflag_command_arg,
@@ -245,5 +245,5 @@ DEFINE_double(
 DEFINE_string(perception_edge_info_topic, "/apollo/perception/edge",
               "Perception edge info topic name.");
 
-DEFINE_string(dv_plugin_panels_path, "/apollo/modules/dreamview_plus_plugin_panels",
+DEFINE_string(dv_plugin_panels_path, "modules/dreamview_plus_plugin_panels",
               "dreamview plugin panels path of frontend.");

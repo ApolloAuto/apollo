@@ -71,11 +71,11 @@ bool ProtoHandler::FindProtoPath(const std::string file_relative_path,
                                  std::string *file_abs_path) {
   std::string tmp_file_path;
 
-  const char *apollo_env_workroot = std::getenv("APOLLO_ENV_WORKROOT");
+  const char *apollo_env_workroot = std::getenv("APOLLO_ROOT_DIR");
   if (apollo_env_workroot != nullptr) {
     tmp_file_path = std::string(apollo_env_workroot) + file_relative_path;
     if (apollo::cyber::common::PathExists(tmp_file_path)) {
-      ADEBUG << "find proto file in APOLLO_ENV_WORKROOT: " << tmp_file_path;
+      ADEBUG << "find proto file in APOLLO_ROOT_DIR: " << tmp_file_path;
       *file_abs_path = tmp_file_path;
       return true;
     }

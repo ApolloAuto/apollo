@@ -555,7 +555,7 @@ export class Carviz {
             datas,
             'gps',
             () => {
-                this.gps.update(datas.gps);
+                this.gps.update(datas.gps, datas.autoDrivingCar);
             },
             noop,
         );

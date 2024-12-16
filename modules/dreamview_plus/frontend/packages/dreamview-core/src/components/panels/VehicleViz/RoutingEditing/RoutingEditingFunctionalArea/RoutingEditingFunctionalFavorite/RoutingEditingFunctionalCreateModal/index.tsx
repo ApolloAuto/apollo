@@ -116,6 +116,7 @@ export default function RoutingEditingFunctionalCreateModal(
         >
             <Form
                 form={form}
+                clearOnDestroy
                 name='form'
                 // onValuesChange={onValuesChange}
                 className={classes['create-modal-form']}
@@ -179,39 +180,42 @@ export default function RoutingEditingFunctionalCreateModal(
                         </div>
                     </div>
                 </CustomScroll>
-                {currentRouteLoopState && (
-                    <Form.Item
-                        label={t('loopRouting')}
-                        style={{ marginLeft: '16px' }}
-                        name='loopRouting'
-                        valuePropName='checked'
-                    >
-                        <Switch disabled className={classes['routing-form-loop-disable']} />
-                    </Form.Item>
-                )}
-                {currentRouteLoopState && (
-                    <Form.Item
-                        label={t('setLooptimes')}
-                        style={{ marginLeft: '11px' }}
-                        name='cycleNumber'
-                        rules={[
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    // 必填校验逻辑
-                                    if (!value) {
-                                        return Promise.reject(new Error('Please enter'));
-                                    }
-                                    if (Number(value) > 10) {
-                                        return Promise.reject(new Error('Max loop times is 10'));
-                                    }
-                                    return Promise.resolve();
-                                },
-                            }),
-                        ]}
-                    >
-                        <InputNumber type='number' max={10} precision={0} disabled />
-                    </Form.Item>
-                )}
+                <Form.Item
+                    label={t('loopRouting')}
+                    style={{ marginLeft: '16px' }}
+                    name='loopRouting'
+                    valuePropName='checked'
+                >
+                    <Switch className={classes['routing-form-loop-disable']} />
+                </Form.Item>
+                <Form.Item shouldUpdate>
+                    {({ getFieldValue }) => {
+                        const isLoopRouting = getFieldValue('loopRouting');
+                        return isLoopRouting ? (
+                            <Form.Item
+                                label={t('setLooptimes')}
+                                style={{ marginLeft: '11px' }}
+                                name='cycleNumber'
+                                rules={[
+                                    () => ({
+                                        validator(_, value) {
+                                            // 必填校验逻辑
+                                            if (!value) {
+                                                return Promise.reject(new Error('Please enter'));
+                                            }
+                                            if (Number(value) > 10) {
+                                                return Promise.reject(new Error('Max loop times is 10'));
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <InputNumber type='number' max={10} precision={0} />
+                            </Form.Item>
+                        ) : null;
+                    }}
+                </Form.Item>
             </Form>
         </Modal>
     );

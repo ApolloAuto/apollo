@@ -1,3 +1,4 @@
+open_space_trajectory_optimizer_config {
     planner_open_space_config {
     warm_start_config {
         xy_grid_resolution: 0.3
@@ -130,3 +131,4 @@
     enable_linear_interpolation: false
     is_near_destination_theta_threshold: 0.1
     }
+}

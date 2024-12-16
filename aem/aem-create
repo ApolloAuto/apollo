@@ -215,6 +215,9 @@ parse_arguments() {
       --cpu)
         export APOLLO_ENV_USE_GPU_HOST=0
         ;;
+      --no-mount-env)
+        export APOLLO_NO_MOUNT_ENV=1
+        ;;
       --)
         env_args+=($@)
         break

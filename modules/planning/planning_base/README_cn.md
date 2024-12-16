@@ -14,7 +14,6 @@ modules/planning/planning_base
     ├── gflags                  // gflag参数配置
     ├── learning_based          // 基于学习算法相关库
     ├── math                    // 基础数学库
-    ├── open_space              // open_space相关算法库
     ├── proto                   // 公共（全局）参数配置结构定义
     ├── reference_line          // 参考线以及参考线处理类
     ├── testdata                // 单元测试数据

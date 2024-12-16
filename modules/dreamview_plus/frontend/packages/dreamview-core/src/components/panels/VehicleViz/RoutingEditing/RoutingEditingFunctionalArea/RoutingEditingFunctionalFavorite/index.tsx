@@ -88,7 +88,7 @@ function RoutingEditingFunctionalFavorite(props: RoutingEditingFunctionalFavorit
         const routeInfo = { initialPoint, wayPoint, cycleNumber };
         routeManager.currentRouteMix.setCurrentRouteMix({
             currentRouteLoop: {
-                currentRouteLoopState: true,
+                currentRouteLoopState: !!cycleNumber,
                 currentRouteLoopTimes: cycleNumber,
             },
         });

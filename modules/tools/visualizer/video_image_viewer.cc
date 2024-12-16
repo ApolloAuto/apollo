@@ -50,7 +50,7 @@ void VideoImgViewer::initializeGL() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   QImage noImage;
-  if (!noImage.load(tr(":/images/no_image.png"))) {
+  if (!noImage.load(tr("modules/tools/visualizer/images/no_image.png"))) {
     std::cout << "--------can not load the default texture------------"
               << std::endl;
     return;
