@@ -32,7 +32,7 @@ void report_error(PaError err, const std::string &func_name) {
 // Stream
 Stream::~Stream() {
   Pa_CloseStream(pastream_ptr_);
-  free(input_parameters_ptr_);
+  delete input_parameters_ptr_;
 }
 
 void Stream::init_stream(int rate, int channels, int chunk,

@@ -14,6 +14,7 @@ export const layerMenu = {
 
     Perception: '感知',
     pointCloud: '点云',
+    curbPointCloud: '路沿点云',
     pedestrian: '行人',
     vehicle: '车辆',
     bicycle: '自行车',
@@ -68,6 +69,8 @@ export const layerMenu = {
     yieldSign: '让行标志',
     speedBump: '减速带',
     parkingSpace: '停车位',
+    barrierGate: '道闸',
+    area: '区域',
     parkingSpaceId: '停车位ID',
     laneId: '车道ID',
     egoBoudingBox: '主车边界框',

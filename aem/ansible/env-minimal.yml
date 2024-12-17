@@ -1,0 +1,52 @@
+- name: Initialize host
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become_method: sudo
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Verify OS
+      ansible.builtin.fail:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not supported."
+      when:
+        - ansible_distribution != 'Ubuntu' and ansible_distribution_version not in ['22.04', '20.04', '18.04']
+        - ansible_distribution != 'Gentoo'
+
+    - name: Install Base Environment
+      include_role:
+        name: apolloauto.dev_env.base_env
+
+    - name: Install Cyber Dependencies
+      include_role:
+        name: apolloauto.dev_env.cyber_deps
+
+    - name: Install Modules Base Dependencies
+      include_role:
+        name: apolloauto.dev_env.modules_base
+
+    - name: Install Oridinary Modules Dependencies
+      include_role:
+        name: apolloauto.dev_env.ordinary_modules
+
+    - name: Install Drivers Dependencies
+      include_role:
+        name: apolloauto.dev_env.drivers_deps
+
+    - name: Install Dreamview Dependencies
+      include_role:
+        name: apolloauto.dev_env.dreamview_deps
+
+    - name: Install Contrib Dependencies
+      include_role:
+        name: apolloauto.dev_env.contrib_deps
+#
+#    - name: Install GPU Support
+#      include_role:
+#        name: apolloauto.dev_env.gpu_support
+#
+#    - name: Install Visualizer Dependencies
+#      include_role:
+#        name: apolloauto.dev_env.visualizer_deps

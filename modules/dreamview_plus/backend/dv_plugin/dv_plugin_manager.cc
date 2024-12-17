@@ -20,6 +20,7 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::cyber::plugin_manager::PluginManager;
+using apollo::dreamview::DataHandlerConf;
 
 void DvPluginManager::Init() {
   AutoLoadPlugins();
@@ -62,11 +63,17 @@ bool DvPluginManager::CreatePluginInstance(const std::string class_name) {
     dv_plugin_ptr->Init();
     auto websocket_handlers = dv_plugin_ptr->GetWebSocketHandlers();
     auto handlers = dv_plugin_ptr->GetHandlers();
+    auto updater_websocket_handlers = dv_plugin_ptr->GetUpdaterHandlers();
     if (!websocket_handlers.empty()) {
       RegisterWebsocketHandlers(websocket_handlers);
     }
     if (!handlers.empty()) {
       RegisterHandlers(handlers);
+    }
+    if (!updater_websocket_handlers.empty()) {
+      auto plugin_data_handler_conf = dv_plugin_ptr->GetDataHandlerConf();
+      RegisterUpdaterHandlers(updater_websocket_handlers,
+                              plugin_data_handler_conf);
     }
     plugin_instance_map_[class_name] = dv_plugin_ptr;
   }
@@ -91,6 +98,35 @@ void DvPluginManager::RegisterHandlers(
     std::map<std::string, CivetHandler *> &hander_map) {
   for (auto &handler : hander_map) {
     server_->addHandler(handler.first, *handler.second);
+  }
+}
+
+void DvPluginManager::RegisterUpdaterHandlers(
+    std::map<std::string, UpdaterBase *> &updater_handler_map,
+    const DataHandlerConf &data_handler_conf) {
+  // 1. register updater
+  for (auto &handler : updater_handler_map) {
+    AINFO << "RegisterUpdaterHandlers: " << handler.first;
+    updater_manager_->RegisterUpdater(handler.first, handler.second);
+  }
+  // 2. register data handler info
+  for (auto &handler : data_handler_conf.data_handler_info()) {
+    if (data_handler_conf_.data_handler_info().find(handler.first) !=
+        data_handler_conf_.data_handler_info().end()) {
+      AERROR << "There are duplicate updater handlers between dv plugins";
+      continue;
+    }
+    auto data_handler_info = data_handler_conf_.mutable_data_handler_info();
+    (*data_handler_info)[handler.first] = handler.second;
+  }
+  AINFO << "RegisterUpdaterHandlers: data_handler_conf_: "
+        << data_handler_conf_.DebugString();
+}
+
+void DvPluginManager::Stop() {
+  for (const auto &instance : plugin_instance_map_) {
+    AINFO << "Instance: " << instance.first << " stopped";
+    instance.second->Stop();
   }
 }
 

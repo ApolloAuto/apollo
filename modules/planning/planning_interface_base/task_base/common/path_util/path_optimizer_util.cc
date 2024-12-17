@@ -93,38 +93,6 @@ PathOptimizerUtil::ConvertPathPointRefFromFrontAxeToRearAxe(
   return ret;
 }
 
-void PathOptimizerUtil::CalculateVertexConstraints(
-    const SLState& init_state, const PathBoundary& path_boundary,
-    ADCVertexConstraints* adc_vertex_constraints) {
-  // front_edge_to_center in Apollo is the front edge to rear center
-  double front_edge_to_center = apollo::common::VehicleConfigHelper::GetConfig()
-                                    .vehicle_param()
-                                    .front_edge_to_center();
-  for (size_t i = 0; i < path_boundary.size(); i++) {
-    double rear_axle_s = path_boundary[i].s - front_edge_to_center;
-    if (rear_axle_s <= path_boundary.start_s()) {
-      continue;
-    }
-    size_t left_index = 0;
-    size_t right_index = 0;
-    double left_weight = 0.0;
-    double right_weight = 0.0;
-    if (!path_boundary.get_interpolated_s_weight(rear_axle_s, &left_weight,
-                                                 &right_weight, &left_index,
-                                                 &right_index)) {
-      AERROR << "Fail to find vertex path bound point in path boundary: "
-             << path_boundary[i].s
-             << "path boundary start s: " << path_boundary.front().s
-             << ", path boundary end s: " << path_boundary.back().s;
-      continue;
-    }
-    adc_vertex_constraints->emplace_back(
-        left_weight, right_weight, path_boundary[i].l_lower.l,
-        path_boundary[i].l_upper.l, left_index, right_index, rear_axle_s);
-  }
-  adc_vertex_constraints->front_edge_to_center = front_edge_to_center;
-}
-
 bool PathOptimizerUtil::OptimizePath(
     const SLState& init_state, const std::array<double, 3>& end_state,
     std::vector<double> l_ref, std::vector<double> l_ref_weight,
@@ -135,15 +103,19 @@ bool PathOptimizerUtil::OptimizePath(
   // num of knots
   const auto& lat_boundaries = path_boundary.boundary();
   const size_t kNumKnots = lat_boundaries.size();
+  AINFO << "kNumKnots: " << kNumKnots;
 
   double delta_s = path_boundary.delta_s();
   PiecewiseJerkPathProblem piecewise_jerk_problem(kNumKnots, delta_s,
                                                   init_state.second);
 
-  ADCVertexConstraints adc_vertex_constraints;
-  // CalculateVertexConstraints(init_state, path_boundary,
-  // &adc_vertex_constraints);
+  const auto& adc_vertex_constraints = path_boundary.adc_vertex_bound();
   const auto& extra_bound = path_boundary.extra_path_bound();
+  // get reference towing l
+  std::vector<double> towing_l_ref;
+  for (auto& path_boundary_pt : path_boundary) {
+    towing_l_ref.emplace_back(path_boundary_pt.towing_l);
+  }
   PrintCurves print_curve;
   for (size_t i = 0; i < adc_vertex_constraints.size(); i++) {
     print_curve.AddPoint(path_boundary.label() + "_vertex_l_lower",
@@ -167,6 +139,8 @@ bool PathOptimizerUtil::OptimizePath(
   for (size_t i = 0; i < kNumKnots; i++) {
     double s = i * path_boundary.delta_s() + path_boundary.start_s();
     print_curve.AddPoint(path_boundary.label() + "_ref_l", s, l_ref[i]);
+    print_curve.AddPoint(path_boundary.label() + "_towing_ref_l", s,
+                         towing_l_ref[i]);
     print_curve.AddPoint(path_boundary.label() + "_ref_l_weight", s,
                          l_ref_weight[i]);
     print_curve.AddPoint(path_boundary.label() + "_l_lower", s,
@@ -190,6 +164,8 @@ bool PathOptimizerUtil::OptimizePath(
                                              config.weight_end_state_ddl()};
   piecewise_jerk_problem.set_end_state_ref(end_state_weight, end_state);
   piecewise_jerk_problem.set_x_ref(std::move(l_ref_weight), l_ref);
+  piecewise_jerk_problem.set_towing_x_ref(config.l_weight(), towing_l_ref);
+
   // for debug:here should use std::move
   piecewise_jerk_problem.set_weight_x(config.l_weight());
   piecewise_jerk_problem.set_weight_dx(config.dl_weight());
@@ -257,9 +233,7 @@ bool PathOptimizerUtil::OptimizePathWithTowingPoints(
   double delta_s = path_boundary.delta_s();
   PiecewiseJerkPathProblem piecewise_jerk_problem(kNumKnots, delta_s,
                                                   init_state.second);
-  ADCVertexConstraints adc_vertex_constraints;
-  // CalculateVertexConstraints(init_state, path_boundary,
-  // &adc_vertex_constraints);
+  const auto& adc_vertex_constraints = path_boundary.adc_vertex_bound();
   const auto& extra_bound = path_boundary.extra_path_bound();
   PrintCurves print_curve;
   for (size_t i = 0; i < adc_vertex_constraints.size(); i++) {
@@ -367,12 +341,19 @@ void PathOptimizerUtil::UpdatePathRefWithBound(
     std::vector<double>* ref_l, std::vector<double>* weight_ref_l) {
   ref_l->resize(path_boundary.size());
   weight_ref_l->resize(path_boundary.size());
+  const double kEpison = 1e-2;
   for (size_t i = 0; i < ref_l->size(); i++) {
-    if (path_boundary[i].l_lower.type == BoundType::OBSTACLE ||
-        path_boundary[i].l_upper.type == BoundType::OBSTACLE) {
+    bool is_need_update_path_ref =
+        (path_boundary[i].l_lower.type == BoundType::OBSTACLE ||
+         path_boundary[i].l_upper.type == BoundType::OBSTACLE) &&
+        (path_boundary[i].l_lower.l > path_boundary[i].towing_l - kEpison ||
+         path_boundary[i].l_upper.l < path_boundary[i].towing_l + kEpison);
+    if (is_need_update_path_ref) {
       ref_l->at(i) =
           (path_boundary[i].l_lower.l + path_boundary[i].l_upper.l) / 2.0;
       weight_ref_l->at(i) = weight;
+      AINFO << "need_update_path_ref: s: " << path_boundary[i].s
+            << ", l: " << ref_l->at(i);
     } else {
       weight_ref_l->at(i) = 0;
     }
@@ -385,9 +366,6 @@ void PathOptimizerUtil::UpdatePathRefWithBound(
     std::vector<double>* weight_ref_l) {
   ref_l->resize(path_boundary.size());
   weight_ref_l->resize(path_boundary.size());
-  double adc_half_width =
-      apollo::common::VehicleConfigHelper::GetConfig().vehicle_param().width() /
-      2.0;
   const double kEpison = 1e-2;
   for (size_t i = 0; i < ref_l->size(); i++) {
     bool is_need_update_path_ref =
@@ -413,14 +391,22 @@ void PathOptimizerUtil::UpdatePathRefWithBoundInSidePassDirection(
     bool is_left_side_pass) {
   ref_l->resize(path_boundary.size());
   weight_ref_l->resize(path_boundary.size());
+  const double kEpison = 1e-2;
   for (size_t i = 0; i < ref_l->size(); i++) {
-    if ((path_boundary[i].l_lower.type == BoundType::OBSTACLE &&
-         is_left_side_pass) ||
-        (path_boundary[i].l_upper.type == BoundType::OBSTACLE &&
-         !is_left_side_pass)) {
+    bool is_need_update_path_ref =
+        ((path_boundary[i].l_lower.type == BoundType::OBSTACLE &&
+          is_left_side_pass) ||
+         (path_boundary[i].l_upper.type == BoundType::OBSTACLE &&
+          !is_left_side_pass)) &&
+        (path_boundary[i].l_lower.l > path_boundary[i].towing_l - kEpison ||
+         path_boundary[i].l_upper.l < path_boundary[i].towing_l + kEpison);
+
+    if (is_need_update_path_ref) {
       ref_l->at(i) =
           (path_boundary[i].l_lower.l + path_boundary[i].l_upper.l) / 2.0;
       weight_ref_l->at(i) = weight;
+      AINFO << "need_update_path_ref: s: " << path_boundary[i].s
+            << ", l: " << ref_l->at(i);
     } else {
       weight_ref_l->at(i) = 0;
     }

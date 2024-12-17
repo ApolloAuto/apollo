@@ -78,6 +78,9 @@ message SimpleLongitudinalPlusDebug {
   optional bool form_go_to_full_stop = 46;
   optional bool begin_end_brake = 47;
   optional double hillup_fullstop_brake_rate = 48;
+  optional double vehicle_speed = 49;
+  optional double vehicle_speed_filter = 50;
+  optional double throttle_cmd_filter = 51;
 }
 
 message SimpleLateralPlusDebug {
@@ -350,6 +353,9 @@ message SimpleAntiSlopeDebug {
   optional bool only_use_brk_downhill = 15;
   optional bool erase_brk_in_go = 16;
   optional bool erase_brk_in_end = 17;
+  optional double hill_start_first_acc = 18;
+  optional double slope_start_acc = 19;
+  optional double slope_offset_compensation = 20;
 }
 
 message CleaningSafetyCheckDebug {

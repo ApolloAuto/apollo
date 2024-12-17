@@ -28,6 +28,8 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::PointENU;
+using apollo::hdmap::AreaInfoConstPtr;
+using apollo::hdmap::BarrierGateInfoConstPtr;
 using apollo::hdmap::ClearAreaInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
@@ -231,6 +233,18 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
     AERROR << "Failed to get yield signs from sim_map.";
   }
   ExtractIds(yield_signs, ids->mutable_yield());
+
+  std::vector<AreaInfoConstPtr> ad_areas;
+  if (SimMap()->GetAreas(point, radius, &ad_areas) != 0) {
+    AERROR << "Failed to get ad areas from sim_map.";
+  }
+  ExtractIds(ad_areas, ids->mutable_ad_area());
+
+  std::vector<BarrierGateInfoConstPtr> barrier_gates;
+  if (SimMap()->GetBarrierGates(point, radius, &barrier_gates) != 0) {
+    AERROR << "Failed to get barrier gate from sim_map.";
+  }
+  ExtractIds(barrier_gates, ids->mutable_barrier_gate());
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
@@ -334,6 +348,23 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
       *result.add_pnc_junction() = element->pnc_junction();
     }
   }
+
+  for (const auto &id : ids.ad_area()) {
+    map_id.set_id(id);
+    auto element = SimMap()->GetAreaById(map_id);
+    if (element) {
+      *result.add_ad_area() = element->area();
+    }
+  }
+
+  for (const auto &id : ids.barrier_gate()) {
+    map_id.set_id(id);
+    auto element = SimMap()->GetBarrierGateById(map_id);
+    if (element) {
+      *result.add_barrier_gate() = element->barrier_gate();
+    }
+  }
+
   apollo::hdmap::Header map_header;
   if (SimMap()->GetMapHeader(&map_header)) {
     result.mutable_header()->CopyFrom(map_header);

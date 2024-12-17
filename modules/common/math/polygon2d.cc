@@ -37,8 +37,9 @@ Polygon2d::Polygon2d(const Box2d &box) {
   BuildFromPoints();
 }
 
-Polygon2d::Polygon2d(std::vector<Vec2d> points) : points_(std::move(points)) {
-  BuildFromPoints();
+Polygon2d::Polygon2d(std::vector<Vec2d> points, bool check_area)
+    : points_(std::move(points)) {
+  BuildFromPoints(check_area);
 }
 
 double Polygon2d::DistanceTo(const Vec2d &point) const {
@@ -49,6 +50,23 @@ double Polygon2d::DistanceTo(const Vec2d &point) const {
   double distance = std::numeric_limits<double>::infinity();
   for (int i = 0; i < num_points_; ++i) {
     distance = std::min(distance, line_segments_[i].DistanceTo(point));
+  }
+  return distance;
+}
+
+double Polygon2d::DistanceTo(const Vec2d &point, Vec2d& closest_point) const {
+  CHECK_GE(points_.size(), 3U);
+  if (IsPointIn(point)) {
+    return 0.0;
+  }
+  double distance = std::numeric_limits<double>::infinity();
+  Vec2d closest_point_tmp;
+  for (int i = 0; i < num_points_; ++i) {
+    double dis = line_segments_[i].DistanceTo(point, &closest_point_tmp);
+    if (dis < distance) {
+      distance = dis;
+      closest_point = closest_point_tmp;
+    }
   }
   return distance;
 }
@@ -89,6 +107,49 @@ double Polygon2d::DistanceTo(const LineSegment2d &line_segment) const {
   return distance;
 }
 
+double Polygon2d::DistanceTo(const LineSegment2d &line_segment,
+                             Vec2d& polygon_closest_point,
+                             Vec2d& segment_closest_point) const {
+  if (line_segment.length() <= kMathEpsilon) {
+    segment_closest_point = line_segment.start();
+    return DistanceTo(line_segment.start(), polygon_closest_point);
+  }
+  CHECK_GE(points_.size(), 3U);
+
+  if (IsPointIn(line_segment.center())) {
+    return 0.0;
+  }
+  if (std::any_of(line_segments_.begin(), line_segments_.end(),
+                  [&](const LineSegment2d &poly_seg) {
+                    return poly_seg.HasIntersect(line_segment);
+                  })) {
+    return 0.0;
+  }
+  double distance = std::numeric_limits<double>::infinity();
+  Vec2d start_closest_point, end_closest_point;
+  double distance_start = DistanceTo(line_segment.start(), start_closest_point);
+  double distance_end = DistanceTo(line_segment.end(), end_closest_point);
+  if (distance_start <= distance_end) {
+    segment_closest_point = line_segment.start();
+    polygon_closest_point = start_closest_point;
+    distance = distance_start;
+  } else {
+    segment_closest_point = line_segment.end();
+    polygon_closest_point = end_closest_point;
+    distance = distance_end;
+  }
+  Vec2d closest_point_tmp;
+  for (int i = 0; i < num_points_; ++i) {
+      double dis = line_segment.DistanceTo(points_[i], &closest_point_tmp);
+      if (dis < distance) {
+        distance = dis;
+        segment_closest_point = closest_point_tmp;
+        polygon_closest_point = points_[i];
+      }
+  }
+  return distance;
+}
+
 double Polygon2d::DistanceTo(const Box2d &box) const {
   CHECK_GE(points_.size(), 3U);
   return DistanceTo(Polygon2d(box));
@@ -107,6 +168,25 @@ double Polygon2d::DistanceTo(const Polygon2d &polygon) const {
   double distance = std::numeric_limits<double>::infinity();
   for (int i = 0; i < num_points_; ++i) {
     distance = std::min(distance, polygon.DistanceTo(line_segments_[i]));
+  }
+  return distance;
+}
+
+double Polygon2d::DistanceTo(const Polygon2d& polygon,
+                             Vec2d& self_closest_point,
+                             Vec2d& other_closest_point) const {
+  CHECK_GE(points_.size(), 3U);
+  CHECK_GE(polygon.num_points(), 3);
+  double distance = std::numeric_limits<double>::infinity();
+  Vec2d segment_closest_point_tmp, polygon_closest_point_tmp;
+  for (int i = 0; i < num_points_; ++i) {
+    double dis = polygon.DistanceTo(line_segments_[i],
+            polygon_closest_point_tmp, segment_closest_point_tmp);
+    if (dis < distance) {
+      distance = dis;
+      self_closest_point = segment_closest_point_tmp;
+      other_closest_point = polygon_closest_point_tmp;
+    }
   }
   return distance;
 }
@@ -210,7 +290,7 @@ int Polygon2d::Next(int at) const { return at >= num_points_ - 1 ? 0 : at + 1; }
 
 int Polygon2d::Prev(int at) const { return at == 0 ? num_points_ - 1 : at - 1; }
 
-void Polygon2d::BuildFromPoints() {
+void Polygon2d::BuildFromPoints(bool check_area) {
   num_points_ = static_cast<int>(points_.size());
   CHECK_GE(num_points_, 3);
 
@@ -224,7 +304,9 @@ void Polygon2d::BuildFromPoints() {
     std::reverse(points_.begin(), points_.end());
   }
   area_ /= 2.0;
-  CHECK_GT(area_, kMathEpsilon);
+  if (check_area) {
+    CHECK_GT(area_, kMathEpsilon);
+  }
 
   // Construct line_segments.
   line_segments_.reserve(num_points_);
@@ -256,7 +338,7 @@ void Polygon2d::BuildFromPoints() {
 }
 
 bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
-                                  Polygon2d *const polygon) {
+                                  Polygon2d *const polygon, bool check_area) {
   CHECK_NOTNULL(polygon);
   const int n = static_cast<int>(points.size());
   if (n < 3) {
@@ -304,7 +386,7 @@ bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
   for (int i = 0; i < count; ++i) {
     result_points.push_back(points[results[i]]);
   }
-  *polygon = Polygon2d(result_points);
+  *polygon = Polygon2d(result_points, check_area);
   return true;
 }
 
@@ -358,7 +440,7 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
       return false;
     }
   }
-  return ComputeConvexHull(points, overlap_polygon);
+  return ComputeConvexHull(points, overlap_polygon, false);
 }
 
 double Polygon2d::ComputeIoU(const Polygon2d &other_polygon) const {
@@ -629,6 +711,12 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
 }
 
 Polygon2d Polygon2d::PolygonExpandByDistance(const double distance) const {
+  if (!is_convex_) {
+    Polygon2d convex_polygon;
+    ComputeConvexHull(points_, &convex_polygon);
+    ACHECK(convex_polygon.is_convex());
+    return convex_polygon.PolygonExpandByDistance(distance);
+  }
   std::vector<Vec2d> points;
   for (int i = 0; i < num_points_; ++i) {
     double v1x = points_[Prev(i)].x() - points_[i].x();
@@ -670,6 +758,17 @@ void Polygon2d::CalculateVertices(const Vec2d &shift_vec) {
     max_y_ = std::fmax(point.y(), max_y_);
     min_y_ = std::fmin(point.y(), min_y_);
   }
+}
+
+LineSegment2d Polygon2d::MinLineSegment() const {
+  double min_length_of_line_segment = 10e3;
+  LineSegment2d line_segment;
+  for (auto &line_segment_ : line_segments_) {
+    if (line_segment_.length() < min_length_of_line_segment) {
+      line_segment = line_segment_;
+    }
+  }
+  return line_segment;
 }
 
 std::string Polygon2d::DebugString() const {

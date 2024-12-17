@@ -301,7 +301,7 @@ inline double SecToMs(const double sec) { return sec * 1000.0; }
 }  // namespace
 
 constexpr int SimulationWorldService::kMaxMonitorItems;
-
+bool SimulationWorldService::to_clear_ = false;
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
     : node_(cyber::CreateNode("simulation_world")),

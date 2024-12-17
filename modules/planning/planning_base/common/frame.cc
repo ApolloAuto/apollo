@@ -213,7 +213,8 @@ bool Frame::CreateReferenceLineInfo(
  */
 const Obstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
-    const std::string &obstacle_id, const double obstacle_s) {
+    const std::string &obstacle_id, const double obstacle_s,
+    double stop_wall_width) {
   if (reference_line_info == nullptr) {
     AERROR << "reference_line_info nullptr";
     return nullptr;
@@ -223,9 +224,8 @@ const Obstacle *Frame::CreateStopObstacle(
   const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
   auto box_center = reference_line.GetReferencePoint(box_center_s);
   double heading = reference_line.GetReferencePoint(obstacle_s).heading();
-  static constexpr double kStopWallWidth = 4.0;
   Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
-                      kStopWallWidth};
+                      stop_wall_width};
 
   return CreateStaticVirtualObstacle(obstacle_id, stop_wall_box);
 }
@@ -349,6 +349,9 @@ Status Frame::Init(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   future_route_waypoints_ = future_route_waypoints;
+  for (auto &reference_line_info : reference_line_info_) {
+    reference_line_info.PrintReferenceSegmentDebugString();
+  }
   return Status::OK();
 }
 

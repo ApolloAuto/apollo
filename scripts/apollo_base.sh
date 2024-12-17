@@ -50,49 +50,6 @@ function set_lib_path() {
   pathprepend /apollo/modules/teleop/common/scripts
 }
 
-function site_restore() {
-  [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE"
-  echo "" > "${TOP_DIR}/tools/package/rules_cc.patch"
-  [[ -e "${TOP_DIR}/tools/proto/proto.bzl.tpl" ]] && rm -f "${TOP_DIR}/tools/proto/proto.bzl" && cp "${TOP_DIR}/tools/proto/proto.bzl.tpl" "${TOP_DIR}/tools/proto/proto.bzl"
-  if [[ -e "${TOP_DIR}/tools/package/dynamic_deps.bzl" ]]; then
-    echo "STATUS = 0" > "${TOP_DIR}/tools/package/dynamic_deps.bzl"
-    echo "SOURCE = {}" >> "${TOP_DIR}/tools/package/dynamic_deps.bzl"
-    echo "BINARY = {}" >> "${TOP_DIR}/tools/package/dynamic_deps.bzl"
-  fi
-  if which buildtool > /dev/null 2>&1; then
-    sudo apt remove -y apollo-neo-buildtool
-  fi
-  # switch back to standalone mode to increase building speed
-  sed -i 's/build --spawn_strategy=sandboxed/build --spawn_strategy=standalone/' "${TOP_DIR}/tools/bazel.rc"
-  # recover ld cache
-  sudo bash -c "echo '/opt/apollo/sysroot/lib' > /etc/ld.so.conf.d/apollo.conf"
-  sudo bash -c "echo '/usr/local/fast-rtps/lib' >> /etc/ld.so.conf.d/apollo.conf"
-  sudo bash -c "echo '/opt/apollo/absl/lib' >> /etc/ld.so.conf.d/apollo.conf"
-  sudo bash -c "echo '/opt/apollo/pkgs/adv_plat/lib' >> /etc/ld.so.conf.d/apollo.conf"
-  return 0
-}
-
-function env_prepare() {
-  set +e
-  mkdir -p /opt/apollo/neo/src
-  dpkg -l apollo-neo-buildtool > /dev/null 2>&1
-  [[ $? -ne 0 ]] && set -e && sudo apt-get install -y ca-certificates curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings &&
-    curl -fsSL https://apollo-pkg-beta.cdn.bcebos.com/neo/beta/key/deb.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/apolloauto.gpg &&
-    sudo chmod a+r /etc/apt/keyrings/apolloauto.gpg && echo \
-    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/apolloauto.gpg] https://apollo-pkg-beta.cdn.bcebos.com/apollo/core" \
-    $(. /etc/os-release && echo "$VERSION_CODENAME") "main" | sudo tee /etc/apt/sources.list.d/apolloauto.list &&
-    sudo apt-get update && sudo apt-get install -y apollo-neo-buildtool apollo-neo-env-manager-dev &&
-    sudo touch /.installed && sudo sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
-  source /opt/apollo/neo/setup.sh
-  # currently, only sandboxed available in package managerment env
-  if cat "${TOP_DIR}/tools/bazel.rc" | grep standalone; then
-    sed -i 's/build --spawn_strategy=standalone/build --spawn_strategy=sandboxed/' "${TOP_DIR}/tools/bazel.rc"
-    rm -rf "${TOP_DIR}/.cache"
-  fi
-  rm -rf "${TOP_DIR}/dev"
-  return 0
-}
-
 function create_data_dir() {
   local DATA_DIR="${APOLLO_ROOT_DIR}/data"
   mkdir -p "${DATA_DIR}/log"

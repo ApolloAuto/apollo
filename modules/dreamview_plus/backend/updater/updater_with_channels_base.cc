@@ -24,9 +24,28 @@
 namespace apollo {
 
 namespace dreamview {
+UpdaterWithChannelsBase::UpdaterWithChannelsBase(
+    const std::vector<std::string> &filter_message_types,
+    const std::vector<std::string> &filter_channels)
+    : filter_message_types_(filter_message_types),
+      filter_channels_(filter_channels) {}
+
+bool UpdaterWithChannelsBase::IsChannelInUpdater(
+    const std::string &message_type, const std::string &channel_name) {
+  if (filter_message_types_.size() == 0 && filter_channels_.size() == 0) {
+    return true;
+  }
+  for (size_t i = 0; i < filter_message_types_.size(); ++i) {
+    if (message_type.rfind(filter_message_types_[i]) != std::string::npos &&
+        channel_name.rfind(filter_channels_[i]) != std::string::npos) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void UpdaterWithChannelsBase::GetChannelMsgWithFilter(
-    std::vector<std::string> *channels, const std::string &filter_message_type,
-    const std::string &filter_channel) {
+    std::vector<std::string> *channels) {
   auto channelManager =
       apollo::cyber::service_discovery::TopologyManager::Instance()
           ->channel_manager();
@@ -49,15 +68,7 @@ void UpdaterWithChannelsBase::GetChannelMsgWithFilter(
     std::string node_name;
     messageType = role_attr.message_type();
     node_name = role_attr.node_name();
-    int index = 0;
-    if (!filter_message_type.empty()) {
-      index = messageType.rfind(filter_message_type);
-    }
-    int index_channel = 0;
-    if (!filter_channel.empty()) {
-      index_channel = role_attr.channel_name().rfind(filter_channel);
-    }
-    if (index != -1 && index_channel != -1) {
+    if (IsChannelInUpdater(messageType, role_attr.channel_name())) {
       if (current_record.empty() ||
           std::find(other_record_node_name.begin(),
                     other_record_node_name.end(),

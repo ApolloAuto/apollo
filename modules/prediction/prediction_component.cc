@@ -40,6 +40,7 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::cyber::Clock;
 using apollo::perception::PerceptionObstacles;
+using apollo::perception::PerceptionWaste;
 using apollo::planning::ADCTrajectory;
 
 PredictionComponent::~PredictionComponent() {}
@@ -251,6 +252,12 @@ bool PredictionComponent::PredictionEndToEndProc(
       perception_msg.header().camera_timestamp());
   prediction_obstacles.mutable_header()->set_radar_timestamp(
       perception_msg.header().radar_timestamp());
+
+  for (const PerceptionWaste& perception_waste :
+      perception_msg.perception_waste()) {
+    prediction_obstacles.add_perception_waste()->CopyFrom(
+      perception_waste);
+  }
 
   prediction_obstacles.set_perception_error_code(perception_msg.error_code());
 

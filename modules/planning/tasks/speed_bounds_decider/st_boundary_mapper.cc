@@ -238,7 +238,9 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     }
 
     if (box_check_collision) {
-      const double backward_distance = -vehicle_param_.front_edge_to_center();
+      // const double backward_distance =
+      // -vehicle_param_.front_edge_to_center();
+      const double backward_distance = 0;
       const double forward_distance = obs_box.length();
 
       for (const auto& curr_point_on_path : path_points) {
@@ -252,13 +254,21 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
               std::fmax(0.0, curr_point_on_path.s() + backward_distance);
           double high_s = std::fmin(planning_max_distance_,
                                     curr_point_on_path.s() + forward_distance);
+          AINFO << "check colllision for obstacle[" << obstacle.Id()
+                << "], at: " << curr_point_on_path.DebugString();
           // It is an unrotated rectangle appearing on the ST-graph.
           // TODO(jiacheng): reconsider the backward_distance, it might be
           // unnecessary, but forward_distance is indeed meaningful though.
-          lower_points->emplace_back(low_s, 0.0);
-          lower_points->emplace_back(low_s, planning_max_time_);
-          upper_points->emplace_back(high_s, 0.0);
-          upper_points->emplace_back(high_s, planning_max_time_);
+          lower_points->emplace_back(
+              low_s - speed_bounds_config_.point_extension(), 0.0);
+          lower_points->emplace_back(
+              low_s - speed_bounds_config_.point_extension(),
+              planning_max_time_);
+          upper_points->emplace_back(
+              high_s + speed_bounds_config_.point_extension(), 0.0);
+          upper_points->emplace_back(
+              high_s + speed_bounds_config_.point_extension(),
+              planning_max_time_);
           break;
         }
       }
@@ -352,7 +362,8 @@ bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
         discretized_path.Evaluate(path_s + discretized_path.front().s());
     if (CheckOverlap(curr_adc_path_point, obstacle_shape, l_buffer)) {
       // Found overlap, start searching with higher resolution
-      const double backward_distance = -step_length;
+      // const double backward_distance = -step_length;
+      const double backward_distance = 0.0;
       const double forward_distance = vehicle_param_.length() +
                                       vehicle_param_.width() + obstacle_length +
                                       obstacle_width;

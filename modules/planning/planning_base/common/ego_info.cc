@@ -104,5 +104,12 @@ void EgoInfo::CalculateFrontObstacleClearDistance(
   }
 }
 
+void EgoInfo::CalculateCurrentRouteInfo(
+    const ReferenceLineProvider* reference_line_provider) {
+  reference_line_provider->GetAdcWaypoint(&adc_waypoint_);
+  reference_line_provider->GetAdcDis2Destination(&distance_to_destination_);
+  AINFO << adc_waypoint_.DebugString();
+  AINFO << "distance_to_destination: " << distance_to_destination_;
+}
 }  // namespace planning
 }  // namespace apollo

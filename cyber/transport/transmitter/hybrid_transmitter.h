@@ -25,12 +25,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/proto/role_attributes.pb.h"
+#include "cyber/proto/transport_conf.pb.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
-#include "cyber/proto/role_attributes.pb.h"
-#include "cyber/proto/transport_conf.pb.h"
 #include "cyber/task/task.h"
+#include "cyber/transport/dispatcher/rtps_dispatcher.h"
 #include "cyber/transport/message/history.h"
 #include "cyber/transport/rtps/participant.h"
 #include "cyber/transport/transmitter/intra_transmitter.h"
@@ -70,6 +71,8 @@ class HybridTransmitter : public Transmitter<M> {
   void Disable(const RoleAttributes& opposite_attr) override;
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
+
+  bool AcquireMessage(std::shared_ptr<M>& msg);
 
  private:
   void InitMode();
@@ -141,7 +144,7 @@ void HybridTransmitter<M>::Enable(const RoleAttributes& opposite_attr) {
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
   receivers_[mapping_table_[relation]].insert(id);
-  transmitters_[mapping_table_[relation]]->Enable();
+  transmitters_[mapping_table_[relation]]->Enable(opposite_attr);
   TransmitHistoryMsg(opposite_attr);
 }
 
@@ -155,9 +158,7 @@ void HybridTransmitter<M>::Disable(const RoleAttributes& opposite_attr) {
   uint64_t id = opposite_attr.id();
   std::lock_guard<std::mutex> lock(mutex_);
   receivers_[mapping_table_[relation]].erase(id);
-  if (receivers_[mapping_table_[relation]].empty()) {
-    transmitters_[mapping_table_[relation]]->Disable();
-  }
+  transmitters_[mapping_table_[relation]]->Disable(opposite_attr);
 }
 
 template <typename M>
@@ -165,10 +166,23 @@ bool HybridTransmitter<M>::Transmit(const MessagePtr& msg,
                                     const MessageInfo& msg_info) {
   std::lock_guard<std::mutex> lock(mutex_);
   history_->Add(msg, msg_info);
+  bool return_val = false;
   for (auto& item : transmitters_) {
     item.second->Transmit(msg, msg_info);
   }
   return true;
+}
+
+template <typename M>
+bool HybridTransmitter<M>::AcquireMessage(std::shared_ptr<M>& msg) {
+  bool result = false;
+  for (auto& item : transmitters_) {
+    result = item.second->AcquireMessage(msg);
+    if (result) {
+      return true;
+    }
+  }
+  return false;
 }
 
 template <typename M>

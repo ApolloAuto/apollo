@@ -507,6 +507,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetSignalById(object_map_id) != nullptr) {
         signals_.emplace_back(overlap_ptr);
       }
+      if (map_instance.GetBarrierGateById(object_map_id) != nullptr) {
+        barrier_gates_.emplace_back(overlap_ptr);
+      }
       if (map_instance.GetYieldSignById(object_map_id) != nullptr) {
         yield_signs_.emplace_back(overlap_ptr);
       }
@@ -530,6 +533,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       }
       if (map_instance.GetPNCJunctionById(object_map_id) != nullptr) {
         pnc_junctions_.emplace_back(overlap_ptr);
+      }
+      if (map_instance.GetAreaById(object_map_id) != nullptr) {
+        areas_.emplace_back(overlap_ptr);
       }
     }
   }
@@ -587,10 +593,66 @@ void JunctionInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
   }
 }
 
+AreaInfo::AreaInfo(const Area &ad_area) : ad_area_(ad_area) { Init(); }
+
+void AreaInfo::Init() {
+  polygon_ = ConvertToPolygon2d(ad_area_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
+
+  for (const auto &overlap_id : ad_area_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
+}
+
+void AreaInfo::PostProcess(const HDMapImpl &map_instance) {
+  UpdateOverlaps(map_instance);
+}
+
+void AreaInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
+  for (const auto &overlap_id : overlap_ids_) {
+    const auto &overlap_ptr = map_instance.GetOverlapById(overlap_id);
+    if (overlap_ptr == nullptr) {
+      continue;
+    }
+
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == id().id()) {
+        continue;
+      }
+
+      if (object.has_area_overlap_info()) {
+        auto area =
+            map_instance.GetAreaById(map_instance.CreateHDMapId(object_id));
+        if (area->type() == Area::UnDriveable)
+          overlap_undriveable_areas_.push_back(area);
+      }
+    }
+  }
+}
+
 SignalInfo::SignalInfo(const Signal &signal) : signal_(signal) { Init(); }
 
 void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
+    SegmentsFromCurve(stop_line, &segments_);
+  }
+  ACHECK(!segments_.empty());
+  std::vector<Vec2d> points;
+  for (const auto &segment : segments_) {
+    points.emplace_back(segment.start());
+    points.emplace_back(segment.end());
+  }
+  CHECK_GT(points.size(), 0U);
+}
+
+BarrierGateInfo::BarrierGateInfo(const BarrierGate &barrier_gate)
+    : barrier_gate_(barrier_gate) {
+  Init();
+}
+
+void BarrierGateInfo::Init() {
+  for (const auto &stop_line : barrier_gate_.stop_line()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
   ACHECK(!segments_.empty());

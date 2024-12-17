@@ -60,9 +60,6 @@ class MessageInfo {
 
   static const std::size_t kSize;
 
-  int32_t msg_seq_num() const { return msg_seq_num_; }
-  void set_msg_seq_num(int32_t msg_seq_num) { msg_seq_num_ = msg_seq_num; }
-
   uint64_t send_time() const { return send_time_; }
   void set_send_time(uint64_t send_time) { send_time_ = send_time; }
 
@@ -71,7 +68,6 @@ class MessageInfo {
   uint64_t channel_id_ = 0;
   uint64_t seq_num_ = 0;
   Identity spare_id_;
-  int32_t msg_seq_num_;
   uint64_t send_time_;
 };
 

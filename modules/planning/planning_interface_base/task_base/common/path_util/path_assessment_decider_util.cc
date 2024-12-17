@@ -47,10 +47,10 @@ bool PathAssessmentDeciderUtil::IsValidRegularPath(
     return false;
   }
   // Check if there is any collision.
-  if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
-    AINFO << path_data.path_label() << ": ADC has collision.";
-    return false;
-  }
+  // if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
+  //   AINFO << path_data.path_label() << ": ADC has collision.";
+  //   return false;
+  // }
 
   if (IsStopOnReverseNeighborLane(reference_line_info, path_data)) {
     AERROR << path_data.path_label() << ": stop at reverse neighbor lane";
@@ -156,7 +156,7 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
       for (const auto& corner_point : ABCDpoints) {
         if (obstacle_polygon.IsPointIn(corner_point)) {
           AERROR << "ADC is colliding with obstacle at path s = "
-                 << path_point.s() << "with obstacle " << obstacle->Id();
+                 << path_point.s() << ", with obstacle " << obstacle->Id();
           return true;
         }
       }

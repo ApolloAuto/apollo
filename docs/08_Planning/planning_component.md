@@ -9,7 +9,7 @@ This article describes the architecture of planning module. It mainly consists o
 
 # Where is the code
 
-Please refer to [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_component.h).
+Please refer to [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_component/planning_component.h).
 
 # Code Reading
 

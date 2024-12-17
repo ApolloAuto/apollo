@@ -221,6 +221,7 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   base::ObjectPool::Instance().BatchGet(num_objects, &tracked_objects);
   size_t pos = 0;
   size_t num_predict = 0;
+  size_t num_delay_output = 0;
   size_t num_front_critical_reserve = 0;
   size_t num_blind_trafficcone = 0;
   auto collect = [&](std::vector<MlfTrackDataPtr>* tracks) {
@@ -238,10 +239,11 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
       // }
       if (track_data->age_ <= pub_track_times_) {
           if (track_data->is_front_critical_track_) {
-              AINFO << "[DelayOutput] track_id: " << track_data->track_id_
+              ADEBUG << "[DelayOutput] track_id: " << track_data->track_id_
                     << " time is " << std::to_string(frame->timestamp)
                     << " not output";
           }
+          ++num_delay_output;
           continue;
       }
       track_data->is_reserve_blind_cone_ = false;
@@ -313,17 +315,16 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   };
   collect(&foreground_track_data_);
   collect(&background_track_data_);
-  if (num_predict != 0) {
-    AINFO << "MlfEngine, num_predict: " << num_predict
-          << " num front_critical: " << num_front_critical_reserve
-          << " num blind trafficcone: " << num_blind_trafficcone
-          << " num_objects: " << num_objects;
-    if (num_predict > num_objects) {
-      AERROR << "num_predict > num_objects";
-      return;
-    }
-    tracked_objects.resize(num_objects - num_predict);
+  AINFO << "MlfEngine, num_predict: " << num_predict
+        << " num delay_output: " << num_delay_output
+        << " num front_critical: " << num_front_critical_reserve
+        << " num blind trafficcone: " << num_blind_trafficcone
+        << " num_objects: " << num_objects;
+  if (num_predict > num_objects) {
+    AERROR << "num_predict > num_objects";
+    return;
   }
+  tracked_objects.resize(num_objects - num_predict - num_delay_output);
 }
 
 void MlfEngine::RemoveStaleTrackData(const std::string& name, double timestamp,

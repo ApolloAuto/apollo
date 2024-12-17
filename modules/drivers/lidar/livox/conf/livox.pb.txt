@@ -9,5 +9,6 @@ config_base {
 
 lidar_config_file_path: "/apollo/modules/drivers/lidar/livox/conf/mid360_config.json"
 enable_sdk_console_log: false
+use_lidar_clock: false
 integral_time: 0.1
 lidar_ip: "192.168.10.238"

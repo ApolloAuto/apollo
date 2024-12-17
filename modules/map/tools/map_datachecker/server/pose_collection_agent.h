@@ -35,12 +35,14 @@ class PoseCollectionAgent {
       const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>
           &bestgnsspos);
   std::shared_ptr<std::vector<FramePose>> GetPoses() const;
+  ~PoseCollectionAgent();
 
  private:
   void Reset();
 
  private:
   std::mutex mutex_;
+  FILE *pose_file = nullptr;
   std::shared_ptr<PoseCollection> sp_pose_collection_ = nullptr;
   std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<PJTransformer> sp_pj_transformer_ = nullptr;

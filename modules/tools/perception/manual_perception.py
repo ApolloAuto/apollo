@@ -4,9 +4,10 @@ import modules.common_msgs.perception_msgs.perception_obstacle_pb2 as perception
 import threading
 import time
 import math
-obs_poly = [[]] * 2
-obs_poly[0] = [(423957.04,4437974.2), (423960.17,4437974.2), (423960.17,4437970.0),(423957.04,4437970.0)]
-obs_poly[1] = [(423959.11,4437960.2), (423957.31,4437960.2), (423957.31,4437958.2),(423959.11,4437958.2)]
+obs_poly = [[]] * 3
+obs_poly[0] = [(437414.87645352894,4432519.946737605), (437420.7041803445,4432520.805670921),(437420.904429548,4432519.7323507555), (437415.23280138825,4432518.528933371)]
+obs_poly[1] = [(437425.53023894905,4432521.440094629), (437429.9091883166,4432522.236959719), (437430.34108831757,4432520.733608818), (437425.9870466118,4432519.591352716)]
+obs_poly[2] = [(437450.06361092144,4432525.741517296), (437455.1306381259,4432526.629585601), (437455.58288495895,4432524.2411506865), (437449.8351994263,4432523.395266685)]
 # obs_poly[1] = [(751041.65, 2563971.9), (751044.12,
 #                                         2563976.5), (751038.53, 2563984.9)]
 # obs_poly = [[]]
@@ -43,9 +44,8 @@ def generate_corner_coordinates(obs_polygon, obs_pb):
 def add_obs(obs,id,msg_pb):
     obs_pb = msg_pb.perception_obstacle.add()
     generate_corner_coordinates(obs, obs_pb)
-    obs_pb.type = perception_obstacle_pb2.PerceptionObstacle.VEHICLE
+    obs_pb.type = perception_obstacle_pb2.PerceptionObstacle.PEDESTRIAN
     obs_pb.id = id
-
 
 seq_num = 0
 
@@ -78,15 +78,17 @@ if __name__ == '__main__':
     thread.start()
     while not cyber.is_shutdown():
         m = input(
-            "1: empty 2: obs\n")
+            "0: empty; 1: one obs; 2: two obs; 3: three obs\n")
         perception_msg.ClearField('perception_obstacle')
         print(m)
-        if m == '2':
+        if m == '1':
             add_obs(obs_poly[0],0,perception_msg)
+        if m == '2':
+          add_obs(obs_poly[0],0,perception_msg)
+          add_obs(obs_poly[1],1,perception_msg)
         if m == '3':
           add_obs(obs_poly[0],0,perception_msg)
           add_obs(obs_poly[1],1,perception_msg)
-        if m == '4':
-          add_obs(obs_poly[1],1,perception_msg)
+          add_obs(obs_poly[2],2,perception_msg)
 
     cyber.shutdown()

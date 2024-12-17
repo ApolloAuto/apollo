@@ -12,6 +12,7 @@ topic_config {
   story_telling_topic: "/apollo/storytelling"
   traffic_light_detection_topic: "/apollo/perception/traffic_light"
   planning_learning_data_topic: "/apollo/planning/learning_data"
+  control_interative_topic: "/apollo/control/interactive"
 }
 # NO_LEARNING / E2E / HYBRID / RL_TEST / E2E_TEST / HYBRID_TEST
 learning_mode: NO_LEARNING

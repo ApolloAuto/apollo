@@ -185,11 +185,6 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    PrintCurves ref_print_curve;
-    for (const auto& p : ref_line.reference_points()) {
-      ref_print_curve.AddPoint("ref_line", p.x(), p.y());
-    }
-    ref_print_curve.PrintToLog();
   }
   for (auto& seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
@@ -198,14 +193,6 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-
-    PrintCurves segment_print_curve;
-    for (auto& lane_segment : seg) {
-      for (const auto& pt : lane_segment.lane->points()) {
-        segment_print_curve.AddPoint("segment_line", pt.x(), pt.y());
-      }
-    }
-    segment_print_curve.PrintToLog();
   }
 
   auto status = frame_->Init(
@@ -322,7 +309,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       TrajectoryStitcher::ComputeStitchingTrajectory(
           *(local_view_.chassis), vehicle_state, start_timestamp,
           planning_cycle_time, FLAGS_trajectory_stitching_preserved_length,
-          true, last_publishable_trajectory_.get(), &replan_reason);
+          true, last_publishable_trajectory_.get(), &replan_reason,
+          *local_view_.control_interactive_msg);
 
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
@@ -331,6 +319,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   if (status.ok()) {
     injector_->ego_info()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
+    injector_->ego_info()->CalculateCurrentRouteInfo(
+        reference_line_provider_.get());
   }
 
   if (FLAGS_enable_record_debug) {
@@ -558,9 +548,12 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().first;
     const auto& publishable_trajectory_gear =
         frame_->open_space_info().publishable_trajectory_data().second;
+    const auto& trajectory_type = frame_->open_space_info().trajectory_type();
+    const auto& is_collision = frame_->open_space_info().is_collision();
     publishable_trajectory.PopulateTrajectoryProtobuf(ptr_trajectory_pb);
     ptr_trajectory_pb->set_gear(publishable_trajectory_gear);
-    ptr_trajectory_pb->set_trajectory_type(ADCTrajectory::OPEN_SPACE);
+    ptr_trajectory_pb->set_trajectory_type(trajectory_type);
+    ptr_trajectory_pb->set_is_collision(is_collision);
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
 

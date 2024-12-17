@@ -289,6 +289,11 @@ buildtool install planning
 
 上述操作 buildtool 将下载 planning 模块，将 planning 模块的源码复制到工作空间。
 
+注：buildtool install planning只会下载planning_component模块源码，如果您希望将planning相关所有模块全部下载，可通过使用通配符"*"
+```shell
+buildtool install planning*
+```
+
 ```shell
 buildtool install --legacy planning
 ```

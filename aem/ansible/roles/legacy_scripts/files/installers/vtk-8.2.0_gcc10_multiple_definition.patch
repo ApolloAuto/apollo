@@ -1,0 +1,22 @@
+diff --git a/ThirdParty/exodusII/vtkexodusII/src/ex_create_par.c b/ThirdParty/exodusII/vtkexodusII/src/ex_create_par.c
+index bf5bb44711..1286074fac 100644
+--- a/ThirdParty/exodusII/vtkexodusII/src/ex_create_par.c
++++ b/ThirdParty/exodusII/vtkexodusII/src/ex_create_par.c
+@@ -614,5 +614,5 @@ int ex_create_par_int(const char *path, int cmode, int *comp_ws, int *io_ws, MPI
+  * Prevent warning in some versions of ranlib(1) because the object
+  * file has no symbols.
+  */
+-const char exodus_unused_symbol_dummy_1;
++const char exodus_unused_symbol_dummy_ex_create_par;
+ #endif
+diff --git a/ThirdParty/exodusII/vtkexodusII/src/ex_open_par.c b/ThirdParty/exodusII/vtkexodusII/src/ex_open_par.c
+index f379fc3496..c568353f52 100644
+--- a/ThirdParty/exodusII/vtkexodusII/src/ex_open_par.c
++++ b/ThirdParty/exodusII/vtkexodusII/src/ex_open_par.c
+@@ -474,5 +474,5 @@ int ex_open_par_int(const char *path, int mode, int *comp_ws, int *io_ws, float
+  * Prevent warning in some versions of ranlib(1) because the object
+  * file has no symbols.
+  */
+-const char exodus_unused_symbol_dummy_1;
++const char exodus_unused_symbol_dummy_ex_open_par;
+ #endif

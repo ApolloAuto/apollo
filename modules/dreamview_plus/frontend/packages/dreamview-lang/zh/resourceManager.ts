@@ -14,9 +14,13 @@ export const profileManagerRecords = {
 
 export const profileManagerScenarios = {
     titleName: '场景集名称',
-    titleType: '场景集类型',
-    titleState: '下载状态',
+    titleType: '类型',
+    titleState: '状态',
     titleOperate: '操作',
+    all: '全部',
+    team: '团队',
+    personal: '个人',
+    system: '系统',
 };
 
 export const profileManagerHDMap = {

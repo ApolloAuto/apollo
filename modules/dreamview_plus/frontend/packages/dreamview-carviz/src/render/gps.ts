@@ -21,7 +21,7 @@ export default class Gps {
         this.coordinates = coordinates;
     }
 
-    update(gps) {
+    update(gps, adcInfo) {
         if (!this.adc?.vehicleParam) {
             return;
         }
@@ -47,7 +47,7 @@ export default class Gps {
             const base = drawSegmentsFromPoints(points, {
                 color: 0x006aff,
                 linewidth: 2,
-                zOffset: 5,
+                zOffset: 0,
                 opacity: 1,
                 matrixAutoUpdate: true,
             });
@@ -59,6 +59,7 @@ export default class Gps {
         const position = this.coordinates.applyOffset({ x: positionX, y: positionY });
         this.group.position.set(position.x, position.y, 0.01);
         this.group.visible = this.option.layerOption.Position.gps;
+        this.group.rotation.set(0, 0, adcInfo?.heading || 0);
         this.scene.add(this.group);
     }
 

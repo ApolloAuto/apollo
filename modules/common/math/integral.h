@@ -22,6 +22,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>

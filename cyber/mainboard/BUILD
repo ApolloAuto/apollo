@@ -19,6 +19,7 @@ apollo_cc_binary(
     ],
     deps = [
         "//cyber",
+        "//cyber/common:cyber_common",
         "//cyber/plugin_manager:cyber_plugin_manager",
         "//cyber/proto:dag_conf_cc_proto",
     ],

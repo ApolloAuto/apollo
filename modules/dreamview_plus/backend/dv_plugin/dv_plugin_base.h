@@ -24,7 +24,9 @@
 
 #include "CivetServer.h"
 
+#include "modules/dreamview_plus/proto/data_handler.pb.h"
 #include "modules/dreamview/backend/common/handlers/websocket_handler.h"
+#include "modules/dreamview_plus/backend/updater/updater_base.h"
 namespace apollo {
 namespace dreamview {
 
@@ -69,6 +71,25 @@ class DvPluginBase {
    * the handler corresponding to uri.
    */
   virtual std::map<std::string, CivetHandler *> GetHandlers();
+
+  /**
+   * @brief Get the websocket that needs to be subscribed and unsubscribed
+   * @return The return value is a map, the key value is uri, and the value is
+   * the handler and data handler info corresponding to uri.
+   */
+  virtual std::map<std::string, UpdaterBase *> GetUpdaterHandlers();
+
+  /**
+   * @brief Get the data handler info that needs to be subscribed and
+   * unsubscribed
+   * @return The data handler info of the plugin.
+   */
+  virtual apollo::dreamview::DataHandlerConf GetDataHandlerConf();
+
+  /**
+   * @brief Mainly stop some resources of the instance.
+   */
+  virtual void Stop();
 };
 
 }  // namespace dreamview

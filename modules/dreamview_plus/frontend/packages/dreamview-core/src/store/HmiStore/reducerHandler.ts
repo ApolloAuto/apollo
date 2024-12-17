@@ -1,7 +1,10 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-param-reassign */
 import assign from 'lodash/assign';
 import isEqual from 'lodash/isEqual';
 import isArray from 'lodash/isArray';
+import uniq from 'lodash/uniq';
+import difference from 'lodash/difference';
 import * as TYPES from './actionTypes';
 
 export const hmiUtils = {
@@ -50,7 +53,7 @@ function isEqualDeep(prev: any, next: any) {
     }
     return isEqual(prev, next);
 }
-
+let simHmiKeys: string[] = [];
 export const reducerHander = {
     changeVehicle(vehicle: string) {
         console.log('vehicle', vehicle);
@@ -79,7 +82,17 @@ export const reducerHander = {
     },
     updateStatusSimp: (originHmi: any, draftHmi: any, newStatus: any) => {
         const prevStatus = originHmi?.prevStatus;
-        Object.keys(newStatus).forEach((key: string) => {
+        const isFromSimHmi = newStatus.frontendIsFromSimHmi;
+        if (isFromSimHmi) {
+            simHmiKeys = Object.keys(newStatus);
+        }
+        const keys = isFromSimHmi
+            ? Object.keys(newStatus)
+            : difference(
+                uniq([...Object.keys(newStatus), ...Object.keys(prevStatus || {})]),
+                simHmiKeys,
+            );
+        keys.forEach((key: string) => {
             const prevValue = prevStatus[key];
             const newValue = newStatus[key];
             if (isEqual(prevValue, newValue)) {
@@ -96,11 +109,17 @@ export const reducerHander = {
                 draftHmi.currentRecordId = newStatus.currentRecordStatus?.currentRecordId;
                 draftHmi.currentRecordStatus = newStatus.currentRecordStatus;
             } else if (key === 'modules') {
-                draftHmi.modules = new Map(Object.entries(newStatus.modules ?? []).sort());
+                draftHmi.modules = new Map(
+                    Object.entries(newStatus.modules ?? []).sort(([prev]: any, [next]: any) => (prev > next ? 1 : -1)),
+                );
             } else if (key === 'modulesLock') {
-                draftHmi.modulesLock = new Map(Object.entries(newStatus.modulesLock ?? []).sort());
-            } else if (isArray(prevValue) && isArray(newValue)) {
-                draftHmi[key] = newStatus[key].sort();
+                draftHmi.modulesLock = new Map(
+                    Object.entries(newStatus.modulesLock ?? []).sort(([prev]: any, [next]: any) =>
+                        (prev > next ? 1 : -1),
+                    ),
+                );
+            } else if (isArray(prevValue) || isArray(newValue)) {
+                draftHmi[key] = (newValue || []).sort((prev: any, next: any) => (prev > next ? 1 : -1));
             } else {
                 draftHmi[key] = newStatus[key];
             }

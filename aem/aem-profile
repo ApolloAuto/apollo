@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+###############################################################################
+# Copyright 2024 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# script flags
+#set -u
+#set -e
+#set -x
+
+# global variables
+PROFILES_DIR="${APOLLO_ENV_WORKROOT}/profiles"
+
+# load basic functions
+if [[ ! "${AEM_INITED}" == 1 ]]; then
+  home_dir="$(dirname "$(realpath "$0")")"
+  # shellcheck source=./run.sh
+  source "${home_dir}/run.sh"
+fi
+
+CONF_MANAGER_SCRIPT="${AEM_HOME}/conf_manager.py"
+
+usage() {
+  echo "Usage: aem profile [-h] {list,use}
+Commands:
+  list    List all available profiles
+  use     Use a specific profile
+"
+}
+
+check_dir_exists() {
+  local dir="${1}"
+  if [[ ! -d "${dir}" ]]; then
+    return 1
+  fi
+  return 0
+}
+
+check_profiles_dir() {
+  check_dir_exists "${PROFILES_DIR}"
+}
+
+check_target_profile_dir() {
+  local profile_name="${1}"
+  local target_profile="${PROFILES_DIR}/${profile_name}"
+  check_dir_exists "${target_profile}"
+}
+
+apollo_profile_list() {
+  check_profiles_dir || die "profiles dir not found"
+  ls -l "${PROFILES_DIR}" | grep '^d' | awk '{print $NF}'
+}
+
+apollo_profile_use() {
+  local profile_name="${1}"
+  if [[ -z "${profile_name}" ]]; then
+    error "profile name missing"
+    return 1
+  fi
+
+  check_profiles_dir || die "profiles dir not found"
+  check_target_profile_dir "${profile_name}" || die "profile not found"
+
+  local target_profile="${PROFILES_DIR}/${profile_name}"
+  local current_profile="${PROFILES_DIR}/current"
+  ln -snf "${target_profile}" "${current_profile}" || die "create link ${current_profile} -> ${target_profile} failed"
+
+  sudo python3 "${CONF_MANAGER_SCRIPT}" update -s "${current_profile}" -t "${APOLLO_CONF_PATH}" -f || die "update conf ${target_profile} failed"
+
+  sudo python3 "${CONF_MANAGER_SCRIPT}" recover -t "${APOLLO_CONF_PATH}" -r "${APOLLO_DISTRIBUTION_HOME}/share" || die "recover invalid conf failed."
+
+  info "use profile ${profile_name} successfully."
+
+}
+
+parse_arguments() {
+  case "$1" in
+    list)
+      shift
+      apollo_profile_list "$@"
+      ;;
+    use)
+      shift
+      apollo_profile_use "$@"
+      ;;
+    --help | -h)
+      usage
+      ;;
+    *)
+      usage
+      ;;
+  esac
+}
+
+execute() {
+  parse_arguments "$@"
+}
+
+execute "$@"

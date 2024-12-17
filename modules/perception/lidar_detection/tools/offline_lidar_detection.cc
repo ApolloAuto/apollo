@@ -26,7 +26,7 @@
 #include "modules/perception/common/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/common/lidar/common/pcl_util.h"
 #include "modules/perception/lidar_detection/interface/base_lidar_detector.h"
-#include "modules/perception/lidar_detection/object_builder/object_builder.h"
+#include "modules/perception/common/lidar/common/object_builder.h"
 
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(output_path, "./output/", "output path");

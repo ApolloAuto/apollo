@@ -1,0 +1,15 @@
+diff --git a/bazel/grpc_build_system.bzl b/bazel/grpc_build_system.bzl
+index 30856f97ce..918c93d17a 100644
+--- a/bazel/grpc_build_system.bzl
++++ b/bazel/grpc_build_system.bzl
+@@ -69,7 +69,9 @@ def _get_external_deps(external_deps):
+         elif dep == "cronet_c_for_grpc":
+             ret.append("//third_party/objective_c/Cronet:cronet_c_for_grpc")
+         elif dep.startswith("absl/"):
+-            ret.append("@com_google_absl//" + dep)
++            if "@com_google_absl//:absl" not in ret:
++                ret += ["@com_google_absl//:absl"]
++
+         else:
+             ret.append("//external:" + dep)
+     return ret

@@ -564,7 +564,7 @@ void TrafficLightTrackComponent::Visualize(
   cv::putText(output_image, str, cv::Point(10, 300), cv::FONT_HERSHEY_DUPLEX,
               1.5, cv::Scalar(255, 255, 255), 3);
 
-  std::string folder = "/apollo/data/debug_vis/";
+  std::string folder = "data/debug_vis/";
   if (!apollo::cyber::common::EnsureDirectory(folder)) {
     AINFO << "EnsureDirectory folder " << folder << " error.";
   }

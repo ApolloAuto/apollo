@@ -19,24 +19,24 @@
 #include <string>
 #include <vector>
 
-#include "cyber/cyber.h"
 #include "cyber/benchmark/benchmark_msg.pb.h"
+#include "cyber/cyber.h"
 
 #if __has_include("gperftools/profiler.h")
-#include "gperftools/profiler.h"
 #include "gperftools/heap-profiler.h"
 #include "gperftools/malloc_extension.h"
+#include "gperftools/profiler.h"
 #endif
 
 using apollo::cyber::benchmark::BenchmarkMsg;
 
-std::string BINARY_NAME = "cyber_benchmark_reader"; // NOLINT
+std::string BINARY_NAME = "cyber_benchmark_reader";  // NOLINT
 
 int nums_of_reader = 1;
 bool enable_cpuprofile = false;
 bool enable_heapprofile = false;
-std::string profile_filename = "cyber_benchmark_reader_cpu.prof"; // NOLINT
-std::string heapprofile_filename = "cyber_benchmark_reader_mem.prof"; // NOLINT
+std::string profile_filename = "cyber_benchmark_reader_cpu.prof";      // NOLINT
+std::string heapprofile_filename = "cyber_benchmark_reader_mem.prof";  // NOLINT
 
 void DisplayUsage() {
   AINFO << "Usage: \n    " << BINARY_NAME << " [OPTION]...\n"
@@ -46,12 +46,12 @@ void DisplayUsage() {
            "default value is 1\n"
         << "    -c, --cpuprofile: enable gperftools cpu profile\n"
         << "    -o, --profile_filename=filename: the filename to dump the "
-            "profile to, default value is cyber_benchmark_writer_cpu.prof.  "
-            "Only work with -c option\n"
+           "profile to, default value is cyber_benchmark_writer_cpu.prof.  "
+           "Only work with -c option\n"
         << "    -H, --heapprofile: enable gperftools heap profile\n"
         << "    -O, --heapprofile_filename=filename: the filename "
-            " to dump the profile to, default value is "
-            "cyber_benchmark_writer_mem.prof. Only work with -H option\n"
+           " to dump the profile to, default value is "
+           "cyber_benchmark_writer_mem.prof. Only work with -H option\n"
         << "Example:\n"
         << "    " << BINARY_NAME << " -h\n"
         << "    " << BINARY_NAME << " -n 1\n"
@@ -133,19 +133,22 @@ void GetOptions(const int argc, char* const argv[]) {
 
 int main(int argc, char** argv) {
   GetOptions(argc, argv);
-  apollo::cyber::Init(argv[0], BINARY_NAME);
+  google::SetCommandLineOption("bvar_dump_interval", "1");
+  apollo::cyber::Init(argv[0],
+                      BINARY_NAME + "_" + std::to_string(nums_of_reader));
 
   apollo::cyber::ReaderConfig reader_config;
   reader_config.channel_name = "/apollo/cyber/benchmark";
+  reader_config.qos_profile.set_depth(10);
 
   std::vector<std::shared_ptr<apollo::cyber::Reader<BenchmarkMsg>>> vec;
 
-  for (int i = 0; i < nums_of_reader; i++) {
-    std::string node_name = BINARY_NAME + "-" + std::to_string(i);
-    auto node = apollo::cyber::CreateNode(node_name);
-    vec.push_back(std::move(node->CreateReader<BenchmarkMsg>(
-      reader_config, [](const std::shared_ptr<BenchmarkMsg> m){})));
-  }
+  // for (int i = 0; i < nums_of_reader; i++) {
+  std::string node_name = BINARY_NAME + "-" + std::to_string(nums_of_reader);
+  auto node = apollo::cyber::CreateNode(node_name);
+  vec.push_back(std::move(node->CreateReader<BenchmarkMsg>(
+      reader_config, [](const std::shared_ptr<BenchmarkMsg> m) {})));
+  // }
 
 #ifndef NO_TCMALLOC
 #ifdef BASE_PROFILER_H_

@@ -6,7 +6,7 @@ module_config {
       class_name : "GnssDriverComponent"
       config {
         name : "gnss"
-        config_file_path : "/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"
+        config_file_path : "modules/drivers/gnss/conf/gnss_conf.pb.txt"
       }
     }
 }

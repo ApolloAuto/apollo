@@ -1,0 +1,22 @@
+---
+
+- name: Install mesa glvnd xcb1
+  become: true
+  ansible.builtin.apt:
+    name:
+      # - freeglut3-dev
+      # - libgl1-mesa-dev
+      # - libegl1-mesa-dev
+      # - libgles2-mesa-dev
+      - mesa-common-dev
+      - libglvnd-dev
+      - libxcb1-dev
+    state: latest
+    update_cache: false
+
+- name: Install qt
+  become: true
+  ansible.builtin.apt:
+    name:
+      - qtbase5-dev
+  when: ansible_architecture == 'aarch64'

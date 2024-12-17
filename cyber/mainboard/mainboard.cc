@@ -56,16 +56,13 @@ int main(int argc, char** argv) {
     }
   }
 
+  if (module_args.GetProcessGroup() !=
+        apollo::cyber::mainboard::DEFAULT_process_group_) {
+    dag_info = module_args.GetProcessGroup();
+  }
+
   // initialize cyber
   apollo::cyber::Init(argv[0], dag_info);
-
-  // start module
-  ModuleController controller(module_args);
-  if (!controller.Init()) {
-    controller.Clear();
-    AERROR << "module start error.";
-    return -1;
-  }
 
   static bool enable_cpu_profile = module_args.GetEnableCpuprofile();
   static bool enable_mem_profile = module_args.GetEnableHeapprofile();
@@ -81,14 +78,22 @@ int main(int argc, char** argv) {
     }
   });
 
-  if (module_args.GetEnableCpuprofile()) {
-    auto profile_filename = module_args.GetProfileFilename();
-    ProfilerStart(profile_filename.c_str());
-  }
-
   if (module_args.GetEnableHeapprofile()) {
     auto profile_filename = module_args.GetHeapProfileFilename();
     HeapProfilerStart(profile_filename.c_str());
+  }
+
+  // start module
+  ModuleController controller(module_args);
+  if (!controller.Init()) {
+    controller.Clear();
+    AERROR << "module start error.";
+    return -1;
+  }
+
+  if (module_args.GetEnableCpuprofile()) {
+    auto profile_filename = module_args.GetProfileFilename();
+    ProfilerStart(profile_filename.c_str());
   }
 
   apollo::cyber::WaitForShutdown();

@@ -29,9 +29,6 @@ preprocess {
   enable_downsample_beams: false
   downsample_beams_factor: 1
   enable_downsample_pointcloud: true
-  downsample_voxel_size_x: 0.09
-  downsample_voxel_size_y: 0.09
-  downsample_voxel_size_z: 0.09
   enable_fuse_frames: false
   num_fuse_frames: 5
   fuse_time_interval: 0.5
@@ -74,3 +71,9 @@ diff_class_iou: 0.25
 nms_strategy: false
 filter_by_semantic_type: false
 filter_ground_points: false
+
+plugins {
+    name: "PclDownSample"
+    config_path: "perception/lidar_detection/data/plugins"
+    config_file: "pcl_down_sample.pb.txt"
+}

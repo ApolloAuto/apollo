@@ -1,0 +1,26 @@
+---
+# tasks file for ansible/roles/dreamview_deps
+- name: Install libtinyxml2-dev libpng-dev nasm
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libtinyxml2-dev
+      - libpng-dev
+      - nasm
+    state: latest
+    update_cache: false
+
+- name: Install yarn source
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+- name: Install yarn
+  become: true
+  ansible.builtin.apt:
+    name:
+      - yarn
+    state: latest
+    update_cache: true

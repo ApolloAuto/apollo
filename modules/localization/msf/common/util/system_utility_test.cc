@@ -26,45 +26,45 @@ namespace msf {
 
 TEST(SystemUtilityTestSuite, SystemTest) {
   bool flag = system::IsExists(
-      "/apollo/modules/localization/msf/common/test_data/test_folder/"
+      "modules/localization/msf/common/test_data/test_folder/"
       "file1.txt");
   EXPECT_TRUE(flag);
   flag = system::IsExists(
-      "/apollo/modules/localization/msf/common/test_data/file4.txt");
+      "modules/localization/msf/common/test_data/file4.txt");
   EXPECT_FALSE(flag);
   flag =
-      system::IsDirectory("/apollo/modules/localization/msf/common/test_data");
+      system::IsDirectory("modules/localization/msf/common/test_data");
   EXPECT_TRUE(flag);
-  flag = system::IsDirectory("/apollo/modules/localization/msf/common/test");
+  flag = system::IsDirectory("modules/localization/msf/common/test");
   EXPECT_FALSE(flag);
   flag = system::CreateDirectory(
-      "/apollo/modules/localization/msf/common/test_data/tem");
+      "modules/localization/msf/common/test_data/tem");
   EXPECT_TRUE(flag);
   unsigned int size;
   flag = system::GetFileSize(
-      "/apollo/modules/localization/msf/common/test_data/test_folder/file1.txt",
+      "modules/localization/msf/common/test_data/test_folder/file1.txt",
       &size);
   EXPECT_TRUE(flag);
   EXPECT_EQ(size, 1);
   flag = system::CopyFile(
-      "/apollo/modules/localization/msf/common/test_data/test_folder/file1.txt",
-      "/apollo/modules/localization/msf/common/test_data/tem/file1.txt");
+      "modules/localization/msf/common/test_data/test_folder/file1.txt",
+      "modules/localization/msf/common/test_data/tem/file1.txt");
   EXPECT_TRUE(flag);
   std::vector<std::string> ret1;
   system::GetFilesInFolderRecursive(
-      "/apollo/modules/localization/msf/common/test_data", ".txt", &ret1);
+      "modules/localization/msf/common/test_data", ".txt", &ret1);
   EXPECT_EQ(ret1.size(), 4);
   std::vector<std::string> ret2;
   system::GetFilesInFolder(
-      "/apollo/modules/localization/msf/common/test_data/test_folder", ".txt",
+      "modules/localization/msf/common/test_data/test_folder", ".txt",
       &ret2);
   EXPECT_EQ(ret2.size(), 3);
   std::vector<std::string> ret3;
   system::GetFoldersInFolder(
-      "/apollo/modules/localization/msf/common/test_data/", &ret3);
+      "modules/localization/msf/common/test_data/", &ret3);
   EXPECT_EQ(ret3.size(), 2);
   boost::filesystem::remove_all(
-      "/apollo/modules/localization/msf/common/test_data/tem");
+      "modules/localization/msf/common/test_data/tem");
 }
 
 }  // namespace msf

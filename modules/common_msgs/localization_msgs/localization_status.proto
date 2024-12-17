@@ -155,6 +155,7 @@ enum MsfRunningStatus {
   MSF_NOSOL_X_XX = 22;
   MSF_NOSOL_X_XXX = 23;
   MSF_RUNNING_INIT = 24;
+  MSF_REINIT_ABNORMALLY = 25;
 }
 
 // The status of sensor msg

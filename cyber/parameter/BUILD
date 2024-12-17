@@ -21,7 +21,7 @@ apollo_cc_library(
         "//cyber/proto:parameter_cc_proto",
         "//cyber/node:cyber_node",
         "//cyber/service:cyber_service",
-        "@fastrtps",
+        "@fastdds",
     ],
 )
 

@@ -4,7 +4,7 @@ module_config {
         class_name : "NanoRadarCanbusComponent"
         config {
             name: "nano_radar_front"
-            config_file_path:  "/apollo/modules/drivers/radar/nano_radar/conf/nano_radar_front_conf.pb.txt"
+            config_file_path:  "modules/drivers/radar/nano_radar/conf/nano_radar_front_conf.pb.txt"
         }
     }
 }

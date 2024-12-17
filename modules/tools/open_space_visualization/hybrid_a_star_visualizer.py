@@ -24,7 +24,7 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from hybrid_a_star_python_interface import *
+from modules.tools.open_space_visualization.hybrid_a_star_python_interface import *
 
 
 def HybridAStarPlan(visualize_flag):

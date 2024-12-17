@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "modules/common_msgs/map_msgs/map_lane.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
@@ -257,10 +258,8 @@ class Path {
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral) const;
 
-  bool GetProjection(const double heading,
-                      const common::math::Vec2d& point,
-                      double* accumulate_s,
-                      double* lateral) const;
+  bool GetProjection(const double heading, const common::math::Vec2d& point,
+                     double* accumulate_s, double* lateral) const;
 
   bool GetProjectionWithWarmStartS(const common::math::Vec2d& point,
                                    double* accumulate_s, double* lateral) const;
@@ -268,10 +267,8 @@ class Path {
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral, double* distance) const;
 
-  bool GetProjection(const common::math::Vec2d& point,
-                     const double heading,
-                     double* accumulate_s,
-                     double* lateral,
+  bool GetProjection(const common::math::Vec2d& point, const double heading,
+                     double* accumulate_s, double* lateral,
                      double* distance) const;
 
   bool GetHeadingAlongPath(const common::math::Vec2d& point,
@@ -330,6 +327,9 @@ class Path {
   }
   const std::vector<PathOverlap>& dead_end_overlaps() const {
     return dead_end_overlaps_;
+  }
+  const std::vector<PathOverlap>& area_overlaps() const {
+    return area_overlaps_;
   }
 
   double GetLaneLeftWidth(const double s) const;
@@ -395,6 +395,7 @@ class Path {
   std::vector<PathOverlap> pnc_junction_overlaps_;
   std::vector<PathOverlap> clear_area_overlaps_;
   std::vector<PathOverlap> speed_bump_overlaps_;
+  std::vector<PathOverlap> area_overlaps_;
 
  private:
   /**

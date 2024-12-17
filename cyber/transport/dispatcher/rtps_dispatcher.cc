@@ -14,9 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/transport/dispatcher/rtps_dispatcher.h"
+
+#include "cyber/common/log.h"
 #include "cyber/statistics/statistics.h"
 #include "cyber/transport/common/endpoint.h"
-#include "cyber/transport/dispatcher/rtps_dispatcher.h"
+#include "cyber/transport/dispatcher/dispatcher.h"
 
 namespace apollo {
 namespace cyber {
@@ -34,7 +37,7 @@ void RtpsDispatcher::Shutdown() {
   {
     std::lock_guard<std::mutex> lock(subs_mutex_);
     for (auto& item : subs_) {
-      item.second.sub = nullptr;
+      item.second = nullptr;
     }
   }
 
@@ -49,33 +52,27 @@ void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
 
   uint64_t channel_id = self_attr.channel_id();
   std::lock_guard<std::mutex> lock(subs_mutex_);
+  // subscriber exsit
   if (subs_.count(channel_id) > 0) {
     return;
   }
 
-  Subscriber new_sub;
-  eprosima::fastrtps::SubscriberAttributes sub_attr;
+  auto listener_adapter =
+      [this, self_attr](const std::shared_ptr<std::string>& msg_str,
+                        uint64_t channel_id, const MessageInfo& msg_info) {
+        statistics::Statistics::Instance()->AddRecvCount(self_attr,
+                                                         msg_info.seq_num());
+        statistics::Statistics::Instance()->SetTotalMsgsStatus(
+            self_attr, msg_info.seq_num());
+        this->OnMessage(channel_id, msg_str, msg_info);
+      };
+
   auto& qos = self_attr.qos_profile();
-  RETURN_IF(!AttributesFiller::FillInSubAttr(self_attr.channel_name(), qos,
-                                             &sub_attr));
+  auto subscriber_ptr = participant_->CreateSubscriber(self_attr.channel_name(),
+                                                       qos, listener_adapter);
+  RETURN_IF_NULL(subscriber_ptr);
 
-  auto listener_adapter = [this, self_attr](uint64_t channel_id,
-                                const std::shared_ptr<std::string>& msg_str,
-                                const MessageInfo& msg_info) {
-    statistics::Statistics::Instance()->AddRecvCount(
-      self_attr, msg_info.msg_seq_num());
-    statistics::Statistics::Instance()->SetTotalMsgsStatus(
-                              self_attr, msg_info.msg_seq_num());
-    this->OnMessage(channel_id, msg_str, msg_info);
-  };
-
-  new_sub.sub_listener = std::make_shared<SubListener>(listener_adapter);
-
-  new_sub.sub = eprosima::fastrtps::Domain::createSubscriber(
-      participant_->fastrtps_participant(), sub_attr,
-      new_sub.sub_listener.get());
-  RETURN_IF_NULL(new_sub.sub);
-  subs_[channel_id] = new_sub;
+  subs_[channel_id] = subscriber_ptr;
 }
 
 void RtpsDispatcher::OnMessage(uint64_t channel_id,

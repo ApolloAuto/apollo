@@ -35,7 +35,7 @@ bool AttributesFiller::FillInPubAttr(
 
   pub_attr->topic.topicName = channel_name;
   pub_attr->topic.topicDataType = "UnderlayMessage";
-  pub_attr->topic.topicKind = eprosima::fastrtps::NO_KEY;
+  pub_attr->topic.topicKind = eprosima::fastrtps::rtps::NO_KEY;
 
   switch (qos.history()) {
     case QosHistoryPolicy::HISTORY_KEEP_LAST:
@@ -88,7 +88,7 @@ bool AttributesFiller::FillInPubAttr(
   // transform messages per second to rtps heartbeat
   // set default heartbeat period
   pub_attr->times.heartbeatPeriod.seconds = 1;
-  pub_attr->times.heartbeatPeriod.fraction = 0;
+  pub_attr->times.heartbeatPeriod.fraction(0);
   if (qos.mps() != 0) {
     uint64_t mps = qos.mps();
 
@@ -104,13 +104,13 @@ bool AttributesFiller::FillInPubAttr(
     int32_t seconds = static_cast<int32_t>(fractions >> 32);
 
     pub_attr->times.heartbeatPeriod.seconds = seconds;
-    pub_attr->times.heartbeatPeriod.fraction = fraction;
+    pub_attr->times.heartbeatPeriod.fraction(fraction);
   }
 
   pub_attr->qos.m_publishMode.kind =
       eprosima::fastrtps::ASYNCHRONOUS_PUBLISH_MODE;
   pub_attr->historyMemoryPolicy =
-      eprosima::fastrtps::DYNAMIC_RESERVE_MEMORY_MODE;
+      eprosima::fastrtps::rtps::DYNAMIC_RESERVE_MEMORY_MODE;
   pub_attr->topic.resourceLimitsQos.max_samples = 10000;
 
   return true;
@@ -122,7 +122,7 @@ bool AttributesFiller::FillInSubAttr(
   RETURN_VAL_IF_NULL(sub_attr, false);
   sub_attr->topic.topicName = channel_name;
   sub_attr->topic.topicDataType = "UnderlayMessage";
-  sub_attr->topic.topicKind = eprosima::fastrtps::NO_KEY;
+  sub_attr->topic.topicKind = eprosima::fastrtps::rtps::NO_KEY;
 
   switch (qos.history()) {
     case QosHistoryPolicy::HISTORY_KEEP_LAST:
@@ -173,7 +173,7 @@ bool AttributesFiller::FillInSubAttr(
   }
 
   sub_attr->historyMemoryPolicy =
-      eprosima::fastrtps::DYNAMIC_RESERVE_MEMORY_MODE;
+      eprosima::fastrtps::rtps::DYNAMIC_RESERVE_MEMORY_MODE;
   sub_attr->topic.resourceLimitsQos.max_samples = 10000;
 
   return true;

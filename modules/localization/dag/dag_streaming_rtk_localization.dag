@@ -6,7 +6,7 @@ module_config {
       class_name : "RTKLocalizationComponent"
       config {
         name : "rtk_localization"
-        config_file_path : "/apollo/modules/localization/conf/rtk_localization.pb.txt"
+        config_file_path : "modules/localization/conf/rtk_localization.pb.txt"
         readers: [
           {
             channel: "/apollo/sensor/gnss/odometry"

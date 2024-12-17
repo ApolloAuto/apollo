@@ -12,4 +12,5 @@ message OpenSpacePreStopDeciderConfig {
   optional StopType stop_type = 1;
   optional double rightaway_stop_distance = 2 [default = 2.0];  // meter
   optional double stop_distance_to_target = 3 [default = 5.0];  // second
+  optional double stop_buffer_to_target = 4 [default = 0.0];  // second
 }

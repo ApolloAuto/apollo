@@ -49,13 +49,17 @@ bool CanbusComponent::Init() {
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
-  if (!apollo::cyber::common::PathExists(FLAGS_load_vehicle_library)) {
+  std::string vehicle_library_path;
+  if (!apollo::cyber::common::GetFilePathWithEnv(FLAGS_load_vehicle_library,
+                                                 "APOLLO_LIB_PATH",
+                                                 &vehicle_library_path)) {
     AERROR << FLAGS_load_vehicle_library << " No such vehicle library";
     return false;
   }
-  AINFO << "Load the vehicle factory library: " << FLAGS_load_vehicle_library;
+  AINFO << "Load the vehicle factory library: " << FLAGS_load_vehicle_library
+        << "(" << vehicle_library_path << ")";
 
-  ClassLoader loader(FLAGS_load_vehicle_library);
+  ClassLoader loader(vehicle_library_path);
   auto vehicle_object = loader.CreateClassObj<AbstractVehicleFactory>(
       FLAGS_load_vehicle_class_name);
   if (!vehicle_object) {

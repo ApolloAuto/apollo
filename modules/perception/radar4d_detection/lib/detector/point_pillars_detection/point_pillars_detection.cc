@@ -169,7 +169,7 @@ bool Radar4dDetection::Detect(RadarFrame* frame,
     }
     if (cloud.points.size() != 0) {
       pcl::io::savePCDFileBinaryCompressed(
-      "/apollo/data/pcd/"+std::to_string(frame->timestamp)+".pcd", cloud);
+      "data/pcd/"+std::to_string(frame->timestamp)+".pcd", cloud);
     }
   }
 

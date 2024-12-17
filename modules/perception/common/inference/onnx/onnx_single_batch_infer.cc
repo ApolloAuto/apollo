@@ -247,7 +247,8 @@ void SingleBatchInference::Infer() {
   for (auto name : input_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
-      blob->gpu_data();
+      int32_t index = engine_->getBindingIndex(name.c_str());
+      buffers_[index] = const_cast<float*>(blob->gpu_data());
     }
   }
   // If `out_blob->mutable_cpu_data()` is invoked outside,
@@ -259,7 +260,8 @@ void SingleBatchInference::Infer() {
   for (auto name : output_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
-      blob->gpu_data();
+      int32_t index = engine_->getBindingIndex(name.c_str());
+      buffers_[index] = blob->mutable_gpu_data();
     }
   }
 

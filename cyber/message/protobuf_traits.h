@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/message/arena_message_wrapper.h"
 #include "cyber/message/protobuf_factory.h"
 
 namespace apollo {
@@ -67,6 +68,28 @@ template <typename MessageT,
               int>::type = 0>
 bool RegisterMessage(const MessageT& message) {
   return ProtobufFactory::Instance()->RegisterMessage(message);
+}
+
+template <typename MessageT,
+          typename std::enable_if<
+              std::is_base_of<google::protobuf::Message, MessageT>::value,
+              bool>::type = true>
+bool SerializeToArenaMessageWrapper(const MessageT& message,
+                                    ArenaMessageWrapper* wrapper,
+                                    MessageT** message_ptr) {
+  *message_ptr = wrapper->SetMessage(message);
+  return true;
+}
+
+template <typename MessageT,
+          typename std::enable_if<
+              std::is_base_of<google::protobuf::Message, MessageT>::value,
+              bool>::type = true>
+bool ParseFromArenaMessageWrapper(ArenaMessageWrapper* wrapper,
+                                  MessageT* message, MessageT** message_ptr) {
+  *message_ptr = wrapper->GetMessage<MessageT>();
+  // message->CopyFrom(*message_ptr);
+  return true;
 }
 
 }  // namespace message

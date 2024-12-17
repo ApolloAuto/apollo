@@ -32,7 +32,7 @@ class PidControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string controllers_dir =
-        "/apollo/modules/control/control_component/testdata/conf/";
+        "modules/control/control_component/testdata/conf/";
     std::string station_pid_conf_file =
         controllers_dir + "station_pid_conf.pb.txt";
     std::string speed_pid_conf_file = controllers_dir + "speed_pid_conf.pb.txt";

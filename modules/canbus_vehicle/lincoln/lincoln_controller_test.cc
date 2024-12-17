@@ -39,7 +39,7 @@ class LincolnControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "/apollo/modules/canbus/testdata/conf/mkz_canbus_conf_test.pb.txt";
+        "modules/canbus/testdata/conf/mkz_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     control_cmd_.set_throttle(20.0);

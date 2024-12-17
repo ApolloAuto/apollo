@@ -2,6 +2,19 @@ syntax = "proto2";
 
 package apollo.external_command_demo;
 
+message Point {
+    optional double x = 1;
+    optional double y = 2;
+}
+
+message Drivable_roi {
+    repeated Point point = 1;
+}
+
+message Un_drivable_roi {
+    repeated Point point = 1;
+}
+
 message DemoConfig {
   // Left path width for Sending PathFollowCommand.
   optional double left_path_width = 1 [default = 2.0];
@@ -25,4 +38,7 @@ message DemoConfig {
   optional double end_pose_heading = 15 [default = 0.0];
   optional string file_of_path_follow_with_localization_record = 16;
   optional string file_of_path_follow_with_planning_record = 17;
+  optional Drivable_roi drivable_roi = 18;
+  optional Un_drivable_roi un_drivable_roi = 19;
+  optional string overlap_id = 20;
 }

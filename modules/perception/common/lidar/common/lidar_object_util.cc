@@ -30,6 +30,8 @@ using base::PointCloud;
 using base::PointD;
 using base::PointF;
 
+static const float kEpsilon = 1e-6;
+
 void GetBoundingBox2d(const std::shared_ptr<Object>& object,
                       PointCloud<PointD>* box, double expand) {
   box->clear();
@@ -127,6 +129,118 @@ void ComputeObjectShapeFromPolygon(std::shared_ptr<Object> object,
   polygon_xy = projected_polygon_xy(0) * direction +
                projected_polygon_xy(1) * odirection;
   object->center << polygon_xy(0) + offset(0), polygon_xy(1) + offset(1), min_z;
+}
+
+void ComputePolygonDirection(
+    const Eigen::Vector3d& ref_center,
+    const base::ObjectPtr& object,
+    Eigen::Vector3f* direction) {
+  if (object->polygon.size() == 0 ||
+      object->lidar_supplement.cloud.size() < 4u) {
+    return;
+  }
+  size_t max_point_index = 0;
+  size_t min_point_index = 0;
+  ComputeMinMaxDirectionPoint(
+      object, ref_center, &max_point_index, &min_point_index);
+  Eigen::Vector3d max_point(
+      object->polygon[max_point_index].x,
+      object->polygon[max_point_index].y,
+      object->polygon[max_point_index].z);
+  Eigen::Vector3d min_point(
+      object->polygon[min_point_index].x,
+      object->polygon[min_point_index].y,
+      object->polygon[min_point_index].z);
+  Eigen::Vector3d line = max_point - min_point;
+  double max_dis = 0;
+  bool vertices_in_vision = false;
+  size_t visible_max_start_point_index = 0;
+  size_t visible_max_end_point_index = 0;
+  for (size_t i = min_point_index, count = 0; count < object->polygon.size();
+    i = (i + 1) % object->polygon.size(), ++count) {
+    size_t j = (i + 1) % object->polygon.size();
+    Eigen::Vector3d p_i;
+    p_i[0] = object->polygon[i].x;
+    p_i[1] = object->polygon[i].y;
+    p_i[2] = object->polygon[i].z;
+    Eigen::Vector3d p_j;
+    p_j[0] = object->polygon[j].x;
+    p_j[1] = object->polygon[j].y;
+    p_j[2] = object->polygon[j].z;
+    Eigen::Vector3d ray;
+    if ((i == min_point_index && j == max_point_index) ||
+        (i == max_point_index && j == min_point_index)) {
+      continue;
+    } else {
+      if (j != min_point_index && j != max_point_index) {
+        ray = p_j - min_point;
+      } else {  // j == min_point_index || j == max_point_index
+        ray = p_i - min_point;
+      }
+      if (line[0] * ray[1] - ray[0] * line[1] < kEpsilon) {
+        double dist = sqrt((p_j[0] - p_i[0]) * (p_j[0] - p_i[0]) +
+                           (p_j[1] - p_i[1]) * (p_j[1] - p_i[1]));
+        if (dist > max_dis) {
+          max_dis = dist;
+          visible_max_start_point_index = i;
+          visible_max_end_point_index = j;
+        }
+        vertices_in_vision = true;
+      }
+    }
+  }
+  size_t start_point_index = 0;
+  size_t end_point_index = 0;
+  if (vertices_in_vision) {
+    start_point_index = visible_max_start_point_index;
+    end_point_index = visible_max_end_point_index;
+  } else {
+    start_point_index = min_point_index;
+    end_point_index = max_point_index;
+  }
+  Eigen::Vector3d start_point(
+      object->polygon[start_point_index].x,
+      object->polygon[start_point_index].y,
+      object->polygon[start_point_index].z);
+  Eigen::Vector3d end_point(
+      object->polygon[end_point_index].x,
+      object->polygon[end_point_index].y,
+      object->polygon[end_point_index].z);
+  Eigen::Vector3d dir = end_point - start_point;
+  *direction << static_cast<float>(dir[0]),
+                static_cast<float>(dir[1]),
+                static_cast<float>(dir[2]);
+  direction->normalize();
+}
+
+void ComputeMinMaxDirectionPoint(
+    const base::ObjectPtr& object,
+    const Eigen::Vector3d& ref_center,
+    size_t* max_point_index,
+    size_t* min_point_index) {
+  Eigen::Vector3d p_0;
+  p_0[0] = object->polygon[0].x;
+  p_0[1] = object->polygon[0].y;
+  p_0[2] = object->polygon[0].z;
+  Eigen::Vector3d max_point = p_0 - ref_center;
+  Eigen::Vector3d min_point = p_0 - ref_center;
+  for (size_t i = 1; i < object->polygon.size(); ++i) {
+    Eigen::Vector3d p;
+    p[0] = object->polygon[i].x;
+    p[1] = object->polygon[i].y;
+    p[2] = object->polygon[i].z;
+    Eigen::Vector3d ray = p - ref_center;
+    // clock direction
+    if (max_point[0] * ray[1] - ray[0] * max_point[1] < kEpsilon) {
+      max_point = ray;
+      *max_point_index = i;
+    }
+    // unclock direction
+    if (min_point[0] * ray[1] - ray[0] * min_point[1] > kEpsilon) {
+      min_point = ray;
+      *min_point_index = i;
+    }
+  }
 }
 
 }  // namespace lidar

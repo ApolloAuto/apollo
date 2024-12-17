@@ -67,8 +67,8 @@ Decode_0B::Decode_0B() {
       "roll,pitch,yaw,GyroX,GyroY,GyroZ,x_acc,y_acc,z_acc,latitude,longitude,"
       "altitude,north_vel,east_vel,ground_vel,ins_status,modestatus,system_ms";
 
-  createFileAndWrite(filename2, content2);
-  createFileAndWrite(filename0b, content0b);
+  // createFileAndWrite(filename2, content2);
+  // createFileAndWrite(filename0b, content0b);
 
   registProtocol(m_typeImu, m_lengthImu, this);
   registProtocol(m_typeGnss, m_lengthGnss, this);
@@ -94,7 +94,7 @@ void Decode_0B::subData(const uint8_t* sub_address, int& index) {
 
 void Decode_0B::parse0B(const uint8_t* data, int& pos) {
   static const double deg_coefficient = 360.0 / 32768;
-  static const double radians_to_degree = 6.283185307179586232 / 360.0;
+  static const double degree_to_radians = 6.283185307179586232 / 360.0;
   static const double angular_coefficient = 300.0 / 32768;
   static const double acc_coefficient = 12.0 / 32768 * 9.7883105;
   static const double velocity_coefficient = 100.0 / 32768;
@@ -103,7 +103,6 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
   int sub_index = 3;
   uint8_t check_sum = 0;
   int dataLength = getLength(m_typeImu);
-  std::vector<std::string> data_w;
   /* check xor */
   for (int i = 0; i < dataLength - 1; ++i) {
     check_sum ^= data[i];
@@ -111,17 +110,15 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
 
   if (check_sum == data[dataLength - 1]) {
     /* roll pitch yaw */
-    float roll = (toValue<int16_t>(data, sub_index)) * deg_coefficient *
-                 radians_to_degree;
-    float pitch = (toValue<int16_t>(data, sub_index)) * deg_coefficient *
-                  radians_to_degree;
+    float roll = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
+    float pitch = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
     float x = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
     if (x > 0) {
       x = 90.0 - x;
     } else {
       x = 90.0 - (360.0 + x);
     }
-    float yaw = x * radians_to_degree;
+    float yaw = x;
 
     /* gx gy gz , ax ay az */
     double imu_msg_y_angular_velocity =
@@ -169,9 +166,15 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
 
     pos += m_lengthImu;
 
-    insdata.Pitch_deg = pitch;                               /*俯仰角*/
-    insdata.Roll_deg = roll;                                 /*横滚角*/
-    insdata.Yaw_deg = yaw;                                   /*航向角*/
+    // 俯仰角
+    insdata.Pitch_deg = pitch;
+    insdata.Pitch_rad = pitch * degree_to_radians;
+    // 横滚角
+    insdata.Roll_deg = roll;
+    insdata.Roll_rad = roll * degree_to_radians;
+    // 航向角
+    insdata.Yaw_deg = yaw;
+    insdata.Yaw_rad = yaw * degree_to_radians;
     insdata.GyroX = imu_msg_x_angular_velocity * deg_to_rad; /*gx*/
     insdata.GyroY = imu_msg_y_angular_velocity * deg_to_rad;
     insdata.GyroZ = imu_msg_z_angular_velocity * deg_to_rad;
@@ -197,30 +200,32 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
     insdata.ModeStatus = modestatus;
     insdata.SysTime_ms = system_ms;
 
-    data_w.push_back(std::to_string(pitch));
-    data_w.push_back(std::to_string(roll));
-    data_w.push_back(std::to_string(yaw));
-    data_w.push_back(std::to_string(imu_msg_x_angular_velocity));
-    data_w.push_back(std::to_string(imu_msg_y_angular_velocity));
-    data_w.push_back(std::to_string(imu_msg_z_angular_velocity));
-    data_w.push_back(std::to_string(imu_msg_x_acc));
-    data_w.push_back(std::to_string(imu_msg_y_acc));
-    data_w.push_back(std::to_string(imu_msg_z_acc));
-    data_w.push_back(std::to_string(imu_msg_longitude));
-    data_w.push_back(std::to_string(imu_msg_latitude));
-    data_w.push_back(std::to_string(imu_msg_altitude));
-    data_w.push_back(std::to_string(imu_msg_north_velocity));
-    data_w.push_back(std::to_string(imu_msg_east_velocity));
-    data_w.push_back(std::to_string(imu_msg_ground_velocity));
-    data_w.push_back(std::to_string(imu_msg_ins_status));
-    data_w.push_back(std::to_string(modestatus));
-    data_w.push_back(std::to_string(system_ms));
+    // Do not write csv.
+    // std::vector<std::string> data_w;
+    // data_w.push_back(std::to_string(pitch));
+    // data_w.push_back(std::to_string(roll));
+    // data_w.push_back(std::to_string(yaw));
+    // data_w.push_back(std::to_string(imu_msg_x_angular_velocity));
+    // data_w.push_back(std::to_string(imu_msg_y_angular_velocity));
+    // data_w.push_back(std::to_string(imu_msg_z_angular_velocity));
+    // data_w.push_back(std::to_string(imu_msg_x_acc));
+    // data_w.push_back(std::to_string(imu_msg_y_acc));
+    // data_w.push_back(std::to_string(imu_msg_z_acc));
+    // data_w.push_back(std::to_string(imu_msg_longitude));
+    // data_w.push_back(std::to_string(imu_msg_latitude));
+    // data_w.push_back(std::to_string(imu_msg_altitude));
+    // data_w.push_back(std::to_string(imu_msg_north_velocity));
+    // data_w.push_back(std::to_string(imu_msg_east_velocity));
+    // data_w.push_back(std::to_string(imu_msg_ground_velocity));
+    // data_w.push_back(std::to_string(imu_msg_ins_status));
+    // data_w.push_back(std::to_string(modestatus));
+    // data_w.push_back(std::to_string(system_ms));
 
-    if (AppendCsv(filename0b, data_w)) {
-      // std::cout << "数据成功写入到文件 " << filename << "\n";
-    } else {
-      std::cerr << "写入文件时出现错误\n";
-    }
+    // if (AppendCsv(filename0b, data_w)) {
+    //   // std::cout << "数据成功写入到文件 " << filename << "\n";
+    // } else {
+    //   std::cerr << "写入文件时出现错误\n";
+    // }
 
     update_ins = 1;
   } else {
@@ -232,7 +237,6 @@ void Decode_0B::parseGnss(const uint8_t* data, int& pos) {
   int sub_index = 3;
   uint8_t check_sum = 0;
   int dataLength = getLength(m_typeGnss);
-  std::vector<std::string> data_w;
   /* check xor */
   for (int i = 0; i < dataLength - 1; ++i) {
     check_sum ^= data[i];
@@ -296,52 +300,53 @@ void Decode_0B::parseGnss(const uint8_t* data, int& pos) {
     insdata.Alt_m = m_gnssMsg_altitude;   /*融合后Altitude (m)*/
     insdata.differential_age = m_gnssMsg_rtk_age;
 
-    data_w.clear();
-    data_w.push_back(std::to_string(m_gnssMsg_longitude));
-    data_w.push_back(std::to_string(m_gnssMsg_lon_sigma));
-    data_w.push_back(std::to_string(m_gnssMsg_latitude));
-    data_w.push_back(std::to_string(m_gnssMsg_lat_sigma));
-    data_w.push_back(std::to_string(m_gnssMsg_altitude));
-    data_w.push_back(std::to_string(m_gnssMsg_alt_sigma));
-    data_w.push_back(std::to_string(m_gnssMsg_gps_fix));
-    data_w.push_back(std::to_string(m_gnssMsg_rtk_age));
-    // data_w.push_back(std::to_string(m_gnssMsg_msg_type));
-    // data_w.push_back(std::to_string(m_gnssMsg_flags_pos));
-    // data_w.push_back(std::to_string(m_gnssMsg_flags_vel));
-    // data_w.push_back(std::to_string(m_gnssMsg_flags_attitude));
-    // data_w.push_back(std::to_string(m_gnssMsg_flags_time));
-    // data_w.push_back(std::to_string(m_gnssMsg_hor_vel));
-    data_w.push_back(std::to_string(m_gnssMsg_track_angle));
-    data_w.push_back(std::to_string(m_gnssMsg_ver_vel));
-    data_w.push_back(std::to_string(m_gnssMsg_latency_vel));
-    data_w.push_back(std::to_string(m_gnssMsg_base_length));
-    data_w.push_back(std::to_string(m_gnssMsg_yaw));
-    data_w.push_back(std::to_string(m_gnssMsg_yaw_sigma));
-    data_w.push_back(std::to_string(m_gnssMsg_pitch));
-    data_w.push_back(std::to_string(m_gnssMsg_pitch_sigma));
-    data_w.push_back(std::to_string(utc_year));
-    data_w.push_back(std::to_string(utc_mon));
-    data_w.push_back(std::to_string(utc_day));
-    data_w.push_back(std::to_string(utc_hour));
-    data_w.push_back(std::to_string(utc_min));
-    data_w.push_back(std::to_string(utc_sec));
-    data_w.push_back(std::to_string(m_gnssMsg_ts_pos));
-    data_w.push_back(std::to_string(m_gnssMsg_ts_vel));
-    data_w.push_back(std::to_string(m_gnssMsg_ts_heading));
-    data_w.push_back(std::to_string(m_gnssMsg_state));
-    data_w.push_back(std::to_string(m_gnssMsg_num_master));
-    data_w.push_back(std::to_string(m_gnssMsg_gdop));
-    data_w.push_back(std::to_string(m_gnssMsg_pdop));
-    data_w.push_back(std::to_string(m_gnssMsg_hdop));
-    // data_w.push_back(std::to_string(m_gnssMsg_vdop));
-    data_w.push_back(std::to_string(m_gnssMsg_tdop));
-    data_w.push_back(std::to_string(m_gnssMsg_num_reserve));
+    // Do not write csv.
+    // std::vector<std::string> data_w;
+    // data_w.push_back(std::to_string(m_gnssMsg_longitude));
+    // data_w.push_back(std::to_string(m_gnssMsg_lon_sigma));
+    // data_w.push_back(std::to_string(m_gnssMsg_latitude));
+    // data_w.push_back(std::to_string(m_gnssMsg_lat_sigma));
+    // data_w.push_back(std::to_string(m_gnssMsg_altitude));
+    // data_w.push_back(std::to_string(m_gnssMsg_alt_sigma));
+    // data_w.push_back(std::to_string(m_gnssMsg_gps_fix));
+    // data_w.push_back(std::to_string(m_gnssMsg_rtk_age));
+    // // data_w.push_back(std::to_string(m_gnssMsg_msg_type));
+    // // data_w.push_back(std::to_string(m_gnssMsg_flags_pos));
+    // // data_w.push_back(std::to_string(m_gnssMsg_flags_vel));
+    // // data_w.push_back(std::to_string(m_gnssMsg_flags_attitude));
+    // // data_w.push_back(std::to_string(m_gnssMsg_flags_time));
+    // // data_w.push_back(std::to_string(m_gnssMsg_hor_vel));
+    // data_w.push_back(std::to_string(m_gnssMsg_track_angle));
+    // data_w.push_back(std::to_string(m_gnssMsg_ver_vel));
+    // data_w.push_back(std::to_string(m_gnssMsg_latency_vel));
+    // data_w.push_back(std::to_string(m_gnssMsg_base_length));
+    // data_w.push_back(std::to_string(m_gnssMsg_yaw));
+    // data_w.push_back(std::to_string(m_gnssMsg_yaw_sigma));
+    // data_w.push_back(std::to_string(m_gnssMsg_pitch));
+    // data_w.push_back(std::to_string(m_gnssMsg_pitch_sigma));
+    // data_w.push_back(std::to_string(utc_year));
+    // data_w.push_back(std::to_string(utc_mon));
+    // data_w.push_back(std::to_string(utc_day));
+    // data_w.push_back(std::to_string(utc_hour));
+    // data_w.push_back(std::to_string(utc_min));
+    // data_w.push_back(std::to_string(utc_sec));
+    // data_w.push_back(std::to_string(m_gnssMsg_ts_pos));
+    // data_w.push_back(std::to_string(m_gnssMsg_ts_vel));
+    // data_w.push_back(std::to_string(m_gnssMsg_ts_heading));
+    // data_w.push_back(std::to_string(m_gnssMsg_state));
+    // data_w.push_back(std::to_string(m_gnssMsg_num_master));
+    // data_w.push_back(std::to_string(m_gnssMsg_gdop));
+    // data_w.push_back(std::to_string(m_gnssMsg_pdop));
+    // data_w.push_back(std::to_string(m_gnssMsg_hdop));
+    // // data_w.push_back(std::to_string(m_gnssMsg_vdop));
+    // data_w.push_back(std::to_string(m_gnssMsg_tdop));
+    // data_w.push_back(std::to_string(m_gnssMsg_num_reserve));
 
-    if (AppendCsv(filename2, data_w)) {
-      // std::cout << "数据成功写入到文件 " << filename << "\n";
-    } else {
-      std::cerr << "写入文件时出现错误\n";
-    }
+    // if (AppendCsv(filename2, data_w)) {
+    //   // std::cout << "数据成功写入到文件 " << filename << "\n";
+    // } else {
+    //   std::cerr << "写入文件时出现错误\n";
+    // }
 
   } else {
     pos += 3;

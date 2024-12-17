@@ -130,7 +130,7 @@ TEST(hdmap_roi_filter_bitmap2d_test, test_polygon_scan_cvter) {
 bool LoadFrameData(LidarFrame* frame) {
   std::ifstream fin;
   fin.open(
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "hdmap_roi_filter/data/"
       "poly_mask_ut.poly");
   CHECK_EQ(fin.fail(), false);
@@ -149,7 +149,7 @@ bool LoadFrameData(LidarFrame* frame) {
   fin.close();
 
   fin.open(
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "hdmap_roi_filter/data/"
       "poly_mask_ut.pcd");
   CHECK_EQ(fin.fail(), false);
@@ -172,7 +172,7 @@ class HdmapROIFilterTest : public ::testing::Test {
     char module_path[50] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root =
-        "/apollo/modules/perception/testdata/"
+        "modules/perception/testdata/"
         "lidar/lib/roi_filter/hdmap_roi_filter";
   }
 

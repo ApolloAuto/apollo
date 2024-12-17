@@ -119,8 +119,6 @@ DECLARE_string(data_recorder_command_keyword);
 
 DECLARE_string(data_record_default_name);
 
-DECLARE_double(threshold_for_destination_check);
-
 DECLARE_string(dv_hmi_modes_config_path);
 
 DECLARE_string(dv_plus_hmi_modes_config_path);
@@ -150,3 +148,9 @@ DECLARE_string(default_rtk_record_path);
 DECLARE_bool(dv_cpu_profile);
 
 DECLARE_bool(dv_heap_profile);
+
+DECLARE_double(monitor_timeout_threshold);
+
+DECLARE_string(perception_edge_info_topic);
+
+DECLARE_string(dv_plugin_panels_path);

@@ -53,4 +53,12 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "perception_barrier_gate_proto",
+    srcs = ["perception_barrier_gate.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
 apollo_package()

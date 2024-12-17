@@ -48,8 +48,27 @@ class Segment {
   bool AcquireBlockToWrite(std::size_t msg_size, WritableBlock* writable_block);
   void ReleaseWrittenBlock(const WritableBlock& writable_block);
 
+  bool AcquireArenaBlockToWrite(
+    std::size_t msg_size, WritableBlock* writable_block);
+  void ReleaseArenaWrittenBlock(const WritableBlock& writable_block);
+
   bool AcquireBlockToRead(ReadableBlock* readable_block);
   void ReleaseReadBlock(const ReadableBlock& readable_block);
+
+  bool AcquireArenaBlockToRead(ReadableBlock* readable_block);
+  void ReleaseArenaReadBlock(const ReadableBlock& readable_block);
+
+  bool InitOnly(uint64_t message_size);
+  void* GetManagedShm();
+  bool LockBlockForWriteByIndex(uint64_t block_index);
+  bool ReleaseBlockForWriteByIndex(uint64_t block_index);
+  bool LockBlockForReadByIndex(uint64_t block_index);
+  bool ReleaseBlockForReadByIndex(uint64_t block_index);
+
+  bool LockArenaBlockForWriteByIndex(uint64_t block_index);
+  bool ReleaseArenaBlockForWriteByIndex(uint64_t block_index);
+  bool LockArenaBlockForReadByIndex(uint64_t block_index);
+  bool ReleaseArenaBlockForReadByIndex(uint64_t block_index);
 
  protected:
   virtual bool Destroy();
@@ -64,14 +83,18 @@ class Segment {
 
   State* state_;
   Block* blocks_;
+  Block* arena_blocks_;
   void* managed_shm_;
   std::mutex block_buf_lock_;
+  std::mutex arena_block_buf_lock_;
   std::unordered_map<uint32_t, uint8_t*> block_buf_addrs_;
+  std::unordered_map<uint32_t, uint8_t*> arena_block_buf_addrs_;
 
  private:
   bool Remap();
   bool Recreate(const uint64_t& msg_size);
   uint32_t GetNextWritableBlockIndex();
+  uint32_t GetNextArenaWritableBlockIndex();
 };
 
 }  // namespace transport

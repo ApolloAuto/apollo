@@ -52,7 +52,7 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
                            const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkPathProblem() = default;
-  void set_extra_constraints(const InterPolatedPointVec& extra_constraints) {
+  void set_extra_constraints(const ObsCornerConstraints& extra_constraints) {
     extra_constraints_ = extra_constraints;
   }
 
@@ -74,7 +74,7 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
                                  std::vector<c_float>* upper_bounds) override;
 
  private:
-  InterPolatedPointVec extra_constraints_;
+  ObsCornerConstraints extra_constraints_;
   ADCVertexConstraints vertex_constraints_;
 };
 

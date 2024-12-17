@@ -5,4 +5,4 @@ topic_conf {
   audio_event_topic_name: "/apollo/audio_event"
   perception_topic_name: "/apollo/perception/obstacles"
 }
-respeaker_extrinsics_path: "/apollo/modules/audio/conf/respeaker_extrinsics.yaml"
+respeaker_extrinsics_path: "modules/audio/conf/respeaker_extrinsics.yaml"

@@ -330,6 +330,15 @@ void PiecewiseJerkProblem::set_x_ref(std::vector<double> weight_x_ref_vec,
   has_x_ref_ = true;
 }
 
+void PiecewiseJerkProblem::set_towing_x_ref(const double weight_towing_x_ref,
+                                            std::vector<double> towing_x_ref) {
+  CHECK_EQ(towing_x_ref.size(), num_of_knots_);
+  weight_towing_x_ref_vec_ =
+      std::vector<double>(num_of_knots_, weight_towing_x_ref);
+  towing_x_ref_ = std::move(towing_x_ref);
+  has_towing_x_ref_ = true;
+}
+
 void PiecewiseJerkProblem::set_towing_x_ref(
     std::vector<double> weight_towing_x_ref_vec,
     std::vector<double> towing_x_ref) {

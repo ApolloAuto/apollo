@@ -132,7 +132,7 @@ class SimulationWorldService {
   /**
    * @brief Sets the flag to clear the owned simulation world object.
    */
-  void SetToClear() { to_clear_ = true; }
+  static void SetToClear() { to_clear_ = true; }
 
   /**
    * @brief Check whether the SimulationWorld object has enough information.
@@ -358,7 +358,7 @@ class SimulationWorldService {
 
   // Whether to clear the SimulationWorld in the next timer cycle, set by
   // frontend request.
-  bool to_clear_ = false;
+  static bool to_clear_;
 
   // Relative map used/retrieved in navigation mode
   apollo::hdmap::Map relative_map_;

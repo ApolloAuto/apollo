@@ -23,8 +23,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/common_msgs/external_command_msgs/geometry.pb.h"
+
 #include "cyber/cyber.h"
+#include "modules/map/hdmap/hdmap_common.h"
 
 namespace apollo {
 namespace hdmap {
@@ -76,6 +79,10 @@ class LaneWayTool {
       std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const;
 
   bool IsParkandgoScenario() const;
+
+  bool GetPreciseParkingLaneWayPoint(
+      hdmap::AreaInfoConstPtr &area_info,
+      std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const;
 
  private:
   const hdmap::HDMap *hdmap_;

@@ -17,8 +17,11 @@
 #ifndef CYBER_TRANSPORT_RTPS_UNDERLAY_MESSAGE_TYPE_H_
 #define CYBER_TRANSPORT_RTPS_UNDERLAY_MESSAGE_TYPE_H_
 
+#include "cyber/base/macros.h"
+
+#include "fastdds/dds/topic/TopicDataType.hpp"
+#include "fastrtps/utils/md5.h"
 #include "cyber/transport/rtps/underlay_message.h"
-#include "fastrtps/TopicDataType.h"
 
 namespace apollo {
 namespace cyber {
@@ -29,18 +32,25 @@ namespace transport {
  * defined by the user in the IDL file.
  * @ingroup UNDERLAYMESSAGE
  */
-class UnderlayMessageType : public eprosima::fastrtps::TopicDataType {
+class UnderlayMessageType : public eprosima::fastdds::dds::TopicDataType {
  public:
   using type = UnderlayMessage;
 
   UnderlayMessageType();
   virtual ~UnderlayMessageType();
-  bool serialize(void* data, SerializedPayload_t* payload);
-  bool deserialize(SerializedPayload_t* payload, void* data);
-  std::function<uint32_t()> getSerializedSizeProvider(void* data);
-  bool getKey(void* data, InstanceHandle_t* ihandle);
-  void* createData();
-  void deleteData(void* data);
+  virtual bool serialize(  // NOLINT
+      void* data,
+      eprosima::fastrtps::rtps::SerializedPayload_t* payload) override;
+  virtual bool deserialize(  // NOLINT
+      eprosima::fastrtps::rtps::SerializedPayload_t* payload,
+      void* data) override;
+  virtual std::function<uint32_t()> getSerializedSizeProvider(  // NOLINT
+      void* data) override;
+  virtual bool getKey(void* data,  // NOLINT
+                      eprosima::fastrtps::rtps::InstanceHandle_t* ihandle,
+                      bool force_md5 = false) override;
+  virtual void* createData() override;           // NOLINT
+  virtual void deleteData(void* data) override;  // NOLINT
   MD5 m_md5;
   unsigned char* m_keyBuffer;
 };

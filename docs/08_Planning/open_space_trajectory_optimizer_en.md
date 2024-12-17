@@ -4,7 +4,7 @@
 The goal of this part is to optimizes the initial trajectory in the open space. Open_space_trajectory_optimizer is able to call a variety of different optimization algorithms.
 
 # Where is the code
-Please refer [open_space_trajectory_optimizer.cc](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_optimizer.cc)
+Please refer [open_space_trajectory_optimizer.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/open_space_trajectory_provider/open_space_trajectory_optimizer.cc)
 
 # Code Reading
 1. Input: stitching trajectory is provided by the open_space_trajectory_provider, planned target point, boundary of x and y, rotation angle relative to the corner of parking space, the reference origin point, line segment of boundary.

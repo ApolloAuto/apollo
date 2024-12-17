@@ -141,7 +141,7 @@ class ProcessWrapper(object):
     def __init__(self, binary_path, dag_num, dag_list, plugin_list,
                  process_name, process_type, sched_name, extra_args_list,
                  exception_handler='', respawn_limit=g_default_respawn_limit,
-                 cpu_profile_file='', mem_profile_file=''):
+                 cpu_profile_file='', mem_profile_file='', nice=0):
         self.time_of_death = None
         self.started = False
         self.cpu_profile = False
@@ -167,6 +167,7 @@ class ProcessWrapper(object):
             self.cpu_profile = True
         if self.mem_profile_file != '':
             self.mem_profile = True
+        self.nice = nice
 
     def wait(self, timeout_secs=None):
         """
@@ -234,6 +235,16 @@ class ProcessWrapper(object):
         # th.start()
         self.started = True
         self.pid = self.popen.pid
+        if self.nice != 0:
+            sudo_check = subprocess.run(
+                ['sudo', '-n', 'true'], stdout=None, stderr=None)
+            if sudo_check.returncode == 0:
+                subprocess.run(
+                    ["sudo", "renice", "-n", str(self.nice), "-p", str(self.pid)],
+                    stdout=None, stderr=subprocess.STDOUT)
+            else:
+                logger.error(
+                    'Can not renice because users do not have sudo privileges')
         logger.info(
             'Start process [%s] successfully. pid: %d', self.name, self.popen.pid)
         logger.info('-' * 120)
@@ -449,6 +460,7 @@ def start(launch_file=''):
             respawn_limit = int(respawn_limit_txt)
         else:
             respawn_limit = g_default_respawn_limit
+        nice_val = get_param_value(module, 'nice', 0)
         logger.info('Load module [%s] %s: [%s] [%s] conf, exception_handler: [%s], respawn_limit: [%d]',
                     module_name, process_type, process_name, sched_name, exception_handler, respawn_limit)
 
@@ -458,7 +470,7 @@ def start(launch_file=''):
                     'Start binary failed. Binary process_name is null.')
                 continue
             pw = ProcessWrapper(process_name.split()[0], 0, [""], [], process_name, process_type,
-                                sched_name, [], exception_handler, respawn_limit)
+                                sched_name, [], exception_handler, respawn_limit, nice=nice_val)
         # Default is library
         else:
             dag_list = get_param_list(module, 'dag_conf')
@@ -473,8 +485,8 @@ def start(launch_file=''):
                 extra_args_list = extra_args.split()
             pw = ProcessWrapper(g_binary_name, 0, dag_list, plugin_list,
                                 process_name, process_type, sched_name,
-                                extra_args_list, exception_handler,
-                                respawn_limit, cpu_profile_file, mem_profile_file)
+                                extra_args_list, exception_handler, respawn_limit,
+                                 cpu_profile_file, mem_profile_file, nice_val)
         result = pw.start()
         if result != 0:
             logger.error('Start manager [%s] failed. Stop all!', process_name)

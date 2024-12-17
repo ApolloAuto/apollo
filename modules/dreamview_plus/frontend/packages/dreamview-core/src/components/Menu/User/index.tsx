@@ -9,6 +9,7 @@ import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
 import { CURRENT_MODE, usePickHmiStore } from '../../../store/HmiStore';
 import showViewLoginModal from '../../WelcomeGuide/showViewLoginModal';
 import { useUserInfoStore } from '../../../store/UserInfoStore';
+import { updateSubscribe } from '../../../store/UserInfoStore/actions';
 
 interface IMenuItem {
     icon: React.ReactNode;
@@ -52,13 +53,17 @@ function Divider() {
 function User(props: UserProps) {
     const { setEnterGuideStateMemo } = props;
     const [hmi] = usePickHmiStore();
-    const [{ isLogin, userInfo }] = useUserInfoStore();
+    const [{ isLogin, userInfo, account }, dispatch] = useUserInfoStore();
     const hasLogin = !!userInfo?.id;
     const { theme } = useThemeContext();
     const { classes } = useStyle(theme);
     const { t } = useTranslation('personal');
     const IconPersonalCenterDefault = useImagePrak('ic_personal_center_default');
     const { isPluginConnected, pluginApi, mainApi } = useWebSocketServices();
+
+    const updateSubscribeAccount = () => {
+        dispatch(updateSubscribe(pluginApi));
+    };
 
     const { menusSetting, menusProfile } = useMemo(
         () => ({
@@ -71,6 +76,7 @@ function User(props: UserProps) {
                         showSettingModal({
                             dreamviewVersion: packageJson.version,
                             dockerVersion: hmi?.dockerImage,
+                            updateSubscribeAccount,
                             pluginApi,
                             isLogin,
                             userInfo,

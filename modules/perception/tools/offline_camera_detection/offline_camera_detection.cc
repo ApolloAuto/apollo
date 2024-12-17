@@ -37,7 +37,7 @@ DEFINE_string(dest_dir, "./data/output", "output dir");
 DEFINE_string(dist_type, "", "dist pred type: H-on-h, H-from-h");
 DEFINE_string(kitti_dir, "", "pre-detected obstacles (skip Detect)");
 DEFINE_string(root_dir,
-              "/apollo/modules/perception/tools/offline_camera_detection/",
+              "modules/perception/tools/offline_camera_detection/",
               "image root dir");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
 DEFINE_string(config_path, "perception/camera_detection_multi_stage/data",

@@ -100,26 +100,59 @@ bool XsiSegment::OpenOrCreate() {
     return false;
   }
 
+  // create field arena_blocks_
+  arena_blocks_ = new (static_cast<char*>(managed_shm_) + sizeof(State) + \
+                       conf_.block_num() * sizeof(Block)) Block[
+                        ShmConf::ARENA_BLOCK_NUM];
+  if (arena_blocks_ == nullptr) {
+    AERROR << "create arena blocks failed.";
+    state_->~State();
+    state_ = nullptr;
+    shmdt(managed_shm_);
+    managed_shm_ = nullptr;
+    shmctl(shmid, IPC_RMID, 0);
+    return false;
+  }
+
   // create block buf
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
-    uint8_t* addr =
-        new (static_cast<char*>(managed_shm_) + sizeof(State) +
-             conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size())
-            uint8_t[conf_.block_buf_size()];
-
+    uint8_t* addr = \
+        new (static_cast<char*>(managed_shm_) + sizeof(State) + \
+             conf_.block_num() * sizeof(Block) + \
+             ShmConf::ARENA_BLOCK_NUM * sizeof(Block) + \
+             i * conf_.block_buf_size()) uint8_t[conf_.block_buf_size()];
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
   }
 
-  if (i != conf_.block_num()) {
-    AERROR << "create block buf failed.";
+  // create arena block buf
+  uint32_t ai = 0;
+  for (; ai < ShmConf::ARENA_BLOCK_NUM; ++ai) {
+    uint8_t* addr = \
+        new(static_cast<char*>(managed_shm_) + sizeof(State) + \
+             conf_.block_num() * sizeof(Block) + \
+             ShmConf::ARENA_BLOCK_NUM * sizeof(Block) + \
+             conf_.block_num() * conf_.block_buf_size() + \
+             ai * ShmConf::ARENA_MESSAGE_SIZE) uint8_t[
+              ShmConf::ARENA_MESSAGE_SIZE];
+    std::lock_guard<std::mutex> _g(arena_block_buf_lock_);
+    arena_block_buf_addrs_[ai] = addr;
+  }
+
+  if (ai != ShmConf::ARENA_BLOCK_NUM || i != conf_.block_num()) {
+    AERROR << "create arena block or block buf failed.";
     state_->~State();
     state_ = nullptr;
     blocks_ = nullptr;
+    arena_blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> _g(block_buf_lock_);
       block_buf_addrs_.clear();
+    }
+    {
+      std::lock_guard<std::mutex> _g(arena_block_buf_lock_);
+      arena_block_buf_addrs_.clear();
     }
     shmdt(managed_shm_);
     managed_shm_ = nullptr;
@@ -174,12 +207,26 @@ bool XsiSegment::OpenOnly() {
     return false;
   }
 
+  // get field arena_blocks_
+  arena_blocks_ = reinterpret_cast<Block*>(
+    static_cast<char*>(managed_shm_) + sizeof(State) + \
+    sizeof(Block) * conf_.block_num());
+  if (arena_blocks_ == nullptr) {
+    AERROR << "get blocks failed.";
+    state_ = nullptr;
+    shmdt(managed_shm_);
+    managed_shm_ = nullptr;
+    return false;
+  }
+
   // get block buf
   uint32_t i = 0;
   for (; i < conf_.block_num(); ++i) {
     uint8_t* addr = reinterpret_cast<uint8_t*>(
-        static_cast<char*>(managed_shm_) + sizeof(State) +
-        conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
+        static_cast<char*>(managed_shm_) + sizeof(State) + \
+        conf_.block_num() * sizeof(Block) + \
+        ShmConf::ARENA_BLOCK_NUM * sizeof(Block) + \
+        i * conf_.block_buf_size());
 
     if (addr == nullptr) {
       break;
@@ -188,14 +235,35 @@ bool XsiSegment::OpenOnly() {
     block_buf_addrs_[i] = addr;
   }
 
-  if (i != conf_.block_num()) {
+  // get arena block buf
+  uint32_t ai = 0;
+  for (; ai < ShmConf::ARENA_BLOCK_NUM; ++ai) {
+    uint8_t* addr = reinterpret_cast<uint8_t*>(
+        static_cast<char*>(managed_shm_) + sizeof(State) + \
+        conf_.block_num() * sizeof(Block) + ShmConf::ARENA_BLOCK_NUM * \
+        sizeof(Block) + conf_.block_num() * conf_.block_buf_size() + \
+        ai * ShmConf::ARENA_MESSAGE_SIZE);
+
+    if (addr == nullptr) {
+      break;
+    }
+    std::lock_guard<std::mutex> _g(arena_block_buf_lock_);
+    arena_block_buf_addrs_[ai] = addr;
+  }
+
+  if (i != conf_.block_num() || ai != ShmConf::ARENA_BLOCK_NUM) {
     AERROR << "open only failed.";
     state_->~State();
     state_ = nullptr;
     blocks_ = nullptr;
+    arena_blocks_ = nullptr;
     {
       std::lock_guard<std::mutex> _g(block_buf_lock_);
       block_buf_addrs_.clear();
+    }
+    {
+      std::lock_guard<std::mutex> _g(arena_block_buf_lock_);
+      arena_block_buf_addrs_.clear();
     }
     shmdt(managed_shm_);
     managed_shm_ = nullptr;
@@ -222,9 +290,14 @@ bool XsiSegment::Remove() {
 void XsiSegment::Reset() {
   state_ = nullptr;
   blocks_ = nullptr;
+  arena_blocks_ = nullptr;
   {
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_.clear();
+  }
+  {
+    std::lock_guard<std::mutex> _g(arena_block_buf_lock_);
+    arena_block_buf_addrs_.clear();
   }
   if (managed_shm_ != nullptr) {
     shmdt(managed_shm_);

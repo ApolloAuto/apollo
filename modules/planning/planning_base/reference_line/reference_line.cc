@@ -771,8 +771,8 @@ bool ReferenceLine::GetSLBoundary(
     std::rotate(obs_corners.begin(), obs_corners.begin() + first_index,
                 obs_corners.end());
     const common::math::Vec2d& first_point = obs_corners.front();
-    AINFO << "first_point: " << std::setprecision(9) << first_point.x() << ", "
-          << first_point.y();
+    ADEBUG << "first_point: " << std::setprecision(9) << first_point.x() << ", "
+           << first_point.y();
     SLPoint first_sl_point;
     if (!XYToSL(first_point, &first_sl_point, warm_start_s)) {
       AERROR << "Failed to get projection for point: "

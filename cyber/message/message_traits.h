@@ -18,9 +18,11 @@
 #define CYBER_MESSAGE_MESSAGE_TRAITS_H_
 
 #include <string>
+#include <typeinfo>
 
 #include "cyber/base/macros.h"
 #include "cyber/common/log.h"
+#include "cyber/message/arena_message_wrapper.h"
 #include "cyber/message/message_header.h"
 #include "cyber/message/protobuf_traits.h"
 #include "cyber/message/py_message_traits.h"
@@ -40,6 +42,9 @@ DEFINE_TYPE_TRAIT(HasSerializeToString, SerializeToString)
 DEFINE_TYPE_TRAIT(HasParseFromString, ParseFromString)
 DEFINE_TYPE_TRAIT(HasSerializeToArray, SerializeToArray)
 DEFINE_TYPE_TRAIT(HasParseFromArray, ParseFromArray)
+DEFINE_TYPE_TRAIT(HasSerializeToArenaMessageWrapper,
+                  SerializeToArenaMessageWrapper)
+DEFINE_TYPE_TRAIT(HasParseFromArenaMessageWrapper, ParseFromArenaMessageWrapper)
 
 template <typename T>
 class HasSerializer {
@@ -142,6 +147,26 @@ int FullByteSize(const T& message) {
 }
 
 template <typename T>
+typename std::enable_if<HasParseFromArenaMessageWrapper<T>::value, bool>::type
+ParseFromArenaMessageWrapper(ArenaMessageWrapper* wrapper, T* message,
+                             T** message_ptr) {
+  return message->ParseFromArenaMessageWrapper(wrapper, message_ptr);
+}
+
+template <typename T,
+          typename std::enable_if<
+              !HasParseFromArenaMessageWrapper<T>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+bool ParseFromArenaMessageWrapper(ArenaMessageWrapper* wrapper, T* message,
+                                  T** message_ptr) {
+  (void)wrapper;
+  (void)message;
+  (void)message_ptr;
+  return false;
+}
+
+template <typename T>
 typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromArray(
     const void* data, int size, T* message) {
   return message->ParseFromArray(data, size);
@@ -181,6 +206,27 @@ typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromHC(
 template <typename T>
 typename std::enable_if<!HasParseFromArray<T>::value, bool>::type ParseFromHC(
     const void* data, int size, T* message) {
+  return false;
+}
+
+template <typename T>
+typename std::enable_if<HasSerializeToArenaMessageWrapper<T>::value, bool>::type
+SerializeToArenaMessageWrapper(const T& message, ArenaMessageWrapper* wrapper,
+                               T** message_ptr) {
+  return message->SerializeToArenaMessageWrapper(wrapper, message_ptr);
+}
+
+template <typename T,
+          typename std::enable_if<
+              !HasSerializeToArenaMessageWrapper<T>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+bool SerializeToArenaMessageWrapper(const T& message,
+                                    ArenaMessageWrapper* wrapper,
+                                    T** message_ptr) {
+  (void)message;
+  (void)wrapper;
+  (void)message_ptr;
   return false;
 }
 

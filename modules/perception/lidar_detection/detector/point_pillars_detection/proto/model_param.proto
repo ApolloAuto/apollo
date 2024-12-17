@@ -4,9 +4,11 @@ package apollo.perception.lidar.pointpillars;
 
 import "modules/perception/common/proto/model_info.proto";
 import "modules/perception/common/proto/model_process.proto";
+import "modules/perception/common/proto/plugin_param.proto";
 
 message ModelParam {
   optional common.ModelInfo info = 1;
   optional common.PointCloudPreProcess preprocess = 2;
   optional common.PointCloudPostProcess postprocess = 3;
+  optional PluginParam plugins = 4;
 }

@@ -44,10 +44,13 @@ export enum MainApiTypes {
     AddObjectStore = 'AddOrModifyObjectToDB',
     DeleteObjectStore = 'DeleteObjectToDB',
     PutObjectStore = 'AddOrModifyObjectToDB',
+    putChartObjectStore = 'AddOrModifyObjectToDB',
     GetObjectStore = 'GetObjectFromDB',
     GetTuplesObjectStore = 'GetTuplesWithTypeFromDB',
     StartTerminal = 'StartTerminal',
     RequestRoutePath = 'RequestRoutePath',
+    GetCurrentLayout = 'GetCurrentLayout',
+    GetDefaultLayout = 'GetDefaultLayout',
 }
 
 /**
@@ -225,6 +228,8 @@ export type ScenarioSet = {
             status: ENUM_DOWNLOAD_STATUS;
         };
     };
+    public: boolean;
+    category: string;
     percentage: number;
     resource_id: string;
     resource_type: 'scenario';
@@ -401,6 +406,8 @@ export type HDMapSwitchInfo = {
 
 export enum OBJECT_STORE_TYPE {
     CHART = 'chart',
+    CURRENT_LAYOUT = 'CurrentLayout',
+    INIT_LATOUR = 'InitLayout',
 }
 export interface IAddObjectStoreParams {
     key: string;

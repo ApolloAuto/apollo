@@ -1,0 +1,3 @@
+<library path="cyber/ros_bridge/converters/common_plugins/localization_msg_converter/liblocalization_estimate.so">
+    <class type="apollo::cyber::LocalizationEstimate" base_class="apollo::cyber::MessageConverter"></class>
+</library>

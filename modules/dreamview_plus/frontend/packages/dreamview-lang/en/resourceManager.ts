@@ -17,6 +17,10 @@ export const profileManagerScenarios = {
     titleType: 'Type',
     titleState: 'State',
     titleOperate: 'Operation',
+    all: 'All',
+    team: 'Team',
+    personal: 'Personal',
+    system: 'System',
 };
 
 export const profileManagerHDMap = {

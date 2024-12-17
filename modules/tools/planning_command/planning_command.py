@@ -2,6 +2,7 @@ import modules.common_msgs.planning_msgs.planning_command_pb2 as planning_comman
 import modules.common_msgs.external_command_msgs.free_space_command_pb2 as free_space_command_pb2
 import modules.common_msgs.external_command_msgs.command_status_pb2 as command_status_pb2
 import modules.common_msgs.external_command_msgs.action_command_pb2 as action_pb2
+import modules.common_msgs.external_command_msgs.precise_parking_command_pb2 as precise_parking_command_pb2
 import modules.common_msgs.external_command_msgs.valet_parking_command_pb2 as parking_pb2
 import google.protobuf.any_pb2 as any_pb2
 from cyber.python.cyber_py3 import cyber
@@ -23,6 +24,7 @@ polygon_parking_out = [(437547.8, 4432544.35),
                        (437549.2, 4432537.6),
                        (437564.3, 4432540.7),
                        (437562.9, 4432547.3)]
+precise_parking = [437560.83, 4432539.28, 1.7]
 # bdkjy_map
 # polygon = [(437556.24, 4432546.77),
 #            (437557.5, 4432543.0),
@@ -74,7 +76,7 @@ if __name__ == '__main__':
     plt.plot(x, y, '*-')
     plt.gca().xaxis.set_major_formatter(ticker.FormatStrFormatter('%.6f'))
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.6f'))
-    plt.show()
+    # plt.show()
     cyber.init()
     node = cyber.Node("planning_command")
     writer = node.create_writer(
@@ -85,9 +87,11 @@ if __name__ == '__main__':
         "/apollo/external_command/action", action_pb2.ActionCommand, command_status_pb2.CommandStatus)
     client_parking = node.create_client(
         "/apollo/external_command/valet_parking", parking_pb2.ValetParkingCommand, command_status_pb2.CommandStatus)
+    client_precise_parking = node.create_client(
+        "/apollo/external_command/precise_parking", precise_parking_command_pb2.PreciseParkingCommand, command_status_pb2.CommandStatus)
     while not cyber.is_shutdown():
         m = input(
-            "0:lanefollow 1: pullover 2: parking 3:parking out 4:freespace 1 5: freespace 2\n")
+            "0:lanefollow 1: pullover 2: parking 3:parking out 4:freespace 1 5: freespace 2 6: precise_parking\n")
         planning_command = planning_command_pb2.PlanningCommand()
         add_header(planning_command)
         print(m)
@@ -128,6 +132,20 @@ if __name__ == '__main__':
             set_pose(fsc, pose['3'])
             print(fsc)
             client_free_space.send_request(fsc)
+        elif m == "6":  # free space pose
+            fsc = precise_parking_command_pb2.PreciseParkingCommand()
+            x = float(input("please input precise_parking x:"))
+            y = float(input("please input precise_parking y:"))
+            heading = float(input("please input precise_parking heading:"))
+            inwards = bool(input("please input precise_parking inwards:"))
+            add_header(fsc)
+            # set_pose(fsc, precise_parking)
+            set_pose(fsc, [x, y, heading])
+            fsc.mission_type = precise_parking_command_pb2.PreciseMissionType.DUMP
+            # fsc.parking_inwards = False
+            fsc.parking_inwards = inwards
+            print(fsc)
+            client_precise_parking.send_request(fsc)
 
             # msg = any_pb2.Any()
             # msg.Pack(fsc, str(fsc))

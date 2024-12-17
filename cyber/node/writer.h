@@ -100,6 +100,12 @@ class Writer : public WriterBase {
    */
   void GetReaders(std::vector<proto::RoleAttributes>* readers) override;
 
+  /**
+   * @brief Acquire message instance to send
+   *
+   */ 
+  std::shared_ptr<MessageT> AcquireMessage();
+
  private:
   void JoinTheTopology();
   void LeaveTheTopology();
@@ -229,6 +235,23 @@ void Writer<MessageT>::GetReaders(std::vector<proto::RoleAttributes>* readers) {
   }
 
   channel_manager_->GetReadersOfChannel(role_attr_.channel_name(), readers);
+}
+
+template <typename MessageT>
+std::shared_ptr<MessageT> Writer<MessageT>::AcquireMessage() {
+  if (!WriterBase::IsInit()) {
+    AERROR << "Please Acquire message after init writer!";
+    auto m = std::make_shared<MessageT>();
+    return m;
+  }
+
+  std::shared_ptr<MessageT> m(nullptr);
+  if (transmitter_->AcquireMessage(m)) {
+    return m;
+  } else {
+    m = std::make_shared<MessageT>();
+    return m;
+  }
 }
 
 }  // namespace cyber

@@ -1,0 +1,157 @@
+---
+# tasks file for ansible/roles/ordinary_modules
+
+# support for modules/common
+#- name: Install osqp (for modules/common)
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_osqp.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "osqp-0.5.0"
+#    INSTALL_PREFIX: "/opt/apollo/sysroot"
+
+- name: Install libsqlite3-dev (for modules/common)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libsqlite3-dev
+    state: latest
+    update_cache: false
+
+# support for modules/perception
+- name: Install paddle deps (for modules/perception)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libsnappy-dev
+      - libleveldb-dev
+      - libffi-dev
+      - libssl-dev
+    state: latest
+    update_cache: false
+
+# support for modules/predictioh
+# already installed in modules_base
+#- name: Install opencv (for modules/prediction)
+#  become: true
+#  ansible.builtin.shell:
+#    cmd: /opt/apollo/installers/install_opencv.sh
+#    executable: /bin/bash
+#  args: []
+#  environment:
+#    INSTALL_ATOM: "opencv-4.4.0"
+#    INSTALL_PREFIX: "/opt/apollo/sysroot"
+
+# support for modules/planning
+#- name: Install adolc (for modules/planning)
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - libcolpack-dev
+#      - libadolc-dev
+#    state: latest
+#    update_cache: false
+
+- name: Install ipopt (for modules/planning)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - coinor-libipopt-dev
+    state: latest
+    update_cache: false
+- name: Dirty hack for ipopt
+  become: true
+  ansible.builtin.shell:
+    cmd: sed -i '/#define __IPSMARTPTR_HPP__/a\#define HAVE_CSTDDEF' /usr/include/coin/IpSmartPtr.hpp
+    executable: /bin/bash
+
+# support for modules/map
+- name: Install tinyxml2 (for modules/map)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libtinyxml2-dev
+    state: latest
+    update_cache: false
+
+# suport for modules/localization
+# nothing.
+
+# support for modules/tools
+- name: Install libgeos libhdf5 (for modules/tools)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libgeos-dev
+      - libhdf5-dev
+    state: latest
+    update_cache: false
+
+# TODO: support venv
+- name: Install python modules (for modules/tools)
+  become: true
+  ansible.builtin.pip:
+    requirements: /opt/apollo/installers/py3_requirements.txt
+    # extra_args: --timeout 30 --no-cache-dir -i https://mirror.baidu.com/pypi/simple/
+    extra_args: --timeout 30 --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+- name: Install pypcd (for modules/tools)
+  become: true
+  ansible.builtin.pip:
+    name: git+https://github.com/klintan/pypcd.git
+
+# support for modules/teleop
+- name: Install openh264 (for modules/teleop)
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_openh264.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "openh264-2.1.1"
+    INSTALL_PREFIX: "/opt/apollo/sysroot"
+
+- name: install GeographicLib
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_GeographicLib.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "GeographicLib-2.3"
+    INSTALL_PREFIX: "/usr"
+
+- name: install gtsam
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_gtsam.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "gtsam-4.2"
+    INSTALL_PREFIX: "/usr"
+
+# support for modules/audio
+#- name: Install fftw3 (for modules/audio)
+#  become: true
+#  ansible.builtin.apt:
+#    name:
+#      - libfftw3-dev
+#    state: latest
+#    update_cache: false
+
+- name: install packages by OS
+  ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}.{{ ansible_architecture }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+        - "default.yaml"
+      paths:
+        - 'tasks'

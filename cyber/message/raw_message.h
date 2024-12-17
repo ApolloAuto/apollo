@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/message/arena_message_wrapper.h"
 #include "cyber/message/protobuf_factory.h"
 
 namespace apollo {
@@ -82,6 +83,10 @@ struct RawMessage {
     return true;
   }
 
+  // bool SerializeToArenaMessageWrapper(ArenaMessageWrapper *wrapper) const {
+  //   return true;
+  // }
+
   bool ParseFromArray(const void *data, int size) {
     if (data == nullptr || size <= 0) {
       return false;
@@ -95,6 +100,10 @@ struct RawMessage {
     message = str;
     return true;
   }
+
+  // bool ParseFromArenaMessageWrapper(const ArenaMessageWrapper &wrapper) {
+  //   return true;
+  // }
 
   int ByteSize() const { return static_cast<int>(message.size()); }
 

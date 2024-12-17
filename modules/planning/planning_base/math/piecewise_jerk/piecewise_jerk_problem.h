@@ -111,6 +111,9 @@ class PiecewiseJerkProblem {
    * @param weight_towing_x_ref_vec: piecewised towing x_ref weightings
    * @param towing_x_ref: objective value of x
    */
+  void set_towing_x_ref(const double weight_towing_x_ref,
+                        std::vector<double> towing_x_ref);
+
   void set_towing_x_ref(std::vector<double> weight_towing_x_ref_vec,
                         std::vector<double> towing_x_ref);
 

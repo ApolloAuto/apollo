@@ -1,0 +1,20 @@
+- name: Initialize host
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become_method: sudo
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Verify OS
+      ansible.builtin.fail:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }} is not supported."
+      when:
+        - ansible_distribution != 'Ubuntu' and ansible_distribution_version not in ['22.04', '20.04', '18.04']
+        - ansible_distribution != 'Gentoo'
+
+    - name: Install Drivers Dependencies
+      include_role:
+        name: apolloauto.dev_env.drivers_deps

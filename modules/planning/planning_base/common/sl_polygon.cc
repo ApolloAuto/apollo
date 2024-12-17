@@ -24,8 +24,14 @@
 #include <string>
 #include <utility>
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
+
+using apollo::common::VehicleConfigHelper;
+
 double SLPolygon::GetInterpolatedLFromBoundary(
     const std::vector<SLPoint>& boundary, const double s) {
   ACHECK(!boundary.empty());
@@ -65,8 +71,9 @@ void SLPolygon::PrintToLogBlock() const {
   print_curve.PrintToLog();
 }
 
-SLPolygon::SLPolygon(SLBoundary sl_boundary, std::string id, bool print_log)
-    : sl_boundary_(sl_boundary), id_(id) {
+SLPolygon::SLPolygon(SLBoundary sl_boundary, std::string id,
+                     PerceptionObstacle::Type type, bool print_log)
+    : sl_boundary_(sl_boundary), id_(id), obstacle_type_(type) {
   int min_s_index = -1;
   int max_s_index = -1;
   int min_l_index = -1;
@@ -163,8 +170,62 @@ double SLPolygon::GetInterpolatedSFromBoundary(
       boundary.begin(), boundary.end(), s,
       [](const SLPoint& sl_point, const double s) { return sl_point.s() < s; });
   auto last_iter = std::prev(iter);
-  return last_iter->l() + (s - last_iter->s()) * (iter->l() - last_iter->l()) /
-                              (iter->s() - last_iter->s());
+  double ret = last_iter->l() + (s - last_iter->s()) *
+                                    (iter->l() - last_iter->l()) /
+                                    (iter->s() - last_iter->s());
+  return ret;
+}
+
+void SLPolygon::UpdatePassableInfo(double left_bound, double right_bound,
+                                   double buffer) {
+  if (!is_passable_[0] && !is_passable_[1]) {
+    return;
+  }
+  is_passable_[0] = left_bound > max_l_point_.l() + buffer;
+  is_passable_[1] = right_bound < min_l_point_.l() - buffer;
+}
+
+double SLPolygon::MinRadiusStopDistance(double check_l) {
+  if (min_radius_stop_distance_ > 0) {
+    return min_radius_stop_distance_;
+  }
+  static constexpr double stop_distance_buffer = 0.4;
+  double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
+  AINFO << "min_turn_radius: " << min_turn_radius;
+
+  const auto& adc_param =
+      VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
+  double lateral_diff = 0.0;
+  double expand_adc_half_width =
+      adc_param.width() / 2.0 + FLAGS_nonstatic_obstacle_nudge_l_buffer;
+  min_turn_radius += expand_adc_half_width;
+  AINFO << "expand min_turn_radius: " << min_turn_radius;
+  if (nudge_type_ == NudgeType::LEFT_NUDGE) {
+    lateral_diff = expand_adc_half_width - check_l + max_l_point_.l();
+  } else if (nudge_type_ == NudgeType::RIGHT_NUDGE) {
+    lateral_diff = expand_adc_half_width + check_l - min_l_point_.l();
+  }
+  lateral_diff = std::max(0.0, lateral_diff);
+  const double kEpison = 1e-5;
+  lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
+  AINFO << "obs: " << id_ << ", lateral_diff: " << lateral_diff;
+  double min_radius_stop_distance_ =
+      std::sqrt(std::fabs(min_turn_radius * min_turn_radius -
+                          (min_turn_radius - lateral_diff) *
+                              (min_turn_radius - lateral_diff))) +
+      stop_distance_buffer;
+  double turn_heading =
+      std::atan2(min_radius_stop_distance_, min_turn_radius - lateral_diff);
+
+  min_radius_stop_distance_ +=
+      adc_param.front_edge_to_center() * std::cos(turn_heading);
+  min_radius_stop_distance_ =
+      std::min(min_radius_stop_distance_, FLAGS_max_stop_distance_obstacle);
+  min_radius_stop_distance_ =
+      std::max(min_radius_stop_distance_, FLAGS_min_stop_distance_obstacle);
+  AINFO << "obs: " << id_
+        << ", min_radius_stop_distance: " << min_radius_stop_distance_;
+  return min_radius_stop_distance_;
 }
 
 }  // namespace planning

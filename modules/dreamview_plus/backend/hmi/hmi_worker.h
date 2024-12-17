@@ -99,11 +99,6 @@ class HMIWorker {
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
-  bool UpdateScenarioSetToStatus(const std::string& scenario_set_id,
-                                 const std::string& scenario_set_name);
-  bool UpdateScenarioSet(const std::string& scenario_set_id,
-                         const std::string& scenario_set_name,
-                         ScenarioSet* new_scenario_set);
   bool UpdateDynamicModelToStatus(const std::string& dynamic_model_name);
   void UpdateComponentStatus();
   // bool UpdateRecordToStatus(const std::string& record_id,
@@ -136,18 +131,6 @@ class HMIWorker {
   void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
   void UpdatePointCloudChannelToStatus(const std::string& channel_name);
 
-  /**
-   * @brief Get the end point of the current scene
-   * @param x is the x-coordinate of the end point
-   * @param y is the y-coordinate of the end point
-   */
-  nlohmann::json GetCurrentScenarioExtremPoint();
-
-  bool StartSimObstacle();
-  bool StopSimObstacle();
-  bool StartScenarioSimulation();
-  bool StopScenarioSimulation();
-
   // Start / Stop Data Recorder
   bool StartDataRecorder();
   bool StopDataRecorder();
@@ -179,6 +162,17 @@ class HMIWorker {
    * @return True if the process exists
    */
   bool isProcessRunning(const std::string& process_name);
+  /**
+   * @brief Get dv current mode default layout.
+   * @return the default layout.
+   */
+  std::string GetCurrentModeDefaultLayout();
+
+  /**
+   * @brief Get dv plugin panels json of frontend.
+   * @return the plugin panels json.
+   */
+  std::string GetDvPluginPanelsJsonStr();
 
  private:
   void InitReadersAndWriters();
@@ -198,10 +192,8 @@ class HMIWorker {
   void ChangeRtkRecord(const std::string& record_id);
   void ChangeOperation(const std::string& operation_str);
   void ChangeDynamicModel(const std::string& dynamic_model_name);
-  void ChangeScenario(const std::string& scenario_info);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
   void ClearRecordInfo();
-  void ClearScenarioInfo();
   void ClearRtkRecordInfo();
   void ClearInvalidRecordStatus(const HMIModeOperation& operation);
   void ReloadMaps();
@@ -215,7 +207,6 @@ class HMIWorker {
   void ClearInvalidResourceUnderChangeOperation(
       const HMIModeOperation operation);
 
-  bool LoadScenarios();
 
   bool LoadDynamicModels();
   void DeleteMap(const std::string& map_name);
@@ -226,14 +217,13 @@ class HMIWorker {
   // Delete the v2x configuration file from the corresponding
   // vehicle configuration file.
   void DeleteV2xConfig(const std::string& vehicle_name);
-  void GetScenarioResourcePath(std::string* scenario_resource_path);
-  void GetRecordPath(std::string* record_path);
+  bool GetScenarioResourcePath(std::string* scenario_resource_path);
+  bool GetRecordPath(std::string* record_path);
   void GetRtkRecordPath(std::string* record_path);
 
   // Start / stop a module.
   void StartModule(const std::string& module);
   void StopModule(const std::string& module);
-  bool StopModuleByCommand(const std::string& stop_command) const;
   void LockModule(const std::string& module, const bool& lock_flag);
   // Stop play current record process but current record not changed
   void StopRecordPlay(const std::string& record_id = "");
@@ -272,6 +262,15 @@ class HMIWorker {
    */
   void AddExpectedModules(const HMIAction& action);
 
+  /**
+   * @brief Check if the package has been installed
+   */
+  bool PackageExist(const std::string& package_name);
+  /**
+   * @brief Load dv plugin panels json of frontend.
+   */
+  void LoadDvPluginPanelsJson();
+
   HMIConfig config_;
 
   // HMI status maintenance.
@@ -309,6 +308,7 @@ class HMIWorker {
   DvCallback callback_api_;
   std::unique_ptr<cyber::Timer> monitor_timer_;
   apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
+  nlohmann::json plugin_panels_json_;
 };
 
 }  // namespace dreamview

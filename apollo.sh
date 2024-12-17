@@ -43,7 +43,7 @@ function check_minimal_memory_requirement() {
 }
 
 function determine_esdcan_use() {
-  local esdcan_dir="${APOLLO_ROOT_DIR}/third_party/can_card_library/esd_can"
+  local esdcan_dir="${TOP_DIR}/third_party/can_card_library/esd_can"
   local use_esd=false
   if [[ "${ARCH}" == "x86_64" ]] &&
     [[ -f "${esdcan_dir}/include/ntcan.h" ]] &&
@@ -96,12 +96,12 @@ function apollo_env_setup() {
     mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
   fi
 
-  env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
+  # env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
 }
 
 #TODO(all): Update node modules
 function build_dreamview_frontend() {
-  pushd "${APOLLO_ROOT_DIR}/modules/dreamview/frontend" > /dev/null
+  pushd "${TOP_DIR}/modules/dreamview/frontend" > /dev/null
   yarn build
   popd > /dev/null
 }
@@ -109,7 +109,7 @@ function build_dreamview_frontend() {
 function build_test_and_lint() {
   env ${APOLLO_ENV} bash "${build_sh}"
   env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test
-  env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" --cpp
+  env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_lint.sh" --cpp
   success "Build and Test and Lint finished."
 }
 
@@ -123,15 +123,7 @@ function _usage() {
     ${BLUE}build_opt [module]${NO_COLOR}: run optimized build.
     ${BLUE}build_cpu [module]${NO_COLOR}: build in CPU mode. Equivalent to 'bazel build --config=cpu'
     ${BLUE}build_gpu [module]${NO_COLOR}: run build in GPU mode. Equivalent to 'bazel build --config=gpu'
-    ${BLUE}build_nvidia [module]${NO_COLOR}: run build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=nvidia'
-    ${BLUE}build_amd [module]${NO_COLOR}: run build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=amd'
     ${BLUE}build_opt_gpu [module]${NO_COLOR}: optimized build in GPU mode. Equivalent to 'bazel build --config=opt --config=gpu'
-    ${BLUE}build_opt_nvidia [module]${NO_COLOR}: optimized build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=opt --config=nvidia'
-    ${BLUE}build_opt_amd [module]${NO_COLOR}: optimized build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=opt --config=amd'
-    ${BLUE}build_pkg [module]${NO_COLOR}: build apollo on package-management way
-    ${BLUE}build_pkg_dbg [module]${NO_COLOR}: build apollo on package-management way
-    ${BLUE}build_pkg_opt [module]${NO_COLOR}: build apollo on package-management way
-    ${BLUE}build_pkg_opt_gpu [module]${NO_COLOR}: build apollo on package-management way
     ${BLUE}test [module]${NO_COLOR}: run unittest for cyber (module='cyber') or modules/<module>. If unspecified, test all.
     ${BLUE}coverage [module]${NO_COLOR}: run coverage test for cyber (module='cyber') or modules/<module>. If unspecified, coverage all.
     ${BLUE}lint${NO_COLOR}: run code style check
@@ -142,7 +134,6 @@ function _usage() {
     ${BLUE}build_prof [module]${NO_COLOR}: build with perf profiling support. Not implemented yet.
     ${BLUE}install_dv_plugins ${NO_COLOR}: install Dreamview plugins package.
     ${BLUE}doc${NO_COLOR}: generate doxygen document
-    ${BLUE}release${NO_COLOR}: build Apollo binary releases
     ${BLUE}clean${NO_COLOR}: cleanup bazel output and log/coredump files
     ${BLUE}format${NO_COLOR}: format C++/Python/Bazel/Shell files
     ${BLUE}usage${NO_COLOR}: show this message and exit
@@ -173,78 +164,51 @@ function main() {
   check_config_cpu "$@"
   apollo_env_setup
 
-  local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
-  local build_pkg_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build_pkg.sh"
-  local pkg_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build_package.sh"
-  local test_sh="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
-  local coverage_sh="${APOLLO_ROOT_DIR}/scripts/apollo_coverage.sh"
-  local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
+  local action_sh="${TOP_DIR}/scripts/apollo_action.sh"
+  local coverage_sh="${TOP_DIR}/scripts/apollo_coverage.sh"
+  local ci_sh="${TOP_DIR}/scripts/apollo_ci.sh"
 
   local cmd="$1"
   shift
   case "${cmd}" in
     config)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_config.sh" "$@"
       ;;
     build)
-      env ${APOLLO_ENV} bash "${build_sh}" "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" "$@"
       ;;
     build_opt)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=opt "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=opt "$@"
       ;;
     build_dbg)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=dbg "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=dbg "$@"
       ;;
     build_cpu)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=cpu "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=cpu "$@"
       ;;
     build_gpu)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=gpu "$@"
-      ;;
-    build_nvidia)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=nvidia "$@"
-      ;;
-    build_amd)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=amd "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=gpu "$@"
       ;;
     build_opt_gpu)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=opt --config=gpu "$@"
       ;;
     build_opt_gpu_pnc)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=opt --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
       ;;
     build_pnc)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=dbg --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
-      ;;
-    build_pkg)
-      env ${APOLLO_ENV} bash "${build_pkg_sh}" "$@"
-      ;;
-    build_pkg_opt)
-      env ${APOLLO_ENV} bash "${build_pkg_sh}" --config=opt "$@"
-      ;;
-    build_pkg_opt_gpu)
-      env ${APOLLO_ENV} bash "${build_pkg_sh}" --config=opt --config=gpu "$@"
-      ;;
-    build_pkg_dbg)
-      env ${APOLLO_ENV} bash "${build_pkg_sh}" --config=dbg "$@"
-      ;;
-    build_opt_nvidia)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=nvidia "$@"
-      ;;
-    build_opt_amd)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=amd "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=dbg --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
       ;;
     build_prof)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=prof "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=prof "$@"
       ;;
     build_teleop)
-      env ${APOLLO_ENV} bash "${build_sh}" --config=teleop "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--build" --config=teleop "$@"
       ;;
     build_fe)
       build_dreamview_frontend
       ;;
     test)
-      env ${APOLLO_ENV} bash "${test_sh}" --config=unit_test "$@"
+      env ${APOLLO_ENV} bash "${action_sh}" "--test" "$@"
       ;;
     coverage)
       env ${APOLLO_ENV} bash "${coverage_sh}" "$@"
@@ -262,25 +226,25 @@ function main() {
       build_test_and_lint
       ;;
     buildify)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_buildify.sh"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_buildify.sh"
       ;;
     lint)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_lint.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_lint.sh" "$@"
       ;;
     clean)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_clean.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_clean.sh" "$@"
       ;;
     release)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_release.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_release.sh" "$@"
       ;;
     install_dv_plugins)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/install_dv_plugins.sh"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/install_dv_plugins.sh"
       ;;
     doc)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_docs.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_docs.sh" "$@"
       ;;
     format)
-      env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_format.sh" "$@"
+      env ${APOLLO_ENV} bash "${TOP_DIR}/scripts/apollo_format.sh" "$@"
       ;;
     usage)
       _usage

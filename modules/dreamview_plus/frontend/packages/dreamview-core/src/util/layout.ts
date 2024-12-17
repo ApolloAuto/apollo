@@ -10,6 +10,14 @@ export const genereatePanelId = (type: string) => {
     return `${replaceUid}!${shortUUID.generate()}`;
 };
 
+export const completionPanelId = (panelId: string) => {
+    const hasHash = /!\w+/.test(panelId);
+    if (hasHash) {
+        return panelId;
+    }
+    return genereatePanelId(panelId);
+};
+
 export const genereateNewMosaicNode = (
     layout: MosaicNode<string>,
     path: MosaicPath,

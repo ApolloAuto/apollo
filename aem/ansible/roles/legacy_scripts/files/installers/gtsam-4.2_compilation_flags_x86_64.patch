@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5bad53988..259b68ea4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,9 @@ set (CMAKE_PROJECT_VERSION_MAJOR ${GTSAM_VERSION_MAJOR})
+ set (CMAKE_PROJECT_VERSION_MINOR ${GTSAM_VERSION_MINOR})
+ set (CMAKE_PROJECT_VERSION_PATCH ${GTSAM_VERSION_PATCH})
+ 
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mavx2")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
++
+ ###############################################################################
+ # Gather information, perform checks, set defaults
+ 

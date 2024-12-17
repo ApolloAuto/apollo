@@ -124,6 +124,7 @@ message ADCTrajectory {
     PATH_REUSED = 4;
     OPEN_SPACE = 5;
     EDGE_FOLLOW = 6;
+    RELATIVE_CONTROL = 7;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
 
@@ -138,7 +139,10 @@ message ADCTrajectory {
   // vehicle location pose
   optional LocationPose location_pose = 25;
 
+  // in RELATIVE_CONTROL trajectory type, if trajectory is collisioned with obstable
+  optional bool is_collision = 26 [default = false];
+
   // output related to RSS
   optional RSSInfo rss_info = 100;
- 
+
 }

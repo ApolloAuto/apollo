@@ -77,4 +77,7 @@ message PredictionObstacles {
 
   // Scenario
   optional Scenario scenario = 7;
+
+  // waste
+  repeated apollo.perception.PerceptionWaste perception_waste = 8;
 }

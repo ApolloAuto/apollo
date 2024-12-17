@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/planning/tasks/open_space_pre_stop_decider/proto/open_space_pre_stop_decider.pb.h"
+
 #include "cyber/common/macros.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/frame.h"

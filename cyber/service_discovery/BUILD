@@ -36,13 +36,17 @@ apollo_cc_library(
         "//cyber/common:cyber_common",
         "//cyber:cyber_binary",
         "//cyber/proto:role_attributes_cc_proto",
-        "@fastrtps",
         "//cyber:cyber_state",
         "//cyber/message:cyber_message",
         "//cyber/proto:proto_desc_cc_proto",
         "//cyber/proto:topology_change_cc_proto",
         "//cyber/time:cyber_time",
     ],
+)
+
+apollo_cc_library(
+    name = "subscriber_listener",
+    hdrs = ["communication/subscriber_listener.h"]
 )
 
 apollo_cc_library(

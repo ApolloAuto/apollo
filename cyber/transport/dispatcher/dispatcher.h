@@ -25,11 +25,12 @@
 #include <string>
 #include <unordered_map>
 
+#include "cyber/proto/role_attributes.pb.h"
+
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
-#include "cyber/proto/role_attributes.pb.h"
 #include "cyber/transport/message/listener_handler.h"
 #include "cyber/transport/message/message_info.h"
 

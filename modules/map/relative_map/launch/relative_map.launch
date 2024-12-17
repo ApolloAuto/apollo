@@ -1,7 +1,7 @@
 <cyber>
     <module>
         <name>relative_map</name>
-        <dag_conf>/apollo/modules/map/relative_map/dag/relative_map.dag</dag_conf>
+        <dag_conf>modules/map/relative_map/dag/relative_map.dag</dag_conf>
         <process_name>relative_map</process_name>
     </module>
 </cyber>

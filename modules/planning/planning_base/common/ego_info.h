@@ -24,11 +24,13 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
+#include "modules/common_msgs/routing_msgs/geometry.pb.h"
 
 #include "cyber/common/macros.h"
 #include "modules/planning/planning_base/common/obstacle.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
+#include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 
 namespace apollo {
 namespace planning {
@@ -54,6 +56,9 @@ class EgoInfo {
 
   void CalculateFrontObstacleClearDistance(
       const std::vector<const Obstacle*>& obstacles);
+
+  void CalculateCurrentRouteInfo(
+      const ReferenceLineProvider* reference_line_provider);
 
  private:
   FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);
@@ -84,6 +89,9 @@ class EgoInfo {
   common::VehicleConfig ego_vehicle_config_;
 
   common::math::Box2d ego_box_;
+
+  apollo::hdmap::LaneWaypoint adc_waypoint_;
+  double distance_to_destination_ = 0;
 };
 
 }  // namespace planning

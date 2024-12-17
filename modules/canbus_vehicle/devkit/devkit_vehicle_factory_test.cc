@@ -30,7 +30,7 @@ class DevkitVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "/apollo/modules/canbus_vehicle/devkit/testdata/"
+        "modules/canbus_vehicle/devkit/testdata/"
         "devkit_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();

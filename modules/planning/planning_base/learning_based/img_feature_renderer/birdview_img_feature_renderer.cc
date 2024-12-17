@@ -31,10 +31,10 @@ namespace planning {
 
 // TODO(Jinyun): take map name from upstream and move to conf
 static const char ROADMAP_IMG_PATH[] =
-    "/apollo/modules/planning/planning_base/learning_based/data/semantic_map/"
+    "modules/planning/planning_base/learning_based/data/semantic_map/"
     "sunnyvale_with_two_offices.png";
 static const char SPEEDLIMITMAP_IMG_PATH[] =
-    "/apollo/modules/planning/planning_base/learning_based/data/semantic_map/"
+    "modules/planning/planning_base/learning_based/data/semantic_map/"
     "sunnyvale_with_two_offices_speedlimit.png";
 
 BirdviewImgFeatureRenderer::BirdviewImgFeatureRenderer() {}

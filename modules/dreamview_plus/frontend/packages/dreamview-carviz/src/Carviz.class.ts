@@ -24,6 +24,7 @@ import CopyMarker from './render/functional/CopyMarker';
 import RulerMarker from './render/functional/RulerMarker';
 import Follow from './render/follow';
 import { checkWebGLSupport, checkWebGPUSupport } from './utils/checkSupport';
+import CurbPointCloud from './render/curbPointCloud';
 
 enum PREVDATA_STATUS {
     EXIT = 'EXIT',
@@ -62,6 +63,8 @@ export class Carviz {
     public obstacles;
 
     public pointCloud;
+
+    public curbPointCloud;
 
     public routing;
 
@@ -287,9 +290,12 @@ export class Carviz {
         );
         this.camera.up.set(0, 0, 1);
 
-        const light = new THREE.DirectionalLight(0xffeedd, 2.0);
-        light.position.set(0, 0, 10);
-        this.scene.add(light);
+        const directionLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+        directionLight.position.set(0, 0, 10);
+        const ambientLight = new THREE.AmbientLight(0xffeedd, 2.0);
+        ambientLight.position.set(0, 0, 10);
+        this.scene.add(directionLight);
+        this.scene.add(ambientLight);
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = false;
@@ -352,6 +358,7 @@ export class Carviz {
         this.map = new Map(this.scene, this.text, this.option, this.coordinates, this.colors);
         this.obstacles = new Obstacles(this.scene, this.view, this.text, this.option, this.coordinates, this.colors);
         this.pointCloud = new PointCloud(this.scene, this.adc, this.option, this.colors);
+        this.curbPointCloud = new CurbPointCloud(this.scene, this.adc, this.option, this.coordinates, this.colors);
         this.routing = new Routing(this.scene, this.option, this.coordinates);
         this.decision = new Decision(this.scene, this.option, this.coordinates, this.colors);
         this.prediction = new Prediction(this.scene, this.option, this.coordinates, this.colors);
@@ -462,6 +469,10 @@ export class Carviz {
         this.pointCloud.update(data);
     };
 
+    updateCurbPointCloud = (data) => {
+        this.curbPointCloud.update(data);
+    };
+
     updateData(datas) {
         this.ifDispose(
             datas,
@@ -544,7 +555,7 @@ export class Carviz {
             datas,
             'gps',
             () => {
-                this.gps.update(datas.gps);
+                this.gps.update(datas.gps, datas.autoDrivingCar);
             },
             noop,
         );
@@ -585,6 +596,7 @@ export class Carviz {
         this.map.dispose();
         this.obstacles.dispose();
         this.pointCloud.dispose();
+        this.curbPointCloud.dispose();
         this.routing.dispose();
         this.decision.dispose();
         this.prediction.dispose();

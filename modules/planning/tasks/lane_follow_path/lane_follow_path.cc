@@ -114,14 +114,17 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     }
   }
   print_curve.PrintToLog();
+
+  path_bound.set_label(absl::StrCat("regular/", "self"));
+
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = path_bound;
   std::vector<SLPolygon> obs_sl_polygons;
   PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
                                        init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          &obs_sl_polygons, init_sl_state_, &path_bound, &blocking_obstacle_id,
-          &path_narrowest_width)) {
+          *reference_line_info_, &obs_sl_polygons, init_sl_state_, &path_bound,
+          &blocking_obstacle_id, &path_narrowest_width)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
         "taking into consideration all static obstacles.";
@@ -174,7 +177,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   //   regular_path_bound_pair.emplace_back(std::get<1>(path_bound[i]),
   //                                        std::get<2>(path_bound[i]));
   // }
-  path_bound.set_label(absl::StrCat("regular/", "self"));
+
   path_bound.set_blocking_obstacle_id(blocking_obstacle_id);
   RecordDebugInfo(path_bound, path_bound.label(), reference_line_info_);
   return true;
@@ -206,13 +209,11 @@ bool LaneFollowPath::OptimizePath(
     print_debug.PrintToLog();
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
         std::fmax(init_sl_state_.first[1], 1e-12));
-    std::vector<double> towing_l(path_boundary_size, 0);
     std::vector<double> ref_l(path_boundary_size, 0);
     std::vector<double> weight_ref_l(path_boundary_size, 0);
 
-    PathOptimizerUtil::UpdatePathRefWithBound(path_boundary,
-                                              config.path_reference_l_weight(),
-                                              towing_l, &ref_l, &weight_ref_l);
+    PathOptimizerUtil::UpdatePathRefWithBound(
+        path_boundary, config.path_reference_l_weight(), &ref_l, &weight_ref_l);
     bool res_opt = PathOptimizerUtil::OptimizePath(
         init_sl_state_, end_state, ref_l, weight_ref_l, path_boundary,
         ddl_bounds, jerk_bound, config, &opt_l, &opt_dl, &opt_ddl);

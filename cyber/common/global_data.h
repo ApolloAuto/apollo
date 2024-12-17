@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "cyber/proto/cyber_conf.pb.h"
+#include "cyber/proto/transport_conf.pb.h"
 
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
@@ -63,6 +64,13 @@ class GlobalData {
 
   bool IsRealityMode() const;
   bool IsMockTimeMode() const;
+
+  bool IsChannelEnableArenaShm(std::string channel_name) const;
+  bool IsChannelEnableArenaShm(uint64_t channel_id) const;
+  apollo::cyber::proto::ArenaChannelConf GetChannelArenaConf(
+      std::string channel_name) const&;
+  apollo::cyber::proto::ArenaChannelConf GetChannelArenaConf(
+      uint64_t channel_id) const&;
 
   static uint64_t GenerateHashId(const std::string& name) {
     return common::Hash(name);

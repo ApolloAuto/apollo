@@ -25,6 +25,7 @@
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/base/signal.h"
 #include "cyber/common/log.h"
+#include "cyber/message/arena_message_wrapper.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/transport/message/message_info.h"

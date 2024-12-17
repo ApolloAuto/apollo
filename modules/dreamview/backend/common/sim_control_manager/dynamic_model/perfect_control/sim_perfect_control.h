@@ -120,7 +120,7 @@ class SimPerfectControl final : public SimControlBase {
    * @brief Starts the timer to publish simulated localization and chassis
    * messages. Designated Start point for scenario
    */
-  void Start(double x, double y) override;
+  void Start(double x, double y, double v = 0.0, double a = 0.0) override;
 
   void InitStartPoint(double start_velocity, double start_acceleration);
 

@@ -22,9 +22,13 @@
 
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
+#include <filesystem>
 #include <memory>
 #include <string>
+
+#include "gflags/gflags.h"
 
 #include "cyber/proto/clock.pb.h"
 
@@ -36,20 +40,15 @@
 #include "cyber/node/node.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
+#include "cyber/statistics/statistics.h"
 #include "cyber/sysmo/sysmo.h"
 #include "cyber/task/task.h"
 #include "cyber/time/clock.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
-#include "cyber/statistics/statistics.h"
-
-#include "gflags/gflags.h"
 
 namespace apollo {
 namespace cyber {
-
-using apollo::cyber::scheduler::Scheduler;
-using apollo::cyber::service_discovery::TopologyManager;
 
 namespace {
 
@@ -97,6 +96,14 @@ void OnShutdown(int sig) {
 void ExitHandle() { Clear(); }
 
 bool Init(const char* binary_name, const std::string& dag_info) {
+  const char* apollo_runtime_path = std::getenv("APOLLO_RUNTIME_PATH");
+  if (apollo_runtime_path != nullptr) {
+    if (std::filesystem::is_directory(
+            std::filesystem::status(apollo_runtime_path))) {
+      std::filesystem::current_path(apollo_runtime_path);
+    }
+  }
+
   std::lock_guard<std::mutex> lg(g_mutex);
   if (GetState() != STATE_UNINITIALIZED) {
     return false;
@@ -135,11 +142,11 @@ bool Init(const char* binary_name, const std::string& dag_info) {
     std::string dump_path;
     if (dag_info.length() > 200) {
       std::string truncated = dag_info.substr(0, 200);
-      dump_path = common::GetEnv(
-        "APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" + truncated;
+      dump_path = common::GetEnv("APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" +
+                  truncated;
     } else {
-      dump_path = \
-        common::GetEnv("APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" + dag_info;
+      dump_path = common::GetEnv("APOLLO_ENV_WORKROOT", "/apollo") + "/dumps/" +
+                  dag_info;
     }
     google::SetCommandLineOption("bvar_dump_file", dump_path.c_str());
   } else {

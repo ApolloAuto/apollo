@@ -298,9 +298,15 @@ class Index(object):
                     origin_key = matched[0].strip(
                         "] print").strip("_").strip(":")
                     # key ,data
-                    data[origin_key] = dict()
-                    data[origin_key]["key"] = key
-                    data[origin_key]["data"] = []
+                    if not origin_key in data:
+                        data[origin_key] = dict()
+                        data[origin_key]["key"] = key
+                        data[origin_key]["data"] = []
+                    elif origin_key != "open_pq":
+                        data[origin_key] = dict()
+                        data[origin_key]["key"] = key
+                        data[origin_key]["data"] = []
+                    # print("matched", matched)
                     # print("key", key)
                     # print("matched[0]", matched[0])
                     # print("name", name)
@@ -325,6 +331,18 @@ class Index(object):
                         if "ego_box" in name:
                             self.ego_xy['x'] = data[name]["data"][0][i]
                             self.ego_xy['y'] = data[name]["data"][1][i]
+                elif "open_pq" in name :
+                  sub_line = []
+                  count = 0
+                  for data_index in range(0, len(data[name]["data"][0]) - 1, 2):
+                    count += 1
+                    line, = self.ax[subplot_name].plot([data[name]["data"][0][data_index], data[name]["data"][0][data_index + 1]],
+                                                [data[name]["data"][1][data_index], data[name]["data"][1][data_index + 1]],
+                                                self.line_map[key]["marker"])
+                    sub_line.append(line)
+                  self.ax[subplot_name].legend(sub_line, "open_pq")
+                  self.ax[subplot_name].grid(True)
+                  self.graphs[name] = sub_line
 
                 else:
                     line, = self.ax[subplot_name].plot(

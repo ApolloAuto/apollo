@@ -1,4 +1,4 @@
-import welcomeGuideBackground from '@dreamview/dreamview-core/src/assets/welcome_guide_background.png';
+import welcomeGuideBackground from './welcome_guide_background.png';
 import { colors } from './base';
 
 export default {

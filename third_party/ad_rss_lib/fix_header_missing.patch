@@ -1,0 +1,36 @@
+diff --git a/include/generated/ad_rss/state/LateralResponseValidInputRange.hpp b/include/generated/ad_rss/state/LateralResponseValidInputRange.hpp
+index 50426c804..d1b0c1ee1 100644
+--- a/include/generated/ad_rss/state/LateralResponseValidInputRange.hpp
++++ b/include/generated/ad_rss/state/LateralResponseValidInputRange.hpp
+@@ -41,6 +41,7 @@
+ 
+ #include <cmath>
+ #include <limits>
++#include <stdexcept>
+ #include "ad_rss/state/LateralResponse.hpp"
+ 
+ /*!
+diff --git a/include/generated/ad_rss/state/LongitudinalRssStateValidInputRange.hpp b/include/generated/ad_rss/state/LongitudinalRssStateValidInputRange.hpp
+index e036bd4fd..0359ec53a 100644
+--- a/include/generated/ad_rss/state/LongitudinalRssStateValidInputRange.hpp
++++ b/include/generated/ad_rss/state/LongitudinalRssStateValidInputRange.hpp
+@@ -41,6 +41,7 @@
+ 
+ #include <cmath>
+ #include <limits>
++#include <stdexcept>
+ #include "ad_rss/state/LongitudinalResponseValidInputRange.hpp"
+ #include "ad_rss/state/LongitudinalRssState.hpp"
+ 
+diff --git a/include/generated/ad_rss/state/ResponseStateValidInputRange.hpp b/include/generated/ad_rss/state/ResponseStateValidInputRange.hpp
+index 8bd07c07b..5c24bf1ed 100644
+--- a/include/generated/ad_rss/state/ResponseStateValidInputRange.hpp
++++ b/include/generated/ad_rss/state/ResponseStateValidInputRange.hpp
+@@ -41,6 +41,7 @@
+ 
+ #include <cmath>
+ #include <limits>
++#include <stdexcept>
+ #include "ad_rss/state/LateralRssStateValidInputRange.hpp"
+ #include "ad_rss/state/LongitudinalRssStateValidInputRange.hpp"
+ #include "ad_rss/state/ResponseState.hpp"

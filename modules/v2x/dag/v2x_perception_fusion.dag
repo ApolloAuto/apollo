@@ -6,7 +6,7 @@ module_config {
       class_name : "V2XFusionComponent"
       config {
         name : "v2x_fusion"
-        flag_file_path : "/apollo/modules/v2x/conf/v2x_fusion_tracker.conf"
+        flag_file_path : "modules/v2x/conf/v2x_fusion_tracker.conf"
         readers: [
           {
             channel: "/perception/vehicle/obstacles"

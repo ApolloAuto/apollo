@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/global_data.h"
 #include "cyber/record/record_message.h"
 #include "cyber/tools/cyber_monitor/general_message.h"
 #include "cyber/tools/cyber_monitor/screen.h"
@@ -121,9 +122,10 @@ GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
   }
 
   auto callback =
-      [this](
+      [this, channel_name](
           const std::shared_ptr<apollo::cyber::message::RawMessage>& raw_msg) {
         UpdateRawMessage(raw_msg);
+        UpdateChannelName(channel_name);
       };
 
   channel_reader_ =

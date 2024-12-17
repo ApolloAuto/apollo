@@ -26,6 +26,7 @@
 #include "modules/perception/common/base/point_cloud_util.h"
 #include "modules/perception/common/lidar/common/lidar_timer.h"
 #include "modules/perception/common/lidar/common/pcl_util.h"
+#include "modules/perception/common/lidar/common/config_util.h"
 #include "modules/perception/lidar_detection/detector/point_pillars_detection/params.h"
 
 namespace apollo {
@@ -67,6 +68,26 @@ bool MaskPillarsDetection::Init(const LidarDetectorInitOptions& options) {
                       static_cast<float>(
                         param_.preprocess().ground_removal_height()));
   }
+
+  if (param_.has_plugins()) {
+    const auto &plugin = param_.plugins();
+    const auto &name = plugin.name();
+    down_sample_ = apollo::cyber::plugin_manager::PluginManager::Instance()
+                       ->CreateInstance<BaseDownSample>(
+                           ConfigUtil::GetFullClassName(name));
+    if (!down_sample_) {
+      AINFO << "Failed to find down_sample plugin: " << name << ", skipped";
+      return false;
+    }
+    DownSampleInitOptions option;
+    option.config_path = plugin.config_path();
+    option.config_file = plugin.config_file();
+    if (!down_sample_->Init(option)) {
+      AINFO << "Failed to init down_sample plugin: " << name << ", skipped";
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -121,21 +142,9 @@ bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
 
   // down sample the point cloud through filtering voxel grid
   if (param_.preprocess().enable_downsample_pointcloud()) {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
-    pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
-        new pcl::PointCloud<pcl::PointXYZI>());
-    TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
-    DownSampleCloudByVoxelGrid(
-        pcl_cloud_ptr, filtered_cloud_ptr,
-        param_.preprocess().downsample_voxel_size_x(),
-        param_.preprocess().downsample_voxel_size_y(),
-        param_.preprocess().downsample_voxel_size_z());
-
-    // transform pcl point cloud to apollo point cloud
-    base::PointFCloudPtr downsample_voxel_cloud_ptr(new base::PointFCloud());
-    TransformFromPCLXYZI(filtered_cloud_ptr, downsample_voxel_cloud_ptr);
-    cur_cloud_ptr_ = downsample_voxel_cloud_ptr;
+    DownSampleOptions down_sample_options;
+    ACHECK(down_sample_ != nullptr);
+    down_sample_->Process(down_sample_options, cur_cloud_ptr_);
   }
   downsample_time_ = timer.toc(true);
 

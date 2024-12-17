@@ -14,19 +14,29 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gperftools/profiler.h"
+#include <filesystem>
+
 #include "gperftools/heap-profiler.h"
 #include "gperftools/malloc_extension.h"
+#include "gperftools/profiler.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/init.h"
 #include "modules/dreamview_plus/backend/dreamview.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
+  // set working directory to APOLLO_RUNTIME_PATH for relative file paths
+  const char* apollo_runtime_path = std::getenv("APOLLO_RUNTIME_PATH");
+  if (apollo_runtime_path != nullptr) {
+    if (std::filesystem::is_directory(
+            std::filesystem::status(apollo_runtime_path))) {
+      std::filesystem::current_path(apollo_runtime_path);
+    }
+  }
   google::ParseCommandLineFlags(&argc, &argv, true);
   // Added by caros to improve dv performance
 
-  std::signal(SIGTERM, [](int sig){
+  std::signal(SIGTERM, [](int sig) {
     apollo::cyber::OnShutdown(sig);
     if (FLAGS_dv_cpu_profile) {
       ProfilerStop();
@@ -37,7 +47,7 @@ int main(int argc, char *argv[]) {
     }
   });
 
-  std::signal(SIGINT, [](int sig){
+  std::signal(SIGINT, [](int sig) {
     apollo::cyber::OnShutdown(sig);
     if (FLAGS_dv_cpu_profile) {
       ProfilerStop();

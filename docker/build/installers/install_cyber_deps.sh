@@ -45,3 +45,10 @@ bash ${CURR_DIR}/install_gflags_glog.sh
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# libc patch
+wget "https://apollo-system.cdn.bcebos.com/archive/9.0/libc6-2.31-ubuntu18-amd64.tar.gz" \
+    -O libc6-2.31-ubuntu18-amd64.tar.gz
+tar -xzvf libc6-2.31-ubuntu18-amd64.tar.gz
+apt-get -y install ./*.deb
+rm -f libc*

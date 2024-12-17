@@ -36,6 +36,7 @@
 #include "cyber/common/log.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "modules/dreamview/backend/common/handlers/websocket_handler.h"
+#include "modules/dreamview_plus/backend/dv_plugin/dv_plugin_manager.h"
 #include "modules/dreamview_plus/backend/updater/updater_manager.h"
 /**
  * @namespace apollo::dreamview
@@ -59,7 +60,8 @@ class SocketManager {
   /**
    * @brief Constructor of SocketManager.
    */
-  SocketManager(WebSocketHandler *websocket, UpdaterManager *updater_manager);
+  SocketManager(WebSocketHandler *websocket, UpdaterManager *updater_manager,
+                DvPluginManager *dv_plugin_manager);
   /**
    * @brief Broadcast data handler conf for all connections
    * @param clear_channel_msg true means broadcast data handler
@@ -83,6 +85,7 @@ class SocketManager {
   std::map<std::string, int> data_handler_channel_count_;
   WebSocketHandler *websocket_ = nullptr;
   UpdaterManager *updater_manager_ = nullptr;
+  DvPluginManager *dv_plugin_manager_ = nullptr;
   void RegisterMessageHandlers();
   /**
    * @brief Subscribe data handler to publish data message.

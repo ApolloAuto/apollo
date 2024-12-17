@@ -1,0 +1,8 @@
+collections:
+  - source: ./ansible
+    type: dir
+#  - name: community.general
+# roles:
+#   - name: staticdev.pyenv
+# roles:
+#   - name: townk.beautiful_output

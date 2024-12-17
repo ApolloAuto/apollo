@@ -46,6 +46,8 @@ class HDMapInput {
                                Eigen::Vector3d* lane_direction);
   bool GetSignals(const Eigen::Vector3d& pointd, double forward_distance,
                   std::vector<apollo::hdmap::Signal>* signals);
+  bool GetBarrierGates(const Eigen::Vector3d& pointd, double forward_distance,
+                  std::vector<apollo::hdmap::BarrierGate>* barrier_gates);
 
  private:
   bool InitHDMap();
@@ -75,6 +77,10 @@ class HDMapInput {
   bool GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
                            double forward_distance,
                            std::vector<apollo::hdmap::Signal>* signals);
+
+  bool GetBarrierGatesFromHDMap(
+      const Eigen::Vector3d& pointd, double forward_distance,
+      std::vector<apollo::hdmap::BarrierGate>* barrier_gates);
 
   bool inited_ = false;
   lib::Mutex mutex_;

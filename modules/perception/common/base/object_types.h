@@ -100,6 +100,7 @@ enum class MotionState {
   UNKNOWN = 0,
   MOVING = 1,
   STATIONARY = 2,
+  MAX_MOTION_STATE,
 };
 
 /**

@@ -58,12 +58,12 @@ const char* licenseMessage =
     "limitations under the License.\n";
 
 const char* pcTempObjGroupName = "pointcloud";
-const char* pcVertexPath = "/apollo/modules/tools/visualizer/shaders/pointcloud.vert";
-const char* pcFragPath = "/apollo/modules/tools/visualizer/shaders/grid_pointcloud.frag";
-const char* gridVertexPath = "/apollo/modules/tools/visualizer/shaders/grid.vert";
-const char* gridFragPath = "/apollo/modules/tools/visualizer/shaders/grid_pointcloud.frag";
-const char* radarVertexPath = "/apollo/modules/tools/visualizer/shaders/radarpoints.vert";
-const char* radarFragPath = "/apollo/modules/tools/visualizer/shaders/radarpoints.frag";
+const char* pcVertexPath = "modules/tools/visualizer/shaders/pointcloud.vert";
+const char* pcFragPath = "modules/tools/visualizer/shaders/grid_pointcloud.frag";
+const char* gridVertexPath = "modules/tools/visualizer/shaders/grid.vert";
+const char* gridFragPath = "modules/tools/visualizer/shaders/grid_pointcloud.frag";
+const char* radarVertexPath = "modules/tools/visualizer/shaders/radarpoints.vert";
+const char* radarFragPath = "modules/tools/visualizer/shaders/radarpoints.frag";
 
 const std::string CompressedImageType("apollo.drivers.CompressedImage");
 

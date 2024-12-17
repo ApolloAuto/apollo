@@ -147,9 +147,9 @@ void AsensingParser::FillGnssBestpos() {
 }
 
 void AsensingParser::FillIns() {
-  ins_.mutable_euler_angles()->set_x(decode_b.insdata.Roll_deg);
-  ins_.mutable_euler_angles()->set_y(-decode_b.insdata.Pitch_deg);
-  ins_.mutable_euler_angles()->set_z(decode_b.insdata.Yaw_deg);
+  ins_.mutable_euler_angles()->set_x(decode_b.insdata.Roll_rad);
+  ins_.mutable_euler_angles()->set_y(-decode_b.insdata.Pitch_rad);
+  ins_.mutable_euler_angles()->set_z(decode_b.insdata.Yaw_rad);
 
   ins_.mutable_position()->set_lon(decode_b.insdata.Lon_deg);
   ins_.mutable_position()->set_lat(decode_b.insdata.Lat_deg);

@@ -87,11 +87,11 @@ void SimControlWithModelBase::InitTimerAndIO() {
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
-  sim_control_timer_.reset(new cyber::Timer(
-      kModelIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(new cyber::Timer(
-      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
-      false));
+  sim_control_timer_.reset(
+      new cyber::Timer(kModelIntervalMs, [this]() { this->RunOnce(); }, false));
+  sim_prediction_timer_.reset(
+      new cyber::Timer(kSimPredictionIntervalMs,
+                       [this]() { this->PublishDummyPrediction(); }, false));
 }
 
 void SimControlWithModelBase::UpdateGearPosition() {
@@ -134,13 +134,13 @@ void SimControlWithModelBase::Start() {
   }
 }
 
-void SimControlWithModelBase::Start(double x, double y) {
+void SimControlWithModelBase::Start(double x, double y, double v, double a) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     InternalReset();
     Json start_point_attr({});
-    start_point_attr["start_velocity"] = 0.0;
-    start_point_attr["start_acceleration"] = 0.0;
+    start_point_attr["start_velocity"] = v;
+    start_point_attr["start_acceleration"] = a;
     start_point_attr["start_heading"] = std::numeric_limits<double>::max();
     start_point_attr["x"] = x;
     start_point_attr["y"] = y;
@@ -184,7 +184,7 @@ void SimControlWithModelBase::InternalReset() {
   current_routing_header_.Clear();
   auto_car_is_moving_ = false;
   planning_command_is_arrival_ = false;
-  // start_auto_ = false;
+  start_auto_ = false;
   send_dummy_prediction_ = true;
 }
 
@@ -209,32 +209,13 @@ void SimControlWithModelBase::OnPlanningCommand(
   }
   // Avoid not sending prediction messages to planning after playing packets
   // with obstacles
+  start_auto_ = true;
   send_dummy_prediction_ = true;
   current_routing_header_ = planning_command->header();
   AINFO << "planning_command: " << planning_command->DebugString();
   planning_command_is_arrival_ = true;
   auto_car_is_moving_ =
       planning_command_is_arrival_ && control_command_is_arrival_;
-
-  if (planning_command->lane_follow_command()
-          .routing_request()
-          .is_start_pose_set()) {
-    auto lane_follow_command = planning_command->mutable_lane_follow_command();
-    const auto& start_pose =
-        lane_follow_command->routing_request().waypoint(0).pose();
-    SimCarStatus point;
-    point.set_x(start_pose.x());
-    point.set_y(start_pose.y());
-    point.set_acceleration_s(start_acceleration_);
-    point.set_speed(start_velocity_);
-    double theta = 0.0;
-    double s = 0.0;
-    // Find the lane nearest to the start pose and get its heading as theta.
-    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                          &theta, &s);
-    point.set_theta(theta);
-    SetStartPoint(point);
-  }
 }
 
 void SimControlWithModelBase::SetStartPoint(const SimCarStatus& point) {
@@ -260,11 +241,11 @@ void SimControlWithModelBase::InitStartPoint(nlohmann::json start_point_attr,
     point.set_y(start_point_attr["y"]);
     // z use default 0
     point.set_z(0);
-    // Todo(@lijin): tmp not support map service,support theta
-    // double theta = 0.0;
-    // double s = 0.0;
-    // map_service_->GetPoseWithRegardToLane(x, y, &theta, &s);
-    // point.set_theta();
+    double theta = 0.0;
+    double s = 0.0;
+    map_service_->GetPoseWithRegardToLane(start_point_attr["x"],
+                                          start_point_attr["y"], &theta, &s);
+    point.set_theta(theta);
     point.set_speed(start_velocity_);
     point.set_acceleration_s(start_acceleration_);
   } else {
@@ -341,11 +322,11 @@ void SimControlWithModelBase::PublishChassis(const std::string model_name) {
   }
   chassis->set_throttle_percentage(control_cmd_.throttle());
   chassis->set_brake_percentage(control_cmd_.brake());
-  // if (start_auto_) {
-  chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  // } else {
-  //   chassis->set_driving_mode(Chassis::COMPLETE_MANUAL);
-  // }
+  if (start_auto_) {
+    chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  } else {
+    chassis->set_driving_mode(Chassis::COMPLETE_MANUAL);
+  }
   chassis->set_gear_location(control_cmd_.gear_location());
   chassis_writer_->Write(chassis);
 }

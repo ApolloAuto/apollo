@@ -1,0 +1,277 @@
+#!/bin/bash
+#
+###############################################################################
+# Copyright 2024 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# script flags
+#set -u
+#set -e
+#set -x
+
+# global variables
+BASH="${BASH:-bash}"
+DOCKER="${DOCKER:-docker}"
+
+# load basic functions
+if [[ ! "${AEM_INITED}" == 1 ]]; then
+  home_dir="$(dirname "$(realpath "$0")")"
+  # shellcheck source=./run.sh
+  source "${home_dir}/run.sh"
+fi
+
+usage() {
+  echo "Usage aem create [options]
+Options:
+  -h|--help                       print this help message
+  -b|--backend <backend>          backend to use, \`host' or \`docker',  default to \`docker'
+  -c|--cross-platform <platform>  cross-platform to use, \`aarch64' or \`x86_64'
+  -f|--force                      force to recreate the environment
+  -F|--force-volumes              force to recreate the environment and volumes
+  -g|--geo <>                     geo to use, \`us' or \`cn'
+  -l|--local                      use local image
+  -m|--mount <mountpoints...>     mount host directory into the container
+  -n|--name <name>                name of the environment
+  -w|--workspace <workspace>      workspace to use, default to current directory
+  --image <image>                 container image to use
+  --shell <shell>                 shell to use
+  --worklocal                     store environment files in workspace dir
+  --user <user>                   user to use
+  --uid <uid>                     user id to use
+  --group <group>                 group to use
+  --gid <gid>                     group id to use
+  --shm-size <size>               shm size to use
+  --gpu                           enable gpu support
+  --cpu                           disable gpu support
+"
+}
+
+# Check whether user has agreed license agreement
+check_agreement() {
+  local agreement_record="${HOME}/.apollo_agreement.txt"
+  if [[ -e "${agreement_record}" ]]; then
+    return 0
+  fi
+  local agreement_file
+  agreement_file="${AEM_HOME}/AGREEMENT.txt"
+  if [[ ! -f "${agreement_file}" ]]; then
+    error "AGREEMENT ${agreement_file} does not exist."
+    exit 1
+  fi
+
+  cat "${agreement_file}"
+  local tip="Type 'y' or 'Y' to agree to the license agreement above, \
+or type any other key to exit: "
+
+  echo -n "${tip}"
+  local choice
+  read -r -n1 choice
+  echo
+
+  if [[ ! "${choice}" =~ [yY] ]]; then
+    exit 1
+  fi
+
+  cp -f "${agreement_file}" "${agreement_record}"
+  echo -n "${tip}" >> "${agreement_record}"
+  echo "${choice}" >> "${agreement_record}"
+}
+
+check_os_kernel() {
+  local os_kernel="$(uname -s)"
+  if [ "${os_kernel}" != "Linux" ]; then
+    fatal "Running Apollo on ${os_kernel} is untested, exiting."
+    exit 1
+  fi
+}
+
+check_target_arch() {
+  local arch="$(uname -m)"
+  local supported_arch=("x86_64" "aarch64")
+  local supported=0
+  for sa in ${supported_arch[@]}; do
+    if [ "${arch}" == "${sa}" ]; then
+      supported=1
+      break
+    fi
+  done
+  if [ "${supported}" == 0 ]; then
+    fatal "unsupported target architecture: \`${arch}'."
+    fatal "current supported architectures: \`${supported_arch[@]}'"
+    exit 1
+  fi
+}
+
+parse_arguments() {
+  env_args=()
+  while [[ $# -gt 0 ]]; do
+    local opt="$1"
+    shift
+    case "${opt}" in
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      -b | --backend)
+        export APOLLO_ENV_BACKEND="$1"
+        if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+          export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+        fi
+        shift
+        ;;
+      -c | --cross-platform)
+        export APOLLO_ENV_CROSS_PLATFORM="$1"
+        shift
+        if [[ "$(uname -m)" == "${APOLLO_ENV_CROSS_PLATFORM}" ]]; then
+          continue
+        fi
+        if [[ "$(uname -m)" == "x86_64" && "${APOLLO_ENV_CROSS_PLATFORM}" == "aarch64" ]]; then
+          if ! docker_setup_cross_platform "aarch64"; then
+            fatal "failed to setup cross-platform environment for aarch64"
+            exit 1
+          fi
+        else
+          fatal "run ${APOLLO_ENV_CROSS_PLATFORM} on $(uname -m) is not supported!"
+          exit 1
+        fi
+        ;;
+      -f | --force)
+        export AEM_FLAG_FORCE_RECREATE=1
+        ;;
+      -F | --force-volumes)
+        export AEM_FLAG_FORCE_RECREATE=1
+        export AEM_FLAG_FORCE_RECREATE_VOLUMES=1
+        ;;
+      -g | --geo)
+        export AEM_GEO="$1"
+        shift
+        ;;
+      -l | --local)
+        export AEM_FLAG_USE_LOCAL_IMAGE=1
+        ;;
+      -m | --mount)
+        while [[ ! $1 == -* ]]; do
+          APOLLO_ENV_MOUNTS+=("$1")
+          shift
+        done
+        ;;
+      -n | --name)
+        export APOLLO_ENV_NAME="$1"
+        export APOLLO_ENV_CONTAINER_NAME="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"
+        shift
+        ;;
+      -w | --workspace)
+        export APOLLO_ENV_WORKSPACE="$1"
+        if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+          export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+        fi
+        shift
+        ;;
+      --image)
+        export APOLLO_ENV_CONTAINER_IMAGE="$1"
+        shift
+        ;;
+      --shell)
+        export APOLLO_ENV_SHELL="$1"
+        shift
+        ;;
+      --worklocal)
+        export APOLLO_ENV_WORKLOCAL=1
+        ;;
+      --user)
+        export APOLLO_ENV_CONTAINER_USER="$1"
+        shift
+        ;;
+      --uid)
+        export APOLLO_ENV_CONTAINER_UID="$1"
+        shift
+        ;;
+      --group)
+        export APOLLO_ENV_CONTAINER_GROUP="$1"
+        shift
+        ;;
+      --gid)
+        export APOLLO_ENV_CONTAINER_GID="$1"
+        shift
+        ;;
+      --shm-size)
+        export AEM_FLAG_SHM_SIZE="$1"
+        shift
+        ;;
+      --gpu)
+        export APOLLO_ENV_USE_GPU_HOST=1
+        ;;
+      --cpu)
+        export APOLLO_ENV_USE_GPU_HOST=0
+        ;;
+      --no-mount-env)
+        export APOLLO_NO_MOUNT_ENV=1
+        ;;
+      --)
+        env_args+=($@)
+        break
+        ;;
+      -*)
+        error "unsupported option: ${opt}"
+        exit 1
+        ;;
+      *)
+        error "unsupported option: ${opt}"
+        exit 1
+        ;;
+
+    esac
+  done
+  export APOLLO_ENV_ARGS=(${env_args[@]})
+}
+
+execute() {
+  check_os_kernel
+  check_target_arch
+
+  check_agreement
+
+  # load custom environment variables
+  local _old_apollo_env_name="${APOLLO_ENV_NAME}"
+  local _old_apollo_env_container_name="${APOLLO_ENV_CONTAINER_NAME}"
+  [[ -f "${PWD}/.env" ]] && set -a && source "${PWD}/.env" && set +a
+  # fix related environment variables
+  if [[ "${_old_apollo_env_name}" != "${APOLLO_ENV_NAME}" ]]; then
+    if [[ "${_old_apollo_env_container_name}" == "${APOLLO_ENV_CONTAINER_NAME}" ]]; then
+      # container name is not set in .env
+      export APOLLO_ENV_CONTAINER_NAME="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"
+    fi
+  fi
+  if [[ "${APOLLO_ENV_BACKEND}" == "host" ]]; then
+    export APOLLO_ENV_WORKROOT="${APOLLO_ENV_WORKSPACE}"
+  fi
+
+  parse_arguments "$@"
+
+  if ! apollo_create_envhome; then
+    fatal "failed to create environment home"
+    exit 1
+  else
+    apollo_load_envconfig
+  fi
+
+  if ! apollo_create_env; then
+    fatal "failed to create environment"
+    exit 1
+  fi
+
+  apollo_enter_env
+}
+
+execute "$@"

@@ -32,7 +32,7 @@ class LeadlagControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string controllers_dir =
-        "/apollo/modules/control/control_component/testdata/conf/";
+        "modules/control/control_component/testdata/conf/";
     std::string leadlag_station_conf_file =
         controllers_dir + "leadlag_station_conf.pb.txt";
     std::string leadlag_speed_conf_file =

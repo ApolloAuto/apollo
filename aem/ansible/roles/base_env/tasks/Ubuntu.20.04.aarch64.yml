@@ -1,0 +1,189 @@
+---
+
+- name: update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+  when: "'apt' in ansible_facts.packages"
+
+- name: install Basic Packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - apt-utils
+      - apt-transport-https
+      - bc
+      - ca-certificates
+      - curl
+      - file
+      - gawk
+      - git
+      - gnupg
+      - less
+      - lsb-release
+      - lsof
+      - rsync
+      - sed
+      - software-properties-common
+      - sudo
+      - tree
+      - unzip
+      - vim-nox
+      - wget
+      - xz-utils
+      - zip
+      - bash-completion
+    state: latest
+    update_cache: false
+  when: "'apt' in ansible_facts.packages"
+
+- name: install Build Essentials
+  become: true
+  ansible.builtin.apt:
+    name:
+      - gcc
+      - g++
+      - build-essential
+    state: latest
+    update_cache: false
+  when: "'apt' in ansible_facts.packages"
+
+- name: detect nodejs version
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      if [ -x "$(command -v node)" ]; then
+        node --version
+      else
+        echo 0
+      fi
+    executable: /bin/bash
+  register: node_version
+
+- name: setup nodejs apt source and install nodejs
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      apt-get install -y nodejs
+  when:
+    - node_version.stdout == "0" or node_version.stdout is version("v20", "<")
+    - "'apt' in ansible_facts.packages"
+
+- name: detect bazel version
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      if [ -x "$(command -v bazel)" ]; then
+        bazel --version | cut -d ' ' -f 2
+      else
+        echo 0
+      fi
+    executable: /bin/bash
+  register: bazel_version
+
+- name: setup bazel apt source and install bazel
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      wget https://github.com/bazelbuild/bazel/releases/download/5.2.0/bazel-5.2.0-linux-arm64 -O bazel-5.2.0-linux-arm64
+      cp -f bazel-5.2.0-linux-arm64 /usr/bin/bazel
+      chmod +x /usr/bin/bazel
+      rm -rf bazel-5.2.0-linux-arm64
+    executable: /bin/bash
+  when:
+    - bazel_version.stdout == "0" or bazel_version.stdout is version("5.2.0", "<")
+    - ansible_architecture == 'aarch64' and 'apt' in ansible_facts.packages
+
+# - name: Install Bazelist
+#   become: true
+#   ansible.builtin.npm:
+#     name: "@bazel/bazelisk"
+#     global: yes
+#     registry: https://registry.npmjs.org/
+#     state: present
+
+# TODO: control via a flag
+- name: disable docker-clean
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      if [[ -e /etc/apt/apt.conf.d/docker-clean ]]; then
+        sed -i 's/^\([^#]\)/# \1/' /etc/apt/apt.conf.d/docker-clean
+      fi
+    executable: /bin/bash
+
+- name: enable apt archive cache
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/apt/apt.conf.d/99downloaded_archives
+    block: |
+      Binary::apt::APT::Keep-Downloaded-Packages "true";
+      APT::Keep-Downloaded-Packages "true";
+    create: yes
+  when: "'apt' in ansible_facts.packages"
+
+- name: install Develop and Debug Tools
+  become: true
+  ansible.builtin.apt:
+    name:
+      - gdb
+      - libtool
+      - valgrind
+      - pkg-config
+      - autoconf
+      - automake
+      - cmake
+      - strace
+      - ltrace
+      - python3-dbg
+      - python3-dev
+      - iproute2
+      - iputils-ping
+      - net-tools
+      - silversearcher-ag
+      - tcpdump
+      - traceroute
+      - iperf3
+      - libexpat1-dev
+      - linux-libc-dev
+      - graphviz
+      # qa tools
+      - lcov
+    state: latest
+    update_cache: false
+  when: "'apt' in ansible_facts.packages"
+
+- name: setup apolloauto apt source
+  become: true
+  ansible.builtin.shell: |
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://apollo-pkg-beta.cdn.bcebos.com/neo/beta/key/deb.gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/apolloauto.gpg
+    echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/apolloauto.gpg] https://apollo-pkg-beta.cdn.bcebos.com/apollo/core" $(lsb_release -c|cut -d':' -f2) "main" | tee /etc/apt/sources.list.d/apolloauto.list
+  when: "'apt' in ansible_facts.packages"
+
+- name: update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+  when: "'apt' in ansible_facts.packages"
+
+- name: install patchelf
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_patchelf.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "patchelf-0.12"
+    INSTALL_PREFIX: "/opt/apollo/sysroot"
+
+- name: install shellcheck
+  become: true
+  ansible.builtin.shell:
+    cmd: /opt/apollo/installers/install_shellcheck.sh
+    executable: /bin/bash
+  args: []
+  environment:
+    INSTALL_ATOM: "shellcheck-0.7.1"
+    INSTALL_PREFIX: "/opt/apollo/sysroot"

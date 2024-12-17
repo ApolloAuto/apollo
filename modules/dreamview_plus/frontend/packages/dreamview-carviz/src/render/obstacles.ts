@@ -239,7 +239,7 @@ export default class Obstacles {
         if (!this.coordinates.isInitialized()) {
             return;
         }
-        const { obstacleHeading, obstacleDistanceAndSpeed } = this.option.layerOption.Perception;
+        const { obstacleHeading, obstacleVelocity } = this.option.layerOption.Perception;
         const paths = [];
         const colors = [];
         let texts: { str: string; position: THREE.Vector3 }[] = [];
@@ -294,8 +294,7 @@ export default class Obstacles {
                         colors.push(r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b);
                     }
                 }
-
-                if (obstacleDistanceAndSpeed) {
+                if (obstacleVelocity) {
                     const speedArrowPath = this.getSpeedHeadingPath(obstacle);
                     if (speedArrowPath.length) {
                         paths.push(...speedArrowPath);

@@ -10,9 +10,9 @@ def clean_dep(dep):
 def repo():
     http_archive(
         name = "centerpoint_infer_op-x86_64",
-        sha256 = "9a8e95e0e71d4fbf6369c21541bbcaaf96581b8df1b1623e7fbf6049fda69306",
+        sha256 = "038470fc2e741ebc43aefe365fc23400bc162c1b4cbb74d8c8019f84f2498190",
         strip_prefix = "centerpoint_infer_op",
-        urls = ["https://apollo-pkg-beta.cdn.bcebos.com/archive/centerpoint_infer_op_cu111.tar.gz"],
+        urls = ["https://apollo-pkg-beta.bj.bcebos.com/archive/centerpoint_infer_op_cu118.tar.gz"],
     )
 
     http_archive(
@@ -21,4 +21,3 @@ def repo():
         strip_prefix = "centerpoint_infer_op",
         urls = ["https://apollo-pkg-beta.bj.bcebos.com/archive/centerpoint_infer_op-linux-aarch64-2.0.0.tar.gz"],
     )
-

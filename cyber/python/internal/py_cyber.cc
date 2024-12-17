@@ -89,7 +89,8 @@ template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
   T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
   if (obj_ptr == nullptr) {
-    AERROR << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
+    AERROR << "PyObjectToPtr failed,type->" << type_ptr << " "
+           << "pyobj: " << pyobj;
   }
   return obj_ptr;
 }
@@ -139,11 +140,12 @@ PyObject *cyber_delete_PyWriter(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyWriter_write(PyObject *self, PyObject *args) {
   PyObject *pyobj_writer = nullptr;
-  char *data = nullptr;
-  Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_PyWriter_write"),
-                        &pyobj_writer, &data, &len)) {
+  Py_buffer buffer;
+  // Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("Oy*:cyber_PyWriter_write"),
+                        &pyobj_writer, &buffer)) {
     AERROR << "cyber_PyWriter_write:cyber_PyWriter_write failed!";
+    PyBuffer_Release(&buffer);
     return PyInt_FromLong(1);
   }
 
@@ -152,11 +154,14 @@ PyObject *cyber_PyWriter_write(PyObject *self, PyObject *args) {
 
   if (nullptr == writer) {
     AERROR << "cyber_PyWriter_write:writer ptr is null!";
+    PyBuffer_Release(&buffer);
     return PyInt_FromLong(1);
   }
 
-  std::string data_str(data, len);
+  std::string data_str(
+      const_cast<const char *>(static_cast<char *>(buffer.buf)), buffer.len);
   int ret = writer->write(data_str);
+  PyBuffer_Release(&buffer);
   return PyInt_FromLong(ret);
 }
 
@@ -297,11 +302,12 @@ PyObject *cyber_delete_PyClient(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
   PyObject *pyobj_client = nullptr;
-  char *data = nullptr;
-  Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:PyClient_send_request"),
-                        &pyobj_client, &data, &len)) {
+  Py_buffer buffer;
+  // Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("Oy*:PyClient_send_request"),
+                        &pyobj_client, &buffer)) {
     AERROR << "cyber_PyClient_send_request:PyArg_ParseTuple failed!";
+    PyBuffer_Release(&buffer);
     return PYOBJECT_NULL_STRING;
   }
 
@@ -310,14 +316,17 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
 
   if (nullptr == client) {
     AERROR << "cyber_PyClient_send_request:client ptr is null!";
+    PyBuffer_Release(&buffer);
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string data_str(data, len);
+  std::string data_str(
+      const_cast<const char *>(static_cast<char *>(buffer.buf)), buffer.len);
   ADEBUG << "c++:PyClient_send_request data->[ " << data_str << "]";
   const std::string response_str =
       client->send_request((std::string const &)data_str);
   ADEBUG << "c++:response data->[ " << response_str << "]";
+  PyBuffer_Release(&buffer);
   return C_STR_TO_PY_BYTES(response_str);
 }
 
@@ -406,11 +415,12 @@ PyObject *cyber_PyService_read(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyService_write(PyObject *self, PyObject *args) {
   PyObject *pyobj_service = nullptr;
-  char *data = nullptr;
-  Py_ssize_t len = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_PyService_write"),
-                        &pyobj_service, &data, &len)) {
+  Py_buffer buffer;
+  // Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("Oy*:cyber_PyService_write"),
+                        &pyobj_service, &buffer)) {
     AERROR << "cyber_PyService_write:PyArg_ParseTuple failed!";
+    PyBuffer_Release(&buffer);
     return PyInt_FromLong(1);
   }
 
@@ -419,12 +429,15 @@ PyObject *cyber_PyService_write(PyObject *self, PyObject *args) {
 
   if (nullptr == service) {
     AERROR << "cyber_PyService_write:writer ptr is null!";
+    PyBuffer_Release(&buffer);
     return PyInt_FromLong(1);
   }
 
-  std::string data_str(data, len);
+  std::string data_str(
+      const_cast<const char *>(static_cast<char *>(buffer.buf)), buffer.len);
   ADEBUG << "c++:PyService_write data->[ " << data_str << "]";
   int ret = service->write((std::string const &)data_str);
+  PyBuffer_Release(&buffer);
   return PyInt_FromLong(ret);
 }
 
@@ -594,24 +607,29 @@ PyObject *cyber_PyNode_shutdown(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyNode_register_message(PyObject *self, PyObject *args) {
   PyObject *pyobj_node = nullptr;
-  char *desc = nullptr;
-  int len = 0;
+  Py_buffer buffer;
+  // int len = 0;
   if (!PyArg_ParseTuple(args,
-                        const_cast<char *>("Os#:cyber_PyNode_register_message"),
-                        &pyobj_node, &desc, &len)) {
+                        const_cast<char *>("Oy*:cyber_PyNode_register_message"),
+                        &pyobj_node, &buffer)) {
     AERROR << "cyber_PyNode_register_message: failed!";
     Py_INCREF(Py_None);
+    PyBuffer_Release(&buffer);
     return Py_None;
   }
+  std::string desc_str(
+      const_cast<const char *>(static_cast<char *>(buffer.buf)), buffer.len);
   PyNode *node = PyObjectToPtr<PyNode *>(pyobj_node, "apollo_cyber_pynode");
   if (nullptr == node) {
-    AERROR << "cyber_PyNode_register_message:node ptr is null! desc->" << desc;
+    AERROR << "cyber_PyNode_register_message:node ptr is null! desc->"
+           << desc_str;
     Py_INCREF(Py_None);
+    PyBuffer_Release(&buffer);
     return Py_None;
   }
-  std::string desc_str(desc, len);
   node->register_message((std::string const &)desc_str);
   Py_INCREF(Py_None);
+  PyBuffer_Release(&buffer);
   return Py_None;
 }
 

@@ -195,14 +195,6 @@ class SimulationWorldUpdater : public UpdaterBase {
   //   bool ModifyCycleNumber(const std::string &routing_name,
   //                          const int &cycle_number);
 
-  /**
-   * @brief Determine whether the current route can form a circular route
-   * @param json JSON file containing start and end points
-   * @param result Messages accompanying the check
-   * @return true if enabled, false otherwise.
-   */
-  bool CheckCycleRouting(const nlohmann::json &json, nlohmann::json &result);
-
   void RegisterMessageHandlers();
   void RegisterRoutingMessageHandlers();
 

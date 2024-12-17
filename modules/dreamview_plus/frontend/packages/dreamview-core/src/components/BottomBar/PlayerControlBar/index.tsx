@@ -151,7 +151,7 @@ function PlayerControlBar(props: PlayerControlBarProps) {
             />
             <Record />
             <DumpBtn disabled={false} />
-            <ResetBtn disabled={recordInfo.disabled} />
+            <ResetBtn disabled={false} />
         </div>
     );
 }

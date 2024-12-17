@@ -20,11 +20,8 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "modules/common/math/aabox2d.h"
-#include "modules/common/math/aaboxkdtree2d.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
+#include "modules/common_msgs/map_msgs/map_area.pb.h"
+#include "modules/common_msgs/map_msgs/map_barrier_gate.pb.h"
 #include "modules/common_msgs/map_msgs/map_clear_area.pb.h"
 #include "modules/common_msgs/map_msgs/map_crosswalk.pb.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
@@ -34,11 +31,17 @@ limitations under the License.
 #include "modules/common_msgs/map_msgs/map_parking_space.pb.h"
 #include "modules/common_msgs/map_msgs/map_pnc_junction.pb.h"
 #include "modules/common_msgs/map_msgs/map_road.pb.h"
+#include "modules/common_msgs/map_msgs/map_rsu.pb.h"
 #include "modules/common_msgs/map_msgs/map_signal.pb.h"
 #include "modules/common_msgs/map_msgs/map_speed_bump.pb.h"
 #include "modules/common_msgs/map_msgs/map_stop_sign.pb.h"
 #include "modules/common_msgs/map_msgs/map_yield_sign.pb.h"
-#include "modules/common_msgs/map_msgs/map_rsu.pb.h"
+
+#include "modules/common/math/aabox2d.h"
+#include "modules/common/math/aaboxkdtree2d.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 
 /**
  * @namespace apollo::hdmap
@@ -86,6 +89,8 @@ class RoadInfo;
 class ParkingSpaceInfo;
 class PNCJunctionInfo;
 class RSUInfo;
+class AreaInfo;
+class BarrierGateInfo;
 class HDMapImpl;
 
 struct LineBoundary {
@@ -137,6 +142,8 @@ using PolygonRoiPtr = std::shared_ptr<PolygonRoi>;
 using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
 using RSUInfoConstPtr = std::shared_ptr<const RSUInfo>;
+using AreaInfoConstPtr = std::shared_ptr<const AreaInfo>;
+using BarrierGateInfoConstPtr = std::shared_ptr<const BarrierGateInfo>;
 
 class LaneInfo {
  public:
@@ -164,6 +171,9 @@ class LaneInfo {
     return cross_lanes_;
   }
   const std::vector<OverlapInfoConstPtr> &signals() const { return signals_; }
+  const std::vector<OverlapInfoConstPtr> &barrier_gates() const {
+    return barrier_gates_;
+  }
   const std::vector<OverlapInfoConstPtr> &yield_signs() const {
     return yield_signs_;
   }
@@ -188,6 +198,7 @@ class LaneInfo {
   const std::vector<OverlapInfoConstPtr> &pnc_junctions() const {
     return pnc_junctions_;
   }
+  const std::vector<OverlapInfoConstPtr> &areas() const { return areas_; }
   double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
@@ -249,6 +260,7 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> overlaps_;
   std::vector<OverlapInfoConstPtr> cross_lanes_;
   std::vector<OverlapInfoConstPtr> signals_;
+  std::vector<OverlapInfoConstPtr> barrier_gates_;
   std::vector<OverlapInfoConstPtr> yield_signs_;
   std::vector<OverlapInfoConstPtr> stop_signs_;
   std::vector<OverlapInfoConstPtr> crosswalks_;
@@ -257,6 +269,7 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> speed_bumps_;
   std::vector<OverlapInfoConstPtr> parking_spaces_;
   std::vector<OverlapInfoConstPtr> pnc_junctions_;
+  std::vector<OverlapInfoConstPtr> areas_;
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
@@ -301,6 +314,38 @@ using JunctionPolygonBox =
 using JunctionPolygonKDTree =
     apollo::common::math::AABoxKDTree2d<JunctionPolygonBox>;
 
+class AreaInfo {
+ public:
+  explicit AreaInfo(const Area &ad_area);
+
+  const Id &id() const { return ad_area_.id(); }
+  const Area &area() const { return ad_area_; }
+  const apollo::hdmap::Area_Type type() const { return ad_area_.type(); }
+  const std::string &get_name() const { return ad_area_.name(); }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+  const std::vector<std::shared_ptr<const AreaInfo>> &OverlapUnDriveableAreas()
+      const {
+    return overlap_undriveable_areas_;
+  }
+
+ private:
+  friend class HDMapImpl;
+  void Init();
+  void PostProcess(const HDMapImpl &map_instance);
+  void UpdateOverlaps(const HDMapImpl &map_instance);
+
+ private:
+  const Area &ad_area_;
+  apollo::common::math::Polygon2d polygon_;
+
+  std::vector<std::shared_ptr<const AreaInfo>> overlap_undriveable_areas_;
+
+  std::vector<Id> overlap_ids_;
+};
+using AreaPolygonBox =
+    ObjectWithAABox<AreaInfo, apollo::common::math::Polygon2d>;
+using AreaPolygonKDTree = apollo::common::math::AABoxKDTree2d<AreaPolygonBox>;
+
 class SignalInfo {
  public:
   explicit SignalInfo(const Signal &signal);
@@ -322,6 +367,28 @@ using SignalSegmentBox =
     ObjectWithAABox<SignalInfo, apollo::common::math::LineSegment2d>;
 using SignalSegmentKDTree =
     apollo::common::math::AABoxKDTree2d<SignalSegmentBox>;
+
+class BarrierGateInfo {
+ public:
+  explicit BarrierGateInfo(const BarrierGate &barrier_gate);
+
+  const Id &id() const { return barrier_gate_.id(); }
+  const BarrierGate &barrier_gate() const { return barrier_gate_; }
+  const std::vector<apollo::common::math::LineSegment2d> &segments() const {
+    return segments_;
+  }
+
+ private:
+  void Init();
+
+ private:
+  const BarrierGate &barrier_gate_;
+  std::vector<apollo::common::math::LineSegment2d> segments_;
+};
+using BarrierGateSegmentBox =
+    ObjectWithAABox<BarrierGateInfo, apollo::common::math::LineSegment2d>;
+using BarrierGateSegmentKDTree =
+    apollo::common::math::AABoxKDTree2d<BarrierGateSegmentBox>;
 
 class CrosswalkInfo {
  public:
@@ -521,14 +588,10 @@ using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
 
 class RSUInfo {
  public:
-  explicit RSUInfo(const RSU& rsu);
+  explicit RSUInfo(const RSU &rsu);
 
-  const Id& id() const {
-    return _rsu.id();
-  }
-  const RSU& rsu() const {
-    return _rsu;
-  }
+  const Id &id() const { return _rsu.id(); }
+  const RSU &rsu() const { return _rsu; }
 
  private:
   RSU _rsu;

@@ -153,7 +153,7 @@ ReferenceLineProvider::FutureRouteWaypoints() {
 }
 
 void ReferenceLineProvider::GetEndLaneWayPoint(
-    std::shared_ptr<routing::LaneWaypoint> end_point) const {
+    std::shared_ptr<routing::LaneWaypoint> &end_point) const {
   if (nullptr == current_pnc_map_) {
     end_point = nullptr;
     return;
@@ -800,7 +800,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   auto last_index = index;
   while (last_index < ref_points.size() &&
          std::fabs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
-             FLAGS_referfece_line_max_forward_heading_diff) {
+             FLAGS_reference_line_max_forward_heading_diff) {
     ++last_index;
   }
   --last_index;
@@ -815,7 +815,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   last_index = index;
   while (last_index > 0 &&
          abs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
-             FLAGS_referfece_line_max_backward_heading_diff) {
+             FLAGS_reference_line_max_backward_heading_diff) {
     --last_index;
   }
   if (last_index != 0) {
@@ -1028,5 +1028,25 @@ bool ReferenceLineProvider::SmoothReferenceLine(
   }
   return true;
 }
+
+bool ReferenceLineProvider::GetAdcWaypoint(
+    hdmap::LaneWaypoint *waypoint) const {
+  if (nullptr == current_pnc_map_) {
+    AERROR << "Cannot find pnc map to get adc waypoint!";
+    return false;
+  }
+  *waypoint = current_pnc_map_->GetAdcWaypoint();
+  return true;
+}
+
+bool ReferenceLineProvider::GetAdcDis2Destination(double *dis) const {
+  if (nullptr == current_pnc_map_) {
+    AERROR << "Cannot find pnc map to get adc distance to destination!";
+    return false;
+  }
+  *dis = current_pnc_map_->GetDistanceToDestination();
+  return true;
+}
+
 }  // namespace planning
 }  // namespace apollo

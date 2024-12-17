@@ -24,7 +24,6 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
 std::map<std::string, int> plugin_function_map = {
-    {"UpdateScenarioSetToStatus", 0},
     {"UpdateRecordToStatus", 1},
     {"UpdateDynamicModelToStatus", 2},
     {"UpdateVehicleToStatus", 3},
@@ -62,7 +61,7 @@ Status Dreamview::Init() {
       FLAGS_dreamview_profiling_duration > 0.0) {
     exit_timer_.reset(new cyber::Timer(
         FLAGS_dreamview_profiling_duration,
-        [this]() { this->TerminateProfilingMode(); }, false));
+                         [this]() { this->TerminateProfilingMode(); }, false));
 
     exit_timer_->Start();
     AWARN << "============================================================";
@@ -117,9 +116,8 @@ Status Dreamview::Init() {
   channels_info_updater_.reset(new ChannelsUpdater(channels_info_ws_.get()));
   updater_manager_.reset(new UpdaterManager());
   RegisterUpdaters();
-  dv_plugin_manager_.reset(new DvPluginManager(server_.get()));
-  socket_manager_.reset(
-      new SocketManager(websocket_.get(), updater_manager_.get()));
+  dv_plugin_manager_.reset(
+      new DvPluginManager(server_.get(), updater_manager_.get()));
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
@@ -133,6 +131,8 @@ Status Dreamview::Init() {
   server_->addHandler("/image", *image_);
   server_->addHandler("/proto", *proto_handler_);
   dv_plugin_manager_->Init();
+  socket_manager_.reset(new SocketManager(
+      websocket_.get(), updater_manager_.get(), dv_plugin_manager_.get()));
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
   teleop_.reset(new TeleopService(teleop_ws_.get()));
@@ -164,6 +164,7 @@ Status Dreamview::Start() {
 }
 
 void Dreamview::Stop() {
+  dv_plugin_manager_->Stop();
   server_->close();
   SimControlManager::Instance()->Stop();
   point_cloud_updater_->Stop();
@@ -220,20 +221,6 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     return false;
   }
   switch (plugin_function_map[function_name]) {
-    case 0: {
-      // 解析结果
-      if (param_json["data"].contains("scenario_set_id") &&
-          param_json["data"].contains("scenario_set_name")) {
-        const std::string scenario_set_id =
-            param_json["data"]["scenario_set_id"];
-        const std::string scenario_set_name =
-            param_json["data"]["scenario_set_name"];
-        if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
-          callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
-                                                         scenario_set_name);
-        }
-      }
-    } break;
     case 1: {
       callback_res = hmi_->UpdateRecordToStatus();
     } break;
@@ -250,9 +237,12 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
       callback_res = hmi_->UpdateVehicleToStatus();
     } break;
     case 4: {
-      if (param_json["data"].contains("resource_id")) {
+      if (param_json["data"].contains("resource_id") &&
+          param_json["data"].contains("resource_id")) {
         const std::string map_name = param_json["data"]["resource_id"];
         callback_res = hmi_->UpdateMapToStatus(map_name);
+      } else {
+        callback_res = hmi_->UpdateMapToStatus();
       }
     } break;
     default:

@@ -26,6 +26,8 @@
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
+
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 
@@ -45,11 +47,28 @@ class TrajectoryStitcher {
       const common::VehicleState& vehicle_state, const double current_timestamp,
       const double planning_cycle_time, const size_t preserved_points_num,
       const bool replan_by_offset, const PublishableTrajectory* prev_trajectory,
-      std::string* replan_reason);
+      std::string* replan_reason,
+      const control::ControlInteractiveMsg& control_interactive_msg);
 
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const double planning_cycle_time,
       const common::VehicleState& vehicle_state);
+
+  static bool need_replan_by_necessary_check(
+      const common::VehicleState& vehicle_state, const double current_timestamp,
+      const PublishableTrajectory* prev_trajectory, std::string* replan_reason,
+      size_t* time_matched_index);
+
+  static bool need_replan_by_control_interactive(
+      const double current_timestamp, std::string* replan_reason,
+      const control::ControlInteractiveMsg& control_interactive_msg);
+
+  static std::vector<common::TrajectoryPoint>
+  ComputeControlInteractiveStitchingTrajectory(
+      const double planning_cycle_time,
+      const common::VehicleState& vehicle_state,
+      const common::TrajectoryPoint& time_match_point,
+      const control::ControlInteractiveMsg& control_interactive_msg);
 
  private:
   static std::pair<double, double> ComputePositionProjection(

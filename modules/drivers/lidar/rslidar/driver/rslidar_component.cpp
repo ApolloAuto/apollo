@@ -113,8 +113,7 @@ void RslidarComponent::ReadScanCallback(
 void RslidarComponent::RsPacketCallback(
         const ::robosense::lidar::Packet& lidar_packet) {
     ADEBUG << __FUNCTION__ << " start";
-    std::shared_ptr<robosense::RobosenseScanPacket> scan_packet
-            = std::make_shared<robosense::RobosenseScanPacket>();
+    auto scan_packet = AcquireScanMessage();
     scan_packet->set_stamp(cyber::Time::Now().ToNanosecond());
     scan_packet->mutable_data()->assign(
             lidar_packet.buf_.begin(), lidar_packet.buf_.end());

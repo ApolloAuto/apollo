@@ -23,18 +23,50 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-// @brief: get bounding box vertices and save in polygon type
-// @param [in]: object
-// @param [in]: expand valud, in meter
-// @param [out]: bounding box vertices(4 in xy plane)
+/**
+ * @brief Get the Bounding Box vertices and save in polygon type
+ *
+ * @param object
+ * @param box bounding box vertices(4 in xy plane)
+ * @param expand expand valud, in meter
+ */
 void GetBoundingBox2d(const std::shared_ptr<base::Object>& object,
                       base::PointCloud<base::PointD>* box, double expand = 0.0);
 
-// @brief: compute object shape(center, size) from given direction and polygon
-// @param [in/out]: input object, center and size will be updated
-// @param [in]: whether use world cloud or local cloud
+/**
+ * @brief compute object shape(center, size) from given direction and polygon
+ *
+ * @param object object, center and size will be updated
+ * @param use_world_cloud whether use world cloud or local cloud
+ */
 void ComputeObjectShapeFromPolygon(std::shared_ptr<base::Object> object,
                                    bool use_world_cloud = false);
+
+/**
+ * @brief Compute polygon direction
+ *
+ * @param ref_center view point
+ * @param object new object
+ * @param direction orintation
+ */
+void ComputePolygonDirection(
+    const Eigen::Vector3d& ref_center,
+    const base::ObjectPtr& object,
+    Eigen::Vector3f* direction);
+
+/**
+ * @brief Compute min max direction
+ *
+ * @param object new object
+ * @param ref_center view point
+ * @param max_point_index max point index
+ * @param min_point_index min point index
+ */
+void ComputeMinMaxDirectionPoint(
+    const base::ObjectPtr& object,
+    const Eigen::Vector3d& ref_center,
+    size_t* max_point_index,
+    size_t* min_point_index);
 
 }  // namespace lidar
 }  // namespace perception

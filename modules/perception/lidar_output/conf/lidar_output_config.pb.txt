@@ -1,8 +1,8 @@
 output_channel_name: "/apollo/perception/obstacles"
 save_benchmark_frame: false
-benchmark_frame_output_dir: "/apollo/data/benchmark/dt"
+benchmark_frame_output_dir: "data/benchmark/dt"
 save_lidar_frame_message: false
-lidar_frame_output_dir: "/apollo/data/benchmark/model_dt"
+lidar_frame_output_dir: "data/benchmark/model_dt"
 lidar_frame_channel_name: "/perception/lidar/detection"
 use_lidar_cooridinate: true
 timestamp_two_decimal_format: false

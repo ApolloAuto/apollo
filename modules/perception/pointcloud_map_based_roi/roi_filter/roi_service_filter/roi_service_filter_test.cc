@@ -47,10 +47,10 @@ class LidarLibROIServiceFilterTest : public testing::Test {
 
 void MockData(LidarFrame* frame) {
   std::string pcd =
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "roi_service_filter/data/pcd/1532063882.176900.pcd";
   std::string pose =
-      "/apollo/modules/perception/testdata/lidar/lib/roi_filter/"
+      "modules/perception/testdata/lidar/lib/roi_filter/"
       "roi_service_filter/data/pose/1532063882.176900.pose";
 
   // a. load pcd

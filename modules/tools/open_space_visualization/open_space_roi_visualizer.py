@@ -20,7 +20,7 @@
 # @file to run it, change the modules/common/configs/config_gflags.cc to use sunnyvale_with_two_offices
 
 
-from open_space_roi_interface import *
+from modules.tools.open_space_visualization.open_space_roi_interface import *
 import matplotlib.pyplot as plt
 
 # initialize object

@@ -11,6 +11,8 @@ import TrafficSignal from './trafficSignal';
 import StopSign from './stopSign';
 import SpeedBump from './speedBump';
 import ParkingSpace from './parkingSpace';
+import Area from './area';
+import BarrierGate from './barrierGate';
 
 class Map {
     private scene;
@@ -41,6 +43,10 @@ class Map {
 
     public grid;
 
+    public area;
+
+    public barrierGate;
+
     private option;
 
     private coordinates;
@@ -65,6 +71,8 @@ class Map {
         this.speedBump = new SpeedBump(scene, coordinates);
         this.parkingSpace = new ParkingSpace(scene, text, option, coordinates);
         this.grid = new Grid(scene);
+        this.area = new Area(scene, coordinates);
+        this.barrierGate = new BarrierGate(scene, coordinates);
     }
 
     public update(mapData, removeOld = false) {
@@ -85,6 +93,8 @@ class Map {
                 yieldSign,
                 speedBump,
                 parkingSpace,
+                area,
+                barrierGate,
             } = this.option.layerOption.Map;
 
             // 如果不是全清除，需要手动去依次清除
@@ -120,6 +130,12 @@ class Map {
 
                 if (!mapData.parkingSpace || !parkingSpace) {
                     this.parkingSpace.dispose();
+                }
+                if (!mapData.adArea || !area) {
+                    this.area.dispose();
+                }
+                if (!mapData.barrierGate || !barrierGate) {
+                    this.barrierGate.dispose();
                 }
             }
 
@@ -179,6 +195,16 @@ class Map {
                         this.parkingSpace.drawParkingSpaces(data);
                     }
                     break;
+                case 'adArea':
+                    if (area) {
+                        this.area.drawAreas(data);
+                    }
+                    break;
+                case 'barrierGate':
+                    if (barrierGate) {
+                        this.barrierGate.drawBarrierGates(data);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -217,6 +243,8 @@ class Map {
         this.road.dispose();
         this.speedBump.dispose();
         this.grid.dispose();
+        this.area.dispose();
+        this.barrierGate.dispose();
     }
 }
 export default Map;

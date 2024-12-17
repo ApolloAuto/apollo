@@ -585,6 +585,7 @@ void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1), &speed_bump_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
                  &parking_space_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::areas, _1), &area_overlaps_);
 }
 
 MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
@@ -741,10 +742,8 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
   return GetProjection(point, accumulate_s, lateral, &distance);
 }
 
-bool Path::GetProjection(const double heading,
-                         const common::math::Vec2d& point,
-                         double* accumulate_s,
-                         double* lateral) const {
+bool Path::GetProjection(const double heading, const common::math::Vec2d& point,
+                         double* accumulate_s, double* lateral) const {
   double distance = 0.0;
   return GetProjection(point, heading, accumulate_s, lateral, &distance);
 }
@@ -824,7 +823,7 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
   int end_interpolation_index = static_cast<int>(
       std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1));
   int min_index = start_interpolation_index;
-  for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
+  for (int i = start_interpolation_index; i <= end_interpolation_index; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
       min_index = i;

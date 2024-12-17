@@ -35,17 +35,17 @@ Apollo is loaded with new modules and features but needs to be calibrated and co
 
 ## Prerequisites
 
-**[New 2021-01]** The Apollo platform (stable version) is now upgraded with
+**[New 2024-11]** The Apollo platform (stable version) is now upgraded with
 software packages and library dependencies of newer versions including:
 
-1. CUDA upgraded to version 11.1 to support Nvidia Ampere (30x0 series) GPUs,
-   with NVIDIA driver >= 455.32
-2. LibTorch (both CPU and GPU version) bumped to version 1.7.0 accordingly.
+1. CUDA upgraded to version 11.8 to support Nvidia Ada Lovelace (40x0 series) GPUs,
+   with NVIDIA driver >= 520.61.05
+2. LibTorch (only for arm64, both CPU and GPU version) bumped to version 1.11.0 accordingly, and for x86_64, still version 1.7.0.
 
 We do not expect a disruption to your current work, but to ease your life of
 migration, you would need to:
 
-1. Update NVIDIA driver on your host to version >= 455.32.
+1. Update NVIDIA driver on your host to version >= 510.61.05.
    ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
 2. Pull latest code and run the following commands after restarting and
    logging into Apollo Development container:
@@ -53,8 +53,12 @@ migration, you would need to:
 ```bash
 # Remove Bazel output of previous builds
 rm -rf /apollo/.cache/{bazel,build,repos}
-# Re-configure bazelrc.
-./apollo.sh config --noninteractive
+```
+
+3. Restart dev container
+
+```bash
+./docker/scripts/dev_start.sh
 ```
 
 ---
@@ -65,9 +69,9 @@ rm -rf /apollo/.cache/{bazel,build,repos}
 
 - NVIDIA Turing GPU / AMD GFX9/RDNA/CDNA GPU is strongly recommended
 
-- Ubuntu 18.04
+- Ubuntu 18.04, 20.04, 22.04 are supported
 
-- NVIDIA driver version 455.32.00 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)) or [ROCm v5.1](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1/page/Prerequisite_Actions.html) and above.
+- NVIDIA driver version 520.61.05 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)) or [ROCm v5.1](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1/page/Prerequisite_Actions.html) and above.
 
 - Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 
@@ -160,6 +164,12 @@ Apollo Open Source Platform 9.0 further focuses on enhancing the development and
 
 ![](docs/02_Quick%20Start/demo_guide/images/Apollo_9_0.png)
 
+[**Apollo 10.0:**](https://apollo.baidu.com/docs/apollo/latest/md_docs_2_xE5_x8F_x91_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E_2_xE6_x96_xB0_xE7_x89_x88_xE8_xAF_xB4_xE6_x98_x8E.html)
+
+In Apollo 8.0, the concept of package management tailored for user learning scenarios was introduced to enable users to deploy and use Apollo more conveniently and efficiently. In Apollo 9.0, the package management tool was updated to Version 2.0, making it easier for users to conduct secondary development and effortlessly build their own autonomous driving applications based on Apollo. In Apollo 10.0, we realize that autonomous driving cannot remain at the stage of local validation. Instead, it requires a comprehensive upgrade, and needs to be applied to scenarios on a large scale. In terms of performance, the performance and stability of various layers and modules are optimied, and extensive tools are provided to improve optimization efficiency. At the cost level, the hardware costs are recuded by enriching the hardware ecosystem which provides users with more options. Besides, the software development costs are lowered by upgrading the operating system, establishing communication with other frameworks, and reusing ecological software capabilities. Regarding safety, functional safety strategies and functional safety framework capabilities are reinforced. See [Release Notes](./RELEASE.md) for more details.
+
+![](docs/02_Quick%20Start/demo_guide/images/Apollo_10_0.png)
+
 ## Architecture
 
 - **Hardware/ Vehicle Overview**
@@ -183,7 +193,9 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 ## Quick Starts:
 
-- [Apollo 9.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/9.0/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_410bb1324792103828eeacd86377c551.html)
+- [Apollo 10.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/10.x/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97.html)
+
+- [Apollo 9.0 QuickStart Guide](https://apollo.baidu.com/docs/apollo/9.x/md_docs_2_xE5_xAE_x89_xE8_xA3_x85_xE6_x8C_x87_xE5_x8D_x97_2_xE5_x8C_x85_xE7_xAE_xA1_xE7_x90_x86_410bb1324792103828eeacd86377c551.html)
 
 - [Apollo 8.0 QuickStart Guide](docs/02_Quick%20Start/apollo_8_0_quick_start.md)
 

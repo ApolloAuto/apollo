@@ -106,8 +106,15 @@ bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   std::string depend_model_package = dynamic_model_conf.depend_model_package();
   std::replace(depend_model_package.begin(), depend_model_package.end(), '-', '_');
 
-  std::string dynamic_model_package_library_path =
-      FLAGS_dynamic_model_package_library_path +
+  std::string dynamic_model_package_library_path;
+  if (!apollo::cyber::common::GetFilePathWithEnv(
+          FLAGS_dynamic_model_package_library_path, "APOLLO_LIB_PATH",
+          &dynamic_model_package_library_path)) {
+    AERROR << "Failed to get dynamic model package library path: "
+           << FLAGS_dynamic_model_package_library_path;
+    return false;
+  }
+  dynamic_model_package_library_path +=
       depend_model_package + "/" + dm_library_name;
   SharedLibraryPtr shared_library = nullptr;
   AINFO << "dm_library_name: " << dm_library_name;

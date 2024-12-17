@@ -35,7 +35,7 @@ class DpStGraphTest : public ::testing::Test {
   virtual void SetUp() {
     SpeedHeuristicOptimizerConfig default_speed_config;
     ACHECK(
-        GetProtoFromFile("/apollo/modules/planning/tasks/path_time_heuristic/"
+        GetProtoFromFile("modules/planning/tasks/path_time_heuristic/"
                          "conf/default_conf.pb.txt",
                          &default_speed_config));
     dp_config_ = default_speed_config.default_speed_config();

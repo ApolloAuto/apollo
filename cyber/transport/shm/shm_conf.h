@@ -37,6 +37,10 @@ class ShmConf {
   const uint32_t& block_num() { return block_num_; }
   const uint64_t& managed_shm_size() { return managed_shm_size_; }
 
+  // For arena msg
+  static const uint32_t ARENA_BLOCK_NUM;
+  static const uint64_t ARENA_MESSAGE_SIZE;
+
  private:
   uint64_t GetCeilingMessageSize(const uint64_t& real_msg_size);
   uint64_t GetBlockBufSize(const uint64_t& ceiling_msg_size);

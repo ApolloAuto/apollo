@@ -14,11 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <filesystem>
+
 #include "cyber/common/global_data.h"
 #include "cyber/init.h"
 #include "modules/dreamview/backend/dreamview.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
+  // set working directory to APOLLO_RUNTIME_PATH for relative file paths
+  const char* apollo_runtime_path = std::getenv("APOLLO_RUNTIME_PATH");
+  if (apollo_runtime_path != nullptr) {
+    if (std::filesystem::is_directory(
+            std::filesystem::status(apollo_runtime_path))) {
+      std::filesystem::current_path(apollo_runtime_path);
+    }
+  }
   google::ParseCommandLineFlags(&argc, &argv, true);
   // Added by caros to improve dv performance
   apollo::cyber::GlobalData::Instance()->SetProcessGroup("dreamview_sched");

@@ -151,6 +151,10 @@ class GeneralChannelMessage : public GeneralMessageBase {
     channel_message_.reset();
     channel_message_ = raw_msg;
   }
+  void UpdateChannelName(const std::string& channel_name) {
+    std::lock_guard<std::mutex> _g(inner_lock_);
+    channel_name_ = channel_name;
+  }
 
   std::shared_ptr<apollo::cyber::message::RawMessage> CopyMsgPtr(void) const {
     decltype(channel_message_) channel_msg;
@@ -185,6 +189,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   std::vector<std::string> writers_;
 
   std::shared_ptr<apollo::cyber::message::RawMessage> channel_message_;
+  std::string channel_name_;
   std::shared_ptr<apollo::cyber::Reader<apollo::cyber::message::RawMessage>>
       channel_reader_;
   mutable std::mutex inner_lock_;

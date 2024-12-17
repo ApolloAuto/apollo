@@ -7,7 +7,7 @@ After a smooth driving guide line is generated, the trajectory is under the cons
 
 # Where is the code
 
-Please refer [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.cc)
+Please refer [code](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/piecewise_jerk_speed_nonlinear/piecewise_jerk_speed_nonlinear_optimizer.cc)
 
 # Code Reading
 

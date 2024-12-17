@@ -18,11 +18,11 @@
 
 DEFINE_string(
     relative_map_config_filename,
-    "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",
+    "modules/map/relative_map/conf/relative_map_config.pb.txt",
     "Relative map configuration file");
 
 DEFINE_string(navigator_config_filename,
-              "/apollo/modules/map/relative_map/conf/navigator_config.pb.txt",
+              "modules/map/relative_map/conf/navigator_config.pb.txt",
               "navigator config file name.");
 
 DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");

@@ -120,58 +120,42 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const canbus::Chassis& vehicle_chassis, const VehicleState& vehicle_state,
     const double current_timestamp, const double planning_cycle_time,
     const size_t preserved_points_num, const bool replan_by_offset,
-    const PublishableTrajectory* prev_trajectory, std::string* replan_reason) {
-  if (!FLAGS_enable_trajectory_stitcher) {
-    *replan_reason = "stitch is disabled by gflag.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-  if (!prev_trajectory) {
-    *replan_reason = "replan for no previous trajectory.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-
-  if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
-    *replan_reason = "replan for manual mode.";
+    const PublishableTrajectory* prev_trajectory, std::string* replan_reason,
+    const control::ControlInteractiveMsg& control_interactive_msg) {
+  // 1.check replan not by offset
+  size_t time_matched_index = 0;
+  if (need_replan_by_necessary_check(vehicle_state, current_timestamp,
+                                     prev_trajectory, replan_reason,
+                                     &time_matched_index)) {
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
-  size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
-
-  if (prev_trajectory_size == 0) {
-    ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
-           << "] size is zero! Previous planning not exist or failed. Use "
-              "origin car status instead.";
-    *replan_reason = "replan for empty previous trajectory.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-
-  const double veh_rel_time =
-      current_timestamp - prev_trajectory->header_time();
-
-  size_t time_matched_index =
-      prev_trajectory->QueryLowerBoundPoint(veh_rel_time);
-
-  if (time_matched_index == 0 &&
-      veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
-    AWARN << "current time smaller than the previous trajectory's first time";
-    *replan_reason =
-        "replan for current time smaller than the previous trajectory's first "
-        "time.";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
-  }
-  if (time_matched_index + 1 >= prev_trajectory_size) {
-    AWARN << "current time beyond the previous trajectory's last time";
-    *replan_reason =
-        "replan for current time beyond the previous trajectory's last time";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
+  // 2. check replan by GEAR switch
+  if (vehicle_chassis.has_gear_location()) {
+    static canbus::Chassis::GearPosition gear_pos =
+        canbus::Chassis::GEAR_NEUTRAL;
+    if (gear_pos == canbus::Chassis::GEAR_NEUTRAL &&
+        vehicle_chassis.gear_location() == canbus::Chassis::GEAR_DRIVE) {
+      gear_pos = vehicle_chassis.gear_location();
+      const std::string msg =
+          "gear change from n to d, replan to avoid large station error";
+      AERROR << msg;
+      *replan_reason = msg;
+      return ComputeReinitStitchingTrajectory(planning_cycle_time,
+                                              vehicle_state);
+    }
+    gear_pos = vehicle_chassis.gear_location();
   }
 
   auto time_matched_point = prev_trajectory->TrajectoryPointAt(
       static_cast<uint32_t>(time_matched_index));
 
-  if (!time_matched_point.has_path_point()) {
-    *replan_reason = "replan for previous trajectory missed path point";
-    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
+  // 3.check replan by control_interactive_msg
+  if (need_replan_by_control_interactive(current_timestamp, replan_reason,
+                                         control_interactive_msg)) {
+    return ComputeControlInteractiveStitchingTrajectory(
+        planning_cycle_time, vehicle_state, time_matched_point,
+        control_interactive_msg);
   }
 
   size_t position_matched_index = prev_trajectory->QueryNearestPointWithBuffer(
@@ -182,6 +166,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       prev_trajectory->TrajectoryPointAt(
           static_cast<uint32_t>(position_matched_index)));
 
+  // 4.check replan by offset
   if (replan_by_offset) {
     if (vehicle_chassis.has_parking_brake()) {
       static bool parking_brake = true;
@@ -247,7 +232,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
            << "lat、lon and time offset is disabled";
   }
 
-  double forward_rel_time = veh_rel_time + planning_cycle_time;
+  // 4.stitching_trajectory
+  double forward_rel_time =
+      current_timestamp - prev_trajectory->header_time() + planning_cycle_time;
 
   size_t forward_time_index =
       prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
@@ -286,6 +273,108 @@ std::pair<double, double> TrajectoryStitcher::ComputePositionProjection(
   frenet_sd.first = v.InnerProd(n) + p.path_point().s();
   frenet_sd.second = v.CrossProd(n);
   return frenet_sd;
+}
+
+bool TrajectoryStitcher::need_replan_by_necessary_check(
+    const common::VehicleState& vehicle_state, const double current_timestamp,
+    const PublishableTrajectory* prev_trajectory, std::string* replan_reason,
+    size_t* time_matched_index) {
+  if (!FLAGS_enable_trajectory_stitcher) {
+    *replan_reason = "stitch is disabled by gflag.";
+    return true;
+  }
+  if (!prev_trajectory) {
+    *replan_reason = "replan for no previous trajectory.";
+    return true;
+  }
+
+  if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    *replan_reason = "replan for manual mode.";
+    return true;
+  }
+
+  size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
+
+  if (prev_trajectory_size == 0) {
+    ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
+           << "] size is zero! Previous planning not exist or failed. Use "
+              "origin car status instead.";
+    *replan_reason = "replan for empty previous trajectory.";
+    return true;
+  }
+
+  const double veh_rel_time =
+      current_timestamp - prev_trajectory->header_time();
+
+  *time_matched_index = prev_trajectory->QueryLowerBoundPoint(veh_rel_time);
+
+  if (*time_matched_index == 0 &&
+      veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
+    AWARN << "current time smaller than the previous trajectory's first time";
+    *replan_reason =
+        "replan for current time smaller than the previous trajectory's first "
+        "time.";
+    return true;
+  }
+
+  if (*time_matched_index + 1 >= prev_trajectory_size) {
+    AWARN << "current time beyond the previous trajectory's last time";
+    *replan_reason =
+        "replan for current time beyond the previous trajectory's last time";
+    return true;
+  }
+
+  auto time_matched_point = prev_trajectory->TrajectoryPointAt(
+      static_cast<uint32_t>(*time_matched_index));
+
+  if (!time_matched_point.has_path_point()) {
+    *replan_reason = "replan for previous trajectory missed path point";
+    return true;
+  }
+  return false;
+}
+
+bool TrajectoryStitcher::need_replan_by_control_interactive(
+    const double current_timestamp, std::string* replan_reason,
+    const control::ControlInteractiveMsg& control_interactive_msg) {
+  const double rel_time =
+      current_timestamp - control_interactive_msg.header().timestamp_sec();
+  if (rel_time > 0.5) {
+    AINFO << "control_interactive_msg time out, skip replay by control "
+             "interactive";
+    return false;
+  }
+  if (control_interactive_msg.has_replan_request() &&
+      control_interactive_msg.replan_request() == true) {
+    *replan_reason = "replan for control_interactive_msg, " +
+                     control_interactive_msg.replan_request_reason();
+    return true;
+  }
+  return false;
+}
+
+std::vector<common::TrajectoryPoint>
+TrajectoryStitcher::ComputeControlInteractiveStitchingTrajectory(
+    const double planning_cycle_time, const common::VehicleState& vehicle_state,
+    const common::TrajectoryPoint& time_match_point,
+    const control::ControlInteractiveMsg& control_interactive_msg) {
+  if (control_interactive_msg.replan_req_reason_code() ==
+          control::ReplanRequestReasonCode::REPLAN_REQ_ALL_REPLAN ||
+      control_interactive_msg.replan_req_reason_code() ==
+          control::ReplanRequestReasonCode::REPLAN_REQ_STATION_REPLAN) {
+    AINFO << "control_interactive_msg replan, all replan";
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
+  } else {
+    AINFO << "control_interactive_msg replan, speed replan";
+    VehicleState vehicle_state_tmp = vehicle_state;
+    vehicle_state_tmp.set_x(time_match_point.path_point().x());
+    vehicle_state_tmp.set_y(time_match_point.path_point().y());
+    vehicle_state_tmp.set_z(time_match_point.path_point().z());
+    vehicle_state_tmp.set_heading(time_match_point.path_point().theta());
+    vehicle_state_tmp.set_kappa(time_match_point.path_point().kappa());
+    return ComputeReinitStitchingTrajectory(planning_cycle_time,
+                                            vehicle_state_tmp);
+  }
 }
 
 }  // namespace planning

@@ -103,6 +103,51 @@ bool GlobalData::IsMockTimeMode() const {
   return clock_mode_ == ClockMode::MODE_MOCK;
 }
 
+bool GlobalData::IsChannelEnableArenaShm(std::string channel_name) const {
+  if (!config_.has_transport_conf() ||
+      !config_.transport_conf().has_shm_conf() ||
+      !config_.transport_conf().shm_conf().has_arena_shm_conf()) {
+    return false;
+  }
+  bool found = false;
+  for (auto arena_channel_conf : config_.transport_conf()
+                                     .shm_conf()
+                                     .arena_shm_conf()
+                                     .arena_channel_conf()) {
+    if (channel_name == arena_channel_conf.channel_name()) {
+      found = true;
+      break;
+    }
+  }
+  return found;
+}
+
+bool GlobalData::IsChannelEnableArenaShm(uint64_t channel_id) const {
+  auto channel_name =
+      cyber::common::GlobalData::Instance()->GetChannelById(channel_id);
+  return IsChannelEnableArenaShm(channel_name);
+}
+
+apollo::cyber::proto::ArenaChannelConf GlobalData::GetChannelArenaConf(
+    std::string channel_name) const& {
+  for (auto arena_channel_conf : config_.transport_conf()
+                                     .shm_conf()
+                                     .arena_shm_conf()
+                                     .arena_channel_conf()) {
+    if (channel_name == arena_channel_conf.channel_name()) {
+      return arena_channel_conf;
+    }
+  }
+  return apollo::cyber::proto::ArenaChannelConf();
+}
+
+apollo::cyber::proto::ArenaChannelConf GlobalData::GetChannelArenaConf(
+    uint64_t channel_id) const& {
+  auto channel_name =
+      cyber::common::GlobalData::Instance()->GetChannelById(channel_id);
+  return GetChannelArenaConf(channel_name);
+}
+
 void GlobalData::InitHostInfo() {
   char host_name[1024];
   gethostname(host_name, sizeof(host_name));

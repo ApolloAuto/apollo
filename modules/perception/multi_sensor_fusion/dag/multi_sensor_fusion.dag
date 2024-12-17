@@ -4,8 +4,8 @@ module_config {
     class_name : "MultiSensorFusionComponent"
     config {
       name : "SensorFusion"
-      config_file_path : "/apollo/modules/perception/multi_sensor_fusion/conf/multi_sensor_fusion_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      config_file_path : "modules/perception/multi_sensor_fusion/conf/multi_sensor_fusion_config.pb.txt"
+      flag_file_path: "modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/inner/PrefusedObjects"
       }

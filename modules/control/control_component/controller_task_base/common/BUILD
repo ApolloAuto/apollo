@@ -68,6 +68,7 @@ apollo_cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
+        "//modules/control/control_component/common:control_gflags",
     ],
 )
 

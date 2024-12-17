@@ -93,6 +93,7 @@ open_space_trajectory_optimizer_config {
         default_bound: 2.0
         vehicle_shortest_dimension: 1.04
         fem_pos_deviation_smoother_config {
+        use_sqp: true
         weight_fem_pos_deviation: 1e7
         weight_path_length: 0.0
         weight_ref_deviation: 1e3

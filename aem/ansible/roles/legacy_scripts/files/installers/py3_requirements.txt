@@ -1,0 +1,49 @@
+## Ref:
+## 1) https://www.python.org/dev/peps/pep-0508/#environment-markers
+
+# System utils
+supervisor
+psutil
+
+# Google infras
+absl-py
+
+# Note(infra): Use protobuf installed from source
+# protobuf
+
+# Note(infra): to be retired by absl-py
+python-gflags
+glog
+
+grpcio-tools; platform_machine == 'x86_64'
+
+# Web
+flask
+flask-cors
+requests
+simplejson
+
+# Python tools
+pyproj
+shapely
+matplotlib
+
+# Driver
+# pyusb
+
+# Learning
+# opencv-python
+## Note(infra): install numpy before h5py
+numpy
+scipy
+
+# Data format
+h5py
+pyyaml
+utm
+
+#Github for CI
+pygithub
+
+# Data excel
+xlsxwriter

@@ -22,6 +22,7 @@
 #include "cyber/common/log.h"
 #include "cyber/transport/dispatcher/shm_dispatcher.h"
 #include "cyber/transport/receiver/receiver.h"
+#include "cyber/transport/shm/protobuf_arena_manager.h"
 
 namespace apollo {
 namespace cyber {
@@ -63,6 +64,17 @@ void ShmReceiver<M>::Enable() {
     return;
   }
 
+  if (cyber::common::GlobalData::Instance()->IsChannelEnableArenaShm(
+          this->attr_.channel_id()) && message::MessageType<M>() != \
+            message::MessageType<message::RawMessage>()) {
+    auto arena_manager = ProtobufArenaManager::Instance();
+    if (!arena_manager->Enable() ||
+        !arena_manager->EnableSegment(this->attr_.channel_id())) {
+      AERROR << "arena manager enable failed.";
+      return;
+    }
+  }
+
   dispatcher_->AddListener<M>(
       this->attr_, std::bind(&ShmReceiver<M>::OnNewMessage, this,
                              std::placeholders::_1, std::placeholders::_2));
@@ -81,6 +93,16 @@ void ShmReceiver<M>::Disable() {
 
 template <typename M>
 void ShmReceiver<M>::Enable(const RoleAttributes& opposite_attr) {
+  if (cyber::common::GlobalData::Instance()->IsChannelEnableArenaShm(
+          this->attr_.channel_id()) && message::MessageType<M>() != \
+            message::MessageType<message::RawMessage>()) {
+    auto arena_manager = ProtobufArenaManager::Instance();
+    if (!arena_manager->Enable() ||
+        !arena_manager->EnableSegment(this->attr_.channel_id())) {
+      AERROR << "arena manager enable failed.";
+      return;
+    }
+  }
   dispatcher_->AddListener<M>(
       this->attr_, opposite_attr,
       std::bind(&ShmReceiver<M>::OnNewMessage, this, std::placeholders::_1,

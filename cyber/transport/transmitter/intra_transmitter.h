@@ -39,12 +39,22 @@ class IntraTransmitter : public Transmitter<M> {
   void Enable() override;
   void Disable() override;
 
+  void Enable(const RoleAttributes& opposite_attr) override;
+  void Disable(const RoleAttributes& opposite_attr) override;
+
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
+
+  bool AcquireMessage(std::shared_ptr<M>& msg);
 
  private:
   uint64_t channel_id_;
   IntraDispatcherPtr dispatcher_;
 };
+
+template <typename M>
+bool IntraTransmitter<M>::AcquireMessage(std::shared_ptr<M>& msg) {
+  return false;
+}
 
 template <typename M>
 IntraTransmitter<M>::IntraTransmitter(const RoleAttributes& attr)
@@ -55,6 +65,18 @@ IntraTransmitter<M>::IntraTransmitter(const RoleAttributes& attr)
 template <typename M>
 IntraTransmitter<M>::~IntraTransmitter() {
   Disable();
+}
+
+template <typename M>
+void IntraTransmitter<M>::Enable(const RoleAttributes& opposite_attr) {
+  (void)opposite_attr;
+  this->Enable();
+}
+
+template <typename M>
+void IntraTransmitter<M>::Disable(const RoleAttributes& opposite_attr) {
+  (void)opposite_attr;
+  this->Disable();
 }
 
 template <typename M>

@@ -93,20 +93,29 @@ function Operations() {
 
     useEffect(() => {
         if (hmi.currentOperation === HMIModeOperation.SCENARIO) {
+            const initState: any = {};
             simHMISubscriptionRef.current = streamApi
                 ?.subscribeToData(StreamDataNames.SIM_HMI_STATUS)
                 .pipe(
                     finalize(() => {
                         dispatch(
                             updateStatus({
-                                currentScenarioId: '',
-                                currentScenarioSetId: '',
+                                ...(initState as any),
+                                frontendIsFromSimHmi: true,
                             } as any),
                         );
                     }),
                 )
                 .subscribe((data) => {
-                    dispatch(updateStatus(data as any));
+                    Object.keys(data).forEach((key) => {
+                        initState[key] = undefined;
+                    });
+                    dispatch(
+                        updateStatus({
+                            ...(data as any),
+                            frontendIsFromSimHmi: true,
+                        }),
+                    );
                 });
         }
 
@@ -411,7 +420,10 @@ function Map() {
         [isMainConnected],
     );
 
-    const items = useMemo(() => hmi.maps.map((item) => ({ id: item, label: item, content: item })), [hmi.maps]);
+    const items = useMemo(() => {
+        const maps = hmi.maps.map((item) => ({ id: item, label: item, content: item }));
+        return maps.sort((prev, next) => (prev.id > next.id ? 1 : -1));
+    }, [hmi.maps]);
 
     return <SourceList1<string> activeId={hmi.currentMap} onChange={onChange} items={items} type='HDMap' />;
 }
@@ -664,6 +676,7 @@ function GudieContainer(props: PropsWithChildren<{ id: string }>) {
 
 function ModeSetting() {
     const [hmi] = usePickHmiStore();
+    // console.log('hmi', hmi);
     const [, { bottomBarHeightString }] = useComponentDisplay();
     const styles = useMemo(
         () => ({

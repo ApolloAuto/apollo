@@ -28,6 +28,7 @@
 #include "modules/perception/common/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar_detection/detector/point_pillars_detection/point_pillars.h"
 #include "modules/perception/lidar_detection/interface/base_lidar_detector.h"
+#include "modules/perception/lidar_detection/interface/base_down_sample.h"
 #include "modules/perception/lidar_detection/detector/point_pillars_detection/proto/model_param.pb.h"
 
 namespace apollo {
@@ -100,6 +101,8 @@ class PointPillarsDetection : public BaseLidarDetector {
   std::unique_ptr<PointPillars> point_pillars_ptr_;
   std::deque<base::PointDCloudPtr> prev_world_clouds_;
   base::PointFCloudPtr cur_cloud_ptr_;
+
+  std::shared_ptr<BaseDownSample> down_sample_;
 
   // PointPillars params
   pointpillars::ModelParam param_;

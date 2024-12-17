@@ -1,0 +1,3 @@
+<library path="cyber/ros_bridge/converters/common_plugins/gnss_msg_converter/libheading_msg_fusion.so">
+    <class type="apollo::cyber::HeadingMsgFusion" base_class="apollo::cyber::MessageConverter"></class>
+</library>

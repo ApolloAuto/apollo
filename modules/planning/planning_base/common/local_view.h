@@ -27,6 +27,7 @@
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -46,7 +47,8 @@ struct LocalView {
   std::shared_ptr<storytelling::Stories> stories;
   std::shared_ptr<PlanningCommand> planning_command;
   std::shared_ptr<routing::LaneWaypoint> end_lane_way_point;
-  std::shared_ptr<perception::PerceptionEdgeInfo> perception_road_edge;
+  std::shared_ptr<control::ControlInteractiveMsg> control_interactive_msg;
+  std::shared_ptr<perception::PerceptionAccurateDockInfo> perception_dock;
 };
 
 }  // namespace planning

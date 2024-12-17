@@ -17,7 +17,7 @@ _**Tip**: 为了更好的展示本文档中的等式，我们建议使用者使�
 
 ![总体流程图](images/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/tree/v9.0.0/modules/planning/scenarios/lane_follow)场景为例子进行说明。task的主要功能位于`Process`函数中。
 
 Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 

@@ -39,7 +39,7 @@ TEST_F(HistoryTest, Add) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_01.pb.txt",
       &adc_trajectory));
   int ret = history_->Add(adc_trajectory);
@@ -53,12 +53,12 @@ TEST_F(HistoryTest, GetLastFrame) {
 
   ADCTrajectory adc_trajectory_1;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_01.pb.txt",
       &adc_trajectory_1));
   ADCTrajectory adc_trajectory_2;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_02.pb.txt",
       &adc_trajectory_2));
 
@@ -92,7 +92,7 @@ TEST_F(HistoryTest, GetObjectDecisions) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_01.pb.txt",
       &adc_trajectory));
 
@@ -147,7 +147,7 @@ TEST_F(HistoryTest, GetStopObjectDecisions) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_01.pb.txt",
       &adc_trajectory));
 
@@ -181,7 +181,7 @@ TEST_F(HistoryTest, GetObjectDecisionsById) {
 
   ADCTrajectory adc_trajectory;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      "/apollo/modules/planning/planning_base/testdata/common/"
+      "modules/planning/planning_base/testdata/common/"
       "history_01.pb.txt",
       &adc_trajectory));
   history_->Add(adc_trajectory);

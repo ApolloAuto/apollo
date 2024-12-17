@@ -11,7 +11,7 @@ DECLARE_bool(collect_shape_info); // 收集动态图文件
 DECLARE_string(dynamic_shape_file); // 动态图文件生成以及读取路径
 ```
 
-### （生成动态图文件以及序列化文件）：
+### 如何使用（生成动态图文件以及序列化文件）：
 
 #### 为什么需要使用生成的动态图：
 

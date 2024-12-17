@@ -32,6 +32,7 @@ namespace map {
 
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::BarrierGateInfoConstPtr;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LineBoundary;
 using apollo::hdmap::RoadRoiPtr;
@@ -111,6 +112,11 @@ bool HDMapInput::GetRoiHDMapStruct(
   if (hdmap_->GetRoadBoundaries(point, distance, &road_boundary_vec,
                                 &junctions_vec) != 0) {
     AERROR << "Failed to get road boundary, point: " << point.DebugString();
+    return false;
+  }
+  junctions_vec.clear();
+  if (hdmap_->GetJunctions(point, distance, &junctions_vec) != 0) {
+    AERROR << "Failed to get junctions, point: " << point.DebugString();
     return false;
   }
   if (hdmap_struct_ptr == nullptr) {
@@ -296,7 +302,7 @@ void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
   // The last point
   polygon_ptr->push_back(raw_cloud[raw_cloud_size - 1]);
   ADEBUG << "Downsample road boundary points from " << raw_cloud_size << " to "
-        << polygon_ptr->size();
+         << polygon_ptr->size();
 }
 
 void HDMapInput::SplitBoundary(
@@ -397,6 +403,30 @@ bool HDMapInput::GetSignalsFromHDMap(
   return true;
 }
 
+bool HDMapInput::GetBarrierGatesFromHDMap(
+    const Eigen::Vector3d& pointd, double forward_distance,
+    std::vector<apollo::hdmap::BarrierGate>* barrier_gates) {
+  apollo::common::PointENU point;
+  point.set_x(pointd(0));
+  point.set_y(pointd(1));
+  point.set_z(pointd(2));
+  std::vector<BarrierGateInfoConstPtr> forward_barrier_gates;
+  if (hdmap_->GetForwardNearestBarriersOnLane(point, forward_distance,
+                                              &forward_barrier_gates) != 0) {
+    AERROR << "Failed to call HDMap::get barrier gates. point: "
+           << point.ShortDebugString();
+    return false;
+  }
+  barrier_gates->reserve(forward_barrier_gates.size());
+  for (auto& barrier_gate_info : forward_barrier_gates) {
+    barrier_gates->push_back(barrier_gate_info->barrier_gate());
+    ADEBUG << "Barrier gate: " << barrier_gates->back().DebugString();
+  }
+  ADEBUG << "get barrier gates success. num barrier gates: "
+         << barrier_gates->size() << " point: " << point.ShortDebugString();
+  return true;
+}
+
 bool HDMapInput::GetSignals(const Eigen::Vector3d& pointd,
                             double forward_distance,
                             std::vector<apollo::hdmap::Signal>* signals) {
@@ -406,6 +436,17 @@ bool HDMapInput::GetSignals(const Eigen::Vector3d& pointd,
     return false;
   }
   return GetSignalsFromHDMap(pointd, forward_distance, signals);
+}
+
+bool HDMapInput::GetBarrierGates(
+    const Eigen::Vector3d& pointd, double forward_distance,
+    std::vector<apollo::hdmap::BarrierGate>* barrier_gates) {
+  lib::MutexLock lock(&mutex_);
+  if (hdmap_.get() == nullptr) {
+    AERROR << "hdmap is not available";
+    return false;
+  }
+  return GetBarrierGatesFromHDMap(pointd, forward_distance, barrier_gates);
 }
 
 }  // namespace map

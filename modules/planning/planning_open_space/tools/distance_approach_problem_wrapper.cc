@@ -433,7 +433,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double ipopt_total = 0.0;
 
   std::string flag_file_path =
-      "/apollo/modules/planning/planning_component/conf/planning.conf";
+      "modules/planning/planning_component/conf/planning.conf";
   google::SetCommandLineOption("flagfile", flag_file_path.c_str());
 
   HybridAStartResult hybrid_astar_result;

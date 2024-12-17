@@ -57,6 +57,8 @@ export const layerVisible: { [key: string]: ChildLayerVisible } = {
         yieldSign: false,
         speedBump: false,
         parkingSpace: false,
+        barrierGate: false,
+        area: false,
         laneId: false,
         parkingSpaceId: false,
     },

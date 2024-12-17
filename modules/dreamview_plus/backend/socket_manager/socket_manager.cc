@@ -23,8 +23,8 @@
 #include "cyber/message/protobuf_factory.h"
 #include "modules/common/util/json_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 #include "modules/dreamview_plus/backend/record_player/record_player_factory.h"
+#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 namespace apollo {
 namespace dreamview {
 
@@ -32,16 +32,13 @@ using apollo::common::util::JsonUtil;
 using Json = nlohmann::json;
 using cyber::common::GetProtoFromFile;
 
-std::map<std::string, std::pair<std::string, std::string>> filter_info = {
-    {"apollo.dreamview.Obstacles", {"perception.PerceptionObstacles", ""}},
-    {"apollo.dreamview.CameraUpdate", {"drivers.Image", ""}},
-    {"apollo.dreamview.PointCloud", {"PointCloud", "sensor"}}};
-
 SocketManager::SocketManager(WebSocketHandler *websocket,
-                             UpdaterManager *updater_manager)
+                             UpdaterManager *updater_manager,
+                             DvPluginManager *dv_plugin_manager)
     : enabled_(false),
       websocket_(websocket),
-      updater_manager_(updater_manager) {
+      updater_manager_(updater_manager),
+      dv_plugin_manager_(dv_plugin_manager) {
   RegisterDataHandlers();
   RegisterMessageHandlers();
   auto channel_manager =
@@ -61,6 +58,19 @@ void SocketManager::RegisterDataHandlers() {
     AERROR << "Unable to parse data handler configuration from file "
            << FLAGS_data_handler_config_path;
   }
+  for (auto &data_handler_iter :
+       dv_plugin_manager_->data_handler_conf_.data_handler_info()) {
+    if (data_handler_base_conf_.data_handler_info().find(
+            data_handler_iter.first) !=
+        data_handler_base_conf_.data_handler_info().end()) {
+      AERROR << "There are duplicate updater handlers between dv and plugins";
+      continue;
+    }
+    auto data_handler_info =
+        data_handler_base_conf_.mutable_data_handler_info();
+    (*data_handler_info)[data_handler_iter.first] = data_handler_iter.second;
+  }
+  AINFO << "data_handler_base_conf_: " << data_handler_base_conf_.DebugString();
 
   // 遍历 然后register
   // for (const auto& data_handler_iter :
@@ -351,19 +361,9 @@ void SocketManager::RefreshDataHandlerChannels(
             updater_info;
         continue;
       }
-
-      int index = 0;
-      if (filter_info.find(data_type) != filter_info.end() &&
-          !filter_info[data_type].first.empty()) {
-        index = message_type.rfind(filter_info[data_type].first);
-      }
-      int index_channel = 0;
-      if (filter_info.find(data_type) != filter_info.end() &&
-          !filter_info[data_type].second.empty()) {
-        index_channel = channel_name.rfind(filter_info[data_type].second);
-      }
-
-      if (index != -1 && index_channel != -1 &&
+      bool is_channel_in_updater = updater_manager_->IsChannelInUpdater(
+          (*iter).second.data_name(), message_type, channel_name);
+      if (is_channel_in_updater &&
           (current_record.empty() ||
            std::find(other_record_node_name.begin(),
                      other_record_node_name.end(),

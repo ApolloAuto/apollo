@@ -37,7 +37,7 @@ class TrafficLightProtectedScenarioTest : public ::testing::Test {
 
 TEST_F(TrafficLightProtectedScenarioTest, Init) {
   std::string scenario_traffic_light_protected_config_file =
-      "/apollo/modules/planning/scenarios/traffic_light_protected/"
+      "modules/planning/scenarios/traffic_light_protected/"
       "conf/scenario_conf.pb.txt";
 
   ScenarioTrafficLightProtectedConfig config;

@@ -91,8 +91,15 @@ class PncMapBase {
       const common::VehicleState &state,
       apollo::hdmap::LaneWaypoint *waypoint) const = 0;
 
+  virtual double GetDistanceToDestination() const = 0;
+  virtual apollo::hdmap::LaneWaypoint GetAdcWaypoint() const = 0;
+
  protected:
   planning::PlanningCommand last_command_;
+  /**
+   * The waypoint of the autonomous driving car
+   */
+  apollo::hdmap::LaneWaypoint adc_waypoint_;
 
  private:
   /**

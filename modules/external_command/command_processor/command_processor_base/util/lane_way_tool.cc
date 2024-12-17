@@ -19,10 +19,13 @@
  */
 
 #include "modules/external_command/command_processor/command_processor_base/util/lane_way_tool.h"
+
 #include <string>
 #include <vector>
+
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/external_command/command_processor/command_processor_base/util/message_reader.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -158,25 +161,78 @@ bool apollo::external_command::LaneWayTool::GetParkingLaneWayPoint(
   apollo::common::PointENU center_enu;
   center_enu.set_x(center_point.x());
   center_enu.set_y(center_point.y());
-  std::vector<hdmap::LaneInfoConstPtr> lanes;
-  static constexpr double kNearbyLaneDistance = 10.0;
-  if (hdmap_->GetLanes(center_enu, kNearbyLaneDistance, &lanes) < 0) {
-    AERROR << "get lanes failed" << center_enu.DebugString();
+  for (const auto &parking_space_overlap_id :
+       parking_space_info->parking_space().overlap_id()) {
+    hdmap::OverlapInfoConstPtr overlap_info_ptr =
+        hdmap_->GetOverlapById(parking_space_overlap_id);
+    if (nullptr == overlap_info_ptr) {
+      AERROR << "Cannot get overlap info!";
+      continue;
+    }
+    for (const auto &object : overlap_info_ptr->overlap().object()) {
+      hdmap::LaneInfoConstPtr lane_ptr = hdmap_->GetLaneById(object.id());
+      if (nullptr == lane_ptr) {
+        AERROR << "Cannot get lane info!";
+        continue;
+      }
+      double s, l;
+      if (!lane_ptr->GetProjection(center_point, &s, &l)) {
+        AERROR << "get projection failed";
+        continue;
+      }
+      lane_way_points->emplace_back();
+      auto &lane_way_point = lane_way_points->back();
+      lane_way_point.mutable_pose()->set_x(center_point.x());
+      lane_way_point.mutable_pose()->set_y(center_point.y());
+      lane_way_point.set_id(lane_ptr->id().id());
+      lane_way_point.set_s(s);
+      AINFO << "GET" << lane_way_point.DebugString();
+    }
+  }
+  if (lane_way_points->empty()) {
+    AERROR << "Cannot get lane way point!";
     return false;
   }
-  for (const auto lane : lanes) {
-    double s, l;
-    if (!lane->GetProjection(center_point, &s, &l)) {
-      AERROR << "get projection failed";
-      return false;
+  return true;
+}
+
+bool apollo::external_command::LaneWayTool::GetPreciseParkingLaneWayPoint(
+    hdmap::AreaInfoConstPtr &area_info,
+    std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const {
+  if (nullptr == area_info) {
+    AERROR << "Cannot get junction info!";
+    return false;
+  }
+
+  for (const auto &junction_overlap_id : area_info->area().overlap_id()) {
+    hdmap::OverlapInfoConstPtr overlap_info_ptr =
+        hdmap_->GetOverlapById(junction_overlap_id);
+    if (nullptr == overlap_info_ptr) {
+      AERROR << "Cannot get overlap info!";
+      continue;
     }
-    lane_way_points->emplace_back();
-    auto &lane_way_point = lane_way_points->back();
-    lane_way_point.mutable_pose()->set_x(center_point.x());
-    lane_way_point.mutable_pose()->set_y(center_point.y());
-    lane_way_point.set_id(lane->id().id());
-    lane_way_point.set_s(s);
-    AINFO << "GET" << lane_way_point.DebugString();
+
+    for (const auto &object : overlap_info_ptr->overlap().object()) {
+      hdmap::LaneInfoConstPtr lane_ptr = hdmap_->GetLaneById(object.id());
+      if (nullptr == lane_ptr) {
+        AERROR << "Cannot get lane info!";
+        continue;
+      }
+      double traget_s = object.lane_overlap_info().end_s();
+      apollo::common::PointENU traget_waypoint =
+          lane_ptr->GetSmoothPoint(traget_s);
+      lane_way_points->emplace_back();
+      auto &lane_way_point = lane_way_points->back();
+      lane_way_point.mutable_pose()->set_x(traget_waypoint.x());
+      lane_way_point.mutable_pose()->set_y(traget_waypoint.y());
+      lane_way_point.set_id(lane_ptr->id().id());
+      lane_way_point.set_s(traget_s);
+      AINFO << "GET" << lane_way_point.DebugString();
+    }
+  }
+  if (lane_way_points->empty()) {
+    AERROR << "Cannot get lane way point!";
+    return false;
   }
   return true;
 }

@@ -50,7 +50,7 @@ void VideoImgViewer::initializeGL() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   QImage noImage;
-  if (!noImage.load(tr(":/images/no_image.png"))) {
+  if (!noImage.load(tr("modules/tools/visualizer/images/no_image.png"))) {
     std::cout << "--------can not load the default texture------------"
               << std::endl;
     return;
@@ -64,8 +64,8 @@ void VideoImgViewer::initializeGL() {
   }
 
   video_image_shader_prog_ = RenderableObject::CreateShaderProgram(
-      tr("/apollo/modules/tools/visualizer/shaders/video_image_plane.vert"),
-      tr("/apollo/modules/tools/visualizer/shaders/video_image_plane.frag"));
+      tr("modules/tools/visualizer/shaders/video_image_plane.vert"),
+      tr("modules/tools/visualizer/shaders/video_image_plane.frag"));
   if (video_image_shader_prog_ == nullptr) {
     return;
   }

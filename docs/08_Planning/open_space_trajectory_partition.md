@@ -8,7 +8,7 @@ Open space trajectory partition task is used to partition and optimize stiched t
 
 # Where is the code
 
-Please refer [open space trajectory parition](https://github.com/ApolloAuto/apollo/modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.cc).
+Please refer [open space trajectory parition](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/tasks/open_space_trajectory_partition/open_space_trajectory_partition.cc).
 
 # Code Reading
 

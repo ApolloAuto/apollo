@@ -26,6 +26,12 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
             currentVisible: false,
             vizKey: 'pointCloud',
         },
+        // 路沿点云
+        curbPointCloud: {
+            defaultVisible: false,
+            currentVisible: false,
+            vizKey: 'curbPointCloud',
+        },
         unknownMovable: {
             defaultVisible: true,
             currentVisible: true,
@@ -253,6 +259,16 @@ export const layerMenuParams: { [key: string]: subMenuParams } = {
             currentVisible: true,
             vizKey: 'parkingSpace',
         },
+        barrierGate: {
+            defaultVisible: true,
+            currentVisible: true,
+            vizKey: 'barrierGate',
+        },
+        area: {
+            defaultVisible: true,
+            currentVisible: true,
+            vizKey: 'area',
+        },
         parkingSpaceId: {
             defaultVisible: false,
             currentVisible: false,
@@ -286,8 +302,17 @@ export const formatLayerParams = (params: { [key: string]: subMenuParams }) => {
 
 export const localLayerMenuParamsManager = new LocalStorage(KEY_MANAGER.layerMenuParams);
 
-export const getCurrentLayerParams = () => {
+export const getCurrentLayerParams = (): { [key: string]: subMenuParams } => {
     const localStorageLayerMenuParams = localLayerMenuParamsManager.get();
+
+    if (localStorageLayerMenuParams) {
+        // 同步点云、路沿点云状态，由于需要适配原有的框架导致这里需要初始化
+        Object.keys(localStorageLayerMenuParams).forEach((key) => {
+            const meun = localStorageLayerMenuParams[key];
+            meun.pointCloud = meun.pointCloud || localStorageLayerMenuParams.Perception.pointCloud;
+            meun.curbPointCloud = meun.curbPointCloud || localStorageLayerMenuParams.Perception.curbPointCloud;
+        });
+    }
 
     return localStorageLayerMenuParams || layerMenuParams;
 };

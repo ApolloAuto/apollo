@@ -34,24 +34,24 @@ function _cpp_lint_impl() {
 }
 
 function run_cpp_lint() {
-  pushd "${APOLLO_ROOT_DIR}" >/dev/null
-  local cpp_dirs="cyber"
-  if [[ "${STAGE}" == "dev" ]]; then
-    cpp_dirs="${cpp_dirs} modules"
-  fi
-  for prey in $(find ${cpp_dirs} -name BUILD \
-    | xargs grep -l -E 'cc_library|cc_test|cc_binary|gpu_library' \
-    | xargs grep -L 'cpplint()'); do
-    warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
-    sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' "${prey}"
-    sed -i -e '$a\\ncpplint()' "${prey}"
-    local buidifier
-    buidifier="$(command -v buildifier)"
-    if [ ! -z "${buidifier}" ]; then
-      ${buidifier} -lint=fix "${prey}"
-    fi
-  done
-  popd >/dev/null
+  # pushd "${APOLLO_ROOT_DIR}" >/dev/null
+  # local cpp_dirs="cyber"
+  # if [[ "${STAGE}" == "dev" ]]; then
+  #   cpp_dirs="${cpp_dirs} modules"
+  # fi
+  # for prey in $(find ${cpp_dirs} -name BUILD \
+  #   | xargs grep -l -E 'cc_library|cc_test|cc_binary|gpu_library' \
+  #   | xargs grep -L 'cpplint()'); do
+  #   warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
+  #   sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' "${prey}"
+  #   sed -i -e '$a\\ncpplint()' "${prey}"
+  #   local buidifier
+  #   buidifier="$(command -v buildifier)"
+  #   if [ ! -z "${buidifier}" ]; then
+  #     ${buidifier} -lint=fix "${prey}"
+  #   fi
+  # done
+  # popd >/dev/null
 
   local targets="//cyber/..."
   _cpp_lint_impl "${targets}"
@@ -154,7 +154,6 @@ function parse_cmdline_args() {
 
 function main() {
   # site_restore
-  sed -i 's/STATUS = 2/STATUS = 0/g' /apollo/tools/package/dynamic_deps.bzl
   [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE" 
   # env_prepare
   parse_cmdline_args "$@"

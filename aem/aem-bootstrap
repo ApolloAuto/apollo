@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+###############################################################################
+# Copyright 2024 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# script flags
+#set -u
+#set -e
+#set -x
+
+# global variables
+DV_URL="http://localhost"
+DV_ORIG_PORT=8899
+DV_PLUS_PORT=8888
+
+# load basic functions
+if [[ ! "${AEM_INITED}" == 1 ]]; then
+  home_dir="$(dirname "$(realpath "$0")")"
+  # shellcheck source=./run.sh
+  source "${home_dir}/run.sh"
+fi
+
+usage() {
+  echo "Usage aem bootstrap [options]
+Options:
+  start --plus    Start dreamview_plus and monitor
+  start           Start dreamview and monitor
+  stop            Stop dreamview/dreamview_plus and monitor
+  restart         Restart dreamview and monitor
+  -h, --help      Display help message
+"
+}
+
+start() {
+  local use_origin_dv=0
+  if [[ -z "${APOLLO_DISTRIBUTION_VERSION}" ]]; then
+    warn "APOLLO_DISTRIBUTION_VERSION is not set. fallback to 8.0"
+    buildtool bootstrap start dreamview-dev
+    buildtool bootstrap start monitor-dev
+  else
+    case "$1" in
+      --plus)
+        buildtool bootstrap start dreamview_plus
+        buildtool bootstrap start monitor
+        ;;
+      *)
+        use_origin_dv=1
+        buildtool bootstrap start dreamview
+        buildtool bootstrap start monitor
+        ;;
+    esac
+  fi
+  # wait for a while to make sure the services are up
+  # TODO: refine the waiting logic
+  sleep 5
+
+  local dv_full_url="${DV_URL}:${DV_PLUS_PORT}"
+  if [[ "${use_origin_dv}" == 1 ]]; then
+    dv_full_url="${DV_URL}:${DV_ORIG_PORT}"
+  fi
+
+  local http_status="$(curl -o /dev/null -x '' -I -L -s -w '%{http_code}' ${dv_full_url})"
+  if [[ "${http_status}" == 200 ]]; then
+    info "dreamview is started at ${dv_full_url}"
+  else
+    error "failed to start dreamview, please check the logs ( ${APOLLO_ENV_ROOT}/opt/apollo/neo/data/log/dreamview.log or ${APOLLO_ENV_ROOT}/opt/apollo/neo/data/log/monitor.log ) for more details."
+  fi
+}
+
+stop() {
+  if [[ -z "${APOLLO_DISTRIBUTION_VERSION}" ]]; then
+    buildtool bootstrap stop dreamview-dev > /dev/null 2>&1
+    buildtool bootstrap stop monitor-dev > /dev/null 2>&1
+  else
+    buildtool bootstrap stop dreamview > /dev/null 2>&1
+    buildtool bootstrap stop dreamview_plus > /dev/null 2>&1
+    buildtool bootstrap stop monitor > /dev/null 2>&1
+  fi
+  info "stop dreamview completed."
+}
+
+parse_arguments() {
+  case "$1" in
+    start)
+      shift
+      start "$@"
+      ;;
+    stop)
+      shift
+      stop "$@"
+      ;;
+    restart)
+      shift
+      stop "$@"
+      sleep 3
+      start "$@"
+      ;;
+    --help | -h)
+      usage
+      ;;
+    *)
+      usage
+      ;;
+  esac
+}
+
+execute() {
+  parse_arguments "$@"
+}
+
+execute "$@"

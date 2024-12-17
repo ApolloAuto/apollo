@@ -31,7 +31,8 @@ int BuildStopDecision(const std::string& stop_wall_id, const double stop_line_s,
                       const StopReasonCode& stop_reason_code,
                       const std::vector<std::string>& wait_for_obstacles,
                       const std::string& decision_tag, Frame* const frame,
-                      ReferenceLineInfo* const reference_line_info);
+                      ReferenceLineInfo* const reference_line_info,
+                      double stop_wall_width = 4.0);
 
 int BuildStopDecision(const std::string& stop_wall_id,
                       const std::string& lane_id, const double lane_s,

@@ -401,6 +401,7 @@ bool ControlComponent::Proc() {
 
   if (pad_msg != nullptr) {
     ADEBUG << "pad_msg: " << pad_msg_.ShortDebugString();
+    ADEBUG << "pad_msg is not nullptr";
     if (pad_msg_.action() == DrivingAction::RESET) {
       AINFO << "Control received RESET action!";
       estop_ = false;
