@@ -62,6 +62,6 @@ apollo_cc_library(
     ],
 )
 
-apollo_package(enable_source=False)
+apollo_package()
 
 cpplint()

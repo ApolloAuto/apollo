@@ -202,8 +202,16 @@ bool Recorder::InitReadersImpl() {
   }
 
   // listen new writers in future
-  change_conn_ = channel_manager->AddChangeListener(
-      std::bind(&Recorder::TopologyCallback, this, std::placeholders::_1));
+  // must use async callback, otherwise deadlock may be occurred.
+  auto topology_callback =
+      [this](const apollo::cyber::proto::ChangeMsg& change_msg) {
+        apollo::cyber::Async(
+            [this, change_msg] { this->TopologyCallback(change_msg); });
+      };
+  change_conn_ = channel_manager->AddChangeListener(topology_callback);
+  // change_conn_ = channel_manager->AddChangeListener(
+  //     std::bind(&Recorder::TopologyCallback, this, std::placeholders::_1));
+
   if (!change_conn_.IsConnected()) {
     AERROR << "change connection is not connected";
     return false;

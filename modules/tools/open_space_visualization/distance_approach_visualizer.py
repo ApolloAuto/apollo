@@ -19,6 +19,7 @@
 import math
 import time
 
+from cyber.python.cyber_py3 import cyber
 from matplotlib import animation
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
@@ -263,7 +264,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
 if __name__ == '__main__':
     # visualize_flag = True
     # SmoothTrajectory(visualize_flag)
-
+    cyber.init()
     visualize_flag = False
     planning_time_stats = []
     hybrid_time_stats = []

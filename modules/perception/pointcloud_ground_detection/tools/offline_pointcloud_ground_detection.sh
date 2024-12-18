@@ -21,7 +21,7 @@ output_path="/apollo/data/output/"
 
 mkdir -p $output_path && rm -rf $output_path/*
 
-/apollo/bazel-bin/modules/perception/pointcloud_ground_detection/tools/offline_pointcloud_ground_detection \
+offline_pointcloud_ground_detection \
         --pcd_path=$pcd_path \
         --output_path=$output_path \
         --ground_detector_name=SpatioTemporalGroundDetector \

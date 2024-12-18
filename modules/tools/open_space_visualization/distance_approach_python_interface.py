@@ -27,10 +27,7 @@ from ctypes import cdll, POINTER
 
 APOLLO_DISTRIBUTION_HOME = os.environ.get(
     'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
-if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo'):
-    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/lib/modules/planning/planning_open_space/distance_approach_problem_wrapper_lib.so"
-else:
-    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/bazel-bin/modules/planning/planning_open_space/distance_approach_problem_wrapper_lib.so"  
+lib_path = f"{APOLLO_DISTRIBUTION_HOME}/lib/modules/planning/planning_open_space/distance_approach_problem_wrapper_lib.so"
 
 lib = cdll.LoadLibrary(lib_path)
 

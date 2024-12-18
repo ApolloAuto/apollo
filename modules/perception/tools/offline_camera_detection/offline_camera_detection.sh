@@ -17,4 +17,4 @@
 ###############################################################################
 
 
-/apollo/bazel-bin/modules/perception/tools/offline_camera_detection/offline_camera_detection "$@"
+offline_camera_detection "$@"

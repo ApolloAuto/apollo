@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import modules.common_msgs.planning_msgs.planning_command_pb2 as planning_command_pb2
 import modules.common_msgs.external_command_msgs.free_space_command_pb2 as free_space_command_pb2
 import modules.common_msgs.external_command_msgs.command_status_pb2 as command_status_pb2

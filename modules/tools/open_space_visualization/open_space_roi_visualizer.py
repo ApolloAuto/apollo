@@ -20,9 +20,11 @@
 # @file to run it, change the modules/common/configs/config_gflags.cc to use sunnyvale_with_two_offices
 
 
+from cyber.python.cyber_py3 import cyber
 from modules.tools.open_space_visualization.open_space_roi_interface import *
 import matplotlib.pyplot as plt
 
+cyber.init()
 # initialize object
 open_space_roi = open_space_roi()
 
