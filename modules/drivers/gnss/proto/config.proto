@@ -31,6 +31,8 @@ message Stream {
     
     FORSENSE_TEXT = 50;
 
+    CXZL_TEXT = 60;
+
   }
   optional Format format = 1;
 
