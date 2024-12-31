@@ -41,7 +41,7 @@ PATCHES=(
 )
 
 src_prepare_pre() {
-  # apt_get_update_and_install libboost-all-dev
+  apt_get_update_and_install libboost-all-dev
   apt_get_update_and_install apollo-neo-3rd-boost
   # TODO: pack to 3rd-boost release tarball
   boost_cmake_files_url='https://apollo-system.cdn.bcebos.com/archive/10.0/3rd-boost_1.74.0_cmake_files.tar.gz'

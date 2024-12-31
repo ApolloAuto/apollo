@@ -59,6 +59,9 @@ execute() {
 
   parse_arguments "$@"
 
+  # compatible for versions before 10.0
+  export APOLLO_ENV_CONTAINER_NAME="${APOLLO_ENV_CONTAINER_PREFIX}${APOLLO_ENV_NAME}"
+
   [[ -f "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}/env.config" ]] && set -a && source "${APOLLO_ENVS_ROOT}/${APOLLO_ENV_NAME}/env.config" && set +a
 
   apollo_enter_env

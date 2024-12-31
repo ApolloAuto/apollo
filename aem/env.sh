@@ -23,7 +23,7 @@ else
   export AEM_HOME=${AEM_HOME:-$(dirname $(realpath $0))}
 fi
 export AEM_SYS_SHARE=${AEM_SYS_SHARE:-${AEM_HOME}/share/aem}
-export AEM_VERSION='10.0.0-rc1-r3'
+export AEM_VERSION='10.0.0-rc1-r4'
 
 export APOLLO_ENVS_ROOT=${APOLLO_ENVS_ROOT:-${HOME}/.aem/envs}
 export APOLLO_ENV_NAME="${USER}"

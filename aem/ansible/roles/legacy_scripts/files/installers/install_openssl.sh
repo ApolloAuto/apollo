@@ -45,6 +45,10 @@ src_configure() {
   popd
 }
 
+pkg_install() {
+  :
+}
+
 pkg_install_post() {
   if [[ -d "${INSTALL_PREFIX}/lib64" ]] && [[ ! -e "${INSTALL_PREFIX}/lib" ]]; then
     ln -snf lib64 "${INSTALL_PREFIX}/lib"

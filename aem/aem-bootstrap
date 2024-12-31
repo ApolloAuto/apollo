@@ -45,6 +45,7 @@ Options:
 
 start() {
   local use_origin_dv=0
+  local log_subfix=""
   if [[ -z "${APOLLO_DISTRIBUTION_VERSION}" ]]; then
     warn "APOLLO_DISTRIBUTION_VERSION is not set. fallback to 8.0"
     buildtool bootstrap start dreamview-dev
@@ -52,6 +53,7 @@ start() {
   else
     case "$1" in
       --plus)
+        log_subfix="_plus"
         buildtool bootstrap start dreamview_plus
         buildtool bootstrap start monitor
         ;;
@@ -75,7 +77,7 @@ start() {
   if [[ "${http_status}" == 200 ]]; then
     info "dreamview is started at ${dv_full_url}"
   else
-    error "failed to start dreamview, please check the logs ( ${APOLLO_ENV_ROOT}/opt/apollo/neo/data/log/dreamview.log or ${APOLLO_ENV_ROOT}/opt/apollo/neo/data/log/monitor.log ) for more details."
+    error "failed to start dreamview, please check the logs ( data/log/dreamview${log_subfix}.INFO or data/log/monitor.INFO ) for more details."
   fi
 }
 
