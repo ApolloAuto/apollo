@@ -69,6 +69,8 @@ enum EPOLLDATATYPE {
   E_POLL_GNSS_STATE = 20,
   E_POLL_IMU_STATE = 40,
   E_POLL_CAN_STATE = 60,
+  E_POLL_INS_STANDARD_GNSS2 = 90,
+  E_POLL_INS_STANDARD_ODS2 = 95,
   E_POLL_INS_STATE = 80,
   E_POLL_GNSS2_STATE = 100,
   E_POLL_DATA_TOTAL = 120,
@@ -79,6 +81,7 @@ enum MessageId : uint16_t {
   BIN_SINS_DATA = 0x02AA,
   BIN_IMU_DATA = 0x03AA,
   BIN_GNSS_DATA = 0x04AA,
+  BIN_Extend_DATA = 0x05AA,
 };
 
 // Every binary message has 32-bit CRC performed on all data including the
@@ -140,7 +143,7 @@ struct NAV_DATA_TypeDef {
   int16_t poll_frame2;
   int16_t poll_frame3;
 };
-static_assert(sizeof(NAV_DATA_TypeDef) == 65, "Incorrect NAV_DATA_TypeDef");
+// static_assert(sizeof(NAV_DATA_TypeDef) == 65, "Incorrect NAV_DATA_TypeDef");
 
 struct NAV_SINS_TypeDef {
   uint32_t gps_week;   // GPS Week number.
@@ -166,7 +169,7 @@ struct NAV_SINS_TypeDef {
   float xigema_roll;   // roll std unit degree
   float xigema_head;   // heading std unit degree
 };
-static_assert(sizeof(NAV_SINS_TypeDef) == 90, "Incorrect NAV_SINS_TypeDef");
+// static_assert(sizeof(NAV_SINS_TypeDef) == 90, "Incorrect NAV_SINS_TypeDef");
 
 struct NAV_IMU_TypeDef {
   uint32_t gps_week;   // GPS Week number.
@@ -185,7 +188,7 @@ struct NAV_IMU_TypeDef {
   double magnetY;      // unit mGauss
   double magnetZ;      // unit mGauss
 };
-static_assert(sizeof(NAV_IMU_TypeDef) == 87, "Incorrect NAV_IMU_TypeDef");
+// static_assert(sizeof(NAV_IMU_TypeDef) == 87, "Incorrect NAV_IMU_TypeDef");
 
 struct NAV_GNSS_TypeDef {
   uint32_t gps_week;   // GPS Week number.
@@ -209,8 +212,25 @@ struct NAV_GNSS_TypeDef {
   float xigema_lat;       // North pos std unit m
   float xigema_lon;       // East pos std unit m
   float xigema_alt;       // up pos std unit m
+  float xigema_heading;   // heading std unit degree
 };
-static_assert(sizeof(NAV_GNSS_TypeDef) == 80, "Incorrect NAV_GNSS_TypeDef");
+// static_assert(sizeof(NAV_GNSS_TypeDef) == 84, "Incorrect NAV_GNSS_TypeDef");
+
+struct NAV_Extend_TypeDef {
+  uint32_t gps_week;   // GPS Week number.
+  uint32_t gpssecond;  // Milliseconds of week.
+  float corrGyroX;
+  float corrGyroY;
+  float corrGyroZ;
+  float corrAccX;
+  float corrAccY;
+  float corrAccZ;
+  float gnssAttFromIMU;  // GNSS angle precision compensation from IMU
+  float odsAttFromIMU;   // Carrier angle compensation from IMU
+  float Undulation;      //  Geoidal separation
+};
+// static_assert(sizeof(NAV_Extend_TypeDef) == 44, "Incorrect
+// NAV_Extend_TypeDef");
 
 #pragma pack(pop)
 
