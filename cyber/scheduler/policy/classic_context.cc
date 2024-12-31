@@ -16,6 +16,7 @@
 
 #include "cyber/scheduler/policy/classic_context.h"
 
+#include <cstdint>
 #include <limits>
 
 namespace apollo {
@@ -28,11 +29,11 @@ using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineState;
 
-alignas(CACHELINE_SIZE) GRP_WQ_MUTEX ClassicContext::mtx_wq_;
-alignas(CACHELINE_SIZE) GRP_WQ_CV ClassicContext::cv_wq_;
-alignas(CACHELINE_SIZE) RQ_LOCK_GROUP ClassicContext::rq_locks_;
-alignas(CACHELINE_SIZE) CR_GROUP ClassicContext::cr_group_;
-alignas(CACHELINE_SIZE) NOTIFY_GRP ClassicContext::notify_grp_;
+std::mutex ClassicContext::mtx_wq_;
+GRP_WQ_CV ClassicContext::cv_wq_;
+RQ_LOCK_GROUP ClassicContext::rq_locks_;
+CR_GROUP ClassicContext::cr_group_;
+NOTIFY_GRP ClassicContext::notify_grp_;
 
 ClassicContext::ClassicContext() { InitGroup(DEFAULT_GROUP_NAME); }
 
@@ -43,10 +44,12 @@ ClassicContext::ClassicContext(const std::string& group_name) {
 void ClassicContext::InitGroup(const std::string& group_name) {
   multi_pri_rq_ = &cr_group_[group_name];
   lq_ = &rq_locks_[group_name];
-  mtx_wrapper_ = &mtx_wq_[group_name];
   cw_ = &cv_wq_[group_name];
-  notify_grp_[group_name] = 0;
-  current_grp = group_name;
+  {
+    std::lock_guard<std::mutex> lk(mtx_wq_);
+    notify_grp_[group_name] = 0;
+    current_grp = group_name;
+  }
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
@@ -73,7 +76,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 }
 
 void ClassicContext::Wait() {
-  std::unique_lock<std::mutex> lk(mtx_wrapper_->Mutex());
+  std::unique_lock<std::mutex> lk(mtx_wq_);
   cw_->Cv().wait_for(lk, std::chrono::milliseconds(1000),
                      [&]() { return notify_grp_[current_grp] > 0; });
   if (notify_grp_[current_grp] > 0) {
@@ -83,16 +86,18 @@ void ClassicContext::Wait() {
 
 void ClassicContext::Shutdown() {
   stop_.store(true);
-  mtx_wrapper_->Mutex().lock();
-  notify_grp_[current_grp] = std::numeric_limits<unsigned char>::max();
-  mtx_wrapper_->Mutex().unlock();
+  {
+    std::lock_guard<std::mutex> lk(mtx_wq_);
+    notify_grp_[current_grp] = std::numeric_limits<uint8_t>::max();
+  }
   cw_->Cv().notify_all();
 }
 
 void ClassicContext::Notify(const std::string& group_name) {
-  (&mtx_wq_[group_name])->Mutex().lock();
-  notify_grp_[group_name]++;
-  (&mtx_wq_[group_name])->Mutex().unlock();
+  {
+    std::lock_guard<std::mutex> lk(mtx_wq_);
+    ++notify_grp_[group_name];
+  }
   cv_wq_[group_name].Cv().notify_one();
 }
 
