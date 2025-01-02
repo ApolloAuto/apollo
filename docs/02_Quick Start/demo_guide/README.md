@@ -43,7 +43,7 @@ bash scripts/bootstrap.sh
 ## Download and play the demo record
 
 ```
-python3 docs/demo_guide/record_helper.py demo_3.5.record
+python3 docs/02_Quick\ Start/demo_guide/record_helper.py demo_3.5.record
 cyber_recorder play -f demo_3.5.record --loop
 ```
 
