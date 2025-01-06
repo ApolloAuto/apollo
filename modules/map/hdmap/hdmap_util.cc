@@ -77,8 +77,11 @@ std::unique_ptr<HDMap> CreateMap(const std::string& map_file_path) {
   AINFO << "Load HDMap success: " << map_file_path;
   return hdmap;
 }
-
+/// @brief 
+/// @param map_msg 
+/// @return 
 std::unique_ptr<HDMap> CreateMap(const MapMsg& map_msg) {
+  // 创建一个 std::unique_ptr<HDMap> 类型的智能指针，并将其指向一个动态分配的 HDMap 对象
   std::unique_ptr<HDMap> hdmap(new HDMap());
   if (hdmap->LoadMapFromProto(map_msg.hdmap()) != 0) {
     AERROR << "Failed to load RelativeMap: "
@@ -94,7 +97,9 @@ std::mutex HDMapUtil::base_map_mutex_;
 
 std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
 std::mutex HDMapUtil::sim_map_mutex_;
-
+/// @brief 返回一个指向常量 HDMap 类型的指针
+/// @param map_msg 一个常量引用类型的 MapMsg 对象
+/// @return 
 const HDMap* HDMapUtil::BaseMapPtr(const MapMsg& map_msg) {
   std::lock_guard<std::mutex> lock(base_map_mutex_);
   if (base_map_ != nullptr &&

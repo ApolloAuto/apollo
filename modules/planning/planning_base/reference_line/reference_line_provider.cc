@@ -296,17 +296,23 @@ double ReferenceLineProvider::LastTimeDelay() {
     return last_calculation_time_;
   }
 }
-
+/// @brief 是否成功获取了参考线（reference_lines）和路段段（segments）
+/// @param reference_lines 
+/// @param segments 
+/// @return 
 bool ReferenceLineProvider::GetReferenceLines(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
+// 确保 reference_lines 和 segments 这两个指针不为空
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
   if (!has_planning_command_) {
+    // 没有必要更新参考线
     return true;
   }
   if (FLAGS_use_navigation_mode) {
     double start_time = Clock::NowInSeconds();
+    // 尝试从“相对地图”中获取参考线和路段
     bool result = GetReferenceLinesFromRelativeMap(reference_lines, segments);
     if (!result) {
       AERROR << "Failed to get reference line from relative map";
@@ -359,7 +365,10 @@ void ReferenceLineProvider::PrioritizeChangeLane(
     ++iter;
   }
 }
-
+/// @brief 从relative_map（一个描述相对位置的地图）中获取参考路线，并填充到reference_lines和segments列表中
+/// @param reference_lines 存储返回的参考线
+/// @param segments 存储路径段信息
+/// @return 
 bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
@@ -379,11 +388,13 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   }
 
   // 1.get adc current lane info ,such as lane_id,lane_priority,neighbor lanes
+  //获取当前adc（自动驾驶车辆）的车道信息，首先通过遍历relative_map_中的导航路径，将所有车道ID存入navigation_lane_ids集合
   std::unordered_set<std::string> navigation_lane_ids;
   for (const auto &path_pair : relative_map_->navigation_path()) {
     const auto lane_id = path_pair.first;
     navigation_lane_ids.insert(lane_id);
   }
+  // 如果导航路径中的车道ID集合为空，则输出错误日志
   if (navigation_lane_ids.empty()) {
     AERROR << "navigation path ids is empty";
     return false;
@@ -391,6 +402,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   // get current adc lane info by vehicle state
   common::VehicleState vehicle_state = vehicle_state_provider_->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;
+  // 根据车辆状态和导航路径获取与当前车道最近的路点（adc_lane_way_point
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {
     return false;

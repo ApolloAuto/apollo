@@ -64,10 +64,12 @@ class EgoInfo {
 
   void set_start_point(const common::TrajectoryPoint& start_point) {
     start_point_ = start_point;
+    // apollo/modules/common/configs/config_gflags.cc
     const auto& param = ego_vehicle_config_.vehicle_param();
+  // 根据这些参数调整 start_point_ 的加速度，确保其在合理的范围内（不超过最大加速度且不低于最大减速度）
     start_point_.set_a(
         std::fmax(std::fmin(start_point_.a(), param.max_acceleration()),
-                  param.max_deceleration()));
+                  param.max_deceleration()));  // 2   -6
   }
 
   void CalculateEgoBox(const common::VehicleState& vehicle_state);

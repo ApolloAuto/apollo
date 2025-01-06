@@ -40,7 +40,8 @@ bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
   CalculateEgoBox(vehicle_state);
   return true;
 }
-
+/// @brief 计算和更新 EgoInfo 类中的车辆边界框（ego_box_）
+/// @param vehicle_state 
 void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
   const auto& param = ego_vehicle_config_.vehicle_param();
   ADEBUG << "param: " << param.DebugString();
@@ -50,6 +51,7 @@ void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
 
   Vec2d position(vehicle_state.x(), vehicle_state.y());
+  // 车辆相对于当前坐标系的几何中心位置
   Vec2d center(position + vec_to_center.rotate(vehicle_state.heading()));
 
   ego_box_ =

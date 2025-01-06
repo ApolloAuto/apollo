@@ -779,12 +779,13 @@ bool HybridAStar::Plan(
     return false;
   }
   double map_time = Clock::NowInSeconds();
+  // 基于动态规划算法，求解每个二维节点的代价值，作为混合A*的启发函数
   grid_a_star_heuristic_generator_->GenerateDpMap(
       ex, ey, XYbounds_, obstacles_linesegments_vec_);
   ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
   open_set_.insert(start_node_->GetIndex());
-  open_pq_.emplace(start_node_, start_node_->GetCost());
+  open_pq_.emplace(start_node_, start_node_->GetCost());  // 优先队列：保存开放集的节点
   // Hybrid A* begins
   size_t explored_node_num = 0;
   size_t available_result_num = 0;

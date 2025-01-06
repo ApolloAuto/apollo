@@ -38,14 +38,15 @@ using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
 
 bool PlanningComponent::Init() {
+// 依赖注入器，本质就是一个数据缓存中心，以便于规划任务前后帧之间的承接，以及异常处理的回溯
   injector_ = std::make_shared<DependencyInjector>();
-// 规划模式的选择
+// 规划模式的选择: apollo/modules/common/configs/config_gflags.cc
   if (FLAGS_use_navigation_mode) {   // 默认是false
-    planning_base_ = std::make_unique<NaviPlanning>(injector_);
+    planning_base_ = std::make_unique<NaviPlanning>(injector_); // 相对地图规划器
   } else {
-    planning_base_ = std::make_unique<OnLanePlanning>(injector_);
+    planning_base_ = std::make_unique<OnLanePlanning>(injector_); // 默认规划器
   }
-
+// 加载config文件
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
@@ -57,8 +58,8 @@ bool PlanningComponent::Init() {
       return false;
     }
   }
-
-  planning_base_->Init(config_);
+// 在这里执行的是OnLanePlanning::Init的初始化
+  planning_base_->Init(config_); // 参考线优化主要在这部分
 // 完成相应的消息订阅
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
@@ -102,7 +103,8 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
-  // 消息发布
+// planning发布话题部分
+// 发布规划路径给control模块
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 
@@ -141,7 +143,7 @@ bool PlanningComponent::Proc(
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);  // 互斥锁
     if (!local_view_.planning_command ||
         !common::util::IsProtoEqual(local_view_.planning_command->header(),
                                     planning_command_.header())) {
@@ -172,12 +174,14 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.stories = std::make_shared<Stories>(stories_);
   }
-
+// 3.0 
+// 输入性检查，如果检查失败，则退出
   if (!CheckInput()) {
     AINFO << "Input check failed";
     return false;
   }
-
+// 4.0 
+// 如果配置文件为深度学习模式，非主流方法，跳过
   if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     // data process for online training
     message_process_.OnChassis(*local_view_.chassis);
@@ -190,8 +194,9 @@ bool PlanningComponent::Proc(
     message_process_.OnTrafficLightDetection(*local_view_.traffic_light);
     message_process_.OnLocalization(*local_view_.localization_estimate);
   }
-
+// 5.0
   // publish learning data frame for RL test
+  // 非主流
   if (config_.learning_mode() == PlanningConfig::RL_TEST) {
     PlanningLearningData planning_learning_data;
     LearningDataFrame* learning_data_frame =
@@ -207,11 +212,16 @@ bool PlanningComponent::Proc(
     }
     return true;
   }
-
+// 6.0
+// adc_trajectory_pb为最终获取的路径信息
   ADCTrajectory adc_trajectory_pb;
-  // 3. 执行注册好的Planning，生成线路
+  // 在这里配置的是on_lane_planning方法，路径规划函数入口
+  // planning逻辑主循环
+  // 输入:local_view   输出:adc_trajectory_pb
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
-  auto start_time = adc_trajectory_pb.header().timestamp_sec();
+    // 7.0 此时路径规划已经完成，获取路径规划计算最开始的时间戳，参看RunOnce时间戳赋值
+  // 获取计算完成后的时间戳，参看FillHeader时间戳赋值
+  auto start_time = adc_trajectory_pb.header().timestamp_sec(); // 从 adc_trajectory_pb 中获取起始时间（start_time），即该消息头中的时间戳
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
   // modify trajectory relative time due to the timestamp change in header
@@ -219,7 +229,8 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
-  // 4.发布消息
+   // 8.0 
+  // 发布路径信息
   planning_writer_->Write(adc_trajectory_pb);
 
   // Send command execution feedback.
@@ -246,8 +257,9 @@ bool PlanningComponent::Proc(
   command_status_writer_->Write(command_status);
 
   // record in history
+  // 记录历史轨迹信息
+  // record in history
   auto* history = injector_->history();
-  // 5.最后记录
   history->Add(adc_trajectory_pb);
 
   return true;
@@ -274,7 +286,7 @@ bool PlanningComponent::CheckInput() {
   auto* not_ready = trajectory_pb.mutable_decision()
                         ->mutable_main_decision()
                         ->mutable_not_ready();
-
+// 检查定位，底盘，地图数据
   if (local_view_.localization_estimate == nullptr) {
     not_ready->set_reason("localization not ready");
   } else if (local_view_.chassis == nullptr) {

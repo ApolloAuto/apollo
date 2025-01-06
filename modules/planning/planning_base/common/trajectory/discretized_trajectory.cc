@@ -61,19 +61,27 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
   return common::math::InterpolateUsingLinearApproximation(
       *(it_lower - 1), *it_lower, relative_time);
 }
-
+/// @brief 
+/// @param relative_time 表示查询的相对时间
+/// @param epsilon 表示容忍的误差，用于调整比较的精度
+/// @return 
 size_t DiscretizedTrajectory::QueryLowerBoundPoint(const double relative_time,
                                                    const double epsilon) const {
+  // 确保DiscretizedTrajectory对象不为空
   ACHECK(!empty());
 
   if (relative_time >= back().relative_time()) {
+    // 返回最后一个点的索引
     return size() - 1;
   }
+  // 判断该轨迹点的相对时间加上epsilon是否小于查询的relative_time
   auto func = [&epsilon](const TrajectoryPoint& tp,
                          const double relative_time) {
     return tp.relative_time() + epsilon < relative_time;
   };
+  // 返回一个迭代器，指向第一个满足func条件的位置
   auto it_lower = std::lower_bound(begin(), end(), relative_time, func);
+  // 返回从容器的开始位置到it_lower迭代器之间的距离。这个距离就是查询点relative_time的下界（lower bound）索引
   return std::distance(begin(), it_lower);
 }
 
@@ -118,10 +126,15 @@ void DiscretizedTrajectory::AppendTrajectoryPoint(
   }
   push_back(trajectory_point);
 }
-
+/// @brief 常量引用意味着该函数返回的对象不能被修改，并且通过引用返回的对象不会被复制
+// 从离散轨迹中获取某个特定点的函数
+/// @param index 
+/// @return 
 const TrajectoryPoint& DiscretizedTrajectory::TrajectoryPointAt(
     const size_t index) const {
+  // 检查 index 是否小于 NumOfPoints()
   CHECK_LT(index, NumOfPoints());
+  // 一个成员函数，它返回 DiscretizedTrajectory 类的一个数据结构（通常是一个数组或类似容器），其中存储了轨迹的所有点
   return data()[index];
 }
 

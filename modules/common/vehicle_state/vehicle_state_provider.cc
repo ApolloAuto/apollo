@@ -31,13 +31,16 @@ namespace common {
 Status VehicleStateProvider::Update(
     const localization::LocalizationEstimate &localization,
     const canbus::Chassis &chassis) {
+  // 定位赋值
   original_localization_ = localization;
+  // 构造期望的线性速度
   if (!ConstructExceptLinearVelocity(localization)) {
     std::string msg = absl::StrCat(
         "Fail to update because ConstructExceptLinearVelocity error.",
         "localization:\n", localization.DebugString());
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);
   }
+  // 获取定位时间戳，如果没有定位数据则使用底盘时间戳
   if (localization.has_measurement_time()) {
     vehicle_state_.set_timestamp(localization.measurement_time());
   } else if (localization.header().has_timestamp_sec()) {
@@ -47,13 +50,13 @@ Status VehicleStateProvider::Update(
               "time instead.";
     vehicle_state_.set_timestamp(chassis.header().timestamp_sec());
   }
-
+// 获取车辆档位
   if (chassis.has_gear_location()) {
     vehicle_state_.set_gear(chassis.gear_location());
   } else {
     vehicle_state_.set_gear(canbus::Chassis::GEAR_NONE);
   }
-
+// 获取车辆速度
   if (chassis.has_speed_mps()) {
     vehicle_state_.set_linear_velocity(chassis.speed_mps());
     if (!FLAGS_reverse_heading_vehicle_state &&
@@ -61,11 +64,11 @@ Status VehicleStateProvider::Update(
       vehicle_state_.set_linear_velocity(-vehicle_state_.linear_velocity());
     }
   }
-
+// 获取车辆方向盘转角百分比
   if (chassis.has_steering_percentage()) {
     vehicle_state_.set_steering_percentage(chassis.steering_percentage());
   }
-
+// 计算车辆行驶曲率
   static constexpr double kEpsilon = 0.1;
   if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
@@ -73,7 +76,7 @@ Status VehicleStateProvider::Update(
     vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
                              vehicle_state_.linear_velocity());
   }
-
+// 获取驾驶模式
   vehicle_state_.set_driving_mode(chassis.driving_mode());
 
   return Status::OK();
@@ -81,6 +84,7 @@ Status VehicleStateProvider::Update(
 
 bool VehicleStateProvider::ConstructExceptLinearVelocity(
     const localization::LocalizationEstimate &localization) {
+// 如果定位没有位姿，则返回错误
   if (!localization.has_pose()) {
     AERROR << "Invalid localization input.";
     return false;
@@ -91,7 +95,7 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     ADEBUG << "Skip localization update when it is in use_navigation_mode.";
     return true;
   }
-
+// 拷贝定位位姿
   vehicle_state_.mutable_pose()->CopyFrom(localization.pose());
   if (localization.pose().has_position()) {
     vehicle_state_.set_x(localization.pose().position().x());
@@ -100,29 +104,32 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
   }
 
   const auto &orientation = localization.pose().orientation();
-
+// 如果定位有航向角，则直接赋值
   if (localization.pose().has_heading()) {
     vehicle_state_.set_heading(localization.pose().heading());
-  } else {
+  } else {// 否则根据四元数推算
     vehicle_state_.set_heading(
         math::QuaternionToHeading(orientation.qw(), orientation.qx(),
                                   orientation.qy(), orientation.qz()));
   }
 
-  if (FLAGS_enable_map_reference_unify) {
+  if (FLAGS_enable_map_reference_unify) { // true
+    // 如果车辆参考坐标系坐标(后轴中心)没有角速度输出，则返回错误
     if (!localization.pose().has_angular_velocity_vrf()) {
       AERROR << "localization.pose().has_angular_velocity_vrf() must be true "
                 "when FLAGS_enable_map_reference_unify is true.";
       return false;
     }
+    // 添加角速度
     vehicle_state_.set_angular_velocity(
         localization.pose().angular_velocity_vrf().z());
-
+    // 没有线性加速度
     if (!localization.pose().has_linear_acceleration_vrf()) {
       AERROR << "localization.pose().has_linear_acceleration_vrf() must be "
                 "true when FLAGS_enable_map_reference_unify is true.";
       return false;
     }
+    // 添加线性加速度，注意车辆坐标系y轴指向车辆行进方向
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration_vrf().y());
   } else {
@@ -140,12 +147,13 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration().y());
   }
-
+  // 如果存在欧拉角，则设置翻滚，俯仰，偏航角度
   if (localization.pose().has_euler_angles()) {
     vehicle_state_.set_roll(localization.pose().euler_angles().y());
     vehicle_state_.set_pitch(localization.pose().euler_angles().x());
     vehicle_state_.set_yaw(localization.pose().euler_angles().z());
   } else {
+  // // 否则根据四元数计算翻滚，俯仰，偏航角度
     math::EulerAnglesZXYd euler_angle(orientation.qw(), orientation.qx(),
                                       orientation.qy(), orientation.qz());
     vehicle_state_.set_roll(euler_angle.roll());
@@ -211,15 +219,23 @@ void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
 const VehicleState &VehicleStateProvider::vehicle_state() const {
   return vehicle_state_;
 }
-
+// 估计车辆未来姿态
 math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
+// 获取车辆线性速度
   double v = vehicle_state_.linear_velocity();
+    /*
+  r = v / angular_velocity
+  angular = angular_velocity * t
+  // 弧形运动
+  */
   // Predict distance travel vector
+  // 角速度几乎为零：车辆为直线运动
   if (std::fabs(vehicle_state_.angular_velocity()) < 0.0001) {
-    vec_distance[0] = 0.0;
-    vec_distance[1] = v * t;
+    vec_distance[0] = 0.0; // x
+    vec_distance[1] = v * t; // y  前进方向
   } else {
+    // 如果车辆不为直线运动，进行轨迹预测
     vec_distance[0] = -v / vehicle_state_.angular_velocity() *
                       (1.0 - std::cos(vehicle_state_.angular_velocity() * t));
     vec_distance[1] = std::sin(vehicle_state_.angular_velocity() * t) * v /
@@ -227,14 +243,19 @@ math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
   }
 
   // If we have rotation information, take it into consideration.
+  // 判断是否有姿态信息
   if (vehicle_state_.pose().has_orientation()) {
     const auto &orientation = vehicle_state_.pose().orientation();
+    // 构造一个 Eigen::Quaternion<double> 类型的四元数对象 quaternion
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
+    // 获取车辆的当前位置（x, y, z 坐标）并构造一个 Eigen::Vector3d 类型的向量 pos_vec，表示车辆当前的三维坐标
     Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                             vehicle_state_.z());
+// 使用四元数的旋转矩阵将位移向量 vec_distance 转换到全局坐标系中（旋转的影响），然后加上车辆当前的位置 pos_vec，得到车辆在未来时间 t 的三维位置 future_pos_3d
     const Eigen::Vector3d future_pos_3d =
         quaternion.toRotationMatrix() * vec_distance + pos_vec;
+// 车辆在未来位置的估计值
     return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 

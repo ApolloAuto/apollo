@@ -37,16 +37,21 @@
 namespace apollo {
 namespace common {
 namespace util {
-
+/// @brief 
+/// @tparam T 接受一个指向类型为 T 的指针 msg
+/// @tparam type 
+/// @param module_name 
+/// @param msg 
 template <typename T, typename std::enable_if<
                           std::is_base_of<google::protobuf::Message, T>::value,
                           int>::type = 0>
 static void FillHeader(const std::string& module_name, T* msg) {
-  static std::atomic<uint64_t> sequence_num = {0};
-  auto* header = msg->mutable_header();
-  double timestamp = ::apollo::cyber::Clock::NowInSeconds();
+  static std::atomic<uint64_t> sequence_num = {0}; // sequence_num 是一个原子类型，表示它是一个可以在多线程环境下安全地进行读写操作的整数
+  auto* header = msg->mutable_header();  // 返回一个可以修改的 header 指针
+  double timestamp = ::apollo::cyber::Clock::NowInSeconds();  // 存储当前时间戳 s
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
+  // sequence_num.fetch_add(1)：对 sequence_num 进行原子操作，递增 1 并返回递增前的值
   header->set_sequence_num(
       static_cast<unsigned int>(sequence_num.fetch_add(1)));
 }

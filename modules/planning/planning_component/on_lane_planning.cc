@@ -159,20 +159,30 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   start_time_ = Clock::NowInSeconds();
   return planner_->Init(injector_, FLAGS_planner_config_path);
 }
-
+/// @brief 
+/// @param sequence_num 标识这一帧的序列号
+/// @param planning_start_point 表示路径规划开始的点
+/// @param vehicle_state 当前车辆的状态，包括位置、速度、加速度等信息
+/// @return 
 Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
                                  const TrajectoryPoint& planning_start_point,
                                  const VehicleState& vehicle_state) {
+  // planning_base.h: std::unique_ptr<Frame> frame_;    ??????    
+  // reset 方法确保 frame_ 的指针是有效的                          
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          vehicle_state, reference_line_provider_.get()));
-
+  
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
 
+  // reference_lines 用来存储参考线
   std::list<ReferenceLine> reference_lines;
+  // segments 用来存储路段信息
   std::list<hdmap::RouteSegments> segments;
+  // 由routing给出的route_segments信息生成reference_lines
   reference_line_provider_->GetReferenceLines(&reference_lines, &segments);
+  // 验证参考线和路段的数量一致
   DCHECK_EQ(reference_lines.size(), segments.size());
 
   auto forward_limit = planning::PncMapBase::LookForwardDistance(
@@ -221,18 +231,20 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
 
 // TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
+  // 确保在生成新轨迹点之前，轨迹数组为空，以避免附加到现有的轨迹点数据上
   ptr_trajectory_pb->clear_trajectory_point();
 
   const auto& vehicle_state = injector_->vehicle_state()->vehicle_state();
-  const double max_t = FLAGS_fallback_total_time;
-  const double unit_t = FLAGS_fallback_time_unit;
+  // apollo/modules/planning/planning_base/gflags/planning_gflags.cc
+  const double max_t = FLAGS_fallback_total_time;  // 3
+  const double unit_t = FLAGS_fallback_time_unit;  // 0.1
 
   TrajectoryPoint tp;
-  auto* path_point = tp.mutable_path_point();
+  auto* path_point = tp.mutable_path_point(); // 返回的是一个指向 path_point 的指针，允许我们修改轨迹点的位置信息
   path_point->set_x(vehicle_state.x());
   path_point->set_y(vehicle_state.y());
   path_point->set_theta(vehicle_state.heading());
-  path_point->set_s(0.0);
+  path_point->set_s(0.0); // 轨迹点的初始位置
   tp.set_v(0.0);
   tp.set_a(0.0);
   for (double t = 0.0; t < max_t; t += unit_t) {
@@ -244,31 +256,36 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
+    // 1.0                           
   // when rerouting, reference line might not be updated. In this case, planning
   // module maintains not-ready until be restarted.
   local_view_ = local_view;
+   // 获取路径规划起始时间戳
   const double start_timestamp = Clock::NowInSeconds();
+  // 路径规划算法耗时起始时间
   const double start_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
           .count();
 
+// 2.0
   // localization
   ADEBUG << "Get localization:"
          << local_view_.localization_estimate->DebugString();
 
   // chassis
   ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
-
+ // 更新车辆状态---> 进入Update函数查看
+ // apollo/modules/common/vehicle_state/vehicle_state_provoder.cc
   Status status = injector_->vehicle_state()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
-
+ // 获取车辆状态
   VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
       << "start_timestamp is behind vehicle_state_timestamp by "
       << start_timestamp - vehicle_state_timestamp << " secs";
-
+// 如果车辆状态无效，生成刹车轨迹
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     const std::string msg =
         "Update VehicleStateProvider failed "
@@ -291,14 +308,16 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
         common::monitor::MonitorMessageItem::PLANNING);
     monitor_logger_buffer.ERROR("ego system time is behind GPS time");
   }
-
+// 对齐时间戳 vehicle_state_timestamp为车辆状态时间戳
   if (start_timestamp - vehicle_state_timestamp <
-      FLAGS_message_latency_threshold) {
+      FLAGS_message_latency_threshold) {  // 0.02s 消息延时阈值
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
 
+// 参考线更新车辆状态
   // Update reference line provider and reset scenario if new routing
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
+  reference_line_provider_->UpdateVehicleState(vehicle_state); // 车辆状态单纯的赋值
+  // // 如果是两个不同的routing,则重新初始化
   if (local_view_.planning_command->is_motion_command() &&
       util::IsDifferentRouting(last_command_, *local_view_.planning_command)) {
     last_command_ = *local_view_.planning_command;
@@ -315,8 +334,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
+  // 3.0
+  // 进行轨迹拼接
+// 在apollo规划算法中，在每一帧规划开始时会调用一个轨迹拼接函数，返回一段拼接轨迹点集
+// 并告诉我们是否重新规划以及重规划的原因
   const double planning_cycle_time =
-      1.0 / static_cast<double>(FLAGS_planning_loop_rate);
+      1.0 / static_cast<double>(FLAGS_planning_loop_rate);  // 10 hz
 
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
@@ -325,10 +348,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
           planning_cycle_time, FLAGS_trajectory_stitching_preserved_length,
           true, last_publishable_trajectory_.get(), &replan_reason);
 
+// 4.0
+// 更新ego信息，进入EgoInfo类查看私有成员变量释义，进入Update查看
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
-  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+  // 初始化frame,重要信息，将拼接轨迹最后一个点作为路径规划起点
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);// frame类存储了一次规划循环中所需的所有数据   180
   if (status.ok()) {
     injector_->ego_info()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
@@ -1202,7 +1228,7 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   (*sliding_line_properties)["fill"] = "false";
   (*sliding_line_properties)["showLine"] = "true";
 }
-
+// 估算未来停车位置
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double curr_timestamp) const {
   // TODO(Jinyun): use the same method in trajectory stitching
