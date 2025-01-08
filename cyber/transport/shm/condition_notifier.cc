@@ -63,7 +63,7 @@ bool ConditionNotifier::Notify(const ReadableInfo& info) {
   uint64_t seq = indicator_->next_seq.fetch_add(1);
   uint64_t idx = seq % kBufLength;
   indicator_->infos[idx] = info;
-  indicator_->seqs[idx] = seq;
+  indicator_->seqs[idx].store(seq, std::memory_order_release);
 
   return true;
 }
@@ -84,7 +84,7 @@ bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
     uint64_t seq = indicator_->next_seq.load();
     if (seq != next_seq_) {
       auto idx = next_seq_ % kBufLength;
-      auto actual_seq = indicator_->seqs[idx];
+      auto actual_seq = indicator_->seqs[idx].load(std::memory_order_acquire);
       if (actual_seq >= next_seq_) {
         next_seq_ = actual_seq;
         *info = indicator_->infos[idx];
