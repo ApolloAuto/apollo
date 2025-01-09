@@ -111,7 +111,7 @@ inline void ReentrantRWLock::WriteLock() {
   while (!lock_num_.compare_exchange_weak(rw_lock_free, WRITE_EXCLUSIVE,
                                           std::memory_order_acq_rel,
                                           std::memory_order_relaxed)) {
-    // rw_lock_free will change after CAS fail, so init agin
+    // rw_lock_free will change after CAS fail, so init again
     rw_lock_free = RW_LOCK_FREE;
     if (++retry_times == MAX_RETRY_TIMES) {
       // saving cpu
