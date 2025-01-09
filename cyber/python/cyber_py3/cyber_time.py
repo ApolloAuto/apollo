@@ -219,7 +219,7 @@ class Rate(object):
         if isinstance(other, int):
             self.rate_ = _CYBER_TIME.new_PyRate(other)
         elif isinstance(other, float):
-            self.rate_ = _CYBER_TIME.new_PyRate(int(1.0 / other))
+            self.rate_ = _CYBER_TIME.new_PyRate(int(1e9 / other))
         elif isinstance(other, Duration):
             self.rate_ = _CYBER_TIME.new_PyRate(other.to_nsec())
 

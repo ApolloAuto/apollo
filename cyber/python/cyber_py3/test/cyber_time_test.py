@@ -82,7 +82,7 @@ class TestTime(unittest.TestCase):
         self.assertEqual(111, rt1.get_expected_cycle_time().to_nsec())
         rt2 = cyber_time.Rate(0.2)
         self.assertEqual(0, rt2.get_cycle_time().to_nsec())
-        self.assertEqual(5, rt2.get_expected_cycle_time().to_nsec())
+        self.assertEqual(5e9, rt2.get_expected_cycle_time().to_nsec())
         rt3 = cyber_time.Rate(cyber_time.Duration(666))
         self.assertEqual(0, rt3.get_cycle_time().to_nsec())
         self.assertEqual(666, rt3.get_expected_cycle_time().to_nsec())
