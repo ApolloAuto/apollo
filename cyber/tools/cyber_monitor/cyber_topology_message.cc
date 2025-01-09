@@ -120,7 +120,7 @@ void CyberTopologyMessage::AddReaderWriter(
     const apollo::cyber::proto::RoleAttributes& role, bool isWriter) {
   const std::string& channel_name = role.channel_name();
 
-  if (!specified_channel_.empty() && specified_channel_ != channel_name) {
+  if (!specified_channel_.empty() && (channelName.find(specified_channel_) == std::string::npos) ) {
     return;
   }
 
