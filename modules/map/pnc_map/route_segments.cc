@@ -129,7 +129,7 @@ LaneWaypoint RouteSegments::FirstWaypoint() const {
 LaneWaypoint RouteSegments::LastWaypoint() const {
   return LaneWaypoint(back().lane, back().end_s, 0.0);
 }
-
+// 给 segment 设置属性
 void RouteSegments::SetProperties(const RouteSegments &other) {
   route_end_waypoint_ = other.RouteEndWaypoint();
   can_exit_ = other.CanExit();
@@ -359,6 +359,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
 
   // 0 if waypoint is on segment, ok
+  // 判断 waypoint 是否在 RoutSegment 上
   if (IsWaypointOnSegment(waypoint)) {
     return true;
   }
@@ -366,17 +367,20 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   // 1. should have valid projection.
   LaneWaypoint segment_waypoint;
   common::SLPoint route_sl;
+  // adc_waypoint 与 segment 进行投影，得到 sl 值和在 segment 上的 way_point
   bool has_projection = GetProjection(point, &route_sl, &segment_waypoint);
   if (!has_projection) {
     AERROR << "No projection from waypoint: " << waypoint.DebugString();
     return false;
   }
+  // 横向距离 >20 
   static constexpr double kMaxLaneWidth = 10.0;
   if (std::fabs(route_sl.l()) > 2 * kMaxLaneWidth) {
     return false;
   }
 
   // 2. heading should be the same.
+  // 判断 heading 
   double waypoint_heading = waypoint.lane->Heading(waypoint.s);
   double segment_heading = segment_waypoint.lane->Heading(segment_waypoint.s);
   double heading_diff =
@@ -387,6 +391,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
   }
 
   // 3. the waypoint and the projected lane should not be separated apart.
+  // 判断相邻车道是否是跨车道
   double waypoint_left_width = 0.0;
   double waypoint_right_width = 0.0;
   waypoint.lane->GetWidth(waypoint.s, &waypoint_left_width,

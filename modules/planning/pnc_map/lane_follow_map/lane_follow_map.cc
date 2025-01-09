@@ -152,11 +152,13 @@ bool LaneFollowMap::IsValid(const planning::PlanningCommand &command) const {
   if (num_road == 0) {
     return false;
   }
+  // 判断 waypoint 中点的个数
   if (!routing.has_routing_request() ||
       routing.routing_request().waypoint_size() < 2) {
     AERROR << "Routing does not have request.";
     return false;
   }
+  // 判断 Routing 中的 id 和 s 值
   for (const auto &waypoint : routing.routing_request().waypoint()) {
     if (!waypoint.has_id() || !waypoint.has_s()) {
       AERROR << "Routing waypoint has no lane_id or s.";
@@ -173,6 +175,7 @@ void LaneFollowMap::UpdateRoutingRange(int adc_index) {
   range_end_ = range_start_;
   while (range_end_ < static_cast<int>(route_indices_.size())) {
     const auto &lane_id = route_indices_[range_end_].segment.lane->id().id();
+    // 如果 lane_id 不在 range_lane_id 中，将其插入
     if (range_lane_ids_.count(lane_id) != 0) {
       break;
     }
@@ -182,11 +185,13 @@ void LaneFollowMap::UpdateRoutingRange(int adc_index) {
 }
 
 bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
+  // 判断 Routing 是否有效
   if (!IsValid(last_command_)) {
     AERROR << "The routing is invalid when updating vehicle state.";
     route_segments_lane_ids_.clear();
     return false;
   }
+  // 判断该帧与上一帧的 vehicle state 是否差距过大
   if (!adc_state_.has_x() ||
       (common::util::DistanceXY(adc_state_, vehicle_state) >
        FLAGS_replan_lateral_distance_threshold +
@@ -196,8 +201,9 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     adc_route_index_ = -1;
     stop_for_destination_ = false;
   }
-
+  // 将该帧进行赋值
   adc_state_ = vehicle_state;
+  // 根据当前自车位置求离它最近的 adc_waypoint 
   if (!GetNearestPointFromRouting(vehicle_state, &adc_waypoint_)) {
     AERROR << "Failed to get waypoint from routing with point: " << "("
            << vehicle_state.x() << ", " << vehicle_state.y() << ", "
@@ -205,6 +211,7 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     route_segments_lane_ids_.clear();
     return false;
   }
+  // 根据 waypoint 找到其 index 
   int route_index = GetWaypointIndex(adc_waypoint_);
   if (route_index < 0 ||
       route_index >= static_cast<int>(route_indices_.size())) {
@@ -214,15 +221,17 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   ADEBUG << "adc_waypoint_" << adc_waypoint_.DebugString() << "route_index"
          << route_index;
   // Track how many routing request waypoints the adc have passed.
+  // 找到下一个 waypoint
   UpdateNextRoutingWaypointIndex(route_index);
   adc_route_index_ = route_index;
+  // 根据 adc_route_index_ 更新 routingrang
   UpdateRoutingRange(adc_route_index_);
 
   if (routing_waypoint_index_.empty()) {
     AERROR << "No routing waypoint index.";
     return false;
   }
-
+  // 如果自车行驶到最后一个点，停止
   if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1) {
     stop_for_destination_ = true;
   }
@@ -239,9 +248,9 @@ bool LaneFollowMap::UpdatePlanningCommand(
     return false;
   }
   const auto &routing = command.lane_follow_command();
-  range_lane_ids_.clear();
-  route_indices_.clear();
-  all_lane_ids_.clear();
+  range_lane_ids_.clear(); // 根据 adc_index(当前车的位置)更新车道 id 范围
+  route_indices_.clear(); // 路线索引
+  all_lane_ids_.clear(); // 收集所有地图中 routing request 获得的车道 id 
   for (int road_index = 0; road_index < routing.road_size(); ++road_index) {
     const auto &road_segment = routing.road(road_index);
     for (int passage_index = 0; passage_index < road_segment.passage_size();
@@ -264,8 +273,11 @@ bool LaneFollowMap::UpdatePlanningCommand(
 
   range_start_ = 0;
   range_end_ = 0;
+  // 通过 adc_route_index_ 判断自车在 那个 road 哪个 passage 哪个 lane 上
   adc_route_index_ = -1;
+  // 下一个 waypoint 的 routing_index
   next_routing_waypoint_index_ = 0;
+  // 初始化 routing_index 
   UpdateRoutingRange(adc_route_index_);
 
   routing_waypoint_index_.clear();
@@ -275,6 +287,7 @@ bool LaneFollowMap::UpdatePlanningCommand(
     return false;
   }
   int i = 0;
+  // 将 waypoint 中的 lane 的值和 index 保存在 routing_waypoint_index_ 中
   for (size_t j = 0; j < route_indices_.size(); ++j) {
     while (i < request_waypoints.size() &&
            hdmap::RouteSegments::WithinLaneSegment(route_indices_[j].segment,
@@ -356,24 +369,29 @@ bool LaneFollowMap::PassageToSegments(routing::Passage passage,
   return !segments->empty();
 }
 
-std::vector<int> LaneFollowMap::GetNeighborPassages(
+std::vector<int> LaneFollowMap:: GetNeighborPassages(
     const routing::RoadSegment &road, int start_passage) const {
   CHECK_GE(start_passage, 0);
   CHECK_LE(start_passage, road.passage_size());
   std::vector<int> result;
+  // 根据 passage index 找到 passage
   const auto &source_passage = road.passage(start_passage);
   result.emplace_back(start_passage);
+  // 无变道行为 
   if (source_passage.change_lane_type() == routing::FORWARD) {
     return result;
   }
+  // 当前 passage 已经无法连接到另一条 routing 上
   if (source_passage.can_exit()) {  // No need to change lane
     return result;
   }
   hdmap::RouteSegments source_segments;
+  // 提取 passage 到 segment 
   if (!PassageToSegments(source_passage, &source_segments)) {
     AERROR << "Failed to convert passage to segments";
     return result;
   }
+  // 下一个查找到的 routing waypoint 在当前车辆所在的 passage 中，则不需要变道，直接返回
   if (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
       source_segments.IsWaypointOnSegment(
           routing_waypoint_index_[next_routing_waypoint_index_].waypoint)) {
@@ -381,6 +399,7 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
            << "] before change lane";
     return result;
   }
+  // 可以变道，将变道结果保存
   std::unordered_set<std::string> neighbor_lanes;
   if (source_passage.change_lane_type() == routing::LEFT) {
     for (const auto &segment : source_segments) {
@@ -397,7 +416,7 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
       }
     }
   }
-
+  // 根据 neighbor_lanes 找到对应的 segment 并保存
   for (int i = 0; i < road.passage_size(); ++i) {
     if (i == start_passage) {
       continue;
@@ -415,8 +434,10 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
 bool LaneFollowMap::GetRouteSegments(
     const VehicleState &vehicle_state,
     std::list<hdmap::RouteSegments> *const route_segments) {
+  // 参考线前向距离的选择是未来 8s 可以走过的路径算
   double look_forward_distance =
       LookForwardDistance(vehicle_state.linear_velocity());
+  // 后视 50
   double look_backward_distance = FLAGS_look_backward_distance;
   return GetRouteSegments(vehicle_state, look_backward_distance,
                           look_forward_distance, route_segments);
@@ -426,6 +447,7 @@ bool LaneFollowMap::GetRouteSegments(
     const VehicleState &vehicle_state, const double backward_length,
     const double forward_length,
     std::list<hdmap::RouteSegments> *const route_segments) {
+  // 根据自车位置找到 adc_waypoit_index
   if (!UpdateVehicleState(vehicle_state)) {
     AERROR << "Failed to update vehicle state in pnc_map.";
     return false;
@@ -437,12 +459,15 @@ bool LaneFollowMap::GetRouteSegments(
     AERROR << "Invalid vehicle state in pnc_map, update vehicle state first.";
     return false;
   }
+  // 根据 route index 获取相关 road passage lane 的信息
   const auto &route_index = route_indices_[adc_route_index_].index;
   const int road_index = route_index[0];
   const int passage_index = route_index[1];
   const auto &road = last_command_.lane_follow_command().road(road_index);
   // Raw filter to find all neighboring passages
+  // 找到相关临近车道，最终返回 passage index 
   auto drive_passages = GetNeighborPassages(road, passage_index);
+  // 根据 passage 找到 segment 
   for (const int index : drive_passages) {
     const auto &passage = road.passage(index);
     hdmap::RouteSegments segments;
@@ -450,6 +475,7 @@ bool LaneFollowMap::GetRouteSegments(
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
+    // 
     const PointENU nearest_point =
         index == passage_index
             ? adc_waypoint_.lane->GetSmoothPoint(adc_waypoint_.s)
@@ -461,6 +487,7 @@ bool LaneFollowMap::GetRouteSegments(
              << nearest_point.ShortDebugString();
       continue;
     }
+    // 如果 passage 不是当前车道进行可驶入检查
     if (index != passage_index) {
       if (!segments.CanDriveFrom(adc_waypoint_)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
@@ -502,9 +529,11 @@ bool LaneFollowMap::GetNearestPointFromRouting(
     const common::VehicleState &state, hdmap::LaneWaypoint *waypoint) const {
   waypoint->lane = nullptr;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
+  // 转换成 ENU 格式
   const auto point = PointFactory::ToPointENU(state);
   std::vector<hdmap::LaneInfoConstPtr> valid_lanes;
   for (auto lane_id : all_lane_ids_) {
+    // 判断该 lane_id 是否在高精地图中可以找到
     hdmap::Id id = hdmap::MakeMapId(lane_id);
     auto lane = hdmap_->GetLaneById(id);
     if (nullptr != lane) {
@@ -515,6 +544,7 @@ bool LaneFollowMap::GetNearestPointFromRouting(
   // Get nearest_waypoints for current position
   std::vector<hdmap::LaneWaypoint> valid_way_points;
   for (const auto &lane : valid_lanes) {
+    // lane 不在 range_lane_ids_ 中
     if (range_lane_ids_.count(lane->id().id()) == 0) {
       ADEBUG << "not in range" << lane->id().id();
       continue;
@@ -527,11 +557,13 @@ bool LaneFollowMap::GetNearestPointFromRouting(
     double s = 0.0;
     double l = 0.0;
     {
+      // 根据当前车辆位置计算车辆在 lane 上的 s 和 l 值
       if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
         continue;
       }
       ADEBUG << lane->id().id() << "," << s << "," << l;
       // Use large epsilon to allow projection diff
+      // 计算的 s 比车道还长
       static constexpr double kEpsilon = 0.5;
       if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
         continue;
@@ -556,6 +588,7 @@ bool LaneFollowMap::GetNearestPointFromRouting(
   }
 
   // find closest lane that satisfy vehicle heading
+  // 如果超过一个 waypoint ，选择正确航向角的车道线
   int closest_index = -1;
   double distance = std::numeric_limits<double>::max();
   double lane_heading = 0.0;
@@ -566,6 +599,7 @@ bool LaneFollowMap::GetNearestPointFromRouting(
         M_PI_2 * 1.5) {
       continue;
     }
+    // 判断距离是否是最近的
     if (std::fabs(valid_way_points[i].l) < distance) {
       distance = std::fabs(valid_way_points[i].l);
       closest_index = i;
@@ -650,6 +684,7 @@ bool LaneFollowMap::ExtendSegments(
   std::unordered_set<std::string> unique_lanes;
   static constexpr double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
+  // 查找轨迹的起点是在哪里
   if (start_s < 0) {
     const auto &first_segment = *segments.begin();
     auto lane = first_segment.lane;
@@ -707,6 +742,7 @@ bool LaneFollowMap::ExtendSegments(
     return true;
   }
   // Extend the trajectory towards the end of the trajectory.
+  // 查找轨迹的终点在哪里
   if (router_s < end_s && !truncated_segments->empty()) {
     auto &back = truncated_segments->back();
     if (back.lane->total_length() > back.end_s) {

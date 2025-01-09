@@ -29,8 +29,8 @@ namespace math {
 Vec2d Vec2d::CreateUnitVec2d(const double angle) {
   return Vec2d(std::cos(angle), std::sin(angle));
 }
-
-double Vec2d::Length() const { return std::hypot(x_, y_); }
+// 计算两点之间的距离
+double Vec2d::Length() const { return std::hypot(x_, y_); } 
 
 double Vec2d::LengthSquare() const { return x_ * x_ + y_ * y_; }
 
