@@ -58,7 +58,9 @@ bool OpenSpaceRoiDecider::Init(
   AINFO << config_.DebugString();
   return res;
 }
-
+/// @brief 处理不同类型的开放空间区域（ROI，Region of Interest）
+/// @param frame 
+/// @return 
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
   if (frame == nullptr) {
     const std::string msg =
@@ -69,15 +71,19 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
   vehicle_state_ = frame->vehicle_state();
   obstacles_by_frame_ = frame->GetObstacleList();
-
+  // 存储停车位的四个顶点坐标
   std::array<Vec2d, 4> spot_vertices;
+  // 存储附近的路径
   Path nearby_path;
   // @brief vector of different obstacle consisting of vertice points.The
   // obstacle and the vertices order are in counter-clockwise order
+  // 一个二维vector，用于存储开放空间区域的边界，边界由一系列顶点（Vec2d）表示
   std::vector<std::vector<common::math::Vec2d>> roi_boundary;
-
+  // 获取当前选择的开放空间区域类型（roi_type）
   const auto &roi_type = config_.roi_type();
+  // 检查roi_type是否为PARKING（停车场）
   if (roi_type == OpenSpaceRoiDeciderConfig::PARKING) {
+    // 从frame中获取目标停车位的ID，并存储到target_parking_spot_id_中
     target_parking_spot_id_ = frame->open_space_info().target_parking_spot_id();
     ParkingInfo parking_info;
     if (!GetParkingSpot(frame, &parking_info)) {
@@ -88,34 +94,36 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
     frame->mutable_open_space_info()->set_parking_type(
         parking_info.parking_type);
-
+    // 根据停车位信息设置原点
     SetOrigin(parking_info, frame);
-
+    // 设置停车位的结束姿态（即停车时车辆的位置和朝向）
     SetParkingSpotEndPose(parking_info, frame);
-
+    // 从地图上获取停车位的边界，并将其存储在roi_boundary中
     if (!GetParkingBoundary(parking_info, *nearby_path_, frame,
                             &roi_boundary)) {
       const std::string msg = "Fail to get parking boundary from map";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // 检查roi_type是否为PULL_OVER（停车）
   } else if (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) {
     if (!GetPullOverSpot(frame, &spot_vertices, &nearby_path)) {
       const std::string msg = "Fail to get parking boundary from map";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-
+    // 根据停车点的四个顶点设置原点
     SetOrigin(frame, spot_vertices);
-
+    // 设置停车结束姿态
     SetPullOverSpotEndPose(frame);
-
+    // 从地图上获取停车区域的边界，并将其存储在roi_boundary中
     if (!GetPullOverBoundary(frame, spot_vertices, nearby_path,
                              &roi_boundary)) {
       const std::string msg = "Fail to get parking boundary from map";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // 检查roi_type是否为PARK_AND_GO（停放并行驶）
   } else if (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO) {
     ADEBUG << "in Park_and_Go";
     nearby_path =
@@ -142,6 +150,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
                            adc_point, 2.0, vehicle_state_.heading(), M_PI / 3.0,
                            &lane, &s, &l) == -1;
     }
+    // 根据是否处于停车区域外，分别获取停车并行驶区域的边界
     if (is_parking_out) {
       AINFO << "GetParkingOutBoundary!!";
       if (!GetParkingOutBoundary(nearby_path, frame, &roi_boundary)) {
