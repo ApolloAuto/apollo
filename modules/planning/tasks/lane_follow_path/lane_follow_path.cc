@@ -117,6 +117,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   // 遍历每个障碍物
   for (const auto* obs : indexed_obstacles.Items()) {
     // 对每个障碍物，提取其在路径坐标系中的边界
+    // 查看 reference_line_.GetSLboundary
     const auto& sl_bound = obs->PerceptionSLBoundary();
     for (int i = 0; i < sl_bound.boundary_point_size(); i++) {
       std::string name = obs->Id() + "_obs_sl_boundary";

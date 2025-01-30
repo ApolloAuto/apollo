@@ -1033,7 +1033,7 @@ double Path::GetSample(const std::vector<double>& samples,
   if (s <= 0.0) {
     return samples[0];
   }
-  const int idx = static_cast<int>(s / kSampleDistance);
+  const int idx = static_cast<int>(s / kSampleDistance);  // 0.25
   if (idx >= num_sample_points_ - 1) {
     return samples.back();
   }

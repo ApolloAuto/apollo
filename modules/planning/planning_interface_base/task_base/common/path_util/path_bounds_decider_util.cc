@@ -162,14 +162,18 @@ bool PathBoundsDeciderUtil::UpdateRightPathBoundaryWithBuffer(
   *bound_point = new_point;
   return true;
 }
-
+/// @brief 根据路径被阻塞的位置修剪路径边界
+/// @param path_blocked_idx 路径被阻塞的索引位置
+/// @param path_boundaries 
 void PathBoundsDeciderUtil::TrimPathBounds(
     const int path_blocked_idx, PathBoundary* const path_boundaries) {
   if (path_blocked_idx != -1) {
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
     }
+    // 计算从阻塞位置到路径边界的剩余部分的长度
     int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
+    // 移除所有在阻塞索引之后的元素
     for (int i = 0; i < range; ++i) {
       path_boundaries->pop_back();
     }
@@ -537,21 +541,31 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
 
   return true;
 }
-
+/// @brief 根据自车的状态扩展路径的左右边界
+/// @param reference_line_info 
+/// @param init_sl_state 
+/// @param extend_buffer 
+/// @param path_bound 
+/// @return 
 bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
     const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
     const double extend_buffer, PathBoundary* const path_bound) {
+  // 自车的横向位置，即自车相对于车道中心的横向偏移
   double adc_l_to_lane_center = init_sl_state.second[0];
+  // 计算自车在横向加速过程中的速度缓冲
   static constexpr double kMaxLateralAccelerations = 1.5;
-
+  // 如果速度大于零，缓冲区值为正（表示加速），如果速度小于零，缓冲区值为负（表示减速）
+  // 通过公式 v² / (2 * a) 来计算需要的缓冲区
   double ADC_speed_buffer = (init_sl_state.second[1] > 0 ? 1.0 : -1.0) *
                             init_sl_state.second[1] * init_sl_state.second[1] /
                             kMaxLateralAccelerations / 2.0;
   double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+  // left_bound_adc 是左侧边界，取自车的当前位置与速度缓冲区的最大值，后面加上自车的半宽度和扩展缓冲区
   double left_bound_adc =
       std::fmax(adc_l_to_lane_center, adc_l_to_lane_center + ADC_speed_buffer) +
       adc_half_width + extend_buffer;
+  // right_bound_adc 是右侧边界，取自车的当前位置与速度缓冲区的最小值，减去自车的半宽度和扩展缓冲区
   double right_bound_adc =
       std::fmin(adc_l_to_lane_center, adc_l_to_lane_center + ADC_speed_buffer) -
       adc_half_width - extend_buffer;
@@ -564,7 +578,8 @@ bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
         (*path_bound)[i].s, &road_left_width, &road_right_width);
     double left_bound_road = road_left_width - adc_half_width;
     double right_bound_road = -road_right_width + adc_half_width;
-
+    // 如果计算出的左边界（left_bound_adc）大于当前路径边界的上边界（l_upper.l），
+    // 则更新上边界为新的左边界，并将边界类型设置为 ADC（表示自车的边界），并将 ID 设置为 "adc"
     if (left_bound_adc > (*path_bound)[i].l_upper.l) {
       (*path_bound)[i].l_upper.l =
           std::max(std::min(left_bound_adc, left_bound_road),
@@ -572,6 +587,8 @@ bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
       (*path_bound)[i].l_upper.type = BoundType::ADC;
       (*path_bound)[i].l_upper.id = "adc";
     }
+        //如果计算出的右边界（right_bound_adc）小于当前路径边界的下边界（l_lower.l），
+    //则更新下边界为新的右边界，并将边界类型设置为 ADC，ID 设置为 "adc"
     if (right_bound_adc < (*path_bound)[i].l_lower.l) {
       (*path_bound)[i].l_lower.l =
           std::min(std::max(right_bound_adc, right_bound_road),

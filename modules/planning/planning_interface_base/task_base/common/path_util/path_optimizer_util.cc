@@ -200,12 +200,17 @@ void PathOptimizerUtil::UpdatePathRefWithBound(
     }
   }
 }
-
+/// @brief 考虑了横向加速度和路径的曲率，基于车辆的物理参数和路径的几何特征来估算加速度边界
+/// @param path_boundary 
+/// @param reference_line 
+/// @param ddl_bounds 
 void PathOptimizerUtil::CalculateAccBound(
     const PathBoundary& path_boundary, const ReferenceLine& reference_line,
     std::vector<std::pair<double, double>>* ddl_bounds) {
+// 获取车辆的物理参数（例如最大转向角、转向比、轴距等）
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
+// 计算车辆在最大转向角下的横向加速度边界
   const double lat_acc_bound =
       std::tan(veh_param.max_steer_angle() / veh_param.steer_ratio()) /
       veh_param.wheel_base();

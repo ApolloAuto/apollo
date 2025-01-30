@@ -522,12 +522,15 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
   }
   return true;
 }
-
+/// @brief 根据给定的 s 坐标，计算并返回相应的 l 偏移量（即车道中心到参考线的偏移量）
+/// @param s 
+/// @param l_offset 
+/// @return 
 bool ReferenceLine::GetOffsetToMap(const double s, double* l_offset) const {
   if (map_path_.path_points().empty()) {
     return false;
   }
-
+// 获取距离给定 s 坐标最近的参考点
   auto ref_point = GetNearestReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     return false;
