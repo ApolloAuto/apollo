@@ -45,11 +45,13 @@ bool VanjeelidarComponent::Init() {
   decoder_param.max_distance = conf_.max_distance();
   decoder_param.start_angle = conf_.start_angle();
   decoder_param.end_angle = conf_.end_angle();
+  decoder_param.hide_points_range = conf_.point_cloud_masking();
   decoder_param.use_lidar_clock = conf_.use_lidar_clock();
   decoder_param.dense_points = conf_.dense_points();
   decoder_param.wait_for_difop = conf_.wait_for_difop();
   decoder_param.config_from_file = conf_.config_from_file();
-  decoder_param.angle_path_ver = conf_.angle_path();
+  decoder_param.angle_path_hor = conf_.angle_path_hor();
+  decoder_param.angle_path_ver = conf_.angle_path_ver();
 
   ::vanjee::lidar::WJInputParam input_param;
   input_param.connect_type = conf_.connect_type();
