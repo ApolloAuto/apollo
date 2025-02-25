@@ -150,11 +150,6 @@ class VehicleController {
   virtual void Acceleration(double acc) = 0;
 
   /*
-   * @brief drive with new speed:-xx.0~xx.0, unit:m/s
-   */
-  virtual void Speed(double speed) {}
-
-  /*
    * @brief steering with old angle speed angle:-99.99~0.00~99.99, unit:%,
    * left:+, right:-
    */
@@ -166,6 +161,9 @@ class VehicleController {
    */
   virtual void Steer(double angle, double angle_spd) = 0;
 
+  virtual void SetSpeed(double speed) {};
+
+  virtual void SetAngularSpeed(double angular_speed) {};
   /*
    * @brief set Electrical Park Brake
    */
@@ -464,10 +462,13 @@ ErrorCode VehicleController<SensorType>::Update(
     Gear(control_command.gear_location());
     Throttle(control_command.throttle());
     Acceleration(control_command.acceleration());
-    Speed(control_command.speed());
     Brake(control_command.brake());
     SetEpbBreak(control_command);
     SetLimits();
+
+    // The ROS chassis receives speed commands, while the Ackerman chassis
+    // receives throttle or acceleration commands.
+    SetSpeed(control_command.speed());
   }
 
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
@@ -478,6 +479,10 @@ ErrorCode VehicleController<SensorType>::Update(
     } else {
       Steer(control_command.steering_target());
     }
+
+    // The ROS chassis receives angular velocity, while the Ackerman chassis
+    // receives steering wheel angle.
+    SetAngularSpeed(control_command.steering_rate());
   }
 
   if ((driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||

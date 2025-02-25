@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+
+message TwistCmd {
+  optional double x_target_speed = 1;
+  optional double y_target_speed = 2;
+  optional double angular_velocity_z = 3;
+}
+
+message TwistFb {
+  optional int32 flag_stop = 1;
+  optional double x_speed = 2;
+  optional double y_speed = 3;
+  optional double z_angle_speed = 4;
+}
+
+message AccFb {
+  optional double acceleration_x = 1;
+  optional double acceleration_y = 2;
+  optional double acceleration_z = 3;
+  optional double angular_velocity_x = 4;
+}
+
+message AngVelFb {
+  optional double angular_velocity_y = 1;
+  optional double angular_velocity_z = 2;
+  optional double battery_voltage = 3;
+}
+
+message Ros {
+  optional TwistCmd twist_cmd = 1; // control message
+
+  optional TwistFb twist_fb = 10; // report message
+  optional AccFb acc_fb = 11; // report message
+  optional AngVelFb ang_vel_fb = 12; // report message
+}
