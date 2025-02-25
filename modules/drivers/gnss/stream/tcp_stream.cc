@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/gnss/stream/tcp_stream.h"
+
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -28,7 +30,6 @@
 
 #include "cyber/cyber.h"
 #include "modules/drivers/gnss/stream/stream.h"
-#include "modules/drivers/gnss/stream/tcp_stream.h"
 
 namespace apollo {
 namespace drivers {
@@ -307,6 +308,7 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
           status_ = Stream::Status::ERROR;
           errno_ = errno;
         }
+        AWARN << "tcp stream write error " << errno << ", " << strerror(errno);
         return total_nsent;
       }
     }

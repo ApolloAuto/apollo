@@ -21,12 +21,11 @@
 #include <string>
 #include <thread>
 
-#include "cyber/cyber.h"
-
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/drivers/gnss/parser/data_parser.h"
 #include "modules/drivers/gnss/parser/rtcm_parser.h"
 #include "modules/drivers/gnss/stream/stream.h"
@@ -68,6 +67,11 @@ class RawStream {
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t buffer_[BUFFER_SIZE] = {0};
   uint8_t buffer_rtk_[BUFFER_SIZE] = {0};
+  uint8_t buffer_last_[BUFFER_SIZE * 2] = {0};
+  int64_t buffer_last_start_ = 0;
+  int64_t buffer_last_end_ = 0;
+  int64_t buffer_last_count_ = 0;
+  int64_t gpgga_last_match_ = 0;
 
   std::shared_ptr<Stream> data_stream_;
   std::shared_ptr<Stream> command_stream_;

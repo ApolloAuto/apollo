@@ -509,6 +509,21 @@ void RawStream::DataSpin() {
       msg_pub->set_data(reinterpret_cast<const char *>(buffer_), length);
       raw_writer_->Write(msg_pub);
       data_parser_ptr_->ParseRawData(msg_pub->data());
+      // ADEBUG << "read " << length << " bytes from data stream: " << buffer_;
+      // message from stream may be truncated, save the last message to
+      // loop buffer to concat the data, onrmally the parser will handle it, but
+      // the gpgga handler below not
+      memcpy(buffer_last_ + buffer_last_end_, buffer_, length);
+      buffer_last_end_ += length;
+      if (buffer_last_end_ > BUFFER_SIZE) {
+        memcpy(buffer_last_, buffer_last_ + BUFFER_SIZE,
+               buffer_last_end_ - BUFFER_SIZE);
+      } else {
+        memcpy(buffer_last_ + buffer_last_end_ + BUFFER_SIZE - length, buffer_,
+               length);
+      }
+      buffer_last_count_ += buffer_last_end_ / BUFFER_SIZE;
+      buffer_last_end_ = buffer_last_end_ % BUFFER_SIZE;
       if (push_location_) {
         PushGpgga(length);
       }
@@ -553,16 +568,33 @@ void RawStream::PushGpgga(const size_t length) {
   if (!in_rtk_stream_) {
     return;
   }
+  (void)length;
+  int64_t start = BUFFER_SIZE * (buffer_last_count_ - 1) + buffer_last_end_;
+  if (start < 0) {
+    start = 0;
+  }
+  int64_t end = BUFFER_SIZE * buffer_last_count_ + buffer_last_end_;
+  char *buffer = reinterpret_cast<char *>(buffer_last_) + (start % BUFFER_SIZE);
+  // ADEBUG << "last buffer start from " << start << " to " << end << "
+  // with "
+  // << end - start << " bytes: " << std::string(buffer, end - start);
 
-  char *gpgga = strstr(reinterpret_cast<char *>(buffer_), "$GPGGA");
+  if (gpgga_last_match_ > start) {
+    start = gpgga_last_match_;
+    buffer = reinterpret_cast<char *>(buffer_last_) + (start % BUFFER_SIZE);
+  }
+
+  char *gpgga = strstr(reinterpret_cast<char *>(buffer), "$GPGGA");
   if (gpgga) {
     char *p = strchr(gpgga, '*');
     if (p) {
       p += 5;
-      if (size_t(p - reinterpret_cast<char *>(buffer_)) <= length) {
+      gpgga_last_match_ = (p - buffer) + start;
+      // ADEBUG << "gpgga last match: " << gpgga_last_match_ << " with "
+      // << p - gpgga << " bytes: " << std::string(gpgga, p - gpgga);
+      if (size_t(p - reinterpret_cast<char *>(buffer)) <= BUFFER_SIZE) {
         AINFO_EVERY(5) << "Push gpgga.";
-        in_rtk_stream_->write(reinterpret_cast<uint8_t *>(gpgga),
-                              reinterpret_cast<uint8_t *>(p) - buffer_);
+        in_rtk_stream_->write(reinterpret_cast<uint8_t *>(gpgga), p - gpgga);
       }
     }
   }

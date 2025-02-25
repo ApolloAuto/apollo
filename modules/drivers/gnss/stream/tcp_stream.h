@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #pragma once
+#include <cinttypes>
+
+#include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
 namespace drivers {

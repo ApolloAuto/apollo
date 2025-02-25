@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #include <unistd.h>
+
 #include <iostream>
 #include <mutex>
 
 #include "cyber/cyber.h"
-
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/gnss/stream/stream.h"
