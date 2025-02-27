@@ -1,0 +1,12 @@
+ts: 0.01
+cutoff_freq: 10
+mass_fl: 520
+mass_fr: 520
+mass_rl: 520
+mass_rr: 520
+mean_filter_window_size: 10
+lock_steer_speed: -0.081
+query_relative_time: 0.8
+query_time_nearest_point_only: false
+switch_speed: 2.0
+switch_speed_window: 0.0

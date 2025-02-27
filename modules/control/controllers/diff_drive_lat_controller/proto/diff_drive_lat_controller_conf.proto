@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message DiffDriveLatControllerConf {
+  optional double ts = 1;  // sample time (dt) 0.01 now, configurable
+  optional int32 mass_fl = 5;
+  optional int32 mass_fr = 6;
+  optional int32 mass_rl = 7;
+  optional int32 mass_rr = 8;
+  optional int32 cutoff_freq = 12;
+  optional int32 mean_filter_window_size = 13;
+
+  optional double lock_steer_speed = 27 [default = 0.081];
+  optional double query_relative_time = 30 [default = 0.8];
+  optional bool query_time_nearest_point_only = 35 [default = false];
+  optional double switch_speed = 36;  // low/high speed controller switch speed
+  optional double switch_speed_window = 37 [default = 0.0];
+}
