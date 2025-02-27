@@ -19,8 +19,6 @@
 
 #include <memory>
 
-// #include "controller/controller.h"
-
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/control/controllers/lon_based_pid_controller/proto/lon_based_pid_controller_conf.pb.h"
 
@@ -33,10 +31,10 @@
 namespace apollo {
 namespace control {
 
-class DiffDriveController : public ControlTask {
+class DiffDriveLonController : public ControlTask {
  public:
-  DiffDriveController();
-  virtual ~DiffDriveController();
+  DiffDriveLonController();
+  virtual ~DiffDriveLonController();
 
   common::Status Init(std::shared_ptr<DependencyInjector> injector) override;
 

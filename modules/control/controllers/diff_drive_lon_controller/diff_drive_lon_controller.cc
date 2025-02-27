@@ -15,7 +15,7 @@
 //  Created Date: 2024-12-30
 //  Author: daohu527
 
-#include "modules/control/controllers/diff_drive_controller/diff_drive_controller.h"
+#include "modules/control/controllers/diff_drive_lon_controller/diff_drive_lon_controller.h"
 
 #include "cyber/time/time.h"
 
@@ -27,7 +27,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::cyber::Time;
 
-DiffDriveController::DiffDriveController()
+DiffDriveLonController::DiffDriveLonController()
     : name_("PID-based Diff drive Controller") {
   if (FLAGS_enable_csv_debug) {
     time_t rawtime;
@@ -61,9 +61,9 @@ DiffDriveController::DiffDriveController()
   }
 }
 
-DiffDriveController::~DiffDriveController() { CloseLogFile(); }
+DiffDriveLonController::~DiffDriveLonController() { CloseLogFile(); }
 
-void DiffDriveController::CloseLogFile() {
+void DiffDriveLonController::CloseLogFile() {
   if (FLAGS_enable_csv_debug) {
     if (speed_log_file_ != nullptr) {
       fclose(speed_log_file_);
@@ -72,7 +72,7 @@ void DiffDriveController::CloseLogFile() {
   }
 }
 
-common::Status DiffDriveController::Init(
+common::Status DiffDriveLonController::Init(
     std::shared_ptr<DependencyInjector> injector) {
   if (!ControlTask::LoadConfig<LonBasedPidControllerConf>(
           &lon_based_pidcontroller_conf_)) {
@@ -82,7 +82,7 @@ common::Status DiffDriveController::Init(
   return Status::OK();
 }
 
-common::Status DiffDriveController::ComputeControlCommand(
+common::Status DiffDriveLonController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
     control::ControlCommand *cmd) {
@@ -158,7 +158,7 @@ common::Status DiffDriveController::ComputeControlCommand(
   return Status::OK();
 }
 
-void DiffDriveController::ComputeLongitudinalErrors(
+void DiffDriveLonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
     const double ts, SimpleLongitudinalDebug *debug) {
   // the decomposed vehicle motion onto Frenet frame
@@ -244,7 +244,7 @@ void DiffDriveController::ComputeLongitudinalErrors(
   debug->set_preview_acceleration_reference(preview_point.a());
 }
 
-bool DiffDriveController::Shifting(control::ControlCommand *cmd) {
+bool DiffDriveLonController::Shifting(control::ControlCommand *cmd) {
   // Switch car gear condition:
   // 1. speed is lower than a threshold
   // 2. gear in NEUTRAL
@@ -258,7 +258,7 @@ bool DiffDriveController::Shifting(control::ControlCommand *cmd) {
   return true;
 }
 
-bool DiffDriveController::EPB() {
+bool DiffDriveLonController::EPB() {
   // The driver presses the brake pedal, and the vehicle speed is zero for 5s.
   // EnterEPB() { debug->set_is_epb_brake(true); }
   // When the driver presses the accelerator pedal and releases the brake pedal,
@@ -268,15 +268,15 @@ bool DiffDriveController::EPB() {
   return true;
 }
 
-common::Status DiffDriveController::Reset() {
+common::Status DiffDriveLonController::Reset() {
   station_pid_controller_.Reset();
   station_leadlag_controller_.Reset();
   return Status::OK();
 }
 
-std::string DiffDriveController::Name() const { return name_; }
+std::string DiffDriveLonController::Name() const { return name_; }
 
-void DiffDriveController::Stop() { CloseLogFile(); }
+void DiffDriveLonController::Stop() { CloseLogFile(); }
 
 }  // namespace control
 }  // namespace apollo

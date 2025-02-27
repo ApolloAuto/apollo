@@ -6,9 +6,9 @@ package(default_visibility = ["//visibility:public"])
 CONTROL_COPTS = ['-DMODULE_NAME=\\"control\\"']
 
 apollo_plugin(
-    name = "libdiff_drive_controller.so",
-    srcs = ["diff_drive_controller.cc"],
-    hdrs = ["diff_drive_controller.h"],
+    name = "libdiff_drive_lon_controller.so",
+    srcs = ["diff_drive_lon_controller.cc"],
+    hdrs = ["diff_drive_lon_controller.h"],
     copts = CONTROL_COPTS,
     description = ":plugins.xml",
     deps = [
