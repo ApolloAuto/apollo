@@ -47,41 +47,53 @@ int TwistFb::flag_stop(const std::uint8_t* bytes, const int32_t length) const {
 }
 
 double TwistFb::x_speed(const std::uint8_t* bytes, const int32_t length) const {
-  Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 2);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 3);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
+  if (high.is_bit_1(7)) {
+    x -= 0x10000;
+  }
+  // mm/s to m/s
   double ret = x * 0.001;
   return ret;
 }
 
 double TwistFb::y_speed(const std::uint8_t* bytes, const int32_t length) const {
-  Byte t0(bytes + 4);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 4);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 5);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
+  if (high.is_bit_1(7)) {
+    x -= 0x10000;
+  }
+  // mm/s to m/s
   double ret = x * 0.001;
   return ret;
 }
 
 double TwistFb::z_angle_speed(const std::uint8_t* bytes, const int32_t length) const {
-  Byte t0(bytes + 6);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 6);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 7);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 7);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
-  double ret = x * 1000;
+  if (high.is_bit_1(7)) {
+    x -= 0x10000;
+  }
+  // Counterclockwise is +, clockwise is -
+  double ret = x * 0.001;
   return ret;
 }
 

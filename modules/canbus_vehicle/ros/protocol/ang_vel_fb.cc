@@ -31,6 +31,7 @@ using ::apollo::drivers::canbus::Byte;
 AngVelFb::AngVelFb() {}
 
 const int32_t AngVelFb::ID = 0x103;
+static constexpr double ANGULAR_VELOCITY_SCALE_FACTOR = 3753.0;
 
 void AngVelFb::Parse(const std::uint8_t* bytes, int32_t length,
                      Ros* chassis) const {
@@ -44,41 +45,49 @@ void AngVelFb::Parse(const std::uint8_t* bytes, int32_t length,
 
 double AngVelFb::angular_velocity_y(const std::uint8_t* bytes,
                                     const int32_t length) const {
-  Byte t0(bytes + 0);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 0);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 1);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 1);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
-  return static_cast<double>(x);
+  if (high.is_bit_1(7)) {
+    x -= 0x10000;
+  }
+  // Convert original data to rad/s by dividing by 3753
+  return static_cast<double>(x) / ANGULAR_VELOCITY_SCALE_FACTOR;
 }
 
 double AngVelFb::angular_velocity_z(const std::uint8_t* bytes,
                                     const int32_t length) const {
-  Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 2);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 3);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 3);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
-  return static_cast<double>(x);
+  if (high.is_bit_1(7)) {
+    x -= 0x10000;
+  }
+  // Convert original data to rad/s by dividing by 3753
+  return static_cast<double>(x) / ANGULAR_VELOCITY_SCALE_FACTOR;
 }
 
 double AngVelFb::battery_voltage(const std::uint8_t* bytes,
                                  const int32_t length) const {
-  Byte t0(bytes + 4);
-  int32_t x = t0.get_byte(0, 8);
+  Byte high(bytes + 4);
+  int32_t x = high.get_byte(0, 8);
 
-  Byte t1(bytes + 5);
-  int32_t t = t1.get_byte(0, 8);
+  Byte low(bytes + 5);
+  int32_t t = low.get_byte(0, 8);
   x <<= 8;
   x |= t;
 
-  return x;
+  return static_cast<double>(x);
 }
 
 }  // namespace ros

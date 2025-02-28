@@ -63,47 +63,49 @@ void TwistCmd::set_angular_velocity_z(double z_angular_velocity) {
 }
 
 void TwistCmd::set_p_x_target_speed(uint8_t* data, double x_target_speed) {
-  double x_bounded_speed = ProtocolData::BoundedValue(0.0, 1.0, x_target_speed);
-  uint32_t x = static_cast<uint32_t>(x_bounded_speed * 1000);
+  x_target_speed = ProtocolData::BoundedValue(-5.0, 5.0, x_target_speed);
+  int x = static_cast<int>(x_target_speed * 1000);
+  uint8_t t = 0;
 
-  std::uint8_t t = 0;
   t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_low(data + 0);
+  Byte frame_low(data + 1);
   frame_low.set_value(t, 0, 8);
-
   x >>= 8;
+
   t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_high(data + 1);
+  Byte frame_high(data + 0);
   frame_high.set_value(t, 0, 8);
 }
 
 void TwistCmd::set_p_y_target_speed(uint8_t* data, double y_target_speed) {
-  double y_bounded_speed = ProtocolData::BoundedValue(0.0, 1.0, y_target_speed);
-  uint32_t y = static_cast<uint32_t>(y_bounded_speed * 1000);
+  y_target_speed = ProtocolData::BoundedValue(-5.0, 5.0, y_target_speed);
+  int y = static_cast<int>(y_target_speed * 1000);
+  uint8_t t = 0;
 
-  std::uint8_t t = 0;
   t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_low(data + 2);
+  Byte frame_low(data + 3);
   frame_low.set_value(t, 0, 8);
-
   y >>= 8;
+
   t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_high(data + 3);
+  Byte frame_high(data + 2);
   frame_high.set_value(t, 0, 8);
 }
 
-void TwistCmd::set_p_angular_velocity_z(uint8_t* data, double z_angular_velocity) {
-  double z_bounded_angular_vel = ProtocolData::BoundedValue(0.0, 1.0, z_angular_velocity);
-  uint32_t z = static_cast<uint32_t>(z_bounded_angular_vel * 1000);
+void TwistCmd::set_p_angular_velocity_z(uint8_t* data,
+                                        double z_angular_velocity) {
+  z_angular_velocity =
+      ProtocolData::BoundedValue(-3.0, 3.0, z_angular_velocity);
+  int z = static_cast<int>(z_angular_velocity * 1000);
+  uint8_t t = 0;
 
-  std::uint8_t t = 0;
   t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_low(data + 4);
+  Byte frame_low(data + 5);
   frame_low.set_value(t, 0, 8);
-
   z >>= 8;
+
   t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_high(data + 5);
+  Byte frame_high(data + 4);
   frame_high.set_value(t, 0, 8);
 }
 
