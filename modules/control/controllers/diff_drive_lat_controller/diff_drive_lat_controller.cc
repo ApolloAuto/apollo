@@ -17,9 +17,17 @@
 
 #include "modules/control/controllers/diff_drive_lat_controller/diff_drive_lat_controller.h"
 
+#include <iomanip>
+
+#include "cyber/time/clock.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/math/linear_interpolation.h"
+
 namespace apollo {
 namespace control {
 
+using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
@@ -66,11 +74,8 @@ DiffDriveLatController::DiffDriveLatController()
 DiffDriveLatController::~DiffDriveLatController() { CloseLogFile(); }
 
 void DiffDriveLatController::CloseLogFile() {
-  if (FLAGS_enable_csv_debug) {
-    if (steer_log_file_ != nullptr) {
-      fclose(steer_log_file_);
-      steer_log_file_ = nullptr;
-    }
+  if (FLAGS_enable_csv_debug && steer_log_file_.is_open()) {
+    steer_log_file_.close();
   }
 }
 
@@ -170,7 +175,7 @@ Status DiffDriveLatController::ComputeControlCommand(
 
   // Transform the coordinate of the planning trajectory from the center of the
   // rear-axis to the center of mass, if conditions matched
-  trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
+  trajectory_analyzer_->TrajectoryTransformToCOM(lr_);
 
   UpdateDrivingOrientation();
 
@@ -182,10 +187,10 @@ Status DiffDriveLatController::ComputeControlCommand(
   ComputeLateralErrors(
       com.x(), com.y(), driving_orientation_, vehicle_state->linear_velocity(),
       vehicle_state->angular_velocity(), vehicle_state->linear_acceleration(),
-      trajectory_analyzer_, debug, chassis);
+      *trajectory_analyzer_, debug, chassis);
 
   // 2. PID control to obtain curvature
-  double curv = curv_pid_controller_.Control(debug->lateral_error(), ts);
+  double curv = curv_pid_controller_.Control(debug->lateral_error(), ts_);
 
   // 3. Convert curvature to angular velocity, rad/s
   double ang_vel = curv * vehicle_state->linear_velocity();
@@ -226,7 +231,7 @@ void DiffDriveLatController::ComputeLateralErrors(
 
   if (diff_drive_lat_controller_conf_.query_time_nearest_point_only()) {
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
-        Clock::NowInSeconds() + query_relative_time_);
+        cyber::Clock::NowInSeconds() + query_relative_time_);
   } else {
     target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
   }
