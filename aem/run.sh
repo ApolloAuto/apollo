@@ -276,6 +276,7 @@ aem() {
     fi
   fi
   shift 1
+  export PATH="${SCRIPT_REAL_DIR}:${PATH}"
   exec "${cmd_path}" "$@"
 
   # local cmd_func="aem_${cmd}"
