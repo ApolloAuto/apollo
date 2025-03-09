@@ -1,0 +1,50 @@
+// Copyright 2025 WheelOS. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//  Created Date: 2025-01-16
+//  Author: daohu527
+#pragma once
+
+#include "modules/drivers/canbus/common/byte.h"
+
+namespace apollo {
+namespace serial {
+
+int flag_stop(const std::uint8_t* bytes, const int32_t length) const;
+
+double x_speed(const std::uint8_t* bytes, const int32_t length) const;
+
+double y_speed(const std::uint8_t* bytes, const int32_t length) const;
+
+double z_speed(const std::uint8_t* bytes, const int32_t length) const;
+
+double acceleration_x(const std::uint8_t* bytes, const int32_t length) const;
+
+double acceleration_y(const std::uint8_t* bytes, const int32_t length) const;
+
+double acceleration_z(const std::uint8_t* bytes, const int32_t length) const;
+
+double angular_velocity_x(const std::uint8_t* bytes,
+                          const int32_t length) const;
+
+double angular_velocity_y(const std::uint8_t* bytes,
+                          const int32_t length) const;
+
+double angular_velocity_z(const std::uint8_t* bytes,
+                          const int32_t length) const;
+
+double battery_voltage(const std::uint8_t* bytes, const int32_t length) const;
+
+}  // namespace serial
+}  // namespace apollo

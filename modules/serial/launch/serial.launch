@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>serial</name>
+        <dag_conf>modules/serial/dag/serial.dag</dag_conf>
+        <process_name>serial</process_name>
+    </module>
+</cyber>

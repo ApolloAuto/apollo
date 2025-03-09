@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/serial/libserial_component.so"
+    timer_components {
+        class_name : "SerialComponent"
+        config {
+            name: "serial"
+            config_file_path:  "modules/serial/conf/serial_conf.pb.txt"
+            flag_file_path:  "modules/serial/conf/serial.conf"
+            interval: 10
+        }
+    }
+}
