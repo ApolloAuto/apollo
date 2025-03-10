@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <bitset>
 
-#include "modules/drivers/canbus/sensor_gflags.h"
-
 namespace apollo {
 namespace drivers {
 namespace canbus {

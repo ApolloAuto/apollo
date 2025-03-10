@@ -7,8 +7,6 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "serial_conf_proto",
     srcs = ["serial_conf.proto"],
-    deps = [
-    ],
 )
 
 apollo_package()

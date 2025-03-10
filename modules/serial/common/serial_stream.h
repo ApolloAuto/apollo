@@ -34,33 +34,9 @@
 #include <linux/serial.h>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
 namespace serial {
-
-speed_t get_serial_baudrate(uint32_t rate) {
-  switch (rate) {
-    case 9600:
-      return B9600;
-    case 19200:
-      return B19200;
-    case 38400:
-      return B38400;
-    case 57600:
-      return B57600;
-    case 115200:
-      return B115200;
-    case 230400:
-      return B230400;
-    case 460800:
-      return B460800;
-    case 921600:
-      return B921600;
-    default:
-      return 0;
-  }
-}
 
 class SerialStream {
  public:

@@ -3,8 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
-
 apollo_cc_library(
     name = "ring_buffer",
     hdrs = [

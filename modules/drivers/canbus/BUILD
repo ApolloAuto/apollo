@@ -43,6 +43,16 @@ apollo_cc_library(
     ],
 )
 
+apollo_cc_library(
+    name = "byte",
+    srcs = [
+        "common/byte.cc",
+    ],
+    hdrs = [
+        "common/byte.h",
+    ]
+)
+
 apollo_cc_test(
     name = "fake_can_client_test",
     size = "small",

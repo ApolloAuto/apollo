@@ -18,6 +18,7 @@
 #include "modules/serial/vehicle/ros/ros_control.h"
 
 #include "cyber/logger/log.h"
+#include "modules/serial/vehicle/ros/ros_parser.h"
 
 namespace apollo {
 namespace serial {

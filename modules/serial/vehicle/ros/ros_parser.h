@@ -30,8 +30,11 @@ class ROSParser {
 
   static bool Encode(const ControlCommand& cmd, uint8_t* data, size_t length);
 
-  static bool DecodeTwistFb(const uint8_t* data, size_t length, Chassis* chassis);
-  static bool DecodeMiscFb(const uint8_t* data, size_t length, Chassis* chassis);
+  static bool DecodeTwistFb(const uint8_t* data, size_t length,
+                            Chassis* chassis);
+
+  static bool DecodeMiscFb(const uint8_t* data, size_t length,
+                           Chassis* chassis);
 };
 
 }  // namespace serial

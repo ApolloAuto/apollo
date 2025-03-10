@@ -19,6 +19,7 @@
 
 #include "modules/serial/base_control.h"
 #include "modules/serial/common/ring_buffer.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 namespace apollo {
 namespace serial {
