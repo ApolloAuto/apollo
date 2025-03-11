@@ -19,19 +19,18 @@
 
 #include <memory>
 
-#include "modules/serial/ros_control.h"
+#include "modules/serial/vehicle/ros/ros_control.h"
 
 namespace apollo {
 namespace serial {
 
-enum class VehicleType { ROS };
-
 class VehicleFactory {
  public:
-  static std::unique_ptr<BaseControl> CreateControl(VehicleType type) {
-    switch (type) {
+  static std::unique_ptr<BaseControl> CreateControl(
+      const SerialConf& serial_conf) {
+    switch (serial_conf.vehicle_type()) {
       case VehicleType::ROS:
-        return std::make_unique<ROSControl>();
+        return std::make_unique<ROSControl>(serial_conf);
       default:
         return nullptr;
     }

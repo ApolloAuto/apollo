@@ -17,31 +17,10 @@
 
 #include "modules/serial/common/serial_stream.h"
 
+#include "cyber/common/log.h"
+
 namespace apollo {
 namespace serial {
-
-speed_t get_serial_baudrate(uint32_t rate) {
-  switch (rate) {
-    case 9600:
-      return B9600;
-    case 19200:
-      return B19200;
-    case 38400:
-      return B38400;
-    case 57600:
-      return B57600;
-    case 115200:
-      return B115200;
-    case 230400:
-      return B230400;
-    case 460800:
-      return B460800;
-    case 921600:
-      return B921600;
-    default:
-      return 0;
-  }
-}
 
 SerialStream::SerialStream(const char* device_name, speed_t baud_rate,
                            uint32_t timeout_usec)
@@ -56,7 +35,7 @@ SerialStream::SerialStream(const char* device_name, speed_t baud_rate,
       errno_(0),
       is_open_(false) {
   if (device_name_.empty()) {
-    status_ = Stream::Status::ERROR;
+    status_ = Status::ERROR;
   }
 }
 
@@ -173,18 +152,17 @@ bool SerialStream::Connect() {
   if (!is_open_) {
     this->open();
     if (!is_open_) {
-      status_ = Stream::Status::ERROR;
+      status_ = Status::ERROR;
       errno_ = errno;
       return false;
     }
   }
 
-  if (status_ == Stream::Status::CONNECTED) {
+  if (status_ == Status::CONNECTED) {
     return true;
   }
 
-  status_ = Stream::Status::CONNECTED;
-  Login();
+  status_ = Status::CONNECTED;
   return true;
 }
 
@@ -193,7 +171,7 @@ void SerialStream::close(void) {
     ::close(fd_);
     fd_ = -1;
     is_open_ = false;
-    status_ = Stream::Status::DISCONNECTED;
+    status_ = Status::DISCONNECTED;
   }
 }
 
@@ -215,7 +193,7 @@ void SerialStream::check_remove() {
     switch (errno) {
       case EBADF:
       case EIO:
-        status_ = Stream::Status::DISCONNECTED;
+        status_ = Status::DISCONNECTED;
         AERROR << "Device " << device_name_ << " removed.";
         Disconnect();
         break;
@@ -259,7 +237,7 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
         default:
           AERROR << "Serial stream read data failed, error: " << strerror(errno)
                  << ", errno: " << errno;
-          status_ = Stream::Status::ERROR;
+          status_ = Status::ERROR;
           errno_ = errno;
           return bytes_read;
       }
@@ -311,7 +289,7 @@ size_t SerialStream::write(const uint8_t* data, size_t length) {
           }
 
         default:
-          status_ = Stream::Status::ERROR;
+          status_ = Status::ERROR;
           errno_ = errno;
           return total_nsent;
       }
@@ -375,13 +353,6 @@ bool SerialStream::wait_writable(uint32_t timeout_us) {
   }
   // Data available to write.
   return true;
-}
-
-Stream* Stream::create_serial(const char* device_name, uint32_t baud_rate,
-                              uint32_t timeout_usec) {
-  speed_t baud = get_serial_baudrate(baud_rate);
-  return baud == 0 ? nullptr
-                   : new SerialStream(device_name, baud, timeout_usec);
 }
 
 }  // namespace serial

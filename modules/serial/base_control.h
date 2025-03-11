@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/serial/proto/serial_conf.pb.h"
+
 #include "modules/serial/common/serial_stream.h"
 
 namespace apollo {
@@ -24,16 +28,29 @@ namespace serial {
 
 class BaseControl {
  public:
+  using ControlCommand = apollo::control::ControlCommand;
+  using Chassis = apollo::canbus::Chassis;
+  BaseControl(const SerialConf& serial_conf) : serial_conf_(serial_conf) {
+    serial_stream_.reset(
+        new SerialStream(serial_conf_.device_name().c_str(),
+                         get_serial_baudrate(serial_conf_.baud_rate()),
+                         serial_conf_.timeout_usec()));
+  }
+
   virtual ~BaseControl() = default;
+
+  virtual ::apollo::common::ErrorCode Start() = 0;
+
+  virtual void Stop() = 0;
 
   virtual bool Send(const ControlCommand& control_command) = 0;
 
-  virtual Chassis GetChassis() const = 0;
-
-  virtual bool Close() = 0;
+  virtual Chassis GetChassis() = 0;
 
  protected:
-  std::unique_ptr<Stream> serial_stream_;
+  SerialConf serial_conf_;
+
+  std::unique_ptr<SerialStream> serial_stream_;
 };
 
 }  // namespace serial

@@ -17,7 +17,9 @@
 
 #include "modules/serial/vehicle/ros/ros_control.h"
 
-#include "cyber/logger/log.h"
+#include "cyber/common/log.h"
+#include "cyber/task/task.h"
+#include "cyber/time/time.h"
 #include "modules/serial/vehicle/ros/ros_parser.h"
 
 namespace apollo {
@@ -25,21 +27,19 @@ namespace serial {
 
 constexpr u_int32_t SERIAL_MAX_LENGTH = 128;
 
-ROSControl::ROSControl()
-    : state_(ParseState::SEEK_HEADER),
+ROSControl::ROSControl(const SerialConf& serial_conf)
+    : BaseControl(serial_conf),
+      state_(ParseState::SEEK_HEADER),
       current_frame_type_(FrameType::UNKNOWN),
       data_payload_length_(0),
-      ring_buffer_(256) {
-  serial_stream_->reset(new SerialStream(
-      serial_conf_.device_name(), get_serial_baudrate(serial_conf_.baud_rate()),
-      serial_conf_.timeout_usec()));
-}
+      ring_buffer_(256) {}
 
 bool ROSControl::Send(const ControlCommand& control_command) {
   uint8_t data[11];
   size_t length = 11;
   ROSParser::Encode(control_command, data, length);
   serial_stream_->write(data, length);
+  return true;
 }
 
 ::apollo::common::ErrorCode ROSControl::Start() {
@@ -111,6 +111,7 @@ bool ROSControl::ProcessPayLoad() {
     state_ = ParseState::SEEK_TAIL;
     return true;
   }
+  return false;
 }
 
 bool ROSControl::ProcessTail() {
@@ -150,12 +151,13 @@ bool ROSControl::ProcessFrame() {
     AERROR << "PROCESS_FRAME: invalid frame data, checksum failed.";
     return false;
   } else {
+    size_t length = current_frame_data_.size();
     switch (current_frame_type_) {
       case FrameType::DATA1:
-        ROSParser::DecodeTwistFb(current_frame_data_, length, &chassis_);
+        ROSParser::DecodeTwistFb(current_frame_data_.data(), length, &chassis_);
         break;
       case FrameType::DATA2:
-        ROSParser::DecodeMiscFb(current_frame_data_, length, &chassis_);
+        ROSParser::DecodeMiscFb(current_frame_data_.data(), length, &chassis_);
         break;
       default:
         break;

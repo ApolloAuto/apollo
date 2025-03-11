@@ -25,10 +25,14 @@ namespace serial {
 
 class ROSParser {
  public:
+  using ControlCommand = apollo::control::ControlCommand;
+  using Chassis = apollo::canbus::Chassis;
+
   ROSParser() = default;
   virtual ~ROSParser() = default;
 
-  static bool Encode(const ControlCommand& cmd, uint8_t* data, size_t length);
+  static bool Encode(const ::apollo::control::ControlCommand& cmd,
+                     uint8_t* data, size_t length);
 
   static bool DecodeTwistFb(const uint8_t* data, size_t length,
                             Chassis* chassis);

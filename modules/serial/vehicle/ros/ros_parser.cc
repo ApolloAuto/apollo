@@ -17,7 +17,7 @@
 
 #include "modules/serial/vehicle/ros/ros_parser.h"
 
-#include "cyber/logger/log.h"
+#include "cyber/common/log.h"
 #include "modules/serial/vehicle/ros/protocol/misc_fb.h"
 #include "modules/serial/vehicle/ros/protocol/twist_cmd.h"
 #include "modules/serial/vehicle/ros/protocol/twist_fb.h"

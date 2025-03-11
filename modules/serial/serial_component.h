@@ -21,10 +21,11 @@
 #include <string>
 #include <utility>
 
-#include "modules/common_msgs/canbus_msgs/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/serial/proto/serial_conf.pb.h"
 
-#include "cyber/common/macros.h"
+#include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
 #include "modules/serial/base_control.h"
 
@@ -33,8 +34,11 @@ namespace serial {
 
 class SerialComponent final : public apollo::cyber::TimerComponent {
  public:
-  SerialComponent();
+  using ControlCommand = apollo::control::ControlCommand;
+  using Chassis = apollo::canbus::Chassis;
 
+  SerialComponent();
+  ~SerialComponent();
   /**
    * @brief obtain module name
    * @return module name

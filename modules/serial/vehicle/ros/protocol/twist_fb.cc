@@ -25,13 +25,13 @@ using apollo::drivers::canbus::Byte;
 static constexpr double ACCELERATION_SCALE_FACTOR = 1672.0;
 static constexpr double ANGULAR_VELOCITY_SCALE_FACTOR = 3753.0;
 
-int flag_stop(const std::uint8_t* bytes, const int32_t length) const {
+int flag_stop(const std::uint8_t* bytes, const int32_t length) {
   Byte t1(bytes + 1);
   int32_t x = t1.get_byte(0, 8);
   return x;
 }
 
-double x_speed(const std::uint8_t* bytes, const int32_t length) const {
+double x_speed(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 2);
   int32_t x = high.get_byte(0, 8);
 
@@ -48,7 +48,7 @@ double x_speed(const std::uint8_t* bytes, const int32_t length) const {
   return ret;
 }
 
-double y_speed(const std::uint8_t* bytes, const int32_t length) const {
+double y_speed(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 4);
   int32_t x = high.get_byte(0, 8);
 
@@ -65,7 +65,7 @@ double y_speed(const std::uint8_t* bytes, const int32_t length) const {
   return ret;
 }
 
-double z_speed(const std::uint8_t* bytes, const int32_t length) const {
+double z_speed(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 6);
   int32_t x = high.get_byte(0, 8);
 
@@ -82,7 +82,7 @@ double z_speed(const std::uint8_t* bytes, const int32_t length) const {
   return ret;
 }
 
-double acceleration_x(const std::uint8_t* bytes, const int32_t length) const {
+double acceleration_x(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 8);
   int32_t x = high.get_byte(0, 8);
 
@@ -98,7 +98,7 @@ double acceleration_x(const std::uint8_t* bytes, const int32_t length) const {
   return static_cast<double>(x) / ACCELERATION_SCALE_FACTOR;
 }
 
-double acceleration_y(const std::uint8_t* bytes, const int32_t length) const {
+double acceleration_y(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 10);
   int32_t x = high.get_byte(0, 8);
 
@@ -114,7 +114,7 @@ double acceleration_y(const std::uint8_t* bytes, const int32_t length) const {
   return static_cast<double>(x) / ACCELERATION_SCALE_FACTOR;
 }
 
-double acceleration_z(const std::uint8_t* bytes, const int32_t length) const {
+double acceleration_z(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 12);
   int32_t x = high.get_byte(0, 8);
 
@@ -130,8 +130,7 @@ double acceleration_z(const std::uint8_t* bytes, const int32_t length) const {
   return static_cast<double>(x) / ACCELERATION_SCALE_FACTOR;
 }
 
-double angular_velocity_x(const std::uint8_t* bytes,
-                          const int32_t length) const {
+double angular_velocity_x(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 14);
   int32_t x = high.get_byte(0, 8);
 
@@ -147,8 +146,7 @@ double angular_velocity_x(const std::uint8_t* bytes,
   return static_cast<double>(x) / ANGULAR_VELOCITY_SCALE_FACTOR;
 }
 
-double angular_velocity_y(const std::uint8_t* bytes,
-                          const int32_t length) const {
+double angular_velocity_y(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 16);
   int32_t x = high.get_byte(0, 8);
 
@@ -164,8 +162,7 @@ double angular_velocity_y(const std::uint8_t* bytes,
   return static_cast<double>(x) / ANGULAR_VELOCITY_SCALE_FACTOR;
 }
 
-double angular_velocity_z(const std::uint8_t* bytes,
-                          const int32_t length) const {
+double angular_velocity_z(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 18);
   int32_t x = high.get_byte(0, 8);
 
@@ -181,7 +178,7 @@ double angular_velocity_z(const std::uint8_t* bytes,
   return static_cast<double>(x) / ANGULAR_VELOCITY_SCALE_FACTOR;
 }
 
-double battery_voltage(const std::uint8_t* bytes, const int32_t length) const {
+double battery_voltage(const std::uint8_t* bytes, const int32_t length) {
   Byte high(bytes + 20);
   int32_t x = high.get_byte(0, 8);
 

@@ -15,32 +15,24 @@
 //  Created Date: 2025-01-16
 //  Author: daohu527
 
-#include "modules/serial/vehicle/ros/protocol/misc_fb.h"
+
+#pragma once
 
 namespace apollo {
 namespace serial {
 
-using apollo::drivers::canbus::Byte;
-
-double ultrasound(const std::uint8_t* bytes, const int32_t length) {
-  Byte high(bytes + 2);
-  int32_t x = high.get_byte(0, 8);
-
-  Byte low(bytes + 3);
-  int32_t t = low.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
-
-  if (high.is_bit_1(7)) {
-    x -= 0x10000;
+template <typename T>
+T BoundedValue(T lower, T upper, T val) {
+  if (lower > upper) {
+    return val;
   }
-  // mm/s to m/s
-  double ret = x * 0.001;
-  return ret;
-}
-
-void checksum(const std::uint8_t* bytes, const int32_t length) {
-  //
+  if (val < lower) {
+    return lower;
+  }
+  if (val > upper) {
+    return upper;
+  }
+  return val;
 }
 
 }  // namespace serial

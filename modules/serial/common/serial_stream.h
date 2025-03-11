@@ -28,15 +28,37 @@
 #include <cerrno>
 #include <cstring>
 #include <ctime>
+#include <string>
 #include <thread>
 
 #include <linux/netlink.h>
 #include <linux/serial.h>
 
-#include "cyber/cyber.h"
-
 namespace apollo {
 namespace serial {
+
+inline speed_t get_serial_baudrate(uint32_t rate) {
+  switch (rate) {
+    case 9600:
+      return B9600;
+    case 19200:
+      return B19200;
+    case 38400:
+      return B38400;
+    case 57600:
+      return B57600;
+    case 115200:
+      return B115200;
+    case 230400:
+      return B230400;
+    case 460800:
+      return B460800;
+    case 921600:
+      return B921600;
+    default:
+      return 0;
+  }
+}
 
 class SerialStream {
  public:
@@ -48,6 +70,13 @@ class SerialStream {
   virtual bool Disconnect();
   virtual size_t read(uint8_t* buffer, size_t max_length);
   virtual size_t write(const uint8_t* data, size_t length);
+
+  // Stream status.
+  enum class Status {
+    DISCONNECTED,
+    CONNECTED,
+    ERROR,
+  };
 
  private:
   SerialStream() {}
@@ -70,6 +99,8 @@ class SerialStream {
   int fd_;
   int errno_;
   bool is_open_;
+
+  Status status_ = Status::DISCONNECTED;
 };
 
 }  // namespace serial

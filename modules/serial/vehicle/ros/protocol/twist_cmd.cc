@@ -17,13 +17,15 @@
 
 #include "modules/serial/vehicle/ros/protocol/twist_cmd.h"
 
+#include "modules/serial/common/util.h"
+
 namespace apollo {
 namespace serial {
 
 using apollo::drivers::canbus::Byte;
 
 void set_x_target_speed(uint8_t* data, double x_target_speed) {
-  x_target_speed = ProtocolData::BoundedValue(-5.0, 5.0, x_target_speed);
+  x_target_speed = BoundedValue(-5.0, 5.0, x_target_speed);
   int x = static_cast<int>(x_target_speed * 1000);
   uint8_t t = 0;
 
@@ -38,7 +40,7 @@ void set_x_target_speed(uint8_t* data, double x_target_speed) {
 }
 
 void set_y_target_speed(uint8_t* data, double y_target_speed) {
-  y_target_speed = ProtocolData::BoundedValue(-5.0, 5.0, y_target_speed);
+  y_target_speed = BoundedValue(-5.0, 5.0, y_target_speed);
   int y = static_cast<int>(y_target_speed * 1000);
   uint8_t t = 0;
 
@@ -53,8 +55,7 @@ void set_y_target_speed(uint8_t* data, double y_target_speed) {
 }
 
 void set_angular_velocity_z(uint8_t* data, double z_angular_velocity) {
-  z_angular_velocity =
-      ProtocolData::BoundedValue(-3.0, 3.0, z_angular_velocity);
+  z_angular_velocity = BoundedValue(-3.0, 3.0, z_angular_velocity);
   int z = static_cast<int>(z_angular_velocity * 1000);
   uint8_t t = 0;
 

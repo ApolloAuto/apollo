@@ -17,9 +17,14 @@
 
 #pragma once
 
+#include <future>
+#include <mutex>
+
+#include "modules/serial/proto/serial_conf.pb.h"
+
+#include "cyber/common/macros.h"
 #include "modules/serial/base_control.h"
 #include "modules/serial/common/ring_buffer.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 namespace apollo {
 namespace serial {
@@ -32,24 +37,33 @@ class ROSControl : public BaseControl {
   // 帧类型
   enum class FrameType { UNKNOWN, DATA1, DATA2 };
 
-  ROSControl();
+  explicit ROSControl(const SerialConf& serial_conf);
+
   virtual ~ROSControl() = default;
 
   bool IsRunning() const;
 
-  ::apollo::common::ErrorCode Start();
+  ::apollo::common::ErrorCode Start() override;
 
-  void Stop();
+  void Stop() override;
 
   bool Send(const ControlCommand& control_command) override;
 
-  Chassis GetChassis() const override {
+  Chassis GetChassis() override {
     std::lock_guard<std::mutex> lock(mutex_);
     return chassis_;
   }
 
  private:
   void RecvThreadFunc();
+  void ParseData();
+  bool ProcessFrame();
+  bool ProcessHeader();
+  bool ProcessPayLoad();
+  bool ProcessTail();
+  void ResetFrameState();
+
+  bool IsFrameChecksumValid(const std::vector<uint8_t>& frame_data);
 
  private:
   std::mutex mutex_;

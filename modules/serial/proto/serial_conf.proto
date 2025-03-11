@@ -2,6 +2,15 @@ syntax = "proto2";
 
 package apollo.serial;
 
-message SerialConf {
 
+enum VehicleType {
+  ROS = 0;
+  UNKNOWN = 99;
+}
+
+message SerialConf {
+  optional VehicleType vehicle_type = 1;
+  optional string device_name = 2;
+  optional uint32 baud_rate = 3;
+  optional uint32 timeout_usec = 4;
 }

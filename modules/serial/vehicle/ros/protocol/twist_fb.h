@@ -21,30 +21,27 @@
 namespace apollo {
 namespace serial {
 
-int flag_stop(const std::uint8_t* bytes, const int32_t length) const;
+int flag_stop(const std::uint8_t* bytes, const int32_t length);
 
-double x_speed(const std::uint8_t* bytes, const int32_t length) const;
+double x_speed(const std::uint8_t* bytes, const int32_t length);
 
-double y_speed(const std::uint8_t* bytes, const int32_t length) const;
+double y_speed(const std::uint8_t* bytes, const int32_t length);
 
-double z_speed(const std::uint8_t* bytes, const int32_t length) const;
+double z_speed(const std::uint8_t* bytes, const int32_t length);
 
-double acceleration_x(const std::uint8_t* bytes, const int32_t length) const;
+double acceleration_x(const std::uint8_t* bytes, const int32_t length);
 
-double acceleration_y(const std::uint8_t* bytes, const int32_t length) const;
+double acceleration_y(const std::uint8_t* bytes, const int32_t length);
 
-double acceleration_z(const std::uint8_t* bytes, const int32_t length) const;
+double acceleration_z(const std::uint8_t* bytes, const int32_t length);
 
-double angular_velocity_x(const std::uint8_t* bytes,
-                          const int32_t length) const;
+double angular_velocity_x(const std::uint8_t* bytes, const int32_t length);
 
-double angular_velocity_y(const std::uint8_t* bytes,
-                          const int32_t length) const;
+double angular_velocity_y(const std::uint8_t* bytes, const int32_t length);
 
-double angular_velocity_z(const std::uint8_t* bytes,
-                          const int32_t length) const;
+double angular_velocity_z(const std::uint8_t* bytes, const int32_t length);
 
-double battery_voltage(const std::uint8_t* bytes, const int32_t length) const;
+double battery_voltage(const std::uint8_t* bytes, const int32_t length);
 
 }  // namespace serial
 }  // namespace apollo

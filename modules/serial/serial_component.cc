@@ -18,8 +18,10 @@
 #include "modules/serial/serial_component.h"
 
 #include "cyber/common/file.h"
+#include "modules/serial/vehicle_factory.h"
 
-using apollo::control::ControlCommand;
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 
 namespace apollo {
 namespace serial {
@@ -35,12 +37,10 @@ bool SerialComponent::Init() {
   }
   ADEBUG << "Serial conf:" << serial_conf_.ShortDebugString();
 
-  control_ = VehicleFactory::CreateControl(serial_conf_.vehicle_type());
+  control_ = VehicleFactory::CreateControl(serial_conf_);
 
   cyber::ReaderConfig control_cmd_reader_config;
   control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
-  control_cmd_reader_config.pending_queue_size =
-      FLAGS_control_cmd_pending_queue_size;
 
   control_command_reader_ = node_->CreateReader<ControlCommand>(
       control_cmd_reader_config,
