@@ -50,6 +50,7 @@ void ParticipantListener::on_participant_discovery(
   callback_(info);
 }
 // this is zhifei for git test.
+// this is zhifei for git reset test 2;
 }  // namespace service_discovery
 }  // namespace cyber
 }  // namespace apollo
