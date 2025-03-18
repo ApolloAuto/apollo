@@ -112,7 +112,7 @@ bool PlanningComponent::Init() {
         });
   }
   // 创建消息的发布者（Writer）
-// planning发布话题部分
+// planning发布话题部分: 话题也是写在配置中
 // 发布规划路径给control模块
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
@@ -148,6 +148,7 @@ bool PlanningComponent::Proc(
   // 2.数据放入local_view_中，并且检查输入数据
   // std::mutex: 互斥锁，用于保护共享资源的访问
   // 当多个线程需要同时访问共享资源时，为了避免出现数据竞争等问题，需要使用互斥锁进行同步控制
+  // 存储传感器数据，用于规划计算
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
@@ -221,12 +222,12 @@ bool PlanningComponent::Proc(
     }
     return true;
   }
-// 6.0
+// 6.0  生成并发布轨迹
 // adc_trajectory_pb为最终获取的路径信息
   ADCTrajectory adc_trajectory_pb;
   // 在这里配置的是on_lane_planning方法，路径规划函数入口
   // planning逻辑主循环
-  // 输入:local_view   输出:adc_trajectory_pb
+  // 输入:local_view_   输出:adc_trajectory_pb  轨迹
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
     // 7.0 此时路径规划已经完成，获取路径规划计算最开始的时间戳，参看RunOnce时间戳赋值
   // 获取计算完成后的时间戳，参看FillHeader时间戳赋值
@@ -268,6 +269,7 @@ bool PlanningComponent::Proc(
   // record in history
   // 记录历史轨迹信息
   // record in history
+  // 将轨迹添加到历史记录
   auto* history = injector_->history();
   history->Add(adc_trajectory_pb);
 
