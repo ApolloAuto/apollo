@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/planning/planning_component/planning_component.h"
-
+#include "modules/planning/planning_component/planning_component.h" // 定义了这个组件的所有功能
+// 包含 Cyber 框架和 Apollo 公共模块的配置，用于处理 gflags 配置参数
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
+// 导入工具函数和 HDMap 相关功能，用于读取地图信息和处理消息
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+// 包含规划模块的通用组件，如历史记录 (history)、规划上下文 (planning_context)
 #include "modules/planning/planning_base/common/history.h"
 #include "modules/planning/planning_base/common/planning_context.h"
 #include "modules/planning/planning_base/common/util/util.h"
-#include "modules/planning/planning_component/navi_planning.h"
-#include "modules/planning/planning_component/on_lane_planning.h"
+// 包含两种规划模式的实现
+#include "modules/planning/planning_component/navi_planning.h"  // 导航模式
+#include "modules/planning/planning_component/on_lane_planning.h"  // 基于车道的规划模式
 namespace apollo {
 namespace planning {
 
@@ -36,9 +39,11 @@ using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
-
+/// @brief 初始化组件
+/// @return 
 bool PlanningComponent::Init() {
 // 依赖注入器，本质就是一个数据缓存中心，以便于规划任务前后帧之间的承接，以及异常处理的回溯
+// 创建 DependencyInjector 对象，用于依赖注入
   injector_ = std::make_shared<DependencyInjector>();
 // 规划模式的选择: apollo/modules/common/configs/config_gflags.cc
   if (FLAGS_use_navigation_mode) {   // 默认是false
@@ -46,11 +51,13 @@ bool PlanningComponent::Init() {
   } else {
     planning_base_ = std::make_unique<OnLanePlanning>(injector_); // 默认规划器
   }
-// 加载config文件
+// 加载config文件  proto
+// ACHECK 检查配置文件是否成功加载，配置文件包含路径规划的相关参数
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
-
+// 消息处理初始化:
+// 初始化消息处理模块，如果启用了离线学习或非零学习模式
   if (FLAGS_planning_offline_learning ||
       config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     if (!message_process_.Init(config_, injector_)) {
@@ -60,7 +67,8 @@ bool PlanningComponent::Init() {
   }
 // 在这里执行的是OnLanePlanning::Init的初始化
   planning_base_->Init(config_); // 参考线优化主要在这部分
-// 完成相应的消息订阅
+// 订阅ROS2话题
+// 订阅 PlanningCommand 话题，收到消息后存入 planning_command_
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -69,7 +77,7 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         planning_command_.CopyFrom(*planning_command);
       });
-
+// 订阅交通信号灯检测数据，存入 traffic_light_
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       config_.topic_config().traffic_light_detection_topic(),
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
@@ -77,7 +85,7 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         traffic_light_.CopyFrom(*traffic_light);
       });
-
+// 订阅 PadMessage（手动输入指令）
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
       config_.topic_config().planning_pad_topic(),
       [this](const std::shared_ptr<PadMessage>& pad_msg) {
@@ -93,7 +101,7 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         stories_.CopyFrom(*stories);
       });
-
+// 如果启用了导航模式，则订阅 relative_map（相对地图）
   if (FLAGS_use_navigation_mode) {
     relative_map_reader_ = node_->CreateReader<MapMsg>(
         config_.topic_config().relative_map_topic(),
@@ -103,6 +111,7 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
+  // 创建消息的发布者（Writer）
 // planning发布话题部分
 // 发布规划路径给control模块
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
@@ -280,7 +289,8 @@ void PlanningComponent::CheckRerouting() {
   rerouting_client_->SendRequest(lane_follow_command_ptr);
   rerouting->set_need_rerouting(false);
 }
-
+/// @brief 检查输入数据是否完整，如定位数据、底盘数据、地图数据是否准备好。如果数据不完整，则跳过当前的规划周期
+/// @return 
 bool PlanningComponent::CheckInput() {
   ADCTrajectory trajectory_pb;
   auto* not_ready = trajectory_pb.mutable_decision()

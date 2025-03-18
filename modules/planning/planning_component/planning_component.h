@@ -100,7 +100,7 @@ class PlanningComponent final
   planning::PadMessage pad_msg_;
   relative_map::MapMsg relative_map_;
   storytelling::Stories stories_;
-  PlanningCommand planning_command_;
+  PlanningCommand planning_command_;  // proto生成的pb.h
   LocalView local_view_;
 
   std::unique_ptr<PlanningBase> planning_base_;
