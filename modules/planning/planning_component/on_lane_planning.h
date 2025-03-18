@@ -46,21 +46,25 @@ class OnLanePlanning : public PlanningBase {
   /**
    * @brief Planning name.
    */
+  // 返回规划模块的名称，覆盖基类中的同名函数
   std::string Name() const override;
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
+  // 模块的初始化函数，接收配置并返回初始化状态
   common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief main logic of the planning module, runs periodically triggered by
    * timer.
    */
+  // 主规划逻辑函数，周期性地被定时器触发，处理输入数据并生成路径
   void RunOnce(const LocalView& local_view,
                ADCTrajectory* const ptr_trajectory_pb) override;
 
+  // 执行路径规划的主要函数，接受时间戳和路径点进行规划
   common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,

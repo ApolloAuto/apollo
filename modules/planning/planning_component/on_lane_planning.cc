@@ -286,6 +286,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = injector_->vehicle_state()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
  // 获取车辆状态
+ // 获取并检查车辆状态的时间戳是否有效，确保 start_timestamp 大于等于车辆状态时间戳
   VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
@@ -308,13 +309,14 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     GenerateStopTrajectory(ptr_trajectory_pb);
     return;
   }
-
+  // 检查系统时间是否滞后于GPS时间，并输出警告
   if (start_timestamp + 1e-6 < vehicle_state_timestamp) {
     common::monitor::MonitorLogBuffer monitor_logger_buffer(
         common::monitor::MonitorMessageItem::PLANNING);
     monitor_logger_buffer.ERROR("ego system time is behind GPS time");
   }
 // 对齐时间戳 vehicle_state_timestamp为车辆状态时间戳
+// 如果时间差小于某个阈值，对齐车辆状态的时间戳
   if (start_timestamp - vehicle_state_timestamp <
       FLAGS_message_latency_threshold) {  // 0.02s 消息延时阈值
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
@@ -338,6 +340,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     planner_->Reset(frame_.get());
   }
   // Get end lane way point.
+  // 获取当前车道的结束点
   reference_line_provider_->GetEndLaneWayPoint(local_view_.end_lane_way_point);
 
   // planning is triggered by prediction data, but we can still use an estimated
@@ -349,6 +352,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const double planning_cycle_time =
       1.0 / static_cast<double>(FLAGS_planning_loop_rate);  // 10 hz
 
+// 使用轨迹拼接器计算拼接后的轨迹
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
@@ -361,6 +365,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
+
+
   // 初始化frame,重要信息，将拼接轨迹最后一个点作为路径规划起点
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);// frame类存储了一次规划循环中所需的所有数据   180
   if (status.ok()) {
@@ -368,6 +374,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
         frame_->obstacles());
   }
 
+// 如果启用了调试记录，则记录调试信息
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
   }
@@ -398,6 +405,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
+    // 结束当前帧的规划并将帧添加到历史中
     const uint32_t n = frame_->SequenceNum();
     injector_->frame_history()->Add(n, std::move(frame_));
     return;
@@ -433,6 +441,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
                       vehicle_state.heading(), true);
   print_box.PrintToLog();
 
+ // 计算总的规划时间并输出
   const auto end_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
@@ -444,7 +453,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
          << ptr_trajectory_pb->latency_stats().DebugString();
-
+  
+  // 如果规划失败，输出错误信息并根据设置发布 estop 信号
   if (!status.ok()) {
     status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     AERROR << "Planning failed:" << status.ToString();
@@ -459,16 +469,19 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
   }
 
+// 设置重新规划标志，并记录重新规划的原因
   ptr_trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
   if (ptr_trajectory_pb->is_replan()) {
     ptr_trajectory_pb->set_replan_reason(replan_reason);
   }
 
+// 根据是否在开放空间轨迹上，填充并保存规划结果
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
   } else {
+    // 处理不同场景的规划结果
     auto* ref_line_task =
         ptr_trajectory_pb->mutable_latency_stats()->add_task_stats();
     ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *

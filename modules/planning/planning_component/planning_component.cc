@@ -276,7 +276,7 @@ bool PlanningComponent::Proc(
 
   return true;
 }
-
+/// @brief 检查是否需要进行路径重新规划。如果需要，填充相关命令并发送请求，然后将标志位need_rerouting置为false
 void PlanningComponent::CheckRerouting() {
   auto* rerouting = injector_->planning_context()
                         ->mutable_planning_status()
