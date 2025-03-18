@@ -53,6 +53,7 @@ bool PlanningComponent::Init() {
   }
 // 加载config文件  proto
 // ACHECK 检查配置文件是否成功加载，配置文件包含路径规划的相关参数
+// 配置文件 planning_config.pb.txt
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();

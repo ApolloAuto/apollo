@@ -58,9 +58,13 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     }
     scheduler::Instance()->RemoveTask(node_->Name());
   }
-
+  /// @brief 读取配置文件并解析成 Proto 配置对象
+  /// @tparam T 
+  /// @param config 
+  /// @return 
   template <typename T>
   bool GetProtoConfig(T* config) const {
+    // 读取 config_file_path_（配置文件路径）中的内容，并填充 config 对象
     return common::GetProtoFromFile(config_file_path_, config);
   }
 

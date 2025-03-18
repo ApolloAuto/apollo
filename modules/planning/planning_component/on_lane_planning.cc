@@ -111,22 +111,26 @@ std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "planning config error: " + config.DebugString());
+                  "planning config error: " + config_.DebugString());
   }
-
-  PlanningBase::Init(config);
+  // 调用父类的Init()函数
+  PlanningBase::Init(config_);
 
   // clear planning history
+  // 清除先前的规划历史数据
   injector_->history()->Clear();
 
   // clear planning status
+  // 清除当前的规划状态
   injector_->planning_context()->mutable_planning_status()->Clear();
 
   // load map
+  // 使用 HDMapUtil::BaseMapPtr() 获取地图指针，并检查地图是否成功加载。如果地图加载失败，会触发断言并输出错误信息
   hdmap_ = HDMapUtil::BaseMapPtr();
   ACHECK(hdmap_) << "Failed to load map";
 
   // instantiate reference line provider
+  // 创建 ReferenceLineProvider 实例并启动它，提供参考路线。如果配置中包含参考路线配置，将其传递给提供者
   const ReferenceLineConfig* reference_line_config = nullptr;
   if (config_.has_reference_line_config()) {
     reference_line_config = &config_.reference_line_config();
@@ -134,7 +138,8 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
       injector_->vehicle_state(), reference_line_config);
   reference_line_provider_->Start();
-
+  
+  // 加载路径规划器并检查其是否成功初始化。如果没有成功初始化，返回错误状态
   // dispatch planner
   LoadPlanner();
   if (!planner_) {
@@ -142,7 +147,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
         ErrorCode::PLANNING_ERROR,
         "planning is not initialized with config : " + config_.DebugString());
   }
-
+  // 如果启用了学习模式，加载并初始化图像特征渲染器配置。如果加载失败，输出错误信息
   if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     PlanningSemanticMapConfig renderer_config;
     ACHECK(apollo::cyber::common::GetProtoFromFile(
@@ -153,11 +158,12 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
     BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
   }
-
+  // 初始化交通决策模块
   traffic_decider_.Init(injector_);
-
+  // 获取当前时间并保存为 start_time_，以记录路径规划的开始时间
   start_time_ = Clock::NowInSeconds();
-  return planner_->Init(injector_, FLAGS_planner_config_path);
+  // 初始化路径规划器，并使用配置路径 FLAGS_planner_config_path 来进行初始化
+  return planner_->Init(injector_, FLAGS_planner_config_path);  // public_road_planner_config.pb.txt
 }
 /// @brief 
 /// @param sequence_num 标识这一帧的序列号
