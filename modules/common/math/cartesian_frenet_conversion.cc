@@ -31,35 +31,36 @@ void CartesianFrenetConverter::cartesian_to_frenet(
     const double v, const double a, const double theta, const double kappa,
     std::array<double, 3>* const ptr_s_condition,
     std::array<double, 3>* const ptr_d_condition) {
+  // 计算目标点(x，y)与参考路径点(rx,ry)的坐标差
   const double dx = x - rx;
   const double dy = y - ry;
-
+  // 计算参考路径方向的余弦和正弦值
   const double cos_theta_r = std::cos(rtheta);
   const double sin_theta_r = std::sin(rtheta);
-
+  // 计算目标点相对于参考路径的横向距离
   const double cross_rd_nd = cos_theta_r * dy - sin_theta_r * dx;
   ptr_d_condition->at(0) =
       std::copysign(std::sqrt(dx * dx + dy * dy), cross_rd_nd);
-
+  // 计算目标点与参考路径之间的角度差
   const double delta_theta = theta - rtheta;
   const double tan_delta_theta = std::tan(delta_theta);
   const double cos_delta_theta = std::cos(delta_theta);
-
+  // 计算路径曲率对横向距离的影响，并存储在d_condition[1]中
   const double one_minus_kappa_r_d = 1 - rkappa * ptr_d_condition->at(0);
   ptr_d_condition->at(1) = one_minus_kappa_r_d * tan_delta_theta;
-
+  // 计算曲率的导数，表示路径曲率对横向偏差变化的影响
   const double kappa_r_d_prime =
       rdkappa * ptr_d_condition->at(0) + rkappa * ptr_d_condition->at(1);
-
+  // 计算横向加速度，并存储在d_condition[2]中
   ptr_d_condition->at(2) =
       -kappa_r_d_prime * tan_delta_theta +
       one_minus_kappa_r_d / cos_delta_theta / cos_delta_theta *
           (kappa * one_minus_kappa_r_d / cos_delta_theta - rkappa);
-
+  // 将参考路径的弧长（rs）存储在s_condition[0]中
   ptr_s_condition->at(0) = rs;
-
+  // 计算目标点沿路径的速度，并存储在s_condition[1]中
   ptr_s_condition->at(1) = v * cos_delta_theta / one_minus_kappa_r_d;
-
+  // 计算目标点的加速度，并存储在s_condition[2]中
   const double delta_theta_prime =
       one_minus_kappa_r_d / cos_delta_theta * kappa - rkappa;
   ptr_s_condition->at(2) =

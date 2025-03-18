@@ -33,7 +33,7 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 
 ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
                                const double kappa, const double dkappa)
-    : hdmap::MapPathPoint(map_path_point), kappa_(kappa), dkappa_(dkappa) {}
+    : hdmap::MapPathPoint(map_path_point), kappa_(kappa), dkappa_(dkappa) {}  // 调用拷贝
 
 common::PathPoint ReferencePoint::ToPathPoint(double s) const {
   return common::util::PointFactory::ToPathPoint(x(), y(), 0.0, s, heading(),

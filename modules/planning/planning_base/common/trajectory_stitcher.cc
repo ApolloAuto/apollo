@@ -198,7 +198,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
         "replan for current time beyond the previous trajectory's last time";
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
-
+  // 获取时间匹配的轨迹点
   auto time_matched_point = prev_trajectory->TrajectoryPointAt(
       static_cast<uint32_t>(time_matched_index));
 
@@ -217,7 +217,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state.x(), vehicle_state.y(),
       prev_trajectory->TrajectoryPointAt(
           static_cast<uint32_t>(position_matched_index)));
-
+// 如果启用了基于偏移量的重新规划（replan_by_offset 为 true），并且停车制动器已释放（车辆开始移动），则触发重新规划
   if (replan_by_offset) {
     if (vehicle_chassis.has_parking_brake()) {
       static bool parking_brake = true;

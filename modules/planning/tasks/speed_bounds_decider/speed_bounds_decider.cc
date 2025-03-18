@@ -56,26 +56,33 @@ bool SpeedBoundsDecider::Init(
 Status SpeedBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // retrieve data from frame and reference_line_info
-  const PathData &path_data = reference_line_info->path_data();
-  const TrajectoryPoint &init_point = frame->PlanningStartPoint();
-  const ReferenceLine &reference_line = reference_line_info->reference_line();
-  PathDecision *const path_decision = reference_line_info->path_decision();
+  //从 reference_line_info 和 frame 中获取规划所需的 路径数据、起点状态、参考线 和 路径决策对象
+  const PathData &path_data = reference_line_info->path_data(); // 规划的路径点序列
+  const TrajectoryPoint &init_point = frame->PlanningStartPoint(); // 规划的起点状态（位置、速度、加速度等）
+  const ReferenceLine &reference_line = reference_line_info->reference_line(); // 车道中心线或全局路径
+  PathDecision *const path_decision = reference_line_info->path_decision(); // 存储路径上的障碍物决策结果（如绕行、停车等）
 
   // 1. Map obstacles into st graph
   // 记录开始时间，创建 STBoundaryMapper 对象用于将障碍物映射到ST图（即时空图）
   auto time1 = std::chrono::system_clock::now();
+  // config_：配置参数（如总时间 total_time）
+  // path_data：路径数据，用于计算障碍物在路径上的投影
+  // path_data.discretized_path().Length()：路径总长度（s轴范围）
+  // total_time：规划时间范围（t轴范围）
   STBoundaryMapper boundary_mapper(config_, reference_line, path_data,
                                    path_data.discretized_path().Length(),
                                    config_.total_time(), injector_);
-
+  // 根据标志位 FLAGS_use_st_drivable_boundary（默认为 false），清除之前的 ST 边界数据，避免历史数据干扰
   if (!FLAGS_use_st_drivable_boundary) {   // 默认为false
     path_decision->EraseStBoundaries();
   }
-  // 将障碍物投影到ST Graph上
+  // 将所有障碍物投影到ST Graph上
+  // ST 图记录了障碍物在 时间（t） 和 路径纵向位置（s） 上的占据区域
   if (boundary_mapper.ComputeSTBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg = "Mapping obstacle failed.";
     AERROR << msg;
+    // 若映射失败，返回错误状态 PLANNING_ERROR
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   // 记录结束时间，并计算ST边界计算的时间（单位为毫秒），输出调试信息
@@ -86,6 +93,7 @@ Status SpeedBoundsDecider::Process(
   // 所有的障碍物的st_boundary送入到一个boundaries vector之中进行保存
   std::vector<const STBoundary *> boundaries;
   // 遍历路径决策中的所有障碍物，获取每个障碍物的ST边界
+  // 遍历所有障碍物，筛选有效的 ST 边界，并根据边界类型标记障碍物是否阻塞路径
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &id = obstacle->Id();
     const auto &st_boundary = obstacle->path_st_boundary();
@@ -98,15 +106,18 @@ Status SpeedBoundsDecider::Process(
         path_decision->Find(id)->SetBlockingObstacle(true);
       }
       st_boundary.PrintDebug("_obs_st_bounds");
+      // 所有非空 ST 边界被存入 boundaries 容器供后续使用
       boundaries.push_back(&st_boundary);
     }
   }
  // 获取速度回退的最小 s 位置（可能是路径上的某个点，用于设置速度限制的回退距离）
+ // 计算 ST 边界中所有障碍物的最小 s 值，作为速度规划的安全回退距离
+ // 确保车辆在遇到障碍物时能提前减
   const double min_s_on_st_boundaries = SetSpeedFallbackDistance(path_decision);
 
   // 2. Create speed limit along path
+  // 通过 SpeedLimitDecider 生成路径上的速度限制（如弯道限速、障碍物限速）
   SpeedLimitDecider speed_limit_decider(config_, reference_line, path_data);
-
   SpeedLimit speed_limit;
   if (!speed_limit_decider
            .GetSpeedLimits(path_decision->obstacles(), &speed_limit)
@@ -135,11 +146,17 @@ Status SpeedBoundsDecider::Process(
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
 // 将计算的ST图数据加载到 st_graph_data 中，包含边界、最小 s 值、初始点、速度限制、巡航速度等信息
+// 将 ST 边界、速度限制、巡航速度等数据加载到 st_graph_data 对象中
+// boundaries：障碍物的 ST 边界集合
+// min_s_on_st_boundaries：安全回退距离
+// speed_limit：路径速度限制
+// cruise_speed：巡航速度（通常来自配置或路网限速）
   st_graph_data->LoadData(boundaries, min_s_on_st_boundaries, init_point,
                           speed_limit, reference_line_info->GetCruiseSpeed(),
                           path_data_length, total_time_by_conf, st_graph_debug);
 
   // Create and record st_graph debug info
+  // 将 ST 图数据记录到调试信息中，便于可视化或日志分
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();

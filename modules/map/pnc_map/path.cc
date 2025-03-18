@@ -586,20 +586,34 @@ void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
                  &parking_space_overlaps_);
 }
-
+/// @brief 根据给定的 InterpolatedIndex 在路径上获取平滑的路径点
+/// @param index 一个 InterpolatedIndex，包含了路径段的索引 id 和相对于该路径段起始点的偏移量 offset
+/// @return 返回一个 MapPathPoint，它表示路径上平滑插值后的位置，包括了位置、朝向、以及可能的车道信息
 MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
+  // 确保 index.id 在有效范围内（大于等于 0 且小于路径点的总数 num_points_）
   CHECK_GE(index.id, 0);
   CHECK_LT(index.id, num_points_);
-
-  const MapPathPoint& ref_point = path_points_[index.id];
+  // 获取路径上的参考点 ref_point，它是路径中 index.id 对应的点
+  const MapPathPoint& ref_point = path_points_[index.id];  // path_points_：路径上的所有参考点
+  // 如果偏移量 offset 大于一个小的容忍值 kMathEpsilon（即路径点有实际的偏移），就会进行插值计算
   if (std::abs(index.offset) > kMathEpsilon) {
+  //使用路径段的单位方向向量 unit_directions_[index.id] 和偏移量 index.offset 来计算偏移量 delta，
+  //然后根据该偏移量调整参考点的位置。新的位置就是 ref_point 的坐标加上偏移量 delta
+  // lane_segments_to_next_point_：路径段对应的车道段信息 
+  // LaneWaypoint 和 MapPathPoint：表示路径上的车道点和路径点
     const Vec2d delta = unit_directions_[index.id] * index.offset;
     MapPathPoint point({ref_point.x() + delta.x(), ref_point.y() + delta.y()},
                        ref_point.heading());
+
+  // 处理车道信息
+  // 如果路径段包含车道信息（即 ref_point.lane_waypoints() 不为空），并且 index.id 小于路径段数 num_segments_，就会查找车道信息
     if (index.id < num_segments_ && !ref_point.lane_waypoints().empty()) {
+  // 使用 lane_segments_to_next_point_ 来获取当前路径段对应的车道段 lane_segment，
+  // 然后根据车道段和参考点的车道信息，创建一个新的 LaneWaypoint 并将其添加到新的路径点 point 中 
       const LaneSegment& lane_segment = lane_segments_to_next_point_[index.id];
       auto ref_lane_waypoint = ref_point.lane_waypoints()[0];
       if (lane_segment.lane != nullptr) {
+  // 如果参考点包含多个车道信息，那么就会选择与当前车道段匹配的车道信息
         for (const auto& lane_waypoint : ref_point.lane_waypoints()) {
           if (lane_waypoint.lane->id().id() == lane_segment.lane->id().id()) {
             ref_lane_waypoint = lane_waypoint;
@@ -611,6 +625,8 @@ MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {
                          ref_lane_waypoint.l));
       }
     }
+  // 处理没有车道信息的情况
+  // 如果新生成的路径点 point 没有车道信息，并且参考点 ref_point 中包含车道信息，那么就将参考点的车道信息复制到新路径点中  
     if (point.lane_waypoints().empty() && !ref_point.lane_waypoints().empty()) {
       point.add_lane_waypoint(ref_point.lane_waypoints()[0]);
     }
@@ -633,7 +649,9 @@ double Path::GetSFromIndex(const InterpolatedIndex& index) const {
   }
   return accumulated_s_[index.id] + index.offset;
 }
-
+/// @brief 根据给定的 s 值（路径上的位置），返回该位置对应的路径段的索引及其相对 s 的偏移量
+/// @param s 路径上的某个位置的累积 s 值，通常表示路径从起点到当前位置的距离
+/// @return id：表示路径段的索引， offset：表示该路径段内给定 s 值的相对偏移
 InterpolatedIndex Path::GetIndexFromS(double s) const {
   if (s <= 0.0) {
     return {0, 0.0};
@@ -642,15 +660,24 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
   if (s >= length_) {
     return {num_points_ - 1, 0.0};
   }
+  // 计算 s 所在的样本点索引 sample_id，该索引是通过将 s 除以样本点间距 kSampleDistance 来得到的
   const int sample_id = static_cast<int>(s / kSampleDistance);
+  // 如果计算得到的样本点索引超出了样本点数组的范围，则返回路径的最后一个点
   if (sample_id >= num_sample_points_) {
     return {num_points_ - 1, 0.0};
   }
+  // 计算下一个样本点的索引，用于后续的二分查找
   const int next_sample_id = sample_id + 1;
+  // low 表示路径段的起始索引，这个值是从 last_point_index_ 数组中获取的，该数组保存了每个样本点索引对应的路径段起始位置
   int low = last_point_index_[sample_id];
+  // high 表示路径段的结束索引，通过计算下一个样本点的路径段索引来确定。如果没有下一个样本点，则 high 取路径的总点数 num_points_
   int high = (next_sample_id < num_sample_points_
                   ? std::min(num_points_, last_point_index_[next_sample_id] + 1)
                   : num_points_);
+  // 二分查找的循环
+  // 进入二分查找的循环，查找路径段的索引。根据 accumulated_s_（路径上每个点的累积 s 值）与给定的 s 值的大小关系，
+  // 不断调整 low 和 high，直到找到最合适的路径段。
+  //mid 是当前查找范围的中点，通过比较 accumulated_s_[mid] 与 s 的关系，决定更新 low 还是 high                
   while (low + 1 < high) {
     const int mid = (low + high) >> 1;
     if (accumulated_s_[mid] <= s) {
@@ -659,6 +686,8 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
       high = mid;
     }
   }
+  // low：路径段的索引
+  // s - accumulated_s_[low]：给定 s 值相对于该路径段的偏移量，即 s 在该段内的相对位置
   return {low, s - accumulated_s_[low]};
 }
 
@@ -740,15 +769,25 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
   double distance = 0.0;
   return GetProjection(point, accumulate_s, lateral, &distance);
 }
-
+/// @brief 
+/// @param heading 给定点的航向角
+/// @param point 在笛卡尔坐标系中的点
+/// @param accumulate_s 沿路径的累积 s 值
+/// @param lateral 投影点的横向偏移
+/// @return 
 bool Path::GetProjection(const double heading,
                          const common::math::Vec2d& point,
                          double* accumulate_s,
                          double* lateral) const {
+  // distance 被初始化为 0.0，但实际的值是在调用 GetProjection 的时候计算的
   double distance = 0.0;
   return GetProjection(point, heading, accumulate_s, lateral, &distance);
 }
-
+/// @brief 
+/// @param point 给定点的坐标，类型为 common::math::Vec2d
+/// @param accumulate_s 给定点的起始累积 s 值（即给定点的初始位置沿路径的距离）
+/// @param lateral 输出参数，表示投影点在路径上的横向偏移（即 Frenet 坐标系中的 l，垂直于路径的距离）
+/// @return 
 bool Path::GetProjectionWithWarmStartS(const common::math::Vec2d& point,
                                        double* accumulate_s,
                                        double* lateral) const {
@@ -758,6 +797,7 @@ bool Path::GetProjectionWithWarmStartS(const common::math::Vec2d& point,
   if (accumulate_s == nullptr || lateral == nullptr) {
     return false;
   }
+  // 确保 accumulate_s 在有效的范围内。它应该大于等于 0 且小于路径的总长度 length()
   if (*accumulate_s < 0.0) {
     *accumulate_s = 0.0;
   } else if (*accumulate_s > length()) {
@@ -766,20 +806,30 @@ bool Path::GetProjectionWithWarmStartS(const common::math::Vec2d& point,
   CHECK_GE(num_points_, 2);
   double warm_start_s = *accumulate_s;
   // Find the segment at the position of "accumulate_s".
+  // 初始化二分查找的索引
+  // 初始化左右边界索引（left_index 和 right_index）用于二分查找，mid_index 是中间点的索引
   int left_index = 0;
   int right_index = num_segments_;
   int mid_index = 0;
   // Find the segment with projection of the given point on it.
   while (right_index > left_index + 1) {
+    // 根据当前的 warm_start_s 计算中间索引 mid_index
     FindIndex(left_index, right_index, warm_start_s, &mid_index);
+    // 获取路径段的起点（start_point）并计算给定点到路径段起点的偏移（delta_x 和 delta_y）
     const auto& segment = segments_[mid_index];
     const auto& start_point = segment.start();
     double delta_x = point.x() - start_point.x();
     double delta_y = point.y() - start_point.y();
+    // unit_direction：路径段的单位方向向量
     const auto& unit_direction = segment.unit_direction();
+    // 计算投影值 proj，即给定点到路径段起点的向量在路径段单位方向上的投影
     double proj = delta_x * unit_direction.x() + delta_y * unit_direction.y();
     *accumulate_s = accumulated_s_[mid_index] + proj;
+    // 计算横向偏移 lateral，即路径段方向与给定点偏移的叉积（表示离路径的横向距离）
     *lateral = unit_direction.x() * delta_y - unit_direction.y() * delta_x;
+    // 如果投影 proj 为正且小于当前路径段的长度，表示点在当前路径段上
+    // 如果投影超过当前路径段的长度，则更新 left_index 或 right_index，继续二分查找，直到找到最合适的路径段
+    // 调整 warm_start_s，确保下一次查找从正确的位置开始
     if (proj > 0.0) {
       if (proj < segment.length()) {
         return true;
@@ -916,10 +966,17 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
   }
   return true;
 }
-
+/// @brief 
+/// @param point 该点在笛卡尔坐标系中的坐标
+/// @param heading 给定点的航向角（角度）
+/// @param accumulate_s 输出，投影点在路径上的累计 s 值
+/// @param lateral  输出，投影点的横向偏移 l（即离路径的横向距离）
+/// @param min_distance 输出，给定点到路径投影点的最小距离
+/// @return 
 bool Path::GetProjection(const Vec2d& point, const double heading,
                          double* accumulate_s, double* lateral,
                          double* min_distance) const {
+// 如果路径没有任何段（segments_ 为空），或者输出参数为空，函数返回 false，表示无法计算投影
   if (segments_.empty()) {
     return false;
   }
@@ -927,14 +984,18 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
       min_distance == nullptr) {
     return false;
   }
+  // 道路近似计算
   if (use_path_approximation_) {
     return approximation_.GetProjection(*this, point, accumulate_s, lateral,
                                         min_distance);
   }
   CHECK_GE(num_points_, 2);
+  // 将最小距离初始化为正无穷（表示开始时找不到任何路径段），并初始化投影点所在路径段的索引为 0
   *min_distance = std::numeric_limits<double>::infinity();
   int min_index = 0;
+  // 遍历所有路径段
   for (int i = 0; i < num_segments_; ++i) {
+  // 过滤路径段的航向角与给定点航向角 heading 之间的角度大于90的点
     if (abs(common::math::AngleDiff(segments_[i].heading(), heading)) >= M_PI_2)
       continue;
     const double distance = segments_[i].DistanceSquareTo(point);
@@ -944,9 +1005,11 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
     }
   }
   *min_distance = std::sqrt(*min_distance);
+  // 计算投影点在路径上的 s 和 l
   const auto& nearest_seg = segments_[min_index];
-  const auto prod = nearest_seg.ProductOntoUnit(point);
-  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  const auto prod = nearest_seg.ProductOntoUnit(point);  // prod：点与路径段单位向量的点积
+  const auto proj = nearest_seg.ProjectOntoUnit(point);  // proj：点到路径段的投影（可能为负值或大于路径段的长度）
+  // 对于起点，s 是 proj 和路径段长度的最小值，l 是点积 prod 或最小距离
   if (min_index == 0) {
     *accumulate_s = std::min(proj, nearest_seg.length());
     if (proj < 0) {
@@ -954,14 +1017,18 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
     } else {
       *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
     }
-  } else if (min_index == num_segments_ - 1) {
+  } 
+  // 对于终点，s 是累积的 s 加上投影值，l 同样取决于投影的符号和最小距离
+  else if (min_index == num_segments_ - 1) {
     *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
     if (proj > 0) {
       *lateral = prod;
     } else {
       *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
     }
-  } else {
+  } 
+  // 对于中间段，s 是累积的 s 加上投影值（或路径段长度的最小值），l 同样是点积 prod 和最小距离
+  else {
     *accumulate_s = accumulated_s_[min_index] +
                     std::max(0.0, std::min(proj, nearest_seg.length()));
     *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;

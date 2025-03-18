@@ -49,11 +49,12 @@ void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
   Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
-
+// position: 后轴中心点坐标
   Vec2d position(vehicle_state.x(), vehicle_state.y());
   // 车辆相对于当前坐标系的几何中心位置
+  //center是车辆几何中心的大地坐标
   Vec2d center(position + vec_to_center.rotate(vehicle_state.heading()));
-
+//调用Box2d()构造函数，通过车辆几何中心，heading航向角，车辆的长度，宽度，构建二维边界盒对象ego_box_ 
   ego_box_ =
       Box2d(center, vehicle_state.heading(), param.length(), param.width());
 }

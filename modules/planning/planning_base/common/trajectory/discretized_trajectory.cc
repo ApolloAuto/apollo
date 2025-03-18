@@ -69,7 +69,7 @@ size_t DiscretizedTrajectory::QueryLowerBoundPoint(const double relative_time,
                                                    const double epsilon) const {
   // 确保DiscretizedTrajectory对象不为空
   ACHECK(!empty());
-
+ // 如果 relative_time 大于等于轨迹中的最后一个点的相对时间 (back().relative_time())，那么就直接返回最后一个轨迹点的索引 size() - 1
   if (relative_time >= back().relative_time()) {
     // 返回最后一个点的索引
     return size() - 1;
@@ -80,8 +80,11 @@ size_t DiscretizedTrajectory::QueryLowerBoundPoint(const double relative_time,
     return tp.relative_time() + epsilon < relative_time;
   };
   // 返回一个迭代器，指向第一个满足func条件的位置
+  // std::lower_bound 是一个标准库算法，它在一个已排序的范围中查找第一个不小于目标值的元素。这里我们查找的是第一个相对时间大于或等于 relative_time 的轨迹点
   auto it_lower = std::lower_bound(begin(), end(), relative_time, func);
   // 返回从容器的开始位置到it_lower迭代器之间的距离。这个距离就是查询点relative_time的下界（lower bound）索引
+  // 返回迭代器 it_lower 距离轨迹开头的元素的偏移量，也就是返回的索引值
+  // 这个索引值对应于第一个相对时间不小于 relative_time 的轨迹点
   return std::distance(begin(), it_lower);
 }
 
@@ -101,21 +104,27 @@ size_t DiscretizedTrajectory::QueryNearestPoint(
   }
   return index_min;
 }
-
+/// @brief 给定的位置 position 查找距离该位置最近的轨迹点，并返回该点的索引
+/// @param position 二维向量（Vec2d），表示要查找的目标位置
+/// @param buffer 一个容忍误差，用来扩展查找范围，使得在距离目标位置较近的轨迹点也能被认为是最近的点
+/// @return 
 size_t DiscretizedTrajectory::QueryNearestPointWithBuffer(
     const common::math::Vec2d& position, const double buffer) const {
+  // 初始化，保存最小的平方距离
   double dist_sqr_min = std::numeric_limits<double>::max();
+  // 保存当前最小距离对应的轨迹点索引，初始为 0
   size_t index_min = 0;
   for (size_t i = 0; i < size(); ++i) {
     const common::math::Vec2d curr_point(data()[i].path_point().x(),
                                          data()[i].path_point().y());
-
+// 计算了当前轨迹点 curr_point 到目标位置 position 的平方距离
     const double dist_sqr = curr_point.DistanceSquareTo(position);
     if (dist_sqr < dist_sqr_min + buffer) {
       dist_sqr_min = dist_sqr;
       index_min = i;
     }
   }
+  // 返回找到的最小距离点的索引 index_min
   return index_min;
 }
 

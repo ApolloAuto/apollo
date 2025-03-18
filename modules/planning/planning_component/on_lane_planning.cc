@@ -323,7 +323,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     last_command_ = *local_view_.planning_command;
     AINFO << "new_command:" << last_command_.DebugString();
     reference_line_provider_->Reset();
+    // 通过 injector_ 调用 history() 获取历史数据的对象，并清除历史记录（Clear()）。这意味着在接收到新命令后，之前的历史数据（如轨迹、状态等）可能已经不再适用
     injector_->history()->Clear();
+// 通过 injector_ 获取规划上下文（planning_context()）并清除其中的规划状态（Clear()）。这表明与当前规划相关的状态信息也需要重置，可能是为了清除过时的规划状态
     injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdatePlanningCommand(
         *(local_view_.planning_command));

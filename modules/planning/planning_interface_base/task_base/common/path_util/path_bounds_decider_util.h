@@ -115,6 +115,16 @@ class PathBoundsDeciderUtil {
       std::string* const blocking_obstacle_id, double* const narrowest_width,
       LaneBorrowInfo lane_borrow_info = LaneBorrowInfo::NO_BORROW);
 
+// The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
+// bool is_start_s: 障碍物是起始边界(1)还是结束边界(0)
+// s:障碍物的纵向位置
+// l_min:障碍物在横向上的最小横向位置
+// l_max:障碍物在横向上的最大横向位置
+// obstacle_id: 障碍物的id   
+  /// @brief 
+  /// @param indexed_obstacles 
+  /// @param init_sl_state 
+  /// @return 
   static std::vector<ObstacleEdge> SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles,
       const SLState& init_sl_state);
