@@ -259,7 +259,11 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
     next_point->CopyFrom(tp);
   }
 }
-
+/*
+private：只有父类自己可以访问，子类不能访问。
+protected：父类自己可以访问，子类也可以访问，但外部无法访问。
+public：所有地方都可以访问
+*/
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
     // 1.0                           
