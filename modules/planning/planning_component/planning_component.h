@@ -18,28 +18,31 @@
 
 #include <memory>
 
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"  // 车辆底盘数据 (Chassis)
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"  // 车辆定位数据 (LocalizationEstimate)
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"  // 交通信号灯检测数据 (TrafficLightDetection)
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"  // 规划轨迹 (ADCTrajectory)
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
-#include "modules/planning/planning_base/proto/learning_data.pb.h"
-#include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/planning/planning_base/proto/learning_data.pb.h"  //  机器学习数据 (PlanningLearningData)
+#include "modules/planning/planning_base/proto/planning_config.pb.h" // 规划模块的参数配置 (PlanningConfig)
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-#include "cyber/message/raw_message.h"
-#include "modules/planning/planning_base/common/message_process.h"
-#include "modules/planning/planning_base/gflags/planning_gflags.h"
-#include "modules/planning/planning_component/planning_base.h"
+#include "cyber/class_loader/class_loader.h"  // 用于加载 Cyber 组件
+#include "cyber/component/component.h" // 使 PlanningComponent 继承 cyber::Component，从而成为 Apollo Cyber RT 组件
+#include "cyber/message/raw_message.h" // 处理原始消息
+#include "modules/planning/planning_base/common/message_process.h"   // 消息处理逻辑
+#include "modules/planning/planning_base/gflags/planning_gflags.h"   //  规划模块的全局标志变量
+#include "modules/planning/planning_component/planning_base.h"       // 规划模块的基类
 
 namespace apollo {
 namespace planning {
-
+/// @brief PlanningComponent 继承自 cyber::Component，表示它是 Apollo Cyber 组件，可以订阅和发布消息
+// 预测模块的障碍物信息
+// 车辆底盘信息
+// 车辆定位信息
 class PlanningComponent final
     : public cyber::Component<prediction::PredictionObstacles, canbus::Chassis,
                               localization::LocalizationEstimate> {
@@ -49,6 +52,7 @@ class PlanningComponent final
   ~PlanningComponent() = default;
 
  public:
+ // 在组件启动时调用，用于初始化 订阅者、发布者、参数配置 等
   bool Init() override;
 
   bool Proc(const std::shared_ptr<prediction::PredictionObstacles>&
@@ -58,25 +62,35 @@ class PlanningComponent final
                 localization_estimate) override;
 
  private:
+ // 检查是否需要重新规划路径
   void CheckRerouting();
+ // 检查输入数据是否有效
   bool CheckInput();
 
  private:
+ // 订阅交通信号灯检测数据
   std::shared_ptr<cyber::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
+ // Apollo Cyber 服务客户端，用于向 rerouting 服务发送车道跟随命令并接收状态反馈
   std::shared_ptr<
       apollo::cyber::Client<apollo::external_command::LaneFollowCommand,
                             apollo::external_command::CommandStatus>>
       rerouting_client_;
+ // 其他订阅者
   std::shared_ptr<cyber::Reader<planning::PadMessage>> pad_msg_reader_;
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
   std::shared_ptr<cyber::Reader<storytelling::Stories>> story_telling_reader_;
   std::shared_ptr<cyber::Reader<PlanningCommand>> planning_command_reader_;
 
+ // 发布者
+ // 规划轨迹 (ADCTrajectory)
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
+ // 重新规划请求 (RoutingRequest)
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;
+ // 学习数据 (PlanningLearningData)
   std::shared_ptr<cyber::Writer<PlanningLearningData>>
       planning_learning_data_writer_;
+ // 指令状态 (CommandStatus)
   std::shared_ptr<cyber::Writer<external_command::CommandStatus>>
       command_status_writer_;
 
@@ -96,6 +110,8 @@ class PlanningComponent final
   MessageProcess message_process_;
 };
 
+// 组件注册
+// CYBER_REGISTER_COMPONENT() 注册 PlanningComponent 组件，使其可以在 Apollo Cyber 框架 中运行
 CYBER_REGISTER_COMPONENT(PlanningComponent)
 
 }  // namespace planning
