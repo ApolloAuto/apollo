@@ -114,7 +114,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
                   "planning config error: " + config_.DebugString());
   }
   // 调用父类的Init()函数
-  PlanningBase::Init(config_);
+  PlanningBase::Init(config_);  // 会将config_赋值给PlanningBase中的成员变量
 
   // clear planning history
   // 清除先前的规划历史数据

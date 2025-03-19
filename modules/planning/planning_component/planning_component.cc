@@ -162,12 +162,14 @@ bool PlanningComponent::Proc(
           std::make_shared<PlanningCommand>(planning_command_);
     }
   }
+
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
         std::make_shared<TrafficLightDetection>(traffic_light_);
     local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
   }
+
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!local_view_.pad_msg ||
@@ -181,6 +183,7 @@ bool PlanningComponent::Proc(
       local_view_.pad_msg = std::make_shared<PadMessage>(pad_msg_);
     }
   }
+  
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.stories = std::make_shared<Stories>(stories_);

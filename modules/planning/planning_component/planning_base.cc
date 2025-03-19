@@ -40,7 +40,7 @@ PlanningBase::PlanningBase(const std::shared_ptr<DependencyInjector>& injector)
     : injector_(injector) {}
 
 PlanningBase::~PlanningBase() {}
-
+// 就是一个赋值
 Status PlanningBase::Init(const PlanningConfig& config) {
   injector_->planning_context()->Init();
   config_ = config;
