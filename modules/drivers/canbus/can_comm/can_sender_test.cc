@@ -18,8 +18,9 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_client/fake/fake_can_client.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -29,9 +30,8 @@ namespace canbus {
 
 TEST(CanSenderTest, OneRunCase) {
   CanSender<::apollo::canbus::ChassisDetail> sender;
-  MessageManager<::apollo::canbus::ChassisDetail> pm;
   can::FakeCanClient can_client;
-  sender.Init(&can_client, &pm, true);
+  sender.Init(&can_client, true);
 
   ProtocolData<::apollo::canbus::ChassisDetail> mpd;
   SenderMessage<::apollo::canbus::ChassisDetail> msg(1, &mpd);

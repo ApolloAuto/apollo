@@ -1,0 +1,632 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+message Pc_bcm_201 {
+  // Control Message
+  enum Pc_reverselampreqType {
+    PC_REVERSELAMPREQ_NOREQ = 0;
+    PC_REVERSELAMPREQ_REQ = 1;
+  }
+  enum Pc_lowbeamreqType {
+    PC_LOWBEAMREQ_NOREQ = 0;
+    PC_LOWBEAMREQ_REQ = 1;
+  }
+  enum Pc_highbeamreqType {
+    PC_HIGHBEAMREQ_NOREQ = 0;
+    PC_HIGHBEAMREQ_REQ = 1;
+  }
+  enum Pc_rightturnlampreqType {
+    PC_RIGHTTURNLAMPREQ_NOREQ = 0;
+    PC_RIGHTTURNLAMPREQ_REQ = 1;
+  }
+  enum Pc_leftturnlampreqType {
+    PC_LEFTTURNLAMPREQ_NOREQ = 0;
+    PC_LEFTTURNLAMPREQ_REQ = 1;
+  }
+  enum Pc_hornreqType {
+    PC_HORNREQ_NOREQ = 0;
+    PC_HORNREQ_REQ = 1;
+  }
+  enum Pc_hazardlampreqType {
+    PC_HAZARDLAMPREQ_NOREQ = 0;
+    PC_HAZARDLAMPREQ_REQ = 1;
+  }
+  // Left turn lamp request [] [0|1]
+  optional Pc_reverselampreqType pc_reverselampreq = 1;
+  // Left turn lamp request [] [0|1]
+  optional Pc_lowbeamreqType pc_lowbeamreq = 2;
+  // Left turn lamp request [] [0|1]
+  optional Pc_highbeamreqType pc_highbeamreq = 3;
+  // Right turn lamp request [] [0|3]
+  optional Pc_rightturnlampreqType pc_rightturnlampreq = 4;
+  // Left turn lamp request [] [0|1]
+  optional Pc_leftturnlampreqType pc_leftturnlampreq = 5;
+  // Horn request [] [0|1]
+  optional Pc_hornreqType pc_hornreq = 6;
+  // Hazard lamp request [] [0|1]
+  optional Pc_hazardlampreqType pc_hazardlampreq = 7;
+}
+
+message Scu_bcs_3_308 {
+  // Report Message
+  enum Bcs_rrwheelspdvdType {
+    BCS_RRWHEELSPDVD_INVALID = 0;
+    BCS_RRWHEELSPDVD_VALID = 1;
+  }
+  enum Bcs_rrwheeldirectionvdType {
+    BCS_RRWHEELDIRECTIONVD_INVALID = 0;
+    BCS_RRWHEELDIRECTIONVD_VALID = 1;
+  }
+  enum Bcs_rlwheelspdvdType {
+    BCS_RLWHEELSPDVD_INVALID = 0;
+    BCS_RLWHEELSPDVD_VALID = 1;
+  }
+  enum Bcs_rlwheeldirectionvdType {
+    BCS_RLWHEELDIRECTIONVD_INVALID = 0;
+    BCS_RLWHEELDIRECTIONVD_VALID = 1;
+  }
+  enum Bcs_frwheelspdvdType {
+    BCS_FRWHEELSPDVD_INVALID = 0;
+    BCS_FRWHEELSPDVD_VALID = 1;
+  }
+  enum Bcs_frwheeldirectionvdType {
+    BCS_FRWHEELDIRECTIONVD_INVALID = 0;
+    BCS_FRWHEELDIRECTIONVD_VALID = 1;
+  }
+  enum Bcs_flwheelspdvdType {
+    BCS_FLWHEELSPDVD_INVALID = 0;
+    BCS_FLWHEELSPDVD_VALID = 1;
+  }
+  enum Bcs_flwheeldirectionvdType {
+    BCS_FLWHEELDIRECTIONVD_INVALID = 0;
+    BCS_FLWHEELDIRECTIONVD_VALID = 1;
+  }
+  enum Bcs_rrwheeldirectionType {
+    BCS_RRWHEELDIRECTION_FORWARD = 0;
+    BCS_RRWHEELDIRECTION_BACKWARD = 1;
+  }
+  enum Bcs_rlwheeldirectionType {
+    BCS_RLWHEELDIRECTION_FORWARD = 0;
+    BCS_RLWHEELDIRECTION_BACKWARD = 1;
+  }
+  enum Bcs_frwheeldirectionType {
+    BCS_FRWHEELDIRECTION_FORWARD = 0;
+    BCS_FRWHEELDIRECTION_BACKWARD = 1;
+  }
+  enum Bcs_flwheeldirectionType {
+    BCS_FLWHEELDIRECTION_FORWARD = 0;
+    BCS_FLWHEELDIRECTION_BACKWARD = 1;
+  }
+  // Rear right wheel speed valid data [-] [0|1]
+  optional Bcs_rrwheelspdvdType bcs_rrwheelspdvd = 1;
+  // Rear right wheel speed direction valid data [-] [0|1]
+  optional Bcs_rrwheeldirectionvdType bcs_rrwheeldirectionvd = 2;
+  // Rear left wheel speed valid data [-] [0|1]
+  optional Bcs_rlwheelspdvdType bcs_rlwheelspdvd = 3;
+  // Rear left wheel speed direction valid data [-] [0|1]
+  optional Bcs_rlwheeldirectionvdType bcs_rlwheeldirectionvd = 4;
+  // Front right wheel speed valid data [-] [0|1]
+  optional Bcs_frwheelspdvdType bcs_frwheelspdvd = 5;
+  // Front right wheel speed direction valid data [-] [0|1]
+  optional Bcs_frwheeldirectionvdType bcs_frwheeldirectionvd = 6;
+  // Front left wheel speed valid data [-] [0|1]
+  optional Bcs_flwheelspdvdType bcs_flwheelspdvd = 7;
+  // Front left wheel speed direction valid data [-] [0|1]
+  optional Bcs_flwheeldirectionvdType bcs_flwheeldirectionvd = 8;
+  // Rear right wheel speed [km/h] [0|240]
+  optional double bcs_rrwheelspd = 9;
+  // Rear right wheel speed direction [-] [0|1]
+  optional Bcs_rrwheeldirectionType bcs_rrwheeldirection = 10;
+  // Rear left wheel speed [km/h] [0|240]
+  optional double bcs_rlwheelspd = 11;
+  // Rear left wheel speed direction [-] [0|1]
+  optional Bcs_rlwheeldirectionType bcs_rlwheeldirection = 12;
+  // Front right wheel speed [km/h] [0|240]
+  optional double bcs_frwheelspd = 13;
+  // Front right wheel speed direction [-] [0|1]
+  optional Bcs_frwheeldirectionType bcs_frwheeldirection = 14;
+  // Front left wheel speed [km/h] [0|240]
+  optional double bcs_flwheelspd = 15;
+  // Front left wheel speed direction [-] [0|1]
+  optional Bcs_flwheeldirectionType bcs_flwheeldirection = 16;
+}
+
+message Pc_epb_203 {
+  // Control Message
+  enum Pc_epbreqType {
+    PC_EPBREQ_INVALID = 0;
+    PC_EPBREQ_RELEASE = 1;
+    PC_EPBREQ_APPLY = 2;
+  }
+  enum Pc_epbenableType {
+    PC_EPBENABLE_DISABLE = 0;
+    PC_EPBENABLE_ENABLE = 1;
+  }
+  // EPB request [] [0|1]
+  optional Pc_epbreqType pc_epbreq = 1;
+  // EPB control enable [] [0|1]
+  optional Pc_epbenableType pc_epbenable = 2;
+}
+
+message Pc_bcs_202 {
+  // Control Message
+  enum Pc_brkpedenableType {
+    PC_BRKPEDENABLE_DISABLE = 0;
+    PC_BRKPEDENABLE_ENABLE = 1;
+  }
+  // Brake pedal request [%] [0|100]
+  optional double pc_brkpedreq = 1;
+  // Brake pedal control enable [] [0|1]
+  optional Pc_brkpedenableType pc_brkpedenable = 2;
+}
+
+message Pc_vcu_205 {
+  // Control Message
+  enum Pc_accpedenableType {
+    PC_ACCPEDENABLE_DISABLE = 0;
+    PC_ACCPEDENABLE_ENABLE = 1;
+  }
+  enum Pc_torqenableType {
+    PC_TORQENABLE_DISABLE = 0;
+    PC_TORQENABLE_ENABLE = 1;
+  }
+  enum Pc_gearreqType {
+    PC_GEARREQ_INVALID = 0;
+    PC_GEARREQ_DRIVE = 1;
+    PC_GEARREQ_NEUTRAL = 2;
+    PC_GEARREQ_REVERSE = 3;
+    PC_GEARREQ_PARK = 4;
+  }
+  enum Pc_gearenableType {
+    PC_GEARENABLE_DISABLE = 0;
+    PC_GEARENABLE_ENABLE = 1;
+  }
+  // Acceleration pedal request [%] [0|100]
+  optional double pc_accpedreq = 1;
+  // Acceleration pedal control enable [] [0|1]
+  optional Pc_accpedenableType pc_accpedenable = 2;
+  // Torque request [Nm] [-3000|3000]
+  optional double pc_torqreq = 3;
+  // Torque control enable [] [0|1]
+  optional Pc_torqenableType pc_torqenable = 4;
+  // Gear request [] [0|7]
+  optional Pc_gearreqType pc_gearreq = 5;
+  // Gear control enable [] [0|1]
+  optional Pc_gearenableType pc_gearenable = 6;
+}
+
+message Pc_eps_204 {
+  // Control Message
+  enum Pc_steerenableType {
+    PC_STEERENABLE_DISABLE = 0;
+    PC_STEERENABLE_ENABLE = 1;
+  }
+  // Steer speed request [deg/s] [0|500]
+  optional int32 pc_steerspdreq = 1;
+  // Steer control enable [] [0|1]
+  optional Pc_steerenableType pc_steerenable = 2;
+  // Steer angle request [deg] [-500|500]
+  optional double pc_steerangreq = 3;
+}
+
+message Scu_vcu_2_313 {
+  // Report Message
+  // Max positive torque [Nm] [0|3000]
+  optional double vcu_torqposmax = 1;
+  // Max negative torque [Nm] [-3000|0]
+  optional double vcu_torqnegmax = 2;
+  // Actual torque [Nm] [-3000|3000]
+  optional double vcu_torqact = 3;
+  // Engine speed [rpm] [0|65535]
+  optional int32 vcu_engspd = 4;
+}
+
+message Scu_1_301 {
+  // Report Message
+  enum Scu_stopbutstType {
+    SCU_STOPBUTST_UNPRESSED = 0;
+    SCU_STOPBUTST_PRESSED = 1;
+  }
+  enum Scu_drvmodeType {
+    SCU_DRVMODE_INVALID = 0;
+    SCU_DRVMODE_MANUAL = 1;
+    SCU_DRVMODE_INTERRUPT = 2;
+    SCU_DRVMODE_AUTO = 3;
+  }
+  enum Scu_faultstType {
+    SCU_FAULTST_NORMAL = 0;
+    SCU_FAULTST_FAULT = 1;
+  }
+  // VIN string character 16 [-] [0|255]
+  optional int32 vin16 = 1;
+  // Brake pedal position [] [0|1]
+  optional Scu_stopbutstType scu_stopbutst = 2;
+  // SCU drive mode [] [0|3]
+  optional Scu_drvmodeType scu_drvmode = 3;
+  // SCU fault status [] [0|15]
+  optional Scu_faultstType scu_faultst = 4;
+}
+
+message Scu_2_302 {
+  // Report Message
+  // VIN string character 07 [-] [0|255]
+  optional int32 vin07 = 1;
+  // VIN string character 06 [-] [0|255]
+  optional int32 vin06 = 2;
+  // VIN string character 05 [-] [0|255]
+  optional int32 vin05 = 3;
+  // VIN string character 04 [-] [0|255]
+  optional int32 vin04 = 4;
+  // VIN string character 03 [-] [0|255]
+  optional int32 vin03 = 5;
+  // VIN string character 02 [-] [0|255]
+  optional int32 vin02 = 6;
+  // VIN string character 01 [-] [0|255]
+  optional int32 vin01 = 7;
+  // VIN string character 00 [-] [0|255]
+  optional int32 vin00 = 8;
+}
+
+message Scu_3_303 {
+  // Report Message
+  // VIN string character 15 [-] [0|255]
+  optional int32 vin15 = 1;
+  // VIN string character 14 [-] [0|255]
+  optional int32 vin14 = 2;
+  // VIN string character 13 [-] [0|255]
+  optional int32 vin13 = 3;
+  // VIN string character 12 [-] [0|255]
+  optional int32 vin12 = 4;
+  // VIN string character 11 [-] [0|255]
+  optional int32 vin11 = 5;
+  // VIN string character 10 [-] [0|255]
+  optional int32 vin10 = 6;
+  // VIN string character 09 [-] [0|255]
+  optional int32 vin09 = 7;
+  // VIN string character 08 [-] [0|255]
+  optional int32 vin08 = 8;
+}
+
+message Scu_bcm_304 {
+  // Report Message
+  enum Bcm_vehreversestType {
+    BCM_VEHREVERSEST_NORMAL = 0;
+    BCM_VEHREVERSEST_REVERSE = 1;
+  }
+  enum Bcm_rightturnlampstType {
+    BCM_RIGHTTURNLAMPST_INACTIVE = 0;
+    BCM_RIGHTTURNLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_rearfoglampstType {
+    BCM_REARFOGLAMPST_INACTIVE = 0;
+    BCM_REARFOGLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_parkinglampstType {
+    BCM_PARKINGLAMPST_INACTIVE = 0;
+    BCM_PARKINGLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_lowbeamstType {
+    BCM_LOWBEAMST_INACTIVE = 0;
+    BCM_LOWBEAMST_ACTIVE = 1;
+  }
+  enum Bcm_leftturnlampstType {
+    BCM_LEFTTURNLAMPST_INACTIVE = 0;
+    BCM_LEFTTURNLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_keystType {
+    BCM_KEYST_OFF = 0;
+    BCM_KEYST_ACC = 1;
+    BCM_KEYST_ON = 2;
+    BCM_KEYST_CRANK = 3;
+  }
+  enum Bcm_hornstType {
+    BCM_HORNST_INACTIVE = 0;
+    BCM_HORNST_ACTIVE = 1;
+  }
+  enum Bcm_highbeamstType {
+    BCM_HIGHBEAMST_INACTIVE = 0;
+    BCM_HIGHBEAMST_ACTIVE = 1;
+  }
+  enum Bcm_hazardlampstType {
+    BCM_HAZARDLAMPST_INACTIVE = 0;
+    BCM_HAZARDLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_frontfoglampstType {
+    BCM_FRONTFOGLAMPST_INACTIVE = 0;
+    BCM_FRONTFOGLAMPST_ACTIVE = 1;
+  }
+  enum Bcm_brakelightswitchstType {
+    BCM_BRAKELIGHTSWITCHST_INACTIVE = 0;
+    BCM_BRAKELIGHTSWITCHST_ACTIVE = 1;
+  }
+  // Vehicle reverse status [-] [0|1]
+  optional Bcm_vehreversestType bcm_vehreversest = 1;
+  // Right turn lamp status [-] [0|1]
+  optional Bcm_rightturnlampstType bcm_rightturnlampst = 2;
+  // Rear fog lamp status [-] [0|1]
+  optional Bcm_rearfoglampstType bcm_rearfoglampst = 3;
+  // Parking lamp status [] [0|1]
+  optional Bcm_parkinglampstType bcm_parkinglampst = 4;
+  // Low beam status [-] [0|1]
+  optional Bcm_lowbeamstType bcm_lowbeamst = 5;
+  // Left turn lamp status [-] [0|1]
+  optional Bcm_leftturnlampstType bcm_leftturnlampst = 6;
+  // Key status [-] [0|3]
+  optional Bcm_keystType bcm_keyst = 7;
+  // Horn status [-] [0|1]
+  optional Bcm_hornstType bcm_hornst = 8;
+  // High beam status [-] [0|1]
+  optional Bcm_highbeamstType bcm_highbeamst = 9;
+  // Hazard lamp status [] [0|1]
+  optional Bcm_hazardlampstType bcm_hazardlampst = 10;
+  // Front fog lamp status [-] [0|1]
+  optional Bcm_frontfoglampstType bcm_frontfoglampst = 11;
+  // Brake light switch status [-] [0|1]
+  optional Bcm_brakelightswitchstType bcm_brakelightswitchst = 12;
+}
+
+message Scu_bcs_1_306 {
+  // Report Message
+  enum Bcs_aebavailableType {
+    BCS_AEBAVAILABLE_UNAVAILABLE = 0;
+    BCS_AEBAVAILABLE_AVAILABLE = 1;
+  }
+  enum Bcs_cddavailableType {
+    BCS_CDDAVAILABLE_UNAVAILABLE = 0;
+    BCS_CDDAVAILABLE_AVAILABLE = 1;
+  }
+  enum Bcs_intidxType {
+    BCS_INTIDX_NOINT = 0;
+    BCS_INTIDX_OVERFLOW = 1;
+    BCS_INTIDX_TIMEOUT = 2;
+    BCS_INTIDX_ACCPEDINT = 3;
+    BCS_INTIDX_BRKPEDINT = 4;
+    BCS_INTIDX_GEARINT = 5;
+  }
+  enum Bcs_vdcfaultstType {
+    BCS_VDCFAULTST_NORMAL = 0;
+    BCS_VDCFAULTST_FAULT = 1;
+  }
+  enum Bcs_vdcactivestType {
+    BCS_VDCACTIVEST_INACTIVE = 0;
+    BCS_VDCACTIVEST_ACTIVE = 1;
+  }
+  enum Bcs_absfaultstType {
+    BCS_ABSFAULTST_NORMAL = 0;
+    BCS_ABSFAULTST_FAULT = 1;
+  }
+  enum Bcs_absactivestType {
+    BCS_ABSACTIVEST_INACTIVE = 0;
+    BCS_ABSACTIVEST_ACTIVE = 1;
+  }
+  enum Bcs_faultstType {
+    BCS_FAULTST_NORMAL = 0;
+    BCS_FAULTST_FAULT = 1;
+  }
+  enum Bcs_drvmodeType {
+    BCS_DRVMODE_INVALID = 0;
+    BCS_DRVMODE_MANUAL = 1;
+    BCS_DRVMODE_INTERRUPT = 2;
+    BCS_DRVMODE_AUTO = 3;
+  }
+  // VDC active status [] [0|1]
+  optional Bcs_aebavailableType bcs_aebavailable = 1;
+  // VDC active status [] [0|1]
+  optional Bcs_cddavailableType bcs_cddavailable = 2;
+  // Actual brake pedal position [%] [0|100]
+  optional double bcs_brkpedact = 3;
+  // BCS interrupt index [] [0|7]
+  optional Bcs_intidxType bcs_intidx = 4;
+  // VDC fault status [] [0|1]
+  optional Bcs_vdcfaultstType bcs_vdcfaultst = 5;
+  // VDC active status [] [0|1]
+  optional Bcs_vdcactivestType bcs_vdcactivest = 6;
+  // ABS fault status [] [0|1]
+  optional Bcs_absfaultstType bcs_absfaultst = 7;
+  // ABS active status [] [0|1]
+  optional Bcs_absactivestType bcs_absactivest = 8;
+  // BCS fault status [] [0|1]
+  optional Bcs_faultstType bcs_faultst = 9;
+  // BCS drive mode [] [0|3]
+  optional Bcs_drvmodeType bcs_drvmode = 10;
+}
+
+message Scu_bcs_2_307 {
+  // Report Message
+  enum Bcs_vehspdvdType {
+    BCS_VEHSPDVD_INVALID = 0;
+    BCS_VEHSPDVD_VALID = 1;
+  }
+  // Vehicle speed valid data [-] [0|1]
+  optional Bcs_vehspdvdType bcs_vehspdvd = 1;
+  // Yaw rate [rad/s] [-2.2243|2.2243]
+  optional double bcs_yawrate = 2;
+  // Vehicle speed [km/h] [0|240]
+  optional double bcs_vehspd = 3;
+  // Vehicle longitudinal acceleration [m/s^2] [-21.593|21.593]
+  optional double bcs_vehlongaccel = 4;
+  // Vehicle lateral acceleration [m/s^2] [-21.593|21.593]
+  optional double bcs_vehlataccel = 5;
+}
+
+message Scu_epb_310 {
+  // Report Message
+  enum Epb_intidxType {
+    EPB_INTIDX_NOINT = 0;
+    EPB_INTIDX_OVERFLOW = 1;
+    EPB_INTIDX_TIMEOUT = 2;
+  }
+  enum Epb_drvmodeType {
+    EPB_DRVMODE_INVALID = 0;
+    EPB_DRVMODE_MANUAL = 1;
+    EPB_DRVMODE_INTERRUPT = 2;
+    EPB_DRVMODE_AUTO = 3;
+  }
+  enum Epb_sysstType {
+    EPB_SYSST_RELEASED = 0;
+    EPB_SYSST_APPLIED = 1;
+    EPB_SYSST_RELEASING = 2;
+    EPB_SYSST_FAULT = 3;
+    EPB_SYSST_APPLYING = 4;
+    EPB_SYSST_DISENGAGED = 5;
+  }
+  enum Epb_faultstType {
+    EPB_FAULTST_NORMAL = 0;
+    EPB_FAULTST_FAULT = 1;
+  }
+  // EPS interrupt index [] [0|7]
+  optional Epb_intidxType epb_intidx = 1;
+  // EPB drive mode [] [0|3]
+  optional Epb_drvmodeType epb_drvmode = 2;
+  // EPB system status [] [0|7]
+  optional Epb_sysstType epb_sysst = 3;
+  // EPB fault status [] [0|1]
+  optional Epb_faultstType epb_faultst = 4;
+}
+
+message Scu_vcu_1_312 {
+  // Report Message
+  enum Vcu_elcsysfaultType {
+    VCU_ELCSYSFAULT_NORMAL = 0;
+    VCU_ELCSYSFAULT_FAULT = 1;
+  }
+  enum Vcu_brkpedstType {
+    VCU_BRKPEDST_UNPRESSED = 0;
+    VCU_BRKPEDST_PRESSED = 1;
+  }
+  enum Vcu_intidxType {
+    VCU_INTIDX_NOINT = 0;
+    VCU_INTIDX_OVERFLOW = 1;
+    VCU_INTIDX_TIMEOUT = 2;
+    VCU_INTIDX_ACCPEDINT = 3;
+    VCU_INTIDX_BRKPEDINT = 4;
+    VCU_INTIDX_GEARINT = 5;
+  }
+  enum Vcu_gearintidxType {
+    VCU_GEARINTIDX_NOINT = 0;
+    VCU_GEARINTIDX_OVERFLOW = 1;
+    VCU_GEARINTIDX_TIMEOUT = 2;
+  }
+  enum Vcu_geardrvmodeType {
+    VCU_GEARDRVMODE_INVALID = 0;
+    VCU_GEARDRVMODE_MANUAL = 1;
+    VCU_GEARDRVMODE_INTERRUPT = 2;
+    VCU_GEARDRVMODE_AUTO = 3;
+  }
+  enum Vcu_vehrdystType {
+    VCU_VEHRDYST_NOTREADY = 0;
+    VCU_VEHRDYST_READY = 1;
+  }
+  enum Vcu_faultstType {
+    VCU_FAULTST_NORMAL = 0;
+    VCU_FAULTST_DERATE = 1;
+    VCU_FAULTST_RSV1 = 2;
+    VCU_FAULTST_RSV2 = 3;
+    VCU_FAULTST_RSV3 = 4;
+    VCU_FAULTST_FAULT = 5;
+  }
+  enum Vcu_drvmodeType {
+    VCU_DRVMODE_INVALID = 0;
+    VCU_DRVMODE_MANUAL = 1;
+    VCU_DRVMODE_INTERRUPT = 2;
+    VCU_DRVMODE_AUTO = 3;
+  }
+  enum Vcu_gearpstType {
+    VCU_GEARPST_INVALID = 0;
+    VCU_GEARPST_DRIVE = 1;
+    VCU_GEARPST_NEUTRAL = 2;
+    VCU_GEARPST_REVERSE = 3;
+    VCU_GEARPST_PARK = 4;
+  }
+  enum Vcu_gearfaultstType {
+    VCU_GEARFAULTST_NORMAL = 0;
+    VCU_GEARFAULTST_FAULT = 1;
+  }
+  enum Vcu_gearactType {
+    VCU_GEARACT_INVALID = 0;
+    VCU_GEARACT_DRIVE = 1;
+    VCU_GEARACT_NEUTRAL = 2;
+    VCU_GEARACT_REVERSE = 3;
+    VCU_GEARACT_PARK = 4;
+  }
+  // Gear fault status [] [0|0]
+  optional Vcu_elcsysfaultType vcu_elcsysfault = 1;
+  // Brake pedal position [] [0|1]
+  optional Vcu_brkpedstType vcu_brkpedst = 2;
+  // VCU interrupt index [] [0|7]
+  optional Vcu_intidxType vcu_intidx = 3;
+  // Gear interrupt index [] [0|7]
+  optional Vcu_gearintidxType vcu_gearintidx = 4;
+  // VCU Gear drive mode [] [0|3]
+  optional Vcu_geardrvmodeType vcu_geardrvmode = 5;
+  // Actual acceleration pedal position [%] [0|100]
+  optional double vcu_accpedact = 6;
+  // Brake pedal position [%] [0|99.96]
+  optional double vcu_brkpedpst = 7;
+  // Veh range [km] [0|1000]
+  optional int32 vcu_vehrng = 8;
+  // Actual acceleration pedal position [%] [0|99.96]
+  optional double vcu_accpedpst = 9;
+  // HEV system ready status [] [0|1]
+  optional Vcu_vehrdystType vcu_vehrdyst = 10;
+  // VCU fault status [] [0|0]
+  optional Vcu_faultstType vcu_faultst = 11;
+  // VCU drive mode [] [0|3]
+  optional Vcu_drvmodeType vcu_drvmode = 12;
+  // Gear lever position [] [0|7]
+  optional Vcu_gearpstType vcu_gearpst = 13;
+  // Gear fault status [] [0|0]
+  optional Vcu_gearfaultstType vcu_gearfaultst = 14;
+  // Actual gear [] [0|7]
+  optional Vcu_gearactType vcu_gearact = 15;
+}
+
+message Scu_eps_311 {
+  // Report Message
+  enum Eps_intidxType {
+    EPS_INTIDX_NOINT = 0;
+    EPS_INTIDX_OVERFLOW = 1;
+    EPS_INTIDX_TIMEOUT = 2;
+    EPS_INTIDX_STEERINT = 3;
+  }
+  enum Eps_faultstType {
+    EPS_FAULTST_NORMAL = 0;
+    EPS_FAULTST_FAULT = 1;
+  }
+  enum Eps_drvmodeType {
+    EPS_DRVMODE_INVALID = 0;
+    EPS_DRVMODE_MANUAL = 1;
+    EPS_DRVMODE_INTERRUPT = 2;
+    EPS_DRVMODE_AUTO = 3;
+  }
+  // EPS interrupt index [] [0|7]
+  optional Eps_intidxType eps_intidx = 1;
+  // Steer angle speed [deg/s] [0|1016]
+  optional double eps_steeranglespd = 2;
+  // Steer angle Left + right - [deg] [-780|779.9]
+  optional double eps_steerangle = 3;
+  // EPS fault status [] [0|1]
+  optional Eps_faultstType eps_faultst = 4;
+  // EPS drive mode [] [0|3]
+  optional Eps_drvmodeType eps_drvmode = 5;
+}
+
+message Ge3 {
+  optional Pc_bcm_201 pc_bcm_201 = 1;         // control message
+  optional Scu_bcs_3_308 scu_bcs_3_308 = 2;   // report message
+  optional Pc_epb_203 pc_epb_203 = 3;         // control message
+  optional Pc_bcs_202 pc_bcs_202 = 4;         // control message
+  optional Pc_vcu_205 pc_vcu_205 = 5;         // control message
+  optional Pc_eps_204 pc_eps_204 = 6;         // control message
+  optional Scu_vcu_2_313 scu_vcu_2_313 = 7;   // report message
+  optional Scu_1_301 scu_1_301 = 8;           // report message
+  optional Scu_2_302 scu_2_302 = 9;           // report message
+  optional Scu_3_303 scu_3_303 = 10;          // report message
+  optional Scu_bcm_304 scu_bcm_304 = 11;      // report message
+  optional Scu_bcs_1_306 scu_bcs_1_306 = 12;  // report message
+  optional Scu_bcs_2_307 scu_bcs_2_307 = 13;  // report message
+  optional Scu_epb_310 scu_epb_310 = 14;      // report message
+  optional Scu_vcu_1_312 scu_vcu_1_312 = 15;  // report message
+  optional Scu_eps_311 scu_eps_311 = 16;      // report message
+}

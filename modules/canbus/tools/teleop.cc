@@ -26,12 +26,12 @@
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/time/time.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/message_util.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,
@@ -55,9 +55,9 @@ using apollo::cyber::Reader;
 using apollo::cyber::Time;
 using apollo::cyber::Writer;
 
-const uint32_t KEYCODE_O = 0x4F;  // 'O' not number
+const uint32_t KEYCODE_O = 0x4F;  // '0'
 
-const uint32_t KEYCODE_UP1 = 0x57;  // 'W'
+const uint32_t KEYCODE_UP1 = 0x57;  // 'w'
 const uint32_t KEYCODE_UP2 = 0x77;  // 'w'
 const uint32_t KEYCODE_DN1 = 0x53;  // 'S'
 const uint32_t KEYCODE_DN2 = 0x73;  // 's'
@@ -66,9 +66,7 @@ const uint32_t KEYCODE_LF2 = 0x61;  // 'a'
 const uint32_t KEYCODE_RT1 = 0x44;  // 'D'
 const uint32_t KEYCODE_RT2 = 0x64;  // 'd'
 
-// set hand brake or parking brake
-const uint32_t KEYCODE_PKBK1 = 0x50;  // 'P'
-const uint32_t KEYCODE_PKBK2 = 0x70;  // 'p'
+const uint32_t KEYCODE_PKBK = 0x50;  // hand brake or parking brake
 
 // set throttle, gear, and brake
 const uint32_t KEYCODE_SETT1 = 0x54;  // 'T'
@@ -77,27 +75,20 @@ const uint32_t KEYCODE_SETG1 = 0x47;  // 'G'
 const uint32_t KEYCODE_SETG2 = 0x67;  // 'g'
 const uint32_t KEYCODE_SETB1 = 0x42;  // 'B'
 const uint32_t KEYCODE_SETB2 = 0x62;  // 'b'
-const uint32_t KEYCODE_ZERO = 0x30;   // '0' number
+const uint32_t KEYCODE_ZERO = 0x30;   // '0'
 
-// set turn signal
 const uint32_t KEYCODE_SETQ1 = 0x51;  // 'Q'
 const uint32_t KEYCODE_SETQ2 = 0x71;  // 'q'
 
-// set low beam
-const uint32_t KEYCODE_SETL1 = 0x4C;  // 'L'
-const uint32_t KEYCODE_SETL2 = 0x6C;  // 'l'
-
 // change action
-const uint32_t KEYCODE_MODE1 = 0x4D;   // 'M'
-const uint32_t KEYCODE_MODE2 = 0x6D;   // 'm'
+const uint32_t KEYCODE_MODE = 0x6D;  // 'm'
 
 // emergency stop
-const uint32_t KEYCODE_ESTOP1 = 0x45;  // 'E'
-const uint32_t KEYCODE_ESTOP2 = 0x65;  // 'e'
+const uint32_t KEYCODE_ESTOP = 0x45;  // 'E'
 
 // help
-const uint32_t KEYCODE_HELP1 = 0x48;   // 'H'
-const uint32_t KEYCODE_HELP2 = 0x68;   // 'h'
+const uint32_t KEYCODE_HELP = 0x68;   // 'h'
+const uint32_t KEYCODE_HELP2 = 0x48;  // 'H'
 
 class Teleop {
  public:
@@ -108,11 +99,10 @@ class Teleop {
   static void PrintKeycode() {
     system("clear");
     printf("=====================    KEYBOARD MAP   ===================\n");
-    printf("HELP:               [%c]     |\n", KEYCODE_HELP2);
-    printf("Set Action:         [%c]+Num\n", KEYCODE_MODE2);
+    printf("HELP:               [%c]     |\n", KEYCODE_HELP);
+    printf("Set Action      :   [%c]+Num\n", KEYCODE_MODE);
     printf("                     0 RESET ACTION\n");
     printf("                     1 START ACTION\n");
-    printf("                     2 VIN_REQ ACTION\n");
     printf("\n-----------------------------------------------------------\n");
     printf("Set Gear:           [%c]+Num\n", KEYCODE_SETG1);
     printf("                     0 GEAR_NEUTRAL\n");
@@ -123,16 +113,14 @@ class Teleop {
     printf("                     5 GEAR_INVALID\n");
     printf("                     6 GEAR_NONE\n");
     printf("\n-----------------------------------------------------------\n");
-    printf("Throttle/Speed up:  [%c]     |  \n",
-           KEYCODE_UP1);
-    printf("Brake/Speed down:   [%c]     |  \n",
-           KEYCODE_DN1);
+    printf("Throttle/Speed up:  [%c]     |  Set Throttle:       [%c]+Num\n",
+           KEYCODE_UP1, KEYCODE_SETT1);
+    printf("Brake/Speed down:   [%c]     |  Set Brake:          [%c]+Num\n",
+           KEYCODE_DN1, KEYCODE_SETB1);
     printf("Steer LEFT:         [%c]     |  Steer RIGHT:        [%c]\n",
            KEYCODE_LF1, KEYCODE_RT1);
-    printf("Parking Brake:      [%c]     |  Emergency Stop      [%c]\n",
-           KEYCODE_PKBK1, KEYCODE_ESTOP1);
-    printf("Left/Right Lamp:    [%c]     |  Low beam            [%c]\n",
-           KEYCODE_SETQ1, KEYCODE_SETL1);
+    printf("Parking Brake:     [%c]     |  Emergency Stop      [%c]\n",
+           KEYCODE_PKBK, KEYCODE_ESTOP);
     printf("\n-----------------------------------------------------------\n");
     printf("Exit: Ctrl + C, then press enter to normal terminal\n");
     printf("===========================================================\n");
@@ -150,7 +138,6 @@ class Teleop {
     struct termios raw_;
     int32_t kfd_ = 0;
     bool parking_brake = false;
-    bool low_beam = false;
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
@@ -239,44 +226,42 @@ class Teleop {
             AINFO << "Acceleration = " << control_command_.acceleration();
           }
           break;
-        case KEYCODE_LF1:  // steer left
+        case KEYCODE_LF1:  // left
         case KEYCODE_LF2:
           steering = control_command_.steering_target();
           steering = GetCommand(steering, FLAGS_steer_inc_delta);
           control_command_.set_steering_target(steering);
           AINFO << "Steering Target = " << steering;
           break;
-        case KEYCODE_RT1:  // steer right
+        case KEYCODE_RT1:  // right
         case KEYCODE_RT2:
           steering = control_command_.steering_target();
           steering = GetCommand(steering, -FLAGS_steer_inc_delta);
           control_command_.set_steering_target(steering);
           AINFO << "Steering Target = " << steering;
           break;
-        case KEYCODE_PKBK1:  // hand brake
-        case KEYCODE_PKBK2:
+        case KEYCODE_PKBK:  // hand brake
           parking_brake = !control_command_.parking_brake();
           control_command_.set_parking_brake(parking_brake);
           AINFO << "Parking Brake Toggled: " << parking_brake;
           break;
-        case KEYCODE_ESTOP1:
-        case KEYCODE_ESTOP2:
+        case KEYCODE_ESTOP:
           control_command_.set_brake(50.0);
           AINFO << "Estop Brake : " << control_command_.brake();
           break;
-        case KEYCODE_SETT1:  // set throttle 0-50
+        case KEYCODE_SETT1:  // set throttle
         case KEYCODE_SETT2:
           // read keyboard again
           if (read(kfd_, &c, 1) < 0) {
             exit(-1);
           }
           level = c - KEYCODE_ZERO;
-          control_command_.set_throttle(level * 5.0);
+          control_command_.set_throttle(level * 10.0);
           control_command_.set_brake(0.0);
           AINFO << "Throttle = " << control_command_.throttle()
                 << ", Brake = " << control_command_.brake();
           break;
-        case KEYCODE_SETG1:  // set gear
+        case KEYCODE_SETG1:
         case KEYCODE_SETG2:
           // read keyboard again
           if (read(kfd_, &c, 1) < 0) {
@@ -287,7 +272,7 @@ class Teleop {
           control_command_.set_gear_location(gear);
           AINFO << "Gear set to : " << level;
           break;
-        case KEYCODE_SETB1:  // set brake 0-50
+        case KEYCODE_SETB1:
         case KEYCODE_SETB2:
           // read keyboard again
           if (read(kfd_, &c, 1) < 0) {
@@ -295,43 +280,34 @@ class Teleop {
           }
           level = c - KEYCODE_ZERO;
           control_command_.set_throttle(0.0);
-          control_command_.set_brake(level * 5.0);
+          control_command_.set_brake(level * 10.0);
           AINFO << "Throttle = " << control_command_.throttle()
                 << ", Brake = " << control_command_.brake();
           break;
-        case KEYCODE_SETQ1:  // set turn signal
+        case KEYCODE_SETQ1:
         case KEYCODE_SETQ2:
+          if (read(kfd_, &c, 1) < 0) {
+            exit(-1);
+          }
           static int cnt = 0;
           ++cnt;
-          if (cnt > 3) {
+          if (cnt > 2) {
             cnt = 0;
           }
+
           if (cnt == 0) {
             control_command_.mutable_signal()->set_turn_signal(
                 VehicleSignal::TURN_NONE);
-            AINFO << "Set Lamp OFF";
           } else if (cnt == 1) {
             control_command_.mutable_signal()->set_turn_signal(
                 VehicleSignal::TURN_LEFT);
-            AINFO << "Set Turn Left";
           } else if (cnt == 2) {
             control_command_.mutable_signal()->set_turn_signal(
                 VehicleSignal::TURN_RIGHT);
-            AINFO << "Set Turn Right";
-          } else if (cnt == 3) {
-            control_command_.mutable_signal()->set_turn_signal(
-                VehicleSignal::TURN_HAZARD_WARNING);
-            AINFO << "Set Turn Hazard Warning Lamp ON";
           }
+
           break;
-        case KEYCODE_SETL1:  // set low beam
-        case KEYCODE_SETL2:
-          low_beam = !control_command_.signal().low_beam();
-          control_command_.mutable_signal()->set_low_beam(low_beam);
-          AINFO << "Low Beam Toggled: " << low_beam;
-          break;
-        case KEYCODE_MODE1:  // set action
-        case KEYCODE_MODE2:
+        case KEYCODE_MODE:
           // read keyboard again
           if (read(kfd_, &c, 1) < 0) {
             exit(-1);
@@ -342,7 +318,7 @@ class Teleop {
           sleep(1);
           control_command_.clear_pad_msg();
           break;
-        case KEYCODE_HELP1:  // set help
+        case KEYCODE_HELP:
         case KEYCODE_HELP2:
           PrintKeycode();
           break;
@@ -393,10 +369,6 @@ class Teleop {
         action = apollo::control::DrivingAction::START;
         AINFO << "SET Action START";
         break;
-      case 2:
-        action = apollo::control::DrivingAction::VIN_REQ;
-        AINFO << "SET Action VIN_REQ";
-        break;
       default:
         AINFO << "unknown action: " << int_action << " use default RESET";
         break;
@@ -434,7 +406,6 @@ class Teleop {
     control_command_.set_engine_on_off(false);
     control_command_.set_driving_mode(Chassis::COMPLETE_MANUAL);
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
-    control_command_.mutable_signal()->set_low_beam(false);
     control_command_.mutable_signal()->set_turn_signal(
         VehicleSignal::TURN_NONE);
   }

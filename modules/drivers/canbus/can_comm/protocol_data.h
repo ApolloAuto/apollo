@@ -88,11 +88,6 @@ class ProtocolData {
   virtual void UpdateData(uint8_t *data);
 
   /*
-   * @brief update the heartbeat data
-   */
-  virtual void UpdateData_Heartbeat(uint8_t *data);
-
-  /*
    * @brief reset the protocol data
    */
   virtual void Reset();
@@ -146,9 +141,6 @@ void ProtocolData<SensorType>::Parse(const uint8_t *bytes, int32_t length,
 
 template <typename SensorType>
 void ProtocolData<SensorType>::UpdateData(uint8_t * /*data*/) {}
-
-template <typename SensorType>
-void ProtocolData<SensorType>::UpdateData_Heartbeat(uint8_t * /*data*/) {}
 
 template <typename SensorType>
 void ProtocolData<SensorType>::Reset() {}

@@ -4,7 +4,14 @@ package apollo.canbus;
 
 import "modules/common_msgs/basic_msgs/vehicle_id.proto";
 import "modules/common_msgs/chassis_msgs/chassis.proto";
-
+import "modules/common_msgs/chassis_msgs/ch.proto";
+import "modules/common_msgs/chassis_msgs/devkit.proto";
+import "modules/common_msgs/chassis_msgs/ge3.proto";
+import "modules/common_msgs/chassis_msgs/lexus.proto";
+import "modules/common_msgs/chassis_msgs/neolix_edu.proto";
+import "modules/common_msgs/chassis_msgs/transit.proto";
+import "modules/common_msgs/chassis_msgs/wey.proto";
+import "modules/common_msgs/chassis_msgs/zhongyun.proto";
 
 message ChassisDetail {
   enum Type {
@@ -28,6 +35,17 @@ message ChassisDetail {
   optional CheckResponseSignal check_response = 15;
   optional License license = 16 [deprecated = true];  // License info
   optional Surround surround = 17;                    // Surround information
+
+  optional Gem gem = 18;
+  optional Lexus lexus = 19;
+  optional Transit transit = 20;
+  optional Ge3 ge3 = 21;
+  optional Wey wey = 22;
+  optional Zhongyun zhongyun = 23;
+  optional Ch ch = 24;
+  optional Devkit devkit = 25;
+  optional Neolix_edu neolix_edu = 26;
+
   // Reserve fields for other vehicles
   optional apollo.common.VehicleID vehicle_id = 101;
 }
