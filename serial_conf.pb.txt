@@ -1,4 +1,0 @@
-vehicle_type: ROS
-device_name: "/dev/ttyACM0"
-baud_rate: 115200
-timeout_usec: 1000000
