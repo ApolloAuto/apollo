@@ -18,6 +18,7 @@
 #include "modules/serial/vehicle/ros/protocol/twist_cmd.h"
 
 #include "modules/serial/common/util.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace serial {
@@ -26,32 +27,46 @@ using apollo::drivers::canbus::Byte;
 
 void set_x_target_speed(uint8_t* data, double x_target_speed) {
   x_target_speed = BoundedValue(-5.0, 5.0, x_target_speed);
+  //AERROR << "x_target_speed: " << x_target_speed;
   int x = static_cast<int>(x_target_speed * 1000);
   uint8_t t = 0;
 
+  //AERROR << "x: " << x;
+
   t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_low(data + 5);
+  Byte frame_low(data + 4);
   frame_low.set_value(t, 0, 8);
   x >>= 8;
 
+  // AERROR << "t: "  << t;
+
   t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_high(data + 4);
+  Byte frame_high(data + 3);
+
+  // AERROR << "t: " << t;
   frame_high.set_value(t, 0, 8);
 }
 
 void set_y_target_speed(uint8_t* data, double y_target_speed) {
   y_target_speed = BoundedValue(-5.0, 5.0, y_target_speed);
+  //AERROR << "y_target_speed: " << y_target_speed;
   int y = static_cast<int>(y_target_speed * 1000);
   uint8_t t = 0;
 
+  //AERROR << "y: " << y;
+
   t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_low(data + 7);
+  Byte frame_low(data + 6);
   frame_low.set_value(t, 0, 8);
   y >>= 8;
 
+  // AERROR << "t: "  << t;
+
   t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_high(data + 6);
+  Byte frame_high(data + 5);
+  // AERROR << "t: " << t;
   frame_high.set_value(t, 0, 8);
+  
 }
 
 void set_angular_velocity_z(uint8_t* data, double z_angular_velocity) {
@@ -60,12 +75,12 @@ void set_angular_velocity_z(uint8_t* data, double z_angular_velocity) {
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_low(data + 9);
+  Byte frame_low(data + 8);
   frame_low.set_value(t, 0, 8);
   z >>= 8;
 
   t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_high(data + 8);
+  Byte frame_high(data + 7);
   frame_high.set_value(t, 0, 8);
 }
 
