@@ -30,10 +30,9 @@ TARGET_ARCH="$(uname -m)"
 
 VERSION_X86_64="dev-x86_64-18.04-20221124_1708"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
-
-VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
+VERSION_AARCH64="dev-aarch64-20.04-20231024_1054"
+#VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
-
 FAST_MODE="n"
 
 GEOLOC=
@@ -74,7 +73,7 @@ DEFAULT_MAPS=(
     sunnyvale_loop
     sunnyvale_with_two_offices
     san_mateo
-    apollo_virutal_map
+    #apollo_virutal_map
 )
 
 DEFAULT_TEST_MAPS=(

@@ -61,12 +61,17 @@ function determine_gpu_use_host() {
     fi
 
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
-        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
+    #if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
+    if [[ "${USE_GPU_HOST}" == "1" ]]; then
+        if [[ -x "$(which nvidia-container-toolkit)" || -x "$(which nvidia-container-runtime)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
             if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
-                DOCKER_RUN_CMD="docker run --gpus all"
+                if [[ "${HOST_ARCH}" == "aarch64" ]]; then
+                    DOCKER_RUN_CMD="docker run --runtime nvidia"
+                else
+                    DOCKER_RUN_CMD="docker run --gpus all"
+                fi
             else
                 warning "Please upgrade to docker-ce 19.03+ to access GPU from container."
                 USE_GPU_HOST=0
