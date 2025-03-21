@@ -33,13 +33,15 @@ class Int8EntropyCalibrator : public IInt8EntropyCalibrator {
       bool read_cache, std::string network);
 
   virtual ~Int8EntropyCalibrator();
-  int getBatchSize() const override { return stream_.getBatchSize(); }
+  int getBatchSize() const noexcept override { return stream_.getBatchSize(); }
 
-  bool getBatch(void *bindings[], const char *names[], int nbBindings) override;
+  bool getBatch(void *bindings[], 
+    const char *names[], int nbBindings) noexcept override;
 
-  const void *readCalibrationCache(size_t &length) override;
+  const void *readCalibrationCache(size_t &length) noexcept override;
 
-  void writeCalibrationCache(const void *cache, size_t length) override;
+  void writeCalibrationCache(const void *cache,
+     size_t length) noexcept override;
 
  private:
   apollo::perception::inference::BatchStream stream_;

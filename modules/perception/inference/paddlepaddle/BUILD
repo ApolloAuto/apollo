@@ -9,8 +9,10 @@ cc_library(
   hdrs = ["paddle_net.h"],
   deps = [
     "//modules/perception/inference:inference_lib",
-    "@paddleinference//:paddleinference_lib",
-  ],
+  ]+ select({
+        "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
+        "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"],
+    }),
 )
 
 cpplint()

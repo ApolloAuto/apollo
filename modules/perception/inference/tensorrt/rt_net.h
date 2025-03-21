@@ -15,7 +15,14 @@
  *****************************************************************************/
 
 #pragma once
+#include <NvInfer.h>
+#include <NvInferVersion.h>
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR == 8
+#include "modules/perception/inference/tensorrt/rt_legacy.h"
+#endif
+#endif
 #include <map>
 #include <memory>
 #include <string>
@@ -220,6 +227,7 @@ class RTNet : public Inference {
   bool is_own_calibrator_ = true;
   std::string model_root_;
   nvinfer1::IBuilder *builder_ = nullptr;
+  nvinfer1::IBuilderConfig *builder_config_ = nullptr;
   nvinfer1::INetworkDefinition *network_ = nullptr;
   std::vector<std::shared_ptr<float>> weights_mem_;
   BlobMap blobs_;

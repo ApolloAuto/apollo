@@ -22,14 +22,18 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "@paddleinference//:paddleinference_lib",
-        "@caddn_infer_op//:caddn_infer_op",
         "@eigen",
         "@opencv//:imgcodecs",
         "@opencv//:imgproc",
         "@opencv//:highgui",
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]+ select({
+        "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
+        "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"],
+    })+ select({
+        "@platforms//cpu:x86_64": ["@caddn_infer_op-x86_64//:caddn_infer_op"],
+        "@platforms//cpu:aarch64": ["@caddn_infer_op-aarch64//:caddn_infer_op"],
+    }),
 )
 
 cpplint()

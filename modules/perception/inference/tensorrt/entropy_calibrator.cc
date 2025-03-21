@@ -15,9 +15,18 @@
  *****************************************************************************/
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 
+#include <NvInferVersion.h>
+
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR == 8
+#include "modules/perception/inference/tensorrt/rt_legacy.h"
+#endif
+#endif
+
 #include <algorithm>
 #include <fstream>
 
+#include "modules/perception/base/common.h"
 #include <cuda_runtime_api.h>
 
 namespace nvinfer1 {
@@ -38,7 +47,7 @@ Int8EntropyCalibrator::~Int8EntropyCalibrator() {
 }
 
 bool Int8EntropyCalibrator::getBatch(void *bindings[], const char *names[],
-                                     int nbBindings) {
+                                     int nbBindings)noexcept {
   if (!stream_.next()) {
     return false;
   }
@@ -49,7 +58,7 @@ bool Int8EntropyCalibrator::getBatch(void *bindings[], const char *names[],
   return true;
 }
 
-const void *Int8EntropyCalibrator::readCalibrationCache(size_t &length) {
+const void *Int8EntropyCalibrator::readCalibrationCache(size_t &length) noexcept{
   calibration_cache_.clear();
   std::ifstream input(
       apollo::perception::inference::locateFile(network_, "CalibrationTable"),
@@ -65,7 +74,7 @@ const void *Int8EntropyCalibrator::readCalibrationCache(size_t &length) {
 }
 
 void Int8EntropyCalibrator::writeCalibrationCache(const void *cache,
-                                                  size_t length) {
+                                                  size_t length) noexcept{
   std::ofstream output(
       apollo::perception::inference::locateFile(network_, "CalibrationTable"),
       std::ios::binary);

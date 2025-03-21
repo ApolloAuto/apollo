@@ -16,7 +16,14 @@
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
 
+#include <NvInferVersion.h>
 #include <utility>
+
+#ifdef NV_TENSORRT_MAJOR
+    #if NV_TENSORRT_MAJOR == 8
+    #include "modules/perception/inference/tensorrt/rt_legacy.h"
+    #endif
+#endif
 
 #include "absl/strings/str_cat.h"
 

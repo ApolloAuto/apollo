@@ -16,6 +16,14 @@
 
 #pragma once
 
+#include <NvInferVersion.h>
+
+#ifdef NV_TENSORRT_MAJOR
+    #if NV_TENSORRT_MAJOR == 8
+    #include "modules/perception/inference/tensorrt/rt_legacy.h"
+    #endif
+#endif
+
 #include <string>
 #include <vector>
 

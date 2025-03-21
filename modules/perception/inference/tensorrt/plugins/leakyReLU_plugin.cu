@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include <vector>
-
+#include <NvInferVersion.h>
 #include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
 
 namespace apollo {
@@ -34,8 +34,15 @@ __global__ void ReLU(const int nthreads, const Dtype *in_data,
   }
 }
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR != 8
 int ReLUPlugin::enqueue(int batchSize, const void *const *inputs,
                         void **outputs, void *workspace, cudaStream_t stream) {
+#else
+int32_t ReLUPlugin::enqueue(int32_t batchSize, const void *const *inputs, void *const *outputs,
+                      void *workspace, cudaStream_t stream) noexcept {
+#endif
+#endif
   const int thread_size = 512;
   const int block_size =
       (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize +
@@ -50,7 +57,7 @@ int ReLUPlugin::enqueue(int batchSize, const void *const *inputs,
   ReLU<<<block_size, thread_size, 0, stream>>>(
       nthreads, (const float *)(inputs[0]), negative_slope_,
       reinterpret_cast<float *>(outputs[0]));
-  return 1;
+  return 0;
 }
 }  // namespace inference
 }  // namespace perception

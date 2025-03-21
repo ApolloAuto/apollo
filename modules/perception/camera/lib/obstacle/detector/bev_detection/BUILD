@@ -26,8 +26,10 @@ cc_library(
         "@eigen",
         "@opencv//:core",
         "@opencv//:highgui",
-        "@paddleinference//:paddleinference_lib",
-    ],
+    ]+ select({
+        "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
+        "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"],
+    }),
 )
 
 cpplint()

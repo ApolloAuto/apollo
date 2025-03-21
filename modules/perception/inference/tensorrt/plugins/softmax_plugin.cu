@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <NvInferVersion.h>
+ 
 #include <vector>
 
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
@@ -22,9 +24,17 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR != 8
 int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
                            void **outputs, void *workspace,
                            cudaStream_t stream) {
+#else
+int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
+                        void *const *outputs, void *workspace,
+                         cudaStream_t stream) noexcept {
+#endif
+#endif
   const float *in_data = reinterpret_cast<const float *>(inputs[0]);
   float *out_data = reinterpret_cast<float *>(outputs[0]);
   int w = 1;
@@ -44,10 +54,16 @@ int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
   float a = 1.0;
   float b = 0.0;
   cudnnSetStream(cudnn_, stream);
+#if GPU_PLATFORM == NVIDIA
   cudnnSoftmaxForward(cudnn_, CUDNN_SOFTMAX_ACCURATE,
                       CUDNN_SOFTMAX_MODE_CHANNEL, (const void *)(&a),
                       input_desc_, in_data, (const void *)(&b), output_desc_,
                       out_data);
+#elif GPU_PLATFORM == AMD
+  miopenSoftmaxForward_V2(cudnn_, (const void *)(&a), input_desc_, in_data,
+                          (const void *)(&b), output_desc_, out_data,
+                          CUDNN_SOFTMAX_ACCURATE, CUDNN_SOFTMAX_MODE_CHANNEL);
+#endif
 
   return 1;
 }

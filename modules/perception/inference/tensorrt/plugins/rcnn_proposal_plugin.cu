@@ -18,7 +18,7 @@
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/sort.h>
 #include <thrust/transform.h>
-
+#include <NvInferVersion.h>
 #include "modules/perception/inference/tensorrt/plugins/kernels.h"
 #include "modules/perception/inference/tensorrt/plugins/rcnn_proposal_plugin.h"
 
@@ -103,9 +103,16 @@ __global__ void get_max_score_kernel(const int nthreads, const float *bbox_pred,
   }
 }
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR != 8
 int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
                                 void **outputs, void *workspace,
                                 cudaStream_t stream) {
+#else
+int32_t RCNNProposalPlugin::enqueue(int32_t batchSize, const void *const *inputs, void *const *outputs,
+  void *workspace, cudaStream_t stream) noexcept {
+#endif
+#endif
   // cls_score_softmax dims: [num_rois, 4, 1, 1]
   const float *cls_score_softmax = reinterpret_cast<const float *>(inputs[0]);
   // bbox_pred dims: [num_rois, 4 * 4 (num_class * box_dim), 1, 1]
@@ -377,6 +384,8 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
   delete[] host_im_info;
   delete[] host_thresholds;
   delete[] batch_rois_nums;
+
+return 0;
 }
 }  // namespace inference
 }  // namespace perception

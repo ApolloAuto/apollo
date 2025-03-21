@@ -26,6 +26,8 @@
    limitations under the License.
 */
 
+#include <NvInferVersion.h>
+
 #include "modules/perception/inference/tensorrt/plugins/dfmb_psroi_align_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/kernels.h"
 
@@ -140,9 +142,16 @@ __global__ void DFMBPSROIAlignForward(
   }
 }
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR != 8
 int DFMBPSROIAlignPlugin::enqueue(int batchSize, const void *const *inputs,
                                   void **outputs, void *workspace,
                                   cudaStream_t stream) {
+#else
+int32_t DFMBPSROIAlignPlugin::enqueue(int32_t batchSize, const void *const *inputs, void *const *outputs,
+            void *workspace, cudaStream_t stream) noexcept {
+#endif
+#endif
   const float *bottom_data = reinterpret_cast<const float *>(inputs[0]);
   const float *bottom_rois = reinterpret_cast<const float *>(inputs[1]);
   const float *bottom_trans =

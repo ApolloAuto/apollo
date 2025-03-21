@@ -69,12 +69,13 @@ namespace perception {
 namespace lidar {
 
 // Logger for TensorRT info/warning/errors
+#if GPU_PLATFORM == NVIDIA
 class Logger : public nvinfer1::ILogger {
  public:
   explicit Logger(Severity severity = Severity::kWARNING)
       : reportable_severity(severity) {}
 
-  void log(Severity severity, const char* msg) override {
+  void log(Severity severity, const char* msg) noexcept override {
     // suppress messages with severity enum value greater than the reportable
     if (severity > reportable_severity) return;
 
@@ -100,6 +101,13 @@ class Logger : public nvinfer1::ILogger {
 
   Severity reportable_severity;
 };
+#elif GPU_PLATFORM == AMD
+  class Logger {};
+namespace nvinfer1 {
+  class ICudaEngine {};
+  class IExecutionContext {};
+}
+#endif
 
 class PointPillars {
  private:

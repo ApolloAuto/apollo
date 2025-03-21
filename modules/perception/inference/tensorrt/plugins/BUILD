@@ -137,6 +137,7 @@ cc_test(
     deps = [
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
+        "//modules/perception/inference/tensorrt:rt_net",
         "@com_google_googletest//:gtest_main",
     ],
     linkstatic = True,

@@ -79,7 +79,7 @@ cc_library(
 cc_test(
     name = "cnn_segmentation_test",
     size = "large",
-    srcs = ["cnn_segmentation_test.cc"],
+    srcs = ["cnn_segmentation_test.cc","cnn_segmentation.h"],
     deps = [
         ":cnn_segmentation",
         "//modules/perception/common:perception_gflags",

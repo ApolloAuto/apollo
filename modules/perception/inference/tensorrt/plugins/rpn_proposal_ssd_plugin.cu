@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <thrust/sort.h>
+#include <NvInferVersion.h>
 
 #include "modules/perception/inference/tensorrt/plugins/kernels.h"
 #include "modules/perception/inference/tensorrt/plugins/rpn_proposal_ssd_plugin.h"
@@ -105,10 +106,18 @@ __global__ void reshape_scores_kernel(const int nthreads,
   }
 }
 
+#ifdef NV_TENSORRT_MAJOR
+#if NV_TENSORRT_MAJOR != 8
 int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
                                   void **outputs, void *workspace,
                                   cudaStream_t stream) {
-  // dimsNCHW: [N, 2 * num_anchor_per_point, H, W]
+#else
+int32_t RPNProposalSSDPlugin::enqueue(int32_t batchSize, const void *const *inputs,
+                                    void *const *outputs, void *workspace,
+                                    cudaStream_t stream) noexcept {
+#endif
+#endif
+// dimsNCHW: [N, 2 * num_anchor_per_point, H, W]
   const float *rpn_cls_prob_reshape =
       reinterpret_cast<const float *>(inputs[0]);
   // dimsNCHW: [N, num_anchor_per_point * 4, H, W]

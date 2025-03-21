@@ -6,7 +6,8 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "rt_common",
     srcs = ["rt_common.cc"],
-    hdrs = ["rt_common.h"],
+    hdrs = ["rt_common.h",
+            "rt_legacy.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:common",
@@ -94,6 +95,7 @@ cc_library(
     deps = [
         ":batch_stream",
         ":rt_utils",
+        ":rt_common",
         "@com_google_protobuf//:protobuf",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
@@ -121,6 +123,7 @@ cc_library(
     srcs = ["batch_stream.cc"],
     hdrs = ["batch_stream.h"],
     deps = [
+        ":rt_common",
         "//cyber",
         "//modules/perception/proto:rt_cc_proto",
         "@com_google_absl//:absl",
