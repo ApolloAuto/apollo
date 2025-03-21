@@ -17,6 +17,8 @@
 
 #include "modules/serial/vehicle/ros/ros_control.h"
 
+#include <iomanip>
+#include <sstream>
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "cyber/time/time.h"
@@ -27,6 +29,16 @@ namespace serial {
 
 constexpr u_int32_t SERIAL_MAX_LENGTH = 128;
 
+// 十六进制转换辅助函数
+std::string HexToString(const uint8_t* data, size_t length) {
+  std::stringstream ss;
+  ss << std::hex << std::uppercase << std::setfill('0');
+  for (size_t i = 0; i < length; ++i) {
+    ss << std::setw(2) << static_cast<int>(data[i]) << " ";
+  }
+  return ss.str();
+}
+
 ROSControl::ROSControl(const SerialConf& serial_conf)
     : BaseControl(serial_conf),
       state_(ParseState::SEEK_HEADER),
@@ -35,7 +47,7 @@ ROSControl::ROSControl(const SerialConf& serial_conf)
       ring_buffer_(256) {}
 
 bool ROSControl::Send(const ControlCommand& control_command) {
-  uint8_t data[11];
+  uint8_t data[11] = {0};
   size_t length = 11;
   ROSParser::Encode(control_command, data, length);
   serial_stream_->write(data, length);
@@ -67,12 +79,12 @@ bool ROSControl::IsRunning() const { return is_running_.load(); }
 
 void ROSControl::RecvThreadFunc() {
   while (IsRunning()) {
-    // 1. 从串口读取数据并写入环形缓冲区
+    //1、从串口读取数据并写入到环形缓冲区
     uint8_t read_buffer[SERIAL_MAX_LENGTH];
     size_t bytes_read = serial_stream_->read(read_buffer, sizeof(read_buffer));
     if (bytes_read > 0) {
       ring_buffer_.Write(read_buffer, bytes_read);
-      // 2. 解析环形缓冲区中的数据
+      //2、解析环形缓冲区中的数据
       ParseData();
     }
     cyber::USleep(1000);
@@ -82,18 +94,25 @@ void ROSControl::RecvThreadFunc() {
 bool ROSControl::ProcessHeader() {
   uint8_t header;
   if (ring_buffer_.Read(&header, 1) == 1) {
+    // 记录有效帧头
+    if (header == 0x7B || header == 0xFA) {
+      AERROR << "[FRAME HEADER] 0x" << std::hex << static_cast<int>(header);
+    }
+
     if (header == 0x7B) {
       current_frame_type_ = FrameType::DATA1;
       data_payload_length_ = 22;
       state_ = ParseState::READ_DATA;
-      current_frame_data_.push_back(header);  // 保存帧头
+      current_frame_data_.push_back(header);//保存帧头
     } else if (header == 0xFA) {
       current_frame_type_ = FrameType::DATA2;
       data_payload_length_ = 17;
       state_ = ParseState::READ_DATA;
       current_frame_data_.push_back(header);
     } else {
-      // 丢弃非帧头字节，继续寻找
+      // 修改后的简化日志
+      AERROR << "Invalid header: 0x" << std::hex << static_cast<int>(header)
+             << " | Raw byte: " << HexToString(&header, 1);
       return false;
     }
     return true;
@@ -117,6 +136,9 @@ bool ROSControl::ProcessPayLoad() {
 bool ROSControl::ProcessTail() {
   uint8_t tail;
   if (ring_buffer_.Read(&tail, 1) == 1) {
+    // 记录帧尾信息
+    AERROR << "[FRAME TAIL] 0x" << std::hex << static_cast<int>(tail);
+
     bool tail_valid = false;
     if (current_frame_type_ == FrameType::DATA1 && tail == 0x7D) {
       tail_valid = true;
@@ -125,15 +147,17 @@ bool ROSControl::ProcessTail() {
     }
 
     if (tail_valid) {
-      current_frame_data_.push_back(tail);  // 保存帧尾
+      current_frame_data_.push_back(tail);
       state_ = ParseState::PROCESS_FRAME;
       return true;
     } else {
-      // 帧尾错误，可能需要错误处理，例如丢弃当前帧，回到 SEEK_HEADER 状态
+      AERROR << "Tail mismatch! Expected: " 
+             << (current_frame_type_ == FrameType::DATA1 ? "0x7D" : "0xFC")
+             << " Received: 0x" << std::hex << static_cast<int>(tail);
       return false;
     }
   }
-  return true;
+  return false;
 }
 
 bool ROSControl::IsFrameChecksumValid(const std::vector<uint8_t>& frame_data) {
@@ -141,32 +165,48 @@ bool ROSControl::IsFrameChecksumValid(const std::vector<uint8_t>& frame_data) {
   for (size_t i = 0; i < frame_data.size() - 1; ++i) {
     checksum_calculated += frame_data[i];
   }
-  // 校验计算的校验和与帧尾的校验和是否一致
-  return checksum_calculated == frame_data.back();
+  
+  const bool valid = (checksum_calculated == frame_data.back());
+  if (!valid) {
+    AERROR << "Checksum failed! Calculated: 0x" 
+           << std::hex << static_cast<int>(checksum_calculated)
+           << " Received: 0x" << std::hex << static_cast<int>(frame_data.back())
+           << "\nFull frame: " << HexToString(frame_data.data(), frame_data.size());
+  }
+  return valid;
 }
 
+// 修复1：修正函数体大括号匹配
 bool ROSControl::ProcessFrame() {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (!IsFrameChecksumValid(current_frame_data_)) {
-    AERROR << "PROCESS_FRAME: invalid frame data, checksum failed.";
-    return false;
-  } else {
-    size_t length = current_frame_data_.size();
-    switch (current_frame_type_) {
-      case FrameType::DATA1:
-        ROSParser::DecodeTwistFb(current_frame_data_.data(), length, &chassis_);
-        break;
-      case FrameType::DATA2:
-        ROSParser::DecodeMiscFb(current_frame_data_.data(), length, &chassis_);
-        break;
-      default:
-        break;
-    }
+  
+  // 强制记录完整帧信息
+  AERROR << "Processing frame (" 
+         << (IsFrameChecksumValid(current_frame_data_) ? "VALID" : "INVALID")
+         << "):\n" << HexToString(current_frame_data_.data(), current_frame_data_.size());
+
+  bool is_checksum_valid = IsFrameChecksumValid(current_frame_data_);
+  if (!is_checksum_valid) {
+    AERROR << "Frame checksum validation failed!";
   }
 
-  return true;
-}
+  size_t length = current_frame_data_.size();
+  switch (current_frame_type_) {
+    case FrameType::DATA1:
+      ROSParser::DecodeTwistFb(current_frame_data_.data(), length, &chassis_);
+      break;
+    case FrameType::DATA2:
+      ROSParser::DecodeMiscFb(current_frame_data_.data(), length, &chassis_);
+      break;
+    default:
+      AERROR << "Unknown frame type: " << static_cast<int>(current_frame_type_);
+      break;
+  }
 
+  return is_checksum_valid;
+}  // 添加缺失的闭合大括号
+
+// 修复2：正确放置成员函数定义
 void ROSControl::ResetFrameState() {
   state_ = ParseState::SEEK_HEADER;
   current_frame_data_.clear();
@@ -178,17 +218,20 @@ void ROSControl::ParseData() {
   while (ring_buffer_.Count() > 0) {
     switch (state_) {
       case ParseState::SEEK_HEADER: {
-        ProcessHeader();
+        if (!ProcessHeader()) {
+          ResetFrameState();
+        }
         break;
       }
       case ParseState::READ_DATA: {
-        ProcessPayLoad();
+        if (!ProcessPayLoad()) {
+          ResetFrameState();
+        }
         break;
       }
       case ParseState::SEEK_TAIL: {
         if (!ProcessTail()) {
           ResetFrameState();
-          return;
         }
         break;
       }
@@ -198,7 +241,7 @@ void ROSControl::ParseData() {
         break;
       }
       default:
-        state_ = ParseState::SEEK_HEADER;  // 默认状态设置为寻找帧头
+        state_ = ParseState::SEEK_HEADER;
         break;
     }
   }
