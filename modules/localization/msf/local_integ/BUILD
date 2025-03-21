@@ -29,7 +29,7 @@ cc_library(
         "//modules/localization/proto:measure_cc_proto",
         "//modules/common_msgs/localization_msgs:pose_cc_proto",
         "//modules/localization/proto:sins_pva_cc_proto",
-        "//third_party/localization_msf",
+        "@localization_msf",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_github_google_glog//:glog",

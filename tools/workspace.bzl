@@ -35,7 +35,8 @@ load("//third_party/sqlite3:workspace.bzl", sqlite3 = "repo")
 load("//third_party/tinyxml2:workspace.bzl", tinyxml2 = "repo")
 load("//third_party/uuid:workspace.bzl", uuid = "repo")
 load("//third_party/yaml_cpp:workspace.bzl", yaml_cpp = "repo")
-
+load("//third_party/sse2neon:workspace.bzl", sse2neon = "repo")
+load("//third_party/localization_msf:workspace.bzl", localization_msf = "repo")
 # load("//third_party/glew:workspace.bzl", glew = "repo")
 
 load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
@@ -70,6 +71,7 @@ def initialize_third_party():
     libtorch_gpu()
     ncurses5()
     nlohmann_json()
+    localization_msf()
     npp()
     opencv()
     opengl()
@@ -84,6 +86,7 @@ def initialize_third_party():
     tinyxml2()
     uuid()
     yaml_cpp()
+    sse2neon()
 
 # Define all external repositories required by
 def apollo_repositories():
