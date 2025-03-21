@@ -247,7 +247,12 @@ function run_bazel_build() {
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  local job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  if [[ "$(uname -m)" == "aarch64" ]]; then
+    local job_args="--copt=-march=native --host_copt=-march=native --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  else
+    # x64
+    local job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  fi
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 
