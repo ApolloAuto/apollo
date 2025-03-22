@@ -18,6 +18,7 @@
 #include "modules/serial/vehicle/ros/ros_parser.h"
 
 #include "cyber/common/log.h"
+#include "modules/serial/common/util.h"
 #include "modules/serial/vehicle/ros/protocol/misc_fb.h"
 #include "modules/serial/vehicle/ros/protocol/twist_cmd.h"
 #include "modules/serial/vehicle/ros/protocol/twist_fb.h"
@@ -27,10 +28,15 @@ namespace serial {
 
 bool ROSParser::Encode(const ControlCommand& cmd, uint8_t* data,
                        size_t length) {
+  ADEBUG << "Received ControlCommand - Speed: " << cmd.speed()
+         << ", Steering Rate: " << cmd.steering_rate();
+
   set_x_target_speed(data, cmd.speed());
   set_angular_velocity_z(data, cmd.steering_rate());
-
   set_checksum(data);
+
+  ADEBUG << "Encoded data frame: " << HexToString(data, length);
+
   return true;
 }
 

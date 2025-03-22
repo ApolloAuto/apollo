@@ -40,7 +40,7 @@ double ultrasound(const std::uint8_t* bytes, const int32_t length) {
 }
 
 void checksum(const std::uint8_t* bytes, const int32_t length) {
-  //
+  // TODO(zero): implement the checksum function
 }
 
 }  // namespace serial

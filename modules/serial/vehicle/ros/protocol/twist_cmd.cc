@@ -17,6 +17,7 @@
 
 #include "modules/serial/vehicle/ros/protocol/twist_cmd.h"
 
+#include "cyber/common/log.h"
 #include "modules/serial/common/util.h"
 
 namespace apollo {
@@ -26,46 +27,49 @@ using apollo::drivers::canbus::Byte;
 
 void set_x_target_speed(uint8_t* data, double x_target_speed) {
   x_target_speed = BoundedValue(-5.0, 5.0, x_target_speed);
-  int x = static_cast<int>(x_target_speed * 1000);
-  uint8_t t = 0;
+  ADEBUG << "x_target_speed: " << x_target_speed;
 
-  t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_low(data + 5);
+  int x = static_cast<int>(x_target_speed * 1000);
+
+  uint8_t t = static_cast<uint8_t>(x & 0xFF);
+  Byte frame_low(data + 4);
   frame_low.set_value(t, 0, 8);
   x >>= 8;
 
   t = static_cast<uint8_t>(x & 0xFF);
-  Byte frame_high(data + 4);
+  Byte frame_high(data + 3);
+
   frame_high.set_value(t, 0, 8);
 }
 
 void set_y_target_speed(uint8_t* data, double y_target_speed) {
   y_target_speed = BoundedValue(-5.0, 5.0, y_target_speed);
-  int y = static_cast<int>(y_target_speed * 1000);
-  uint8_t t = 0;
+  ADEBUG << "y_target_speed: " << y_target_speed;
 
-  t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_low(data + 7);
+  int y = static_cast<int>(y_target_speed * 1000);
+
+  uint8_t t = static_cast<uint8_t>(y & 0xFF);
+  Byte frame_low(data + 6);
   frame_low.set_value(t, 0, 8);
   y >>= 8;
 
   t = static_cast<uint8_t>(y & 0xFF);
-  Byte frame_high(data + 6);
+  Byte frame_high(data + 5);
+
   frame_high.set_value(t, 0, 8);
 }
 
 void set_angular_velocity_z(uint8_t* data, double z_angular_velocity) {
   z_angular_velocity = BoundedValue(-3.0, 3.0, z_angular_velocity);
   int z = static_cast<int>(z_angular_velocity * 1000);
-  uint8_t t = 0;
 
-  t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_low(data + 9);
+  uint8_t t = static_cast<uint8_t>(z & 0xFF);
+  Byte frame_low(data + 8);
   frame_low.set_value(t, 0, 8);
   z >>= 8;
 
   t = static_cast<uint8_t>(z & 0xFF);
-  Byte frame_high(data + 8);
+  Byte frame_high(data + 7);
   frame_high.set_value(t, 0, 8);
 }
 

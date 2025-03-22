@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include <iomanip>
+#include <sstream>
+#include <string>
+
 namespace apollo {
 namespace serial {
 
@@ -33,6 +37,15 @@ T BoundedValue(T lower, T upper, T val) {
     return upper;
   }
   return val;
+}
+
+std::string HexToString(const uint8_t* data, size_t length) {
+  std::stringstream ss;
+  ss << std::hex << std::uppercase << std::setfill('0');
+  for (size_t i = 0; i < length; ++i) {
+    ss << std::setw(2) << static_cast<int>(data[i]) << " ";
+  }
+  return ss.str();
 }
 
 }  // namespace serial
