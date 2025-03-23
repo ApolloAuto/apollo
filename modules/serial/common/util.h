@@ -15,7 +15,6 @@
 //  Created Date: 2025-01-16
 //  Author: daohu527
 
-
 #pragma once
 
 #include <iomanip>
@@ -39,7 +38,7 @@ T BoundedValue(T lower, T upper, T val) {
   return val;
 }
 
-std::string HexToString(const uint8_t* data, size_t length) {
+inline std::string HexToString(const uint8_t* data, size_t length) {
   std::stringstream ss;
   ss << std::hex << std::uppercase << std::setfill('0');
   for (size_t i = 0; i < length; ++i) {
