@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2025 daohu527 <daohu527@gmail.com>
+# Copyright 2025 WheelOS. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import keyboard
+import curses
 
-from cyber.python.cyber_py3 import cyber
-from cyber.python.cyber_py3 import cyber_time, cyber_timer
+from cyber.python.cyber_py3 import cyber, cyber_time, cyber_timer
 from modules.common_msgs.prediction_msgs import prediction_obstacle_pb2
 
 TOPIC = "/apollo/prediction"
-PERIOD = 100   # ms
+PERIOD = 100  # ms
+
 
 def publish(writer, sequence_num):
     try:
@@ -36,7 +36,7 @@ def publish(writer, sequence_num):
         print(f"[Error] Failed to publish message: {e}")
 
 
-def main():
+def main(stdscr):
     try:
         cyber.init()
         node = cyber.Node("mock_prediction")
@@ -54,14 +54,22 @@ def main():
         ct = cyber_timer.Timer(PERIOD, callback, 0)
         ct.start()
 
-        print("Press 'ESC' or 'Q' to exit...")
+        stdscr.clear()
+        stdscr.addstr(0, 0, "Press 'ESC' or 'q' to exit...")
+        stdscr.refresh()
 
-        keyboard.wait(lambda e: e.name == 'esc' or e.name == 'q')
+        while True:
+            key = stdscr.getch()
+            # 27 is the ASCII for ESC
+            if key == 27 or key == ord('q') or key == ord('Q'):
+                break
 
-        print("Exiting...")
+        stdscr.addstr(2, 0, "Exiting...")
+        stdscr.refresh()
 
     except Exception as e:
-        print(f"[Error] {e}")
+        stdscr.addstr(4, 0, f"[Error] {e}")
+        stdscr.refresh()
 
     finally:
         ct.stop()
@@ -69,4 +77,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    curses.wrapper(main)

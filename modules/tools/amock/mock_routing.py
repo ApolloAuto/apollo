@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2025 daohu527 <daohu527@gmail.com>
+# Copyright 2025 WheelOS. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import keyboard
+import curses
 
-from cyber.python.cyber_py3 import cyber
-from cyber.python.cyber_py3 import cyber_time, cyber_timer
+from cyber.python.cyber_py3 import cyber, cyber_time, cyber_timer
 from modules.common_msgs.routing_msgs import routing_pb2
 
 TOPIC = "/apollo/raw_routing_request"
@@ -47,12 +46,12 @@ def publish(writer, sequence_num):
         print(f"[Error] Failed to publish message: {e}")
 
 
-def main():
+def main(stdscr):
     try:
         cyber.init()
         node = cyber.Node("mock_routing")
         writer = node.create_writer(TOPIC,
-                                    routing_pb2.RoutingRequest)
+                                     routing_pb2.RoutingRequest)
 
         sequence_num = 0
 
@@ -65,11 +64,20 @@ def main():
         ct = cyber_timer.Timer(PERIOD, callback, 0)
         ct.start()
 
-        print("Press 'ESC' or 'Q' to exit...")
+        stdscr.clear()
+        stdscr.addstr("Press 'ESC' or 'q' to exit...\n")
+        stdscr.refresh()
 
-        keyboard.wait(lambda e: e.name == 'esc' or e.name == 'q')
+        while True:
+            key = stdscr.getch()
+            if key == 27 or key == ord('q') or key == ord('Q'):  # 27 is the ASCII for ESC
+                break
+            elif key == curses.KEY_RESIZE:
+                stdscr.clear()
+                stdscr.addstr("Press 'ESC' or 'q' to exit...\n")
+                stdscr.refresh()
 
-        print("Exiting...")
+        print("\nExiting...")
 
     except Exception as e:
         print(f"[Error] {e}")
@@ -80,4 +88,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    curses.wrapper(main)
