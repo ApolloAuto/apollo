@@ -55,7 +55,8 @@ class RTKLocalizationComponent final
  private:
   bool InitConfig();
   bool InitIO();
-  bool GetLocalizationToImuTF();
+  bool GetLocalizationToImuTF(Eigen::Vector3d *localization_imu_translation,
+                              Eigen::Quaterniond *localization_imu_quat);
   void CompensateImuLocalizationExtrinsic(LocalizationEstimate *localization);
 
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
@@ -83,10 +84,6 @@ class RTKLocalizationComponent final
   std::string broadcast_tf_child_frame_id_ = "";
   std::string imu_frame_id_ = "";
   std::unique_ptr<apollo::transform::TransformBroadcaster> tf2_broadcaster_;
-
-  // transform from localization to imu
-  std::unique_ptr<Eigen::Quaterniond> imu_localization_quat_;
-  std::unique_ptr<Eigen::Vector3d> imu_localization_translation_;
 
   std::unique_ptr<RTKLocalization> localization_;
 };

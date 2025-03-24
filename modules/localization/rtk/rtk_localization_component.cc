@@ -43,12 +43,6 @@ bool RTKLocalizationComponent::Init() {
     return false;
   }
 
-  // get imu to localizaiton transform
-  if (!GetLocalizationToImuTF()) {
-    AERROR << "Get IMU to Localization tranform failed.";
-    return false;
-  }
-
   return true;
 }
 
@@ -95,41 +89,50 @@ bool RTKLocalizationComponent::InitIO() {
   return true;
 }
 
-bool RTKLocalizationComponent::GetLocalizationToImuTF() {
+bool RTKLocalizationComponent::GetLocalizationToImuTF(
+    Eigen::Vector3d* localization_imu_translation,
+    Eigen::Quaterniond* localization_imu_quat) {
+  CHECK_NOTNULL(localization_imu_translation);
+  CHECK_NOTNULL(localization_imu_quat);
+
   transform::Buffer* tf2_buffer = transform::Buffer::Instance();
   transform::TransformStamped tf;
-  cyber::Duration duration(1.0);
-  for (uint8_t i = 0; i < 10; ++i) {
-    try {
-      tf = tf2_buffer->lookupTransform(
-          imu_frame_id_, broadcast_tf_child_frame_id_, cyber::Time(0));
-    } catch (std::exception& ex) {
-      AERROR << ex.what();
-      duration.Sleep();
-      continue;
-    }
-    AINFO << "read localization to imu transform: " << tf.DebugString();
-    auto& rotation = tf.transform().rotation();
-    imu_localization_quat_.reset(new Eigen::Quaterniond(
-        rotation.qw(), rotation.qx(), rotation.qy(), rotation.qz()));
-    auto& translation = tf.transform().translation();
-    imu_localization_translation_.reset(
-        new Eigen::Vector3d(translation.x(), translation.y(), translation.z()));
-    return true;
+
+  try {
+    // Get broadcast_tf_child_frame_id_ to imu_frame_id_ transform
+    tf = tf2_buffer->lookupTransform(
+        imu_frame_id_, broadcast_tf_child_frame_id_, cyber::Time(0));
+  } catch (std::exception& ex) {
+    AERROR << ex.what();
+    return false;
   }
-  return false;
+  ADEBUG << "read localization to imu transform: " << tf.DebugString();
+
+  auto& rotation = tf.transform().rotation();
+  *localization_imu_quat = Eigen::Quaterniond(rotation.qw(), rotation.qx(),
+                                              rotation.qy(), rotation.qz());
+
+  auto& translation = tf.transform().translation();
+  *localization_imu_translation =
+      Eigen::Vector3d(translation.x(), translation.y(), translation.z());
+
+  return true;
 }
 
 void RTKLocalizationComponent::CompensateImuLocalizationExtrinsic(
     LocalizationEstimate* localization) {
   CHECK_NOTNULL(localization);
+
+  Eigen::Vector3d localization_imu_translation = Eigen::Vector3d::Zero();
+  Eigen::Quaterniond localization_imu_quat = Eigen::Quaterniond::Identity();
+  GetLocalizationToImuTF(&localization_imu_translation, &localization_imu_quat);
+
   // calculate orientation_vehicle_world
   apollo::localization::Pose* posepb_loc = localization->mutable_pose();
   const apollo::common::Quaternion& orientation = posepb_loc->orientation();
   const Eigen::Quaterniond quaternion(orientation.qw(), orientation.qx(),
                                       orientation.qy(), orientation.qz());
-  Eigen::Quaterniond quat_vehicle_world =
-      quaternion * (*imu_localization_quat_);
+  Eigen::Quaterniond quat_vehicle_world = quaternion * localization_imu_quat;
 
   // set heading according to rotation of vehicle
   posepb_loc->set_heading(common::math::QuaternionToHeading(
@@ -148,7 +151,7 @@ void RTKLocalizationComponent::CompensateImuLocalizationExtrinsic(
   // Compensate the translation between imu and vehicle center.
   apollo::common::PointENU* position = posepb_loc->mutable_position();
   Eigen::Vector3d compensated_position =
-      quat_vehicle_world.toRotationMatrix() * (*imu_localization_translation_);
+      quat_vehicle_world.toRotationMatrix() * localization_imu_translation;
   position->set_x(position->x() + compensated_position[0]);
   position->set_y(position->y() + compensated_position[1]);
   position->set_z(position->z() + compensated_position[2]);
