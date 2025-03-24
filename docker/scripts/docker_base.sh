@@ -61,8 +61,7 @@ function determine_gpu_use_host() {
     fi
 
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    #if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
-    if [[ "${USE_GPU_HOST}" == "1" ]]; then
+    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
         if [[ -x "$(which nvidia-container-toolkit)" || -x "$(which nvidia-container-runtime)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
