@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>third_party_perception</name>
-        <dag_conf>/apollo/modules/third_party_perception/dag/third_party_perception.dag</dag_conf>
-        <process_name>third_party_perception</process_name>
-    </module>
-</cyber>
