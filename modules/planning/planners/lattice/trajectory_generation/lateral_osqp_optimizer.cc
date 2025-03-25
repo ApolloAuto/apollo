@@ -22,17 +22,20 @@
 
 namespace apollo {
 namespace planning {
-
+// d_state: 初始 d，d_bounds：这个 reference 上的 d_bounds ，大概有 70 个点
 bool LateralOSQPOptimizer::optimize(
     const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
+  // 按照列来存储非零元素的值
   std::vector<c_float> P_data;
+  // 存储非零元素的行索引
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
   CalculateKernel(d_bounds, &P_data, &P_indices, &P_indptr);
   delta_s_ = delta_s;
   const int num_var = static_cast<int>(d_bounds.size());
   const int kNumParam = 3 * static_cast<int>(d_bounds.size());
+  // 得到约束中 6n 的维度
   const int kNumConstraint = kNumParam + 3 * (num_var - 1) + 3;
   c_float lower_bounds[kNumConstraint];
   c_float upper_bounds[kNumConstraint];
@@ -41,15 +44,15 @@ bool LateralOSQPOptimizer::optimize(
   const int pprime_offset = 2 * num_var;
 
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
-  columns.resize(kNumParam);
-
+  columns.resize(kNumParam);  // 3n
+  // colum 的系数，constraint_index 的系数控制是第几个约束
   int constraint_index = 0;
 
-  // d_i+1'' - d_i''
+  // d_i+1'' - d_i'' 第 4 条约束
   for (int i = 0; i + 1 < num_var; ++i) {
     columns[pprime_offset + i].emplace_back(constraint_index, -1.0);
     columns[pprime_offset + i + 1].emplace_back(constraint_index, 1.0);
-
+    // l 和 u 的不等式约束
     lower_bounds[constraint_index] =
         -FLAGS_lateral_third_order_derivative_max * delta_s_;
     upper_bounds[constraint_index] =
@@ -57,23 +60,24 @@ bool LateralOSQPOptimizer::optimize(
     ++constraint_index;
   }
 
-  // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')
+  // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')--->第 5 条约束
   for (int i = 0; i + 1 < num_var; ++i) {
     columns[prime_offset + i].emplace_back(constraint_index, -1.0);
     columns[prime_offset + i + 1].emplace_back(constraint_index, 1.0);
     columns[pprime_offset + i].emplace_back(constraint_index, -0.5 * delta_s_);
     columns[pprime_offset + i + 1].emplace_back(constraint_index,
                                                 -0.5 * delta_s_);
-
+    // 没有对应的 lu 约束
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
     ++constraint_index;
   }
 
-  // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
+  // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2 ---> 第
+  // 6 条约束
   for (int i = 0; i + 1 < num_var; ++i) {
-    columns[i].emplace_back(constraint_index, -1.0);
-    columns[i + 1].emplace_back(constraint_index, 1.0);
+    columns[i].emplace_back(constraint_index, -1.0);     // l
+    columns[i + 1].emplace_back(constraint_index, 1.0);  // l'
     columns[prime_offset + i].emplace_back(constraint_index, -delta_s_);
     columns[pprime_offset + i].emplace_back(constraint_index,
                                             -delta_s_ * delta_s_ / 3.0);
@@ -84,22 +88,23 @@ bool LateralOSQPOptimizer::optimize(
     upper_bounds[constraint_index] = 0.0;
     ++constraint_index;
   }
-
+  // 第 7 条约束
   columns[0].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[0];
   upper_bounds[constraint_index] = d_state[0];
   ++constraint_index;
-
+  // 第 7 条约束
   columns[prime_offset].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[1];
   upper_bounds[constraint_index] = d_state[1];
   ++constraint_index;
-
+  // 第 7 条约束
   columns[pprime_offset].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[2];
   upper_bounds[constraint_index] = d_state[2];
   ++constraint_index;
 
+  // 第 123 条约束
   const double LARGE_VALUE = 2.0;
   for (int i = 0; i < kNumParam; ++i) {
     columns[i].emplace_back(constraint_index, 1.0);
@@ -116,6 +121,7 @@ bool LateralOSQPOptimizer::optimize(
   CHECK_EQ(constraint_index, kNumConstraint);
 
   // change affine_constraint to CSC format
+  // 转换为系数矩阵
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
@@ -131,9 +137,12 @@ bool LateralOSQPOptimizer::optimize(
   A_indptr.push_back(ind_p);
 
   // offset
+  // q 矩阵
   double q[kNumParam];
   for (int i = 0; i < kNumParam; ++i) {
     if (i < num_var) {
+      // q[i] = -optimizer_config_.get_weight_lateral_bias() * target_bias_; 将
+      // target_offset 看作是 reference_line
       q[i] = -2.0 * FLAGS_weight_lateral_obstacle_distance *
              (d_bounds[i].first + d_bounds[i].second);
     } else {
@@ -141,7 +150,7 @@ bool LateralOSQPOptimizer::optimize(
     }
   }
 
-  // Problem settings
+  // Problem settings 初始化求解器
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
 
@@ -155,6 +164,7 @@ bool LateralOSQPOptimizer::optimize(
   settings->verbose = FLAGS_enable_osqp_debug;
 
   // Populate data
+  // OSQP 初始化
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = kNumParam;
   data->m = kNumConstraint;
@@ -175,6 +185,7 @@ bool LateralOSQPOptimizer::optimize(
   osqp_solve(work);
 
   // extract primal results
+  // 得到优化后的 l,l',l''
   for (int i = 0; i < num_var; ++i) {
     opt_d_.push_back(work->solution->x[i]);
     opt_d_prime_.push_back(work->solution->x[i + num_var]);
@@ -197,11 +208,12 @@ void LateralOSQPOptimizer::CalculateKernel(
     const std::vector<std::pair<double, double>>& d_bounds,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
-  const int kNumParam = 3 * static_cast<int>(d_bounds.size());
-  P_data->resize(kNumParam);
-  P_indices->resize(kNumParam);
+  // [l0,l1,...,ln-1,l'0,l'1,...,l'n-1,l''0,...,l''n-1]
+  const int kNumParam = 3 * static_cast<int>(d_bounds.size());  // 3n 的维度
+  P_data->resize(kNumParam);                                    // 3n
+  P_indices->resize(kNumParam);                                 // 3n
   P_indptr->resize(kNumParam + 1);
-
+  // 构建 P 矩阵
   for (int i = 0; i < kNumParam; ++i) {
     if (i < static_cast<int>(d_bounds.size())) {
       P_data->at(i) = 2.0 * FLAGS_weight_lateral_offset +
