@@ -185,6 +185,9 @@ bool ROSControl::ProcessFrame() {
       break;
   }
 
+  // Default setting is COMPLETE_AUTO_DRIVE mode
+  chassis_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+
   return is_checksum_valid;
 }
 

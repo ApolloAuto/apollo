@@ -26,7 +26,7 @@ namespace serial {
 using apollo::drivers::canbus::Byte;
 
 void set_x_target_speed(uint8_t* data, double x_target_speed) {
-  x_target_speed = BoundedValue(-5.0, 5.0, x_target_speed);
+  x_target_speed = BoundedValue(-1.0, 1.0, x_target_speed);
   ADEBUG << "x_target_speed: " << x_target_speed;
 
   int x = static_cast<int>(x_target_speed * 1000);
