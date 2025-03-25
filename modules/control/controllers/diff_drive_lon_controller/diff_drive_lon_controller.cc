@@ -79,6 +79,9 @@ common::Status DiffDriveLonController::Init(
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_INIT_ERROR, "failed to load control conf");
   }
+
+  injector_ = injector;
+
   return Status::OK();
 }
 
