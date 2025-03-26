@@ -133,5 +133,8 @@ class DiffDriveLatController : public ControlTask {
   double pre_ang_vel_ = 0.0;
 };
 
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::control::DiffDriveLatController,
+                                     ControlTask)
+
 }  // namespace control
 }  // namespace apollo

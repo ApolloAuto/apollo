@@ -79,5 +79,8 @@ class DiffDriveLonController : public ControlTask {
   LeadlagController station_leadlag_controller_;
 };
 
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::control::DiffDriveLonController,
+                                     ControlTask)
+
 }  // namespace control
 }  // namespace apollo
