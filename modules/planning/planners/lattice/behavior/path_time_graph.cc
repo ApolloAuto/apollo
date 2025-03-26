@@ -107,7 +107,7 @@ void PathTimeGraph::SetupObstacles(
     path_time_obstacles_.push_back(path_time_obstacle.second);
   }
 }
-
+// 得到 obstacle 的 boundry
 void PathTimeGraph::SetStaticObstacle(
     const Obstacle* obstacle,
     const std::vector<PathPoint>& discretized_ref_points) {
@@ -363,32 +363,42 @@ void PathTimeGraph::UpdateLateralBoundsByObstacle(
   if (sl_boundary.start_s() > s_end || sl_boundary.end_s() < s_start) {
     return;
   }
-  auto start_iter = std::lower_bound(
-      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
-  auto end_iter = std::upper_bound(
-      discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
+  // 查找障碍物 start_s 所在的 iter
+  auto start_iter =
+      std::lower_bound(discretized_path.begin(), discretized_path.end(),
+                       sl_boundary.start_s());  // 大于等于
+  auto end_iter =
+      std::upper_bound(discretized_path.begin(), discretized_path.end(),
+                       sl_boundary.start_s());  // 大于
+  // 得到 index
   size_t start_index = start_iter - discretized_path.begin();
   size_t end_index = end_iter - discretized_path.begin();
+  // 目标物是压着车道线走的
   if (sl_boundary.end_l() > -FLAGS_numerical_epsilon &&
       sl_boundary.start_l() < FLAGS_numerical_epsilon) {
+    // 重新赋值为压着车道线走
     for (size_t i = start_index; i < end_index; ++i) {
       bounds->operator[](i).first = -FLAGS_numerical_epsilon;
       bounds->operator[](i).second = FLAGS_numerical_epsilon;
     }
     return;
   }
+  // 障碍物完全在中心线右边
   if (sl_boundary.end_l() < FLAGS_numerical_epsilon) {
     for (size_t i = start_index; i < std::min(end_index + 1, bounds->size());
          ++i) {
+      // 将右边界往左移动。更新右边界：障碍物左侧
       bounds->operator[](i).first =
           std::max(bounds->operator[](i).first,
                    sl_boundary.end_l() + FLAGS_nudge_buffer);
     }
     return;
   }
+  // 目标物完全在左边
   if (sl_boundary.start_l() > -FLAGS_numerical_epsilon) {
     for (size_t i = start_index; i < std::min(end_index + 1, bounds->size());
          ++i) {
+      // 更新左边界： 障碍物的右侧
       bounds->operator[](i).second =
           std::min(bounds->operator[](i).second,
                    sl_boundary.start_l() - FLAGS_nudge_buffer);
