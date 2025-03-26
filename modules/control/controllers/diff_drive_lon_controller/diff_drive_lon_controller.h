@@ -75,7 +75,6 @@ class DiffDriveLonController : public ControlTask {
   FILE *speed_log_file_ = nullptr;
   LonBasedPidControllerConf lon_based_pidcontroller_conf_;
   double previous_acceleration_ = 0.0;
-  double reference_spd_ = 0.0;
   double previous_acceleration_reference_ = 0.0;
   LeadlagController station_leadlag_controller_;
 };

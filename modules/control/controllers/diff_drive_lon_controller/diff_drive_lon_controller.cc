@@ -82,6 +82,16 @@ common::Status DiffDriveLonController::Init(
 
   injector_ = injector;
 
+  station_pid_controller_.Init(lon_based_pidcontroller_conf_.station_pid_conf());
+
+  double ts = lon_based_pidcontroller_conf_.ts();
+  bool enable_leadlag =
+      lon_based_pidcontroller_conf_.enable_reverse_leadlag_compensation();
+  if (enable_leadlag) {
+    station_leadlag_controller_.Init(
+        lon_based_pidcontroller_conf_.reverse_station_leadlag_conf(), ts);
+  }
+
   return Status::OK();
 }
 
@@ -140,7 +150,7 @@ common::Status DiffDriveLonController::ComputeControlCommand(
   // Check EPB
   EPB();
 
-  double reference_spd_cmd = reference_spd_ + speed_offset;
+  double reference_spd_cmd = debug->speed_reference() + speed_offset;
 
   double speed_controller_input_limit =
       lon_based_pidcontroller_conf_.speed_controller_input_limit();
