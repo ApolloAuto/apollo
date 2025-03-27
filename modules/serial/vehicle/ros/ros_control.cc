@@ -111,8 +111,8 @@ bool ROSControl::ProcessHeader() {
       current_frame_data_.push_back(header);
     } else {
       // 修改后的简化日志
-      AERROR << "Invalid header: 0x" << std::hex << static_cast<int>(header)
-             << " | Raw byte: " << HexToString(&header, 1);
+      //AERROR << "Invalid header: 0x" << std::hex << static_cast<int>(header)
+             //<< " | Raw byte: " << HexToString(&header, 1);
       return false;
     }
     return true;
@@ -161,22 +161,26 @@ bool ROSControl::ProcessTail() {
 }
 
 bool ROSControl::IsFrameChecksumValid(const std::vector<uint8_t>& frame_data) {
-  uint8_t checksum_calculated = 0;
-  for (size_t i = 0; i < frame_data.size() - 1; ++i) {
-    checksum_calculated += frame_data[i];
+  if (frame_data.size() < 2) {
+    AERROR << "Invalid frame: too short!";
+    return false;
   }
-  
-  const bool valid = (checksum_calculated == frame_data.back());
+
+  uint8_t checksum_calculated = 0;
+  // 计算到倒数第三位
+  for (size_t i = 0; i < frame_data.size() - 2; ++i) {
+    checksum_calculated ^= frame_data[i];
+  }
+
+  const bool valid = (checksum_calculated == frame_data[frame_data.size() - 2]);
   if (!valid) {
     AERROR << "Checksum failed! Calculated: 0x" 
            << std::hex << static_cast<int>(checksum_calculated)
-           << " Received: 0x" << std::hex << static_cast<int>(frame_data.back())
-           << "\nFull frame: " << HexToString(frame_data.data(), frame_data.size());
+           << " Received: 0x" << std::hex << static_cast<int>(frame_data[frame_data.size() - 2]);
   }
   return valid;
 }
 
-// 修复1：修正函数体大括号匹配
 bool ROSControl::ProcessFrame() {
   std::lock_guard<std::mutex> lock(mutex_);
   
@@ -199,14 +203,14 @@ bool ROSControl::ProcessFrame() {
       ROSParser::DecodeMiscFb(current_frame_data_.data(), length, &chassis_);
       break;
     default:
-      AERROR << "Unknown frame type: " << static_cast<int>(current_frame_type_);
+      //AERROR << "Unknown frame type: " << static_cast<int>(current_frame_type_);
       break;
   }
 
   return is_checksum_valid;
-}  // 添加缺失的闭合大括号
+}  
 
-// 修复2：正确放置成员函数定义
+
 void ROSControl::ResetFrameState() {
   state_ = ParseState::SEEK_HEADER;
   current_frame_data_.clear();
