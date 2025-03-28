@@ -171,7 +171,7 @@ class ReLUPlugin : public nvinfer1::IPluginV2Ext {
   }
 
   bool canBroadcastInputAcrossBatch(int32_t inputIndex)
-      const  override {
+      const noexcept override {
     return false;
   }
 

@@ -14,80 +14,50 @@
  * limitations under the License.
  *****************************************************************************/
 
- #pragma once
+#pragma once
 
- #include <NvInferLegacyDims.h>
- 
- namespace nvinfer1 {
- class DimsNCHW : public Dims4 {
-  public:
-     DimsNCHW() : Dims4() {}
-     DimsNCHW(
-       int32_t batch_size, int32_t channels,
-       int32_t height, int32_t width)
-         : Dims4(batch_size, channels, height, width) {}
- 
-     int32_t& n() {
-       return d[0];
-     }
- 
-     int32_t n() const {
-       return d[0];
-     }
- 
-     int32_t& c() {
-       return d[1];
-     }
- 
-     int32_t c() const {
-       return d[1];
-     }
- 
-     int32_t& h() {
-       return d[2];
-     }
- 
-     int32_t h() const {
-       return d[2];
-     }
- 
-     int32_t& w() {
-       return d[3];
-     }
- 
-     int32_t w() const {
-       return d[3];
-     }
- };
- 
- class DimsCHW : public Dims3 {
-  public:
-     DimsCHW() : Dims3() {}
-     DimsCHW(int32_t channels, int32_t height, int32_t width)
-       : Dims3(channels, height, width) {}
- 
-     int32_t& c() {
-       return d[0];
-     }
- 
-     int32_t c() const {
-       return d[0];
-     }
- 
-     int32_t& h() {
-       return d[1];
-     }
- 
-     int32_t h() const {
-       return d[1];
-     }
- 
-     int32_t& w() {
-       return d[2];
-     }
- 
-     int32_t w() const {
-       return d[2];
-     }
- };
- }  // namespace nvinfer1
+#include <NvInferLegacyDims.h>
+
+namespace nvinfer1 {
+class DimsNCHW : public Dims4 {
+ public:
+  DimsNCHW() : Dims4() {}
+  DimsNCHW(int32_t batch_size, int32_t channels, int32_t height, int32_t width)
+      : Dims4(batch_size, channels, height, width) {}
+
+  int32_t& n() { return d[0]; }
+
+  int32_t n() const { return d[0]; }
+
+  int32_t& c() { return d[1]; }
+
+  int32_t c() const { return d[1]; }
+
+  int32_t& h() { return d[2]; }
+
+  int32_t h() const { return d[2]; }
+
+  int32_t& w() { return d[3]; }
+
+  int32_t w() const { return d[3]; }
+};
+
+class DimsCHW : public Dims3 {
+ public:
+  DimsCHW() : Dims3() {}
+  DimsCHW(int32_t channels, int32_t height, int32_t width)
+      : Dims3(channels, height, width) {}
+
+  int32_t& c() { return d[0]; }
+
+  int32_t c() const { return d[0]; }
+
+  int32_t& h() { return d[1]; }
+
+  int32_t h() const { return d[1]; }
+
+  int32_t& w() { return d[2]; }
+
+  int32_t w() const { return d[2]; }
+};
+}  // namespace nvinfer1

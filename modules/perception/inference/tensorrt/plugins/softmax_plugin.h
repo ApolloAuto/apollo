@@ -16,7 +16,7 @@
 
 #pragma once
 
-
+#include <string>
 #include <NvInferVersion.h>
 
 #include "modules/perception/inference/tensorrt/rt_common.h"
