@@ -145,18 +145,21 @@ bool ROSControl::ProcessTail() {
 }
 
 bool ROSControl::IsFrameChecksumValid(const std::vector<uint8_t>& frame_data) {
-  uint8_t checksum_calculated = 0;
-  for (size_t i = 0; i < frame_data.size() - 1; ++i) {
-    checksum_calculated += frame_data[i];
+  if (frame_data.size() < 2) {
+    AERROR << "Invalid frame: too short!";
+    return false;
   }
 
-  const bool valid = (checksum_calculated == frame_data.back());
+  uint8_t checksum_calculated = 0;
+  for (size_t i = 0; i < frame_data.size() - 2; ++i) {
+    checksum_calculated ^= frame_data[i];
+  }
+
+  const bool valid = (checksum_calculated == frame_data[frame_data.size() - 2]);
   if (!valid) {
-    AERROR << "Checksum failed! Calculated: 0x" << std::hex
-           << static_cast<int>(checksum_calculated) << " Received: 0x"
-           << std::hex << static_cast<int>(frame_data.back())
-           << "\nFull frame: "
-           << HexToString(frame_data.data(), frame_data.size());
+    AERROR << "Checksum failed! Calculated: 0x" 
+           << std::hex << static_cast<int>(checksum_calculated)
+           << " Received: 0x" << std::hex << static_cast<int>(frame_data[frame_data.size() - 2]);
   }
   return valid;
 }
