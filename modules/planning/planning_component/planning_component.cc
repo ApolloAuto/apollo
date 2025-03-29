@@ -32,6 +32,17 @@
 namespace apollo {
 namespace planning {
 
+//planning 支持两种规划模式：OnLanePlanning: 基于高精地图的轨迹规划，也是默认的规划模式；
+// NaviPlanning: 相对地图导航规划，主要用于交通规则较简单的高速公路
+
+// 每种规划模式可以通过 PlannerDispatcher 选择使用的 Planner ，目前 planning 模块中共有 4 种 Planner
+/*
+apollo::planning::PublicRoadPlanner: 于高精地图的规划器；
+apollo::planning::NaviPlanner: 于实时相对地图的规划器；
+apollo::planning::LatticePlanner: 于网格算法的规划器
+apollo::planning::RTKReplayPlanner: 于录制轨迹的规划器
+*/
+
 using apollo::cyber::ComponentBase;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
@@ -46,6 +57,7 @@ bool PlanningComponent::Init() {
 // 创建 DependencyInjector 对象，用于依赖注入
   injector_ = std::make_shared<DependencyInjector>();
 // 规划模式的选择: apollo/modules/common/configs/config_gflags.cc
+// 创建PlanningBase对象（默认OnLanePlanning），它是轨迹规划的主体
   if (FLAGS_use_navigation_mode) {   // 默认是false
     planning_base_ = std::make_unique<NaviPlanning>(injector_); // 相对地图规划器
   } else {
@@ -70,6 +82,7 @@ bool PlanningComponent::Init() {
   planning_base_->Init(config_); // 参考线优化主要在这部分
 // 订阅ROS2话题
 // 订阅 PlanningCommand 话题，收到消息后存入 planning_command_
+// 输入导航命令订阅
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -87,6 +100,7 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 // 订阅 PadMessage（手动输入指令）
+// planning操作命令（start，stop）消息订阅
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
       config_.topic_config().planning_pad_topic(),
       [this](const std::shared_ptr<PadMessage>& pad_msg) {
@@ -94,7 +108,7 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         pad_msg_.CopyFrom(*pad_msg);
       });
-
+// storytelling消息订阅
   story_telling_reader_ = node_->CreateReader<Stories>(
       config_.topic_config().story_telling_topic(),
       [this](const std::shared_ptr<Stories>& stories) {
@@ -103,6 +117,7 @@ bool PlanningComponent::Init() {
         stories_.CopyFrom(*stories);
       });
 // 如果启用了导航模式，则订阅 relative_map（相对地图）
+// 实时相对地图消息订阅（用于NaviPlanning）
   if (FLAGS_use_navigation_mode) {
     relative_map_reader_ = node_->CreateReader<MapMsg>(
         config_.topic_config().relative_map_topic(),
@@ -114,16 +129,18 @@ bool PlanningComponent::Init() {
   }
   // 创建消息的发布者（Writer）
 // planning发布话题部分: 话题也是写在配置中
-// 发布规划路径给control模块
+// 发布规划路径给control模块  
+// planning输出轨迹消息发布
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
-
+// planning阻塞时需要重新路由的请求
   rerouting_client_ =
       node_->CreateClient<apollo::external_command::LaneFollowCommand,
                           external_command::CommandStatus>(
           config_.topic_config().routing_request_topic());
   planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
       config_.topic_config().planning_learning_data_topic());
+// planning实时任务状态消息发布
   command_status_writer_ = node_->CreateWriter<external_command::CommandStatus>(
       FLAGS_planning_command_status);
   return true;
