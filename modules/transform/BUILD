@@ -111,7 +111,6 @@ install(
     library_dest = "transform/lib",
     data = [
         ":runtime_data",
-        "cyberfile.xml",
         "transform.BUILD",
     ],
     targets = [

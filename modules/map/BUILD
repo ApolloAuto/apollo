@@ -21,7 +21,6 @@ install(
     name = "install",
     data_dest = "map",
     data = [
-        ":cyberfile.xml",
         ":map.BUILD",
     ],
     deps = [

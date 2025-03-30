@@ -65,7 +65,6 @@ install(
     data_dest = "control",
     data = [
         ":runtime_data",
-        ":cyberfile.xml",
         "control.BUILD",
     ],
     targets = [
@@ -97,7 +96,7 @@ install(
         "//modules/control/proto:mpc_controller_conf_cc_proto",
         "//modules/control/proto:mrac_conf_cc_proto",
         "//modules/control/proto:pid_conf_cc_proto",
-        "//modules/control/proto:preprocessor_cc_proto",       
+        "//modules/control/proto:preprocessor_cc_proto",
     ],
 )
 

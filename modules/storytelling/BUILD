@@ -39,7 +39,6 @@ install(
     data_dest = "storytelling",
     data = [
         ":runtime_data",
-        ":cyberfile.xml",
         ":storytelling.BUILD",
     ],
     targets = [

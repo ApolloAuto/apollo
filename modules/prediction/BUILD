@@ -65,7 +65,6 @@ install(
     data_dest = "prediction",
     data = [
         ":runtime_data",
-        ":cyberfile.xml",
         ":prediction.BUILD",
     ],
     targets = [
@@ -77,7 +76,7 @@ install(
         "//modules/prediction/common:install",
         "//modules/prediction/submodules:install",
         ":prediction_testdata_install",
-        "//modules/prediction/proto:py_pb_prediction", 
+        "//modules/prediction/proto:py_pb_prediction",
     ],
 )
 

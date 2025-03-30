@@ -19,7 +19,6 @@ install(
         ":cyber_conf",
         #"//cyber/python/cyber_py3:runtime_files",
         "//cyber/proto:runtime_files",
-        ":cyberfile.xml",
         "cyber.BUILD"
     ],
     data_dest = "cyber",

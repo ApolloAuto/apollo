@@ -184,14 +184,10 @@ install(
     ),
     data = [
         ":runtime_data",
-        
+
     ] + if_gpu(
-        ["planning-gpu.BUILD", "cyberfile_gpu.xml",],
-        ["planning.BUILD", "cyberfile_cpu.xml",]
-    ),
-    rename= if_gpu(
-        {"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"}, 
-        {"planning/cyberfile_cpu.xml": "cyberfile.xml"}
+        ["planning-gpu.BUILD"],
+        ["planning.BUILD"]
     ),
     targets = [
         ":libplanning_component.so",
