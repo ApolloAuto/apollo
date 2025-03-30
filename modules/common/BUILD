@@ -9,7 +9,6 @@ install(
     library_dest = "common/lib",
     data_dest = "common",
     data = [
-        ":cyberfile.xml",
         "common.BUILD"
     ],
     deps = [
