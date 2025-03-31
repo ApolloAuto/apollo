@@ -57,7 +57,7 @@ PathTimeGraph::PathTimeGraph(
 
   SetupObstacles(obstacles, discretized_ref_points);
 }
-
+// 将目标物映射到 Frenet 坐标系
 SLBoundary PathTimeGraph::ComputeObstacleBoundary(
     const std::vector<common::math::Vec2d>& vertices,
     const std::vector<PathPoint>& discretized_ref_points) const {
@@ -97,7 +97,7 @@ void PathTimeGraph::SetupObstacles(
       SetDynamicObstacle(obstacle, discretized_ref_points);
     }
   }
-
+  // 由近及远进行排序
   std::sort(static_obs_sl_boundaries_.begin(), static_obs_sl_boundaries_.end(),
             [](const SLBoundary& sl0, const SLBoundary& sl1) {
               return sl0.start_s() < sl1.start_s();
@@ -121,6 +121,7 @@ void PathTimeGraph::SetStaticObstacle(
   double right_width = FLAGS_default_reference_line_width * 0.5;
   ptr_reference_line_info_->reference_line().GetLaneWidth(
       sl_boundary.start_s(), &left_width, &right_width);
+  // s 方向超出参考线
   if (sl_boundary.start_s() > path_range_.second ||
       sl_boundary.end_s() < path_range_.first ||
       sl_boundary.start_l() > left_width ||
@@ -128,7 +129,7 @@ void PathTimeGraph::SetStaticObstacle(
     ADEBUG << "Obstacle [" << obstacle_id << "] is out of range.";
     return;
   }
-
+  // 得到 st 图初始化
   path_time_obstacle_map_[obstacle_id].set_id(obstacle_id);
   path_time_obstacle_map_[obstacle_id].set_bottom_left_point(
       SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
@@ -151,7 +152,9 @@ void PathTimeGraph::SetDynamicObstacle(
     const std::vector<PathPoint>& discretized_ref_points) {
   double relative_time = time_range_.first;
   while (relative_time < time_range_.second) {
+    // 得到障碍物某一时刻的位置
     TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+    // 将点膨胀成 box
     Box2d box = obstacle->GetBoundingBox(point);
     SLBoundary sl_boundary =
         ComputeObstacleBoundary(box.GetAllCorners(), discretized_ref_points);
@@ -162,10 +165,12 @@ void PathTimeGraph::SetDynamicObstacle(
         sl_boundary.start_s(), &left_width, &right_width);
 
     // The obstacle is not shown on the region to be considered.
+    // 剔除较远目标
     if (sl_boundary.start_s() > path_range_.second ||
         sl_boundary.end_s() < path_range_.first ||
         sl_boundary.start_l() > left_width ||
         sl_boundary.end_l() < -right_width) {
+      // 这个障碍物从没有在 path_time_obstacle_map 中出现过
       if (path_time_obstacle_map_.find(obstacle->Id()) !=
           path_time_obstacle_map_.end()) {
         break;
@@ -173,7 +178,7 @@ void PathTimeGraph::SetDynamicObstacle(
       relative_time += FLAGS_trajectory_time_resolution;
       continue;
     }
-
+    // ST 图
     if (path_time_obstacle_map_.find(obstacle->Id()) ==
         path_time_obstacle_map_.end()) {
       path_time_obstacle_map_[obstacle->Id()].set_id(obstacle->Id());
@@ -310,13 +315,14 @@ bool PathTimeGraph::IsObstacleInGraph(const std::string& obstacle_id) {
   return path_time_obstacle_map_.find(obstacle_id) !=
          path_time_obstacle_map_.end();
 }
-
+// 初始化 boundary 和 segment
 std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
     const double s_start, const double s_end, const double s_resolution) {
   CHECK_LT(s_start, s_end);
   CHECK_GT(s_resolution, FLAGS_numerical_epsilon);
   std::vector<std::pair<double, double>> bounds;
   std::vector<double> discretized_path;
+  // 得到 segmant 的总长度
   double s_range = s_end - s_start;
   double s_curr = s_start;
   size_t num_bound = static_cast<size_t>(s_range / s_resolution);
@@ -331,8 +337,11 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
     double right_width = FLAGS_default_reference_line_width / 2.0;
     ptr_reference_line_info_->reference_line().GetLaneWidth(s_curr, &left_width,
                                                             &right_width);
+    // 找到自车左右边界
     double ego_d_lower = init_d_[0] - ego_width / 2.0;
     double ego_d_upper = init_d_[0] + ego_width / 2.0;
+    // xu todo
+    // 将 Boundary 定义为更靠左或者靠右的那一个
     bounds.emplace_back(
         std::min(-right_width, ego_d_lower - FLAGS_bound_buffer),
         std::max(left_width, ego_d_upper + FLAGS_bound_buffer));
@@ -373,6 +382,7 @@ void PathTimeGraph::UpdateLateralBoundsByObstacle(
   // 得到 index
   size_t start_index = start_iter - discretized_path.begin();
   size_t end_index = end_iter - discretized_path.begin();
+  // xu todo
   // 目标物是压着车道线走的
   if (sl_boundary.end_l() > -FLAGS_numerical_epsilon &&
       sl_boundary.start_l() < FLAGS_numerical_epsilon) {
