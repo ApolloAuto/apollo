@@ -317,11 +317,14 @@ Path::Path(const std::vector<MapPathPoint>& path_points,
 
 Path::Path(const std::vector<LaneSegment>& segments)
     : lane_segments_(segments) {
+  // 得到 LaneSegment
   for (const auto& segment : lane_segments_) {
+    // 得到 LaneSegment 上的点，将这些点放入 path_points_ 中
     const auto points = MapPathPoint::GetPointsFromLane(
         segment.lane, segment.start_s, segment.end_s);
     path_points_.insert(path_points_.end(), points.begin(), points.end());
   }
+  // 移除重复的点
   MapPathPoint::RemoveDuplicates(&path_points_);
   CHECK_GE(path_points_.size(), 2U);
   Init();
@@ -365,32 +368,35 @@ void Path::InitPoints() {
 
   accumulated_s_.clear();
   accumulated_s_.reserve(num_points_);
+  // 更新线段
   segments_.clear();
   segments_.reserve(num_points_);
+  // 单位向量
   unit_directions_.clear();
   unit_directions_.reserve(num_points_);
   double s = 0.0;
   for (int i = 0; i < num_points_; ++i) {
     accumulated_s_.push_back(s);
     Vec2d heading;
-    if (i + 1 >= num_points_) {
+    if (i + 1 >= num_points_) { // 最后一个点
       heading = path_points_[i] - path_points_[i - 1];
       heading.Normalize();
     } else {
       segments_.emplace_back(path_points_[i], path_points_[i + 1]);
       heading = path_points_[i + 1] - path_points_[i];
-      float heading_length = heading.Length();
+      float heading_length = heading.Length(); // 得到两点距离
       // TODO(All): use heading.length when all adjacent lanes are guarantee to
       // be connected.
       s += heading_length;
       // Normalize "heading".
       if (heading_length > 0.0) {
-        heading /= heading_length;
+        heading /= heading_length; // 归一化得到两个点之间的单位向量
       }
     }
     unit_directions_.push_back(heading);
   }
   length_ = s;
+  // 将点进行降采样，采样距离是 0.25m
   num_sample_points_ = static_cast<int>(length_ / kSampleDistance) + 1;
   num_segments_ = num_points_ - 1;
 

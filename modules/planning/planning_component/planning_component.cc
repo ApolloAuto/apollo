@@ -63,7 +63,7 @@ bool PlanningComponent::Init() {
   }
 
   planning_base_->Init(config_);
-
+  // 初始化流程指令信息 Reader
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -72,7 +72,7 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         planning_command_.CopyFrom(*planning_command);
       });
-
+  // 初始化交通 Reader
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       config_.topic_config().traffic_light_detection_topic(),
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
@@ -115,6 +115,7 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
+  // 规划轨迹的 Writer
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 
@@ -128,14 +129,14 @@ bool PlanningComponent::Init() {
       FLAGS_planning_command_status);
   return true;
 }
-
+// planning 的处理函数
 bool PlanningComponent::Proc(
     const std::shared_ptr<prediction::PredictionObstacles>&
         prediction_obstacles,
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
-  ACHECK(prediction_obstacles != nullptr);
+  ACHECK(prediction_obstacles != nullptr);  // 判断输入是否为空
 
   // check and process possible rerouting request
   CheckRerouting();
@@ -223,6 +224,7 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
+  // 规划执行的函数
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
@@ -233,6 +235,7 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
+  // 输出结果
   planning_writer_->Write(adc_trajectory_pb);
 
   // Send command execution feedback.

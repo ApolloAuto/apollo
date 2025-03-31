@@ -53,7 +53,7 @@ void Trajectory1dGenerator::GenerateTrajectoryBundles(
     Trajectory1DBundle* ptr_lat_trajectory_bundle) {
   GenerateLongitudinalTrajectoryBundle(planning_target,
                                        ptr_lon_trajectory_bundle);
-
+  // lateral boundary
   GenerateLateralTrajectoryBundle(ptr_lat_trajectory_bundle);
 }
 
@@ -119,13 +119,17 @@ void Trajectory1dGenerator::GenerateLongitudinalTrajectoryBundle(
 
 void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     Trajectory1DBundle* ptr_lat_trajectory_bundle) const {
-  if (!FLAGS_lateral_optimization) {
-    auto end_conditions = end_condition_sampler_.SampleLatEndConditions();
+  if (!FLAGS_lateral_optimization) {  // 采样法
+    auto end_conditions =
+        end_condition_sampler_.SampleLatEndConditions();  // 速度采样
 
     // Use the common function to generate trajectory bundles.
+    // 生成 5 条采样的轨迹
     GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
                                   ptr_lat_trajectory_bundle);
   } else {
+    // 大致这么个意思：在一段长60m的里程中，以ds=1m进行采样，遍历每个采样点的横向可达范围，
+    // 即每个点的横向约束，通过这么多约束构建对应的二次型，最后通过调用OSQP进行二次规划求解
     double s_min = init_lon_state_[0];
     double s_max = s_min + FLAGS_max_s_lateral_optimization;
 

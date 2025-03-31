@@ -36,6 +36,7 @@ bool ScenarioManager::Init(const std::shared_ptr<DependencyInjector>& injector,
     return true;
   }
   injector_ = injector;
+  // 从配置⽂件中读取⽀持的场景列表，并创建相应的场景
   for (int i = 0; i < planner_config.scenario_size(); i++) {
     auto scenario = PluginManager::Instance()->CreateInstance<Scenario>(
         ConfigUtil::GetFullPlanningClassName(
@@ -57,12 +58,14 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              Frame* frame) {
   CHECK_NOTNULL(frame);
   for (auto scenario : scenario_list_) {
+    // 如果是当前场景并且状态为正在规划中
     if (current_scenario_.get() == scenario.get() &&
         current_scenario_->GetStatus() ==
             ScenarioStatusType::STATUS_PROCESSING) {
       // The previous scenario has higher priority
       return;
     }
+    // IsTransferable 判断是否可以场景切换
     if (scenario->IsTransferable(current_scenario_.get(), *frame)) {
       current_scenario_->Exit(frame);
       AINFO << "switch scenario from" << current_scenario_->Name() << " to "

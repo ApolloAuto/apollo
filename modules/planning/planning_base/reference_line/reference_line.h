@@ -264,8 +264,10 @@ class ReferenceLine {
   /**
    * This speed limit overrides the lane speed limit
    **/
-  std::vector<SpeedLimit> speed_limit_;
+  // Reference Line 中存在很多个 Lane 会有多种限速
+  std::vector<SpeedLimit> speed_limit_; 
   std::vector<ReferencePoint> reference_points_;
+  // 道路信息
   hdmap::Path map_path_;
   uint32_t priority_ = 0;
   common::math::Vec2d ego_position_;

@@ -20,7 +20,7 @@
 
 namespace apollo {
 namespace planning {
-
+// 对 osqp 结果赋值
 PiecewiseJerkTrajectory1d LateralQPOptimizer::GetOptimalTrajectory() const {
   ACHECK(!opt_d_.empty() && !opt_d_prime_.empty() && !opt_d_pprime_.empty());
 
