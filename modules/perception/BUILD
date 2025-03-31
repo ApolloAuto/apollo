@@ -20,7 +20,6 @@ install(
     name = "install",
     data_dest = "perception",
     data = [
-        ":cyberfile.xml",
         ":perception.BUILD",
     ],
     deps = [

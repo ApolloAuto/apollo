@@ -1,4 +1,0 @@
-  channel: {
-		name: "__NAME__"
-		extraction_rate: __RATE__
-	}

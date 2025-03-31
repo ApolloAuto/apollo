@@ -18,24 +18,41 @@
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
-# Setup core dump format.
-if [ -e /proc/sys/kernel ]; then
-  echo "${APOLLO_ROOT_DIR}/data/core/core_%e.%p" | \
-      sudo tee /proc/sys/kernel/core_pattern
+set -euo pipefail
+
+# 1. Setup core dump format.
+CORE_DIR="${APOLLO_ROOT_DIR}/data/core"
+if [ ! -d "${CORE_DIR}" ]; then
+  sudo mkdir -p "${CORE_DIR}"
+fi
+sudo tee /etc/sysctl.d/99-core-dump.conf > /dev/null <<EOF
+kernel.core_pattern = ${CORE_DIR}/core_%e.%p
+EOF
+# Apply sysctl configuration to make it take effect immediately.
+sudo sysctl -p /etc/sysctl.d/99-core-dump.conf
+
+# 2. Setup ntpdate to run once per minute. Log at /var/log/syslog.
+if systemctl list-unit-files | grep -q "^systemd-timesyncd.service"; then
+  echo "Enable and start the systemd-timesyncd time synchronization service..."
+  sudo systemctl enable systemd-timesyncd
+  sudo systemctl start systemd-timesyncd
+else
+  echo "systemd-timesyncd service not found!"
 fi
 
-# Setup ntpdate to run once per minute. Log at /var/log/syslog.
-grep -q ntpdate /etc/crontab
-if [ $? -ne 0 ]; then
-  echo "*/1 * * * * root ntpdate -v -u us.pool.ntp.org" | \
-      sudo tee -a /etc/crontab
-fi
+# 3. Add udev rules.
+sudo cp -r ${APOLLO_ROOT_DIR}/docker/setup_host/etc/udev/rules.d/* /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger
 
-# Add udev rules.
-sudo cp -r ${APOLLO_ROOT_DIR}/docker/setup_host/etc/* /etc/
-
-# Add uvcvideo clock config.
-grep -q uvcvideo /etc/modules
-if [ $? -ne 0 ]; then
-  echo "uvcvideo clock=realtime" | sudo tee -a /etc/modules
+# 4. Add uvcvideo clock config.
+sudo tee /etc/modprobe.d/uvcvideo.conf > /dev/null <<EOF
+options uvcvideo clock=realtime
+EOF
+# If the uvcvideo module is already loaded, unload and reload it for the configuration to take effect.
+if lsmod | grep -q uvcvideo; then
+  sudo modprobe -r uvcvideo
 fi
+sudo modprobe uvcvideo
+
+echo "Setup host machine successfully!"

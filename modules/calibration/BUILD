@@ -7,7 +7,6 @@ install(
     data_dest = "calibration",
     data = [
         ":calibrated_vehicles",
-        ":cyberfile.xml",
         ":calibration.BUILD",
     ],
 )

@@ -8,7 +8,6 @@ install(
     name = "install",
     data_dest = "drivers",
     data = [
-        ":cyberfile.xml",
         ":drivers.BUILD",
     ],
     deps = [

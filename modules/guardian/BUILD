@@ -39,7 +39,6 @@ install(
     data_dest = "guardian",
     data = [
         ":runtime_data",
-        ":cyberfile.xml",
         ":guardian.BUILD",
     ],
     targets = [

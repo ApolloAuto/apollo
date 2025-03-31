@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>manual_traffic_light</name>
-        <dag_conf>/apollo/modules/tools/manual_traffic_light/manual_traffic_light.dag</dag_conf>
-        <process_name>manual_traffic_light</process_name>
-    </module>
-</cyber>

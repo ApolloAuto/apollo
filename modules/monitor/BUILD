@@ -59,7 +59,6 @@ install(
     ],
     data = [
        ":runtime_data",
-        ":cyberfile.xml",
         ":monitor.BUILD",
     ],
 )
@@ -84,6 +83,6 @@ install_src_files(
     src_dir = ["."],
     dest = "monitor/include",
     filter = "*.h",
-) 
+)
 
 cpplint()
