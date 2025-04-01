@@ -141,6 +141,11 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(
   return reference_points_[min_index];
 }
 
+/// @brief 
+/// @param point 
+/// @param look_backward 
+/// @param look_forward 
+/// @return 
 bool ReferenceLine::Segment(const common::math::Vec2d& point,
                             const double look_backward,
                             const double look_forward) {

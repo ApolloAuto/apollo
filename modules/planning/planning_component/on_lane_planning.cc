@@ -202,16 +202,21 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   // segments 用来存储路段信息
   std::list<hdmap::RouteSegments> segments;
   // 由routing给出的route_segments信息生成reference_lines
+  //  会填充这两个列表，获取当前的参考线和路段
   reference_line_provider_->GetReferenceLines(&reference_lines, &segments);
   // 验证参考线和路段的数量一致
   DCHECK_EQ(reference_lines.size(), segments.size());
-
+  
+  // 静态方法，用于计算车辆基于当前速度的前向可视距离
   auto forward_limit = planning::PncMapBase::LookForwardDistance(
       vehicle_state.linear_velocity());
-
+  
+  // 遍历所有参考线，调用 ref_line.Segment 方法进行收缩。收缩操作是根据车辆当前位置和前向/后向限制来进行的
+  // planning::FLAGS_look_backward_distance：后向可视距离
+  // forward_limit：前向可视距离
   for (auto& ref_line : reference_lines) {
     if (!ref_line.Segment(Vec2d(vehicle_state.x(), vehicle_state.y()),
-                          planning::FLAGS_look_backward_distance,
+                          planning::FLAGS_look_backward_distance,  // 50
                           forward_limit)) {
       const std::string msg = "Fail to shrink reference line.";
       AERROR << msg;
@@ -223,6 +228,7 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
     }
     ref_print_curve.PrintToLog();
   }
+  // 遍历所有路段并对每个路段调用 seg.Shrink 方法进行收缩，确保它们在车辆当前状态下是有效的。如果收缩失败，则返回错误
   for (auto& seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
                     planning::FLAGS_look_backward_distance, forward_limit)) {
@@ -240,6 +246,12 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
     segment_print_curve.PrintToLog();
   }
 
+ // 初始化帧
+ // injector_->vehicle_state()：注入的车辆状态
+ // reference_lines：参考线列表
+ // segments：路段列表
+ // reference_line_provider_->FutureRouteWaypoints()：未来的路线点
+ // injector_->ego_info()：车辆的自我信息
   auto status = frame_->Init(
       injector_->vehicle_state(), reference_lines, segments,
       reference_line_provider_->FutureRouteWaypoints(), injector_->ego_info());
@@ -401,6 +413,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
 // 4.0
 // 更新ego信息，进入EgoInfo类查看私有成员变量释义，进入Update查看
+// 规划起点设置、车辆状态、包围盒
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
