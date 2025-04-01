@@ -95,9 +95,14 @@ bool PlanningBase::IsPlanningFinished(
   }
 }
 
+/// @brief 
+/// @param timestamp 当前规划周期的时间戳，用于同步不同模块的数据
+/// @param trajectory_pb 
 void PlanningBase::FillPlanningPb(const double timestamp,
                                   ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
+  // 将感知模块提供的激光雷达、摄像头、雷达时间戳同步到 trajectory_pb 中
+  // 保证轨迹生成时，使用的感知数据是最新的，避免时间不匹配导致的问题
   if (local_view_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
         local_view_.prediction_obstacles->header().lidar_timestamp());
@@ -106,6 +111,11 @@ void PlanningBase::FillPlanningPb(const double timestamp,
     trajectory_pb->mutable_header()->set_radar_timestamp(
         local_view_.prediction_obstacles->header().radar_timestamp());
   }
+  //  直接拷贝 planning_command 里的头部信息，确保轨迹和路径规划模块的最新指令对齐
+  // planning_command 可能存储
+  // 当前的全局路径
+  // 目标点信息
+  // 规划模式（如巡航、变道、紧急停车等）
   trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.planning_command->header());
 }

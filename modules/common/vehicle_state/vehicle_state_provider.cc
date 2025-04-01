@@ -220,8 +220,12 @@ void VehicleStateProvider::set_linear_velocity(const double linear_velocity) {
 const VehicleState &VehicleStateProvider::vehicle_state() const {
   return vehicle_state_;
 }
-// 估计车辆未来姿态
+
+/// @brief 基于当前速度、角速度和姿态信息预测车辆 t 秒后的位置，用于时间对齐（AlignTimeStamp）或轨迹规划
+/// @param t 预测的时间间隔
+/// @return 车辆在 t 秒后的预计位置 (x, y)，使用 math::Vec2d 表示
 math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
+  // 存储 t 秒后的位置增量 (Δx, Δy, Δz)
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
 // 获取车辆线性速度
   double v = vehicle_state_.linear_velocity();
@@ -237,26 +241,35 @@ math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
     vec_distance[1] = v * t; // y  前进方向
   } else {
     // 如果车辆不为直线运动，进行轨迹预测
+    // 车辆有角速度时，按圆周轨迹预测
+    // Δx = - (v / ω) * (1 - cos(ω * t))
+    // Δy = (v / ω) * sin(ω * t)
+    // 角速度 ω 不变时，车辆沿半径 r = v / ω 的圆轨迹运动
     vec_distance[0] = -v / vehicle_state_.angular_velocity() *
                       (1.0 - std::cos(vehicle_state_.angular_velocity() * t));
     vec_distance[1] = std::sin(vehicle_state_.angular_velocity() * t) * v /
                       vehicle_state_.angular_velocity();
   }
 
+  // 旋转修正（考虑姿态信息）
   // If we have rotation information, take it into consideration.
   // 判断是否有姿态信息
+  // 车辆具有旋转信息时，vec_distance 需要转换到全局坐标系
   if (vehicle_state_.pose().has_orientation()) {
     const auto &orientation = vehicle_state_.pose().orientation();
     // 构造一个 Eigen::Quaternion<double> 类型的四元数对象 quaternion
+    // 1.获取车辆的四元数 (quaternion)，表示当前姿态
     Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                          orientation.qy(), orientation.qz());
     // 获取车辆的当前位置（x, y, z 坐标）并构造一个 Eigen::Vector3d 类型的向量 pos_vec，表示车辆当前的三维坐标
     Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                             vehicle_state_.z());
 // 使用四元数的旋转矩阵将位移向量 vec_distance 转换到全局坐标系中（旋转的影响），然后加上车辆当前的位置 pos_vec，得到车辆在未来时间 t 的三维位置 future_pos_3d
+    // 2.计算旋转矩阵（quaternion.toRotationMatrix()），将 vec_distance 旋转到全局坐标系
     const Eigen::Vector3d future_pos_3d =
         quaternion.toRotationMatrix() * vec_distance + pos_vec;
 // 车辆在未来位置的估计值
+// 3.加上当前车辆位置，得到 t 秒后在全局坐标系下的位置
     return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 

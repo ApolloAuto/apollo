@@ -110,36 +110,48 @@ ReferenceLineProvider::ReferenceLineProvider(
   is_initialized_ = true;
 }
 
+/// @brief 更新参考路线的规划命令，并确保当前的规划命令能正确处理并匹配相应的 PNC map（路径导航计算图）
+/// @param command 
+/// @return 
 bool ReferenceLineProvider::UpdatePlanningCommand(
     const planning::PlanningCommand &command) {
+ // 使用路由锁保护对 pnc_map_list_ 的访问
   std::lock_guard<std::mutex> routing_lock(routing_mutex_);
   bool find_matched_pnc_map = false;
+   // 遍历 pnc_map_list_ 查找能够处理当前命令的 pnc_map
   for (const auto &pnc_map : pnc_map_list_) {
     if (pnc_map->CanProcess(command)) {
-      current_pnc_map_ = pnc_map;
+      current_pnc_map_ = pnc_map;   // 找到匹配的 pnc_map，更新 current_pnc_map_
       find_matched_pnc_map = true;
       break;
     }
   }
+   // 如果没有找到合适的 pnc_map，返回失败
   if (nullptr == current_pnc_map_) {
     AERROR << "Cannot find pnc map to process input command!"
            << command.DebugString();
     return false;
   }
+  // 如果没有找到匹配的 pnc_map，警告使用旧的 pnc_map
   if (!find_matched_pnc_map) {
     AWARN << "Find no pnc map for the input command and the old one will be "
              "used!";
   }
+  // 锁住 pnc_map_mutex_ 来更新当前 pnc_map 的路由
   // Update routing in pnc_map
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  // 如果当前 pnc_map 需要更新规划命令
   if (current_pnc_map_->IsNewPlanningCommand(command)) {
     is_new_command_ = true;
+
+    // 更新 pnc_map 路由信息
     if (!current_pnc_map_->UpdatePlanningCommand(command)) {
       AERROR << "Failed to update routing in pnc map: "
              << command.DebugString();
       return false;
     }
   }
+  // 更新当前的规划命令和状态
   planning_command_ = command;
   has_planning_command_ = true;
   return true;
@@ -156,6 +168,8 @@ ReferenceLineProvider::FutureRouteWaypoints() {
   return std::vector<routing::LaneWaypoint>();
 }
 
+/// @brief 获取参考车道的结束航路点，并将其通过引用传递给 end_point
+/// @param end_point 
 void ReferenceLineProvider::GetEndLaneWayPoint(
     std::shared_ptr<routing::LaneWaypoint> &end_point) const {
   if (nullptr == current_pnc_map_) {

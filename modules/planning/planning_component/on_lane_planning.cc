@@ -257,7 +257,9 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
 
   const auto& vehicle_state = injector_->vehicle_state()->vehicle_state();
   // apollo/modules/planning/planning_base/gflags/planning_gflags.cc
+  // 轨迹时间范围（如 3 秒），表示这个轨迹要持续多久
   const double max_t = FLAGS_fallback_total_time;  // 3
+  // 轨迹时间步长（如 0.1 秒），表示每个轨迹点的间隔
   const double unit_t = FLAGS_fallback_time_unit;  // 0.1
 
   TrajectoryPoint tp;
@@ -268,6 +270,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
   path_point->set_s(0.0); // 轨迹点的初始位置
   tp.set_v(0.0);
   tp.set_a(0.0);
+  // 未来3s内，每个0.1s取一个轨迹点，这些点的信息和tp一样
   for (double t = 0.0; t < max_t; t += unit_t) {
     tp.set_relative_time(t);
     auto next_point = ptr_trajectory_pb->add_trajectory_point();
@@ -318,10 +321,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
  // 获取并检查车辆状态的时间戳是否有效，确保 start_timestamp 大于等于车辆状态时间戳
   VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
+  // 确保 start_timestamp 不会早于 vehicle_state_timestamp，并在不符合要求时打印出详细的错误信息
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
       << "start_timestamp is behind vehicle_state_timestamp by "
       << start_timestamp - vehicle_state_timestamp << " secs";
 // 如果车辆状态无效，生成刹车轨迹
+// status.ok()： Status status
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     const std::string msg =
         "Update VehicleStateProvider failed "
@@ -346,6 +351,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
 // 对齐时间戳 vehicle_state_timestamp为车辆状态时间戳
 // 如果时间差小于某个阈值，对齐车辆状态的时间戳
+// 大于它就完犊子了
   if (start_timestamp - vehicle_state_timestamp <
       FLAGS_message_latency_threshold) {  // 0.02s 消息延时阈值
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
@@ -357,8 +363,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   // // 如果是两个不同的routing,则重新初始化
   if (local_view_.planning_command->is_motion_command() &&
       util::IsDifferentRouting(last_command_, *local_view_.planning_command)) {
+    // 如果发现新的规划命令，更新 last_command_ 为当前的规划命令
     last_command_ = *local_view_.planning_command;
     AINFO << "new_command:" << last_command_.DebugString();
+    // 重置参考路线提供者，即清除当前的参考路线信息
     reference_line_provider_->Reset();
     // 通过 injector_ 调用 history() 获取历史数据的对象，并清除历史记录（Clear()）。这意味着在接收到新命令后，之前的历史数据（如轨迹、状态等）可能已经不再适用
     injector_->history()->Clear();
@@ -366,6 +374,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdatePlanningCommand(
         *(local_view_.planning_command));
+// 重置规划器，并使用 frame_ 中的相关信息来重新初始化或更新规划器的状态
     planner_->Reset(frame_.get());
   }
   // Get end lane way point.
@@ -382,6 +391,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       1.0 / static_cast<double>(FLAGS_planning_loop_rate);  // 10 hz
 
 // 使用轨迹拼接器计算拼接后的轨迹
+// 轨迹拼接保留长度
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
@@ -1278,11 +1288,17 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   (*sliding_line_properties)["fill"] = "false";
   (*sliding_line_properties)["showLine"] = "true";
 }
-// 估算未来停车位置
+
+/// @brief 对齐车辆状态的时间戳，即根据时间差 (curr_timestamp - vehicle_state.timestamp()) 
+// 预测 curr_timestamp 时刻的车辆位置 (x, y)，然后返回更新后的 VehicleState
+/// @param vehicle_state 当前的车辆状态
+/// @param curr_timestamp 目标时间戳，通常是规划器希望对齐的轨迹起点时间
+/// @return 
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double curr_timestamp) const {
   // TODO(Jinyun): use the same method in trajectory stitching
   //               for forward prediction
+  // 预测 time_delta 秒后 车辆的位置
   auto future_xy = injector_->vehicle_state()->EstimateFuturePosition(
       curr_timestamp - vehicle_state.timestamp());
 

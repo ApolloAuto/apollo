@@ -118,6 +118,9 @@ std::vector<routing::LaneWaypoint> LaneFollowMap::FutureRouteWaypoints() const {
       waypoints.begin() + next_routing_waypoint_index_, waypoints.end());
 }
 
+/// @brief 从最近的命令（last_command_）中获取结束车道航路点并通过引用返回
+// 检查是否有有效的车道跟随命令和有效的路由请求，然后提取路由请求中的最后一个航路点作为车道的结束点
+/// @param end_point 
 void LaneFollowMap::GetEndLaneWayPoint(
     std::shared_ptr<routing::LaneWaypoint> &end_point) const {
   if (!last_command_.has_lane_follow_command() ||
@@ -125,13 +128,17 @@ void LaneFollowMap::GetEndLaneWayPoint(
     end_point = nullptr;
     return;
   }
+  // 获取路由请求
   const auto &routing_request =
       last_command_.lane_follow_command().routing_request();
   if (routing_request.waypoint().size() < 1) {
     end_point = nullptr;
     return;
   }
+  // 获取并设置结束航路点
+  // 如果 waypoint 中有至少一个点，使用 std::make_shared<routing::LaneWaypoint>() 创建一个新的 LaneWaypoint 对象，并将其指针赋给 end_point
   end_point = std::make_shared<routing::LaneWaypoint>();
+  // 将该终点的内容复制到新的 LaneWaypoint 对象
   end_point->CopyFrom(*(routing_request.waypoint().rbegin()));
 }
 
@@ -143,25 +150,31 @@ hdmap::LaneInfoConstPtr LaneFollowMap::GetLaneById(const hdmap::Id &id) const {
 }
 
 bool LaneFollowMap::IsValid(const planning::PlanningCommand &command) const {
+  // 检查是否可以处理该命令
   if (!CanProcess(command)) {
     return false;
   }
+   // 获取车道跟随命令的路由信息
   const auto &routing = command.lane_follow_command();
   const int num_road = routing.road_size();
+  // 如果没有路信息，返回无效
   if (num_road == 0) {
     return false;
   }
+   // 检查路由请求是否存在且包含至少两个航路点
   if (!routing.has_routing_request() ||
       routing.routing_request().waypoint_size() < 2) {
     AERROR << "Routing does not have request.";
     return false;
   }
+  // 遍历航路点，检查每个航路点是否包含必要的字段：id 和 s
   for (const auto &waypoint : routing.routing_request().waypoint()) {
     if (!waypoint.has_id() || !waypoint.has_s()) {
       AERROR << "Routing waypoint has no lane_id or s.";
       return false;
     }
   }
+  // 如果所有验证通过，返回有效
   return true;
 }
 

@@ -32,6 +32,9 @@ namespace util {
 using apollo::common::VehicleState;
 using apollo::hdmap::PathOverlap;
 
+/// @brief 
+/// @param vehicle_state 
+/// @return 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
       std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
@@ -43,14 +46,21 @@ bool IsVehicleStateValid(const VehicleState& vehicle_state) {
   return true;
 }
 
+/// @brief 判断两个 PlanningCommand 对象在路线规划方面是否有差异，主要是通过比较它们的头部信息（header）来实现
+/// @param first 
+/// @param second 
+/// @return 
 bool IsDifferentRouting(const PlanningCommand& first,
                         const PlanningCommand& second) {
+// 检查两个 PlanningCommand 对象是否都包含头部信息
   if (first.has_header() && second.has_header()) {
     const auto& first_header = first.header();
     const auto& second_header = second.header();
+ // 比较头部的序列号和模块名称，判断是否不同
     return (first_header.sequence_num() != second_header.sequence_num() ||
             first_header.module_name() != second_header.module_name());
   }
+   // 如果任何一个命令缺少头部信息，则认为它们不同
   return true;
 }
 
