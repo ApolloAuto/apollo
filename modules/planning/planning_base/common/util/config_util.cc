@@ -29,10 +29,15 @@ std::string ConfigUtil::TransformToPathName(const std::string& name) {
   return output;
 }
 
+/// @brief ConfigUtil 类的一个静态成员函数，用于获取完整的规划器类名
+/// @param class_name 
+/// @return 
 std::string ConfigUtil::GetFullPlanningClassName(
     const std::string& class_name) {
+  // 静态常量字符串
   static const std::string kNameSpace = "apollo::planning::";
   // If the class name already has namespace in it, do nothing.
+  // 如果 class_name 里面已经有 ::，说明它是完整的类名，则直接返回，不做任何修改
   if (class_name.find("::") != std::string::npos) {
     return class_name;
   }

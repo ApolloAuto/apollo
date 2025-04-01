@@ -146,6 +146,10 @@ class PluginManager {
   static PluginManager* instance_;
 };
 
+/// @brief 用于 创建插件类的实例，并返回一个 std::shared_ptr<Base> 指针
+/// @tparam Base 基类类型，表示插件的基本类型
+/// @param class_name 插件的具体类名（字符串）
+/// @return std::shared_ptr<Base>：插件实例的 智能指针
 template <typename Base>
 std::shared_ptr<Base> PluginManager::CreateInstance(
     const std::string& derived_class) {
@@ -188,51 +192,78 @@ std::string PluginManager::GetPluginClassHomePath(
   return "";
 }
 
+/// @brief 根据插件类的名称和配置文件名称，返回插件配置文件的路径
+/// @tparam Base 
+/// @param class_name 插件类的名称
+/// @param conf_name 配置文件的名称
+/// @return 插件配置文件的路径
 template <typename Base>
 std::string PluginManager::GetPluginConfPath(const std::string& class_name,
                                              const std::string& conf_name) {
+// 获取插件类的主路径（即插件的根目录路径）。它将插件类名 class_name 作为参数传递，并且 Base 是模板参数类型
   std::string plugin_home_path = GetPluginClassHomePath<Base>(class_name);
+  // 测路径是否为绝对路径
   if (apollo::cyber::common::PathIsAbsolute(plugin_home_path)) {
     // can not detect the plugin relative path
+ // 如果插件路径是绝对路径，则输出警告信息，表示无法检测插件的相对路径，并且配置文件路径将相对于插件描述文件进行解析
     AWARN << "plugin of class " << class_name << " load from absolute path, "
           << "conf path will be relative to it's description file";
   }
-
+// 将插件主路径 plugin_home_path 和配置文件名 conf_name 拼接成一个相对的配置文件路径 relative_conf_path
   std::string relative_conf_path = plugin_home_path + "/" + conf_name;
-  std::string actual_conf_path;
+  std::string actual_conf_path; // 存储实际的配置文件路径‘
+// 根据环境变量 APOLLO_CONF_PATH 查找实际的配置文件路径。如果能找到配置文件，函数返回 true，并将实际路径存储在 actual_conf_path 中
   if (apollo::cyber::common::GetFilePathWithEnv(
           relative_conf_path, "APOLLO_CONF_PATH", &actual_conf_path)) {
     return actual_conf_path;
   }
+// 如果 GetFilePathWithEnv 没有找到配置文件路径，函数将返回由插件主路径 plugin_home_path 和配置文件名 conf_name 拼接而成的默认路径
   return plugin_home_path + "/" + conf_name;
 }
 
+/// @brief 检查一个插件库是否已经加载
+/// @tparam Base 模板类型参数，表示插件的基类
+/// @param class_name 传入的类名，用来在插件中查找特定的类
+/// @return 
 template <typename Base>
 bool PluginManager::IsLibraryLoaded(const std::string& class_name) {
-  int status = 0;
+  int status = 0; // 接收 abi::__cxa_demangle 的返回状态（该函数用来获取类型名称的可读格式）
+// typeid(Base).name() 获取 Base 类型的原始名称（通常是经过编译器编码的），
+// 然后通过 abi::__cxa_demangle 转换为人类可读的类型名称，并赋值给 base_class_name
   std::string base_class_name =
       abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
+// 在 plugin_class_plugin_name_map_ 中查找一个由 class_name 和 base_class_name 组成的键值对
   if (plugin_class_plugin_name_map_.find({class_name, base_class_name}) ==
       plugin_class_plugin_name_map_.end()) {
     // not found
     return false;
   }
+// 如果找到了插件，取出插件的名字，赋值给 plugin_name
   std::string plugin_name =
       plugin_class_plugin_name_map_[{class_name, base_class_name}];
+// 在 plugin_loaded_map_ 中查找 plugin_name 是否存在。如果未找到，表示该插件未加载
   if (plugin_loaded_map_.find(plugin_name) == plugin_loaded_map_.end()) {
     // not found
     return false;
   }
-
+  // 返回该插件的加载状态值
   return plugin_loaded_map_[plugin_name];
 }
 
+/// @brief 检查并加载指定的插件库
+/// @tparam Base 
+/// @param class_name 
+// 接受一个类型 Base 和一个参数 class_name，该参数是插件类的名称，返回一个布尔值，表示插件库是否成功加载
+/// @return 
 template <typename Base>
 bool PluginManager::CheckAndLoadPluginLibrary(const std::string& class_name) {
+  // 检查是否已经加载了指定的插件库
   if (IsLibraryLoaded<Base>(class_name)) {
     return true;
   }
   int status = 0;
+  // typeid(Base).name() 获取 Base 类型的名字，然后通过 abi::__cxa_demangle 函数将其转化为人类可读的格式，
+  // 存储在 base_class_name 变量中。如果转换失败，status 会被设置为非零值
   std::string base_class_name =
       abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
   if (plugin_class_plugin_name_map_.find({class_name, base_class_name}) ==

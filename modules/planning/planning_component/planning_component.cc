@@ -65,7 +65,7 @@ bool PlanningComponent::Init() {
   }
 // 加载config文件  proto
 // ACHECK 检查配置文件是否成功加载，配置文件包含路径规划的相关参数
-// 配置文件 planning_config.pb.txt
+// 配置文件 planning_config.pb.txt  ？？？？？？？？？？？？？？？？？？？？？？？？
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
@@ -265,6 +265,7 @@ bool PlanningComponent::Proc(
   // 在这里配置的是on_lane_planning方法，路径规划函数入口
   // planning逻辑主循环
   // 输入:local_view_   输出:adc_trajectory_pb  轨迹
+  // planning_base_: OnLanePlanning实例化的对象
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
     // 7.0 此时路径规划已经完成，获取路径规划计算最开始的时间戳，参看RunOnce时间戳赋值
   // 获取计算完成后的时间戳，参看FillHeader时间戳赋值

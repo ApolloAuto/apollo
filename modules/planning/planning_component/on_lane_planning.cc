@@ -108,6 +108,16 @@ std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 /// @brief 分配具体的Planner，启动参考线提供器(reference_line_provider_)
 /// @param config 
 /// @return 
+/*
+1.检查 PlanningConfig，确保配置正确。
+2.清理历史数据，避免干扰。
+3.加载高精地图，为规划提供地图支持。
+4.初始化 ReferenceLineProvider，计算参考线。
+5.创建 planner_（路径规划器），加载不同的规划算法。
+6.启用强化学习（如果配置允许），用于训练自动驾驶模型。
+7.初始化 traffic_decider_，处理交通规则。
+8.记录启动时间，初始化 planner_
+*/
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -118,6 +128,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   // clear planning history
   // 清除先前的规划历史数据
+  // OnLanePlanning公有继承PlanningBase， 且injecteor_是PlanningBase的protocted成员变量
   injector_->history()->Clear();
 
   // clear planning status
@@ -137,11 +148,13 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   }
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
       injector_->vehicle_state(), reference_line_config);
+  // 调用 Start() 开始提供参考线数据
   reference_line_provider_->Start();
   
   // 加载路径规划器并检查其是否成功初始化。如果没有成功初始化，返回错误状态
   // dispatch planner
-  LoadPlanner();
+  // 加载规划器
+  LoadPlanner();  // 在父类中定义，选择EM 或者 Lattice
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
@@ -159,10 +172,12 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
     BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
   }
   // 初始化交通决策模块
+  // traffic_decider_ 负责处理交通信号灯、行人、让行规则等
   traffic_decider_.Init(injector_);
   // 获取当前时间并保存为 start_time_，以记录路径规划的开始时间
   start_time_ = Clock::NowInSeconds();
   // 初始化路径规划器，并使用配置路径 FLAGS_planner_config_path 来进行初始化
+  // 从LoadPlanner中得到的
   return planner_->Init(injector_, FLAGS_planner_config_path);  // public_road_planner_config.pb.txt
 }
 /// @brief 
@@ -264,19 +279,29 @@ private：只有父类自己可以访问，子类不能访问。
 protected：父类自己可以访问，子类也可以访问，但外部无法访问。
 public：所有地方都可以访问
 */
+// 这部分主要做以下工作：
+/*
+1.更新传感器数据
+2.检查车辆状态
+3.更新参考线
+4.轨迹拼接
+5.生成规划轨迹
+6.轨迹平滑 & 输出
+*/
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
     // 1.0                           
   // when rerouting, reference line might not be updated. In this case, planning
   // module maintains not-ready until be restarted.
   local_view_ = local_view;
-   // 获取路径规划起始时间戳
-  const double start_timestamp = Clock::NowInSeconds();
-  // 路径规划算法耗时起始时间
+   // 获取路径规划起始时间戳 s
+   // 受 ROS 2 use_sim_time 影响，如果 use_sim_time:=true，那么 Clock::NowInSeconds() 取的是 仿真时间 而不是系统时间
+  const double start_timestamp = Clock::NowInSeconds(); // start_timestamp 用来计算轨迹的时间戳，确保和 ROS 2 其他模块同步
+  // 路径规划算法耗时起始时间 s
   const double start_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
-          .count();
+          .count(); // start_system_timestamp 用来计算 规划耗时（单位：毫秒），避免受 ROS 2 use_sim_time 影响
 
 // 2.0
   // localization

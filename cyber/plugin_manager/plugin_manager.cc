@@ -192,7 +192,11 @@ bool PluginManager::LoadInstalledPlugins() {
   return true;
 }
 
+/// @brief 
+/// @param library_path 库文件的路径
+/// @return 
 bool PluginManager::LoadLibrary(const std::string& library_path) {
+  // 尝试加载指定路径的插件库
   if (!class_loader_manager_.LoadLibrary(library_path)) {
     AWARN << "plugin library[" << library_path << "] load failed";
     return false;
