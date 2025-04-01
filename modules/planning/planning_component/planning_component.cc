@@ -156,10 +156,12 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
+  // 确保预测障碍物数据 prediction_obstacles 非空，否则会触发 ACHECK 终止程序
   ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
   // 1.检查是否需要重新规划线路
+  // 如果路径不通或环境变化，可能需要重新规划路径，调用 CheckRerouting() 进行检查
   CheckRerouting();
 
   // process fused input data
@@ -167,36 +169,47 @@ bool PlanningComponent::Proc(
   // std::mutex: 互斥锁，用于保护共享资源的访问
   // 当多个线程需要同时访问共享资源时，为了避免出现数据竞争等问题，需要使用互斥锁进行同步控制
   // 存储传感器数据，用于规划计算
+
+  // 填充local_view_
   local_view_.prediction_obstacles = prediction_obstacles;
   local_view_.chassis = chassis;
   local_view_.localization_estimate = localization_estimate;
+  
+  // yk: std::mutex mutex_
+  // 处理 planning_command_（规划指令）
   {
     std::lock_guard<std::mutex> lock(mutex_);  // 互斥锁
     if (!local_view_.planning_command ||
         !common::util::IsProtoEqual(local_view_.planning_command->header(),
                                     planning_command_.header())) {
+  // 如果不相同，说明规划指令有更新，拷贝到 local_view_.planning_command
       local_view_.planning_command =
           std::make_shared<PlanningCommand>(planning_command_);
     }
   }
 
+  // 存储交通灯检测数据 (traffic_light_) 和 相对地图信息 (relative_map_)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
-        std::make_shared<TrafficLightDetection>(traffic_light_);
+        std::make_shared<TrafficLightDetection>(traffic_light_);  // 需要看一下
     local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
   }
 
+  // 处理用户控制指令
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!local_view_.pad_msg ||
         !common::util::IsProtoEqual(local_view_.pad_msg->header(),
                                     pad_msg_.header())) {
+
+      // 特殊情况： 如果 PadMessage 指令是 "CLEAR_PLANNING"，则清除 planning_command_
       // Check if "CLEAR_PLANNING" PadMessage is received and process.
       if (pad_msg_.action() == PadMessage::CLEAR_PLANNING) {
         local_view_.planning_command = nullptr;
         planning_command_.Clear();
       }
+      // 如果 PadMessage 发生变化，则更新 local_view_.pad_msg
       local_view_.pad_msg = std::make_shared<PadMessage>(pad_msg_);
     }
   }
@@ -211,8 +224,10 @@ bool PlanningComponent::Proc(
     AINFO << "Input check failed";
     return false;
   }
-// 4.0 
+
+// 4.0 处理强化学习数据
 // 如果配置文件为深度学习模式，非主流方法，跳过
+// 如果当前处于 Learning Mode，将输入数据存入 message_process_，用于强化学习训练
   if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     // data process for online training
     message_process_.OnChassis(*local_view_.chassis);
@@ -225,9 +240,10 @@ bool PlanningComponent::Proc(
     message_process_.OnTrafficLightDetection(*local_view_.traffic_light);
     message_process_.OnLocalization(*local_view_.localization_estimate);
   }
-// 5.0
+// 5.0 强化学习数据发布
   // publish learning data frame for RL test
   // 非主流
+  // 如果处于 RL_TEST 模式，记录学习数据，并 写入 planning_learning_data_writer_
   if (config_.learning_mode() == PlanningConfig::RL_TEST) {
     PlanningLearningData planning_learning_data;
     LearningDataFrame* learning_data_frame =
@@ -253,9 +269,11 @@ bool PlanningComponent::Proc(
     // 7.0 此时路径规划已经完成，获取路径规划计算最开始的时间戳，参看RunOnce时间戳赋值
   // 获取计算完成后的时间戳，参看FillHeader时间戳赋值
   auto start_time = adc_trajectory_pb.header().timestamp_sec(); // 从 adc_trajectory_pb 中获取起始时间（start_time），即该消息头中的时间戳
+  // 填充 header，包含时间戳
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
   // modify trajectory relative time due to the timestamp change in header
+  // 修正轨迹点的相对时间，确保时间戳一致
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
@@ -266,12 +284,14 @@ bool PlanningComponent::Proc(
 
   // Send command execution feedback.
   // Error occured while executing the command.
+  // 创建 CommandStatus 反馈规划执行状态
   external_command::CommandStatus command_status;
   common::util::FillHeader(node_->Name(), &command_status);
   if (nullptr != local_view_.planning_command) {
     command_status.set_command_id(local_view_.planning_command->command_id());
   }
 
+  // 根据 adc_trajectory_pb 的 error_code，判断状态是 ERROR、FINISHED 还是 RUNNING
   ADCTrajectory::TrajectoryType current_trajectory_type =
       adc_trajectory_pb.trajectory_type();
   if (adc_trajectory_pb.header().status().error_code() !=
@@ -297,19 +317,29 @@ bool PlanningComponent::Proc(
   return true;
 }
 /// @brief 检查是否需要进行路径重新规划。如果需要，填充相关命令并发送请求，然后将标志位need_rerouting置为false
+// 检查是否需要重新规划路径（rerouting），如果需要，则发送新的车道跟随（LaneFollowCommand）请求，
+// 并更新 rerouting 状态
 void PlanningComponent::CheckRerouting() {
   auto* rerouting = injector_->planning_context()
                         ->mutable_planning_status()
                         ->mutable_rerouting();
+  // 检查是否需要重新规划
   if (!rerouting->need_rerouting()) {
     return;
   }
+  // 填充 lane_follow_command 的 header
+  // FillHeader() 方法会添加 当前节点名称 和 时间戳
   common::util::FillHeader(node_->Name(),
                            rerouting->mutable_lane_follow_command());
+  // 从 rerouting 提取 lane_follow_command 并包装为 shared_ptr
   auto lane_follow_command_ptr =
       std::make_shared<apollo::external_command::LaneFollowCommand>(
           rerouting->lane_follow_command());
-  rerouting_client_->SendRequest(lane_follow_command_ptr);
+  // 向 rerouting_client_ 发送新的 rerouting 请求
+  // rerouting_client_ 可能是一个 gRPC 或 ROS 2 Service Client，向路径规划模块发送新的 LaneFollowCommand
+  // 发送新的规划请求
+  rerouting_client_->SendRequest(lane_follow_command_ptr);  // 需要看一下
+  // 重置 need_rerouting 标志，防止重复请求 rerouting
   rerouting->set_need_rerouting(false);
 }
 /// @brief 检查输入数据是否完整，如定位数据、底盘数据、地图数据是否准备好。如果数据不完整，则跳过当前的规划周期
@@ -331,10 +361,12 @@ bool PlanningComponent::CheckInput() {
   }
 
   if (FLAGS_use_navigation_mode) {
+  // 如果开启了导航模式，则需要 relative_map 数据
     if (!local_view_.relative_map->has_header()) {
       not_ready->set_reason("relative map not ready");
     }
   } else {
+  // 如果 planning_command 为空，或不含 header，则说明规划指令未准备好
     if (!local_view_.planning_command ||
         !local_view_.planning_command->has_header()) {
       not_ready->set_reason("planning_command not ready");
@@ -343,7 +375,9 @@ bool PlanningComponent::CheckInput() {
 
   if (not_ready->has_reason()) {
     AINFO << not_ready->reason() << "; skip the planning cycle.";
+    // 填充 trajectory_pb 的 header
     common::util::FillHeader(node_->Name(), &trajectory_pb);
+    // 发布空轨迹
     planning_writer_->Write(trajectory_pb);
     return false;
   }

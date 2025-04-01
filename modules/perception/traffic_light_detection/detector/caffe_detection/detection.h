@@ -15,6 +15,15 @@
  *****************************************************************************/
 #pragma once
 
+/*
+功能	方法
+初始化	Init()
+检测交通灯	Detect()
+运行神经网络	Inference()
+筛选交通灯框	SelectOutputBoxes()
+去除重叠框	ApplyNMS()
+*/
+
 #include <map>
 #include <memory>
 #include <string>
@@ -53,6 +62,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
    * @return true 
    * @return false 
    */
+  // 初始化交通灯检测器，加载模型参数
+  // 初始化交通灯检测器
+  // 可能涉及 加载模型参数、设置推理器、初始化 GPU 资源等
   bool Init(const TrafficLightDetectorInitOptions &options) override;
 
   /**
@@ -62,6 +74,12 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
    * @return true 
    * @return false 
    */
+  // 在图像中检测交通信号灯
+  // 从输入图像中检测交通信号灯
+  // 主要调用：
+  // 1.Inference()：使用深度学习模型进行交通灯检测
+  // 2.SelectOutputBoxes()：筛选有效检测结果
+  // 3.ApplyNMS()：去除重叠的框
   bool Detect(camera::TrafficLightFrame *frame) override;
   /**
    * @brief Dump output of inference results.
@@ -73,6 +91,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
    * @return true 
    * @return false 
    */
+  // 对推理结果进行后处理，筛选有效的交通灯框
+  // 对模型输出的检测框进行筛选和转换
+  // 考虑缩放比例，将推理结果映射回原始图像坐标
   bool SelectOutputBoxes(const std::vector<base::RectI> &crop_box_list,
                          const std::vector<float> &resize_scale_list_col,
                          const std::vector<float> &resize_scale_list_row,
@@ -83,6 +104,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
    * @param lights 
    * @param iou_thresh 
    */
+  // 使用非极大值抑制（NMS）过滤重叠的检测框
+  // 使用非极大值抑制（NMS），过滤重叠的检测框，保留最优结果
+  // iou_thresh（交并比阈值）用于判定两个框是否重叠
   void ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
                 double iou_thresh = 0.6);
   /**
@@ -93,6 +117,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
    * @return true 
    * @return false 
    */
+  // 执行神经网络推理（深度学习模型）
+  // 运行神经网络模型，进行推理（Inference）
+  // 使用 rt_net_ 执行深度学习计算，预测交通灯的位置
   bool Inference(std::vector<base::TrafficLightPtr> *lights,
                  camera::DataProvider *data_provider);
   /**
@@ -105,26 +132,29 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   }
 
  private:
-  trafficlight::ModelParam detection_param_;
-  std::string detection_root_dir;
+  trafficlight::ModelParam detection_param_;  // 存储交通灯检测模型的参数
+  std::string detection_root_dir;             // 存储模型文件路径
 
-  camera::DataProvider::ImageOptions data_provider_image_option_;
-  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
-  std::shared_ptr<base::Image8U> image_ = nullptr;
-  std::shared_ptr<base::Blob<float>> param_blob_;
-  std::shared_ptr<base::Blob<float>> mean_buffer_;
-  std::shared_ptr<IGetBox> crop_;
-  std::vector<base::TrafficLightPtr> detected_bboxes_;
-  std::vector<base::TrafficLightPtr> selected_bboxes_;
-  std::vector<std::string> net_inputs_;
+  camera::DataProvider::ImageOptions data_provider_image_option_;   // 图像预处理参数
+  // rt_net_ 是神经网络推理器，用来执行深度学习推理，可能基于 TensorRT、Caffe、ONNX Runtime 等
+  std::shared_ptr<inference::Inference> rt_net_ = nullptr;          // 神经网络推理器，执行深度学习推理
+  std::shared_ptr<base::Image8U> image_ = nullptr;                  // 处理后的图像
+  std::shared_ptr<base::Blob<float>> param_blob_;                   // 神经网络的输入参数
+  std::shared_ptr<base::Blob<float>> mean_buffer_;                  // 归一化的均值
+  std::shared_ptr<IGetBox> crop_;                                   // 裁剪算法，用于从原始图像裁剪交通灯区域
+  // detected_bboxes_：存储所有检测到的交通灯（可能包含误检）
+  std::vector<base::TrafficLightPtr> detected_bboxes_;              // 存储所有检测到的交通灯框
+  // selected_bboxes_：经过筛选后的交通灯
+  std::vector<base::TrafficLightPtr> selected_bboxes_;              // 存储筛选后的交通灯框
+  std::vector<std::string> net_inputs_;                  
   std::vector<std::string> net_outputs_;
-  Select select_;
+  Select select_;    // 选择有效的交通灯
   int max_batch_size_;
   int param_blob_length_;
   float mean_[3];
   std::vector<base::RectI> crop_box_list_;
   std::vector<float> resize_scale_list_;
-  int gpu_id_;
+  int gpu_id_;      // 指定 GPU 设备 ID
 
   DISALLOW_COPY_AND_ASSIGN(TrafficLightDetection);
 };  // class TrafficLightDetection

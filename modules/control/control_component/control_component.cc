@@ -41,6 +41,7 @@ ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool ControlComponent::Init() {
+  // 完成配置文件参数读取，并完成控制器初始化
   injector_ = std::make_shared<DependencyInjector>();
   init_time_ = Clock::Now();
 
@@ -66,6 +67,7 @@ bool ControlComponent::Init() {
     }
   }
 
+  // 创建Control输入输出node,从话题通道中拿数据
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;

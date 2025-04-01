@@ -43,10 +43,18 @@
 namespace apollo {
 namespace common {
 namespace util {
+// 模板函数IsProtoEqual，用于 比较两个 Protobuf 消息对象是否相等
+// ProtoA 和 ProtoB 是两个 泛型 Protobuf 消息类型
 template <typename ProtoA, typename ProtoB>
 bool IsProtoEqual(const ProtoA& a, const ProtoB& b) {
+// 通过 GetTypeName() 获取 Protobuf 消息的 类型名称（字符串表示）
+// 将 Protobuf 消息对象转换为二进制字符串，这个二进制字符串 完全代表该对象的内容
+// 思路: 序列化+字符串
   return a.GetTypeName() == b.GetTypeName() &&
          a.SerializeAsString() == b.SerializeAsString();
+
+// 以下是官方提供的 Protobuf 消息比较函数，但它的性能较低
+// MessageDifferencer::Equals() 会逐个字段进行递归比较，处理更复杂，性能较低
   // Test shows that the above method is 5 times faster than the
   // API: google::protobuf::util::MessageDifferencer::Equals(a, b);
 }
