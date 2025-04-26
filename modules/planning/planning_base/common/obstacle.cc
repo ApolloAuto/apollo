@@ -193,11 +193,16 @@ bool Obstacle::IsValidPerceptionObstacle(const PerceptionObstacle& obstacle) {
   }
   return true;
 }
-
+/// @brief 将预测结果转换为规划模块障碍物表示的函数
+/// @param predictions 
+/// @return 
 std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
+//  初始化空列表
   std::list<std::unique_ptr<Obstacle>> obstacles;
+// 遍历每一个预测障碍物
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
+// 检查感知障碍物合法性
     if (!IsValidPerceptionObstacle(prediction_obstacle.perception_obstacle())) {
       AERROR << "Invalid perception obstacle: "
              << prediction_obstacle.perception_obstacle().DebugString();
@@ -205,6 +210,7 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
+// 如果没有预测轨迹（static）
     if (prediction_obstacle.trajectory().empty()) {
       obstacles.emplace_back(
           new Obstacle(perception_id, prediction_obstacle.perception_obstacle(),
@@ -214,8 +220,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
 
     int trajectory_index = 0;
+    // 有预测轨迹的情况
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
       bool is_valid_trajectory = true;
+      // 验证每个 trajectory 的点是否合法
       for (const auto& point : trajectory.trajectory_point()) {
         if (!IsValidTrajectoryPoint(point)) {
           AERROR << "obj:" << perception_id
@@ -228,9 +236,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
       if (!is_valid_trajectory) {
         continue;
       }
-
+      // 用原始感知 id 加上轨迹编号来唯一标识这个障碍物轨迹
       const std::string obstacle_id =
           absl::StrCat(perception_id, "_", trajectory_index);
+      // 创建新的 Obstacle 实例并加入返回列表
       obstacles.emplace_back(
           new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
                        trajectory, prediction_obstacle.priority().priority(),

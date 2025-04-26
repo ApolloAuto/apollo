@@ -322,7 +322,13 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
   }
   return ptr;
 }
-
+/// @brief 初始化一帧数据的函数，用来准备轨迹规划所需的信息
+/// @param vehicle_state_provider 
+/// @param reference_lines 
+/// @param segments 
+/// @param future_route_waypoints 
+/// @param ego_info 
+/// @return 
 Status Frame::Init(
     const common::VehicleStateProvider *vehicle_state_provider,
     const std::list<ReferenceLine> &reference_lines,
@@ -330,11 +336,13 @@ Status Frame::Init(
     const std::vector<routing::LaneWaypoint> &future_route_waypoints,
     const EgoInfo *ego_info) {
   // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
+  // 初始化基本数据，比如车辆状态、Ego 车辆信息等
   auto status = InitFrameData(vehicle_state_provider, ego_info);
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
   }
+  // 将参考线和路径段匹配成参考线信息
   if (!CreateReferenceLineInfo(reference_lines, segments)) {
     const std::string msg = "Failed to init reference line info.";
     AERROR << msg;
