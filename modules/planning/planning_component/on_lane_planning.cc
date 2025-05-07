@@ -316,7 +316,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const double start_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
-          .count(); // start_system_timestamp 用来计算 规划耗时（单位：毫秒），避免受 ROS 2 use_sim_time 影响
+          .count(); // start_system_timestamp 用来计算 规划耗时（单位：秒），避免受 ROS 2 use_sim_time 影响
 
 // 2.0
   // localization
