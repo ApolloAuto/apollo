@@ -147,8 +147,13 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
   *ptr_s_dot = v * cos_delta_theta / one_minus_kappa_r_d;
 }
 
+/// @brief 根据相对路径时间戳找到参考轨迹对应点
+/// @param t ：绝对时间戳
+/// @return 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByAbsoluteTime(
     const double t) const {
+// header_time_为参考轨迹的全局时间戳
+// 相对路径时间戳 = 绝对时间戳 - 参考轨迹全局时间戳
   return QueryNearestPointByRelativeTime(t - header_time_);
 }
 
