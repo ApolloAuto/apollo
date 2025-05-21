@@ -72,11 +72,15 @@ ReferenceLineProvider::ReferenceLineProvider(
   } else {
     relative_map_ = relative_map;
   }
-  // 加载参考线平滑器（Smoother）配置
+
+  // modules/planning/conf/planning.conf中定义smoother_config_filename
+  // 或者使用 modules/planning/common/planning_gflags.cc
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
                                          &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
+
+  // 根据配置，创建参考线平滑器。 多态: 父类指针指向子类对象   
   if (smoother_config_.has_qp_spline()) {
     smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_spiral()) {
@@ -204,6 +208,7 @@ bool ReferenceLineProvider::Start() {
     return false;
   }
   // 异步启动
+  // 创建参考线生成线程：FLAGS_enable_reference_line_provider_thread定义在modules/planning/common/pkanning_gflags.cc中
   if (FLAGS_enable_reference_line_provider_thread) {
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
@@ -243,6 +248,8 @@ void ReferenceLineProvider::UpdateReferenceLine(
     return;
   }
   std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+
+  // 将最新计算好的参考线拷贝给成员变量
   if (reference_lines_.size() != reference_lines.size()) {
     reference_lines_ = reference_lines;
     route_segments_ = route_segments;
@@ -257,7 +264,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
          internal_segment_iter != route_segments_.end();
          ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
       if (iter->reference_points().empty()) {
-        *internal_iter = *iter;
+        *internal_iter = *iter;  // 将iter所指向的数据复制到internal_iter 所指向的位置
         *internal_segment_iter = *segment_iter;
         continue;
       }
@@ -284,6 +291,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
   }
 }
 
+// 多线程的回调函数
 void ReferenceLineProvider::GenerateThread() {
   // is_stop_ 是一个 原子变量（std::atomic<bool>），用于标识线程是否应终止
   // 只要 is_stop_ 为 false，线程就会一直运行
@@ -296,6 +304,8 @@ void ReferenceLineProvider::GenerateThread() {
     if (!has_planning_command_) {
       continue;
     }
+
+    // 生成参考线和短期路由
     std::list<ReferenceLine> reference_lines;  // 用于存储生成的参考线
     std::list<hdmap::RouteSegments> segments;  // 用于存储对应的路径段信息
     if (!CreateReferenceLine(&reference_lines, &segments)) {
@@ -303,6 +313,8 @@ void ReferenceLineProvider::GenerateThread() {
       AERROR << "Fail to get reference line";
       continue;
     }
+
+
     // 将 reference_lines 和 segments 更新到类成员变量中，以便规划模块使用
     UpdateReferenceLine(reference_lines, segments);
     const double end_time = Clock::NowInSeconds();
@@ -706,13 +718,17 @@ bool ReferenceLineProvider::CreateReferenceLine(
     AERROR << "Failed to create reference line from routing";
     return false;
   }
+
+  // 判断是否需要进行参考线拼接
   // 如果 收到新的规划命令 或 禁用拼接模式，则执行 重新生成参考线 逻辑；否则执行 参考线拼接 逻辑
-  if (is_new_command_ || !FLAGS_enable_reference_line_stitching) {
+  if (is_new_command_ || !FLAGS_enable_reference_line_stitching) {  // 首次运行或者新路由，不拼接参考线
     // 重新生成参考线
     // 遍历路径段 segments，为每个路径段创建一个参考线
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
-      // 平滑化处理 SmoothRouteSegment()
+
+  // 参考线平滑
+  // 平滑各路由片段列表segments，并将平滑后的路由片段存储到参考线reference_lines中，同时将不能平滑的路由片段从segments中删除
       if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
         AERROR << "Failed to create reference line from route segments";
         // 失败，删除该路径段
@@ -730,7 +746,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
         }
         // 成功，保留该参考线
         // 用于裁剪参考线，确保它符合当前规划需求
-        Shrink(sl, &reference_lines->back(), &(*iter));
+        Shrink(sl, &reference_lines->back(), &(*iter));  // 收缩参考线
         ++iter;
       }
     }
@@ -741,6 +757,8 @@ bool ReferenceLineProvider::CreateReferenceLine(
   // 先遍历 segments，为每个路径段创建新的参考线
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
+
+// 合并不同参考片段的重合部分，并将拼接后的路由片段保存到参考线列表reference_lines中，同时将不能拼接的路由片段从segments中删除
       // 负责将新路径段拼接到现有参考线上
       if (!ExtendReferenceLine(vehicle_state, &(*iter),
                                &reference_lines->back())) {
@@ -929,8 +947,11 @@ bool ReferenceLineProvider::IsReferenceLineSmoothValid(
 
 AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     const ReferenceLine &reference_line, double s) const {
+  // 1.设置纵向边界限制
   AnchorPoint anchor;
   anchor.longitudinal_bound = smoother_config_.longitudinal_boundary_bound();
+
+  // 2. 获取参考点
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     anchor.path_point = ref_point.ToPathPoint(s);
@@ -1006,16 +1027,25 @@ void ReferenceLineProvider::GetAnchorPoints(
     const ReferenceLine &reference_line,
     std::vector<AnchorPoint> *anchor_points) const {
   CHECK_NOTNULL(anchor_points);
+// interval为采样间隔，默认max_constraint_interval=0.25，即路径累积距离0.25m采样一个点
   const double interval = smoother_config_.max_constraint_interval();
+
+// 路径采样点数量计算
   int num_of_anchors =
       std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));
+
+// uniform_slice函数就是对[0, len]区间等间隔采样，每两个点之间距离为(length_ - 0.0)/(num_of_anchors - 1)
   std::vector<double> anchor_s;
   common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
                               &anchor_s);
+
+// 计算采样点的坐标(x,y),并进行矫正
   for (const double s : anchor_s) {
     AnchorPoint anchor = GetAnchorPoint(reference_line, s);
     anchor_points->emplace_back(anchor);
   }
+
+  // 参考线首位两点设置强约束
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
   anchor_points->front().enforced = true;
@@ -1082,6 +1112,7 @@ bool ReferenceLineProvider::SmoothReferenceLine(
   std::vector<AnchorPoint> anchor_points;
   GetAnchorPoints(raw_reference_line, &anchor_points);
   smoother_->SetAnchorPoints(anchor_points);
+  // 调用具体的平滑算法进行参考线平滑
   if (!smoother_->Smooth(raw_reference_line, reference_line)) {
     AERROR << "Failed to smooth reference line with anchor points";
     return false;
