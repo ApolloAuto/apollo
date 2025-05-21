@@ -16,64 +16,69 @@ enum TurnSignal {
   TURN_RIGHT = 2;
 }
 
+// 延迟统计信息（用于调试）
 message LatencyStats {
-  optional double total_time_ms = 1;
-  repeated double controller_time_ms = 2;
-  optional bool total_time_exceeded = 3;
+  optional double total_time_ms = 1;  // 总耗时，单位为毫秒
+  repeated double controller_time_ms = 2;  // 控制器各部分耗时
+  optional bool total_time_exceeded = 3;   // 总时间是否超出阈值
 }
 
 // next id : 27
+// 控制命令（核心控制输出）
 message ControlCommand {
-  optional apollo.common.Header header = 1;
+  optional apollo.common.Header header = 1; // 通用消息头
   // target throttle in percentage [0, 100]
-  optional double throttle = 3;
+  optional double throttle = 3;   // 油门百分比（0~100）
 
   // target brake in percentage [0, 100]
-  optional double brake = 4;
+  optional double brake = 4;   // 刹车百分比（0~100）
 
   // target non-directional steering rate, in percentage of full scale per
   // second [0, 100]
-  optional double steering_rate = 6;
+  optional double steering_rate = 6;  // 转向速率（百分比）
 
   // target steering angle, in percentage of full scale [-100, 100]
-  optional double steering_target = 7;
+  optional double steering_target = 7;  // 目标转角（百分比，-100~100）
 
   // parking brake engage. true: engaged
-  optional bool parking_brake = 8;
+  optional bool parking_brake = 8;  // 驻车制动（true 表示激活）
 
   // target speed, in m/s
-  optional double speed = 9;
+  optional double speed = 9;  // 目标车速（m/s）
 
   // target acceleration in m`s^-2
-  optional double acceleration = 10;
+  optional double acceleration = 10;  // 目标加速度（m/s²）
 
   // model reset
-  optional bool reset_model = 16 [deprecated = true];
+  optional bool reset_model = 16 [deprecated = true];  // 是否重置控制模型（已废弃）
   // engine on/off, true: engine on
-  optional bool engine_on_off = 17;
+  optional bool engine_on_off = 17;  // 发动机启停
   // completion percentage of trajectory planned in last cycle
-  optional double trajectory_fraction = 18;
+  optional double trajectory_fraction = 18;   // 上一周期轨迹完成度（0~1）
   optional apollo.canbus.Chassis.DrivingMode driving_mode = 19
-      [deprecated = true];
-  optional apollo.canbus.Chassis.GearPosition gear_location = 20;
+      [deprecated = true];  // 驾驶模式（已废弃）
+  optional apollo.canbus.Chassis.GearPosition gear_location = 20; // 档位状态
 
-  optional Debug debug = 22;
-  optional apollo.common.VehicleSignal signal = 23;
-  optional LatencyStats latency_stats = 24;
-  optional PadMessage pad_msg = 25;
-  optional apollo.common.EngageAdvice engage_advice = 26;
-  optional bool is_in_safe_mode = 27 [default = false];
+  optional Debug debug = 22; // 控制调试信息
+  optional apollo.common.VehicleSignal signal = 23;  // 灯光/喇叭等信号
+  optional LatencyStats latency_stats = 24;   // 延迟统计信息
+  optional PadMessage pad_msg = 25;  // 来自人机交互的 Pad 消息
+  optional apollo.common.EngageAdvice engage_advice = 26;  // 系统是否建议 engage
+  optional bool is_in_safe_mode = 27 [default = false];   // 是否处于安全模式（例如应急状态）
 
+  // 以下字段已废弃
   // deprecated fields
   optional bool left_turn = 13 [deprecated = true];
   optional bool right_turn = 14 [deprecated = true];
   optional bool high_beam = 11 [deprecated = true];
   optional bool low_beam = 12 [deprecated = true];
   optional bool horn = 15 [deprecated = true];
-  optional TurnSignal turnsignal = 21 [deprecated = true];
+  optional TurnSignal turnsignal = 21 [deprecated = true]; // 转向灯状态（已弃用，建议使用 VehicleSignal）
 }
 
+// 简单纵向控制调试信息
 message SimpleLongitudinalDebug {
+ // 包含站点误差、速度误差、加速度误差、控制输出、PID饱和状态等。
   optional double station_reference = 1;
   optional double station_error = 2;
   optional double station_error_limited = 3;
@@ -88,13 +93,13 @@ message SimpleLongitudinalDebug {
   optional double acceleration_cmd = 12;
   optional double acceleration_lookup = 13;
   optional double speed_lookup = 14;
-  optional double calibration_value = 15;
-  optional double throttle_cmd = 16;
-  optional double brake_cmd = 17;
-  optional bool is_full_stop = 18;
+  optional double calibration_value = 15;  // 表示经过标定曲线处理后的值
+  optional double throttle_cmd = 16;  // 油门输出值
+  optional double brake_cmd = 17;     // 刹车输出值
+  optional bool is_full_stop = 18;  // 表示是否完全停车
   optional double slope_offset_compensation = 19;
-  optional double current_station = 20;
-  optional double path_remain = 21;
+  optional double current_station = 20;  // 表示当前位置
+  optional double path_remain = 21;     // 剩余路径长度
   optional int32 pid_saturation_status = 22;
   optional int32 leadlag_saturation_status = 23;
   optional double speed_offset = 24;
@@ -108,7 +113,7 @@ message SimpleLongitudinalDebug {
   optional apollo.common.TrajectoryPoint current_matched_point = 32;
   optional apollo.common.TrajectoryPoint current_reference_point = 33;
   optional apollo.common.TrajectoryPoint preview_reference_point = 34;
-  optional double acceleration_lookup_limit = 35;
+  optional double acceleration_lookup_limit = 35;  // lookup 表示查表获得的控制值
   optional double vehicle_pitch = 36;
   optional bool is_epb_brake = 37;
   optional double current_steer_interval = 38;
@@ -118,6 +123,7 @@ message SimpleLongitudinalDebug {
   optional bool is_full_stop_soft = 42;
 }
 
+// 简单横向控制调试信息
 message SimpleLateralDebug {
   optional double lateral_error = 1;
   optional double ref_heading = 2;
@@ -133,7 +139,7 @@ message SimpleLateralDebug {
   optional double steer_angle_heading_contribution = 12;
   optional double steer_angle_heading_rate_contribution = 13;
   optional double steer_angle_feedback = 14;
-  optional double steering_position = 15;
+  optional double steering_position = 15;  // 当前方向盘位置
   optional double ref_speed = 16;
   optional double steer_angle_limited = 17;
 
@@ -163,19 +169,22 @@ message SimpleLateralDebug {
   optional double heading_error_feedback = 29;
 
   // current planning target point
+  // 当前规划点
   optional apollo.common.TrajectoryPoint current_target_point = 30;
 
   // Augmented feedback control term in addition to LQR control
-  optional double steer_angle_feedback_augment = 31;
+  optional double steer_angle_feedback_augment = 31; // 增强反馈项
 
   // Mrac control status and feedback states for steer control
-  optional MracDebug steer_mrac_debug = 32;
+  optional MracDebug steer_mrac_debug = 32;  // MRAC 控制器调试信息
   optional bool steer_mrac_enable_status = 33;
 
   // lat acc in ENU, in m/s^2
+  // 车身离心加速度（ENU 坐标系）
   optional double lateral_centripetal_acceleration = 34;
 }
 
+// MPC 控制调试信息（集成横纵向控制）
 message SimpleMPCDebug {
   optional double lateral_error = 1;
   optional double ref_heading = 2;
@@ -258,24 +267,26 @@ message SimpleMPCDebug {
   optional double acceleration_vrf = 64;
 }
 
+// MRAC 控制器调试信息（模型参考自适应控制）
 message MracDebug {
-  optional int32 mrac_model_order = 1;
-  repeated double mrac_reference_state = 2;
-  repeated double mrac_state_error = 3;
-  optional MracAdaptiveGain mrac_adaptive_gain = 4;
-  optional int32 mrac_reference_saturation_status = 5;
-  optional int32 mrac_control_saturation_status = 6;
+  optional int32 mrac_model_order = 1; // MRAC 模型阶数
+  repeated double mrac_reference_state = 2; // 参考状态向量
+  repeated double mrac_state_error = 3; // 状态误差
+  optional MracAdaptiveGain mrac_adaptive_gain = 4; // 自适应增益
+  optional int32 mrac_reference_saturation_status = 5; // 参考输入饱和状态
+  optional int32 mrac_control_saturation_status = 6;  // 控制输出饱和状态
 }
 
 message MracAdaptiveGain {
-  repeated double state_adaptive_gain = 1;
-  repeated double input_adaptive_gain = 2;
-  repeated double nonlinear_adaptive_gain = 3;
+  repeated double state_adaptive_gain = 1; // 状态反馈增益
+  repeated double input_adaptive_gain = 2;  // 输入反馈增益
+  repeated double nonlinear_adaptive_gain = 3;  // 非线性反馈增益
 }
 
+// 调试结构体顶层封装
 message Debug {
-  optional SimpleLongitudinalDebug simple_lon_debug = 1;
-  optional SimpleLateralDebug simple_lat_debug = 2;
-  optional InputDebug input_debug = 3;
-  optional SimpleMPCDebug simple_mpc_debug = 4;
+  optional SimpleLongitudinalDebug simple_lon_debug = 1; // 纵向调试信息
+  optional SimpleLateralDebug simple_lat_debug = 2;  // 横向调试信息
+  optional InputDebug input_debug = 3;   // 控制器输入调试
+  optional SimpleMPCDebug simple_mpc_debug = 4;  // MPC 调试信息
 }

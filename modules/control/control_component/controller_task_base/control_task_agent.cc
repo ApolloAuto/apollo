@@ -57,10 +57,14 @@ Status ControlTaskAgent::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis, const planning::ADCTrajectory *trajectory,
     control::ControlCommand *cmd) {
+  // 遍历 controller_list_，每一个控制器（如 LQR、MPC 等）都将参与控制命令计算
   for (auto &controller : controller_list_) {
+  // 打印当前正在处理的控制器的名称，帮助调试和性能分析
     ADEBUG << "controller:" << controller->Name() << " processing ...";
+  // 获取当前系统时间（秒），用于统计该控制器的计算耗时
     double start_timestamp = Clock::NowInSeconds();
     controller->ComputeControlCommand(localization, chassis, trajectory, cmd);
+  // 获取控制器计算后的时间，用于计算耗时
     double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
