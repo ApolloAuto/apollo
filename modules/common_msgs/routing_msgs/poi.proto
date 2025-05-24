@@ -19,6 +19,7 @@ message ParkingInfo {
   optional apollo.hdmap.Polygon corner_point = 4;
 }
 
+// 地图上的一个点，包含了名称和位置信息
 message Landmark {
   optional string name = 1;
   repeated LaneWaypoint waypoint = 2;
@@ -27,6 +28,7 @@ message Landmark {
   optional int32 cycle_number = 5;
 }
 
+// Point of interest的缩写，一个POI中可以包含多个Landmark
 message POI {
   repeated Landmark landmark = 1;
 }

@@ -44,6 +44,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
 
 }  // namespace
 
+// FindFirstExist：在指定目录和文件名列表中找到第一个存在的文件路径（通常是依次尝试多个文件名）
 std::string BaseMapFile() {
   if (FLAGS_use_navigation_mode) {
     AWARN << "base_map file is not used when FLAGS_use_navigation_mode is true";

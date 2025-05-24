@@ -18,9 +18,9 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_string(routing_conf_file);
-DECLARE_string(routing_node_name);
+DECLARE_string(routing_conf_file);  // Routing模块配置文件的路径
+DECLARE_string(routing_node_name);  // Routing模块的节点名称
 
-DECLARE_double(min_length_for_lane_change);
-DECLARE_bool(enable_change_lane_in_result);
-DECLARE_uint32(routing_response_history_interval_ms);
+DECLARE_double(min_length_for_lane_change); // 在变道前，在当前车道上行驶的最短距离
+DECLARE_bool(enable_change_lane_in_result); // 导航结果是否允许变道
+DECLARE_uint32(routing_response_history_interval_ms); // 路由请求的响应时长
