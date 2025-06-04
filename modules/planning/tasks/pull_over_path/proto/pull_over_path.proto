@@ -15,11 +15,11 @@ message PullOverPathConfig {
     DESTINATION = 1;
   }
   optional PiecewiseJerkPathConfig path_optimizer_config = 1;
-  optional double pull_over_road_edge_buffer = 2 [default = 0.15];
-  optional double pull_over_weight = 3 [default = 10];
-  optional double pull_over_approach_lon_distance_adjust_factor = 5 [default = 1.5];
-  optional double pull_over_destination_to_adc_buffer = 6 [default = 25.0];
-  optional double pull_over_destination_to_pathend_buffer = 7 [default = 10.0];
-  optional PullOverDirection pull_over_direction = 8 [default = RIGHT_SIDE];
-  optional PullOverPosition pull_over_position = 9 [default = DESTINATION];
+  optional double pull_over_road_edge_buffer = 2 [default = 0.15];  //离道路边缘的最小缓冲距离（单位：米）
+  optional double pull_over_weight = 3 [default = 10];  // 靠边路径的代价权重:值越大越倾向选择靠边路径
+  optional double pull_over_approach_lon_distance_adjust_factor = 5 [default = 1.5]; // 靠边路径接近段的纵向距离调节因子:动态调整停车前的减速段长度
+  optional double pull_over_destination_to_adc_buffer = 6 [default = 25.0]; // 目标点与车辆之间最小前向距离：防止车辆过早停车或距离太短影响安全
+  optional double pull_over_destination_to_pathend_buffer = 7 [default = 10.0]; // 目标点与路径末端的最小距离：确保停车点不太靠近路径末尾，避免急停或路径不足
+  optional PullOverDirection pull_over_direction = 8 [default = RIGHT_SIDE]; // 靠边方向设定：
+  optional PullOverPosition pull_over_position = 9 [default = DESTINATION]; // 停车点选择方式设定
 }
