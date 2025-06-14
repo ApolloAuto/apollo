@@ -973,6 +973,11 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
 /// @param lateral  输出，投影点的横向偏移 l（即离路径的横向距离）
 /// @param min_distance 输出，给定点到路径投影点的最小距离
 /// @return 
+// 起始点投影用这个
+// 将一个 笛卡尔坐标系中的点 (x, y) 投影到一条路径 Path 上，并计算出该点在路径上的
+// s（纵向投影位置，即沿路径的累计距离）
+// l（横向偏移距离，正负代表左/右偏）
+// min_distance（到路径的最近欧氏距离）
 bool Path::GetProjection(const Vec2d& point, const double heading,
                          double* accumulate_s, double* lateral,
                          double* min_distance) const {
@@ -980,11 +985,14 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
   if (segments_.empty()) {
     return false;
   }
+
+// 判断指针非空，防止访问非法内存
   if (accumulate_s == nullptr || lateral == nullptr ||
       min_distance == nullptr) {
     return false;
   }
-  // 道路近似计算
+
+  // 判断是否启用路径近似投影
   if (use_path_approximation_) {
     return approximation_.GetProjection(*this, point, accumulate_s, lateral,
                                         min_distance);
@@ -993,9 +1001,10 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
   // 将最小距离初始化为正无穷（表示开始时找不到任何路径段），并初始化投影点所在路径段的索引为 0
   *min_distance = std::numeric_limits<double>::infinity();
   int min_index = 0;
-  // 遍历所有路径段
+  
+  /// 搜索最近段落
   for (int i = 0; i < num_segments_; ++i) {
-  // 过滤路径段的航向角与给定点航向角 heading 之间的角度大于90的点
+  // 过滤路径段的航向角与给定点航向角 heading 之间的角度大于90的点   右 x 0  前 y 90 逆时针为正
     if (abs(common::math::AngleDiff(segments_[i].heading(), heading)) >= M_PI_2)
       continue;
     const double distance = segments_[i].DistanceSquareTo(point);
@@ -1004,22 +1013,33 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
       *min_distance = distance;
     }
   }
+  // 通过上述的计算获取了最近距离以及对应的索引
+
+  // 开始正式投影
   *min_distance = std::sqrt(*min_distance);
-  // 计算投影点在路径上的 s 和 l
   const auto& nearest_seg = segments_[min_index];
-  const auto prod = nearest_seg.ProductOntoUnit(point);  // prod：点与路径段单位向量的点积
+  const auto prod = nearest_seg.ProductOntoUnit(point);  // prod点到路径的叉积(判断左右偏)
   const auto proj = nearest_seg.ProjectOntoUnit(point);  // proj：点到路径段的投影（可能为负值或大于路径段的长度）
+
+  // 根据点在路径段的位置（起始、中间、末尾）分别处理
   // 对于起点，s 是 proj 和路径段长度的最小值，l 是点积 prod 或最小距离
+  // 起点段
   if (min_index == 0) {
+    // s 最多就是这一段的长度
     *accumulate_s = std::min(proj, nearest_seg.length());
     if (proj < 0) {
+      // 若投影在段前，l 直接用 prod
       *lateral = prod;
     } else {
+      // l 按 prod 的符号赋值为 ±min_distance
       *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
     }
   } 
+
   // 对于终点，s 是累积的 s 加上投影值，l 同样取决于投影的符号和最小距离
+  // 终点段
   else if (min_index == num_segments_ - 1) {
+    // s 是累积 s + 投影位置（不能小于 0）
     *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
     if (proj > 0) {
       *lateral = prod;
@@ -1027,10 +1047,14 @@ bool Path::GetProjection(const Vec2d& point, const double heading,
       *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
     }
   } 
+
   // 对于中间段，s 是累积的 s 加上投影值（或路径段长度的最小值），l 同样是点积 prod 和最小距离
+  // 中间段
   else {
+    // s 在累积基础上加上夹在当前段内的投影
     *accumulate_s = accumulated_s_[min_index] +
                     std::max(0.0, std::min(proj, nearest_seg.length()));
+    // l 直接根据 prod 正负判断左右偏
     *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
   }
   return true;

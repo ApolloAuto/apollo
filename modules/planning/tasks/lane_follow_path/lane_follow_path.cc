@@ -43,8 +43,13 @@ bool LaneFollowPath::Init(const std::string& config_dir,
   return Task::LoadConfig<LaneFollowPathConfig>(&config_);
 }
 
+/// @brief 
+/// @param frame 当前的全局规划帧对象，包含所有障碍物、参考线等信息
+/// @param reference_line_info 当前处理的参考线对象，里面包含与该参考线相关的路径、速度、障碍物等数据
+/// @return 
 apollo::common::Status LaneFollowPath::Process(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
+  // 已有路径数据 或者 路径可以复用
   if (!reference_line_info->path_data().Empty() ||
       reference_line_info->path_reusable()) {
     ADEBUG << "Skip this time path empty:"
@@ -52,10 +57,15 @@ apollo::common::Status LaneFollowPath::Process(
            << "path reusable: " << reference_line_info->path_reusable();
     return Status::OK();
   }
+  // 候选路径边界集合
   std::vector<PathBoundary> candidate_path_boundaries;
+  // 候选路径数据集合（路径点序列）
   std::vector<PathData> candidate_path_data;
-
+  
+  // 获取车辆起点的 SL 坐标（S：沿参考线的距离，L：垂直偏移）
   GetStartPointSLState();
+
+  // 计算候选路径边界（避障的左右限位）
   if (!DecidePathBounds(&candidate_path_boundaries)) {
     AERROR << "Decide path bound failed";
     return Status::OK();
@@ -78,12 +88,15 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   // 在 boundary 向量的末尾添加一个新的空 PathBoundary
   boundary->emplace_back();
   auto& path_bound = boundary->back();
+
   // 存储障碍物ID
   std::string blocking_obstacle_id = "";
   // 车道类型
   std::string lane_type = "";
   // 路径最窄宽度
   double path_narrowest_width = 0;
+
+  //  先初始化路径边界为一个非常宽的区域，保证后续有空间收窄
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!PathBoundsDeciderUtil::InitPathBoundary(*reference_line_info_,
                                                &path_bound, init_sl_state_)) {
@@ -92,6 +105,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   std::string borrow_lane_type;
+
+  // 配置决定是否将自动驾驶车本体边界包含在路径边界内，避免规划路径脱离车辆实际占据空间
   // 将自动驾驶车辆（ADC）包括在车道边界内
   bool is_include_adc = config_.is_extend_lane_bounds_to_include_adc() &&
                         !injector_->planning_context()
@@ -105,7 +120,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     AERROR << "Failed to decide a rough boundary based on self lane.";
     return false;
   }
-  // 要扩展边界以包括自动驾驶车辆
+ 
+  // 将车辆占据的空间（含一定缓冲）加入路径边界，避免规划路径侵入车辆自身
   if (is_include_adc) {
     PathBoundsDeciderUtil::ExtendBoundaryByADC(
         *reference_line_info_, init_sl_state_, config_.extend_buffer(),

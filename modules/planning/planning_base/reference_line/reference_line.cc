@@ -222,21 +222,40 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
 //并返回一个 std::pair<std::array<double, 3>, std::array<double, 3>> 类型的值
 /// @param traj_point 
 /// @return 
+// 返回值： std::pair<std::array<double, 3>, std::array<double, 3>>
+// s_condition：沿参考线方向的【位置 s，速度 s'，加速度 s''】；
+// l_condition：垂直参考线方向的【偏移量 l，速度 l'，加速度 l''】。
 std::pair<std::array<double, 3>, std::array<double, 3>>
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   // 验证参考点非空
   ACHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
-  // 将轨迹点的 (x, y) 坐标和角度 theta() 转换为 Frenet 坐标系中的 s 和 l 值
+  // 使用 XYToSL 函数，将 traj_point 对应的 (x, y) 坐标转换成 Frenet 系的 (s, l)
+  // s：点在线上的投影点离参考线起点的距离
+  // l：点到参考线的垂直距离
+  // theta 用于辅助判断偏移方向（左侧为正 l，右侧为负 l）
+  // 第一步：
   XYToSL(traj_point.path_point().theta(),
          {traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
 
+  // 结果变量
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
-  // 使用 sl_point.s() 获取对应的参考点
+  
+  // 根据上一步获得的 s 值，在参考线上获取对应的 ReferencePoint（插值或查表）
+  // 包含：x, y, heading（朝向）, kappa（曲率）, dkappa（曲率变化率）等信息
+  // 这个点是 Frenet 转换的“基准点”
+  // 第二步：进行插值查找
   ReferencePoint ref_point = GetReferencePoint(sl_point.s());
+
   // 将轨迹点的笛卡尔坐标转换为 Frenet 坐标
+  // s：路径上投影点的弧长位置
+  // s'：在参考线方向上的速度
+  // s''：在参考线方向上的加速度
+  // l：车辆相对于参考线的横向偏移
+  // l'：横向速度
+  // l''：横向加速度
   CartesianFrenetConverter::cartesian_to_frenet(
       sl_point.s(), ref_point.x(), ref_point.y(), ref_point.heading(),
       ref_point.kappa(), ref_point.dkappa(), traj_point.path_point().x(),
@@ -457,6 +476,10 @@ bool ReferenceLine::XYToSL(const double heading,
   double s = warm_start_s;
   double l = 0.0;
   if (warm_start_s < 0.0) {
+    // 调用 `map_path_` 的方法在参考线上**搜索离 `(x, y)` 最近的投影点**，返回：
+    // `s`：投影点在参考线上的弧长
+    // `l`：输入点到投影点的横向偏移（垂直于参考线方向，左正右负）
+    // heading: 右方 x轴 0 前方  y轴  90  逆时针
     if (!map_path_.GetProjection(heading, xy_point, &s, &l)) {
       AERROR << "Cannot get nearest point from path.";
       return false;
