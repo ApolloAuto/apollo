@@ -128,12 +128,10 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
         &path_bound);
   }
   PrintCurves print_curve;
-  // 获取路径决策中的障碍物列表
+  
+  //  遍历障碍物，将其在路径坐标系上的边界点保存，用于后续可视化或日志调试
   auto indexed_obstacles = reference_line_info_->path_decision()->obstacles();
-  // 遍历每个障碍物
   for (const auto* obs : indexed_obstacles.Items()) {
-    // 对每个障碍物，提取其在路径坐标系中的边界
-    // 查看 reference_line_.GetSLboundary
     const auto& sl_bound = obs->PerceptionSLBoundary();
     for (int i = 0; i < sl_bound.boundary_point_size(); i++) {
       std::string name = obs->Id() + "_obs_sl_boundary";
@@ -146,6 +144,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = path_bound;
   // 根据静态障碍物进一步微调路径边界
+  // 会选出最远的那个阻塞障碍物id
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           *reference_line_info_, init_sl_state_, &path_bound,
           &blocking_obstacle_id, &path_narrowest_width)) {
@@ -156,6 +155,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   // 4. Append some extra path bound points to avoid zero-length path data.
+  // 如果有阻挡障碍物，给路径边界尾部加额外点，防止路径变成零长度
   // 向路径边界中添加一些额外的边界点，以避免生成零长度的路径数据
   int counter = 0;
   while (!blocking_obstacle_id.empty() &&
@@ -165,6 +165,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     counter++;
   }
 
+  //  更新规划状态中的障碍物阻塞信息
   // lane_follow_status update
   auto* lane_follow_status = injector_->planning_context()
                                     ->mutable_planning_status()
@@ -182,7 +183,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
       lane_follow_status->set_lane_follow_block(true);
     }
     lane_follow_status->set_last_block_timestamp(current_time);
-  } else { // 如果没有障碍物，则重置相关状态
+  } else { 
+    // 无阻塞，重置相关状态
     if (lane_follow_status->lane_follow_block()) {
       lane_follow_status->set_block_duration(0);
       lane_follow_status->set_lane_follow_block(false);
@@ -191,6 +193,7 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   }
 
   ADEBUG << "Completed generating path boundaries.";
+  // 检查初始车辆横向位置是否在路径边界内
   // 如果需要包括 ADC，检查初始化时车辆的横向位置是否在路径边界内。如果不在边界内，表示可能发生了车道借道，返回 false
   if (is_include_adc) {
     CHECK_LE(init_sl_state_.second[0], path_bound[0].l_upper.l);
@@ -216,22 +219,34 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   return true;
 }
 
+/// @brief 
+/// @param path_boundaries 
+/// @param candidate_path_data 
+/// @return 
 bool LaneFollowPath::OptimizePath(
     const std::vector<PathBoundary>& path_boundaries,
     std::vector<PathData>* candidate_path_data) {
+  // 从成员变量中提取路径优化器的参数配置
   const auto& config = config_.path_optimizer_config();
+  // 获取参考线: 用于计算曲率（kappa）、起止点坐标等几何信息
   const ReferenceLine& reference_line = reference_line_info_->reference_line();
+  // 设置终点状态: 路径优化器使用起点、终点状态作为优化约束，这里设定终点为 0 横向偏移、0 速度、0 加速度
   std::array<double, 3> end_state = {0.0, 0.0, 0.0};
+  // 遍历所有路径边界: 对每一条候选路径边界执行一次路径优化
   for (const auto& path_boundary : path_boundaries) {
+    // 路径边界校验: 确保路径边界的点数量足够（至少两个点），否则报错返回失败
     size_t path_boundary_size = path_boundary.boundary().size();
     if (path_boundary_size <= 1U) {
       AERROR << "Get invalid path boundary with size: " << path_boundary_size;
       return false;
     }
+    // 定义优化结果容器: 存储优化得到的横向偏移 l、一阶导数 dl（速度）和二阶导数 ddl（曲率变化）
     std::vector<double> opt_l, opt_dl, opt_ddl;
+    // 计算曲率二阶导（加速度）的边界：根据路径边界和参考线信息，计算每个点允许的最大曲率变化范围（上下限）
     std::vector<std::pair<double, double>> ddl_bounds;
     PathOptimizerUtil::CalculateAccBound(path_boundary, reference_line,
                                          &ddl_bounds);
+    // 调试输出参考线曲率：收集每个点对应的参考线曲率，并输出至日志用于调试（可视化工具查看路径曲率变化）
     PrintCurves print_debug;
     for (size_t i = 0; i < path_boundary_size; ++i) {
       double s = static_cast<double>(i) * path_boundary.delta_s() +
@@ -241,28 +256,38 @@ bool LaneFollowPath::OptimizePath(
           "ref_kappa", static_cast<double>(i) * path_boundary.delta_s(), kappa);
     }
     print_debug.PrintToLog();
+    
+    // 估计路径平滑性限制（jerk 限制）：通过当前初始状态的横向速度估算路径允许的最大三阶导数（jerk）边界
     const double jerk_bound = PathOptimizerUtil::EstimateJerkBoundary(
         std::fmax(init_sl_state_.first[1], 1e-12));
+    // 生成路径参考偏移（ref_l）及其权重：通常以中心线或安全区域为参考，引导优化结果向安全区域居中，同时赋予不同位置不同的优化权重
     std::vector<double> ref_l(path_boundary_size, 0);
     std::vector<double> weight_ref_l(path_boundary_size, 0);
     PathOptimizerUtil::UpdatePathRefWithBound(
         path_boundary, config.path_reference_l_weight(), &ref_l, &weight_ref_l);
+    // 执行路径优化： 对当前 path_boundary 区域执行最小化 cost 的轨迹规划，结果保存在 opt_l, opt_dl, opt_ddl 中
     bool res_opt = PathOptimizerUtil::OptimizePath(
         init_sl_state_, end_state, ref_l, weight_ref_l, path_boundary,
         ddl_bounds, jerk_bound, config, &opt_l, &opt_dl, &opt_ddl);
     if (res_opt) {
+      // 生成 Frenet 坐标系下的路径结构： 将优化结果转为可用于后续坐标转换与跟踪控制的结构体
       auto frenet_frame_path = PathOptimizerUtil::ToPiecewiseJerkPath(
           opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
           path_boundary.start_s());
+      //  构造路径数据对象 PathData：绑定参考线并设置刚才优化得到的 Frenet 路径
       PathData path_data;
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(std::move(frenet_frame_path));
+      // 前轴 / 后轴参考点转换：某些规划场景下需要以前轴中心（或后轴中心）为参考点进行路径转换，以匹配控制器模型
       if (FLAGS_use_front_axe_center_in_path_planning) {
         auto discretized_path = DiscretizedPath(
             PathOptimizerUtil::ConvertPathPointRefFromFrontAxeToRearAxe(
                 path_data));
         path_data.SetDiscretizedPath(discretized_path);
       }
+      // 设置路径标签和阻塞障碍物 ID
+      // path_label：用于标识该路径用途（如主道、换道、临停等）
+      // blocking_obstacle_id：路径被谁阻挡了，便于后续决策使用
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data->push_back(std::move(path_data));

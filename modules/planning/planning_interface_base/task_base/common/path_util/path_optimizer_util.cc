@@ -68,9 +68,13 @@ FrenetFramePath PathOptimizerUtil::ToPiecewiseJerkPath(
 double PathOptimizerUtil::EstimateJerkBoundary(const double vehicle_speed) {
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  const double axis_distance = veh_param.wheel_base();
+  const double axis_distance = veh_param.wheel_base();  // 轴距
+  // max_steer_angle_rate() 是转向盘角速度的最大值（单位：弧度/秒或度/秒）
+  // 除以转向比 (steer_ratio) 后得到前轮实际转向角速度最大值
   const double max_yaw_rate =
       veh_param.max_steer_angle_rate() / veh_param.steer_ratio();
+  // 最大偏航角速度除以轴距，得到最大曲率变化率（单位 1/m/s）
+  // 再除以车辆当前速度，转成曲率的“变化率的变化率”，即路径的横向 jerk 边界
   return max_yaw_rate / axis_distance / vehicle_speed;
 }
 
@@ -187,6 +191,7 @@ bool PathOptimizerUtil::OptimizePath(
 void PathOptimizerUtil::UpdatePathRefWithBound(
     const PathBoundary& path_boundary, double weight,
     std::vector<double>* ref_l, std::vector<double>* weight_ref_l) {
+  // 大小调整为和路径边界点数量相同，准备存储每个路径点的参考横向偏移值和权重
   ref_l->resize(path_boundary.size());
   weight_ref_l->resize(path_boundary.size());
   for (size_t i = 0; i < ref_l->size(); i++) {
@@ -194,8 +199,10 @@ void PathOptimizerUtil::UpdatePathRefWithBound(
         path_boundary[i].l_upper.type == BoundType::OBSTACLE) {
       ref_l->at(i) =
           (path_boundary[i].l_lower.l + path_boundary[i].l_upper.l) / 2.0;
+      // 将权重设置为传入的参数 weight，表示路径优化时尽量靠近这个参考横向位置，权重越大越重要
       weight_ref_l->at(i) = weight;
     } else {
+      // 如果当前路径点左右边界都不是障碍物（没有特别限制），则权重设为0，不强制路径靠近某个横向参考
       weight_ref_l->at(i) = 0;
     }
   }
@@ -211,9 +218,14 @@ void PathOptimizerUtil::CalculateAccBound(
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 // 计算车辆在最大转向角下的横向加速度边界
+// veh_param.max_steer_angle() 是最大前轮转向角（单位一般是弧度）
+// 除以 veh_param.steer_ratio() 把转向盘角度换算成前轮角度
+// tan(前轮角度) 代表车辆侧向力的切线值
+// 除以轴距（wheel_base）得到车辆绕垂直轴转动的曲率上限
   const double lat_acc_bound =
       std::tan(veh_param.max_steer_angle() / veh_param.steer_ratio()) /
       veh_param.wheel_base();
+// 获取路径边界点数量
   size_t path_boundary_size = path_boundary.boundary().size();
   for (size_t i = 0; i < path_boundary_size; ++i) {
     double s = static_cast<double>(i) * path_boundary.delta_s() +
