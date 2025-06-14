@@ -62,10 +62,11 @@ STBoundaryMapper::STBoundaryMapper(
       planning_max_time_(planning_time),
       injector_(injector) {}
 /// @brief 
-/// @param path_decision 一个 PathDecision* 类型的参数 path_decision，表示路径决策对象，包含路径规划过程中所有的障碍物和决策信息
+/// @param path_decision 路径上的障碍物决策信息，包含每个障碍物的状态、决策结果等。
 /// @return 
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   // Sanity checks.
+  // 1.参数有效性检查
   // 确保 planning_max_time_（规划最大时间）大于 0，确保时间配置有效
   //断言检查规划时间 planning_max_time_ 必须大于 0，确保时间参数合法
   CHECK_GT(planning_max_time_, 0.0);
@@ -79,6 +80,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
                   "Fail to get params because of too few path points");
   }
 
+  // 2.遍历路径决策中的每个障碍物，计算其 ST 边界
   // Go through every obstacle.
   // 记录最近的停车障碍物
   // stop_obstacle：记录距离最近的停车障碍物
@@ -94,16 +96,19 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
     ACHECK(ptr_obstacle != nullptr);
 
+    // 3. 根据障碍物是否已有纵向决策，分别处理
+    
     // 无纵向决策的障碍物处理
     // If no longitudinal decision has been made, then plot it onto ST-graph.
     // 如果该障碍物没有纵向决策（即没有决定是否停车、是否超车等），则将其时空边界绘制到 ST 图中，调用 ComputeSTBoundary 递归处理该障碍物，然后继续处理下一个障碍物
-// 若障碍物 无纵向决策（如未标记停车/跟随），调用 ComputeSTBoundary 生成基础 ST 边界（根据障碍物运动预测）
+    // 若障碍物 无纵向决策（如未标记停车/跟随），调用 ComputeSTBoundary 生成基础 ST 边界（根据障碍物运动预测）
     if (!ptr_obstacle->HasLongitudinalDecision()) {
       ComputeSTBoundary(ptr_obstacle);
       continue;
     }
 
-// 处理停车决策
+    // 4. 若有纵向决策，根据不同类型调整 ST 边界
+    // 处理停车决策
     // If there is a longitudinal decision, then fine-tune boundary.
     // 如果障碍物有纵向决策，则获取其决策，存储在 decision 中。该决策可能包括停车、跟随、超车、让行等
     const auto& decision = ptr_obstacle->LongitudinalDecision();
@@ -139,6 +144,8 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
       AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }
+
+  // 5. 如果有停车障碍物，映射停车决策到 ST 图
   // 如果找到停车决策（stop_obstacle 非空），则调用 MapStopDecision 函数来处理停车决策并更新相应的时空边界
   if (stop_obstacle) {
   // MapStopDecision 将停车点转换为 ST 图中的垂直线（时间轴上的固定 s 值）
@@ -223,10 +230,10 @@ void STBoundaryMapper::ComputeSTBoundary(Obstacle* obstacle) const {
   }
 
   // 计算重叠边界点
-  // 存储计算出的时间-空间边界的下边界点
-  std::vector<STPoint> lower_points;  // 时空下边界点（s 较小侧）
-  // 存储计算出的时间-空间边界的上边界点
-  std::vector<STPoint> upper_points;  // 时空上边界点（s 较大侧）
+  // 存储ST边界的下边界点集（时间-空间图中边界的下限）
+  std::vector<STPoint> lower_points; 
+  // ST边界的上边界点集（时间-空间图中边界的上限）
+  std::vector<STPoint> upper_points;  
   // 计算出重叠的边界点
   // discretized_path：离散化的车辆规划路径
   // obstacle：当前处理的障碍物对象

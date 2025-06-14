@@ -49,20 +49,25 @@ bool SpeedBoundsDecider::Init(
   // Load the config this task.
   return Decider::LoadConfig<SpeedBoundsDeciderConfig>(&config_);
 }
-/// @brief 
-/// @param frame 
-/// @param reference_line_info 
+
+/// @brief 在路径上生成 ST 图（空间-时间图）边界和速度限制信息，为后续速度优化器提供输入
+/// @param frame 当前规划周期的帧数据，包含起点、历史轨迹、决策等全局信息
+/// @param reference_line_info 当前参考线的规划信息（如路径、障碍物决策、参考线等）
 /// @return 
 Status SpeedBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // retrieve data from frame and reference_line_info
-  //从 reference_line_info 和 frame 中获取规划所需的 路径数据、起点状态、参考线 和 路径决策对象
+  // path_data：表示当前参考线上的路径信息
   const PathData &path_data = reference_line_info->path_data(); // 规划的路径点序列
+  // init_point：车辆当前的起始状态
   const TrajectoryPoint &init_point = frame->PlanningStartPoint(); // 规划的起点状态（位置、速度、加速度等）
+  // reference_line：参考线本身，包含 lane 信息
   const ReferenceLine &reference_line = reference_line_info->reference_line(); // 车道中心线或全局路径
+  // path_decision：路径上的障碍物决策结果对象，用于访问和修改障碍物的属性
   PathDecision *const path_decision = reference_line_info->path_decision(); // 存储路径上的障碍物决策结果（如绕行、停车等）
 
   // 1. Map obstacles into st graph
+  // 步骤1：映射障碍物到 ST 图
   // 记录开始时间，创建 STBoundaryMapper 对象用于将障碍物映射到ST图（即时空图）
   auto time1 = std::chrono::system_clock::now();
   // config_：配置参数（如总时间 total_time）
@@ -85,6 +90,7 @@ Status SpeedBoundsDecider::Process(
     // 若映射失败，返回错误状态 PLANNING_ERROR
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   // 记录结束时间，并计算ST边界计算的时间（单位为毫秒），输出调试信息
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;
@@ -110,6 +116,8 @@ Status SpeedBoundsDecider::Process(
       boundaries.push_back(&st_boundary);
     }
   }
+
+
  // 获取速度回退的最小 s 位置（可能是路径上的某个点，用于设置速度限制的回退距离）
  // 计算 ST 边界中所有障碍物的最小 s 值，作为速度规划的安全回退距离
  // 确保车辆在遇到障碍物时能提前减
@@ -137,11 +145,13 @@ Status SpeedBoundsDecider::Process(
 
   // Load generated st graph data back to frame
   // 将生成的ST图数据加载到 frame 中
+  // 获取当前参考线下的 ST 图数据结构，用于向优化器传递 ST 边界与速度限制信息
   StGraphData *st_graph_data = reference_line_info_->mutable_st_graph_data();
 
   // Add a st_graph debug info and save the pointer to st_graph_data for
   // optimizer logging
   // 创建调试信息并保存 st_graph_data 的指针，以便日志记录器使用
+  // 获取调试信息对象，并为本次规划新建一个 STGraphDebug 实例
   auto *debug = reference_line_info_->mutable_debug();
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
