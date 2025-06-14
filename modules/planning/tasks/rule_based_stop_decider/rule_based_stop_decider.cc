@@ -50,17 +50,28 @@ bool RuleBasedStopDecider::Init(
   return Decider::LoadConfig<RuleBasedStopDeciderConfig>(&config_);
 }
 
+/// @brief 根据一系列规则（rule-based）来决定是否在特定位置设置停止点（Stop），以保证车辆行驶的安全性与合规性
+/// @param frame 当前规划帧（包含所有规划过程信息，如决策、障碍物、参考线等）
+/// @param reference_line_info 当前参考线上的信息（包含路径、车辆位置、参考点等）
+/// @return 
 apollo::common::Status RuleBasedStopDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // 1. Rule_based stop for side pass onto reverse lane
+  //  靠边通行（side-pass）时在逆向车道设置停止点
+  // 如果车辆需要靠边绕行，而且需要临时进入逆向车道，该逻辑判断是否需要在进入之前设置一个停止点
+  // 目的：防止突然并入逆行车道造成冲突，特别是在能见度或可行驶空间受限时
   StopOnSidePass(frame, reference_line_info);
 
   // 2. Rule_based stop for urgent lane change
+  // 检查紧急变道的情况
+  // 目的：判断是否有因为路线限制或障碍物导致的“必须立刻变道”的情况
   if (config_.enable_lane_change_urgency_checking()) {
     CheckLaneChangeUrgency(frame);
   }
 
   // 3. Rule_based stop at path end position
+  // 在路径终点处添加停止点
+  // 检查当前参考路径的终点，如果路径长度不足或前方没有可行驶空间，则设置停止点
   AddPathEndStop(frame, reference_line_info);
 
   return Status::OK();
@@ -115,14 +126,19 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
   }
 }
 
+/// @brief 在路径终点处添加一个停止点（stop decision），用于防止车辆在路径较短或规划不足时继续前进，确保安全
+/// @param frame 当前 Frame（整个规划周期的数据集合，包括决策、参考线等）
+/// @param reference_line_info 当前的参考线信息
 void RuleBasedStopDecider::AddPathEndStop(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   if (!reference_line_info->path_data().path_label().empty() &&
       reference_line_info->path_data().frenet_frame_path().back().s() -
               reference_line_info->path_data().frenet_frame_path().front().s() <
           config_.short_path_length_threshold()) {
+    // 构造一个虚拟障碍物（stop wall）的 ID，例如 "STOP_PATH_END_<path_label>"        
     const std::string stop_wall_id =
         PATH_END_VO_ID_PREFIX + reference_line_info->path_data().path_label();
+    // 此处设置停止点 不是因为具体障碍物，而是因为路径终点规则
     std::vector<std::string> wait_for_obstacles;
     util::BuildStopDecision(
         stop_wall_id,
@@ -131,6 +147,37 @@ void RuleBasedStopDecider::AddPathEndStop(
         "RuleBasedStopDecider", frame, reference_line_info);
   }
 }
+
+// 参考线
+// void RuleBasedStopDecider::AddReferenceEndStop(Frame *const frame, ReferenceLineInfo *const reference_line_info) {
+//     CHECK_NOTNULL(reference_line_info);
+//     const double ref_end_s = reference_line_info->reference_line().reference_points().back().s() -
+//                              reference_line_info->reference_line().reference_points().front().s();
+//     const double vehicle_end_s = reference_line_info->AdcSlBoundary().end_s();
+//     const double distance_to_ref_end = ref_end_s - vehicle_end_s;
+//     common::math::Vec2d xy_point(frame->goal().x(), frame->goal().y());
+
+//     if (!reference_line_info->reference_line().IsOnLane(xy_point)) {
+//         return;
+//     }
+
+//     common::SLPoint goal_sl;
+//     reference_line_info->reference_line().XYToSL(frame->goal().heading(), xy_point, &goal_sl);
+
+//     if (goal_sl.s() < reference_line_info->AdcSlBoundary().start_s()) {
+//         return;
+//     }
+
+//     const std::string stop_wall_id = "REFERENCE_LINE_END";
+//     std::vector<std::string> wait_for_obstacles;
+//     const double end_s = std::min(ref_end_s - kReferenceEndStopBuffer, goal_sl.s() - kGoalEndStopBuffer);
+//     double ref_stop_s =
+//         apollo::common::math::Clamp(end_s, reference_line_info->reference_line().reference_points().front().s(),
+//                                     reference_line_info->reference_line().reference_points().back().s());
+
+//     util::BuildStopDecision(stop_wall_id, ref_stop_s, 0.0, StopReasonCode::STOP_REASON_REFERENCE_END,
+//                             wait_for_obstacles, "RuleBasedStopDecider", frame, reference_line_info);
+// }
 
 void RuleBasedStopDecider::StopOnSidePass(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
