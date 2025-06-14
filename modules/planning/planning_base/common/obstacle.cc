@@ -299,16 +299,23 @@ void Obstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
   sl_boundary_ = sl_boundary;
 }
 
+/// @brief 根据当前障碍物的位置和车辆参数计算车辆在最小转弯半径下与障碍物的最小安全停车距离
+/// @param vehicle_param 
+/// @return 
 double Obstacle::MinRadiusStopDistance(
     const common::VehicleParam& vehicle_param) const {
   if (min_radius_stop_distance_ > 0) {
     return min_radius_stop_distance_;
   }
+  // 定义一个静态常量缓冲区（单位：米），用于增加安全冗余，默认值为 0.5 米
   static constexpr double stop_distance_buffer = 0.5;
+  // 从车辆配置中获取车辆的最小安全转弯半径，这是车辆在低速极限情况下能保持的最小转弯曲率
   const double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
+  // lateral_diff 表示车辆绕障碍物打最小方向盘时的横向最小绕行距离
   double lateral_diff =
       vehicle_param.width() / 2.0 + std::max(std::fabs(sl_boundary_.start_l()),
                                              std::fabs(sl_boundary_.end_l()));
+  // 对 lateral_diff 做限制，确保不会超过最小转弯半径
   const double kEpison = 1e-5;
   lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
   double stop_distance =
@@ -317,6 +324,7 @@ double Obstacle::MinRadiusStopDistance(
                               (min_turn_radius - lateral_diff))) +
       stop_distance_buffer;
   stop_distance -= vehicle_param.front_edge_to_center();
+  // 最后stop_distance： 把停车点设置为车辆前缘刚好到达该停止点
   stop_distance = std::min(stop_distance, FLAGS_max_stop_distance_obstacle);
   stop_distance = std::max(stop_distance, FLAGS_min_stop_distance_obstacle);
   return stop_distance;
