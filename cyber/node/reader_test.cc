@@ -30,7 +30,7 @@ namespace cyber {
 namespace reader {
 
 using proto::Chatter;
-
+//zhifei_for_test_1___1__test
 auto callback = [](const std::shared_ptr<proto::Chatter>& msg) {
   AINFO << "msg size = " << msg->ByteSizeLong();
 };

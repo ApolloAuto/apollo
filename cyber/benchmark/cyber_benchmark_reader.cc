@@ -28,17 +28,22 @@
 #include "gperftools/profiler.h"
 #endif
 
-using apollo::cyber::benchmark::BenchmarkMsg;
+using apollo::cyber::benchmark::BenchmarkMsg;  //程序员b正在开发功能 ,
 
 std::string BINARY_NAME = "cyber_benchmark_reader";  // NOLINT
 
 int nums_of_reader = 1;
+<<<<<<< HEAD
 bool enable_cpuprofile = false;
 bool enable_heapprofile = false; //this is commention of zhifei
+=======
+bool enable_cpuprofile = false;   //this is a git test from zhifei
+bool enable_heapprofile = false;
+>>>>>>> sub-branch
 std::string profile_filename = "cyber_benchmark_reader_cpu.prof";      // NOLINT
 std::string heapprofile_filename = "cyber_benchmark_reader_mem.prof";  // NOLINT
 
-void DisplayUsage() {
+void DisplayUsage() { 
   AINFO << "Usage: \n    " << BINARY_NAME << " [OPTION]...\n"
         << "Description: \n"
         << "    -h, --help: help information \n"
@@ -61,9 +66,9 @@ void DisplayUsage() {
 void GetOptions(const int argc, char* const argv[]) {
   opterr = 0;  // extern int opterr
   int long_index = 0;
-  const std::string short_opts = "hn:co:HO:";
+  const std::string short_opts = "hn:co:HO:";  //本地a子分支进行开发
   static const struct option long_opts[] = {
-      {"help", no_argument, nullptr, 'h'},
+      {"help", no_argument, nullptr, 'h'}, //本地master分支进行了变动
       {"nums_of_reader", required_argument, nullptr, 'n'},
       {"cpuprofile", no_argument, nullptr, 'c'},
       {"profile_filename", required_argument, nullptr, 'o'},

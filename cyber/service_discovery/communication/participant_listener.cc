@@ -49,7 +49,9 @@ void ParticipantListener::on_participant_discovery(
   std::lock_guard<std::mutex> lock(mutex_);
   callback_(info);
 }
-
+// this is zhifei for git test.
+// this is zhifei for git reset test 2;
+// this is zhifei for git reset test 3;
 }  // namespace service_discovery
 }  // namespace cyber
 }  // namespace apollo
