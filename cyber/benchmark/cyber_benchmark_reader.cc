@@ -34,7 +34,7 @@ std::string BINARY_NAME = "cyber_benchmark_reader";  // NOLINT
 
 int nums_of_reader = 1;
 bool enable_cpuprofile = false;
-bool enable_heapprofile = false;
+bool enable_heapprofile = false; //this is commention of zhifei
 std::string profile_filename = "cyber_benchmark_reader_cpu.prof";      // NOLINT
 std::string heapprofile_filename = "cyber_benchmark_reader_mem.prof";  // NOLINT
 
