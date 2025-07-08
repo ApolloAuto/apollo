@@ -37,13 +37,13 @@ int message_size = -1;
 int transport_freq = -1;
 int qos_policy = 0;
 int data_type = 0;
-int running_time = 10;
-bool enable_cpuprofile = false;
+int running_time = 10; 
+bool enable_cpuprofile = false;    //第二个子分支开发功能
 bool enable_heapprofile = false;   //子分支第一次开发功能
 std::string profile_filename = "cyber_benchmark_writer_cpu.prof";      // NOLINT
 std::string heapprofile_filename = "cyber_benchmark_writer_mem.prof";  // NOLINT
 
-void DisplayUsage() {
+void DisplayUsage() {  
   AINFO << "Usage: \n    " << BINARY_NAME << " [OPTION]...\n"
         << "Description: \n"
         << "    -h, --help: help information \n"
