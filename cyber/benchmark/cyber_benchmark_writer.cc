@@ -39,7 +39,7 @@ int qos_policy = 0;
 int data_type = 0;
 int running_time = 10;
 bool enable_cpuprofile = false;
-bool enable_heapprofile = false;
+bool enable_heapprofile = false;   //子分支第一次开发功能
 std::string profile_filename = "cyber_benchmark_writer_cpu.prof";      // NOLINT
 std::string heapprofile_filename = "cyber_benchmark_writer_mem.prof";  // NOLINT
 
