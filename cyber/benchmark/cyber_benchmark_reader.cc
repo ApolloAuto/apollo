@@ -38,7 +38,7 @@ bool enable_heapprofile = false;
 std::string profile_filename = "cyber_benchmark_reader_cpu.prof";      // NOLINT
 std::string heapprofile_filename = "cyber_benchmark_reader_mem.prof";  // NOLINT
 
-void DisplayUsage() {
+void DisplayUsage() { 
   AINFO << "Usage: \n    " << BINARY_NAME << " [OPTION]...\n"
         << "Description: \n"
         << "    -h, --help: help information \n"
@@ -61,7 +61,7 @@ void DisplayUsage() {
 void GetOptions(const int argc, char* const argv[]) {
   opterr = 0;  // extern int opterr
   int long_index = 0;
-  const std::string short_opts = "hn:co:HO:";
+  const std::string short_opts = "hn:co:HO:";  //本地a子分支进行开发
   static const struct option long_opts[] = {
       {"help", no_argument, nullptr, 'h'},
       {"nums_of_reader", required_argument, nullptr, 'n'},
