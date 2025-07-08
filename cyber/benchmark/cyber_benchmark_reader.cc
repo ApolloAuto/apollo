@@ -28,7 +28,7 @@
 #include "gperftools/profiler.h"
 #endif
 
-using apollo::cyber::benchmark::BenchmarkMsg;
+using apollo::cyber::benchmark::BenchmarkMsg;  //程序员b正在开发功能 ,
 
 std::string BINARY_NAME = "cyber_benchmark_reader";  // NOLINT
 
