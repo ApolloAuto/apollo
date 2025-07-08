@@ -63,7 +63,7 @@ void GetOptions(const int argc, char* const argv[]) {
   int long_index = 0;
   const std::string short_opts = "hn:co:HO:";  //本地a子分支进行开发
   static const struct option long_opts[] = {
-      {"help", no_argument, nullptr, 'h'},
+      {"help", no_argument, nullptr, 'h'}, //本地master分支进行了变动
       {"nums_of_reader", required_argument, nullptr, 'n'},
       {"cpuprofile", no_argument, nullptr, 'c'},
       {"profile_filename", required_argument, nullptr, 'o'},
