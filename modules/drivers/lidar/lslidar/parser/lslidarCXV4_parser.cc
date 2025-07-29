@@ -168,10 +168,9 @@ void LslidarCXV4Parser::GeneratePointcloud(
         const std::shared_ptr<LslidarScan> &scan_msg,
         const std::shared_ptr<PointCloud> &out_msg) {
     // allocate a point cloud with same time and frame ID as raw data
-    out_msg->mutable_header()->set_timestamp_sec(
-            scan_msg->basetime() / 1000000000.0);
-    out_msg->mutable_header()->set_module_name(
-            scan_msg->header().module_name());
+    // out_msg->mutable_header()->set_timestamp_sec(
+    //         scan_msg->basetime() / 1000000000.0);
+    out_msg->mutable_header()->set_module_name(scan_msg->header().module_name());
     out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
     out_msg->set_height(1);
     out_msg->set_measurement_time(scan_msg->basetime() / 1000000000.0);
@@ -227,6 +226,8 @@ void LslidarCXV4Parser::Unpack(
 
     // decode the packet
     decodePacket(raw_packet);
+
+    current_packet_time = pkt.stamp();
 
     if (!is_get_scan_altitude_
         && static_cast<uint16_t>(data[1211]) == 0x46) {  // old C32w
@@ -316,12 +317,16 @@ void LslidarCXV4Parser::Unpack(
 
         if (firings.distance[fir_idx] > config_.max_range()
             || firings.distance[fir_idx] < config_.min_range()) {
-            PointXYZIT *point = pc->add_point();
-            point->set_x(nan);
-            point->set_y(nan);
-            point->set_z(nan);
-            point->set_timestamp(point_time);
-            point->set_intensity(0);
+            // NAN原因 有序点云保证每条线点数一致
+            // PointXYZIT *point = pc->add_point();
+            // point->set_x(nan);
+            // point->set_y(nan);
+            // point->set_z(nan);
+            // point->set_timestamp(point_time);
+            // point->set_intensity(0);
+
+            // 无序点云
+            continue;
         } else {
             if ((firings.azimuth[fir_idx] < config_.scan_start_angle())
                 || (firings.azimuth[fir_idx] > config_.scan_end_angle()))
@@ -362,26 +367,27 @@ void LslidarCXV4Parser::Unpack(
 }
 
 void LslidarCXV4Parser::Order(std::shared_ptr<PointCloud> cloud) {
-    int width = 32;
-    cloud->set_width(width);
-    int height = cloud->point_size() / cloud->width();
-    cloud->set_height(height);
+    // 有序点云排序
+    // int width = 32;
+    // cloud->set_width(width);
+    // int height = cloud->point_size() / cloud->width();
+    // cloud->set_height(height);
 
-    std::shared_ptr<PointCloud> cloud_origin = std::make_shared<PointCloud>();
-    cloud_origin->CopyFrom(*cloud);
+    // std::shared_ptr<PointCloud> cloud_origin = std::make_shared<PointCloud>();
+    // cloud_origin->CopyFrom(*cloud);
 
-    for (int i = 0; i < width; ++i) {
-        int col = ORDER_32[i];
+    // for (int i = 0; i < width; ++i) {
+    //     int col = ORDER_32[i];
 
-        for (int j = 0; j < height; ++j) {
-            // make sure offset is initialized, should be init at setup() just
-            // once
-            int target_index = j * width + i;
-            int origin_index = j * width + col;
-            cloud->mutable_point(target_index)
-                    ->CopyFrom(cloud_origin->point(origin_index));
-        }
-    }
+    //     for (int j = 0; j < height; ++j) {
+    //         // make sure offset is initialized, should be init at setup() just
+    //         // once
+    //         int target_index = j * width + i;
+    //         int origin_index = j * width + col;
+    //         cloud->mutable_point(target_index)
+    //                 ->CopyFrom(cloud_origin->point(origin_index));
+    //     }
+    // }
 }
 
 }  // namespace parser

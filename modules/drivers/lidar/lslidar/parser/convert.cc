@@ -55,6 +55,7 @@ void Convert::ConvertPacketsToPointcloud(
     point_cloud->set_is_dense(false);
 }
 
+
 }  // namespace parser
 }  // namespace lslidar
 }  // namespace drivers

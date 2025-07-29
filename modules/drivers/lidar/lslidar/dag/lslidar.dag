@@ -4,8 +4,8 @@ module_config {
     components {
       class_name : "LslidarComponent"
       config {
-        name : "lslidar_driver_c1_v4"
-        config_file_path : "modules/drivers/lidar/lslidar/conf/lslidar1v4_conf.pb.txt"
+        name : "lslidar_driver_c16_v4"
+        config_file_path : "modules/drivers/lidar/lslidar/conf/lslidar16v4_conf.pb.txt"
       }
     }
 }

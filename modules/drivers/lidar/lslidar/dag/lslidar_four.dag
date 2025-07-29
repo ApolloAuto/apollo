@@ -1,0 +1,31 @@
+module_config {
+    module_library : "modules/drivers/lidar/lslidar/liblslidar_component.so"
+    components {
+        class_name : "LslidarComponent"
+        config {
+            name : "lslidar_c32w_left"
+            config_file_path : "modules/drivers/lidar/lslidar/conf/C32W_left_conf.pb.txt"
+        }
+    }
+    components {
+        class_name : "LslidarComponent"
+        config {
+            name : "lslidar_c32w_right"
+            config_file_path : "modules/drivers/lidar/lslidar/conf/C32W_right_conf.pb.txt"
+        }
+    }
+    components {
+        class_name : "LslidarComponent"
+        config {
+            name : "lslidar_ls180_front"
+            config_file_path : "modules/drivers/lidar/lslidar/conf/LS180S3_front_conf.pb.txt"
+        }
+    }
+    components {
+        class_name : "LslidarComponent"
+        config {
+            name : "lslidar_ls180_back"
+            config_file_path : "modules/drivers/lidar/lslidar/conf/LS180S3_back_conf.pb.txt"
+        }
+    }
+}

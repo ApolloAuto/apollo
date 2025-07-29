@@ -8,7 +8,7 @@ config_base {
 }
 
 model: LSLIDAR_C32_V4
-device_ip: "192.168.1.200"
+device_ip: "127.0.0.1"
 msop_port: 2368
 difop_port: 2369
 vertical_angle: 32   # 雷达垂直角度： 32度，70度，90度

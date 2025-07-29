@@ -8,9 +8,9 @@ config_base {
 }
 
 model: LSLIDAR_CH128X1
-device_ip: "192.168.1.200"
-msop_port: 2368
-difop_port: 2369
+device_ip: "127.0.0.1"
+msop_port: 2372
+difop_port: 2373
 packet_size: 1206
 time_synchronization: false
 add_multicast: false

@@ -1,30 +1,29 @@
 config_base {
-  scan_channel: "/apollo/sensor/lslidar16v4/Scan"
-  point_cloud_channel: "/apollo/sensor/lslidar16v4/PointCloud2"
-  frame_id: "lslidar16v4"
+  scan_channel: "/apollo/sensor/LS180S3_front/Scan"
+  point_cloud_channel: "/apollo/sensor/LS180S3_front/PointCloud2"
+  frame_id: "LS180S3_front"
 
   # sample ONLINE_LIDAR, RAW_PACKET
   source_type: ONLINE_LIDAR
 }
 
-model: LSLIDAR_C16_V4
+model: LSLIDAR_LS128S2
 device_ip: "127.0.0.1"
 msop_port: 2368
 difop_port: 2369
-return_mode: 1
-degree_mode: 2      #2: 均匀1度校准两列  1://均匀0.33度校准两列
-distance_unit: 0.4
-packet_size: 1212
+packet_size: 1206
 time_synchronization: false
 add_multicast: false
 group_ip: "224.1.1.2"
 rpm: 600
-frame_id: "lslidar16v4"
+frame_id: "LS180S3_front"
 min_range: 0.15
-max_range: 150.0
-config_vert: true
-scan_start_angle: 0.0
-scan_end_angle: 36000.0
+max_range: 500.0
+scan_start_angle: -60.0
+scan_end_angle: 60.0
+calibration: false
+calibration_file: "modules/drivers/lidar/lslidar/params/LS128S2_calibration.yaml"
+
 #要屏蔽的矩形区域参数
 bottom_left_x: 0.0             #左下 x值
 bottom_left_y: 0.0             #左下 y值
