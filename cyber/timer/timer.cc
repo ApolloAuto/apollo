@@ -112,6 +112,7 @@ bool Timer::InitTimerTask() {
                                  TIMER_RESOLUTION_MS) >= accumulated_error_ms) {
           task->next_fire_duration_ms =
               task->interval_ms - execute_time_ms - accumulated_error_ms;
+              task->accumulated_error_ns -= accumulated_error_ms * 1e6;
         } else {
           task->next_fire_duration_ms = TIMER_RESOLUTION_MS;
         }
