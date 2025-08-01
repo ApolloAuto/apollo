@@ -38,19 +38,34 @@ class WaitStrategy {
 class BlockWaitStrategy : public WaitStrategy {
  public:
   BlockWaitStrategy() {}
-  void NotifyOne() override { cv_.notify_one(); }
+  void NotifyOne() override {
+    {
+      std::lock_guard<std::mutex> lock(mutex_);  // 锁定互斥锁
+      notify_one_ = true;
+    }
+    cv_.notify_one();
+  }
 
   bool EmptyWait() override {
     std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock);
+    cv_.wait(lock, [this] { return break_all_wait_ || notify_one_; });
+    notify_one_ = false;
     return true;
   }
 
-  void BreakAllWait() override { cv_.notify_all(); }
+  void BreakAllWait() override {
+    {
+      std::lock_guard<std::mutex> lock(mutex_);  // 锁定互斥锁
+      break_all_wait_ = true;
+    }
+    cv_.notify_all();
+  }
 
  private:
   std::mutex mutex_;
   std::condition_variable cv_;
+  bool notify_one_{false};
+  bool break_all_wait_{false};
 };
 
 class SleepWaitStrategy : public WaitStrategy {
