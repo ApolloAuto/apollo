@@ -60,7 +60,7 @@ https://apollo.baidu.com/community/course/37
 
 2. 定义此次通信消息的数据结构，编写`proto/communication.proto`文件，内容如下：
 
-   ```bash
+   ```proto
    syntax = "proto2";
 
    package apollo.communication.proto;
@@ -77,8 +77,8 @@ https://apollo.baidu.com/community/course/37
 
 3. 编写发送方 talker 代码，talker.cc 代码如下：
 
-   ```bash
-   #include "communication/proto/communication.pb.h"
+    ```cpp
+    #include "communication/proto/communication.pb.h"
     #include "cyber/cyber.h"
     #include "cyber/time/rate.h"
 
@@ -106,12 +106,12 @@ https://apollo.baidu.com/community/course/37
       }
       return 0;
     }
-   ```
+    ```
 
 4. 编写接受方 listener 代码，listener.cc 代码如下：
 
-   ```bash
-   #include "communication/proto/communication.pb.h"
+    ```cpp
+    #include "communication/proto/communication.pb.h"
     #include "cyber/cyber.h"
 
     using apollo::communication::proto::Car;
@@ -133,12 +133,12 @@ https://apollo.baidu.com/community/course/37
         apollo::cyber::WaitForShutdown();
         return 0;
     }
-   ```
+    ```
 
 5. 修改 BUILD 文件，将新写的代码加入到编译中，`communication/BUILD`文件修改如下：
 
-   ```bash
-       load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
+    ```bash
+    load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
     load("//tools:cpplint.bzl", "cpplint")
 
     package(default_visibility = ["//visibility:public"])

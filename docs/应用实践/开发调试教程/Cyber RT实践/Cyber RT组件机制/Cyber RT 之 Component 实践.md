@@ -20,21 +20,21 @@ https://apollo.baidu.com/community/course/42
 
 1. 使用以下命令解压 TimerCoponent 源码压缩文件
 
-   ```bash
-   tar -zxvf component.tar.gz
-   ```
+    ```bash
+    tar -zxvf component.tar.gz
+    ```
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_58eeec9.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_58eeec9.png)
 
 2. 使用以下命令编译解压的 TimerComponent 实验源码：
 
-   ```bash
-   buildtool build -p component/timer_component_sensor/
-   ```
+    ```bash
+    buildtool build -p component/timer_component_sensor/
+    ```
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d222781.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d222781.png)
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_8c56f76.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_8c56f76.png)
 
 3. 修改`timer_component_sensor`配置文件，产生一路新的消息：
 
@@ -51,7 +51,7 @@ sensor_topic:"/sensor/second"
 
 2）新增`timer_component_sensor_second.dag`文件。复制`timer_component_sensor.dag`文件，并重命名为`timer_component_sensor_second.dag`，修改该文件内的配置项。
 
-```bash
+```proto
 module_config {
   module_library : "component/timer_component_sensor/libtimer_component_sensor_component.so"
   timer_components {
@@ -76,7 +76,7 @@ module_config {
 
 3）新增`timer_component_sensor_second.launch`文件，复制`timer_component_sensor.launch`文件，并重命名为`timer_component_sensor_second.launch`，修改该文件内的配置项。
 
-```bash
+```xml
 <cyber>
   <module>
     <name>timer_component_sensor</name>
@@ -92,19 +92,19 @@ module_config {
 
 4. 使用以下命令，运行`timer_component_sensor_second.launch`文件。
 
-   ```bash
-   cyber_launch start component/timer_component_sensor/launch/timer_component_sensor_second.launch
-   ```
+    ```bash
+    cyber_launch start component/timer_component_sensor/launch/timer_component_sensor_second.launch
+    ```
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_2e0d265.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_2e0d265.png)
 
 5. 使用 cyber_monitor 工具验证，配置是否生效。
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_bf22ba3.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_bf22ba3.png)
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d2cf9b1.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d2cf9b1.png)
 
-   若 /sensor/second channel 有数据、数据帧率为 1.25、且数据内容与配置的一致，表示配置成功。
+    若 /sensor/second channel 有数据、数据帧率为 1.25、且数据内容与配置的一致，表示配置成功。
 
 6. 最后，在终端中，使用 **Ctrl+C** 组合键，结束程序运行。
 
@@ -112,24 +112,24 @@ module_config {
 
 1. 在终端中，执行以下指令，在 component 文件夹下生成 component_fusion_message 模板实例（功能包）。
 
-   ```bash
-   buildtool create --template component component/component_fusion_message
-   ```
+    ```bash
+    buildtool create --template component component/component_fusion_message
+    ```
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d97f121.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_d97f121.png)
 
 2. 切换目录到生成的`component_fusion_message`目录下，使用 tree 命令查看生成的 component 功能包的目录结构。
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_e5320f8.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_e5320f8.png)
 
-   其中，`BUILD`、`component_fusion_message.cc`和`component_fusion_message.h`三个文件分别为 component_fusion_message 功能包的源码编译规则文件、源文件和头文件；conf 目录下，`component_fusion_message.conf`为全局变量配置文件，`component_fusion_message.pb.txt`为用户在`protobuffer`文件中定义的可配置项的配置文件；`cyberfile.xml`为`component_fusion_message`功能包的描述文件；dag 目录下的`component_fusion_message.dag`文件中描述了`component_fusion_message`功能包的依赖关系；launch 文件夹下的`component_fusion_message.launch`为`component_fusion_message`功能包的 launch 启动文件；proto 文件夹下的 BUILD 为用户在 proto 文件夹下定义的`protobuffer`文件的编译规则文件，`component_fusion_message.proto`文件中用户可以定义自己的消息结构。
+    其中，`BUILD`、`component_fusion_message.cc`和`component_fusion_message.h`三个文件分别为 component_fusion_message 功能包的源码编译规则文件、源文件和头文件；conf 目录下，`component_fusion_message.conf`为全局变量配置文件，`component_fusion_message.pb.txt`为用户在`protobuffer`文件中定义的可配置项的配置文件；`cyberfile.xml`为`component_fusion_message`功能包的描述文件；dag 目录下的`component_fusion_message.dag`文件中描述了`component_fusion_message`功能包的依赖关系；launch 文件夹下的`component_fusion_message.launch`为`component_fusion_message`功能包的 launch 启动文件；proto 文件夹下的 BUILD 为用户在 proto 文件夹下定义的`protobuffer`文件的编译规则文件，`component_fusion_message.proto`文件中用户可以定义自己的消息结构。
 
 ### 3. 定义Component消息结构
 
 1. 在`component_fusion_message.proto`中，添加以下消息数据结构。
 
-   ```bash
-   syntax = "proto2";
+    ```bash
+    syntax = "proto2";
 
     package apollo;
 
@@ -146,16 +146,16 @@ module_config {
       optional string name = 1;
       optional string fusion_topic = 2;
     };
-   ```
+    ```
 
-   在`ComponentFusionMessageMsg`中添加 fusion_content、fusion_msg_id 和 timestamp 3 项，分别表示消息内容，消息编号和消息发出时的时间戳。
+    在`ComponentFusionMessageMsg`中添加 fusion_content、fusion_msg_id 和 timestamp 3 项，分别表示消息内容，消息编号和消息发出时的时间戳。
 
-   在`ComponentFusionMessageConfig`中添加可配置项 name 和 fusion_topic ，用来配置 `ComponentFusionMessageConfig`的名称标识和输出数据的 channel。
+    在`ComponentFusionMessageConfig`中添加可配置项 name 和 fusion_topic ，用来配置 `ComponentFusionMessageConfig`的名称标识和输出数据的 channel。
 
 2. 在 proto 文件夹下的 BUILD 文件中，添加`protobuffer`文件的编译规则。
 
-   ```bash
-   load("//tools:apollo_package.bzl", "apollo_package")
+    ```bash
+    load("//tools:apollo_package.bzl", "apollo_package")
     load("//tools/proto:proto.bzl", "proto_library")
     load("//tools:cpplint.bzl", "cpplint")
 
@@ -169,9 +169,9 @@ module_config {
     apollo_package()
 
     cpplint()
-   ```
+    ```
 
-   由于没有新增`protobuffer`文件，这里无需修改 BUILD 文件，如若新增`protobuffer`文件，可参考 BUILD 文件中已有的配置规则，添加对应`protobuffer`的编译规则。
+    由于没有新增`protobuffer`文件，这里无需修改 BUILD 文件，如若新增`protobuffer`文件，可参考 BUILD 文件中已有的配置规则，添加对应`protobuffer`的编译规则。
 
 ### 4. 配置Component的配置文件
 
@@ -188,8 +188,8 @@ fusion_topic: "/fusion/message"
 
 1. 修改`component_fusion_message.h`文件。
 
-   ```bash
-   #pragma once
+    ```cpp
+    #pragma once
     #include <memory>
 
     #include "cyber/cyber.h"
@@ -216,22 +216,22 @@ fusion_topic: "/fusion/message"
     CYBER_REGISTER_COMPONENT(ComponentFusionMessage)
 
     } // namespace apollo
-   ```
+    ```
 
-   由于 component 要融合的消息类型是`TimerComponentSensorMsg`，这里需要包含（include）定义`TimerComponentSensorMsg`的头文件（timer_component_sensor.pb.h）。
+    由于 component 要融合的消息类型是`TimerComponentSensorMsg`，这里需要包含（include）定义`TimerComponentSensorMsg`的头文件（timer_component_sensor.pb.h）。
 
-   使用 **using** 引入将 **apollo::cyber** 命名空间下的 **Time** 和 **Write** 注入当前作用域中；
+    使用 **using** 引入将 **apollo::cyber** 命名空间下的 **Time** 和 **Write** 注入当前作用域中；
 
-   修改类继承 component 的模板参数；将模板参数改为要融合的消息类型，两个参数。
+    修改类继承 component 的模板参数；将模板参数改为要融合的消息类型，两个参数。
 
-   修改 Proc 函数的输入参数；将 Proc 函数的输入参数修改为 **TimerComponentSensorMsg** 的指针。
+    修改 Proc 函数的输入参数；将 Proc 函数的输入参数修改为 **TimerComponentSensorMsg** 的指针。
 
-   ComponentFusionMessage 类增加私有成员 fusion*writer*，fusion*writer* 是智能指针，指向 Writer 对象，Writer 对象可以写出`ComponentFusionMessageMsg`数据。
+    ComponentFusionMessage 类增加私有成员 fusion*writer*，fusion*writer* 是智能指针，指向 Writer 对象，Writer 对象可以写出`ComponentFusionMessageMsg`数据。
 
 2. 修改`component_fusion_message.cc`文件。
 
-   ```bash
-   #include "component/component_fusion_message/component_fusion_message_component.h"
+    ```cpp
+    #include "component/component_fusion_message/component_fusion_message_component.h"
 
     namespace apollo {
 
@@ -266,17 +266,17 @@ fusion_topic: "/fusion/message"
     }
 
     } // namespace apollo
-   ```
+    ```
 
-   在 Init 函数中增加智能指针 fusion*write* 的初始化；
+    在 Init 函数中增加智能指针 fusion*write* 的初始化；
 
-   修改 Proc 函数的输入参数与头文件中的定义一致；
+    修改 Proc 函数的输入参数与头文件中的定义一致；
 
-   在 Proc 函数中创建`ComponentFusionMessageMsg`消息，并通过 fusion*writer* 发出消息到对应的 channel。
+    在 Proc 函数中创建`ComponentFusionMessageMsg`消息，并通过 fusion*writer* 发出消息到对应的 channel。
 
 3. 修改`BUILD`文件。
 
-   ```bash
+    ```bash
     load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
     load("//tools:cpplint.bzl", "cpplint")
 
@@ -311,7 +311,7 @@ fusion_topic: "/fusion/message"
     apollo_package()
 
     cpplint()
-   ```
+    ```
 
    由于源文件中由于包含了`timer_component_sensor.pb.h`，需要在编译的依赖项中添加对应的依赖项。
 
@@ -333,7 +333,7 @@ buildtool build -p  component/component_fusion_message/
 
 在`component_fusion_message.dag`文件中，将第一个 readers 相中的 channel 值改为 component 中融合的主 channel， 在主 channel readers下面添加需要融合的其它 readers 配置，并配置正确的 channel。
 
-```bash
+```proto
 module_config {
   module_library : "component/component_fusion_message/libcomponent_fusion_message_component.so"
   components {
@@ -357,7 +357,7 @@ module_config {
 
 ### 8. 修改Component的launch文件
 
-```bash
+```xml
 <cyber>
   <module>
     <name>component_fusion_message</name>
@@ -405,7 +405,7 @@ module_config {
 
 复制`component_fusion_message.launch`文件，并重命名为`component_fusion_message_all.launch`，将`timer_component_sensor.launch`文件和`timer_component_sensor_second.launch`文件中的 <module> 标签内容拷贝到`component_fusion_message_all.launch`中的 <cyber> 标签内。这样，就可以只启动此`component_fusion_message_all.launch`文件即可一次启动 3 个 component 了。
 
-```bash
+```xml
 <cyber>
   <module>
     <name>timer_component_sensor</name>
