@@ -28,22 +28,19 @@ using apollo::common::math::Vec2d;
 GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   xy_grid_resolution_ =
       open_space_conf.warm_start_config().grid_a_star_xy_resolution();
-  node_radius_ =
-      open_space_conf.warm_start_config().node_radius();
+  node_radius_ = open_space_conf.warm_start_config().node_radius();
 }
 
-double GridSearch::EuclidDistance(
-    const double x1, const double y1, const double x2, const double y2) {
+double GridSearch::EuclidDistance(const double x1, const double y1,
+                                  const double x2, const double y2) {
   return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   const double node_grid_x = node->GetGridX();
   const double node_grid_y = node->GetGridY();
-  if (node_grid_x > max_grid_x_ ||
-      node_grid_x < 0  ||
-      node_grid_y > max_grid_y_ ||
-      node_grid_y < 0) {
+  if (node_grid_x > max_grid_x_ || node_grid_x < 0 ||
+      node_grid_y > max_grid_y_ || node_grid_y < 0) {
     return false;
   }
   if (obstacles_linesegments_vec_.empty()) {
@@ -52,8 +49,8 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
     for (const common::math::LineSegment2d& linesegment :
          obstacle_linesegments) {
-      if (linesegment.DistanceTo({node->GetGridX(), node->GetGridY()})
-          < node_radius_) {
+      if (linesegment.DistanceTo({node->GetGridX(), node->GetGridY()}) <
+          node_radius_) {
         return false;
       }
     }
@@ -120,7 +117,7 @@ bool GridSearch::GenerateAStarPath(
       std::make_shared<Node2d>(sx, sy, xy_grid_resolution_, XYbounds_);
   std::shared_ptr<Node2d> end_node =
       std::make_shared<Node2d>(ex, ey, xy_grid_resolution_, XYbounds_);
-  std::shared_ptr<Node2d> final_node_ = nullptr;
+  final_node_ = nullptr;
   obstacles_linesegments_vec_ = obstacles_linesegments_vec;
   open_set.emplace(start_node->GetIndex(), start_node);
   open_pq.emplace(start_node->GetIndex(), start_node->GetCost());
@@ -168,13 +165,11 @@ bool GridSearch::GenerateAStarPath(
 }
 
 bool GridSearch::GenerateDpMap(
-        const double ex,
-        const double ey,
-        const std::vector<double>& XYbounds,
-        const std::vector<std::vector<common::math::LineSegment2d>>&
-            obstacles_linesegments_vec,
-        const std::vector<std::vector<common::math::LineSegment2d>>&
-            soft_boundary_linesegments_vec) {
+    const double ex, const double ey, const std::vector<double>& XYbounds,
+    const std::vector<std::vector<common::math::LineSegment2d>>&
+        obstacles_linesegments_vec,
+    const std::vector<std::vector<common::math::LineSegment2d>>&
+        soft_boundary_linesegments_vec) {
   std::priority_queue<std::pair<std::string, double>,
                       std::vector<std::pair<std::string, double>>, cmp>
       open_pq;
