@@ -22,16 +22,16 @@ https://apollo.baidu.com/community/course/38
 
 1. 创建代码结构目录。
 
-   ```bash
+    ```bash
     buildtool create --template component communication
     touch /apollo_workspace/communication/listener.py
     touch /apollo_workspace/communication/talker.py
-   ```
+    ```
 
-   检验目录结构是否正确：
+    检验目录结构是否正确：
 
-   ```bash
-   communication
+    ```bash
+    communication
     ├── BUILD <必须有>
     ├── communication.cc
     ├── communication.h
@@ -48,14 +48,14 @@ https://apollo.baidu.com/community/course/38
     │   ├── BUILD <必须有>
     │   └── communication.proto <必须有>
     └── talker.py <必须有>
-   ```
+    ```
 
 2. 定义此次通信消息的数据结构，编写proto/communication.proto文件，内容如下：
 
-   ```bash
-   syntax = "proto2";
+    ```proto
+    syntax = "proto2";
 
-   package apollo.communication.proto;
+    package apollo.communication.proto;
 
     //定义一个车的消息，车的型号，车主，车的车牌号,已跑公里数,车速
     message Car{
@@ -65,12 +65,12 @@ https://apollo.baidu.com/community/course/38
         optional uint64 kilometers = 4;
         optional uint64 speed = 5;
     };
-   ```
+    ```
 
 3. 编写发送方 talker 代码，talker.py 代码如下：
 
-   ```bash
-   import time
+    ```python
+    import time
     from cyber.python.cyber_py3 import cyber
     from communication.proto.communication_pb2 import Car
 
@@ -97,39 +97,39 @@ https://apollo.baidu.com/community/course/38
 
     if __name__ == '__main__':
         main()
-   ```
+    ```
 
 4. 编写接受方 listener 代码，listener.py 代码如下：
 
-   ```bash
-   import time
-   from cyber.python.cyber_py3 import cyber
-   from communication.proto.communication_pb2 import Car
+    ```python
+    import time
+    from cyber.python.cyber_py3 import cyber
+    from communication.proto.communication_pb2 import Car
 
-   # 接收到消息后的回调函数
-   def message_callback(msg):
-       print("now speed is:", msg.speed)
+    # 接收到消息后的回调函数
+    def message_callback(msg):
+        print("now speed is:", msg.speed)
 
-   def main():
-       # 初始化 Cyber
-       cyber.init()
+    def main():
+        # 初始化 Cyber
+        cyber.init()
 
-       # 创建监听节点
-       listener_node = cyber.Node("listener")
+        # 创建监听节点
+        listener_node = cyber.Node("listener")
 
-       # 创建消息监听器并指定回调函数
-       listener = listener_node.create_reader("/car_speed", Car, message_callback)
+        # 创建消息监听器并指定回调函数
+        listener = listener_node.create_reader("/car_speed", Car, message_callback)
 
-       while not cyber.is_shutdown():
-           time.sleep(0.2)
+        while not cyber.is_shutdown():
+            time.sleep(0.2)
 
-   if __name__ == '__main__':
-       main()
-   ```
+    if __name__ == '__main__':
+        main()
+    ```
 
 5. 将`communication/BUILD`修改为以下内容：
 
-   ```bash
+    ```bash
     load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
     load("//tools:cpplint.bzl", "cpplint")
 
@@ -138,7 +138,7 @@ https://apollo.baidu.com/community/course/38
     apollo_package()
 
     cpplint()
-   ```
+    ```
 
 ### 2. 编译程序
 

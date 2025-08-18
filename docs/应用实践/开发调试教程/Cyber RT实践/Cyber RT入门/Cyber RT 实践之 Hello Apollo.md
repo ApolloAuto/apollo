@@ -30,15 +30,15 @@ https://apollo.baidu.com/community/course/19
 
 1. 在终端中，执行 DreamView+ 启动指令，执行成功后，点击菜单栏 dreamview+ 按钮，进入 dreamview+ 界面。
 
-   ```bash
-   aem bootstrap start --plus
-   ```
+    ```bash
+    aem bootstrap start --plus
+    ```
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_1563a05.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_1563a05.png)
 
-   当出现如下，即表示 dreamview+ 启动成功了。
+    当出现如下，即表示 dreamview+ 启动成功了。
 
-   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_023df8d.png)
+    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_023df8d.png)
 
 2. 点击左下角 **个人中心** > **设置** > **通用设置** ，可以选择界面语言类型。
 
@@ -76,31 +76,31 @@ https://apollo.baidu.com/community/course/19
 
 1. 打开新的终端窗口，输入配置参数同步指令，系统将自动将 planning 模块的 Traffic_light 配置参数复制到 profile 的 default 目录中：
 
-   ```bash
-   buildtool profile config init --package planning-traffic-rules-traffic-light --profile=default
-   ```
+    ```bash
+    buildtool profile config init --package planning-traffic-rules-traffic-light --profile=default
+    ```
 
-   使用 default 目录这份配置：
+    使用 default 目录这份配置：
 
-   ```bash
+    ```bash
     # 使用名字叫default的这份配置
     aem profile use default
-   ```
+    ```
 
-   查看 profile 插件目录结构：
+    查看 profile 插件目录结构：
 
-   ```bash
-   tree profiles/default/modules/planning/traffic_rules/
-   ```
+    ```bash
+    tree profiles/default/modules/planning/traffic_rules/
+    ```
 
-   目录结构：
+    目录结构：
 
-   ```bash
-   profiles/default/modules/planning/traffic_rules/
-   `-- traffic_light
+    ```bash
+    profiles/default/modules/planning/traffic_rules/
+    `-- traffic_light
     `-- conf
         `-- default_conf.pb.txt
-   ```
+    ```
 
 ### 调整交通灯场景停止距离
 
@@ -112,11 +112,11 @@ https://apollo.baidu.com/community/course/19
 
 2. 在 apollo_workspace 工作目录找到`profiles/default/modules/planning/traffic_rules/traffic_light/conf/default_conf.pb.txt`配置文件，调整红绿灯场景停止配置参数，达到我们期望停车效果。
 
-```bash
- #原始
- stop_distance: 1.0
- #修改后
- stop_distance: 2.2
+```
+#原始
+stop_distance: 1.0
+#修改后
+stop_distance: 2.2
 ```
 
 3. 保存修改后，回到 dreamview+，在 Modules 中重启 Planning 模块（让系统重新加载 Planing 参数)，重新选择红绿灯场景场景，观察主车遇到红灯场景时调整前后停车距离的变化。
