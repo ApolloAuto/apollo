@@ -127,9 +127,12 @@ bool ReferenceLineProvider::UpdatePlanningCommand(
              "used!";
   }
   // Update routing in pnc_map
+  // 判断 PNC 中的 Routing 是否与 Routing 模块中的相同
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  // 判断与上一帧的 Routing 是否一致
   if (current_pnc_map_->IsNewPlanningCommand(command)) {
     is_new_command_ = true;
+    // 更新 Routing 中的值
     if (!current_pnc_map_->UpdatePlanningCommand(command)) {
       AERROR << "Failed to update routing in pnc map: "
              << command.DebugString();
@@ -175,7 +178,7 @@ void ReferenceLineProvider::UpdateVehicleState(
   vehicle_state_ = vehicle_state;
 }
 
-bool ReferenceLineProvider::Start() {
+bool ReferenceLineProvider::Start() { // 参考线入口
   if (FLAGS_use_navigation_mode) {
     return true;
   }
@@ -185,6 +188,7 @@ bool ReferenceLineProvider::Start() {
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
+    // 参考线处理线程
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
@@ -263,8 +267,8 @@ void ReferenceLineProvider::UpdateReferenceLine(
     route_segments_history_.pop();
   }
 }
-
-void ReferenceLineProvider::GenerateThread() {
+// 参考线生成主入口
+void ReferenceLineProvider::GenerateThread() { 
   while (!is_stop_) {
     static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
@@ -272,8 +276,8 @@ void ReferenceLineProvider::GenerateThread() {
     if (!has_planning_command_) {
       continue;
     }
-    std::list<ReferenceLine> reference_lines;
-    std::list<hdmap::RouteSegments> segments;
+    std::list<ReferenceLine> reference_lines; // 要生成的参考线
+    std::list<hdmap::RouteSegments> segments; // 根据 segments_ 生成参考线
     if (!CreateReferenceLine(&reference_lines, &segments)) {
       is_reference_line_updated_ = false;
       AERROR << "Fail to get reference line";
@@ -282,6 +286,7 @@ void ReferenceLineProvider::GenerateThread() {
     UpdateReferenceLine(reference_lines, segments);
     const double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+    // 参考线生成的耗时
     last_calculation_time_ = end_time - start_time;
     is_reference_line_updated_ = true;
   }
@@ -352,7 +357,9 @@ void ReferenceLineProvider::PrioritizeChangeLane(
   CHECK_NOTNULL(route_segments);
   auto iter = route_segments->begin();
   while (iter != route_segments->end()) {
+    // 如果当前 routesegment 为允许变道
     if (!iter->IsOnSegment()) {
+      // 将 routesegment 的第一个值设置为 iter
       route_segments->splice(route_segments->begin(), *route_segments, iter);
       break;
     }
@@ -613,6 +620,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
     std::list<hdmap::RouteSegments> *segments) {
   {
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    // 根据当前自车的状态创建 routesegments
     if (!current_pnc_map_->GetRouteSegments(vehicle_state, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
@@ -621,6 +629,7 @@ bool ReferenceLineProvider::CreateRouteSegments(
   for (auto &seg : *segments) {
     ADEBUG << seg.DebugString();
   }
+  // 判断是否是优先换道
   if (FLAGS_prioritize_change_lane) {
     PrioritizeChangeLane(segments);
   }
@@ -632,13 +641,13 @@ bool ReferenceLineProvider::CreateReferenceLine(
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
-
+  // 获取 vehicle_state
   common::VehicleState vehicle_state;
   {
     std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
     vehicle_state = vehicle_state_;
   }
-
+  // 获取 Routing 
   planning::PlanningCommand command;
   {
     std::lock_guard<std::mutex> lock(routing_mutex_);
@@ -648,20 +657,21 @@ bool ReferenceLineProvider::CreateReferenceLine(
     AERROR << "Current pnc map is null! " << command.DebugString();
     return false;
   }
-
-  if (!CreateRouteSegments(vehicle_state, segments)) {
+  // 生成 RouteSegments
+  if (!CreateRouteSegments(vehicle_state, segments)) { 
     AERROR << "Failed to create reference line from routing";
     return false;
   }
   if (is_new_command_ || !FLAGS_enable_reference_line_stitching) {
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
-      if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
+      if (!SmoothRouteSegment(*iter, &reference_lines->back())) { // 根据segments生成ReferenceLine 
         AERROR << "Failed to create reference line from route segments";
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
         common::SLPoint sl;
+        // 参考线未优化成功
         if (!reference_lines->back().XYToSL(
                 vehicle_state.heading(),
                 common::math::Vec2d(vehicle_state.x(), vehicle_state.y()),
@@ -669,6 +679,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
           AWARN << "Failed to project point: {" << vehicle_state.x() << ","
                 << vehicle_state.y() << "} to stitched reference line";
         }
+        // 收缩参考线和 Segment
         Shrink(sl, &reference_lines->back(), &(*iter));
         ++iter;
       }
@@ -723,6 +734,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   }
   const double prev_segment_length = RouteSegments::Length(*prev_segment);
   const double remain_s = prev_segment_length - sl_point.s();
+  // 提取前向距离
   const double look_forward_required_distance =
       planning::PncMapBase::LookForwardDistance(state.linear_velocity());
   if (remain_s > look_forward_required_distance) {
@@ -1018,7 +1030,7 @@ bool ReferenceLineProvider::SmoothReferenceLine(
   std::vector<AnchorPoint> anchor_points;
   GetAnchorPoints(raw_reference_line, &anchor_points);
   smoother_->SetAnchorPoints(anchor_points);
-  if (!smoother_->Smooth(raw_reference_line, reference_line)) {
+  if (!smoother_->Smooth(raw_reference_line, reference_line)) { // 参考线平滑
     AERROR << "Failed to smooth reference line with anchor points";
     return false;
   }

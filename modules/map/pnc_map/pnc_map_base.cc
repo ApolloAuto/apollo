@@ -47,8 +47,9 @@ bool PncMapBase::UpdatePlanningCommand(
 }
 
 double PncMapBase::LookForwardDistance(const double velocity) {
+  // 判断 8s 内行驶的距离
   auto forward_distance = velocity * FLAGS_look_forward_time_sec;
-
+  // 距离 > 180 ? 250 : 180
   return forward_distance > FLAGS_look_forward_short_distance
              ? FLAGS_look_forward_long_distance
              : FLAGS_look_forward_short_distance;

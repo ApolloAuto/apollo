@@ -117,14 +117,15 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<5>(
     std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const {
   CHECK_NOTNULL(ptr_trajectory_bundle);
   ACHECK(!end_conditions.empty());
-
+  // 创建空间
   ptr_trajectory_bundle->reserve(ptr_trajectory_bundle->size() +
                                  end_conditions.size());
   for (const auto& end_condition : end_conditions) {
-    auto ptr_trajectory1d = std::make_shared<LatticeTrajectory1d>(
-        std::shared_ptr<Curve1d>(new QuinticPolynomialCurve1d(
-            init_state, end_condition.first, end_condition.second)));
-
+    auto ptr_trajectory1d =
+        std::make_shared<LatticeTrajectory1d>(std::shared_ptr<Curve1d>(
+            new QuinticPolynomialCurve1d(  // 构建五次多项式
+                init_state, end_condition.first, end_condition.second)));
+    // 赋值
     ptr_trajectory1d->set_target_position(end_condition.first[0]);
     ptr_trajectory1d->set_target_velocity(end_condition.first[1]);
     ptr_trajectory1d->set_target_time(end_condition.second);

@@ -100,8 +100,10 @@ ScenarioResult Scenario::Process(
     scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_DONE);
     return scenario_result_;
   }
+  // 先执行当前 Stage
   auto ret = current_stage_->Process(planning_init_point, frame);
   scenario_result_.SetStageResult(ret);
+  // 得到当前 Stage 的状态机
   switch (ret.GetStageStatus()) {
     case StageStatusType::ERROR: {
       AERROR << "Stage '" << current_stage_->Name() << "' returns error";
@@ -127,6 +129,7 @@ ScenarioResult Scenario::Process(
               ScenarioStatusType::STATUS_UNKNOWN);
           return scenario_result_;
         }
+        // 创建下一个 Stage
         current_stage_ = CreateStage(*stage_pipeline_map_[next_stage]);
         if (current_stage_ == nullptr) {
           AWARN << "Current stage is a null pointer.";

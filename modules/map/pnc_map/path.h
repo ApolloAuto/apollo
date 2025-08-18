@@ -365,10 +365,13 @@ class Path {
  protected:
   int num_points_ = 0;
   int num_segments_ = 0;
+  // 路径点的信息
   std::vector<MapPathPoint> path_points_;
   std::vector<LaneSegment> lane_segments_;
+  // 车道累计的长度
   std::vector<double> lane_accumulated_s_;
   std::vector<LaneSegment> lane_segments_to_next_point_;
+  // 单位向量
   std::vector<common::math::Vec2d> unit_directions_;
   double length_ = 0.0;
   std::vector<double> accumulated_s_;
