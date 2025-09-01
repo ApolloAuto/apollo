@@ -7,7 +7,7 @@ config_base {
   source_type: ONLINE_LIDAR
 }
 
-# sample: "vanjee_720_16,vanjee_720_32,vanjee_722"
+# sample: "vanjee_720_16,vanjee_720_32,vanjee_722,vanjee_722f"
 model: "vanjee_720_16"
 connect_type: 1
 host_msop_port: 3001
