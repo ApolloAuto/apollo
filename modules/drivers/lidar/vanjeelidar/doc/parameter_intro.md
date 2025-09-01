@@ -16,16 +16,18 @@ start_angle: 0
 end_angle: 360
 min_distance: 0.2
 max_distance: 120
+point_cloud_masking: ""
 use_lidar_clock: false
 dense_points: false
 wait_for_difop: true
 config_from_file: false
-angle_path: ""
+angle_path_hor: ""
+angle_path_ver: ""
 ```
 
 **model**
 
-This is the lidar model, since this configuration file is for vanjee_720_16, we set the model="vanjee_720_16".The parameter are as followed below:vanjee_720_16,vanjee_720_32.
+This is the lidar model, since this configuration file is for vanjee_720_16, we set the model="vanjee_720_16".The parameter are as followed below:vanjee_720_16,vanjee_720_32,vanjee_722 and vanjee_722f.
 
 **connect_type**
 
@@ -67,6 +69,22 @@ The minimum distance of point cloud,unit:m.
 
 The maximum distance of point cloud,unit:m.The point cloud published would only include the distance between min_distance and max_distance.
 
+**point_cloud_masking**
+masking range,
+  line id range: C1-C2，angle range: A1-A2，distance range: L1-L2；(Range is set in ascending order)
+  Group 1：1-3,0-0.5/100-105,0-1.5/10-20;(masking line id: 1 2 3，masking angle: 0-0.5°+100-105°，masking distance: 0-1.5m+10-20m);
+  Group 2：5,0/90/180/270,10;(masking line id: 5，masking angle: 0+90+180+270°，masking distance: 10m);
+  Group 3：1-3,0-0.5/100-105,0-1.5/10-20;5,0/90/180/270,10;(masking range = Group 1 + Group 2);
+
+masking Rules,
+  Separate group elements with commas (,), separate line id, angles, and distances with slashes (/) when they are not continuous, and separate two groups with semicolons (;), all using English characters as separators;
+
+Note: The angle/distance ranges of Shielding Group 1 and Shielding Group 2 are independent of each other, as shown below. Shielding Group 4 and     Shielding Group 5 have different ranges, while Shielding Group 4 and Shielding Group 6 have equal ranges;
+
+  Group 4：5,10-20/50-60,1.5-2.5/11-13;
+  Group 5：5,10-20,1.5-2.5;5,50-60,11-13;
+  Group 6：5,10-20,1.5-2.5;5,10-20,11-13;5,50-60,1.5-2.5;5,50-60,11-13;
+
 **use_lidar_clock**
 
   - true: The timestamp of lidar messages is the lidar clock.
@@ -85,6 +103,10 @@ The flag whether need to request the angle information from the lidar firstly. U
 
 The flag whether read the angle information from the configuration file .Usually set config_from_file=true in RAW_PACKET mode,otherwise set it as false.
 
-**angle_path**
+**angle_path_hor**
 
-The path of angle configuration file.
+The path of horizontal angle configuration file.
+
+**angle_path_ver**
+
+The path of vertical angle configuration file.
