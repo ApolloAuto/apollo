@@ -5,7 +5,7 @@ load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:common.bzl", "select2dict", "list_str2list")
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 
-package_path = "@@REPLACE@@"
+package_path = "modules/dreamview_plus"
 
 def apollo_py_library(**kwargs):
     if "deps" not in kwargs:

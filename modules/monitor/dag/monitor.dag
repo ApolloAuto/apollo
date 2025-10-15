@@ -1,4 +1,4 @@
-module_config {
+  module_config {
     module_library : "modules/monitor/libmonitor.so"
     timer_components {
         class_name : "Monitor"
