@@ -18,6 +18,12 @@
 
 #include <cstdio>
 #include <utility>
+#include <sstream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <cerrno>
+#include <cstring>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
@@ -94,12 +100,194 @@ void SetGlobalFlag(std::string_view flag_name, const ValueType &value,
   }
 }
 
+// 命令解析结果结构
+struct ParsedCommand {
+  std::string executable;
+  std::vector<std::string> args;
+  bool is_background;
+  bool use_nohup;
+};
+
+// 解析命令字符串为可执行文件和参数列表
+ParsedCommand ParseCommand(const std::string& cmd_str) {
+  ParsedCommand result;
+  result.is_background = false;
+  result.use_nohup = false;
+  
+  std::string cmd = cmd_str;
+  
+  // 检查是否是后台命令（末尾有 &）
+  if (cmd.size() >= 2 && cmd.substr(cmd.size() - 2) == " &") {
+    result.is_background = true;
+    cmd = cmd.substr(0, cmd.size() - 2);
+    // 去掉末尾空格
+    while (!cmd.empty() && cmd.back() == ' ') {
+      cmd.pop_back();
+    }
+  }
+  
+  // 检查是否使用 nohup
+  const std::string nohup_prefix = "nohup ";
+  if (cmd.find(nohup_prefix) == 0) {
+    result.use_nohup = true;
+    cmd = cmd.substr(nohup_prefix.length());
+  }
+  
+  // 简单的参数分割（使用 absl 分割，处理空格）
+  std::vector<std::string> tokens = absl::StrSplit(cmd, ' ', absl::SkipEmpty());
+  
+  if (!tokens.empty()) {
+    result.executable = tokens[0];
+    result.args = tokens;  // args[0] 也是可执行文件名
+  }
+  
+  return result;
+}
+
+// 使用 fork + exec 启动后台进程（通过交互式 shell 自动加载环境）
+// 返回值: >0 为子进程PID, -1 表示失败
+pid_t LaunchBackgroundProcess(const std::string& original_command) {
+  pid_t pid = fork();
+  
+  if (pid < 0) {
+    AERROR << "Fork failed: " << strerror(errno);
+    return -1;
+  }
+  
+  if (pid == 0) {
+    // 子进程
+    
+    // 创建新的会话，使进程完全独立于父进程
+    if (setsid() < 0) {
+      AERROR << "setsid failed: " << strerror(errno);
+      _exit(1);
+    }
+    
+    // 切换到 Apollo 工作空间目录（重要！）
+    // mainboard 需要从工作空间目录查找模块（bazel 编译输出在这里）
+    const char* apollo_workroot = std::getenv("APOLLO_ENV_WORKROOT");
+    if (apollo_workroot == nullptr) {
+      apollo_workroot = "/apollo_workspace";
+    }
+    if (chdir(apollo_workroot) != 0) {
+      AERROR << "chdir to " << apollo_workroot << " failed: " << strerror(errno);
+      _exit(1);
+    }
+    
+    // 注意：环境变量现在通过 bash -i 自动加载 ~/.bashrc 来设置
+    // ~/.bashrc 会执行：
+    //   1. source /opt/apollo/neo/setup.sh  （设置 APOLLO_* 环境变量）
+    //   2. export LD_LIBRARY_PATH (循环添加 /opt/apollo/neo/lib/*/)
+    // 这样环境配置更集中、更易维护
+    
+    // 重定向标准输入到 /dev/null
+    int null_fd = open("/dev/null", O_RDWR);
+    if (null_fd >= 0) {
+      dup2(null_fd, STDIN_FILENO);
+      close(null_fd);
+    }
+    
+    // 重定向 stdout 和 stderr 到 nohup.out
+    int out_fd = open("nohup.out", O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (out_fd >= 0) {
+      dup2(out_fd, STDOUT_FILENO);
+      dup2(out_fd, STDERR_FILENO);
+      close(out_fd);
+    }
+    
+    // 通过交互式 shell 执行原始命令（会自动加载 ~/.bashrc）
+    // 这样可以继承所有交互式环境设置，包括 /opt/apollo/neo/setup.sh
+    execl("/bin/bash", "bash", "-i", "-c", original_command.c_str(), nullptr);
+    
+    // 如果到达这里，说明 execl 失败
+    AERROR << "execl failed for " << original_command << ": " << strerror(errno);
+    _exit(127);
+  }
+  
+  // 父进程，返回子进程 PID
+  return pid;
+}
+
+// 改进的 System 函数：支持后台进程真实状态检测
 void System(std::string_view cmd) {
-  const int ret = std::system(cmd.data());
-  if (ret == 0) {
-    AINFO << "SUCCESS: " << cmd;
+  std::string cmd_str(cmd);
+  
+  // 解析命令
+  ParsedCommand parsed = ParseCommand(cmd_str);
+  
+  if (parsed.executable.empty()) {
+    AERROR << "Empty command";
+    return;
+  }
+  
+  // 判断是否是后台进程
+  if (parsed.is_background || parsed.use_nohup) {
+    // 构造去掉 nohup 和 & 的命令（但保持原始路径格式）
+    std::string clean_cmd = cmd_str;
+    if (parsed.use_nohup) {
+      size_t pos = clean_cmd.find("nohup ");
+      if (pos != std::string::npos) {
+        clean_cmd = clean_cmd.substr(pos + 6);  // 去掉 "nohup "
+      }
+    }
+    if (parsed.is_background) {
+      size_t pos = clean_cmd.rfind(" &");
+      if (pos != std::string::npos) {
+        clean_cmd = clean_cmd.substr(0, pos);  // 去掉 " &"
+      }
+    }
+    
+    // 使用 fork+exec 启动后台进程（通过 shell 保持命令行原样）
+    pid_t pid = LaunchBackgroundProcess(clean_cmd);
+    
+    if (pid > 0) {
+      AINFO << "Launched background process: " << cmd << " (PID: " << pid << ")";
+      
+      // 等待一小段时间，检查进程是否立即崩溃
+      usleep(200000);  // 200ms
+      
+      int status;
+      pid_t result = waitpid(pid, &status, WNOHANG);
+      
+      if (result == 0) {
+        // 进程仍在运行
+        AINFO << "SUCCESS: " << cmd << " (PID: " << pid << ")";
+      } else if (result == pid) {
+        // 进程已退出
+        if (WIFEXITED(status)) {
+          int exit_code = WEXITSTATUS(status);
+          AERROR << "FAILED(" << exit_code << "): " << cmd 
+                 << " - Process exited immediately with code " << exit_code;
+        } else if (WIFSIGNALED(status)) {
+          int signal = WTERMSIG(status);
+          AERROR << "FAILED(signal " << signal << "): " << cmd
+                 << " - Process terminated by signal " << signal;
+        }
+      } else {
+        // waitpid 出错（不太可能发生）
+        AWARN << "Could not verify process status for: " << cmd 
+              << " (PID: " << pid << ") - " << strerror(errno);
+        AINFO << "SUCCESS: " << cmd << " (PID: " << pid << ", unverified)";
+      }
+    } else {
+      AERROR << "FAILED: " << cmd << " - Could not start process";
+    }
   } else {
-    AERROR << "FAILED(" << ret << "): " << cmd;
+    // 前台命令，通过交互式 bash 执行以加载 ~/.bashrc
+    // 需要转义单引号以避免命令注入
+    std::string escaped_cmd = cmd_str;
+    size_t pos = 0;
+    while ((pos = escaped_cmd.find("'", pos)) != std::string::npos) {
+      escaped_cmd.replace(pos, 1, "'\\''");
+      pos += 4;
+    }
+    std::string wrapped_cmd = "bash -i -c '" + escaped_cmd + "'";
+    const int ret = std::system(wrapped_cmd.c_str());
+    if (ret == 0) {
+      AINFO << "SUCCESS: " << cmd;
+    } else {
+      AERROR << "FAILED(" << ret << "): " << cmd;
+    }
   }
 }
 
@@ -2126,19 +2314,39 @@ void HMIWorker::ClearInvalidRecordStatus(const HMIModeOperation &operation) {
 }
 
 bool HMIWorker::isProcessRunning(const std::string &process_name) {
+  // 提取实际的命令（去掉 nohup 和 & ）
+  std::string actual_cmd = process_name;
+  
+  // 去掉开头的 "nohup "
+  const std::string nohup_prefix = "nohup ";
+  if (actual_cmd.find(nohup_prefix) == 0) {
+    actual_cmd = actual_cmd.substr(nohup_prefix.length());
+  }
+  
+  // 去掉结尾的 " &"
+  const std::string bg_suffix = " &";
+  size_t pos = actual_cmd.rfind(bg_suffix);
+  if (pos != std::string::npos && pos == actual_cmd.length() - bg_suffix.length()) {
+    actual_cmd = actual_cmd.substr(0, pos);
+  }
+  
+  // 使用 ps + grep 并排除 grep 和 ps 自身进程
+  // grep -v grep: 排除 grep 进程本身
+  // grep -v "ps aux": 排除 ps 命令本身
   std::stringstream commandStream;
-  commandStream << "pgrep -f " << process_name;
+  commandStream << "ps aux | grep \"" << actual_cmd 
+                << "\" | grep -v grep | grep -v \"ps aux\"";
   std::string command = commandStream.str();
 
   FILE *fp = popen(command.c_str(), "r");
   if (fp) {
-    char result[128];
+    char result[1024];  // 增大缓冲区以容纳完整的 ps 输出
     if (fgets(result, sizeof(result), fp) != nullptr) {
-      AINFO << process_name << " is running";
+      AINFO << process_name << " is running!";
       pclose(fp);
       return true;
     } else {
-      AINFO << process_name << " is not running";
+      AINFO << process_name << " is not running!";
     }
     pclose(fp);
   }

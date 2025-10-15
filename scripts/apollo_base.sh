@@ -162,7 +162,11 @@ function decide_task_dir() {
 function is_stopped_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
+  # Match both absolute and relative paths
   NUM_PROCESSES="$(pgrep -f "modules/${MODULE_PATH}/launch/${MODULE}.launch" | grep -cv '^1$')"
+  if [ "${NUM_PROCESSES}" -eq 0 ]; then
+    NUM_PROCESSES="$(pgrep -f "${APOLLO_ROOT_DIR}/modules/${MODULE_PATH}/launch/${MODULE}.launch" | grep -cv '^1$')"
+  fi
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     return 1
   else
