@@ -1,5 +1,14 @@
+# model files
+modules/*/data/models/*
 # Bazel
 bazel-*
+
+# tmporary files
+dumps/*
+dev/*
+.aem/*
+__MACOSX/*
+third_party/*
 
 # Temporary files
 *.pyc
@@ -30,6 +39,9 @@ nohup.out
 *.bak
 *.stderr
 *.stdout
+*.log
+*.log.*
+*.INFO
 
 # Editor configs
 .ycm_extra_conf.py
