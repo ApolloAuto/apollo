@@ -67,8 +67,10 @@ STBoundaryMapper::STBoundaryMapper(
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   // Sanity checks.
   // 确保 planning_max_time_（规划最大时间）大于 0，确保时间配置有效
+  //断言检查规划时间 planning_max_time_ 必须大于 0，确保时间参数合法
   CHECK_GT(planning_max_time_, 0.0);
   // 检查路径点的数量是否少于 2。如果路径点数量不足，输出错误信息并返回 PLANNING_ERROR 状态
+  // 检查离散化路径点数量是否足够生成 ST 图。若路径点少于 2 个，直接报错返回
   if (path_data_.discretized_path().size() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
@@ -79,23 +81,29 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
 
   // Go through every obstacle.
   // 记录最近的停车障碍物
+  // stop_obstacle：记录距离最近的停车障碍物
   Obstacle* stop_obstacle = nullptr;   // 后面需要更新的
   // 记录停车决策
   ObjectDecisionType stop_decision;    //  后面需要更新的
   // 用于存储最小停车点的 s 值，初始化为最大值
+  // min_stop_s：记录所有停车决策中最小的停车距离（s 坐标）
   double min_stop_s = std::numeric_limits<double>::max();   // 后面需要更新的
   // 遍历路径决策中的每个障碍物（path_decision->obstacles().Items() 返回所有障碍物），并通过 Find 方法获取障碍物对象 ptr_obstacle
+  // 循环逻辑：遍历路径决策中的所有障碍物，并通过 Find 方法获取完整障碍物对象
   for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
     ACHECK(ptr_obstacle != nullptr);
 
+    // 无纵向决策的障碍物处理
     // If no longitudinal decision has been made, then plot it onto ST-graph.
     // 如果该障碍物没有纵向决策（即没有决定是否停车、是否超车等），则将其时空边界绘制到 ST 图中，调用 ComputeSTBoundary 递归处理该障碍物，然后继续处理下一个障碍物
+// 若障碍物 无纵向决策（如未标记停车/跟随），调用 ComputeSTBoundary 生成基础 ST 边界（根据障碍物运动预测）
     if (!ptr_obstacle->HasLongitudinalDecision()) {
       ComputeSTBoundary(ptr_obstacle);
       continue;
     }
 
+// 处理停车决策
     // If there is a longitudinal decision, then fine-tune boundary.
     // 如果障碍物有纵向决策，则获取其决策，存储在 decision 中。该决策可能包括停车、跟随、超车、让行等
     const auto& decision = ptr_obstacle->LongitudinalDecision();
@@ -105,22 +113,27 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
       // TODO(all): store ref. s value in stop decision; refine the code then.
       // 将停车点信息存储起来。通过 XYToSL 方法将停车点从 XY 坐标转换为参考线上的 s 和 l 坐标，存储在 stop_sl_point 中
       common::SLPoint stop_sl_point;
+  // 坐标转换：将停车点从笛卡尔坐标系（XY）转换为参考线坐标系（SL）
       reference_line_.XYToSL(decision.stop().stop_point(), &stop_sl_point);
       // 获取停车点的 s 值，存储为 stop_s
       const double stop_s = stop_sl_point.s();
       // 如果当前障碍物的停车点 stop_s 小于记录的最小停车点 min_stop_s
+      // 记录最小停车距离：确保车辆在最近的停车点前停车，避免碰撞
       if (stop_s < min_stop_s) {
-        stop_obstacle = ptr_obstacle;
-        min_stop_s = stop_s;
-        stop_decision = decision;
+        stop_obstacle = ptr_obstacle;  // 更新最近停车障碍物
+        min_stop_s = stop_s;          // 更新最小停车距离
+        stop_decision = decision;     // 保存停车决策
       }
+  // 根据决策类型（跟随、超车、让行），调用 ComputeSTBoundaryWithDecision 细化 ST 边界
     } else if (decision.has_follow() || decision.has_overtake() ||
                decision.has_yield()) {
       // 2. Depending on the longitudinal overtake/yield decision,
       //    fine-tune the upper/lower st-boundary of related obstacles.
       // 如果决策包含跟随、超车或让行（has_follow()、has_overtake()、has_yield()），则根据这些决策调整时空边界。
       ComputeSTBoundaryWithDecision(ptr_obstacle, decision);
-    } else if (!decision.has_ignore()) {
+    } 
+    // 对非忽略（ignore）且未处理的决策类型发出警告，提醒开发者补充逻辑
+    else if (!decision.has_ignore()) {
       // 3. Ignore those unrelated obstacles.
       // 如果决策是 ignore（忽略）以外的其他类型，则记录警告，说明当前决策没有被处理或没有映射
       AWARN << "No mapping for decision: " << decision.DebugString();
@@ -128,6 +141,8 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   }
   // 如果找到停车决策（stop_obstacle 非空），则调用 MapStopDecision 函数来处理停车决策并更新相应的时空边界
   if (stop_obstacle) {
+  // MapStopDecision 将停车点转换为 ST 图中的垂直线（时间轴上的固定 s 值）
+  // 在 ST 图中标记停车位置，规划模块会生成减速至停车的轨迹
     bool success = MapStopDecision(stop_obstacle, stop_decision);
     if (!success) {
       const std::string msg = "Fail to MapStopDecision.";
@@ -139,67 +154,103 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   return Status::OK();
 }
 
+/// @brief // 将障碍物的停止决策映射到ST图边界
+/// @param stop_obstacle  // 需要处理的障碍物指针
+/// @param stop_decision  // 包含停止决策的对象
+/// @return 
 bool STBoundaryMapper::MapStopDecision(
     Obstacle* stop_obstacle, const ObjectDecisionType& stop_decision) const {
+  // 检查决策必须包含停止信息，否则触发断言
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
+  // 创建SL坐标点存储停止点
   common::SLPoint stop_sl_point;
+  // 将笛卡尔坐标的停止点转换为参考线上的SL坐标
   reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl_point);
 
+// 初始化ST图中的停止点s值
   double st_stop_s = 0.0;
+  // 计算调整后的参考s值：减去车辆前边缘到中心的距离（将停止点转换到车辆中心参考系）
   const double stop_ref_s =
       stop_sl_point.s() - vehicle_param_.front_edge_to_center();
 
+// 判断停止点是否在路径末端之后
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
+  // 计算延伸后的s值：离散路径末端s + 超出部分的s差值
     st_stop_s = path_data_.discretized_path().back().s() +
                 (stop_ref_s - path_data_.frenet_frame_path().back().s());
   } else {
+  // 尝试获取路径上对应参考s值的路径点
     PathPoint stop_point;
     if (!path_data_.GetPathPointWithRefS(stop_ref_s, &stop_point)) {
-      return false;
+      return false;  // 获取失败则返回错误
     }
-    st_stop_s = stop_point.s();
+    st_stop_s = stop_point.s();  // 使用路径点的s值
   }
 
+// 计算s轴最小边界（不小于0）
   const double s_min = std::fmax(0.0, st_stop_s);
+  // 计算s轴最大边界（取规划最大距离/参考线长度的较大值）
   const double s_max = std::fmax(
       s_min, std::fmax(planning_max_distance_, reference_line_.Length()));
 
+// 创建ST边界点对集合
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
+  // 添加下边界：时间0时刻从s_min到s_max的水平线
   point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
+  // 添加上边界：最大规划时间时刻的斜线（s_max增加缓冲值）
   point_pairs.emplace_back(
       STPoint(s_min, planning_max_time_),
       STPoint(s_max + speed_bounds_config_.boundary_buffer(),
               planning_max_time_));
+ // 创建ST边界对象
   auto boundary = STBoundary(point_pairs);
+  // 设置边界类型为停止
   boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
+  // 设置特征长度（用于边界处理）
   boundary.SetCharacteristicLength(speed_bounds_config_.boundary_buffer());
+  // 设置边界ID与障碍物ID一致
   boundary.set_id(stop_obstacle->Id());
+  // 将边界对象关联到障碍物
   stop_obstacle->set_path_st_boundary(boundary);
   return true;
 }
 /// @brief 计算并更新与某个障碍物（obstacle）相关的时间-空间（ST）边界
 /// @param obstacle 
 void STBoundaryMapper::ComputeSTBoundary(Obstacle* obstacle) const {
+// 若启用 use_st_drivable_boundary 标志（通常表示使用预定义的可行区域边界），则跳过自定义 ST 边界计算
   if (FLAGS_use_st_drivable_boundary) {   // 默认为false
     return;
   }
+
+  // 计算重叠边界点
   // 存储计算出的时间-空间边界的下边界点
-  std::vector<STPoint> lower_points;
+  std::vector<STPoint> lower_points;  // 时空下边界点（s 较小侧）
   // 存储计算出的时间-空间边界的上边界点
-  std::vector<STPoint> upper_points;
+  std::vector<STPoint> upper_points;  // 时空上边界点（s 较大侧）
   // 计算出重叠的边界点
+  // discretized_path：离散化的车辆规划路径
+  // obstacle：当前处理的障碍物对象
+  // 功能：
+  // 预测障碍物在路径上的运动轨迹，计算其占据的时空区域
+  // 通过几何投影或运动模型，生成边界点序列（例如：障碍物在不同时间 t 占据的最小和最大纵向位置 s）
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
                                 &upper_points, &lower_points)) {
     return;
   }
   // 使用之前计算得到的上下边界点创建一个 STBoundary 对象 boundary
+  // 根据上下边界点创建 STBoundary 对象，表示障碍物的时空占据区域
+  // CreateInstance：工厂方法，根据点集构造边界（可能进行插值或凸包计算）
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
   // 将该障碍物的 ID 设置给 boundary 对象，确保边界与特定的障碍物关联
+  // set_id：绑定边界与障碍物的唯一标识，便于后续跟踪
   boundary.set_id(obstacle->Id());
 
   // TODO(all): potential bug here.
+  // 若两种边界同时存在，可能覆盖优先级逻辑，需确认设计是否符合预期
+  // 未处理两者均为空的情况，可能导致边界类型未初始化（需结合上下文确认是否合理）
   const auto& prev_st_boundary = obstacle->path_st_boundary();
   const auto& ref_line_st_boundary = obstacle->reference_line_st_boundary();
+  // 优先继承路径 ST 边界类型，次优先继承参考线 ST 边界类型
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
   } else if (!ref_line_st_boundary.IsEmpty()) {
@@ -209,19 +260,20 @@ void STBoundaryMapper::ComputeSTBoundary(Obstacle* obstacle) const {
   obstacle->set_path_st_boundary(boundary);
 }
 /// @brief 根据路径点和障碍物的轨迹计算可能的重叠区域，并返回这些区域的上下边界点
-/// @param path_points 表示路径上的离散点，是一个 PathPoint 类型的向量
-/// @param obstacle 表示障碍物对象，用于获取障碍物的信息，如轨迹、尺寸等
-/// @param upper_points 保存重叠区域的上边界
-/// @param lower_points 保存重叠区域的下边界
+/// @param path_points 离散化的路径点序列，表示自车规划路径
+/// @param obstacle 障碍物对象，包含位置、尺寸、预测轨迹等信息
+/// @param upper_points 保存重叠区域的上边界 障碍物在 ST 图上的上边界点（s 值较大的一侧）
+/// @param lower_points 保存重叠区域的下边界 障碍物在 ST 图上的下边界点（s 值较小的一侧）
 /// @return 返回一个 bool 类型，表示是否找到了有效的重叠边界点
 bool STBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
   // Sanity checks.
-  // 数据有效性检查
+  // 检查输出容器是否为空
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
+  // 检查路径点是否为空
   if (path_points.empty()) {
     AERROR << "No points in path_data_.discretized_path().";
     return false;
@@ -231,6 +283,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
                                     ->mutable_planning_status()
                                     ->mutable_change_lane();
   // 根据是否处于换道，调整l_buffer
+  // 若处于换道状态 (IN_CHANGE_LANE)，使用较小的缓冲距离 0.3，因换道需要更紧凑的避让
+  // 否则使用默认值 0.4，提供更大的安全裕度
   double l_buffer =
       planning_status->status() == ChangeLaneStatus::IN_CHANGE_LANE
           ? speed_bounds_config_.lane_change_obstacle_nudge_l_buffer()    // 0.3
@@ -259,6 +313,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     // 获取障碍物的包围盒（Box2d），用于碰撞检测
     const Box2d& obs_box = obstacle.PerceptionBoundingBox();   
   // 遍历路径上的每个点，检查每个路径点是否与障碍物的包围盒发生重叠
+  // 遍历路径点检查碰撞
     for (const auto& curr_point_on_path : path_points) { 
       // 遍历离散路径点，若当前点超过了规划最大距离，退出
       if (curr_point_on_path.s() > planning_max_distance_) {
@@ -270,7 +325,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
         break;
       }
     }
-
+// 若发生碰撞，计算边界点
     if (box_check_collision) {
       const double backward_distance = -vehicle_param_.front_edge_to_center();
       const double forward_distance = obs_box.length();
@@ -283,6 +338,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
         if (CheckOverlap(curr_point_on_path, obs_polygon, l_buffer)) {
           // If there is overlapping, then plot it on ST-graph.
           // 计算重叠区域的 s 值（路径上的位置）。low_s 为重叠区的开始位置，high_s 为重叠区的结束位置
+ //low_s：路径点 s 值 + 车头到中心的负向距离（覆盖车体后方）
+ //high_s：路径点 s 值 + 障碍物长度（覆盖车体前方）         
           double low_s =
               std::fmax(0.0, curr_point_on_path.s() + backward_distance);
           double high_s = std::fmin(planning_max_distance_,
@@ -291,6 +348,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           // TODO(jiacheng): reconsider the backward_distance, it might be
           // unnecessary, but forward_distance is indeed meaningful though.
           // 将重叠区域的上下边界点添加到 upper_points 和 lower_points 中，并退出循环
+          // // 添加边界点
           lower_points->emplace_back(low_s, 0.0);
           lower_points->emplace_back(low_s, planning_max_time_);
           upper_points->emplace_back(high_s, 0.0);
@@ -308,6 +366,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     const int default_num_point = 50;
     DiscretizedPath discretized_path;
     if (path_points.size() > 2 * default_num_point) {
+      // 按比例降采样
       const auto ratio = path_points.size() / default_num_point;
       std::vector<PathPoint> sampled_path_points;
       for (size_t i = 0; i < path_points.size(); ++i) {
@@ -322,19 +381,26 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
 
     // 2. Go through every point of the predicted obstacle trajectory.
     // 根据障碍物的速度和路径点间隔，计算用于轨迹点的步长（trajectory_step），即每次检查的轨迹点数量
+   // 计算轨迹点步长 
     double trajectory_time_interval =
               obstacle.Trajectory().trajectory_point()[1].relative_time();
+// 根据障碍物速度、车辆宽度和轨迹时间间隔，动态调整步长，确保在高速下不会漏检
+// 步长 = 车辆宽度 / (障碍物速度 * 轨迹时间间隔)，取整且至少为1
     int trajectory_step = std::min(
                             FLAGS_trajectory_check_collision_time_step,
                             std::max(vehicle_param_.width() / obstacle.speed()
                           / trajectory_time_interval, 1.0));
+
+
    // 初始化轨迹点的碰撞状态
+   // 遍历轨迹点检测碰撞
     bool trajectory_point_collision_status = false;
     int previous_index = 0;
    // 遍历障碍物的每个轨迹点，并计算其形状（多边形）
     for (int i = 0; i < trajectory.trajectory_point_size();
           i = std::min(i + trajectory_step,
                         trajectory.trajectory_point_size() - 1)) {
+   // 获取轨迹点对应的障碍物形状
       const auto& trajectory_point = trajectory.trajectory_point(i);
       Polygon2d obstacle_shape =
                   obstacle.GetObstacleTrajectoryPolygon(trajectory_point);
@@ -346,6 +412,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
         continue;
       }
       // 检查路径点是否与当前轨迹点的障碍物形状发生重叠
+      // 检测碰撞并更新边界点
       bool collision = CheckOverlapWithTrajectoryPoint(
                                       discretized_path, obstacle_shape,
                                       upper_points, lower_points,
@@ -353,12 +420,15 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
                                       obstacle_length, obstacle_width,
                                       trajectory_point_time);
      // 如果碰撞状态发生变化，则回溯检查之前的轨迹点
+     // 碰撞状态变化时回溯检查
       if ((trajectory_point_collision_status ^ collision) && i != 0) {
+      // 向前回溯轨迹点，找到精确碰撞时刻
         // Start retracing track points forward
         int index = i - 1;
         while ((trajectory_point_collision_status ^ collision)
                   && index > previous_index) {
                     // 回溯并更新碰撞状态
+          // 更新碰撞状态
           const auto& point = trajectory.trajectory_point(index);
           trajectory_point_time = point.relative_time();
           obstacle_shape = obstacle.GetObstacleTrajectoryPolygon(point);
@@ -374,11 +444,13 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       }
       // 如果到达最后一个轨迹点，退出循环
       if (i == trajectory.trajectory_point_size() - 1) break;
+      // 更新状态和索引
       previous_index = i;
     }
   }
 
   // Sanity checks and return.
+  // 按时间 t 对边界点排序，确保在 ST 图上按时间顺序连接
   std::sort(lower_points->begin(), lower_points->end(),
             [](const STPoint& a, const STPoint& b) {
               return a.t() < b.t();
@@ -487,20 +559,22 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
          decision.has_overtake())
       << "decision is " << decision.DebugString()
       << ", but it must be follow or yield or overtake.";
-// 存储时空边界的下界点
-  std::vector<STPoint> lower_points;
-// 存储时空边界的上界点
-  std::vector<STPoint> upper_points;
+// 定义存储ST边界下界点与上界点的容器
+  std::vector<STPoint> lower_points;   // 时空边界下界点集合
+  std::vector<STPoint> upper_points;   // 时空边界上界点集合
 
+// 检查是否启用动态边界且障碍物已初始化路径ST边界
   if (FLAGS_use_st_drivable_boundary &&
       obstacle->is_path_st_boundary_initialized()) {
+    // 若条件满足，直接获取障碍物现有的路径ST边界数据
     const auto& path_st_boundary = obstacle->path_st_boundary();
-    lower_points = path_st_boundary.lower_points();
-    upper_points = path_st_boundary.upper_points();
+    lower_points = path_st_boundary.lower_points(); // 复制下界点
+    upper_points = path_st_boundary.upper_points(); // 复制上界点
   } else {
+  // 否则通过计算获取重叠区域的边界点
     if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
                                   &upper_points, &lower_points)) {
-      return;
+      return;  // 若无法获取边界点则提前退出
     }
   }
  // 使用 lower_points 和 upper_points 创建一个 STBoundary 实例，表示时空边界
@@ -508,37 +582,41 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
 
   // get characteristic_length and boundary_type.
   // 初始化边界类型 b_type 为 UNKNOWN
-  STBoundary::BoundaryType b_type = STBoundary::BoundaryType::UNKNOWN;
+  STBoundary::BoundaryType b_type = STBoundary::BoundaryType::UNKNOWN; // 边界类型
   // 初始化 characteristic_length（特征长度）为 0
-  double characteristic_length = 0.0;
-  if (decision.has_follow()) {
-    characteristic_length = std::fabs(decision.follow().distance_s());  // 这个距离怎么来的
-    AINFO << "characteristic_length: " << characteristic_length;
-    // 扩展边界
+  double characteristic_length = 0.0;   // 特征长度（安全距离）
+
+  // 根据决策类型处理边界
+  if (decision.has_follow()) { // 跟随决策
+    characteristic_length = std::fabs(decision.follow().distance_s()); // 获取跟随距离
+    AINFO << "characteristic_length: " << characteristic_length; // 记录日志
+    // 沿S轴扩展边界（增加安全距离）
     boundary = STBoundary::CreateInstance(lower_points, upper_points)
                    .ExpandByS(characteristic_length);
-    b_type = STBoundary::BoundaryType::FOLLOW;
-  } else if (decision.has_yield()) {
-    characteristic_length = std::fabs(decision.yield().distance_s());
+    b_type = STBoundary::BoundaryType::FOLLOW;  // 标记为跟随类型
+  } else if (decision.has_yield()) { // 让行决策
+    characteristic_length = std::fabs(decision.yield().distance_s());  // 获取让行距离
     boundary = STBoundary::CreateInstance(lower_points, upper_points)
-                   .ExpandByS(characteristic_length);
-    b_type = STBoundary::BoundaryType::YIELD;
-  } else if (decision.has_overtake()) {
-    characteristic_length = std::fabs(decision.overtake().distance_s());
-    b_type = STBoundary::BoundaryType::OVERTAKE;
-  } else {
+                   .ExpandByS(characteristic_length);  // 扩展边界
+    b_type = STBoundary::BoundaryType::YIELD;   // 标记为让行类型
+  } else if (decision.has_overtake()) {  // 超车决策
+    characteristic_length = std::fabs(decision.overtake().distance_s()); // 获取超车距离
+    b_type = STBoundary::BoundaryType::OVERTAKE;  // 标记为超车类型
+  } else {  // 非法决策类型处理
     // 如果决策既不是 follow、yield 也不是 overtake，则触发断言错误，打印出决策的调试信息
     DCHECK(false) << "Obj decision should be either yield or overtake: "
                   << decision.DebugString();
   }
+
   // 设置边界的类型为之前计算出的 b_type
-  boundary.SetBoundaryType(b_type);
+  // 配置最终边界属性
+  boundary.SetBoundaryType(b_type); // 设置边界类型
   // 设置边界的 ID 为障碍物的 ID
-  boundary.set_id(obstacle->Id());
+  boundary.set_id(obstacle->Id()); // 关联障碍物ID
   // 设置边界的特征长度
-  boundary.SetCharacteristicLength(characteristic_length);
+  boundary.SetCharacteristicLength(characteristic_length); // 设置特征长度
   // 将计算得到的时空边界设置回障碍物中
-  obstacle->set_path_st_boundary(boundary);
+  obstacle->set_path_st_boundary(boundary);  // 将计算后的边界保存到障碍物对象
 }
 /// @brief 检查两个矩形框（一个表示障碍物，另一个表示自动驾驶车辆的边界框）是否有重叠
 /// @param path_point 当前路径点，包含了车辆的位置 (x, y) 和朝向角度 theta

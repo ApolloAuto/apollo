@@ -21,7 +21,7 @@
 
 namespace apollo {
 namespace common {
-/// @brief 
+/// @brief 基于后置中心运动学自行车模型预测车辆的未来状态
 /// @param vehicle_model_config 车辆模型的配置参数
 /// @param predicted_time_horizon 预测的时间范围，表示从当前时刻开始，预测的车辆状态持续的时间：规划周期 100ms
 /// @param cur_vehicle_state 当前车辆的状态，包含位置、速度、加速度、航向角等信息

@@ -45,6 +45,7 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
   // Sanity checks.
   // 确保 path_bound 指针不为空
   CHECK_NOTNULL(path_bound);
+  // 清空路径边界，准备重新初始化
   path_bound->clear();
   const auto& reference_line = reference_line_info.reference_line();
   // 设置路径边界的分辨率 delta_s ： 0.5
@@ -55,10 +56,10 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
   // 车辆前端到后轴中心的距离    
   const double ego_front_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();
-
+// reference_line.Length() - ego_front_to_center 确保了在路径的末端，车辆的前端不会超出路径的边界，确保了路径的有效性，避免了车辆行驶出路径范围
   for (double curr_s = init_sl_state.first[0];
        curr_s < std::fmin(init_sl_state.first[0] +
-                              std::fmax(FLAGS_path_bounds_horizon,
+                              std::fmax(FLAGS_path_bounds_horizon,  // 100
                                         reference_line_info.GetCruiseSpeed() *
                                             FLAGS_trajectory_time_length),
                           reference_line.Length() - ego_front_to_center);
@@ -192,7 +193,10 @@ std::string PathBoundsDeciderUtil::FindFarthestBlockObstaclesId(
   }
   return nearest_obstcles_id;
 }
-
+/// @brief 左边界值从小到大排序
+/// @param lhs 
+/// @param rhs 
+/// @return 
 bool CompareLeftBound(const std::pair<std::string, double>& lhs,
                       const std::pair<std::string, double>& rhs) {
   if (lhs.first == rhs.first) {
@@ -200,6 +204,10 @@ bool CompareLeftBound(const std::pair<std::string, double>& lhs,
   }
   return lhs.second < rhs.second;
 }
+/// @brief 右边界从大到小排序
+/// @param lhs 
+/// @param rhs 
+/// @return 
 bool CompareRightBound(const std::pair<std::string, double>& lhs,
                        const std::pair<std::string, double>& rhs) {
   if (lhs.first == rhs.first) {
@@ -219,8 +227,11 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
   AINFO << "There are " << sorted_obstacles.size() << " obstacles.";
   double center_line = init_sl_state.second[0];
   ADEBUG << "init l" << init_sl_state.second[0];
+  // 指示当前正在处理的障碍物(上面排序过的)的索引
   size_t obs_idx = 0;
+  // 存储被阻塞的位置的索引
   int path_blocked_idx = -1;
+  // 存储路径右侧的障碍物边界，每个元素是一个 pair，包含障碍物的 ID 和相应的右侧边界的值（即障碍物在 l_max 方向的值）
   std::multiset<std::pair<std::string, double>, decltype(CompareRightBound)*>
       right_bounds(CompareRightBound);
   std::multiset<std::pair<std::string, double>, decltype(CompareLeftBound)*>
@@ -230,11 +241,14 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
   left_bounds.insert(std::make_pair("", std::numeric_limits<double>::max()));
   // Maps obstacle ID's to the decided ADC pass direction, if ADC should
   // pass from left, then true; otherwise, false.
+  // 存储障碍物的 ID 和自车（ADC）通过障碍物的方向（true 表示从左侧通过，false 表示从右侧通过）
   std::unordered_map<std::string, bool> obs_id_to_direction;
   // Maps obstacle ID's to the decision of whether side-pass on this obstacle
   // is allowed. If allowed, then true; otherwise, false.
+  // 用于存储障碍物的 ID 和是否允许侧方通过的决策（true 表示允许侧方通过，false 表示不允许）
   std::unordered_map<std::string, bool> obs_id_to_sidepass_decision;
   // Maps obstacle ID's to start s on this obstacle
+  // 存储障碍物的 ID 和障碍物的起始位置 s。s 表示障碍物在路径上的位置（沿着路径的纵向位置）
   std::unordered_map<std::string, double> obs_id_to_start_s;
   // Step through every path point.
   for (size_t i = 1; i < path_boundaries->size(); ++i) {
@@ -351,18 +365,26 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
 }
 
 // The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
+// bool is_start_s: 障碍物是起始边界(1)还是结束边界(0)
+// s:障碍物的纵向位置
+// l_min:障碍物在横向上的最小横向位置
+// l_max:障碍物在横向上的最大横向位置
+// obstacle_id: 障碍物的id
 std::vector<ObstacleEdge> PathBoundsDeciderUtil::SortObstaclesForSweepLine(
     const IndexedList<std::string, Obstacle>& indexed_obstacles,
     const SLState& init_sl_state) {
+  // 初始化 sorted_obstacles 向量
   std::vector<ObstacleEdge> sorted_obstacles;
 
   // Go through every obstacle and preprocess it.
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Only focus on those within-scope obstacles.
+    // 过滤出在路径规划范围内的障碍物
     if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
     // Only focus on obstacles that are ahead of ADC.
+    // // 过滤后方的障碍物
     if (obstacle->PerceptionSLBoundary().end_s() < init_sl_state.first[0]) {
       continue;
     }
@@ -415,7 +437,7 @@ bool PathBoundsDeciderUtil::IsWithinPathDeciderScopeObstacle(
   }
   // Obstacle should not be moving obstacle.
   if (!obstacle.IsStatic() ||
-      obstacle.speed() > FLAGS_static_obstacle_speed_threshold) {
+      obstacle.speed() > FLAGS_static_obstacle_speed_threshold) {  // 0.5
     return false;
   }
   // TODO(jiacheng):
@@ -542,10 +564,10 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
   return true;
 }
 /// @brief 根据自车的状态扩展路径的左右边界
-/// @param reference_line_info 
-/// @param init_sl_state 
-/// @param extend_buffer 
-/// @param path_bound 
+/// @param reference_line_info 包含参考路径的相关信息
+/// @param init_sl_state 初始路径的 S 方向状态，包含车辆的横向位置（l）和速度（v）
+/// @param extend_buffer 额外的扩展缓冲区，用来扩展路径的边界
+/// @param path_bound 路径的边界数据结构，存储路径的每一段的左右边界信息
 /// @return 
 bool PathBoundsDeciderUtil::ExtendBoundaryByADC(
     const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,

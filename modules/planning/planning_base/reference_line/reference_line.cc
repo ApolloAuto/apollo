@@ -213,18 +213,25 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   frenet_frame_point.set_ddl(ddl);
   return frenet_frame_point;
 }
-
+/// @brief 将一个给定的轨迹点（traj_point）转换为 Frenet 坐标系下的 s 和 l 条件，
+//并返回一个 std::pair<std::array<double, 3>, std::array<double, 3>> 类型的值
+/// @param traj_point 
+/// @return 
 std::pair<std::array<double, 3>, std::array<double, 3>>
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
+  // 验证参考点非空
   ACHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
+  // 将轨迹点的 (x, y) 坐标和角度 theta() 转换为 Frenet 坐标系中的 s 和 l 值
   XYToSL(traj_point.path_point().theta(),
          {traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
+  // 使用 sl_point.s() 获取对应的参考点
   ReferencePoint ref_point = GetReferencePoint(sl_point.s());
+  // 将轨迹点的笛卡尔坐标转换为 Frenet 坐标
   CartesianFrenetConverter::cartesian_to_frenet(
       sl_point.s(), ref_point.x(), ref_point.y(), ref_point.heading(),
       ref_point.kappa(), ref_point.dkappa(), traj_point.path_point().x(),
@@ -299,8 +306,11 @@ std::vector<ReferencePoint> ReferenceLine::GetReferencePoints(
   }
   return ref_points;
 }
-
+/// @brief 
+/// @param s 路径上某一点的累积距离值，即路径上的 s 坐标
+/// @return 
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
+  // 检查给定的 s 是否在路径的有效范围内
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front() - 1e-2) {
     AWARN << "The requested s: " << s << " < 0.";
@@ -311,7 +321,9 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
           << " > reference line length: " << accumulated_s.back();
     return reference_points_.back();
   }
-
+  // 获取 s 所在路径段的索引
+  // 返回一个结构体，里面包含了 id（路径段的索引）。然后，index 和 next_index 分别表示当前路径段和下一个路径段的索引。
+  // 如果下一个索引超出了参考点数组的范围，next_index 被设置为最后一个参考点的索引
   auto interpolate_index = map_path_.GetIndexFromS(s);
 
   size_t index = interpolate_index.id;
@@ -319,12 +331,13 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   if (next_index >= reference_points_.size()) {
     next_index = reference_points_.size() - 1;
   }
-
+  // 获取当前路径段的参考点 p0 和下一个路径段的参考点 p1
   const auto& p0 = reference_points_[index];
   const auto& p1 = reference_points_[next_index];
-
+  // 获取当前参考点和下一个参考点的累计弧长值 s0 和 s1
   const double s0 = accumulated_s[index];
   const double s1 = accumulated_s[next_index];
+  // 通过已知的两个参考点 p0 和 p1，以及它们的累计弧长 s0 和 s1，根据 s 值插值得到对应的参考点
   return InterpolateWithMatchedIndex(p0, s0, p1, s1, interpolate_index);
 }
 
@@ -425,11 +438,17 @@ bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
   sl_point->set_l(l);
   return true;
 }
-
+/// @brief 
+/// @param heading 当前点的航向角
+/// @param xy_point 当前点在笛卡尔坐标系中的坐标
+/// @param sl_point 输出的 Frenet 坐标点，包含 s 和 l 值
+/// @param warm_start_s 提供的起始位置 s，如果小于 0 会进行路径的重新计算
+/// @return 
 bool ReferenceLine::XYToSL(const double heading,
                            const common::math::Vec2d& xy_point,
                            common::SLPoint* const sl_point,
                            double warm_start_s) const {
+  // 如果 warm_start_s 小于 0，则通过路径投影计算
   double s = warm_start_s;
   double l = 0.0;
   if (warm_start_s < 0.0) {
@@ -449,22 +468,32 @@ bool ReferenceLine::XYToSL(const double heading,
   sl_point->set_l(l);
   return true;
 }
-
+/// @brief 
+/// @param p0 路径段的起始参考点
+/// @param s0 路径段的起始参考点对应的累积 s 值
+/// @param p1 路径段的终止参考点
+/// @param s1 路径段的终止参考点对应的累积 s 值
+/// @param index 包含路径段的索引和偏移量的结构体，用于确定插值位置
+/// @return 
 ReferencePoint ReferenceLine::InterpolateWithMatchedIndex(
     const ReferencePoint& p0, const double s0, const ReferencePoint& p1,
     const double s1, const InterpolatedIndex& index) const {
+  // 两个点太近
   if (std::fabs(s0 - s1) < common::math::kMathEpsilon) {
     return p0;
   }
+  // 使用传入的 index.offset 计算当前目标 s 值。offset 是从起始点 s0 开始的相对偏移，表示目标位置在路径段上的位置
   double s = s0 + index.offset;
+  // 使用 DCHECK_LE 进行断言检查，确保目标 s 值在 s0 和 s1 之间（稍微容忍误差）。如果 s 值超出了该范围，将会触发断言错误
   DCHECK_LE(s0 - 1.0e-6, s) << "s: " << s << " is less than s0 : " << s0;
   DCHECK_LE(s, s1 + 1.0e-6) << "s: " << s << " is larger than s1: " << s1;
-
+  // 根据插值位置的 index 获取平滑路径点。这通常是通过对路径进行插值计算得到的连续的路径点
   auto map_path_point = map_path_.GetSmoothPoint(index);
+  // 使用 lerp（线性插值）计算路径段上目标位置的曲率 (kappa) 和曲率变化率 (dkappa)
   const double kappa = common::math::lerp(p0.kappa(), s0, p1.kappa(), s1, s);
   const double dkappa = common::math::lerp(p0.dkappa(), s0, p1.dkappa(), s1, s);
-
-  return ReferencePoint(map_path_point, kappa, dkappa);
+  // 使用获取的平滑路径点 map_path_point、计算得到的曲率 kappa 和曲率变化率 dkappa，创建并返回一个新的 ReferencePoint，表示路径上目标位置的参考点
+  return ReferencePoint(map_path_point, kappa, dkappa);   
 }
 
 ReferencePoint ReferenceLine::Interpolate(const ReferencePoint& p0,
