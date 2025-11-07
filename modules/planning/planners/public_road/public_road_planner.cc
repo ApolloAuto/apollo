@@ -28,11 +28,14 @@ using apollo::common::TrajectoryPoint;
 /// @param injector 
 /// @param config_path 
 /// @return 
+// 初始化 PublicRoadPlanner 类的对象，包括初始化父类、加载配置文件、初始化场景管理器，并最终返回一个成功状态
 Status PublicRoadPlanner::Init(
     const std::shared_ptr<DependencyInjector>& injector,
     const std::string& config_path) {
+  // 先调用父类的初始化操作
   Planner::Init(injector, config_path);
-  LoadConfig<PlannerPublicRoadConfig>(config_path, &config_);
+  // 加载配置文件，并将其内容存储到 config_ 成员变量中
+  LoadConfig<PlannerPublicRoadConfig>(config_path, &config_);  // config_path： public_road_planner_config.pb.txt
   scenario_manager_.Init(injector, config_);
   return Status::OK();
 }

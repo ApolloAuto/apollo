@@ -53,14 +53,20 @@ void NodeSRange::SetStartS(double start_s) { start_s_ = start_s; }
 
 void NodeSRange::SetEndS(double end_s) { end_s_ = end_s; }
 
+/// @brief 将两个区间合并，如果有重叠或相邻，则合并到当前区间中
+/// @param other 
+/// @return 
 bool NodeSRange::MergeRangeOverlap(const NodeSRange& other) {
   if (!IsValid() || !other.IsValid()) {
     return false;
   }
+  // 判断两个区间是否不相交
   if (other.StartS() > EndS() || other.EndS() < StartS()) {
     return false;
   }
+  // 将当前区间的结束位置更新为两个区间的最大结束位置
   SetEndS(std::max(EndS(), other.EndS()));
+  // 将当前区间的起始位置更新为两个区间的最小起始位置
   SetStartS(std::min(StartS(), other.StartS()));
   return true;
 }

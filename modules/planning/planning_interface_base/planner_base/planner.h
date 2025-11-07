@@ -79,6 +79,12 @@ class Planner {
   std::shared_ptr<DependencyInjector> injector_ = nullptr;
 };
 
+/// @brief 
+/// @tparam T 
+/// @param custom_config_path 表示自定义配置文件路径
+/// @param config 指向类型 T 的指针 config（用于存放加载的配置）
+/// @return 
+// 如果提供了自定义的配置文件路径，就加载它。如果没有提供，则通过反射机制获取当前类的名字，并根据类名查找默认的配置文件路径，最终加载配置文件并填充配置对象
 template <typename T>
 bool Planner::LoadConfig(const std::string& custom_config_path, T* config) {
   std::string config_path = custom_config_path;
@@ -86,12 +92,15 @@ bool Planner::LoadConfig(const std::string& custom_config_path, T* config) {
   if ("" == config_path) {
     int status;
     // Get the name of this class.
+    //通过 typeid(*this).name() 获取当前对象的类型信息，并使用 abi::__cxa_demangle 函数将类型名称解码为更可读的格式
+    // （例如，从 typeid 返回的名称通常是编译器特定的符号，需要解码）。最终，解码后的类名存储在 class_name 字符串中
     std::string class_name =
         abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
     config_path = apollo::cyber::plugin_manager::PluginManager::Instance()
                       ->GetPluginConfPath<Planner>(
                           class_name, "conf/planner_config.pb.txt");
   }
+  // 读取配置文件并将内容填充到 config 指向的对象中
   return apollo::cyber::common::LoadConfig<T>(config_path, config);
 }
 

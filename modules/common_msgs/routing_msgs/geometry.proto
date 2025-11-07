@@ -4,6 +4,7 @@ package apollo.routing;
 
 import "modules/common_msgs/basic_msgs/geometry.proto";
 
+// 道路上的路径点，包含了id，长度和位置点信息
 message LaneWaypoint {
   optional string id = 1;
   optional double s = 2;
@@ -14,6 +15,7 @@ message LaneWaypoint {
   optional double heading = 4;
 }
 
+// 道路的一段，包含了id和起止点信息
 message LaneSegment {
   optional string id = 1;
   optional double start_s = 2;
@@ -22,26 +24,30 @@ message LaneSegment {
 
 enum DeadEndRoutingType {
   ROUTING_OTHER = 0;
-  ROUTING_IN = 1;
-  ROUTING_OUT = 2;
+  ROUTING_IN = 1;  // 当前路径是进入死胡同的路径（车辆要驶入一个无出口区域）
+  ROUTING_OUT = 2; // 当前路径是驶出死胡同的路径（车辆从尽头区域驶回正常车道）
 }
 
+// 描述测量的距离
 message Measurement {
   optional double distance = 1;
 }
 
+// 道路的类型，有FORWARD，LEFT，RIGHT三种取值
 enum ChangeLaneType {
   FORWARD = 0;
   LEFT = 1;
   RIGHT = 2;
 };
 
+// 一段通路，其中可以包含多个LaneSegment，以及ChangeLaneType
 message Passage {
   repeated LaneSegment segment = 1;
   optional bool can_exit = 2;
   optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
 }
 
+// 道路的一段，拥有一个id，并可以包含多个Passage
 message RoadSegment {
   optional string id = 1;
   repeated Passage passage = 2;

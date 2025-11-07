@@ -162,6 +162,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
+// 验证先前的轨迹
   size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
 // 如果先前轨迹的点数为零（即轨迹为空）
   if (prev_trajectory_size == 0) {
@@ -177,12 +178,16 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 // 所对应的轨迹点作为当前帧的规划起始状态点，待当前帧规划生成轨迹后，再和上一帧轨迹中所选择
 // 的规划起始点前一段距离的轨迹点进行拼接
 
+// 3.计算时间匹配点：通过 veh_rel_time 查询先前轨迹中与当前时间最接近的轨迹点
   const double veh_rel_time =
       current_timestamp - prev_trajectory->header_time();
   // 查询先前轨迹中时间最接近的点的索引
   size_t time_matched_index =
       prev_trajectory->QueryLowerBoundPoint(veh_rel_time);
+
+// 4. 检查时间与位置偏差
   // 如果当前时间比先前轨迹的起始时间还要早，则重新规划
+  // 检查当前时间是否小于先前轨迹的起始时间
   if (time_matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
     AWARN << "current time smaller than the previous trajectory's first time";
@@ -202,12 +207,14 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   auto time_matched_point = prev_trajectory->TrajectoryPointAt(
       static_cast<uint32_t>(time_matched_index));
 
+// 5. 检查路径点
 // 如果与当前时间匹配的轨迹点没有路径信息（has_path_point()），则重新规划
   if (!time_matched_point.has_path_point()) {
     *replan_reason = "replan for previous trajectory missed path point";
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
+// 6.检查位置匹配点
 // 查询与车辆当前位置最接近的轨迹点索引
   size_t position_matched_index = prev_trajectory->QueryNearestPointWithBuffer(
       {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
@@ -245,7 +252,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
            << ", longitudinal diff: " << lon_diff
            << ", time diff: " << time_diff;
 // 如果横向误差（lat_diff）超过预设阈值，则重新规划
-    if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold) {
+    if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold) {  // 0.5
       const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
           "large. Replan is triggered. lat_diff = ",
@@ -256,7 +263,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
                                               vehicle_state);
     }
 // 如果纵向误差（lon_diff）超过预设阈值，则重新规划
-    if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
+    if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {  // 2.5
       const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
           "large. Replan is triggered. lon_diff = ",
@@ -267,7 +274,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
                                               vehicle_state);
     }
 // 如果时间差异（time_diff）超过预设阈值，则重新规划
-    if (std::fabs(time_diff) > FLAGS_replan_time_threshold) {
+    if (std::fabs(time_diff) > FLAGS_replan_time_threshold) {  // 7.0
       const std::string msg = absl::StrCat(
           "the difference between time matched point relative time and "
           "actual position corresponding relative time is too "
@@ -293,6 +300,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 // 选择时间匹配和位置匹配中较小的索引作为最终的匹配点
   auto matched_index = std::min(time_matched_index, position_matched_index);
 // 基于匹配点和保留点数，从先前轨迹中提取出拼接的轨迹部分
+// 从 prev_trajectory 中提取一段子轨迹，起始点为 matched_index - preserved_points_num（确保不会越界），结束点为 forward_time_index
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->begin() +
           std::max(0, static_cast<int>(matched_index - preserved_points_num)),

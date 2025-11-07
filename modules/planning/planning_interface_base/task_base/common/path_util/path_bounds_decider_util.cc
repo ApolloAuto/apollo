@@ -181,16 +181,21 @@ void PathBoundsDeciderUtil::TrimPathBounds(
   }
 }
 
+/// @brief 找到起始 s 值最大的障碍物 ID，也就是最靠前（沿路径最远）开始阻挡自车的障碍物
+/// @param obs_id_to_start_s 键是障碍物的 ID，值是该障碍物在参考线上开始影响路径的 s 值
+/// @return 
 std::string PathBoundsDeciderUtil::FindFarthestBlockObstaclesId(
     const std::unordered_map<std::string, double>& obs_id_to_start_s) {
   std::string nearest_obstcles_id = "";
   double max_start_s = std::numeric_limits<double>::lowest();
+  // 遍历所有障碍物，找到 start_s 最大的那个
   for (auto obs : obs_id_to_start_s) {
     if (obs.second > max_start_s) {
       nearest_obstcles_id = obs.first;
       max_start_s = obs.second;
     }
   }
+  // 返回 start_s 最大的障碍物 ID
   return nearest_obstcles_id;
 }
 /// @brief 左边界值从小到大排序
@@ -225,7 +230,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
   auto sorted_obstacles =
       SortObstaclesForSweepLine(indexed_obstacles, init_sl_state);
   AINFO << "There are " << sorted_obstacles.size() << " obstacles.";
-  double center_line = init_sl_state.second[0];
+  double center_line = init_sl_state.second[0]; // // 当前 ADC 的初始横向位置
   ADEBUG << "init l" << init_sl_state.second[0];
   // 指示当前正在处理的障碍物(上面排序过的)的索引
   size_t obs_idx = 0;
@@ -267,6 +272,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
                << "] curr_obstacle_l_min[" << curr_obstacle_l_min
                << "] curr_obstacle_l_max[" << curr_obstacle_l_max
                << "] center_line[" << center_line << "]";
+        // 新障碍物进入（in）
         if (std::get<0>(curr_obstacle) == 1) {
           // A new obstacle enters into our scope:
           //   - Decide which direction for the ADC to pass.
@@ -274,7 +280,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           //   - If boundaries blocked, then decide whether can side-pass.
           //   - If yes, then borrow neighbor lane to side-pass.
 
-          if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
+          if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {  // 靠右，建议从左绕
             // Obstacle is to the right of center-line, should pass from
             // left.
             ADEBUG << curr_obstacle_id << "left nudge";
@@ -291,6 +297,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           ADEBUG << curr_obstacle_id << "right nudge";
           obs_id_to_start_s[curr_obstacle_id] = curr_obstacle_s;
         } else {
+          // 障碍物离开（out）
           // An existing obstacle exits our scope.
           if (obs_id_to_direction[curr_obstacle_id]) {
             right_bounds.erase(right_bounds.find(
@@ -504,11 +511,14 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
     const ReferenceLineInfo& reference_line_info, const SLState& init_sl_state,
     PathBoundary* const path_bound) {
   // Sanity checks.
+  // 输入合法性检查
   // 确保 path_bound 指针不为空
   CHECK_NOTNULL(path_bound);
   // path_bound 内的边界数据不为空
   ACHECK(!path_bound->empty());
   const ReferenceLine& reference_line = reference_line_info.reference_line();
+
+  // 通过初始点的 s 坐标获取 ADC 所在车道的总宽度，用于初始化历史值
   // 根据车辆起始位置（init_sl_state.first[0]）计算出车辆所在车道的宽度 adc_lane_width
   double adc_lane_width =
       GetADCLaneWidth(reference_line, init_sl_state.first[0]);
@@ -518,6 +528,8 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
   double past_lane_right_width = adc_lane_width / 2.0;
   // 记录路径上被阻塞的点的索引，初始值设为 -1
   int path_blocked_idx = -1;
+
+  // 遍历每一个 PathBoundary 点（每个 s）
   // 开始循环遍历路径边界中的每个点，curr_s 是当前路径点在参考线上的位置
   for (size_t i = 0; i < path_bound->size(); ++i) {
     double curr_s = (*path_bound)[i].s;
@@ -531,6 +543,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
       curr_lane_left_width = past_lane_left_width;
       curr_lane_right_width = past_lane_right_width;
     } else {
+    // 当前点的参考线 reference_line 与 它所在车道的中心线之间的横向距离（即参考线是否偏离了该车道的中心线）
       reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
       curr_lane_left_width += offset_to_lane_center;
       curr_lane_right_width -= offset_to_lane_center;
@@ -541,6 +554,7 @@ bool PathBoundsDeciderUtil::GetBoundaryFromSelfLane(
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
     // 计算当前路径点的实际左右边界。首先计算从参考线坐标系到地图坐标系的偏移量 offset_to_map
+    // 当前参考线 reference_line 相对于全局地图横向参考线的偏移，也可以理解为当前 s 位置下，参考线在横向 L 方向上的实际坐标
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 

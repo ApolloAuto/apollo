@@ -254,50 +254,70 @@ bool TopoNode::IsOverlapEnough(const TopoNode* sub_node,
 }
 
 void TopoNode::AddInEdge(const TopoEdge* edge) {
+  // 检查该边的终点是不是当前节点（即这是否是一条“入边”）
   if (edge->ToNode() != this) {
     return;
   }
+
+  // 如果这条边的起点（FromNode）已经在入边映射中存在，说明这条边已经添加过，也直接返回避免重复添加
   if (in_edge_map_.count(edge->FromNode()) != 0) {
     return;
   }
   switch (edge->Type()) {
+  // 对于一条从其他车道左转进入当前车道的边
     case TET_LEFT:
-      in_from_right_edge_set_.insert(edge);
+    // 这里的命名基于当前节点“看到”的入边角度 —— 别人左转进来，相对我是从右侧来
+      in_from_right_edge_set_.insert(edge); // 在当前节点看来，它是从“右侧”进入的，因此加入 in_from_right_edge_set_
       in_from_left_or_right_edge_set_.insert(edge);
       break;
     case TET_RIGHT:
+    // 如果别人右转进入当前节点，当前节点看到的方向是“从左侧”进入
       in_from_left_edge_set_.insert(edge);
       in_from_left_or_right_edge_set_.insert(edge);
       break;
     default:
+    // 对于直行或无法分类的边，认为是“从前方进入”的，加入 in_from_pre_edge_set_
       in_from_pre_edge_set_.insert(edge);
       break;
   }
+  // 不管类型是什么，所有入边都加入总集合 in_from_all_edge_set_
   in_from_all_edge_set_.insert(edge);
+  // 将这条入边存入映射表中，方便根据起点节点快速访问边信息
   in_edge_map_[edge->FromNode()] = edge;
 }
 
+/// @brief 接收一条指向其他节点的边（TopoEdge）指针，尝试将它加入当前节点的“出边”集合中
+/// @param edge 
 void TopoNode::AddOutEdge(const TopoEdge* edge) {
+  // 检查这条边的起点是否确实是当前这个节点
   if (edge->FromNode() != this) {
     return;
   }
+
+  // 如果这条边的终点已经存在于 out_edge_map_ 中（说明之前已经添加过），也不重复添加，直接返回
   if (out_edge_map_.count(edge->ToNode()) != 0) {
     return;
   }
+
+  // 根据边的类型 Type() 做分类。Apollo 中边类型一般包括直行、左转、右转等
   switch (edge->Type()) {
     case TET_LEFT:
-      out_to_left_edge_set_.insert(edge);
-      out_to_left_or_right_edge_set_.insert(edge);
+      out_to_left_edge_set_.insert(edge); // 左转边集合
+      out_to_left_or_right_edge_set_.insert(edge); // 左右转边集合
       break;
     case TET_RIGHT:
-      out_to_right_edge_set_.insert(edge);
-      out_to_left_or_right_edge_set_.insert(edge);
+      out_to_right_edge_set_.insert(edge); // 右转边集合
+      out_to_left_or_right_edge_set_.insert(edge); // 左右转边集合
       break;
     default:
-      out_to_suc_edge_set_.insert(edge);
+      out_to_suc_edge_set_.insert(edge); // 其他类型的边（如直行），加入 out_to_suc_edge_set_（继承边集合）中
       break;
   }
+
+  // 统一处理
+  //  所有出边的统一集合（无论左转、右转还是直行），方便统一访问
   out_to_all_edge_set_.insert(edge);
+  //  从当前节点到其他节点的出边映射表，键是终点节点，值是对应的边
   out_edge_map_[edge->ToNode()] = edge;
 }
 

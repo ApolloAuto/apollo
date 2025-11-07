@@ -58,8 +58,11 @@ using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::CloseToJunction;
 using apollo::storytelling::Stories;
-
+/// @brief 
+/// @param planning_config 规划配置
+/// @return 
 bool MessageProcess::Init(const PlanningConfig& planning_config) {
+  // 将 planning_config 的内容复制到 planning_config_ 中，确保 MessageProcess 持有最新的规划配置
   planning_config_.CopyFrom(planning_config);
 
   map_m_["Sunnyvale"] = "sunnyvale";
@@ -68,23 +71,39 @@ bool MessageProcess::Init(const PlanningConfig& planning_config) {
   map_m_["Gomentum"] = "gomentum";
   map_m_["Sunnyvale Loop"] = "sunnyvale_loop";
   map_m_["San Mateo"] = "san_mateo";
+  /*
+  FLAGS_map_dir = "/home/user/maps/sunnyvale";
+  map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
+  结果：map_name_ = "sunnyvale"
 
+  */
+
+  // find_last_of("/") 找到最后一个 / 的位置，然后 substr() 获取路径的最后一部分，即当前地图的名称
+  // 提取地图名称
   map_name_ = FLAGS_map_dir.substr(FLAGS_map_dir.find_last_of("/") + 1);
 
   obstacle_history_map_.clear();
 
   if (FLAGS_planning_offline_learning) {
+    // 以 追加模式 (std::ios_base::app) 打开 "learning_data.log" 日志文件，确保新日志不会覆盖旧日志
     // offline process logging
+    // std::ofstream log_file_;
     log_file_.open(FLAGS_planning_data_dir + "/learning_data.log",
                    std::ios_base::out | std::ios_base::app);
+    // 记录当前时间 start_time_，可能用于计算 日志记录的时间间隔 或 启动时间
     start_time_ = std::chrono::system_clock::now();
+    // std::time(nullptr) 获取当前时间（UTC 时间）
     std::time_t now = std::time(nullptr);
+    // std::asctime() 将时间转换为可读的字符串格式
     log_file_ << "UTC date and time: " << std::asctime(std::gmtime(&now))
               << "Local date and time: " << std::asctime(std::localtime(&now));
   }
   return true;
 }
-
+/// @brief 
+/// @param planning_config PlanningConfig 类型的常量引用，表示规划配置参数
+/// @param injector 共享指针，指向 DependencyInjector 类的实例，通常用于依赖注入，提供其他对象的创建和管理
+/// @return 
 bool MessageProcess::Init(const PlanningConfig& planning_config,
                           const std::shared_ptr<DependencyInjector>& injector) {
   injector_ = injector;

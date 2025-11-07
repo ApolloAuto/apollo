@@ -7,6 +7,7 @@ import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/basic_msgs/error_code.proto";
 import "modules/common_msgs/routing_msgs/poi.proto";
 
+// 描述了路由请求的信息，一次路由请求可以包含多个路径点
 message RoutingRequest {
   optional apollo.common.Header header = 1;
   // at least two points. The first is start point, the end is final point.
@@ -20,6 +21,7 @@ message RoutingRequest {
   optional bool is_start_pose_set = 7 [default = false];
 }
 
+// 路由请求的响应结果，可以包含多个RoadSegment，距离等信息
 message RoutingResponse {
   optional apollo.common.Header header = 1;
   repeated apollo.routing.RoadSegment road = 2;

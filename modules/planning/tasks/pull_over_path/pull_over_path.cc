@@ -72,6 +72,7 @@ apollo::common::Status PullOverPath::Process(
 }
 
 bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
+  // 获取当前规划上下文中的泊车状态对象 pull_over_status，可以用于读取/修改泊车相关状态
   auto* pull_over_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_pull_over();
@@ -79,20 +80,25 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   if (!plan_pull_over_path) {
     return false;
   }
+  // 为 boundary 添加一个新的 PathBoundary 实例，并引用为 path_bound
   boundary->emplace_back();
   auto& path_bound = boundary->back();
+  // 定义一个变量记录路径边界中最窄的位置宽度
   double path_narrowest_width = 0;
   // 1. Initialize the path boundaries to be an indefinitely large area.
+  // 初始化路径边界为一个非常大的范围
   if (!PathBoundsDeciderUtil::InitPathBoundary(*reference_line_info_,
                                                &path_bound, init_sl_state_)) {
     AERROR << "Failed to initialize path boundaries.";
     return false;
   }
+  // 根据道路边界进行粗略裁剪
   if (!GetBoundaryFromRoads(*reference_line_info_, &path_bound)) {
     AERROR << "Failed to decide a rough boundary based on road boundary.";
     return false;
   }
   RecordDebugInfo(path_bound, "pull_over_road", reference_line_info_);
+  // 将边界的坐标系从“车道中心”为基准转换为“参考线”为基准
   PathBoundsDeciderUtil::ConvertBoundarySAxisFromLaneCenterToRefLine(
       *reference_line_info_, &path_bound);
 
@@ -102,6 +108,7 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
               "path";
     return false;
   }
+  // 根据配置决定是向左泊车还是向右泊车。如果配置是“左右都行”，则计算左右边界距离来自动决定方向
   bool is_pull_over_right = true;
   if (config_.pull_over_direction() == PullOverPathConfig::BOTH_SIDE) {
     double adc_to_left_bound =
@@ -115,11 +122,13 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     is_pull_over_right = true;
   }
   // 2. Update boundary by lane boundary for pull_over
+  // 进一步裁剪边界：基于车道边界
   UpdatePullOverBoundaryByLaneBoundary(is_pull_over_right, &path_bound);
   RecordDebugInfo(path_bound, "pull_over_lane", reference_line_info_);
 
   std::string blocking_obstacle_id = "";
   PathBound temp_path_bound = path_bound;
+  // 根据静态障碍物进一步缩小路径边界。记录被挡住的障碍物 ID 以及路径最窄宽度
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           *reference_line_info_, init_sl_state_, &path_bound,
           &blocking_obstacle_id, &path_narrowest_width)) {
@@ -128,6 +137,7 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     return false;
   }
   // If already found a pull-over position, simply check if it's valid.
+  // 检查当前已知的泊车目标点是否仍在当前路径边界内，返回对应的索引。如果不在范围内，返回 -1
   int curr_idx = -1;
   if (pull_over_status->has_position()) {
     curr_idx = PathBoundsDeciderUtil::IsPointWithinPathBound(
@@ -135,6 +145,7 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
         pull_over_status->position().y(), path_bound);
   }
   // If haven't found a pull-over position, search for one.
+  // 如果还没有找到泊车点，就在裁剪后的路径边界中搜索可行泊车点
   if (curr_idx < 0) {
     pull_over_status->Clear();
     pull_over_status->set_plan_pull_over_path(true);
@@ -145,8 +156,10 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
     }
     const auto& vehicle_param =
         VehicleConfigHelper::GetConfig().vehicle_param();
+    // 获取泊车点对应的边界索引
     curr_idx = std::get<3>(pull_over_configuration);
     // If have found a pull-over position, update planning-context
+    // 将泊车点的信息（位置和朝向）更新到 pull_over_status 中
     pull_over_status->mutable_position()->set_x(
         std::get<0>(pull_over_configuration));
     pull_over_status->mutable_position()->set_y(
@@ -163,10 +176,12 @@ bool PullOverPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
           << pull_over_status->theta() << "]";
   }
   // Trim path-bound properly
+  // 修剪路径边界为泊车区域所需的长度：将边界修剪为以泊车点为终点、保留一定后备点数的长度
   while (static_cast<int>(path_bound.size()) - 1 >
          curr_idx + FLAGS_num_extra_tail_bound_point) {
     path_bound.pop_back();
   }
+  // 修剪后段边界，保持泊车区域边界一致
   for (size_t idx = curr_idx + 1; idx < path_bound.size(); ++idx) {
     path_bound[idx].l_lower.l = path_bound[curr_idx].l_lower.l;
     path_bound[idx].l_upper.l = path_bound[curr_idx].l_upper.l;
@@ -273,37 +288,51 @@ bool PullOverPath::AssessPath(std::vector<PathData>* candidate_path_data,
   return true;
 }
 
+/// @brief
+/// @param reference_line_info 
+/// @param path_bound 
+/// @return 
 bool PullOverPath::GetBoundaryFromRoads(
     const ReferenceLineInfo& reference_line_info,
     PathBoundary* const path_bound) {
   // Sanity checks.
+  // 合法性检查
   CHECK_NOTNULL(path_bound);
   ACHECK(!path_bound->empty());
+
   const ReferenceLine& reference_line = reference_line_info.reference_line();
+  // 获取车辆当前位置（s = init_sl_state_.first[0]）所在的车道宽度
   double adc_lane_width = PathBoundsDeciderUtil::GetADCLaneWidth(
       reference_line, init_sl_state_.first[0]);
   // Go through every point, update the boudnary based on the road boundary.
+  // 初始化左右侧道路宽度，以备某些点获取失败时使用
   double past_road_left_width = adc_lane_width / 2.0;
   double past_road_right_width = adc_lane_width / 2.0;
   int path_blocked_idx = -1;
   for (size_t i = 0; i < path_bound->size(); ++i) {
     // 1. Get road boundary.
     double curr_s = (*path_bound)[i].s;
+    // 初始化当前点的道路边界宽度和参考线到车道中心的偏移
     double curr_road_left_width = 0.0;
     double curr_road_right_width = 0.0;
     double refline_offset_to_lane_center = 0.0;
+    // 获取当前 s 位置参考线相对于车道中心线的横向偏移
     reference_line.GetOffsetToMap(curr_s, &refline_offset_to_lane_center);
+    //  尝试获取当前 s 处的道路左、右宽度
     if (!reference_line.GetRoadWidth(curr_s, &curr_road_left_width,
                                      &curr_road_right_width)) {
       AWARN << "Failed to get lane width at s = " << curr_s;
       curr_road_left_width = past_road_left_width;
       curr_road_right_width = past_road_right_width;
     } else {
+      // 当前参考线可能不是完全居中，需要根据偏移进行左右边界调整
       curr_road_left_width += refline_offset_to_lane_center;
       curr_road_right_width -= refline_offset_to_lane_center;
+      // 记录当前宽度，为下一点失败时备用
       past_road_left_width = curr_road_left_width;
       past_road_right_width = curr_road_right_width;
     }
+    // 计算左右界限（以中心线为 0）
     double curr_left_bound = curr_road_left_width;
     double curr_right_bound = -curr_road_right_width;
     ADEBUG << "At s = " << curr_s
@@ -313,16 +342,18 @@ bool PullOverPath::GetBoundaryFromRoads(
            << refline_offset_to_lane_center;
 
     // 2. Update into path_bound.
+    // 更新 path_bound 当前点的左右边界
     if (!PathBoundsDeciderUtil::UpdatePathBoundaryWithBuffer(
             curr_left_bound, curr_right_bound, BoundType::ROAD, BoundType::ROAD,
             "", "", &path_bound->at(i))) {
       path_blocked_idx = static_cast<int>(i);
     }
+    //  一旦发现某点被阻塞，停止后续处理
     if (path_blocked_idx != -1) {
       break;
     }
   }
-
+  //  将从阻塞点之后的所有 path_bound 点删掉，保持边界合法
   PathBoundsDeciderUtil::TrimPathBounds(path_blocked_idx, path_bound);
   return true;
 }
@@ -353,6 +384,10 @@ void PullOverPath::UpdatePullOverBoundaryByLaneBoundary(
   }
 }
 
+/// @brief 
+/// @param path_bound 路径边界 path_bound（每个点包含 s, l_upper, l_lower）
+/// @param pull_over_configuration 泊车位置信息 pull_over_configuration（x, y, θ, 索引）
+/// @return 
 bool PullOverPath::SearchPullOverPosition(
     const PathBound& path_bound,
     std::tuple<double, double, double, int>* const pull_over_configuration) {
@@ -452,7 +487,7 @@ bool PullOverPath::SearchPullOverPosition(
              << curr_road_left_width << "] curr_road_right_width["
              << curr_road_right_width << "]";
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
-          config_.pull_over_road_edge_buffer()) {
+          config_.pull_over_road_edge_buffer()) {  // 0.15
         AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
@@ -462,6 +497,7 @@ bool PullOverPath::SearchPullOverPosition(
       ADEBUG << "left_bound[" << left_bound << "] right_bound[" << right_bound
              << "]";
       if (left_bound - right_bound < pull_over_space_width) {
+        // 至少要能横向放下整个车辆（含一定 buffer）
         AERROR << "Not wide enough to fit ADC. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
@@ -543,7 +579,9 @@ bool PullOverPath::FindNearestPullOverS(double* pull_over_s) {
                                      .min_turn_radius();
   const double adjust_factor =
       config_.pull_over_approach_lon_distance_adjust_factor();
+  // 设定拉车靠边所需的最小纵向距离
   const double pull_over_distance = min_turn_radius * 2 * adjust_factor;
+  // 目标 pull over 的参考线 s 值 就是在当前车尾位置往前偏移 pull_over_distance 米
   *pull_over_s = adc_end_s + pull_over_distance;
   return true;
 }
@@ -561,6 +599,7 @@ bool PullOverPath::FindDestinationPullOverS(const PathBound& path_bound,
   // Check if destination is some distance away from ADC.
   ADEBUG << "Destination s[" << destination_s << "] adc_end_s[" << adc_end_s
          << "]";
+  // 车辆在离终点不足 25 米的距离内不进行靠边决策
   if (destination_s - adc_end_s <
       config_.pull_over_destination_to_adc_buffer()) {
     AERROR << "Destination is too close to ADC. distance["
@@ -569,6 +608,7 @@ bool PullOverPath::FindDestinationPullOverS(const PathBound& path_bound,
   }
 
   // Check if destination is within path-bounds searching scope.
+  // 车辆靠边目标点必须距离 path_bound 末尾不少于 10 米
   const double destination_to_pathend_buffer =
       config_.pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >= path_bound.back().s) {

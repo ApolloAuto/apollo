@@ -57,6 +57,10 @@ using apollo::hdmap::RouteSegments;
 
 ReferenceLineProvider::~ReferenceLineProvider() {}
 
+/// @brief 
+/// @param vehicle_state_provider 一个指向 common::VehicleStateProvider 的指针，用于提供车辆状态信息
+/// @param reference_line_config 参考线的配置，包含参考线的各种参数
+/// @param relative_map 用于导航模式下的相对地图信息
 ReferenceLineProvider::ReferenceLineProvider(
     const common::VehicleStateProvider *vehicle_state_provider,
     const ReferenceLineConfig *reference_line_config,
@@ -69,10 +73,14 @@ ReferenceLineProvider::ReferenceLineProvider(
     relative_map_ = relative_map;
   }
 
+  // modules/planning/conf/planning.conf中定义smoother_config_filename
+  // 或者使用 modules/planning/common/planning_gflags.cc
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
                                          &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
+
+  // 根据配置，创建参考线平滑器。 多态: 父类指针指向子类对象   
   if (smoother_config_.has_qp_spline()) {
     smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
   } else if (smoother_config_.has_spiral()) {
@@ -106,36 +114,48 @@ ReferenceLineProvider::ReferenceLineProvider(
   is_initialized_ = true;
 }
 
+/// @brief 更新参考路线的规划命令，并确保当前的规划命令能正确处理并匹配相应的 PNC map（路径导航计算图）
+/// @param command 
+/// @return 
 bool ReferenceLineProvider::UpdatePlanningCommand(
     const planning::PlanningCommand &command) {
+ // 使用路由锁保护对 pnc_map_list_ 的访问
   std::lock_guard<std::mutex> routing_lock(routing_mutex_);
   bool find_matched_pnc_map = false;
+   // 遍历 pnc_map_list_ 查找能够处理当前命令的 pnc_map
   for (const auto &pnc_map : pnc_map_list_) {
     if (pnc_map->CanProcess(command)) {
-      current_pnc_map_ = pnc_map;
+      current_pnc_map_ = pnc_map;   // 找到匹配的 pnc_map，更新 current_pnc_map_
       find_matched_pnc_map = true;
       break;
     }
   }
+   // 如果没有找到合适的 pnc_map，返回失败
   if (nullptr == current_pnc_map_) {
     AERROR << "Cannot find pnc map to process input command!"
            << command.DebugString();
     return false;
   }
+  // 如果没有找到匹配的 pnc_map，警告使用旧的 pnc_map
   if (!find_matched_pnc_map) {
     AWARN << "Find no pnc map for the input command and the old one will be "
              "used!";
   }
+  // 锁住 pnc_map_mutex_ 来更新当前 pnc_map 的路由
   // Update routing in pnc_map
   std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+  // 如果当前 pnc_map 需要更新规划命令
   if (current_pnc_map_->IsNewPlanningCommand(command)) {
     is_new_command_ = true;
+
+    // 更新 pnc_map 路由信息
     if (!current_pnc_map_->UpdatePlanningCommand(command)) {
       AERROR << "Failed to update routing in pnc map: "
              << command.DebugString();
       return false;
     }
   }
+  // 更新当前的规划命令和状态
   planning_command_ = command;
   has_planning_command_ = true;
   return true;
@@ -152,6 +172,8 @@ ReferenceLineProvider::FutureRouteWaypoints() {
   return std::vector<routing::LaneWaypoint>();
 }
 
+/// @brief 获取参考车道的结束航路点，并将其通过引用传递给 end_point
+/// @param end_point 
 void ReferenceLineProvider::GetEndLaneWayPoint(
     std::shared_ptr<routing::LaneWaypoint> &end_point) const {
   if (nullptr == current_pnc_map_) {
@@ -175,6 +197,8 @@ void ReferenceLineProvider::UpdateVehicleState(
   vehicle_state_ = vehicle_state;
 }
 
+/// @brief 
+/// @return 
 bool ReferenceLineProvider::Start() {
   if (FLAGS_use_navigation_mode) {
     return true;
@@ -183,7 +207,8 @@ bool ReferenceLineProvider::Start() {
     AERROR << "ReferenceLineProvider has NOT been initiated.";
     return false;
   }
-
+  // 异步启动
+  // 创建参考线生成线程：FLAGS_enable_reference_line_provider_thread定义在modules/planning/common/pkanning_gflags.cc中
   if (FLAGS_enable_reference_line_provider_thread) {
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
@@ -223,6 +248,8 @@ void ReferenceLineProvider::UpdateReferenceLine(
     return;
   }
   std::lock_guard<std::mutex> lock(reference_lines_mutex_);
+
+  // 将最新计算好的参考线拷贝给成员变量
   if (reference_lines_.size() != reference_lines.size()) {
     reference_lines_ = reference_lines;
     route_segments_ = route_segments;
@@ -237,7 +264,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
          internal_segment_iter != route_segments_.end();
          ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
       if (iter->reference_points().empty()) {
-        *internal_iter = *iter;
+        *internal_iter = *iter;  // 将iter所指向的数据复制到internal_iter 所指向的位置
         *internal_segment_iter = *segment_iter;
         continue;
       }
@@ -264,25 +291,37 @@ void ReferenceLineProvider::UpdateReferenceLine(
   }
 }
 
+// 多线程的回调函数
 void ReferenceLineProvider::GenerateThread() {
+  // is_stop_ 是一个 原子变量（std::atomic<bool>），用于标识线程是否应终止
+  // 只要 is_stop_ 为 false，线程就会一直运行
   while (!is_stop_) { // 执行的定时任务，每隔50ms提供一次参考线
     static constexpr int32_t kSleepTime = 50;  // milliseconds
+    // 线程休眠50ms
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();
+    // 如果没有收到新的规划命令，则 跳过本次循环，等待下一次执行
     if (!has_planning_command_) {
       continue;
     }
-    std::list<ReferenceLine> reference_lines;
-    std::list<hdmap::RouteSegments> segments;
+
+    // 生成参考线和短期路由
+    std::list<ReferenceLine> reference_lines;  // 用于存储生成的参考线
+    std::list<hdmap::RouteSegments> segments;  // 用于存储对应的路径段信息
     if (!CreateReferenceLine(&reference_lines, &segments)) {
       is_reference_line_updated_ = false;
       AERROR << "Fail to get reference line";
       continue;
     }
+
+
+    // 将 reference_lines 和 segments 更新到类成员变量中，以便规划模块使用
     UpdateReferenceLine(reference_lines, segments);
     const double end_time = Clock::NowInSeconds();
+    // 使用 互斥锁 reference_lines_mutex_ 保护 last_calculation_time_，防止并发访问导致数据异常
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     last_calculation_time_ = end_time - start_time;
+    // 新的参考线已更新
     is_reference_line_updated_ = true;
   }
 }
@@ -620,16 +659,23 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
   return waypoint->lane != nullptr;
 }
 
+/// @brief 是否成功创建了路线段（Route Segments）
+/// @param vehicle_state common::VehicleState 类型，表示车辆的当前状态（如位置、速度、朝向等）
+/// @param segments 指向 std::list<hdmap::RouteSegments> 的指针，用于存储生成的路线段
+/// @return 
 bool ReferenceLineProvider::CreateRouteSegments(
     const common::VehicleState &vehicle_state,
     std::list<hdmap::RouteSegments> *segments) {
   {
+    // 使用 std::lock_guard 加锁 pnc_map_mutex_ 互斥量，防止多线程并发访问 pnc_map_ 对象导致数据竞争
     std::lock_guard<std::mutex> lock(pnc_map_mutex_);
+    // 根据 vehicle_state 获取当前车辆对应的路线段，并存入 segments
     if (!current_pnc_map_->GetRouteSegments(vehicle_state, segments)) {
       AERROR << "Failed to extract segments from routing";
       return false;
     }
   }
+  // 遍历 segments 中的每个 RouteSegment，并调用其 DebugString() 方法，打印调试信息
   for (auto &seg : *segments) {
     ADEBUG << seg.DebugString();
   }
@@ -639,18 +685,24 @@ bool ReferenceLineProvider::CreateRouteSegments(
   return !segments->empty();
 }
 
+/// @brief 根据车辆状态和路由信息生成参考线，并对参考线进行平滑处理或拼接
+/// @param reference_lines 用于存储生成的参考线
+/// @param segments 用于存储 路由段信息（路径片段）
+/// @return 
 bool ReferenceLineProvider::CreateReferenceLine(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
 
-  common::VehicleState vehicle_state;
+  // vehicle_state_ 是 ReferenceLineProvider 类的成员变量，存储车辆的 当前位置、速度、航向角等信息
+  common::VehicleState vehicle_state;  // .pb.h
   {
     std::lock_guard<std::mutex> lock(vehicle_state_mutex_);
     vehicle_state = vehicle_state_;
   }
 
+  // planning_command_ 存储了规划模块的指令，可能包含 变道、停止、加速等决策信息
   planning::PlanningCommand command;
   {
     std::lock_guard<std::mutex> lock(routing_mutex_);
@@ -660,20 +712,31 @@ bool ReferenceLineProvider::CreateReferenceLine(
     AERROR << "Current pnc map is null! " << command.DebugString();
     return false;
   }
-
+  
+  // 根据 当前车辆状态 生成 路径段信息（Route Segments）
   if (!CreateRouteSegments(vehicle_state, segments)) {
     AERROR << "Failed to create reference line from routing";
     return false;
   }
-  if (is_new_command_ || !FLAGS_enable_reference_line_stitching) {
+
+  // 判断是否需要进行参考线拼接
+  // 如果 收到新的规划命令 或 禁用拼接模式，则执行 重新生成参考线 逻辑；否则执行 参考线拼接 逻辑
+  if (is_new_command_ || !FLAGS_enable_reference_line_stitching) {  // 首次运行或者新路由，不拼接参考线
+    // 重新生成参考线
+    // 遍历路径段 segments，为每个路径段创建一个参考线
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
+
+  // 参考线平滑
+  // 平滑各路由片段列表segments，并将平滑后的路由片段存储到参考线reference_lines中，同时将不能平滑的路由片段从segments中删除
       if (!SmoothRouteSegment(*iter, &reference_lines->back())) {
         AERROR << "Failed to create reference line from route segments";
+        // 失败，删除该路径段
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
         common::SLPoint sl;
+        // 车辆坐标投影到参考线的 Frenet 坐标系
         if (!reference_lines->back().XYToSL(
                 vehicle_state.heading(),
                 common::math::Vec2d(vehicle_state.x(), vehicle_state.y()),
@@ -681,15 +744,22 @@ bool ReferenceLineProvider::CreateReferenceLine(
           AWARN << "Failed to project point: {" << vehicle_state.x() << ","
                 << vehicle_state.y() << "} to stitched reference line";
         }
-        Shrink(sl, &reference_lines->back(), &(*iter));
+        // 成功，保留该参考线
+        // 用于裁剪参考线，确保它符合当前规划需求
+        Shrink(sl, &reference_lines->back(), &(*iter));  // 收缩参考线
         ++iter;
       }
     }
     is_new_command_ = false;
     return true;
   } else {  // stitching reference line
+  // 启用了参考线拼接（stitching）
+  // 先遍历 segments，为每个路径段创建新的参考线
     for (auto iter = segments->begin(); iter != segments->end();) {
       reference_lines->emplace_back();
+
+// 合并不同参考片段的重合部分，并将拼接后的路由片段保存到参考线列表reference_lines中，同时将不能拼接的路由片段从segments中删除
+      // 负责将新路径段拼接到现有参考线上
       if (!ExtendReferenceLine(vehicle_state, &(*iter),
                                &reference_lines->back())) {
         AERROR << "Failed to extend reference line";
@@ -877,8 +947,11 @@ bool ReferenceLineProvider::IsReferenceLineSmoothValid(
 
 AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     const ReferenceLine &reference_line, double s) const {
+  // 1.设置纵向边界限制
   AnchorPoint anchor;
   anchor.longitudinal_bound = smoother_config_.longitudinal_boundary_bound();
+
+  // 2. 获取参考点
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     anchor.path_point = ref_point.ToPathPoint(s);
@@ -954,16 +1027,25 @@ void ReferenceLineProvider::GetAnchorPoints(
     const ReferenceLine &reference_line,
     std::vector<AnchorPoint> *anchor_points) const {
   CHECK_NOTNULL(anchor_points);
+// interval为采样间隔，默认max_constraint_interval=0.25，即路径累积距离0.25m采样一个点
   const double interval = smoother_config_.max_constraint_interval();
+
+// 路径采样点数量计算
   int num_of_anchors =
       std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));
+
+// uniform_slice函数就是对[0, len]区间等间隔采样，每两个点之间距离为(length_ - 0.0)/(num_of_anchors - 1)
   std::vector<double> anchor_s;
   common::util::uniform_slice(0.0, reference_line.Length(), num_of_anchors - 1,
                               &anchor_s);
+
+// 计算采样点的坐标(x,y),并进行矫正
   for (const double s : anchor_s) {
     AnchorPoint anchor = GetAnchorPoint(reference_line, s);
     anchor_points->emplace_back(anchor);
   }
+
+  // 参考线首位两点设置强约束
   anchor_points->front().longitudinal_bound = 1e-6;
   anchor_points->front().lateral_bound = 1e-6;
   anchor_points->front().enforced = true;
@@ -1030,6 +1112,7 @@ bool ReferenceLineProvider::SmoothReferenceLine(
   std::vector<AnchorPoint> anchor_points;
   GetAnchorPoints(raw_reference_line, &anchor_points);
   smoother_->SetAnchorPoints(anchor_points);
+  // 调用具体的平滑算法进行参考线平滑
   if (!smoother_->Smooth(raw_reference_line, reference_line)) {
     AERROR << "Failed to smooth reference line with anchor points";
     return false;

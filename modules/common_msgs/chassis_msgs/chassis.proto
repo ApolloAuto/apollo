@@ -12,109 +12,120 @@ import "modules/common_msgs/basic_msgs/vehicle_signal.proto";
 
 // next id :31
 message Chassis {
-  // 驾驶模式
+  // 驾驶模式 DrivingMode
   enum DrivingMode {
-    COMPLETE_MANUAL = 0;  // human drive
-    COMPLETE_AUTO_DRIVE = 1;
-    AUTO_STEER_ONLY = 2;  // only steer
-    AUTO_SPEED_ONLY = 3;  // include throttle and brake
+    COMPLETE_MANUAL = 0;  // human drive // 人工驾驶
+    COMPLETE_AUTO_DRIVE = 1;   // 全自动驾驶
+    AUTO_STEER_ONLY = 2;  // only steer // 仅自动转向
+    AUTO_SPEED_ONLY = 3;  // include throttle and brake // 仅自动控制油门和刹车
 
     // security mode when manual intervention happens, only response status
-    EMERGENCY_MODE = 4;
+    EMERGENCY_MODE = 4; // 手动接管时的安全模式
   }
 
+  // 错误码 ErrorCode
   enum ErrorCode {
-    NO_ERROR = 0;
+    NO_ERROR = 0; // 无错误
 
-    CMD_NOT_IN_PERIOD = 1;  // control cmd not in period
+    CMD_NOT_IN_PERIOD = 1;  // control cmd not in period // 控制命令不在规定周期内
 
     // car chassis report error, like steer, brake, throttle, gear fault
-    CHASSIS_ERROR = 2;
+    CHASSIS_ERROR = 2;  // 底盘系统错误
 
     // classify the types of the car chassis errors
-    CHASSIS_ERROR_ON_STEER = 6;
-    CHASSIS_ERROR_ON_BRAKE = 7;
-    CHASSIS_ERROR_ON_THROTTLE = 8;
-    CHASSIS_ERROR_ON_GEAR = 9;
+    CHASSIS_ERROR_ON_STEER = 6;  // 转向系统错误
+    CHASSIS_ERROR_ON_BRAKE = 7;   // 制动系统错误
+    CHASSIS_ERROR_ON_THROTTLE = 8;  // 油门系统错误
+    CHASSIS_ERROR_ON_GEAR = 9;   // 档位系统错误
 
-    MANUAL_INTERVENTION = 3;  // human manual intervention
+    MANUAL_INTERVENTION = 3;  // human manual intervention // 人工干预
 
     // receive car chassis can frame not in period
-    CHASSIS_CAN_NOT_IN_PERIOD = 4;
+    CHASSIS_CAN_NOT_IN_PERIOD = 4;   // CAN 信号超时
 
-    UNKNOWN_ERROR = 5;
+    UNKNOWN_ERROR = 5; // 未知错误
   }
- // 档位情况
+ 
+ // 档位 GearPosition
   enum GearPosition {
-    GEAR_NEUTRAL = 0;
-    GEAR_DRIVE = 1;
-    GEAR_REVERSE = 2;
-    GEAR_PARKING = 3;
-    GEAR_LOW = 4;
-    GEAR_INVALID = 5;
-    GEAR_NONE = 6;
+    GEAR_NEUTRAL = 0;  // 空挡
+    GEAR_DRIVE = 1;    // 前进挡
+    GEAR_REVERSE = 2;   // 倒挡
+    GEAR_PARKING = 3;   // 停车挡
+    GEAR_LOW = 4;      // 低速挡
+    GEAR_INVALID = 5;  // 无效挡
+    GEAR_NONE = 6;      // 未上挡
   }
 
+// 防撞传感器事件 BumperEvent
   enum BumperEvent {
     BUMPER_INVALID = 0;
     BUMPER_NORMAL = 1;
-    BUMPER_PRESSED = 2;
+    BUMPER_PRESSED = 2;  // 防撞器被压缩，表示发生碰撞
   }
 
-  optional bool engine_started = 3;
+// 车辆状态字段说明（部分）
+  optional bool engine_started = 3; // 引擎是否启动
 
   // Engine speed in RPM.
-  // 引擎转速
+  // 引擎转速，单位 RPM
   optional float engine_rpm = 4 [default = nan];
 
   // Vehicle Speed in meters per second.
-  // 车辆速度
+  // 车辆当前速度，单位 m/s
   optional float speed_mps = 5 [default = nan];
 
   // Vehicle odometer in meters.
-  // 里程表
+   // 总里程，单位 m
   optional float odometer_m = 6 [default = nan];
 
   // Fuel range in meters.
+   // 燃油续航里程，单位 m
   optional int32 fuel_range_m = 7;
 
   // Real throttle location in [%], ranging from 0 to 100.
-  // 油门开度
+  // 油门开度，百分比
   optional float throttle_percentage = 8 [default = nan];
 
   // Real brake location in [%], ranging from 0 to 100.
-  // 刹车开度
+  // 刹车开度，百分比
   optional float brake_percentage = 9 [default = nan];
 
   // Real steering location in [%], ranging from -100 to 100.
   // steering_angle / max_steering_angle
   // Clockwise: negative
   // CountClockwise: positive
+   // 方向盘转角（百分比表示）
   optional float steering_percentage = 11 [default = nan];
 
   // Applied steering torque in [Nm].
+  // 转向力矩，单位 Nm
   optional float steering_torque_nm = 12 [default = nan];
 
   // Parking brake status.
+  // 是否拉了驻车
   optional bool parking_brake = 13;
 
   // Light signals.
+  // 灯光与信号（部分字段已废弃）
   optional bool high_beam_signal = 14 [deprecated = true];
   optional bool low_beam_signal = 15 [deprecated = true];
   optional bool left_turn_signal = 16 [deprecated = true];
   optional bool right_turn_signal = 17 [deprecated = true];
   optional bool horn = 18 [deprecated = true];
 
-  optional bool wiper = 19;
+  optional bool wiper = 19; // 雨刷状态
   optional bool disengage_status = 20 [deprecated = true];
-  optional DrivingMode driving_mode = 21 [default = COMPLETE_MANUAL];
-  optional ErrorCode error_code = 22 [default = NO_ERROR];
-  optional GearPosition gear_location = 23;
+  optional DrivingMode driving_mode = 21 [default = COMPLETE_MANUAL]; // 当前驾驶模式
+  optional ErrorCode error_code = 22 [default = NO_ERROR]; // 当前错误码
+  optional GearPosition gear_location = 23; // 当前挡位
 
   // timestamp for steering module
+  // 转向模块的时间戳
   optional double steering_timestamp = 24;  // In seconds, with 1e-6 accuracy
 
   // chassis also needs it own sending timestamp
+  // 消息头，包括时间戳、帧 ID
   optional apollo.common.Header header = 25;
 
   optional int32 chassis_error_mask = 26 [default = 0];
@@ -142,15 +153,18 @@ message Chassis {
   optional int32 battery_soc_percentage = 34 [default = -1];
 
   // Real send throttle location in [%], ranging from 0 to 100.
+  // 实际发送给车辆的油门开度
   optional float throttle_percentage_cmd = 35 [default = nan];
 
   // Real send brake location in [%], ranging from 0 to 100.
+  // 实际刹车命令
   optional float brake_percentage_cmd = 36 [default = nan];
 
   // Real send steering location in [%], ranging from -100 to 100.
   // steering_angle / max_steering_angle
   // Clockwise: negative
   // CountClockwise: positive
+   // 实际转向命令
   optional float steering_percentage_cmd = 37 [default = nan];
 
   optional BumperEvent front_bumper_event = 38;
@@ -160,13 +174,15 @@ message Chassis {
   optional CheckResponse check_response = 40;
 
   // Custom chassis operation command defined by user for extensibility.
+  // 用户自定义扩展状态
   optional google.protobuf.Any custom_status = 41;
 }
 
+// ChassisGPS：GPS 信息
 message ChassisGPS {
-  optional double latitude = 1;
-  optional double longitude = 2;
-  optional bool gps_valid = 3;
+  optional double latitude = 1; // 纬度
+  optional double longitude = 2; // 经度
+  optional bool gps_valid = 3; // GPS 是否有效
 
   optional int32 year = 4;
   optional int32 month = 5;
@@ -185,7 +201,7 @@ message ChassisGPS {
   optional double vdop = 17;
   optional GpsQuality quality = 18;
   optional int32 num_satellites = 19;
-  optional double gps_speed = 20;
+  optional double gps_speed = 20;  // GPS 速度
 }
 
 enum GpsQuality {
@@ -195,6 +211,7 @@ enum GpsQuality {
   FIX_INVALID = 3;
 }
 
+// WheelSpeed：四轮转速信息
 message WheelSpeed {
   enum WheelSpeedType {
     FORWARD = 0;
@@ -202,9 +219,9 @@ message WheelSpeed {
     STANDSTILL = 2;
     INVALID = 3;
   }
-  optional bool is_wheel_spd_rr_valid = 1 [default = false];
+  optional bool is_wheel_spd_rr_valid = 1 [default = false]; // 后右轮速度是否有效
   optional WheelSpeedType wheel_direction_rr = 2 [default = INVALID];
-  optional double wheel_spd_rr = 3 [default = 0.0];
+  optional double wheel_spd_rr = 3 [default = 0.0]; // 后右轮速度
   optional bool is_wheel_spd_rl_valid = 4 [default = false];
   optional WheelSpeedType wheel_direction_rl = 5 [default = INVALID];
   optional double wheel_spd_rl = 6 [default = 0.0];
@@ -222,8 +239,9 @@ message Sonar {
   optional apollo.common.Quaternion rotation = 3;
 }
 
+// Surround：环视与雷达传感器数据
 message Surround {
-  optional bool cross_traffic_alert_left = 1;
+  optional bool cross_traffic_alert_left = 1; // 左侧横向交通警报
   optional bool cross_traffic_alert_left_enabled = 2;
   optional bool blind_spot_left_alert = 3;
   optional bool blind_spot_left_alert_enabled = 4;
@@ -231,7 +249,7 @@ message Surround {
   optional bool cross_traffic_alert_right_enabled = 6;
   optional bool blind_spot_right_alert = 7;
   optional bool blind_spot_right_alert_enabled = 8;
-  optional double sonar00 = 9;
+  optional double sonar00 = 9; // 超声波传感器数据（总共 12 个）
   optional double sonar01 = 10;
   optional double sonar02 = 11;
   optional double sonar03 = 12;
@@ -246,7 +264,7 @@ message Surround {
   optional bool sonar_enabled = 21;
   optional bool sonar_fault = 22;
   repeated double sonar_range = 23;
-  repeated Sonar sonar = 24;
+  repeated Sonar sonar = 24;// 所有雷达对象数据
 }
 
 message License {
@@ -254,12 +272,13 @@ message License {
 }
 
 // CheckResponseSignal
+// CheckResponse：ECU 状态诊断
 message CheckResponse {
-  optional bool is_eps_online = 1 [default = false];
+  optional bool is_eps_online = 1 [default = false];// 电动助力转向是否在线
   optional bool is_epb_online = 2 [default = false];
   optional bool is_esp_online = 3 [default = false];
   optional bool is_vtog_online = 4 [default = false];
   optional bool is_scu_online = 5 [default = false];
   optional bool is_switch_online = 6 [default = false];
-  optional bool is_vcu_online = 7 [default = false];
+  optional bool is_vcu_online = 7 [default = false]; // 整车控制器是否在线
 }

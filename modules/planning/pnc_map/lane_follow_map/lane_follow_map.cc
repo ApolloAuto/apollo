@@ -118,6 +118,9 @@ std::vector<routing::LaneWaypoint> LaneFollowMap::FutureRouteWaypoints() const {
       waypoints.begin() + next_routing_waypoint_index_, waypoints.end());
 }
 
+/// @brief 从最近的命令（last_command_）中获取结束车道航路点并通过引用返回
+// 检查是否有有效的车道跟随命令和有效的路由请求，然后提取路由请求中的最后一个航路点作为车道的结束点
+/// @param end_point 
 void LaneFollowMap::GetEndLaneWayPoint(
     std::shared_ptr<routing::LaneWaypoint> &end_point) const {
   if (!last_command_.has_lane_follow_command() ||
@@ -125,13 +128,17 @@ void LaneFollowMap::GetEndLaneWayPoint(
     end_point = nullptr;
     return;
   }
+  // 获取路由请求
   const auto &routing_request =
       last_command_.lane_follow_command().routing_request();
   if (routing_request.waypoint().size() < 1) {
     end_point = nullptr;
     return;
   }
+  // 获取并设置结束航路点
+  // 如果 waypoint 中有至少一个点，使用 std::make_shared<routing::LaneWaypoint>() 创建一个新的 LaneWaypoint 对象，并将其指针赋给 end_point
   end_point = std::make_shared<routing::LaneWaypoint>();
+  // 将该终点的内容复制到新的 LaneWaypoint 对象
   end_point->CopyFrom(*(routing_request.waypoint().rbegin()));
 }
 
@@ -143,25 +150,31 @@ hdmap::LaneInfoConstPtr LaneFollowMap::GetLaneById(const hdmap::Id &id) const {
 }
 
 bool LaneFollowMap::IsValid(const planning::PlanningCommand &command) const {
+  // 检查是否可以处理该命令
   if (!CanProcess(command)) {
     return false;
   }
+   // 获取车道跟随命令的路由信息
   const auto &routing = command.lane_follow_command();
   const int num_road = routing.road_size();
+  // 如果没有路信息，返回无效
   if (num_road == 0) {
     return false;
   }
+   // 检查路由请求是否存在且包含至少两个航路点
   if (!routing.has_routing_request() ||
       routing.routing_request().waypoint_size() < 2) {
     AERROR << "Routing does not have request.";
     return false;
   }
+  // 遍历航路点，检查每个航路点是否包含必要的字段：id 和 s
   for (const auto &waypoint : routing.routing_request().waypoint()) {
     if (!waypoint.has_id() || !waypoint.has_s()) {
       AERROR << "Routing waypoint has no lane_id or s.";
       return false;
     }
   }
+  // 如果所有验证通过，返回有效
   return true;
 }
 
@@ -409,16 +422,26 @@ std::vector<int> LaneFollowMap::GetNeighborPassages(
   }
   return result;
 }
+/// @brief 获取路线段
+/// @param vehicle_state 一个常量引用，表示车辆的状态（例如，车辆的速度、位置等）
+/// @param route_segments 一个指向 std::list<hdmap::RouteSegments> 类型的指针，函数通过该参数返回路线段数据
+/// @return 
 bool LaneFollowMap::GetRouteSegments(
     const VehicleState &vehicle_state,
     std::list<hdmap::RouteSegments> *const route_segments) {
   double look_forward_distance =
       LookForwardDistance(vehicle_state.linear_velocity());
-  double look_backward_distance = FLAGS_look_backward_distance;
+  double look_backward_distance = FLAGS_look_backward_distance;   // 50
   return GetRouteSegments(vehicle_state, look_backward_distance,
                           look_forward_distance, route_segments);
 }
 
+/// @brief 根据当前车辆的状态和指定的前后长度（backward_length 和 forward_length）获取路线的多个路段（route_segments）
+/// @param vehicle_state 
+/// @param backward_length 
+/// @param forward_length 
+/// @param route_segments 
+/// @return 
 bool LaneFollowMap::GetRouteSegments(
     const VehicleState &vehicle_state, const double backward_length,
     const double forward_length,
@@ -429,28 +452,40 @@ bool LaneFollowMap::GetRouteSegments(
   }
   // Vehicle has to be this close to lane center before considering change
   // lane
+  // 判断当前的车辆所在车道是否有效、路线索引是否有效
   if (!adc_waypoint_.lane || adc_route_index_ < 0 ||
       adc_route_index_ >= static_cast<int>(route_indices_.size())) {
     AERROR << "Invalid vehicle state in pnc_map, update vehicle state first.";
     return false;
   }
+  // 获取当前路线的索引，拆解出道路索引（road_index）和通道索引（passage_index），
+  //并通过 last_command_ 获取当前道路的信息
   const auto &route_index = route_indices_[adc_route_index_].index;
   const int road_index = route_index[0];
   const int passage_index = route_index[1];
   const auto &road = last_command_.lane_follow_command().road(road_index);
+
   // Raw filter to find all neighboring passages
+  // 获取邻近的通道
   auto drive_passages = GetNeighborPassages(road, passage_index);
+  // 遍历所有邻近的通道，获取每个通道的详细信息，并准备一个空的路段对象 segments
   for (const int index : drive_passages) {
     const auto &passage = road.passage(index);
     hdmap::RouteSegments segments;
+
+// 如果无法将通道转换为路段（RouteSegments），则输出调试信息并跳过当前通道
     if (!PassageToSegments(passage, &segments)) {
       ADEBUG << "Failed to convert passage to lane segments.";
       continue;
     }
+
+// 计算当前车辆的位置，如果当前通道是车辆所在通道，则获取平滑路径点；否则，将车辆状态转换为 PointENU 坐标点
     const PointENU nearest_point =
         index == passage_index
             ? adc_waypoint_.lane->GetSmoothPoint(adc_waypoint_.s)
             : PointFactory::ToPointENU(adc_state_);
+
+// 获取当前车辆在路段上的投影点（sl）和路段的点位（segment_waypoint）。如果失败，则输出调试信息并跳过当前通道
     common::SLPoint sl;
     hdmap::LaneWaypoint segment_waypoint;
     if (!segments.GetProjection(nearest_point, &sl, &segment_waypoint)) {
@@ -458,6 +493,8 @@ bool LaneFollowMap::GetRouteSegments(
              << nearest_point.ShortDebugString();
       continue;
     }
+
+// 如果当前通道不是车辆所在通道，则检查是否可以从当前位置进入该通道。如果不行，则输出调试信息并跳过当前通道
     if (index != passage_index) {
       if (!segments.CanDriveFrom(adc_waypoint_)) {
         ADEBUG << "You cannot drive from current waypoint to passage: "
@@ -465,8 +502,12 @@ bool LaneFollowMap::GetRouteSegments(
         continue;
       }
     }
+
+// 向返回的路线段列表中添加一个新路段对象，并获取该路段的最后一个路点
     route_segments->emplace_back();
     const auto last_waypoint = segments.LastWaypoint();
+
+// 通过 ExtendSegments 方法扩展路段，前后分别延伸 backward_length 和 forward_length 的长度。如果扩展失败，则打印错误信息并返回 false
     if (!ExtendSegments(segments, sl.s() - backward_length,
                         sl.s() + forward_length, &route_segments->back())) {
       AERROR << "Failed to extend segments with s=" << sl.s()
@@ -474,14 +515,25 @@ bool LaneFollowMap::GetRouteSegments(
              << ", forward: " << forward_length;
       return false;
     }
+
+// 如果最后一个路点在当前路段上，则设置当前路段的结束点为该路点
     if (route_segments->back().IsWaypointOnSegment(last_waypoint)) {
       route_segments->back().SetRouteEndWaypoint(last_waypoint);
     }
+
+// 设置当前路段是否可以退出（can_exit），以及下一个动作（如是否变道）
     route_segments->back().SetCanExit(passage.can_exit());
     route_segments->back().SetNextAction(passage.change_lane_type());
+
+// 为当前路段生成一个唯一的标识符 route_segment_id，并设置给当前路段
     const std::string route_segment_id = absl::StrCat(road_index, "_", index);
     route_segments->back().SetId(route_segment_id);
+
+// 设置当前路段是否需要为目的地停车（stop_for_destination_）
     route_segments->back().SetStopForDestination(stop_for_destination_);
+
+// 如果当前通道是车辆所在通道，设置当前路段的相关信息为“在该路段上”，并且设置之前的动作为“向前”；
+// 否则根据投影点的横向偏移（sl.l()）设置前进方向（右或左）
     if (index == passage_index) {
       route_segments->back().SetIsOnSegment(true);
       route_segments->back().SetPreviousAction(routing::FORWARD);
@@ -491,6 +543,7 @@ bool LaneFollowMap::GetRouteSegments(
       route_segments->back().SetPreviousAction(routing::LEFT);
     }
   }
+  // 完成所有邻近通道的处理后，检查 route_segments 是否非空
   return !route_segments->empty();
 }
 

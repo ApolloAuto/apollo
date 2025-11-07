@@ -4,15 +4,18 @@ package apollo.routing;
 
 import "modules/common_msgs/map_msgs/map_geometry.proto";
 
+// 曲线上的一个点
 message CurvePoint {
   optional double s = 1;
 }
 
+// 曲线上的一段
 message CurveRange {
   optional CurvePoint start = 1;
   optional CurvePoint end = 2;
 }
 
+// 车道上的一个节点，包含了所属车道，道路，长度，曲线起止点，中心线等信息
 message Node {
   optional string lane_id = 1;
   optional double length = 2;
@@ -24,6 +27,7 @@ message Node {
   optional string road_id = 8;
 }
 
+// 连接车道之间的边，包含了起止车道id，代价和方向等信息
 message Edge {
   enum DirectionType {
     FORWARD = 0;
@@ -37,9 +41,10 @@ message Edge {
   optional DirectionType direction_type = 4;
 }
 
+// 完整地图的Topo结构，这其中包含了多个Node和Edge
 message Graph {
-  optional string hdmap_version = 1;
-  optional string hdmap_district = 2;
+  optional string hdmap_version = 1;  // 拓扑地图对应的地图版本
+  optional string hdmap_district = 2; // 托普地图对应的地图区域
   repeated Node node = 3;
   repeated Edge edge = 4;
 }

@@ -193,11 +193,16 @@ bool Obstacle::IsValidPerceptionObstacle(const PerceptionObstacle& obstacle) {
   }
   return true;
 }
-
+/// @brief 将预测结果转换为规划模块障碍物表示的函数
+/// @param predictions 
+/// @return 
 std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
+//  初始化空列表
   std::list<std::unique_ptr<Obstacle>> obstacles;
+// 遍历每一个预测障碍物
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
+// 检查感知障碍物合法性
     if (!IsValidPerceptionObstacle(prediction_obstacle.perception_obstacle())) {
       AERROR << "Invalid perception obstacle: "
              << prediction_obstacle.perception_obstacle().DebugString();
@@ -205,6 +210,7 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
+// 如果没有预测轨迹（static）
     if (prediction_obstacle.trajectory().empty()) {
       obstacles.emplace_back(
           new Obstacle(perception_id, prediction_obstacle.perception_obstacle(),
@@ -214,8 +220,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     }
 
     int trajectory_index = 0;
+    // 有预测轨迹的情况
     for (const auto& trajectory : prediction_obstacle.trajectory()) {
       bool is_valid_trajectory = true;
+      // 验证每个 trajectory 的点是否合法
       for (const auto& point : trajectory.trajectory_point()) {
         if (!IsValidTrajectoryPoint(point)) {
           AERROR << "obj:" << perception_id
@@ -228,9 +236,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
       if (!is_valid_trajectory) {
         continue;
       }
-
+      // 用原始感知 id 加上轨迹编号来唯一标识这个障碍物轨迹
       const std::string obstacle_id =
           absl::StrCat(perception_id, "_", trajectory_index);
+      // 创建新的 Obstacle 实例并加入返回列表
       obstacles.emplace_back(
           new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
                        trajectory, prediction_obstacle.priority().priority(),
@@ -290,16 +299,23 @@ void Obstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
   sl_boundary_ = sl_boundary;
 }
 
+/// @brief 根据当前障碍物的位置和车辆参数计算车辆在最小转弯半径下与障碍物的最小安全停车距离
+/// @param vehicle_param 
+/// @return 
 double Obstacle::MinRadiusStopDistance(
     const common::VehicleParam& vehicle_param) const {
   if (min_radius_stop_distance_ > 0) {
     return min_radius_stop_distance_;
   }
+  // 定义一个静态常量缓冲区（单位：米），用于增加安全冗余，默认值为 0.5 米
   static constexpr double stop_distance_buffer = 0.5;
+  // 从车辆配置中获取车辆的最小安全转弯半径，这是车辆在低速极限情况下能保持的最小转弯曲率
   const double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
+  // lateral_diff 表示车辆绕障碍物打最小方向盘时的横向最小绕行距离
   double lateral_diff =
       vehicle_param.width() / 2.0 + std::max(std::fabs(sl_boundary_.start_l()),
                                              std::fabs(sl_boundary_.end_l()));
+  // 对 lateral_diff 做限制，确保不会超过最小转弯半径
   const double kEpison = 1e-5;
   lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
   double stop_distance =
@@ -308,6 +324,7 @@ double Obstacle::MinRadiusStopDistance(
                               (min_turn_radius - lateral_diff))) +
       stop_distance_buffer;
   stop_distance -= vehicle_param.front_edge_to_center();
+  // 最后stop_distance： 把停车点设置为车辆前缘刚好到达该停止点
   stop_distance = std::min(stop_distance, FLAGS_max_stop_distance_obstacle);
   stop_distance = std::max(stop_distance, FLAGS_min_stop_distance_obstacle);
   return stop_distance;

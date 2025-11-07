@@ -105,13 +105,19 @@ void PathGeneration::RecordDebugInfo(
       {path_points.begin(), path_points.end()});
 }
 void PathGeneration::GetStartPointSLState() {
+  // 获取当前正在处理的参考线对象 reference_line
   const ReferenceLine& reference_line = reference_line_info_->reference_line();
+  // 获取规划起点的世界坐标（x, y, heading, speed 等），通常是车辆当前位置
   common::TrajectoryPoint planning_start_point = frame_->PlanningStartPoint();
+  // 使用车辆前轮中心作为路径起点
   if (FLAGS_use_front_axe_center_in_path_planning) {
+    // 获取车辆前轴到后轴之间的距离（wheel_base，轴距），单位为米
+    // 用来从车辆重心位置推算前轴中心位置的关键参数
     double front_to_rear_axe_distance =
         apollo::common::VehicleConfigHelper::GetConfig()
             .vehicle_param()
             .wheel_base();
+    // 根据车辆朝向 theta，将路径起点向前（车辆前轴方向）移动一个“轴距”长度
     planning_start_point.mutable_path_point()->set_x(
         planning_start_point.path_point().x() +
         front_to_rear_axe_distance *
@@ -120,6 +126,7 @@ void PathGeneration::GetStartPointSLState() {
         planning_start_point.path_point().y() +
         front_to_rear_axe_distance *
             std::sin(planning_start_point.path_point().theta()));
+    // 最终得到的点位于车辆前轮轴中心
   }
   ADEBUG << std::fixed << "Plan at the starting point: x = "
          << planning_start_point.path_point().x()
@@ -128,6 +135,7 @@ void PathGeneration::GetStartPointSLState() {
 
   // Initialize some private variables.
   // ADC s/l info.
+  //  将世界坐标点 planning_start_point 转换成参考线下的 Frenet 坐标（S, L）
   init_sl_state_ = reference_line.ToFrenetFrame(planning_start_point);
 }
 

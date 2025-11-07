@@ -25,7 +25,7 @@ using apollo::common::util::WithinBound;
 /*
  * @brief: build virtual obstacle of stop wall, and add STOP decision
  */
-/// @brief 根据停车线的位置和一些参数创建停车决策，并将该决策添加到参考线的路径决策中
+/// @brief 根在参考线上 stop_line_s 位置创建一个虚拟障碍物（代表车辆应该停止的位置），并基于此障碍物添加一个带有距离和原因的 stop 决策
 /// @param stop_wall_id 停车围栏的标识符
 /// @param stop_line_s 停车线的位置（在参考线上的 s 坐标）
 /// @param stop_distance 停车距离，即车辆从停车线到目标停车点的距离
@@ -41,6 +41,7 @@ int BuildStopDecision(const std::string& stop_wall_id, const double stop_line_s,
                       const std::vector<std::string>& wait_for_obstacles,
                       const std::string& decision_tag, Frame* const frame,
                       ReferenceLineInfo* const reference_line_info) {
+  // 空指针检查
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 

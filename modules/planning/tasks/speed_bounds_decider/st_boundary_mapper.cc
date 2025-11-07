@@ -62,10 +62,11 @@ STBoundaryMapper::STBoundaryMapper(
       planning_max_time_(planning_time),
       injector_(injector) {}
 /// @brief 
-/// @param path_decision 一个 PathDecision* 类型的参数 path_decision，表示路径决策对象，包含路径规划过程中所有的障碍物和决策信息
+/// @param path_decision 路径上的障碍物决策信息，包含每个障碍物的状态、决策结果等。
 /// @return 
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   // Sanity checks.
+  // 1.参数有效性检查
   // 确保 planning_max_time_（规划最大时间）大于 0，确保时间配置有效
   //断言检查规划时间 planning_max_time_ 必须大于 0，确保时间参数合法
   CHECK_GT(planning_max_time_, 0.0);
@@ -79,6 +80,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
                   "Fail to get params because of too few path points");
   }
 
+  // 2.遍历路径决策中的每个障碍物，计算其 ST 边界
   // Go through every obstacle.
   // 记录最近的停车障碍物
   // stop_obstacle：记录距离最近的停车障碍物
@@ -139,6 +141,8 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
       AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }
+
+  // 5. 如果有停车障碍物，映射停车决策到 ST 图
   // 如果找到停车决策（stop_obstacle 非空），则调用 MapStopDecision 函数来处理停车决策并更新相应的时空边界
   if (stop_obstacle) {
   // MapStopDecision 将停车点转换为 ST 图中的垂直线（时间轴上的固定 s 值）

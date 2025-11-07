@@ -19,16 +19,20 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+## 加载 Apollo 基础环境
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function main() {
+  # 调用 site_restore 函数（该函数定义在 apollo_base.sh），可能用于 恢复某些 Apollo 依赖项或环境设置
   site_restore
+  # 解析传入的命令行参数
   parse_cmdline_arguments "$@"
+  # 运行 Bazel 进行构建
   run_bazel "Build"
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"
   fi
   success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
-
+# 运行 main 函数，传入所有命令行参数
 main "$@"

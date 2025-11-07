@@ -37,21 +37,24 @@ bool PathAssessmentDeciderUtil::IsValidRegularPath(
     return false;
   }
   // Check if the path is greatly off the reference line.
+  // 判断该路径是否严重偏离参考线（比如横向偏移过大
   if (IsGreatlyOffReferenceLine(path_data)) {
     ADEBUG << path_data.path_label() << ": ADC is greatly off reference line.";
     return false;
   }
   // Check if the path is greatly off the road.
+  // 判断路径是否严重偏离道路边界（即路径不在车道或道路允许范围内）
   if (IsGreatlyOffRoad(reference_line_info, path_data)) {
     ADEBUG << path_data.path_label() << ": ADC is greatly off road.";
     return false;
   }
   // Check if there is any collision.
+  // 判断路径是否与静态障碍物发生碰撞（比如停在路边的车辆、交通设施等）
   if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
     ADEBUG << path_data.path_label() << ": ADC has collision.";
     return false;
   }
-
+  // 判断路径终点是否停在了逆向邻接车道上（即车头朝向和车道方向相反）
   if (IsStopOnReverseNeighborLane(reference_line_info, path_data)) {
     ADEBUG << path_data.path_label() << ": stop at reverse neighbor lane";
     return false;
@@ -65,6 +68,7 @@ bool PathAssessmentDeciderUtil::IsGreatlyOffReferenceLine(
   static constexpr double kOffReferenceLineThreshold = 20.0;
   const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
+    // 判断当前路径点的横向偏移 l 值的绝对值是否大于 20 米
     if (std::fabs(frenet_path_point.l()) > kOffReferenceLineThreshold) {
       ADEBUG << "Greatly off reference line at s = " << frenet_path_point.s()
              << ", with l = " << frenet_path_point.l();
@@ -83,6 +87,7 @@ bool PathAssessmentDeciderUtil::IsGreatlyOffRoad(
     double road_right_width = 0.0;
     if (reference_line_info.reference_line().GetRoadWidth(
             frenet_path_point.s(), &road_left_width, &road_right_width)) {
+      // 判断当前路径点的横向位置（l 值）是否严重超出道路边缘
       if (frenet_path_point.l() > road_left_width + kOffRoadThreshold ||
           frenet_path_point.l() < -road_right_width - kOffRoadThreshold) {
         ADEBUG << "Greatly off-road at s = " << frenet_path_point.s()
@@ -104,14 +109,18 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   double front_edge_to_center = vehicle_param.front_edge_to_center();
   double back_edge_to_center = vehicle_param.back_edge_to_center();
+  // 计算路径点的横向缓冲区（用于包裹车辆边界的矩形碰撞体积）
   double path_point_lateral_buffer =
       std::max(vehicle_param.width() / 2.0, vehicle_param.length() / 2.0);
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Filter out unrelated obstacles.
+    // 障碍物筛选
+    // 是否在路径规划考虑的范围内（例如远处无关障碍物直接忽略）
     if (!PathBoundsDeciderUtil::IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
     // Ignore too small obstacles.
+    // 是否面积太小，比如小碎石、标志杆等，不构成严重影响
     const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
             (obstacle_sl.end_l() - obstacle_sl.start_l()) <
@@ -120,16 +129,21 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
     }
     obstacles.push_back(obstacle);
   }
+
+  // 遍历路径点进行碰撞检测
   // Go through all the four corner points at every path pt, check collision.
   const auto& frenet_path = path_data.frenet_frame_path();
   for (size_t i = 0; i < path_data.discretized_path().size(); ++i) {
     // Skip the point after end point.
+    // 忽略尾部的冗余路径点
+    // 判断逻辑：从当前点到路径尾部的 s 距离是否太短，如果短于设定阈值则退出
     if (path_data.frenet_frame_path().back().s() -
             path_data.frenet_frame_path()[i].s() <
         (FLAGS_num_extra_tail_bound_point + 1) *
             FLAGS_path_bounds_decider_resolution) {
       break;
     }
+    // 构建路径点的边界框（SL）
     double path_point_start_s = frenet_path[i].s() - back_edge_to_center;
     double path_point_end_s = frenet_path[i].s() + front_edge_to_center;
     double path_point_start_l = frenet_path[i].l() - path_point_lateral_buffer;
@@ -138,6 +152,7 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
     for (const auto* obstacle : obstacles) {
       const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
       // Filter the path points by s range.
+      // 快速判断当前障碍物是否可能和车辆包围盒有重叠（以SL边界为基础）
       if (obstacle_sl.start_s() > path_point_end_s ||
           obstacle_sl.end_s() < path_point_start_s) {
         continue;
@@ -146,10 +161,14 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
           obstacle_sl.end_l() < path_point_start_l) {
         continue;
       }
+
+      // 准确地用矩形多边形碰撞检测
       const auto& path_point = path_data.discretized_path()[i];
+      // 获取当前路径点对应的车辆矩形包络框（通过 vehicle_box）
       const auto& vehicle_box =
           common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
       const std::vector<Vec2d>& ABCDpoints = vehicle_box.GetAllCorners();
+      // 使用障碍物的真实多边形轮廓（obstacle_polygon）进行点是否在障碍物内部的判断
       const common::math::Polygon2d& obstacle_polygon =
           obstacle->PerceptionPolygon();
       for (const auto& corner_point : ABCDpoints) {

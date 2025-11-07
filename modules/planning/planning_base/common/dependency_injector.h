@@ -30,14 +30,20 @@ class DependencyInjector {
  public:
   DependencyInjector() = default;
   ~DependencyInjector() = default;
-
+  // PlanningContext 存储了当前规划任务的上下文（如前一帧信息、紧急状态等）
   PlanningContext* planning_context() { return &planning_context_; }
+  // FrameHistory 存储了过去的多个帧数据，用于规划模块进行时序分析
   FrameHistory* frame_history() { return &frame_history_; }
+  // History 存储了全局历史信息，用于回溯过去的规划决策
   History* history() { return &history_; }
+  // EgoInfo 存储了当前自动驾驶车辆的状态（如速度、位置、加速度等）
   EgoInfo* ego_info() { return &ego_info_; }
+  // VehicleStateProvider 提供了车辆状态信息
+  // 当前位置、速度、方向角、车辆运动学信息
   apollo::common::VehicleStateProvider* vehicle_state() {
     return &vehicle_state_;
   }
+  // LearningBasedData 用于存储学习数据，供离线/在线机器学习模块使用，优化规划算法
   LearningBasedData* learning_based_data() { return &learning_based_data_; }
 
  private:

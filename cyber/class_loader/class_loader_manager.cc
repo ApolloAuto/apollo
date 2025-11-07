@@ -36,9 +36,13 @@ std::vector<ClassLoader*> ClassLoaderManager::GetAllValidClassLoaders() {
   return class_loaders;
 }
 
+/// @brief 获取所有有效的库路径
+/// @return 
 std::vector<std::string> ClassLoaderManager::GetAllValidLibPath() {
-  std::vector<std::string> libpath;
+  std::vector<std::string> libpath;  // 存储有效的库路径
   for (auto& lib_class_loader : libpath_loader_map_) {
+    // libpath_loader_map_ 应该是一个映射（例如 std::map 或 std::unordered_map），
+    // 其键是库路径（std::string 类型），值是某种类的实例（可能是指向类加载器的指针）
     if (lib_class_loader.second != nullptr) {
       libpath.emplace_back(lib_class_loader.first);
     }
@@ -46,15 +50,23 @@ std::vector<std::string> ClassLoaderManager::GetAllValidLibPath() {
   return libpath;
 }
 
+/// @brief 检查给定的库名称 library_name 是否存在于有效的库路径列表中
+/// @param library_name 需要检查的库名称
+/// @return 
 bool ClassLoaderManager::IsLibraryValid(const std::string& library_name) {
+  // 存储了所有被认为是有效的库路径
   std::vector<std::string> valid_libraries = GetAllValidLibPath();
   return (valid_libraries.end() != std::find(valid_libraries.begin(),
                                              valid_libraries.end(),
                                              library_name));
 }
 
+/// @brief 
+/// @param library_path 
+/// @return 
 bool ClassLoaderManager::LoadLibrary(const std::string& library_path) {
   std::lock_guard<std::mutex> lck(libpath_loader_map_mutex_);
+  // 检查给定路径的库是否有效
   if (!IsLibraryValid(library_path)) {
     libpath_loader_map_[library_path] =
         new class_loader::ClassLoader(library_path);

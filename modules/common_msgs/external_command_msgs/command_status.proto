@@ -6,27 +6,29 @@ import "modules/common_msgs/basic_msgs/header.proto";
 
 enum CommandStatusType {
   // Command is being executed without error.
-  RUNNING = 1;
+  RUNNING = 1;  // // 命令正在执行中，无错误。
   // Command is finished.
-  FINISHED = 2;
+  FINISHED = 2;  // 命令执行完成。
   // Command's execution has error.
-  ERROR = 3;
+  ERROR = 3;  // 命令执行中发生了错误。
   // Cannot get the status of command.
-  UNKNOWN = 4;
+  UNKNOWN = 4;  // 无法获得命令状态。
 }
 
+// 用于查询某条命令的执行状态
 message CommandStatusRequest {
   optional apollo.common.Header header = 1;
   // Unique identification for command.
-  optional int64 command_id = 2 [default = -1];
+  optional int64 command_id = 2 [default = -1]; // 唯一的命令 ID，请求的目标
 }
 
+// 用于响应状态请求或主动上报命令状态
 message CommandStatus {
   optional apollo.common.Header header = 1;
   // Unique identification for command.
-  optional int64 command_id = 2 [default = -1];
+  optional int64 command_id = 2 [default = -1];  // 被查询的命令 ID
   // The status of command execution.
-  required CommandStatusType status = 3;
+  required CommandStatusType status = 3;  // 执行状态
   // The message for the status.
-  optional string message = 4;
+  optional string message = 4;   // 可选的状态说明信息
 }

@@ -40,12 +40,17 @@ const double kDoubleEpsilon = 1e-6;
 ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
+/// @brief 初始化控制模块：依赖注入、读取配置、初始化控制器、订阅各类传感器和规划话题、设置发布器、车辆状态初始化等
+/// @return 
 bool ControlComponent::Init() {
+  // 完成配置文件参数读取，并完成控制器初始化
   injector_ = std::make_shared<DependencyInjector>();
   init_time_ = Clock::Now();
 
   AINFO << "Control init, starting ...";
-
+  
+  // 读取 .pb.txt 格式的 ControlPipelineConfig
+  // 该配置定义了控制模块中各个 task（如 longitudinal、lateral）的执行顺序与参数
   ACHECK(
       cyber::common::GetProtoFromFile(FLAGS_pipeline_file, &control_pipeline_))
       << "Unable to load control pipeline file: " + FLAGS_pipeline_file;
@@ -66,9 +71,10 @@ bool ControlComponent::Init() {
     }
   }
 
+  // 创建Control输入输出node,从话题通道中拿数据
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
-  chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
+  chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;  // 10 控制缓存大小，防止高频数据堆积延迟处理
 
   chassis_reader_ =
       node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
@@ -76,7 +82,7 @@ bool ControlComponent::Init() {
 
   cyber::ReaderConfig planning_reader_config;
   planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
-  planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
+  planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;  // 10
 
   trajectory_reader_ =
       node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
@@ -86,7 +92,7 @@ bool ControlComponent::Init() {
   planning_command_status_reader_config.channel_name =
       FLAGS_planning_command_status;
   planning_command_status_reader_config.pending_queue_size =
-      FLAGS_planning_status_msg_pending_queue_size;
+      FLAGS_planning_status_msg_pending_queue_size;  // 10
   planning_command_status_reader_ =
       node_->CreateReader<external_command::CommandStatus>(
           planning_command_status_reader_config, nullptr);
@@ -95,7 +101,7 @@ bool ControlComponent::Init() {
   cyber::ReaderConfig localization_reader_config;
   localization_reader_config.channel_name = FLAGS_localization_topic;
   localization_reader_config.pending_queue_size =
-      FLAGS_localization_pending_queue_size;
+      FLAGS_localization_pending_queue_size;  // 10
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       localization_reader_config, nullptr);
@@ -103,31 +109,35 @@ bool ControlComponent::Init() {
 
   cyber::ReaderConfig pad_msg_reader_config;
   pad_msg_reader_config.channel_name = FLAGS_pad_topic;
-  pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
+  pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;  // 10
 
   pad_msg_reader_ =
       node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
   ACHECK(pad_msg_reader_ != nullptr);
 
   if (!FLAGS_use_control_submodules) {
+  // 如果不使用子模块，控制模块直接发布 ControlCommand 给底盘
     control_cmd_writer_ =
-        node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+        node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic); // /apollo/control
     ACHECK(control_cmd_writer_ != nullptr);
   } else {
+  // 如果使用子模块控制逻辑，将拼装完整的 LocalView（含定位、底盘、规划等信息）给子模块处理
     local_view_writer_ =
-        node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
+        node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);  // /apollo/control/localview
     ACHECK(local_view_writer_ != nullptr);
   }
 
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
+  // 车辆状态初始化延迟：为了确保所有话题都完成了注册与广播，等待 1 秒避免早期状态获取失败
   AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   // should init_vehicle first, let car enter work status, then use status msg
   // trigger control
 
+// 设置默认驾驶模式（如START、STOP等），通过 pad_msg_ 来控制行为
   AINFO << "Control default driving action is "
         << DrivingAction_Name((enum DrivingAction)FLAGS_action);
   pad_msg_.set_action((enum DrivingAction)FLAGS_action);
@@ -181,21 +191,29 @@ void ControlComponent::OnMonitor(
   }
 }
 
+/// @brief 负责生成一个周期的控制指令 control_command
+/// @param control_command 
+/// @return 
 Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
+  // CheckInput()：判断各类消息是否齐全、是否异常（如缺失、时间不合法等），若失败直接设置 estop_
   Status status = CheckInput(&local_view_);
   // check data
   if (!status.ok()) {
+  // 每 100 次输出一次错误日志，提示控制输入失败，并打印具体错误原因
     AERROR_EVERY(100) << "Control input data failed: "
                       << status.error_message();
+  // 设置车辆不能进入自动驾驶状态
     control_command->mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+  // 给出不能 engage 的原因，用于上层系统或 UI 显示
     control_command->mutable_engage_advice()->set_reason(
         status.error_message());
     estop_ = true;
     estop_reason_ = status.error_message();
   } else {
     estop_ = false;
+    // CheckTimestamp()：判断输入消息时间戳是否超时（如超过容忍周期）
     Status status_ts = CheckTimestamp(local_view_);
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
@@ -205,14 +223,17 @@ Status ControlComponent::ProduceControlCommand(
       // latest_trajectory_.Clear();
       estop_ = true;
       status = status_ts;
+  //  如果当前驾驶模式不是自动驾驶
       if (local_view_.chassis().driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+      // 禁止自动驾驶，提示超时原因
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
         control_command->mutable_engage_advice()->set_reason(
             status.error_message());
       }
     } else {
+    //  如果输入检查和时间戳检查都通过，则设置为“可以 engage”，取消 estop
       control_command->mutable_engage_advice()->set_advice(
           apollo::common::EngageAdvice::READY_TO_ENGAGE);
       estop_ = false;
@@ -220,10 +241,17 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   // check estop
+  // 是否允许 estop 状态持续跨周期存在
+  // 若配置了“持续 estop 模式”，一旦 estop 触发，需显式清除，否则将持续保持；否则根据当前 trajectory 中的 estop 状态判断
   estop_ = FLAGS_enable_persistent_estop
                ? estop_ || local_view_.trajectory().estop().is_estop()
                : local_view_.trajectory().estop().is_estop();
-
+  /*
+  多种情况会触发 estop_：
+        planning estop 标志
+        trajectory 为空
+        齿轮前进但轨迹速度为负（Gear Drive + Negative Velocity）
+  */
   if (local_view_.trajectory().estop().is_estop()) {
     estop_ = true;
     estop_reason_ = "estop from planning : ";
@@ -248,6 +276,7 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   if (!estop_) {
+    // 如果是手动驾驶模式，重置控制器
     if (local_view_.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
       control_task_agent_.Reset();
       AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
@@ -260,6 +289,7 @@ Status ControlComponent::ProduceControlCommand(
     debug->mutable_trajectory_header()->CopyFrom(
         local_view_.trajectory().header());
 
+// 若当前轨迹是重新规划生成的（如变道、避障触发），记录其 header 信息
     if (local_view_.trajectory().is_replan()) {
       latest_replan_trajectory_header_ = local_view_.trajectory().header();
     }
@@ -272,6 +302,7 @@ Status ControlComponent::ProduceControlCommand(
 
   if (!local_view_.trajectory().trajectory_point().empty()) {
     // controller agent
+    //  使用轨迹、定位、底盘数据调用控制器计算输出命令
     Status status_compute = control_task_agent_.ComputeControlCommand(
         &local_view_.localization(), &local_view_.chassis(),
         &local_view_.trajectory(), control_command);
@@ -293,6 +324,7 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   // if planning set estop, then no control process triggered
+  //  设置刹车、零速、保持当前转角，避免车辆有任何动作
   if (estop_) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
@@ -304,6 +336,8 @@ Status ControlComponent::ProduceControlCommand(
         injector_->previous_control_command_mutable()->steering_target();
     control_command->set_steering_target(previous_steering_command_);
   }
+
+  // 设置转向灯等信号信息：如果轨迹中包含转向灯、喇叭等信号，写入控制命令中
   // check signal
   if (local_view_.trajectory().decision().has_vehicle_signal()) {
     control_command->mutable_signal()->CopyFrom(
@@ -312,7 +346,10 @@ Status ControlComponent::ProduceControlCommand(
   return status;
 }
 
+/// @brief 采集消息 ➜ 处理消息 ➜ 执行控制逻辑 ➜ 发布控制指令
+/// @return 
 bool ControlComponent::Proc() {
+  // 获取当前时间，准备统计周期延迟
   const auto start_time = Clock::Now();
 
   chassis_reader_->Observe();
@@ -361,6 +398,7 @@ bool ControlComponent::Proc() {
     OnPad(pad_msg);
   }
 
+// 此处加锁，保证 local_view_ 在其他线程使用时的一致性
   {
     // TODO(SHU): to avoid redundent copy
     std::lock_guard<std::mutex> lock(mutex_);
@@ -372,6 +410,7 @@ bool ControlComponent::Proc() {
     }
   }
 
+// 若启用子模块，直接发布 LocalView，由子模块处理控制逻辑
   // use control submodules
   if (FLAGS_use_control_submodules) {
     local_view_.mutable_header()->set_lidar_timestamp(
@@ -395,6 +434,7 @@ bool ControlComponent::Proc() {
     return true;
   }
 
+// 若收到 RESET 指令，清除当前急停状态（estop）
   if (pad_msg != nullptr) {
     ADEBUG << "pad_msg: " << pad_msg_.ShortDebugString();
     if (pad_msg_.action() == DrivingAction::RESET) {
@@ -405,6 +445,7 @@ bool ControlComponent::Proc() {
     pad_received_ = true;
   }
 
+// 控制测试模式检查:在持续一段时间后自动退出
   if (FLAGS_is_control_test_mode && FLAGS_control_test_duration > 0 &&
       (start_time - init_time_).ToSecond() > FLAGS_control_test_duration) {
     AERROR << "Control finished testing. exit";
@@ -417,6 +458,7 @@ bool ControlComponent::Proc() {
   ControlCommand control_command;
 
   Status status;
+  // 若车辆未进入自动驾驶模式，不生成正常控制量，发布零控制指令（防止误操作）
   if (local_view_.chassis().driving_mode() ==
       apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     status = ProduceControlCommand(&control_command);
@@ -455,6 +497,7 @@ bool ControlComponent::Proc() {
     return true;
   }
 
+// 若 pitch 角为 0，调用额外函数更新 pitch（用定位+底盘融合）
   if (fabs(control_command.debug().simple_lon_debug().vehicle_pitch()) <
       kDoubleEpsilon) {
     injector_->vehicle_state()->Update(local_view_.localization(),

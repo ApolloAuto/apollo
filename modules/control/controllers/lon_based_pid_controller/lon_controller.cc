@@ -166,6 +166,20 @@ void LonController::InitControlCalibrationTable() {
       << "Fail to load control calibration table";
 }
 
+/*
+1. 基础校验 & 状态更新
+2. 控制器配置选择（不同工况选择不同 PID 参数）
+3. 两级 PID 控制：
+   - station（位置）误差控制 → 生成 speed_offset
+   - speed（速度）误差控制 → 生成加速度命令
+4. 可选：Lead-Lag 前馈控制器补偿
+5. 坡度补偿（使用 pitch）
+6. 最终加速度融合（闭环 + 规划期望 + 坡度）
+7. full_stop 检查与处理（目的地 or 行人长期停车）
+8. 查表生成 throttle / brake 控制量
+9. EPB（电子驻车）控制判断
+10. 写入调试信息，输出指令
+*/
 Status LonController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,
     const canbus::Chassis *chassis,
@@ -204,21 +218,27 @@ Status LonController::ComputeControlCommand(
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
   ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, ts,
-                            debug);
+                            debug);  // // 计算 station / speed / acceleration 误差
 
   double station_error_limit =
       lon_based_pidcontroller_conf_.station_error_limit();
-  double station_error_limited = 0.0;
+  double station_error_limited = 0.0;  // 限幅后的纵向位置误差
+
+  // 考虑预瞄时纵向位置偏差的上下限不同
   if (lon_based_pidcontroller_conf_.enable_speed_station_preview()) {
+    // preview_station_error = 预瞄点纵向位置 - 匹配点纵向位置
     station_error_limited =
         common::math::Clamp(debug->preview_station_error(),
                             -station_error_limit, station_error_limit);
   } else {
+    // station_error = 参考点纵向位置 - 匹配点纵向位置
     station_error_limited = common::math::Clamp(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
 
+// a. 判断是否为倒车
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
+    // Pit 区检测（特殊工况，停车场？）
     if (CheckPit::CheckInPit(debug, &lon_based_pidcontroller_conf_,
                              injector_->vehicle_state()->linear_velocity(),
                              trajectory_message_->is_replan())) {
@@ -233,23 +253,29 @@ Status LonController::ComputeControlCommand(
       speed_pid_controller_.SetPID(
           lon_based_pidcontroller_conf_.reverse_speed_pid_conf());
     }
+    // d. Lead-Lag 控制是否启用
     if (enable_leadlag) {
       station_leadlag_controller_.SetLeadlag(
           lon_based_pidcontroller_conf_.reverse_station_leadlag_conf());
       speed_leadlag_controller_.SetLeadlag(
           lon_based_pidcontroller_conf_.reverse_speed_leadlag_conf());
     }
-  } else if (injector_->vehicle_state()->linear_velocity() <=
+  } 
+  // b. 判断是否低速（小于某个速度阈值）
+  else if (injector_->vehicle_state()->linear_velocity() <=
              lon_based_pidcontroller_conf_.switch_speed()) {
     if (CheckPit::CheckInPit(debug, &lon_based_pidcontroller_conf_,
                              injector_->vehicle_state()->linear_velocity(),
                              trajectory_message_->is_replan())) {
       ADEBUG << "in pit";
+
+  // 速度PID控制器对象speed_pid_controller_加载控制配置文件中低速PID参数
       station_pid_controller_.SetPID(
           lon_based_pidcontroller_conf_.pit_station_pid_conf());
       speed_pid_controller_.SetPID(
           lon_based_pidcontroller_conf_.pit_speed_pid_conf());
     } else {
+  // 速度PID控制器对象加载控制配置文件中高速PID参数，通常低速PID参数要更大些
       station_pid_controller_.SetPID(
           lon_based_pidcontroller_conf_.station_pid_conf());
       speed_pid_controller_.SetPID(
@@ -262,8 +288,13 @@ Status LonController::ComputeControlCommand(
         lon_based_pidcontroller_conf_.high_speed_pid_conf());
   }
 
+   // 一阶段 PID: Station → speed offset
+   // 位置环输出到速度环输入补偿，也就是速度环为内环
+   // delta_s = vt 我们在当前纵向偏差下的速度补偿
+   // 速度偏差 = 位置PID控制器根据(限幅后位置误差，采样周期)计算出控制量即速度
   double speed_offset =
       station_pid_controller_.Control(station_error_limited, ts);
+  // 可选 Lead-Lag 前馈补偿
   if (enable_leadlag) {
     speed_offset = station_leadlag_controller_.Control(speed_offset, ts);
   }
@@ -273,8 +304,10 @@ Status LonController::ComputeControlCommand(
       lon_based_pidcontroller_conf_.speed_controller_input_limit();
   double speed_controller_input_limited = 0.0;
   if (lon_based_pidcontroller_conf_.enable_speed_station_preview()) {
+  // 速度控制器的输入 = 位置控制器计算出的speed_offset + 当前时间向前加上预瞄时间在轨迹上的对应点速度和当前车速的偏差
     speed_controller_input = speed_offset + debug->preview_speed_error();
   } else {
+  // 速度控制器的输入 = 位置控制器计算出的speed_offset + 参考点车速和当前车速的偏差
     speed_controller_input = speed_offset + debug->speed_error();
   }
   speed_controller_input_limited =
@@ -282,7 +315,8 @@ Status LonController::ComputeControlCommand(
                           speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-
+  // 二阶段 PID: Speed → acceleration
+  // 求解速度环输出，给出加速度结果 v=at
   acceleration_cmd_closeloop =
       speed_pid_controller_.Control(speed_controller_input_limited, ts);
   debug->set_pid_saturation_status(
@@ -299,6 +333,7 @@ Status LonController::ComputeControlCommand(
     station_pid_controller_.Reset_integral();
   }
 
+// 坡度补偿：滤波
   double vehicle_pitch_rad =
       digital_filter_pitch_angle_.Filter(injector_->vehicle_state()->pitch());
   double vehicle_pitch =
@@ -308,17 +343,20 @@ Status LonController::ComputeControlCommand(
   // TODO(ALL): confirm the slope_offset_compensation whether is positive or not
   // when vehicle move uphill
   // Resume: uphill: + , downhill: -
+  // 定义斜坡补偿加速度 = (重力加速度*车辆俯仰角的正弦值)
   double slope_offset_compensation =
       lon_based_pidcontroller_conf_.use_opposite_slope_compensation() *
       GRA_ACC *
       std::sin(vehicle_pitch_rad + FLAGS_pitch_offset_deg * M_PI / 180);
 
+// 判断坡道补偿加速度是否为非数NaN,当浮点数过小下溢就可能出现NaN非数
   if (std::isnan(slope_offset_compensation)) {
     slope_offset_compensation = 0;
   }
 
   debug->set_slope_offset_compensation(slope_offset_compensation);
 
+// 总的加速度指令 = 闭环加速度指令 + 预瞄点参考加速度 + 坡道补偿加速度
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
       lon_based_pidcontroller_conf_.enable_slope_offset() *
@@ -610,6 +648,7 @@ void LonController::ComputeLongitudinalErrors(
   double d_matched = 0.0;
   double d_dot_matched = 0.0;
 
+//匹配最近点
   auto vehicle_state = injector_->vehicle_state();
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
       vehicle_state->x(), vehicle_state->y());
@@ -620,12 +659,18 @@ void LonController::ComputeLongitudinalErrors(
       &s_dot_matched, &d_matched, &d_dot_matched);
 
   // double current_control_time = Time::Now().ToSecond();
+  // 当前时间确定参考点，预瞄时间确定预瞄点
+  // 预瞄时间 = 预瞄窗口数目 * 预瞄窗口时间(20 * 0.01 = 0.2s)
   double current_control_time = ::apollo::cyber::Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
 
+
+// 根据绝对时间戳匹配参考点和预瞄点
+// 参考点：参考轨迹上，当前时刻车辆应该处于的位置
   TrajectoryPoint reference_point =
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           current_control_time);
+// 预瞄点：参考轨迹上，预瞄绝对时间处车辆应该处于的位置
   TrajectoryPoint preview_point =
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           preview_control_time);
@@ -658,9 +703,11 @@ void LonController::ComputeLongitudinalErrors(
 
   debug->set_station_reference(reference_point.path_point().s());
   debug->set_current_station(s_matched);
+  // 纵向位置误差debug.station_error = 参考点路径点的累积弧长 - 匹配点的累积弧长(匹配点就是路径最近点)
   debug->set_station_error(reference_point.path_point().s() - s_matched);
   debug->set_speed_reference(reference_point.v());
   debug->set_current_speed(lon_speed);
+  // 速度误差 = 参考点速度 - 匹配点速度
   debug->set_speed_error(reference_point.v() - s_dot_matched);
   debug->set_acceleration_reference(reference_point.a());
   debug->set_current_acceleration(lon_acceleration);
@@ -676,7 +723,9 @@ void LonController::ComputeLongitudinalErrors(
   previous_acceleration_reference_ = debug->acceleration_reference();
   previous_acceleration_ = debug->current_acceleration();
 
+  // 预瞄点位置误差 = 预瞄点的纵向位置s - 匹配点纵向位置s
   debug->set_preview_station_error(preview_point.path_point().s() - s_matched);
+  // 预瞄点速度误差 = 预瞄点纵向速度 - 匹配点纵向速度
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());

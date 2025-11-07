@@ -65,25 +65,32 @@ bool SetProtoToASCIIFile(const google::protobuf::Message &message,
   }
   return SetProtoToASCIIFile(message, fd);
 }
-
+/// @brief 
+/// @param file_name 文件路径
+/// @param message protobuf 解析结果存储对象
+/// @return 
 bool GetProtoFromASCIIFile(const std::string &file_name,
                            google::protobuf::Message *message) {
   using google::protobuf::TextFormat;
   using google::protobuf::io::FileInputStream;
   using google::protobuf::io::ZeroCopyInputStream;
+  // open() 以 只读模式 (O_RDONLY) 打开 file_name
   int file_descriptor = open(file_name.c_str(), O_RDONLY);
-  if (file_descriptor < 0) {
+  if (file_descriptor < 0) { // 打开失败
     AERROR << "Failed to open file " << file_name << " in text mode.";
     // Failed to open;
     return false;
   }
-
+  // Google Protobuf 提供的 流式读取工具，适用于 大文件 解析
+  // ZeroCopyInputStream 避免不必要的数据拷贝，提高性能
   ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
   bool success = TextFormat::Parse(input, message);
   if (!success) {
     AERROR << "Failed to parse file " << file_name << " as text proto.";
   }
+  // 释放 FileInputStream 对象，防止内存泄漏
   delete input;
+  // close(file_descriptor); 关闭文件描述符，防止文件句柄泄漏
   close(file_descriptor);
   return success;
 }
@@ -108,14 +115,22 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
   }
   return true;
 }
-
+/// @brief 从文件中读取 protobuf 数据，并解析到 message 对象中
+/// @param file_name protobuf 配置文件的路径
+/// @param message 指向 protobuf 消息对象，用于存储解析后的数据
+/// @return 
 bool GetProtoFromFile(const std::string &file_name,
                       google::protobuf::Message *message) {
+  // 检查文件是否存在
   if (!PathExists(file_name)) {
     AERROR << "File [" << file_name << "] does not exist! ";
     return false;
   }
   // Try the binary parser first if it's much likely a binary proto.
+  // 判断是否是二进制 .bin 文件
+  // 检查文件扩展名是否为 .bin
+  // kBinExt.rbegin() 代表 ".bin" 反向迭代器（即从 n 开始向前匹配）
+  // file_name.rbegin() 代表 file_name 反向迭代器（即从 file_name 末尾向前匹配）
   static const std::string kBinExt = ".bin";
   if (std::equal(kBinExt.rbegin(), kBinExt.rend(), file_name.rbegin())) {
     return GetProtoFromBinaryFile(file_name, message) ||

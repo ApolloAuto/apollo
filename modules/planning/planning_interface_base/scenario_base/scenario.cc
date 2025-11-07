@@ -82,12 +82,18 @@ bool Scenario::Init(std::shared_ptr<DependencyInjector> injector,
   }
   return true;
 }
-
+/// @brief 执行特定场景中各个阶段（stage）的核心函数，涉及到场景状态的管理以及阶段的处理和切换
+/// @param planning_init_point 
+/// @param frame 
+/// @return 
 ScenarioResult Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+// 如果当前阶段为空
   if (current_stage_ == nullptr) {
+  //  从scenario_pipeline_config_ 中获取第一个阶段的配置信息,并通过 CreateStage 创建该阶段
     current_stage_ = CreateStage(
         *stage_pipeline_map_[scenario_pipeline_config_.stage(0).name()]);
+  // 创建失败,打印错误信息并将阶段状态设置为 ERROR，然后返回场景结果
     if (nullptr == current_stage_) {
       AERROR << "Create stage " << scenario_pipeline_config_.stage(0).name()
              << " failed!";
@@ -96,6 +102,7 @@ ScenarioResult Scenario::Process(
     }
     AINFO << "Create stage " << current_stage_->Name();
   }
+  // 如果当前阶段的名称为空，表示当前场景已经完成，不再需要处理，直接将场景的状态设置为 STATUS_DONE（已完成），然后返回场景结
   if (current_stage_->Name().empty()) {
     scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_DONE);
     return scenario_result_;
@@ -112,8 +119,10 @@ ScenarioResult Scenario::Process(
       scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_PROCESSING);
       break;
     }
+    //  如果阶段返回 FINISHED，表示当前阶段已经完成，接下来要判断是否需要切换到下一个阶段
     case StageStatusType::FINISHED: {
       auto next_stage = current_stage_->NextStage();
+    // 如果 next_stage 不为空，表示需要切换阶段
       if (next_stage != current_stage_->Name()) {
         AINFO << "switch stage from " << current_stage_->Name() << " to "
               << next_stage;
@@ -121,12 +130,14 @@ ScenarioResult Scenario::Process(
           scenario_result_.SetScenarioStatus(ScenarioStatusType::STATUS_DONE);
           return scenario_result_;
         }
+        // 如果下一个阶段的配置找不到，打印错误并返回 STATUS_UNKNOWN
         if (stage_pipeline_map_.find(next_stage) == stage_pipeline_map_.end()) {
           AERROR << "Failed to find config for stage: " << next_stage;
           scenario_result_.SetScenarioStatus(
               ScenarioStatusType::STATUS_UNKNOWN);
           return scenario_result_;
         }
+        // 如果下一个阶段的配置存在，尝试创建下一个阶段。如果创建失败，则打印警告并返回 STATUS_UNKNOWN
         current_stage_ = CreateStage(*stage_pipeline_map_[next_stage]);
         if (current_stage_ == nullptr) {
           AWARN << "Current stage is a null pointer.";
@@ -135,6 +146,7 @@ ScenarioResult Scenario::Process(
           return scenario_result_;
         }
       }
+      // 如果当前阶段继续有效，设置场景状态为 STATUS_PROCESSING（处理中）
       if (current_stage_ != nullptr && !current_stage_->Name().empty()) {
         scenario_result_.SetScenarioStatus(
             ScenarioStatusType::STATUS_PROCESSING);

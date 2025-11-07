@@ -250,12 +250,19 @@ bool DeleteFile(const std::string &filename);
 bool GetType(const std::string &filename, FileType *type);
 
 bool CreateDir(const std::string &dir);
-
+/// @brief 
+/// @tparam T 用于泛化支持任何类型的 protobuf
+/// @param relative_path 配置文件的相对路径
+/// @param config 指向 protobuf 对象的指针，用于接收解析后的配置
+/// @return 
 template <typename T>
 bool LoadConfig(const std::string &relative_path, T *config) {
+  // 断言 config 不为 nullptr，使用的是 Google 的 glog 或 gflags 中的宏，常用于调试
   CHECK_NOTNULL(config);
   // todo: get config base relative path
+  // 存储解析后的真实路径
   std::string actual_config_path;
+  // 一个工具函数，试图在环境变量 APOLLO_CONF_PATH 指定的路径中拼接出 relative_path
   if (!GetFilePathWithEnv(relative_path, "APOLLO_CONF_PATH",
                           &actual_config_path)) {
     AERROR << "conf file [" << relative_path
@@ -263,6 +270,7 @@ bool LoadConfig(const std::string &relative_path, T *config) {
     return false;
   }
   AINFO << "load conf file: " << actual_config_path;
+  // 调用 GetProtoFromFile 来读取 protobuf 文件内容并解析到 config 对象中，返回其结果
   return GetProtoFromFile(actual_config_path, config);
 }
 
