@@ -445,7 +445,7 @@ void Path::InitWidth() {
   road_right_width_.clear();
   road_right_width_.reserve(num_sample_points_);
 
-  double sample_s = 0;
+  double sample_s = 0; // 当前采样点的 s（沿路径的累计距离）
   double segment_end_s = -1.0;
   double segment_start_s = -1.0;
   double waypoint_s = 0.0;
@@ -467,6 +467,7 @@ void Path::InitWidth() {
       }
     }
     // Find the width of the way point at the position of "sample_s".
+    // sample 在 path 的 s = 该 segment 起点在 lane 上的 s + 从 segment 起点到 sample_s 的距离
     waypoint_s = cur_waypoint->s + sample_s - segment_start_s;
     cur_waypoint->lane->GetWidth(waypoint_s, &left_width, &right_width);
     lane_left_width_.push_back(left_width - cur_waypoint->l);
