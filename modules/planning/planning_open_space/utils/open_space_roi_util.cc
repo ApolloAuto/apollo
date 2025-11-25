@@ -295,6 +295,7 @@ void OpenSpaceRoiUtil::TransformByOriginPoint(
   auto xy_boundary = open_space_info->mutable_ROI_xy_boundary();
   GetRoiXYBoundary(*obstacles_vertices_vec, xy_boundary);
 }
+// 判断多边形顶点是否为顺时针
 bool OpenSpaceRoiUtil::IsPolygonClockwise(const std::vector<Vec2d> &polygon) {
   double s = 0;
   for (size_t i = 0; i < polygon.size(); i++) {
@@ -306,9 +307,10 @@ bool OpenSpaceRoiUtil::IsPolygonClockwise(const std::vector<Vec2d> &polygon) {
            polygon.at(i).y() * polygon.at(0).x();
     }
   }
-  if (s < 0) {
+  // 基于有向面积判断顺逆时针
+  if (s < 0) { // 顺时针
     return true;
-  } else {
+  } else {   // 逆时针
     return false;
   }
 }
@@ -318,6 +320,7 @@ bool OpenSpaceRoiUtil::AdjustPointsOrderToClockwise(
   if (!IsPolygonClockwise(*polygon)) {
     // counter clockwise reverse it
     ADEBUG << "point is anticlockwise,reverse";
+    // 强制转换为顺时针
     std::reverse(polygon->begin(), polygon->end());
     return true;
   } else {
@@ -328,6 +331,7 @@ bool OpenSpaceRoiUtil::AdjustPointsOrderToClockwise(
 bool OpenSpaceRoiUtil::UpdateParkingPointsOrder(
     const apollo::hdmap::Path &nearby_path, std::vector<Vec2d> *points) {
   AdjustPointsOrderToClockwise(points);
+  // 找到“最靠近参考路径起点”的顶点作为新起点
   double min_dist = std::numeric_limits<double>::max();
   size_t min_index = 0;
   for (size_t i = 0; i < points->size(); i++) {

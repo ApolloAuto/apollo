@@ -42,6 +42,7 @@ double DiscretizedPath::Length() const {
 
 PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   ACHECK(!empty());
+  // 返回第一个路径点 p，满足 p.s >= path_s
   auto it_lower = QueryLowerBound(path_s);
   if (it_lower == begin()) {
     return front();

@@ -37,12 +37,17 @@ using apollo::cyber::Clock;
 
 HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   planner_open_space_config_.CopyFrom(open_space_conf);
+  // ReedShepp 是一种计算两点之间满足车辆运动学约束的最短路径的算法（考虑前进/后退、最小转弯半径）
   reed_shepp_generator_ =
       std::make_unique<ReedShepp>(vehicle_param_, planner_open_space_config_);
+  // GridSearch 是一个基于栅格地图的 A* 算法，用于预计算从终点反向搜索的启发式代价
+  // 这里不是最终路径，而是为 Hybrid A* 提供“到终点大概多远”的估计值
   grid_a_star_heuristic_generator_ =
       std::make_unique<GridSearch>(planner_open_space_config_);
+  // 每个节点扩展的子节点数量
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
+  // 最大有效前轮转角（带缩放）R = L / tan(δ)
   max_steer_angle_ = vehicle_param_.max_steer_angle() /
                      vehicle_param_.steer_ratio() *
                      planner_open_space_config_.warm_start_config()
@@ -54,11 +59,13 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       planner_open_space_config_.warm_start_config().phi_grid_resolution() *
       vehicle_param_.wheel_base() /
       std::tan(max_steer_angle_ * 2 / (next_node_num_ / 2 - 1));
+  // 确保每一步至少跨越一个栅格对角线，避免在同一个栅格内反复震荡
   if (arc_length_ < std::sqrt(2) * xy_grid_resolution_) {
     arc_length_ = std::sqrt(2) * xy_grid_resolution_;
   }
   AINFO << "arc_length" << arc_length_;
   delta_t_ = planner_open_space_config_.delta_t();
+  // Hybrid A* 的总代价 = g(n)（实际代价） + h(n)（启发式）
   traj_forward_penalty_ =
       planner_open_space_config_.warm_start_config().traj_forward_penalty();
   traj_back_penalty_ =

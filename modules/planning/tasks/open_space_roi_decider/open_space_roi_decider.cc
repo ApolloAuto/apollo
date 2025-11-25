@@ -1219,20 +1219,25 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   }
   const auto &parking_spot_id_string =
       frame->open_space_info().target_parking_spot_id();
+  //  将字符串转换为地图内部使用的 Id 类型
   hdmap::Id parking_spot_id = hdmap::MakeMapId(parking_spot_id_string);
+  //  从高精地图中获取对应的 ParkingSpace 对象（包含多边形、朝向等信息）
   auto parking_spot = hdmap_->GetParkingSpaceById(parking_spot_id);
   if (!nearby_path_) {
+    // 获取停车位附近的参考路径: 作为开放空间规划的参考线
     GetNearbyPath(frame->local_view().planning_command->lane_follow_command(),
                   parking_spot, &nearby_path_);
   }
   // points in polygon is always clockwise
   auto points = parking_spot->polygon().points();
   OpenSpaceRoiUtil::UpdateParkingPointsOrder(*nearby_path_, &points);
+  // 计算停车位中心点
   Vec2d center_point(0, 0);
   for (size_t i = 0; i < points.size(); i++) {
     center_point += points[i];
   }
   center_point /= 4.0;
+  // 获取中心点在参考路径上的投影与航向
   double lane_heading = 0;
   parking_info->center_point = center_point;
   nearby_path_->GetHeadingAlongPath(center_point, &lane_heading);
@@ -1244,6 +1249,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   } else {
     parking_info->is_on_left = false;
   }
+  // 初步判断泊车类型（基于航向角差异）
   double diff_angle = common::math::AngleDiff(
       lane_heading, parking_spot->parking_space().heading());
   if (std::fabs(diff_angle) < M_PI / 3.0) {
@@ -1251,9 +1257,13 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   } else {
     parking_info->parking_type = ParkingType::VERTICAL_PARKING;
   }
+  //  “top” 指的是靠近道路的一侧（即入口边），"bottom" 是远离道路的一侧
   parking_info->corner_points = points;
+  // 最终判断泊车类型（基于几何尺寸）
+  // parallel_dist：[0] 到 [1] 的距离（假设为长边）
   double parallel_dist =
       parking_info->corner_points[0].DistanceTo(parking_info->corner_points[1]);
+  // verticle_dist：[0] 到 [3] 的距离（假设为短边）
   double verticle_dist =
       parking_info->corner_points[0].DistanceTo(parking_info->corner_points[3]);
   if (parallel_dist > verticle_dist) {
@@ -1683,26 +1693,38 @@ void OpenSpaceRoiDecider::GetAllLaneSegments(
   }
 }
 
+/// @brief 
+/// @param routing_response 全局路径规划结果（包含车辆应行驶的车道序列）
+/// @param parking_spot 目标停车位信息（来自高精地图）
+/// @param nearby_path 生成的局部参考路径（由 1~3 个连续车道段组成）
+/// @return 
 bool OpenSpaceRoiDecider::GetNearbyPath(
     const apollo::routing::RoutingResponse &routing_response,
     const ParkingSpaceInfoConstPtr &parking_spot,
     std::shared_ptr<hdmap::Path> *nearby_path) {
+  // 1.校验停车位有效性
   LaneInfoConstPtr nearest_lane;
   if (nullptr == parking_spot) {
-    AERROR << "The parking spot id is invalid!" << parking_spot->id().id();
+    // AERROR << "The parking spot id is invalid!" << parking_spot->id().id();
+    AERROR << "The parking spot is invalid!";
     return false;
   }
+  // 2.通过 Overlap 关系找到关联车道
   auto parking_space = parking_spot->parking_space();
+  // 返回与该停车位有空间重叠（或逻辑连接）的 Overlap 对象 ID 列表
   auto overlap_ids = parking_space.overlap_id();
   if (overlap_ids.empty()) {
     AERROR << "There is no lane overlaps with the parking spot: "
            << parking_spot->id().id();
     return false;
   }
+  // 获取 Routing 中的所有车道段
   std::vector<routing::LaneSegment> lane_segments;
   GetAllLaneSegments(routing_response, &lane_segments);
+  // 遍历 Overlap，查找在 Routing 中的最近车道
   bool has_found_nearest_lane = false;
   size_t nearest_lane_index = 0;
+  // 有问题：
   for (auto id : overlap_ids) {
     auto overlaps = hdmap_->GetOverlapById(id)->overlap();
     for (auto object : overlaps.object()) {
@@ -1714,6 +1736,7 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
         continue;
       }
       // Check if the lane is contained in the routing response.
+      // 检查该车道是否在 routing 路径中
       for (auto &segment : lane_segments) {
         if (segment.id() == nearest_lane->id().id()) {
           has_found_nearest_lane = true;
@@ -1734,6 +1757,7 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
   // Get the lane nearest to the current position of the vehicle. If the
   // vehicle has not reached the nearest lane to the parking spot, set the
   // lane nearest to the vehicle as "nearest_lane".
+  // 考虑车辆当前位置（动态调整参考路径）
   LaneInfoConstPtr nearest_lane_to_vehicle;
   auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
   double vehicle_lane_s = 0.0;
@@ -1741,7 +1765,7 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
   int status = hdmap_->GetNearestLaneWithHeading(
       point, 10.0, vehicle_state_.heading(), M_PI / 2.0,
       &nearest_lane_to_vehicle, &vehicle_lane_s, &vehicle_lane_l);
-  if (status == 0) {
+  if (status == 0) {  // 成功找到
     size_t nearest_lane_to_vehicle_index = 0;
     bool has_found_nearest_lane_to_vehicle = false;
     for (auto &segment : lane_segments) {
@@ -1751,22 +1775,26 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
       }
       ++nearest_lane_to_vehicle_index;
     }
+    // 确保 nearby_path 从车辆当前位置开始，而不是直接跳到停车位附近
     // The vehicle has not reached the nearest lane to the parking spot。
+    // 如果车辆所在车道在 routing 中，且排在停车位车道之前
     if (has_found_nearest_lane_to_vehicle &&
         nearest_lane_to_vehicle_index < nearest_lane_index) {
-      nearest_lane = nearest_lane_to_vehicle;
+      nearest_lane = nearest_lane_to_vehicle; // 替换为车辆当前车道
     }
   }
 
   // Find parking spot by getting nearestlane
+  // 构建 nearby_path（1~3 个连续车道段）
   ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
   LaneSegment nearest_lanesegment =
       LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
                   nearest_lane->accumulate_s().back());
   std::vector<LaneSegment> segments_vector;
+  // 添加后继车道（最多再加两个）
   int next_lanes_num = nearest_lane->lane().successor_id_size();
   if (next_lanes_num != 0) {
-    auto next_lane_id = nearest_lane->lane().successor_id(0);
+    auto next_lane_id = nearest_lane->lane().successor_id(0); // 取第一个后继
     segments_vector.push_back(nearest_lanesegment);
     auto next_lane = hdmap_->GetLaneById(next_lane_id);
     LaneSegment next_lanesegment =
@@ -1774,6 +1802,7 @@ bool OpenSpaceRoiDecider::GetNearbyPath(
                     next_lane->accumulate_s().back());
     segments_vector.push_back(next_lanesegment);
     size_t succeed_lanes_num = next_lane->lane().successor_id_size();
+    // 再取后继的后继
     if (succeed_lanes_num != 0) {
       auto succeed_lane_id = next_lane->lane().successor_id(0);
       auto succeed_lane = hdmap_->GetLaneById(succeed_lane_id);

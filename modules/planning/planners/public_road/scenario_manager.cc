@@ -38,13 +38,18 @@ bool ScenarioManager::Init(const std::shared_ptr<DependencyInjector>& injector,
   if (init_) {
     return true;
   }
+  // 保存依赖注入器，用于后面各个场景的初始化
   injector_ = injector;
+  // 加载并创建所有 Scenario
   for (int i = 0; i < planner_config.scenario_size(); i++) {
+    // 根据配置中的类型字符串（如 "LAYER_FOLLOW", "PARK_AND_GO" 等），通过 插件系统动态创建对应的 Scenario 对象
     auto scenario = PluginManager::Instance()->CreateInstance<Scenario>(
         ConfigUtil::GetFullPlanningClassName(
             planner_config.scenario(i).type()));
+    // 用依赖注入器和场景名称初始化该 Scenario
     ACHECK(scenario->Init(injector_, planner_config.scenario(i).name()))
         << "Can not init scenario" << planner_config.scenario(i).name();
+    // 把创建好的场景加入场景列表
     scenario_list_.push_back(scenario);
     if (planner_config.scenario(i).name() == "LANE_FOLLOW") {
       default_scenario_type_ = scenario;

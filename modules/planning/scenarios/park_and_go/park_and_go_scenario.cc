@@ -80,14 +80,16 @@ bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
   if (nullptr == routing_end) {
     return false;
   }
+  // 把导航终点转换到参考线的 SL 坐标（主要用 s）
   common::SLPoint dest_sl;
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
   reference_line.XYToSL(routing_end->pose(), &dest_sl);
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-
+  // 标记车辆是不是在车道上、是否是城市驾驶车道（CITY_DRIVING）
   bool is_ego_on_lane = false;
   bool is_lane_type_city_driving = false;
+  // 按照位置 + 方向 找附近车道
   HDMapUtil::BaseMap().GetNearestLaneWithHeading(
       adc_point, 5.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s, &l);
   if (lane != nullptr && lane->IsOnLane({adc_point.x(), adc_point.y()})) {
@@ -96,7 +98,7 @@ bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
       is_lane_type_city_driving = true;
     }
   }
-
+  // 计算车辆距离目的地的 s 距离
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
   ADEBUG << "adc_distance_to_dest:" << adc_distance_to_dest;
   bool is_vehicle_static = (std::fabs(adc_speed) < max_abs_speed_when_stopped);

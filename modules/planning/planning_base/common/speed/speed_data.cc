@@ -59,13 +59,15 @@ void SpeedData::AppendSpeedPoint(const double s, const double time,
 
 bool SpeedData::EvaluateByTime(const double t,
                                common::SpeedPoint* const speed_point) const {
+  // 1.边界检查
   if (size() < 2) {
     return false;
   }
   if (!(front().t() < t + 1.0e-6 && t - 1.0e-6 < back().t())) {
     return false;
   }
-
+  
+  // 2.使用 二分查找 (lower_bound) 找到第一个 sp.t() >= t 的点
   auto comp = [](const common::SpeedPoint& sp, const double t) {
     return sp.t() < t;
   };

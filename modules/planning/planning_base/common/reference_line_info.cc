@@ -513,9 +513,9 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   ACHECK(ptr_discretized_trajectory != nullptr);
   // use varied resolution to reduce data load but also provide enough data
   // point for control module
-  const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
-  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
-  const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
+  const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;  // 0.02
+  const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval; // 0.1
+  const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;  // 1.0
 
   if (path_data_.discretized_path().empty()) {
     AERROR << "path data is empty";
@@ -526,19 +526,21 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     AERROR << "speed profile is empty";
     return false;
   }
-
+  // 以时间遍历 speed profile
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
                                                      : kSparseTimeResolution)) {
+    // 1 根据时间找 speed_point
     common::SpeedPoint speed_point;
     if (!speed_data_.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
       return false;
     }
-
+    // 2 s 超出 path 长度就停止
     if (speed_point.s() > path_data_.discretized_path().Length()) {
       break;
     }
+    // 3 根据 s 找对应的 PathPoint
     common::PathPoint path_point =
         path_data_.GetPathPointWithPathS(speed_point.s());
     path_point.set_s(path_point.s() + start_s);

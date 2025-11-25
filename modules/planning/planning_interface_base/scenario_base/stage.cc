@@ -40,6 +40,7 @@ using apollo::cyber::Clock;
 Stage::Stage()
     : next_stage_(""), context_(nullptr), injector_(nullptr), name_("") {}
 
+// 初始化一个 Stage 并加载其 Task 列表 + fallback task
 bool Stage::Init(const StagePipeline& config,
                  const std::shared_ptr<DependencyInjector>& injector,
                  const std::string& config_dir, void* context) {

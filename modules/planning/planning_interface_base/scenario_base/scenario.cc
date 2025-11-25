@@ -45,27 +45,31 @@ bool Scenario::Init(std::shared_ptr<DependencyInjector> injector,
   name_ = name;
   injector_ = injector;
   // set scenario_type in PlanningContext
+  // 1.设置 PlanningContext 中当前 Scenario 类型
   auto* scenario = injector_->planning_context()
                        ->mutable_planning_status()
                        ->mutable_scenario();
   scenario->Clear();
   scenario->set_scenario_type(name_);
 
+  // 2. 获取当前 Scenario 类的名称
   // Generate the default config path.
   int status;
   // Get the name of this class.
   std::string class_name =
       abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
-
+  // 3. 找到该 Scenario 插件所在目录（配置目录）
   config_dir_ = apollo::cyber::plugin_manager::PluginManager::Instance()
                     ->GetPluginClassHomePath<Scenario>(class_name);
   config_dir_ += "/conf";
   AINFO << "config_dir : " << config_dir_;
   // Generate the default task config path from PluginManager.
+  // 4. 获取 scenario_conf.pb.txt 的路径
   config_path_ = apollo::cyber::plugin_manager::PluginManager::Instance()
                      ->GetPluginConfPath<Scenario>(class_name,
                                                    "conf/scenario_conf.pb.txt");
-
+  
+  // 5.加载 pipeline（流水线）配置
   // Load the pipeline config.
   std::string pipeline_config_path =
       apollo::cyber::plugin_manager::PluginManager::Instance()
@@ -77,6 +81,7 @@ bool Scenario::Init(std::shared_ptr<DependencyInjector> injector,
     AERROR << "Load pipeline of " << name_ << " failed!";
     return false;
   }
+  // 6. 将 pipeline 中的 stage 映射进 map
   for (const auto& stage : scenario_pipeline_config_.stage()) {
     stage_pipeline_map_[stage.name()] = &stage;
   }
