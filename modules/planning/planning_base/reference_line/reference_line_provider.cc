@@ -920,20 +920,23 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   return true;
 }
 
+// 确保路径平滑算法没有“过度扭曲”原始参考线，从而保证导航一致性与安全性
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
+  // 1.每隔 10 米沿平滑后的参考线采样一个点进行检查
   static constexpr double kReferenceLineDiffCheckStep = 10.0;
+  // 2. 沿平滑参考线遍历采样点
   for (double s = 0.0; s < smoothed.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_new = smoothed.GetReferencePoint(s);
-
+  // 3. 将平滑点投影到原始参考线的 Frenet 坐标系
     common::SLPoint sl_new;
     if (!raw.XYToSL(xy_new, &sl_new)) {
       AERROR << "Fail to change xy point on smoothed reference line to sl "
                 "point respect to raw reference line.";
       return false;
     }
-
+  // 4. 检查横向偏差是否超限
     const double diff = std::fabs(sl_new.l());
     if (diff > FLAGS_smoothed_reference_line_max_diff) {
       AERROR << "Fail to provide reference line because too large diff "
@@ -951,16 +954,19 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   AnchorPoint anchor;
   anchor.longitudinal_bound = smoother_config_.longitudinal_boundary_bound();
 
-  // 2. 获取参考点
+  // 2. 获取参考点并处理无车道信息的情况
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
+    // 路径点由参考点转换而来
     anchor.path_point = ref_point.ToPathPoint(s);
+    // 直接使用最大横向边界（最宽松的约束）
     anchor.lateral_bound = smoother_config_.max_lateral_boundary_bound();
     return anchor;
   }
-
+  // 3.获取车辆宽度和车道左右边界信息
   const double adc_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width();
+  // 垂直于行驶方向的单位向量（指向左侧）
   const Vec2d left_vec =
       Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
   auto waypoint = ref_point.lane_waypoints().front();
@@ -969,20 +975,22 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
   const double kEpislon = 1e-8;
   double effective_width = 0.0;
-
+  // 4. 初始安全车道宽度计算
   // shrink width by vehicle width, curb
   double safe_lane_width = left_width + right_width;
+  // 安全车道宽度 = 车道总宽 - 车辆宽度
   safe_lane_width -= adc_width;
   bool is_lane_width_safe = true;
-
+  // 如果剩余空间太小（< ε），说明车道太窄，无法安全通行，标记为不安全，并设置极小的有效宽度
   if (safe_lane_width < kEpislon) {
     ADEBUG << "lane width [" << left_width + right_width << "] "
            << "is smaller than adc width [" << adc_width << "]";
     effective_width = kEpislon;
     is_lane_width_safe = false;
   }
-
+  // 5. 考虑路缘（Curb）的影响
   double center_shift = 0.0;
+  // 如果右侧/左侧是路缘（CURB），车辆应主动避让，因此
   if (hdmap::RightBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
     safe_lane_width -= smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
@@ -990,6 +998,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
       effective_width = kEpislon;
       is_lane_width_safe = false;
     } else {
+      // 将参考点向远离路缘的方向平移半个 curb_shift（即 center_shift 调整）
       center_shift += 0.5 * smoother_config_.curb_shift();
     }
   }
@@ -1003,18 +1012,22 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
       center_shift -= 0.5 * smoother_config_.curb_shift();
     }
   }
-
+  // 6. 应用横向缓冲（Lateral Buffer）
   //  apply buffer if possible
+  // 在安全宽度基础上，左右各扣除一个 lateral_buffer（如 0.2m），作为额外的安全余量
   const double buffered_width =
       safe_lane_width - 2.0 * smoother_config_.lateral_buffer();
   safe_lane_width =
       buffered_width < kEpislon ? safe_lane_width : buffered_width;
 
   // shift center depending on the road width
+  // 7. 确定最终横向边界（effective_width）
+  // 车道宽度足够安全，则横向边界设为 可用宽度的一半（因为车辆可在中心线左右摆动）
   if (is_lane_width_safe) {
     effective_width = 0.5 * safe_lane_width;
   }
-
+  // 8. 应用中心线偏移并构造锚点
+  // 将原始参考点按 center_shift 平移（避开路缘）
   ref_point += left_vec * center_shift;
   anchor.path_point = ref_point.ToPathPoint(s);
   anchor.lateral_bound = common::math::Clamp(
