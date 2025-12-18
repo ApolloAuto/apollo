@@ -56,27 +56,27 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   double east = 0.0;
   std::string vendor;
   int checker =
-      UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major);
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major); // 主版本号
   checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor);
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor); // 次版本号
   checker +=
       UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
   checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);
-  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
-  checker += header_node->QueryDoubleAttribute("north", &north);
-  checker += header_node->QueryDoubleAttribute("south", &south);
-  checker += header_node->QueryDoubleAttribute("east", &east);
-  checker += header_node->QueryDoubleAttribute("west", &west);
+      UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);  // 地图版本
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date); // 地图创建时间
+  checker += header_node->QueryDoubleAttribute("north", &north);  // 地图北边界纬度
+  checker += header_node->QueryDoubleAttribute("south", &south);  // 地图南边界纬度
+  checker += header_node->QueryDoubleAttribute("east", &east);    // 地图东边界经度
+  checker += header_node->QueryDoubleAttribute("west", &west);    // 地图西边界经度
   checker +=
-      UtilXmlParser::QueryStringAttribute(*header_node, "vendor", &vendor);
+      UtilXmlParser::QueryStringAttribute(*header_node, "vendor", &vendor);  // 地图供应商
 
   if (checker != tinyxml2::XML_SUCCESS) {
     std::string err_msg = "Error parsing header attributes";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
 
-  auto geo_reference_node = header_node->FirstChildElement("geoReference");
+  auto geo_reference_node = header_node->FirstChildElement("geoReference"); // 地图使用的坐标系统
   if (!geo_reference_node) {
     std::string err_msg = "Error parsing header geoReoference attributes";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

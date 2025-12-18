@@ -675,6 +675,9 @@ bool ReferenceLine::IsOnLane(const SLBoundary& sl_boundary) const {
          sl_boundary.end_l() >= -lane_right_width;
 }
 
+/// @brief 判断sl点是否在车道内
+/// @param sl_point 
+/// @return 
 bool ReferenceLine::IsOnLane(const SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;

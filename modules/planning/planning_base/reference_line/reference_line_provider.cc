@@ -880,6 +880,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   const auto &ref_points = reference_line->reference_points();
   const double cur_heading = ref_points[index].heading();
   auto last_index = index;
+  // 主车航向与参考线航向偏差超过一定阈值，对参考线进行收缩
   while (last_index < ref_points.size() &&
          std::fabs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
              FLAGS_referfece_line_max_forward_heading_diff) {

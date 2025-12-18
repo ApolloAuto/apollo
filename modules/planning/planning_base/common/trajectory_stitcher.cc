@@ -179,6 +179,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 // 的规划起始点前一段距离的轨迹点进行拼接
 
 // 3.计算时间匹配点：通过 veh_rel_time 查询先前轨迹中与当前时间最接近的轨迹点
+// 找到 当前时刻 在上一帧轨迹中的 理论执行位置（按时间推算）
   const double veh_rel_time =
       current_timestamp - prev_trajectory->header_time();
   // 查询先前轨迹中时间最接近的点的索引
@@ -188,6 +189,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 // 4. 检查时间与位置偏差
   // 如果当前时间比先前轨迹的起始时间还要早，则重新规划
   // 检查当前时间是否小于先前轨迹的起始时间
+  // 情况1: 当前时间 < 轨迹起始时间（时钟回退 or 轨迹未来）
   if (time_matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
     AWARN << "current time smaller than the previous trajectory's first time";
@@ -197,6 +199,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
   // 如果当前时间超出了先前轨迹的时间范围，则重新规划
+  // 情况2: 当前时间 > 轨迹结束时间（轨迹已过期）
   if (time_matched_index + 1 >= prev_trajectory_size) {
     AWARN << "current time beyond the previous trajectory's last time";
     *replan_reason =
@@ -289,7 +292,11 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     ADEBUG << "replan according to certain amount of "
            << "lat、lon and time offset is disabled";
   }
+
+
+// 如果 所有重规划条件都不满足，进入正常缝合
 // 计算前进方向上的相对时间
+// 保留到 未来一个规划周期（如当前 10.1s，规划周期 0.1s → 保留到 10.2s）
   double forward_rel_time = veh_rel_time + planning_cycle_time;
 // 查找与前进方向时间最接近的轨迹点
   size_t forward_time_index =
@@ -298,9 +305,11 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   ADEBUG << "Position matched index:\t" << position_matched_index;
   ADEBUG << "Time matched index:\t" << time_matched_index;
 // 选择时间匹配和位置匹配中较小的索引作为最终的匹配点
+// 确定起始索引:取 更保守（靠前） 的匹配点，避免跳过当前位置
   auto matched_index = std::min(time_matched_index, position_matched_index);
 // 基于匹配点和保留点数，从先前轨迹中提取出拼接的轨迹部分
 // 从 prev_trajectory 中提取一段子轨迹，起始点为 matched_index - preserved_points_num（确保不会越界），结束点为 forward_time_index
+// preserved_points_num：额外保留的历史点（如 20 点 ≈ 2 秒）
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->begin() +
           std::max(0, static_cast<int>(matched_index - preserved_points_num)),
@@ -317,9 +326,12 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
                                               vehicle_state);
     }
     // 调整每个点的相对时间，并将路径坐标归一化
+    // 时间归一化：使当前时刻 ≈ 0
     tp.set_relative_time(tp.relative_time() + prev_trajectory->header_time() -
                          current_timestamp);
+    // 路程归一化：使当前点 s = 0
     tp.mutable_path_point()->set_s(tp.path_point().s() - zero_s);
+    // 归一化后，Planner 在 以当前车辆为原点的局部坐标系 中工作
   }
   // 返回拼接后的轨迹
   return stitching_trajectory;

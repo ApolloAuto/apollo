@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #include "modules/common/configs/config_gflags.h"
-
+// map_dir
 DEFINE_string(map_dir, "/apollo/modules/map/data/sunnyvale_loop",
               "Directory which contains a group of related maps.");
 DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
-
+// hd_map
 DEFINE_string(test_base_map_filename, "",
               "If not empty, use this test base map files.");
 

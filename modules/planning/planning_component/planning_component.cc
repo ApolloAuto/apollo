@@ -54,7 +54,7 @@ using apollo::storytelling::Stories;
 /// @return 
 bool PlanningComponent::Init() {
 // 依赖注入器，本质就是一个数据缓存中心，以便于规划任务前后帧之间的承接，以及异常处理的回溯
-// 创建 DependencyInjector 对象，用于依赖注入
+// 创建 DependencyInjector 对象，用于依赖注入：用于在不同模块间共享状态（如规划上下文、历史轨迹等）
   injector_ = std::make_shared<DependencyInjector>();
 // 规划模式的选择: apollo/modules/common/configs/config_gflags.cc
 // 创建PlanningBase对象（默认OnLanePlanning），它是轨迹规划的主体
@@ -66,6 +66,7 @@ bool PlanningComponent::Init() {
 // 加载config文件  proto
 // ACHECK 检查配置文件是否成功加载，配置文件包含路径规划的相关参数
 // 配置文件 planning_config.pb.txt  ？？？？？？？？？？？？？？？？？？？？？？？？
+// 从 .conf 或 .pb.txt 配置文件中加载 PlanningConfig
   ACHECK(ComponentBase::GetProtoConfig(&config_))
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
@@ -73,16 +74,19 @@ bool PlanningComponent::Init() {
 // 初始化消息处理模块，如果启用了离线学习或非零学习模式
   if (FLAGS_planning_offline_learning ||
       config_.learning_mode() != PlanningConfig::NO_LEARNING) {
+    // 初始化 MessageProcess 用于收集训练数据
     if (!message_process_.Init(config_, injector_)) {
       AERROR << "failed to init MessageProcess";
       return false;
     }
   }
+// 初始化规划子模块
 // 在这里执行的是OnLanePlanning::Init的初始化
   planning_base_->Init(config_); // 参考线优化主要在这部分
 // 订阅ROS2话题
 // 订阅 PlanningCommand 话题，收到消息后存入 planning_command_
 // 输入导航命令订阅
+// 来自 Routing 或人机交互的规划指令
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(
       config_.topic_config().planning_command_topic(),
       [this](const std::shared_ptr<PlanningCommand>& planning_command) {
@@ -92,6 +96,7 @@ bool PlanningComponent::Init() {
         planning_command_.CopyFrom(*planning_command);
       });
 // 订阅交通信号灯检测数据，存入 traffic_light_
+// 交通灯状态
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       config_.topic_config().traffic_light_detection_topic(),
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
@@ -101,6 +106,7 @@ bool PlanningComponent::Init() {
       });
 // 订阅 PadMessage（手动输入指令）
 // planning操作命令（start，stop）消息订阅
+// 车内物理按钮（如“清除规划”）
   pad_msg_reader_ = node_->CreateReader<PadMessage>(
       config_.topic_config().planning_pad_topic(),
       [this](const std::shared_ptr<PadMessage>& pad_msg) {
@@ -109,6 +115,7 @@ bool PlanningComponent::Init() {
         pad_msg_.CopyFrom(*pad_msg);
       });
 // storytelling消息订阅
+// 场景描述（用于仿真或日志）
   story_telling_reader_ = node_->CreateReader<Stories>(
       config_.topic_config().story_telling_topic(),
       [this](const std::shared_ptr<Stories>& stories) {
@@ -118,6 +125,7 @@ bool PlanningComponent::Init() {
       });
 // 如果启用了导航模式，则订阅 relative_map（相对地图）
 // 实时相对地图消息订阅（用于NaviPlanning）
+// 仅导航模式使用，相对地图
   if (FLAGS_use_navigation_mode) {
     relative_map_reader_ = node_->CreateReader<MapMsg>(
         config_.topic_config().relative_map_topic(),
@@ -133,14 +141,16 @@ bool PlanningComponent::Init() {
 // planning输出轨迹消息发布
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
-// planning阻塞时需要重新路由的请求
+// planning阻塞时需要重新路由的请求   服务客户端：用于在需要时主动发起 重新路径规划（Rerouting） 请求
   rerouting_client_ =
       node_->CreateClient<apollo::external_command::LaneFollowCommand,
                           external_command::CommandStatus>(
           config_.topic_config().routing_request_topic());
+  // 发布学习用数据（RL/IL）
   planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
       config_.topic_config().planning_learning_data_topic());
 // planning实时任务状态消息发布
+// 回传命令执行状态（RUNNING / FINISHED / ERROR）
   command_status_writer_ = node_->CreateWriter<external_command::CommandStatus>(
       FLAGS_planning_command_status);
   return true;
@@ -162,6 +172,7 @@ bool PlanningComponent::Proc(
   // check and process possible rerouting request
   // 1.检查是否需要重新规划线路
   // 如果路径不通或环境变化，可能需要重新规划路径，调用 CheckRerouting() 进行检查
+  // 如果规划上下文中标记了 need_rerouting()，则发送 LaneFollowCommand 触发新路径规划
   CheckRerouting();
 
   // process fused input data
@@ -169,6 +180,8 @@ bool PlanningComponent::Proc(
   // std::mutex: 互斥锁，用于保护共享资源的访问
   // 当多个线程需要同时访问共享资源时，为了避免出现数据竞争等问题，需要使用互斥锁进行同步控制
   // 存储传感器数据，用于规划计算
+  // 将所有输入（包括缓存的 pad、交通灯、故事等）整合成一个结构体 local_view_，供规划器使用
+  // 对每个缓存变量都加锁读取，并检查是否为新消息（通过 IsProtoEqual 判断 header 是否变化）
 
   // 填充local_view_
   local_view_.prediction_obstacles = prediction_obstacles;
@@ -204,6 +217,7 @@ bool PlanningComponent::Proc(
                                     pad_msg_.header())) {
 
       // 特殊情况： 如果 PadMessage 指令是 "CLEAR_PLANNING"，则清除 planning_command_
+      // 清除当前规划命令，通常用于紧急停止或重置
       // Check if "CLEAR_PLANNING" PadMessage is received and process.
       if (pad_msg_.action() == PadMessage::CLEAR_PLANNING) {
         local_view_.planning_command = nullptr;
@@ -245,6 +259,7 @@ bool PlanningComponent::Proc(
   // 非主流
   // 如果处于 RL_TEST 模式，记录学习数据，并 写入 planning_learning_data_writer_
   if (config_.learning_mode() == PlanningConfig::RL_TEST) {
+    // 发布 LearningDataFrame，不执行实际规划
     PlanningLearningData planning_learning_data;
     LearningDataFrame* learning_data_frame =
         injector_->learning_based_data()->GetLatestLearningDataFrame();
@@ -275,6 +290,7 @@ bool PlanningComponent::Proc(
 
   // modify trajectory relative time due to the timestamp change in header
   // 修正轨迹点的相对时间，确保时间戳一致
+  // 修正 relative_time 因 header timestamp 变化导致的偏移
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
@@ -286,6 +302,7 @@ bool PlanningComponent::Proc(
   // Send command execution feedback.
   // Error occured while executing the command.
   // 创建 CommandStatus 反馈规划执行状态
+  // 根据轨迹生成状态（OK / ERROR / FINISHED / RUNNING），通过 command_status_writer_ 回传
   external_command::CommandStatus command_status;
   common::util::FillHeader(node_->Name(), &command_status);
   if (nullptr != local_view_.planning_command) {
@@ -373,7 +390,7 @@ bool PlanningComponent::CheckInput() {
       not_ready->set_reason("planning_command not ready");
     }
   }
-
+  // 若任一缺失，发布一个空轨迹并返回 false
   if (not_ready->has_reason()) {
     AINFO << not_ready->reason() << "; skip the planning cycle.";
     // 填充 trajectory_pb 的 header

@@ -100,13 +100,14 @@ void LonController::Stop() { CloseLogFile(); }
 LonController::~LonController() { CloseLogFile(); }
 
 Status LonController::Init(std::shared_ptr<DependencyInjector> injector) {
+  // /apollo/modules/control/lon_based_pid_controller/conf/controller_conf.pb.txt
   if (!ControlTask::LoadConfig<LonBasedPidControllerConf>(
           &lon_based_pidcontroller_conf_)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "failed to load lon control_conf");
   }
-
+  // /apollo/modules/control/control_component/conf/calibration_table.pb.txt
   if (!ControlTask::LoadCalibrationTable(&calibration_table_)) {
     AERROR << "failed to load calibration table";
     return Status(ErrorCode::CONTROL_INIT_ERROR,
@@ -121,7 +122,7 @@ Status LonController::Init(std::shared_ptr<DependencyInjector> injector) {
   double ts = lon_based_pidcontroller_conf_.ts();
   bool enable_leadlag =
       lon_based_pidcontroller_conf_.enable_reverse_leadlag_compensation();
-
+  // 位置、速度控制器初始化
   station_pid_controller_.Init(
       lon_based_pidcontroller_conf_.station_pid_conf());
   speed_pid_controller_.Init(
@@ -136,7 +137,7 @@ Status LonController::Init(std::shared_ptr<DependencyInjector> injector) {
 
   vehicle_param_.CopyFrom(
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
-
+  // 俯仰角低通滤波
   SetDigitalFilterPitchAngle();
 
   InitControlCalibrationTable();

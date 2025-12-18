@@ -19,10 +19,13 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-
+// 引入 Apollo 的 插件管理器，用于 动态创建场景对象（通过类名字符串）
 #include "cyber/plugin_manager/plugin_manager.h"
+// 引入状态宏（如 ACHECK, AINFO），用于日志和断言
 #include "modules/common/status/status.h"
+// 引入配置工具类 ConfigUtil，用于 拼接完整的 C++ 类名（从配置中的简写名转为带命名空间的全名)
 #include "modules/planning/planning_base/common/util/config_util.h"
+// 引入 Scenario 基类定义。所有具体场景（如车道跟随、红绿灯等）都继承自它
 #include "modules/planning/planning_interface_base/scenario_base/scenario.h"
 
 namespace apollo {
@@ -38,11 +41,12 @@ bool ScenarioManager::Init(const std::shared_ptr<DependencyInjector>& injector,
   if (init_) {
     return true;
   }
-  // 保存依赖注入器，用于后面各个场景的初始化
+  //保存依赖注入器到成员变量 injector_，供后续创建场景时使用
   injector_ = injector;
   // 加载并创建所有 Scenario
   for (int i = 0; i < planner_config.scenario_size(); i++) {
     // 根据配置中的类型字符串（如 "LAYER_FOLLOW", "PARK_AND_GO" 等），通过 插件系统动态创建对应的 Scenario 对象
+    // 利用 插件机制（PluginManager） 动态创建每个 Scenario 实例
     auto scenario = PluginManager::Instance()->CreateInstance<Scenario>(
         ConfigUtil::GetFullPlanningClassName(
             planner_config.scenario(i).type()));
@@ -70,6 +74,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   CHECK_NOTNULL(frame);
   for (auto scenario : scenario_list_) {
     // current_scenario_是一个智能指针，get()方法返回原始指针
+    // 如果当前正在处理的场景（current_scenario_）就是遍历到的这个 scenario，并且它的状态是 正在处理中（STATUS_PROCESSING）
     if (current_scenario_.get() == scenario.get() &&
         current_scenario_->GetStatus() ==
             ScenarioStatusType::STATUS_PROCESSING) {
@@ -78,6 +83,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       return;
     }
     // 如果当前场景不是在正在处理状态，接着判断场景是否可以切换
+    // 检查该 scenario 是否可以从当前场景 转移过来
     if (scenario->IsTransferable(current_scenario_.get(), *frame)) {
       // 如果场景切换可行，退出当前场景
       current_scenario_->Exit(frame);

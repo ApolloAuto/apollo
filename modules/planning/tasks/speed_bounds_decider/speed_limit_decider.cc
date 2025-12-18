@@ -74,7 +74,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
     //  -- 2.1: limit by centripetal force (acceleration)
     // 根据路径曲率（kappa，即路径的弯曲程度）计算速度限制，主要考虑离心加速度对速度的影响。较大的曲率会导致较小的安全速度限制
     const double speed_limit_from_centripetal_acc =
-        std::sqrt(speed_bounds_config_.max_centric_acceleration_limit() /
+        std::sqrt(speed_bounds_config_.max_centric_acceleration_limit() /  // 0.8
                   std::fmax(std::fabs(discretized_path.at(i).kappa()),
                             speed_bounds_config_.minimal_kappa()));
     print_curve.AddPoint("speed_limit_from_centripetal_acc", path_s,
@@ -162,7 +162,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
                               speed_limit_from_nearby_obstacles}));
     } else {
       curr_speed_limit =
-          std::fmax(speed_bounds_config_.lowest_speed(),
+          std::fmax(speed_bounds_config_.lowest_speed(),  // 0.1
                     std::min({speed_limit_from_reference_line,
                               speed_limit_from_centripetal_acc}));
     }

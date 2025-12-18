@@ -16,34 +16,59 @@
 
 #include "modules/planning/planning_component/on_lane_planning.h"
 
-#include <algorithm>
-#include <limits>
-#include <list>
-#include <utility>
-
+#include <algorithm>  // 如 std::sort, std::find 等，用于轨迹点排序、参考线选择等
+#include <limits>     // 获取数值类型极值（如 std::numeric_limits<double>::max()），常用于初始化最小/最大距离
+#include <list>       // 可能用于存储历史轨迹或障碍物列表（虽然 Apollo 更常用 vector）
+#include <utility>    // 提供 std::pair, std::move 等，用于高效数据传递（如移动语义）
+// 作用：允许 Google Test 框架访问 OnLanePlanning 的 私有成员函数
+// 机制：通过 FRIEND_TEST 宏，测试代码可调用内部逻辑进行白盒测试
+// 注意：此头文件 不影响运行时行为，仅在编译测试时生效
 #include "gtest/gtest_prod.h"
-
+// 作用：使用 absl::StrCat() 高效拼接字符串（比 std::string + 更快、更安全）
 #include "absl/strings/str_cat.h"
-
+// 包含调试用的内部数据结构（如 ST 图、SL 图、参考线信息）
 #include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
+// 接收来自 Routing 模块的导航路径（RoutingResponse），是规划的起点
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+// 定义语义地图相关配置（如路口放大区域、虚拟车道等）
 #include "modules/planning/planning_base/proto/planning_semantic_map_config.pb.h"
-
+// Cyber RT 基础设施（Apollo 的中间件
+// 文件操作（如读取配置文件、保存调试数据）
 #include "cyber/common/file.h"
+// 定义 AINFO, AWARN, AERROR, ADEBUG 等日志宏
 #include "cyber/common/log.h"
+// 高精度时间获取（Clock::Now()），用于时间戳对齐、性能分析
 #include "cyber/time/clock.h"
+// 提供四元数运算，用于处理车辆姿态（从定位消息中提取 heading）
 #include "modules/common/math/quaternion.h"
+// 封装车辆状态（位置、速度、加速度、航向、角速度等）
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+// 提供高精地图查询工具
+// 根据 GPS 坐标查找最近车道
+// 获取车道边界、限速、交通灯关联关系
+// 判断是否在交叉口、匝道等
 #include "modules/map/hdmap/hdmap_util.h"
+// 规划核心公共组件
+// 封装自车（Ego Vehicle）相关信息，如前方净空距离、是否在路口等
 #include "modules/planning/planning_base/common/ego_info.h"
+// 管理历史帧缓存（FrameHistory），用于轨迹平滑、预测等
 #include "modules/planning/planning_base/common/history.h"
+// 全局规划上下文，存储跨帧状态（如变道意图、红灯等待状态）
 #include "modules/planning/planning_base/common/planning_context.h"
+// 实现轨迹“缝合”逻辑，保证新旧轨迹平滑衔接（避免跳变）
 #include "modules/planning/planning_base/common/trajectory_stitcher.h"
+// 通用工具函数，如坐标转换、插值、角度归一化等
 #include "modules/planning/planning_base/common/util/util.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
+// 动态生成参考线（Reference Line），是 Frenet 坐标系规划的基础
+// 支持多参考线（如直行、变道）并行评估
 #include "modules/planning/planning_base/reference_line/reference_line_provider.h"
+// 定义规划器抽象接口（Planner），具体实现如 PublicRoadPlanner, LatticePlanner 等
+// 采用 策略模式（Strategy Pattern），支持插件化替换
 #include "modules/planning/planning_interface_base/planner_base/planner.h"
+// 应用交通规则（Traffic Rules）对每条参考线进行可行性判断
+// 包括：红绿灯、让行、限速、行人避让等子规则
 #include "modules/planning/planning_interface_base/traffic_rules_base/traffic_decider.h"
 
 namespace apollo {
@@ -62,13 +87,19 @@ using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
+/// @brief 自动设置 Dreamview 图表的 X/Y 轴范围和标签
+/// @param chart 图表指针
+/// @param label_name_x X轴标签名
+/// @param label_name_y Y轴标签名
 void SetChartminmax(apollo::dreamview::Chart* chart, std::string label_name_x,
                     std::string label_name_y) {
   auto* options = chart->mutable_options();
+  // 初始化极值变量，用于遍历所有数据点后确定坐标轴范围
   double xmin(std::numeric_limits<double>::max()),
       xmax(std::numeric_limits<double>::lowest()),
       ymin(std::numeric_limits<double>::max()),
       ymax(std::numeric_limits<double>::lowest());
+  // 遍历图表中所有折线（line）的所有点（point），更新 X/Y 的最小/最大值
   for (int i = 0; i < chart->line_size(); i++) {
     auto* line = chart->mutable_line(i);
     for (auto& pt : line->point()) {
@@ -77,6 +108,8 @@ void SetChartminmax(apollo::dreamview::Chart* chart, std::string label_name_x,
       xmax = std::max(xmax, pt.x());
       ymax = std::max(ymax, pt.y());
     }
+    // 设置折线样式：线宽 2px、无点标记、直线连接（无线条张力）、不填充区域、显示线条
+    // 这些是 Chart.js（Dreamview 前端图表库）的配置项
     auto* properties = line->mutable_properties();
     (*properties)["borderWidth"] = "2";
     (*properties)["pointRadius"] = "0";
@@ -84,6 +117,7 @@ void SetChartminmax(apollo::dreamview::Chart* chart, std::string label_name_x,
     (*properties)["fill"] = "false";
     (*properties)["showLine"] = "true";
   }
+  // 将计算出的范围和标签应用到图表的 X/Y 轴
   options->mutable_x()->set_min(xmin);
   options->mutable_x()->set_max(xmax);
   options->mutable_x()->set_label_string(label_name_x);
@@ -92,11 +126,13 @@ void SetChartminmax(apollo::dreamview::Chart* chart, std::string label_name_x,
   options->mutable_y()->set_label_string(label_name_y);
   // Set chartJS's dataset properties
 }
+/// @brief 释放资源，停止后台线程，清空状态
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
   }
   planner_->Stop();
+  // 清空历史缓存、规划上下文、自车信息等，防止内存泄漏或状态残留
   injector_->frame_history()->Clear();
   injector_->history()->Clear();
   injector_->planning_context()->mutable_planning_status()->Clear();
@@ -118,12 +154,14 @@ std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 7.初始化 traffic_decider_，处理交通规则。
 8.记录启动时间，初始化 planner_
 */
+// planning_config.pb.txt
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "planning config error: " + config_.DebugString());
   }
   // 调用父类的Init()函数
+  // 调用基类初始化，并清空前序状态
   PlanningBase::Init(config_);  // 会将config_赋值给PlanningBase中的成员变量
 
   // clear planning history
@@ -137,11 +175,13 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   // load map
   // 使用 HDMapUtil::BaseMapPtr() 获取地图指针，并检查地图是否成功加载。如果地图加载失败，会触发断言并输出错误信息
+  // 加载高精地图，失败则终止（ACHECK 是 fatal check）
   hdmap_ = HDMapUtil::BaseMapPtr();
   ACHECK(hdmap_) << "Failed to load map";
 
   // instantiate reference line provider
   // 创建 ReferenceLineProvider 实例并启动它，提供参考路线。如果配置中包含参考路线配置，将其传递给提供者
+  // 创建并启动参考线提供器（内部可能有独立线程预计算参考线）
   const ReferenceLineConfig* reference_line_config = nullptr;
   if (config_.has_reference_line_config()) {
     reference_line_config = &config_.reference_line_config();
@@ -154,6 +194,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
   // 加载路径规划器并检查其是否成功初始化。如果没有成功初始化，返回错误状态
   // dispatch planner
   // 加载规划器
+  // 根据配置加载具体 Planner（如 PublicRoadPlanner）
   LoadPlanner();  // 在父类中定义，选择EM 或者 Lattice
   if (!planner_) {
     return Status(
@@ -161,6 +202,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
         "planning is not initialized with config : " + config_.DebugString());
   }
   // 如果启用了学习模式，加载并初始化图像特征渲染器配置。如果加载失败，输出错误信息
+  // 若启用学习模式，则初始化图像特征渲染器
   if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     PlanningSemanticMapConfig renderer_config;
     ACHECK(apollo::cyber::common::GetProtoFromFile(
@@ -171,6 +213,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
     BirdviewImgFeatureRenderer::Instance()->Init(renderer_config);
   }
+  // 初始化交通规则决策器，并调用 Planner 的 Init 完成最终初始化
   // 初始化交通决策模块
   // traffic_decider_ 负责处理交通信号灯、行人、让行规则等
   traffic_decider_.Init(injector_);
@@ -189,7 +232,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
                                  const TrajectoryPoint& planning_start_point,
                                  const VehicleState& vehicle_state) {
   // planning_base.h: std::unique_ptr<Frame> frame_;    ??????    
-  // reset 方法确保 frame_ 的指针是有效的                          
+  // reset 方法确保 frame_ 的指针是有效的   
+  // 创建新的 Frame 对象，封装当前帧所有上下文（车辆状态、参考线、障碍物等）                       
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          vehicle_state, reference_line_provider_.get()));
   
@@ -327,6 +371,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
  // 更新车辆状态---> 进入Update函数查看
  // apollo/modules/common/vehicle_state/vehicle_state_provoder.cc
+ // 融合定位（位置/姿态）和底盘（速度/档位）数据，生成统一的 VehicleState
   Status status = injector_->vehicle_state()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
  // 获取车辆状态
@@ -334,12 +379,14 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   VehicleState vehicle_state = injector_->vehicle_state()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
   // 确保 start_timestamp 不会早于 vehicle_state_timestamp，并在不符合要求时打印出详细的错误信息
+  // 检查时间合理性：规划开始时间不应早于车辆状态时间（否则说明时钟异常）
   DCHECK_GE(start_timestamp, vehicle_state_timestamp)
       << "start_timestamp is behind vehicle_state_timestamp by "
       << start_timestamp - vehicle_state_timestamp << " secs";
 // 如果车辆状态无效，生成刹车轨迹
 // status.ok()： Status status
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
+    // 车辆状态无效 → 输出 NotReady + 停车轨迹
     const std::string msg =
         "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.";
@@ -364,6 +411,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 // 对齐时间戳 vehicle_state_timestamp为车辆状态时间戳
 // 如果时间差小于某个阈值，对齐车辆状态的时间戳
 // 大于它就完犊子了
+// 时间对齐：若延迟小（如 < 100ms），用运动学模型预测车辆在 start_timestamp 时刻的状态，提升规划精度
   if (start_timestamp - vehicle_state_timestamp <
       FLAGS_message_latency_threshold) {  // 0.02s 消息延时阈值
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
@@ -373,24 +421,29 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   // Update reference line provider and reset scenario if new routing
   reference_line_provider_->UpdateVehicleState(vehicle_state); // 车辆状态单纯的赋值
   // // 如果是两个不同的routing,则重新初始化
+  // 当收到新的导航指令（如重新规划路线）时
   if (local_view_.planning_command->is_motion_command() &&
       util::IsDifferentRouting(last_command_, *local_view_.planning_command)) {
     // 如果发现新的规划命令，更新 last_command_ 为当前的规划命令
     last_command_ = *local_view_.planning_command;
     AINFO << "new_command:" << last_command_.DebugString();
     // 重置参考路线提供者，即清除当前的参考路线信息
+    // 重置参考线提供器（ReferenceLineProvider）
     reference_line_provider_->Reset();
     // 通过 injector_ 调用 history() 获取历史数据的对象，并清除历史记录（Clear()）。这意味着在接收到新命令后，之前的历史数据（如轨迹、状态等）可能已经不再适用
+    // 清空历史缓存（FrameHistory）和规划上下文（PlanningContext）
     injector_->history()->Clear();
 // 通过 injector_ 获取规划上下文（planning_context()）并清除其中的规划状态（Clear()）。这表明与当前规划相关的状态信息也需要重置，可能是为了清除过时的规划状态
     injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdatePlanningCommand(
         *(local_view_.planning_command));
 // 重置规划器，并使用 frame_ 中的相关信息来重新初始化或更新规划器的状态
+// 通知 Planner 重置状态（如取消正在进行的变道）
     planner_->Reset(frame_.get());
   }
   // Get end lane way point.
   // 获取当前车道的结束点
+  // 更新终点车道信息（用于泊车或终点减速）
   reference_line_provider_->GetEndLaneWayPoint(local_view_.end_lane_way_point);
 
   // planning is triggered by prediction data, but we can still use an estimated
@@ -399,6 +452,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   // 进行轨迹拼接
 // 在apollo规划算法中，在每一帧规划开始时会调用一个轨迹拼接函数，返回一段拼接轨迹点集
 // 并告诉我们是否重新规划以及重规划的原因
+// 将上一帧发布的轨迹末尾与当前车辆状态拼接，保证轨迹连续性
   const double planning_cycle_time =
       1.0 / static_cast<double>(FLAGS_planning_loop_rate);  // 10 hz
 
@@ -414,6 +468,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 // 4.0
 // 更新ego信息，进入EgoInfo类查看私有成员变量释义，进入Update查看
 // 规划起点设置、车辆状态、包围盒
+// 更新自车信息（如前方净空距离），供后续决策使用
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   AINFO << "Planning start frame sequence id = [" << frame_num << "]";
@@ -421,20 +476,25 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // 初始化frame,重要信息，将拼接轨迹最后一个点作为路径规划起点
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);// frame类存储了一次规划循环中所需的所有数据   180
+  // 计算前方障碍物距离、当前路段信息（如是否在交叉口）
   if (status.ok()) {
     injector_->ego_info()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
+    // injector_->ego_info()->CalculateCurrentRouteInfo(
+    //     reference_line_provider_.get());
   }
 
 // 如果启用了调试记录，则记录调试信息
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
   }
+  // 记录 Frame 初始化耗时
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
 
   if (!status.ok()) {
     AERROR << status.ToString();
+    // ESTOP：最高优先级，控制模块会立即刹车
     if (FLAGS_publish_estop) {
       // "estop" signal check in function "Control::ProduceControlCommand()"
       // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
@@ -446,6 +506,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       ptr_trajectory_pb->CopyFrom(estop_trajectory);
     } else {
+      // NotReady + Stop Trajectory：温和降级，缓慢停车
       ptr_trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
@@ -462,7 +523,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     injector_->frame_history()->Add(n, std::move(frame_));
     return;
   }
-
+  // 交通规则决策
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
     auto traffic_status =
         traffic_decider_.Execute(frame_.get(), &ref_line_info);
@@ -476,6 +537,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
   // print trajxy
+  // 打印轨迹 XY 曲线
   PrintCurves trajectory_print_curve;
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     trajectory_print_curve.AddPoint("trajxy", p.path_point().x(),
@@ -484,16 +546,19 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   trajectory_print_curve.PrintToLog();
 
   // print obstacle polygon
+  // 打印障碍物多边形
   for (const auto& obstacle : frame_->obstacles()) {
     obstacle->PrintPolygonCurve();
   }
   // print ego box
+  // 打印自车包围盒
   PrintBox print_box("ego_box");
   print_box.AddAdcBox(vehicle_state.x(), vehicle_state.y(),
                       vehicle_state.heading(), true);
   print_box.PrintToLog();
 
  // 计算总的规划时间并输出
+ // 记录总耗时（通常要求 < 100ms）
   const auto end_system_timestamp =
       std::chrono::duration<double>(
           std::chrono::system_clock::now().time_since_epoch())
@@ -521,7 +586,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
   }
 
-// 设置重新规划标志，并记录重新规划的原因
+// 若轨迹缝合失败（只保留一个点），说明是重新规划，记录原因
   ptr_trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
   if (ptr_trajectory_pb->is_replan()) {
     ptr_trajectory_pb->set_replan_reason(replan_reason);
@@ -529,20 +594,22 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
 // 根据是否在开放空间轨迹上，填充并保存规划结果
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
+    // 泊车模式：直接输出
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
   } else {
     // 处理不同场景的规划结果
+    // 主干道模式：可能进行轨迹平滑
     auto* ref_line_task =
         ptr_trajectory_pb->mutable_latency_stats()->add_task_stats();
     ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
                                1000.0);
     ref_line_task->set_name("ReferenceLineProvider");
-
+    // 填充header信息
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
-
+    // 将当前帧加入历史缓存，供下一帧缝合使用
     frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     if (FLAGS_enable_planning_smoother) {
       planning_smoother_.Smooth(injector_->frame_history(), frame_.get(),
@@ -559,6 +626,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   AINFO << "Planning Perf: planning name [" << Name() << "], "
         << plnning_perf_ms << " ms.";
   AINFO << "Planning end frame sequence id = [" << frame_num << "]";
+
   injector_->frame_history()->Add(frame_num, std::move(frame_));
 }
 
@@ -638,6 +706,7 @@ Status OnLanePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const ptr_trajectory_pb) {
+  // 记录调试起点（Init Point）
   auto* ptr_debug = ptr_trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
@@ -658,10 +727,12 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().first;
     const auto& publishable_trajectory_gear =
         frame_->open_space_info().publishable_trajectory_data().second;
+    // 直接使用 OpenSpace 生成的轨迹
     publishable_trajectory.PopulateTrajectoryProtobuf(ptr_trajectory_pb);
     ptr_trajectory_pb->set_gear(publishable_trajectory_gear);
     ptr_trajectory_pb->set_trajectory_type(ADCTrajectory::OPEN_SPACE);
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
+    // 设置 Engage Advice（接管建议）
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
 
     // enable start auto from open_space planner.
@@ -675,11 +746,12 @@ Status OnLanePlanning::Plan(
       engage_advice->set_reason("Keep engage while in parking");
     }
     // TODO(QiL): refine the export decision in open space info
+    // 设置决策状态
     ptr_trajectory_pb->mutable_decision()
         ->mutable_main_decision()
         ->mutable_parking()
         ->set_status(MainParking::IN_PARKING);
-
+    // 记录 Debug & 导出图表
     if (FLAGS_enable_record_debug) {
       // ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());
       frame_->mutable_open_space_info()->RecordDebug(ptr_debug);
@@ -690,11 +762,13 @@ Status OnLanePlanning::Plan(
                            ptr_debug);
     }
   } else {
+    // On-Lane 规划（正常行驶）
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
     const auto* target_ref_info = frame_->FindTargetReferenceLineInfo();
     if (!best_ref_info) {
       const std::string msg = "planner failed to make a driving plan";
       AERROR << msg;
+      // 参考线空,清空last_publishable_trajectory_
       if (last_publishable_trajectory_) {
         last_publishable_trajectory_->Clear();
       }
@@ -702,13 +776,17 @@ Status OnLanePlanning::Plan(
     }
     // Store current frame stitched path for possible speed fallback in next
     // frames
+    //  构建 current_frame_planned_path（用于速度回退）
     DiscretizedPath current_frame_planned_path;
+    // 先加入 stitching_trajectory 的所有 path_point
     for (const auto& trajectory_point : stitching_trajectory) {
       current_frame_planned_path.push_back(trajectory_point.path_point());
     }
     const auto& best_ref_path = best_ref_info->path_data().discretized_path();
+    // 再追加 best_ref_info 规划的新路径（跳过第一个点，避免重复）
     std::copy(best_ref_path.begin() + 1, best_ref_path.end(),
               std::back_inserter(current_frame_planned_path));
+    // Speed Fallback 机制: 如果下一帧速度规划失败，可沿用本帧的路径，只重新规划速度
     frame_->set_current_frame_planned_path(current_frame_planned_path);
 
     ptr_debug->MergeFrom(best_ref_info->debug());
@@ -722,12 +800,14 @@ Status OnLanePlanning::Plan(
         ExportFailedLaneChangeSTChart(failed_ref_info->debug(), ptr_debug);
       }
     }
+    // 各子模块耗时（ST图生成、DP、QP等）
     ptr_trajectory_pb->mutable_latency_stats()->MergeFrom(
         best_ref_info->latency_stats());
     // set right of way status
+    // 是否拥有路权（如通过无保护左转）
     ptr_trajectory_pb->set_right_of_way_status(
         best_ref_info->GetRightOfWayStatus());
-
+    // 当前车道 & 目标车道 ID
     for (const auto& id : best_ref_info->TargetLaneId()) {
       ptr_trajectory_pb->add_lane_id()->CopyFrom(id);
     }
@@ -737,11 +817,11 @@ Status OnLanePlanning::Plan(
     }
 
     ptr_trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
-
+    // Responsibility-Sensitive Safety 信息
     if (FLAGS_enable_rss_info) {
       *ptr_trajectory_pb->mutable_rss_info() = best_ref_info->rss_info();
     }
-
+    // 包含 yield、overtake、stop 等决策
     best_ref_info->ExportDecision(ptr_trajectory_pb->mutable_decision(),
                                   injector_->planning_context());
 
@@ -775,7 +855,7 @@ Status OnLanePlanning::Plan(
         prev_y = reference_point.y();
       }
     }
-
+    // (1) 创建新轨迹（仅含新规划部分）
     last_publishable_trajectory_.reset(new PublishableTrajectory(
         current_time_stamp, best_ref_info->trajectory()));
     PrintCurves debug_traj;
@@ -788,13 +868,13 @@ Status OnLanePlanning::Plan(
     }
     // debug_traj.PrintToLog();
     ADEBUG << "current_time_stamp: " << current_time_stamp;
-
+    // (2) 前置拼接历史轨迹（stitching）
     last_publishable_trajectory_->PrependTrajectoryPoints(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
                                      stitching_trajectory.end() - 1));
-
+    // 最终发布的轨迹 = 历史缝合点 + 新规划轨迹，保证连续性
     last_publishable_trajectory_->PopulateTrajectoryProtobuf(ptr_trajectory_pb);
-
+    // 设置 Engage Advice（接管建议）
     best_ref_info->ExportEngageAdvice(
         ptr_trajectory_pb->mutable_engage_advice(),
         injector_->planning_context());
@@ -847,6 +927,7 @@ void AddSTGraph(const STGraphDebug& st_graph, Chart* chart) {
 
     if (type == "DRIVABLE_REGION") {
       (*properties)["color"] = "\"rgba(0, 255, 0, 0.5)\"";
+      // (*properties)["color"] = "\"rgba(255, 145, 0, 0.5)\"";
     } else {
       (*properties)["color"] = "\"rgba(255, 0, 0, 0.8)\"";
     }

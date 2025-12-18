@@ -46,13 +46,16 @@ using apollo::perception::PerceptionObstacle;
 
 bool SpeedDecider::Init(const std::string& config_dir, const std::string& name,
                         const std::shared_ptr<DependencyInjector>& injector) {
+  // 1.调用父类 Task 的初始化
   if (!Task::Init(config_dir, name, injector)) {
     return false;
   }
   // Load the config this task.
+  // 2.加载 SpeedDecider 自己的配置
   if (!Task::LoadConfig<SpeedDeciderConfig>(&config_)) {
     return false;
   }
+  // 3.读取 follow_distance 函数配置
   for (const auto& follow_function :
        config_.follow_distance_scheduler().follow_distance()) {
     follow_distance_function_.emplace_back(
@@ -67,10 +70,13 @@ bool SpeedDecider::Init(const std::string& config_dir, const std::string& name,
 
 common::Status SpeedDecider::Execute(Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {
+  // 1.调用父类 Task 的 Execute
   Task::Execute(frame, reference_line_info);
+  // 2.初始化起始点和边界
   init_point_ = frame_->PlanningStartPoint();
   adc_sl_boundary_ = reference_line_info_->AdcSlBoundary();
   reference_line_ = &reference_line_info_->reference_line();
+  // 3.获取物体决策并判断是否成功
   if (!MakeObjectDecision(reference_line_info->speed_data(),
                           reference_line_info->path_decision())
            .ok()) {
@@ -218,36 +224,42 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
 
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
+  // 1.检查速度配置有效性
   if (speed_profile.size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-
+  // 2.遍历路径决策中的所有障碍物
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->path_st_boundary();
-
+    // 忽略决策障碍物
+    // 3.判断障碍物是否需要忽略
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0 ||
         boundary.min_t() >= speed_profile.back().t()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
+    // 4.处理已经有纵向决策的障碍物
     if (obstacle->HasLongitudinalDecision()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
 
     // for Virtual obstacle, skip if center point NOT "on lane"
+    // 5.处理虚拟障碍物
     if (obstacle->IsVirtual()) {
       const auto& obstacle_box = obstacle->PerceptionBoundingBox();
+      // Vec2d 转换成 sl, 判断sl点是否在lane上
       if (!reference_line_->IsOnLane(obstacle_box.center())) {
         continue;
       }
     }
 
     // always STOP for pedestrian
+    // 6.判断是否需要停车（如行人）
     if (config_.is_stop_for_pedestrain() &&
         CheckStopForPedestrian(*mutable_obstacle)) {
       ObjectDecisionType stop_decision;
@@ -258,7 +270,7 @@ Status SpeedDecider::MakeObjectDecision(
       }
       continue;
     }
-
+    // 7.获取障碍物的 ST 位置信息
     auto location = GetSTLocation(path_decision, speed_profile, boundary);
 
     if (!FLAGS_use_st_drivable_boundary) {
@@ -268,7 +280,7 @@ Status SpeedDecider::MakeObjectDecision(
         }
       }
     }
-
+    // 8.判断障碍物的位置，并做出相应决策
     switch (location) {
       case BELOW:
         if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
@@ -332,9 +344,11 @@ Status SpeedDecider::MakeObjectDecision(
           return Status(ErrorCode::PLANNING_ERROR, msg);
         }
         break;
+      // 9.其他未知障碍物
       default:
         AERROR << "Unknown position:" << location;
     }
+    // 10.忽略障碍物
     AppendIgnoreDecision(mutable_obstacle);
   }
 
@@ -534,6 +548,7 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
   }
 
   const auto& obstacle_sl_boundary = obstacle.PerceptionSLBoundary();
+  // 忽略后方存在的障碍物
   if (obstacle_sl_boundary.end_s() < adc_sl_boundary_.start_s()) {
     return false;
   }
