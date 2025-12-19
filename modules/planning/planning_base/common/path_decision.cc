@@ -64,7 +64,11 @@ void PathDecision::SetSTBoundary(const std::string &id,
     obstacle->set_path_st_boundary(boundary);
   }
 }
-
+/// @brief 
+/// @param tag 决策来源标识（如 "reference_line_filter"、"path_bounds_decider"），用于调试和追踪
+/// @param object_id 障碍物唯一 ID（来自感知/预测模块）
+/// @param decision 具体的横向决策类型（protobuf 定义，可为 ignore、nudge、side_pass 等）
+/// @return 
 bool PathDecision::AddLateralDecision(const std::string &tag,
                                       const std::string &object_id,
                                       const ObjectDecisionType &decision) {

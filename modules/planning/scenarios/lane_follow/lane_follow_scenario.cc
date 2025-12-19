@@ -25,7 +25,10 @@
 
 namespace apollo {
 namespace planning {
-
+/// @brief 
+/// @param other_scenario 当前正在运行的场景（可能为 nullptr，表示初始状态）
+/// @param frame 当前规划周期的全局上下文（含感知、地图、定位、交通规则等）
+/// @return 
 bool LaneFollowScenario::IsTransferable(const Scenario* other_scenario,
                                         const Frame& frame) {
   if (!frame.local_view().planning_command->has_lane_follow_command()) {

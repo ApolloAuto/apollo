@@ -558,16 +558,19 @@ bool Obstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
 
 ObjectDecisionType Obstacle::MergeLongitudinalDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  // 1. 空决策处理（同横向）
   if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return rhs;
   }
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
+  // 2. 安全优先级排序（通过 s_longitudinal_decision_safety_sorter_）
   const auto lhs_val =
       FindOrDie(s_longitudinal_decision_safety_sorter_, lhs.object_tag_case());
   const auto rhs_val =
       FindOrDie(s_longitudinal_decision_safety_sorter_, rhs.object_tag_case());
+  // 3. 同类型决策的细化合并规则（重点！）
   if (lhs_val < rhs_val) {
     return rhs;
   } else if (lhs_val > rhs_val) {
@@ -613,21 +616,26 @@ bool Obstacle::IsLateralIgnore() const {
 
 ObjectDecisionType Obstacle::MergeLateralDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
+  // 1. 处理“空决策”（默认值）
   if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return rhs;
   }
   if (rhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return lhs;
   }
+  //  2. 安全优先级排序（核心机制）
   const auto lhs_val =
       FindOrDie(s_lateral_decision_safety_sorter_, lhs.object_tag_case());
   const auto rhs_val =
       FindOrDie(s_lateral_decision_safety_sorter_, rhs.object_tag_case());
+  // 数值越大，决策越“强”或越“主动”
   if (lhs_val < rhs_val) {
     return rhs;
   } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
+  // 3. 同类型决策的细化合并
+  // 情况1：都是 ignore
     if (lhs.has_ignore()) {
       return rhs;
     } else if (lhs.has_nudge()) {

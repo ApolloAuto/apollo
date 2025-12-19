@@ -380,7 +380,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     AERROR << "failed to add obstacle " << obstacle->Id();
     return nullptr;
   }
-
+  // 使用障碍物的感知多边形（通常是凸包）投影到参考线，得到其在 SL 空间的占据范围
   SLBoundary perception_sl;
   if (!reference_line_.GetSLBoundary(obstacle->PerceptionPolygon(),
                                      &perception_sl)) {
@@ -388,13 +388,15 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     return mutable_obstacle;
   }
   mutable_obstacle->SetPerceptionSlBoundary(perception_sl);
+  // 判断障碍物是否物理上占据本车道（基于 SL 边界与车道边界的关系）
   mutable_obstacle->CheckLaneBlocking(reference_line_);
   if (mutable_obstacle->IsLaneBlocking()) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is lane blocking.";
   } else {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
   }
-
+  
+  // 判断是否为“无关障碍物”
   if (IsIrrelevantObstacle(*mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
@@ -405,6 +407,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
+    // 构建 ST 边界（用于速度规划）
     mutable_obstacle->BuildReferenceLineStBoundary(reference_line_,
                                                    adc_sl_boundary_.start_s());
 
@@ -444,14 +447,18 @@ bool ReferenceLineInfo::AddObstacles(
 }
 
 bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
+  // 1.谨慎障碍物（Caution Level）永不忽略
   if (obstacle.IsCautionLevelObstacle()) {
     return false;
   }
+
+  //  2. 障碍物超出参考线长度 → 忽略
   // if adc is on the road, and obstacle behind adc, ignore
   const auto& obstacle_boundary = obstacle.PerceptionSLBoundary();
   if (obstacle_boundary.end_s() > reference_line_.Length()) {
     return true;
   }
+  // 3. 主要忽略逻辑：后方远处 + 在车道上 + 非变道
   if (is_on_reference_line_ && !IsChangeLanePath() &&
       adc_sl_boundary_.end_s() - obstacle_boundary.end_s() >
           FLAGS_obstacle_lon_ignore_buffer &&
