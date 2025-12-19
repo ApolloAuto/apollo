@@ -44,7 +44,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   // 这里不是最终路径，而是为 Hybrid A* 提供“到终点大概多远”的估计值
   grid_a_star_heuristic_generator_ =
       std::make_unique<GridSearch>(planner_open_space_config_);
-  // 每个节点扩展的子节点数量
+  // 每个节点扩展的子节点数量：前进和后退之和
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
   // 最大有效前轮转角（带缩放）R = L / tan(δ)
@@ -52,9 +52,13 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
                      vehicle_param_.steer_ratio() *
                      planner_open_space_config_.warm_start_config()
                          .traj_kappa_contraint_ratio();
+  // 每步(从一个状态到另一个状态)前进/后退的距离
   step_size_ = planner_open_space_config_.warm_start_config().step_size();
+  // 栅格分辨率
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config().xy_grid_resolution();
+  // 确保每一步至少跨越一个栅格对角线，防止在同一栅格内“打转”。
+  // phi_grid_resolution 是角度分辨率，结合车辆几何（wheel_base）和转向角，换算成实际行驶弧长
   arc_length_ =
       planner_open_space_config_.warm_start_config().phi_grid_resolution() *
       vehicle_param_.wheel_base() /
@@ -64,6 +68,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
     arc_length_ = std::sqrt(2) * xy_grid_resolution_;
   }
   AINFO << "arc_length" << arc_length_;
+  // 用于后续速度剖面生成的时间间隔
   delta_t_ = planner_open_space_config_.delta_t();
   // Hybrid A* 的总代价 = g(n)（实际代价） + h(n)（启发式）
   traj_forward_penalty_ =
@@ -76,6 +81,8 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       planner_open_space_config_.warm_start_config().traj_steer_penalty();
   traj_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
                                    .traj_steer_change_penalty();
+
+
   acc_weight_ = planner_open_space_config_.iterative_anchoring_smoother_config()
                     .s_curve_config()
                     .acc_weight();
@@ -95,6 +102,8 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       planner_open_space_config_.iterative_anchoring_smoother_config()
           .s_curve_config()
           .ref_v_weight();
+
+
   max_forward_v_ =
       planner_open_space_config_.iterative_anchoring_smoother_config()
           .max_forward_v();
@@ -112,6 +121,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
           .max_acc_jerk();
 }
 
+// 尝试从 current_node 到 end_node_ 用 Reed-Shepp 路径 直接连接
 bool HybridAStar::AnalyticExpansion(
     std::shared_ptr<Node3d> current_node,
     std::shared_ptr<Node3d>* candidate_final_node) {
@@ -121,6 +131,8 @@ bool HybridAStar::AnalyticExpansion(
                                           reeds_shepp_to_check)) {
     return false;
   }
+  // 将 Reed-Shepp 路径离散化为一系列 (x, y, phi)
+  // 创建临时 Node3d，调用 ValidityCheck 检查是否与障碍物碰撞或越界
   if (!RSPCheck(reeds_shepp_to_check)) {
     return false;
   }
@@ -153,12 +165,16 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   // The first {x, y, phi} is collision free unless they are start and end
   // configuration of search problem
   size_t check_start_index = 0;
+  // 当 step_size == 1：表示这是一个“单点”节点（通常是起始节点或极小步长），需要检查第 0 个点
   if (node_step_size == 1) {
     check_start_index = 0;
   } else {
+  // 当 step_size > 1：跳过第 0 个点（i=0），从 i=1 开始检查
     check_start_index = 1;
   }
-
+  // 在 Hybrid A* 搜索中，每个新节点的轨迹是 从前一个节点的最后一个状态开始模拟的
+  // 当前节点的 traversed_x[0] 实际上等于 父节点的最后一个点
+  // 为了避免重复检测（父节点已经检测过该点），跳过索引 0，只检测新生成的部分
   for (size_t i = check_start_index; i < node_step_size; ++i) {
     if (traversed_x[i] > XYbounds_[1] || traversed_x[i] < XYbounds_[0] ||
         traversed_y[i] > XYbounds_[3] || traversed_y[i] < XYbounds_[2]) {
@@ -182,47 +198,61 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   return true;
 }
 
+// 加载 Reed-Shepp 路径到闭集
 std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
     std::shared_ptr<Node3d> current_node) {
+  // 创建终点节点，设置其前驱为 current_node
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
+  // 总轨迹代价 = 当前代价 + Reed-Shepp 路径长度（reeds_shepp_to_end->cost）
   end_node->SetTrajCost(current_node->GetTrajCost() + reeds_shepp_to_end->cost);
   return end_node;
 }
 
+/// @brief 根据 next_node_index 选择一个方向盘转角（steering） 和 行驶方向（前进/后退）
+// 使用自行车运动学模型（bicycle model）向前（或向后）积分一段轨迹
+// 生成包含多个中间点的轨迹 (x, y, phi)
+// 构造一个新的 Node3d 节点并返回
+/// @param current_node 
+/// @param next_node_index 
+/// @return 
 std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
     std::shared_ptr<Node3d> current_node, size_t next_node_index) {
   double steering = 0.0;
   double traveled_distance = 0.0;
   if (next_node_index < static_cast<double>(next_node_num_) / 2) {
+    // 前进：steering 从 -max 到 +max
     steering = -max_steer_angle_ +
                (2 * max_steer_angle_ /
                (static_cast<double>(next_node_num_) / 2 - 1))
                * static_cast<double>(next_node_index);
-    traveled_distance = step_size_;
+    traveled_distance = step_size_;  // 正值 → 前进
   } else {
+    // 后退：同样 steering 范围，但距离为负
     size_t index = next_node_index - next_node_num_ / 2;
     steering = -max_steer_angle_
             + (2 * max_steer_angle_
             / (static_cast<double>(next_node_num_) / 2 - 1))
             * static_cast<double>(index);
-    traveled_distance = -step_size_;
+    traveled_distance = -step_size_;  // 负值 → 后退
   }
   // take above motion primitive to generate a curve driving the car to a
   // different grid
+  // 轨迹积分
   std::vector<double> intermediate_x;
   std::vector<double> intermediate_y;
   std::vector<double> intermediate_phi;
   double last_x = current_node->GetX();
   double last_y = current_node->GetY();
   double last_phi = current_node->GetPhi();
-  intermediate_x.push_back(last_x);
+  intermediate_x.push_back(last_x);   // 起点 = 当前节点终点
   intermediate_y.push_back(last_y);
   intermediate_phi.push_back(last_phi);
   for (size_t i = 0; i < arc_length_ / step_size_; ++i) {
+    // 使用中点法（trapezoidal integration）更新状态
     const double next_phi = last_phi +
                             traveled_distance /
                             vehicle_param_.wheel_base() *
@@ -258,17 +288,24 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
 
 void HybridAStar::CalculateNodeCost(
     std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node) {
+  // 更新轨迹代价 g_cost
+  // current_node->GetTrajCost()：从起点到当前节点的累计代价（即 g(current)）
+  // TrajCost(current_node, next_node)：从 current → next 这一步的增量代价
   next_node->SetTrajCost(
       current_node->GetTrajCost() + TrajCost(current_node, next_node));
   // evaluate heuristic cost
+  // 计算启发式代价（h-cost）
   double optimal_path_cost = 0.0;
+  // 假设车辆能横移” 但 “避开障碍物” 的最短距离估计
   optimal_path_cost += HoloObstacleHeuristic(next_node);
   next_node->SetHeuCost(optimal_path_cost);
 }
 
+// distance_weight > gear_switch >> steer_change > steer_abs
 double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
                              std::shared_ptr<Node3d> next_node) {
     // evaluate cost on the trajectory and add current cost
+    // 路径长度代价（主项）
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
     piecewise_cost +=
@@ -282,10 +319,13 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
       traj_back_penalty_;
   }
   AINFO << "traj cost: " << piecewise_cost;
+  // 换挡惩罚（Gear Switch Penalty）
   if (current_node->GetDirec() != next_node->GetDirec()) {
     piecewise_cost += traj_gear_switch_penalty_;
   }
+  // 方向盘转角绝对值惩罚
   piecewise_cost += traj_steer_penalty_ * std::abs(next_node->GetSteer());
+  // 转角变化率	
   piecewise_cost += traj_steer_change_penalty_ *
                     std::abs(next_node->GetSteer() - current_node->GetSteer());
   return piecewise_cost;
@@ -726,6 +766,8 @@ bool HybridAStar::Plan(
   PrintCurves print_curves;
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec;
+  // 将每个障碍物多边形转为一组 LineSegment2d
+  // 后续碰撞检测用的是 线段 vs 车辆包围盒（Box2d） 的相交判断，效率高
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
     size_t vertices_num = obstacle_vertices.size();
     std::vector<common::math::LineSegment2d> obstacle_linesegments;
@@ -786,13 +828,16 @@ bool HybridAStar::Plan(
     return false;
   }
   double map_time = Clock::NowInSeconds();
-  // 基于动态规划算法，求解每个二维节点的代价值，作为混合A*的启发函数
+  // 基于动态规划算法，求解每个二维节点的代价值，作为混合A*的启发函数h值
+  // 使用 二维动态规划（DP） 在 xy 平面上计算从任意点到终点的最短距离（忽略朝向和车辆模型）
   grid_a_star_heuristic_generator_->GenerateDpMap(
       ex, ey, XYbounds_, obstacles_linesegments_vec_);
   ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
+
+  // 初始化搜索结构
   // load open set, pq
-  open_set_.insert(start_node_->GetIndex());
-  open_pq_.emplace(start_node_, start_node_->GetCost());  // 优先队列：保存开放集的节点
+  open_set_.insert(start_node_->GetIndex());  // 哈希集合，快速查重
+  open_pq_.emplace(start_node_, start_node_->GetCost());  // 优先队列（最小堆），按 f = g + h 排序
   // Hybrid A* begins
   size_t explored_node_num = 0;
   size_t available_result_num = 0;
@@ -847,20 +892,26 @@ bool HybridAStar::Plan(
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       node_generator_time += Clock::NowInSeconds() - gen_node_time;
 
+
+      // 对每个 next_node：
       // boundary check failure handle
+      // 越界？ → Next_node_generator 返回 nullptr（已处理）
       if (next_node == nullptr) {
         continue;
       }
       // check if the node is already in the close set
+      // 已在 closed set？ → 跳过（避免重复）
       if (close_set_.count(next_node->GetIndex()) > 0) {
         continue;
       }
       // collision check
       const double validity_check_start_time = Clock::NowInSeconds();
+      // 碰撞？ → ValidityCheck(next_node) 返回 false → 跳过
       if (!ValidityCheck(next_node)) {
         continue;
       }
       validity_check_time += Clock::NowInSeconds() - validity_check_start_time;
+      // 未在 open set？ → 计算代价，加入 open set
       if (open_set_.count(next_node->GetIndex()) == 0) {
         const double start_time = Clock::NowInSeconds();
         CalculateNodeCost(current_node, next_node);

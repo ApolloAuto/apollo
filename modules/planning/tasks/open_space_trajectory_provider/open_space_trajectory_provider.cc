@@ -43,14 +43,18 @@ using apollo::cyber::Clock;
 bool OpenSpaceTrajectoryProvider::Init(
     const std::string& config_dir, const std::string& name,
     const std::shared_ptr<DependencyInjector>& injector) {
+  // 调用基类 Task::Init() 初始化通用任务框架
   if (!Task::Init(config_dir, name, injector)) {
     return false;
   }
   // Load the config this task.
+  // 加载本任务的专属配置（OpenSpaceTrajectoryProviderConfig），存入 config_
   if (!Task::LoadConfig<OpenSpaceTrajectoryProviderConfig>(&config_)) {
     return false;
   }
+  // 从配置中读取“直线轨迹长度”（用于泊车后微调）
   straight_trajectory_length_ = config_.open_space_straight_trajectory_length();
+  // 创建轨迹优化器 OpenSpaceTrajectoryOptimizer 实例（核心规划算法）
   open_space_trajectory_optimizer_.reset(new OpenSpaceTrajectoryOptimizer(
       config_.open_space_trajectory_optimizer_config()));
   return true;
@@ -92,10 +96,12 @@ void OpenSpaceTrajectoryProvider::Restart() {
 
 Status OpenSpaceTrajectoryProvider::Process() {
   ADEBUG << "trajectory provider";
+  // 1.获取当前帧中用于存储最终轨迹的可变引用
   auto trajectory_data =
       frame_->mutable_open_space_info()->mutable_stitched_trajectory_result();
 
   // generate stop trajectory at park_and_go check_stage
+  // 2.如果处于“泊车检查阶段”，直接生成原地停车轨迹（不规划）
   if (injector_->planning_context()
           ->mutable_planning_status()
           ->mutable_park_and_go()
@@ -104,12 +110,16 @@ Status OpenSpaceTrajectoryProvider::Process() {
     GenerateStopTrajectory(trajectory_data);
     return Status::OK();
   }
+
+  // 3.若启用多线程且尚未启动，则用 cyber::Async 启动 GenerateTrajectoryThread
   // Start thread when getting in Process() for the first time
   if (config_.enable_open_space_planner_thread() && !thread_init_flag_) {
     task_future_ = cyber::Async(
         &OpenSpaceTrajectoryProvider::GenerateTrajectoryThread, this);
     thread_init_flag_ = true;
   }
+
+  // 4.判断是否需要重新规划（replan）
   bool need_replan = false;
   // Get stitching trajectory from last frame
   const common::VehicleState vehicle_state = frame_->vehicle_state();
@@ -122,6 +132,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
           previous_frame->open_space_info().fallback_flag(), vehicle_state)) {
     is_stop_due_to_fallback = true;
   }
+
+  // 从未规划成功（!is_planned_）或上一帧因回退（fallback）导致车辆停下，则需要 重新初始化轨迹
   if (!is_planned_ || is_stop_due_to_fallback) {
     AINFO << "need to fallback: is_planned" << is_planned_
           << "is_stop_due_to_fallback" << is_stop_due_to_fallback;
@@ -129,6 +141,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
         1.0 / static_cast<double>(FLAGS_planning_loop_rate);
     stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
         planning_cycle_time, vehicle_state);
+    // 设置 need_replan = true，触发新规划
     need_replan = true;
     injector_->planning_context()
         ->mutable_planning_status()
@@ -138,25 +151,29 @@ Status OpenSpaceTrajectoryProvider::Process() {
   }
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
-
+  // 5.多线程模式处理（enable_open_space_planner_thread == true）
   if (config_.enable_open_space_planner_thread()) {
     ADEBUG << "Open space plan in multi-threads mode";
-
+    //  若线程已停止 → 生成停车轨迹
     if (is_generation_thread_stop_) {
       GenerateStopTrajectory(trajectory_data);
       return Status(ErrorCode::OK, "Parking finished");
     }
-
+    
+    // 若需要重新规划 → 准备数据给后台线程
     if (need_replan) {
       std::vector<double> temp_target =
           frame_->open_space_info().open_space_end_pose();
       if (open_space_info.target_parking_spot_id() != "") {
         double angle = open_space_info.open_space_end_pose()[2];
+        // 将目标点向前延伸一段（straight_trajectory_length_），用于更平滑泊入
+        // 目标点前移是为了让车辆在到达真实停车位前就开始减速对齐
         temp_target[0] = straight_trajectory_length_ * cos(angle) +
                             open_space_info.open_space_end_pose()[0];
         temp_target[1] = straight_trajectory_length_ * sin(angle) +
                             open_space_info.open_space_end_pose()[1];
       }
+      // 加锁，将规划所需数据拷贝到 thread_data_
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.stitching_trajectory = stitching_trajectory;
       thread_data_.end_pose = temp_target;
@@ -168,7 +185,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
       thread_data_.obstacles_vertices_vec =
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
-      data_ready_.store(true);
+      // ... 其他障碍物、边界等数据 ...
+      data_ready_.store(true); // 通知后台线程可以开始规划
       is_planned_ = true;
     } else {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -176,6 +194,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
     }
 
     // Check vehicle state
+  // 检查是否接近终点
     if (IsVehicleNearDestination(
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
@@ -186,12 +205,15 @@ Status OpenSpaceTrajectoryProvider::Process() {
     }
 
     // Check if trajectory updated
+    // 若后台线程已生成新轨迹 → 加载结果
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
+      // LoadResult() 会拼接“衔接轨迹”和“优化轨迹”，形成完整轨迹
       LoadResult(trajectory_data);
       if (FLAGS_enable_record_debug) {
         // call merge debug ptr, open_space_trajectory_optimizer_
         auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug();
+        // 同步调试信息
         open_space_trajectory_optimizer_->UpdateDebugInfo(
             ptr_debug->mutable_planning_data()->mutable_open_space());
 
@@ -203,7 +225,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
       trajectory_updated_.store(false);
       return Status::OK();
     }
-
+    
+    // 若规划出错 → 计数并重试
     if (trajectory_error_) {
       AINFO << "error";
       ++optimizer_thread_counter;
@@ -218,7 +241,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
                       "open_space_optimizer failed too many times");
       }
     }
-
+    
+    // 若上一帧成功且无需 replan → 复用上一帧轨迹
     if (previous_frame &&
         previous_frame->open_space_info().open_space_provider_success() &&
         !need_replan) {
@@ -234,10 +258,12 @@ Status OpenSpaceTrajectoryProvider::Process() {
                     "open_space_trajectory_provider");
     } else {
       AINFO << "Stop due to computation not finished";
+      // 否则 → 生成停车轨迹（等待规划完成）
       GenerateStopTrajectory(trajectory_data);
       return Status(ErrorCode::OK, "Stop due to computation not finished");
     }
   } else {
+    // 6.单线程模式（enable_open_space_planner_thread == false）
     const auto& end_pose = open_space_info.open_space_end_pose();
     const auto& rotate_angle = open_space_info.origin_heading();
     const auto& translate_origin = open_space_info.origin_point();
@@ -277,6 +303,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
 void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
   while (!is_generation_thread_stop_) {
     if (!trajectory_updated_ && data_ready_) {
+      // 拷贝 thread_data_（加锁）
       OpenSpaceTrajectoryThreadData thread_data;
       {
         std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -310,6 +337,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, double rotate_angle,
     const Vec2d& translate_origin) {
+  // 将目标点从局部坐标系转换到世界坐标系（旋转 + 平移）
   CHECK_EQ(end_pose.size(), 4U);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
@@ -372,6 +400,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleStopDueToFallBack(
   return false;
 }
 
+//生成一段原地停车轨迹（10 个点，每 0.1 秒一个）
 void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
     DiscretizedTrajectory* const trajectory_data) {
   double relative_time = 0.0;
@@ -425,7 +454,7 @@ void OpenSpaceTrajectoryProvider::LoadResult(
         optimizer_trajectory_ptr->at(i).path_point().s() +
         stitching_point_relative_s);
   }
-
+  // 最后那段倒车轨迹是硬编码的匀减速运动（v=0.3m/s, a=-v/t），方向与末尾朝向相反
   if (frame_->open_space_info().target_parking_spot_id() != "") {
     double distance = straight_trajectory_length_;
     double v = 0.3;

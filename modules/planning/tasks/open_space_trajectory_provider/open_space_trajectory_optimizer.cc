@@ -36,21 +36,37 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
   // Load config
   AINFO << config_.DebugString();
   // Initialize hybrid astar class pointer
+  // 用于生成初始可行路径（warm start），考虑车辆运动学约束和障碍物
   warm_start_.reset(new HybridAStar(config.planner_open_space_config()));
 
   // Initialize dual variable warm start class pointer
+  // 为后续优化提供对偶变量初值（用于距离约束的拉格朗日乘子）
   dual_variable_warm_start_.reset(
       new DualVariableWarmStartProblem(config.planner_open_space_config()));
 
   // Initialize distance approach trajectory smootherclass pointer
+  // 基于距离约束的轨迹平滑器（使用非线性优化/NLP）
   distance_approach_.reset(
       new DistanceApproachProblem(config.planner_open_space_config()));
 
   // Initialize iterative anchoring smoother config class pointer
+  // 另一种平滑方法（可能更轻量或用于 fallback）
   iterative_anchoring_smoother_.reset(
       new IterativeAnchoringSmoother(config.planner_open_space_config()));
 }
 
+/// @brief 
+/// @param stitching_trajectory 上一周期规划的轨迹末尾点，用于衔接（stitching）
+/// @param end_pose 目标位姿 [x, y, theta, v]
+/// @param XYbounds ROI 区域边界 [xmin, xmax, ymin, ymax]
+/// @param rotate_angle 坐标系变换参数（将世界坐标转为局部坐标）
+/// @param translate_origin 
+/// @param obstacles_edges_num 
+/// @param obstacles_A 
+/// @param obstacles_b 
+/// @param obstacles_vertices_vec 
+/// @param time_latency 输出：本次规划耗时（ms）
+/// @return 
 Status OpenSpaceTrajectoryOptimizer::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     const std::vector<double>& end_pose, const std::vector<double>& XYbounds,
@@ -98,6 +114,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
         << ")";
 
   // Rotate and scale the state
+  // 将世界坐标下的初始点转换到 局部 ROI 坐标系（原点在 translate_origin，x 轴旋转 rotate_angle）
   PathPointNormalizing(rotate_angle, translate_origin, &init_x, &init_y,
                        &init_phi);
 
@@ -125,7 +142,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
   Eigen::MatrixXd n_warm_up;
   Eigen::MatrixXd dual_l_result_ds;
   Eigen::MatrixXd dual_n_result_ds;
-
+  // 分段平滑（partition + parallel smooth）
   if (FLAGS_enable_parallel_trajectory_smoothing) {
     std::vector<HybridAStartResult> partition_trajectories;
     if (!warm_start_->TrajectoryPartition(result, &partition_trajectories)) {
@@ -240,6 +257,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                         &n_warm_up, &dual_l_result_ds, &dual_n_result_ds);
 
   } else {
+    // 单段平滑
     AINFO << "use distance approach smoother";
     LoadHybridAstarResultInEigen(&result, &xWS, &uWS);
 
