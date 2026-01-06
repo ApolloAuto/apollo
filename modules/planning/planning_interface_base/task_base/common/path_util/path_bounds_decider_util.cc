@@ -34,7 +34,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::VehicleConfigHelper;
-/// @brief 初始化路径边界
+/// @brief 初始化一个空的路径边界（PathBoundary），从当前 s 开始，按固定步长（FLAGS_path_bounds_decider_resolution）向前生成一系列点，初始上下界设为 ±∞
 /// @param reference_line_info 包含参考线的信息（如参考线的路径、速度等）
 /// @param path_bound 指向 PathBoundary 对象的指针，用来存储路径边界
 /// @param init_sl_state 起始状态，表示路径坐标系中的起始位置和状态
@@ -57,6 +57,9 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
   const double ego_front_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();
 // reference_line.Length() - ego_front_to_center 确保了在路径的末端，车辆的前端不会超出路径的边界，确保了路径的有效性，避免了车辆行驶出路径范围
+// 起始 s = init_sl_state.first[0]（即 ego 车当前位置 s）
+// 终止 s = min(起始s + horizon, 参考线长度 - 车头到中心距离)
+// horizon = max(配置的 horizon, 巡航速度 × 时间长度)
   for (double curr_s = init_sl_state.first[0];
        curr_s < std::fmin(init_sl_state.first[0] +
                               std::fmax(FLAGS_path_bounds_horizon,  // 100
@@ -76,6 +79,7 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
   return true;
 }
 
+// 将规划起点（通常是后轴中心）转换为 Frenet 坐标（s, l, l', l''）
 void PathBoundsDeciderUtil::GetStartPoint(
     common::TrajectoryPoint planning_start_point,
     const ReferenceLine& reference_line, SLState* init_sl_state) {
@@ -93,6 +97,7 @@ void PathBoundsDeciderUtil::GetStartPoint(
   *init_sl_state = reference_line.ToFrenetFrame(planning_start_point);
 }
 
+// 获取 ego 车所在位置的车道总宽度（左宽 + 右宽）
 double PathBoundsDeciderUtil::GetADCLaneWidth(
     const ReferenceLine& reference_line, const double adc_s) {
   double lane_left_width = 0.0;
@@ -111,6 +116,7 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryWithBuffer(
     double left_bound, double right_bound, BoundType left_type,
     BoundType right_type, std::string left_id, std::string right_id,
     PathBoundPoint* const bound_point) {
+  // 将输入的 left_bound 减去 半车宽（因为边界是车道边缘，而路径是车辆中心轨迹
   if (!UpdateLeftPathBoundaryWithBuffer(left_bound, left_type, left_id,
                                         bound_point)) {
     return false;
@@ -163,6 +169,7 @@ bool PathBoundsDeciderUtil::UpdateRightPathBoundaryWithBuffer(
   *bound_point = new_point;
   return true;
 }
+
 /// @brief 根据路径被阻塞的位置修剪路径边界
 /// @param path_blocked_idx 路径被阻塞的索引位置
 /// @param path_boundaries 
@@ -176,6 +183,27 @@ void PathBoundsDeciderUtil::TrimPathBounds(
     int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
     // 移除所有在阻塞索引之后的元素
     for (int i = 0; i < range; ++i) {
+      path_boundaries->pop_back();
+    }
+  }
+}
+
+// 如果在某点 i 被障碍物完全堵死，则截断路径边界，只保留到 i 之前的部分（再减去车头长度）
+// 从尾部 pop_back() 直到 s <= blocked_s - front_edge_to_center
+void PathBoundsDeciderUtil::TrimPathBounds(
+    const int path_blocked_idx, PathBoundary* const path_boundaries) {
+  if (path_blocked_idx != -1) {
+    if (path_blocked_idx == 0) {
+      AINFO << "Completely blocked. Cannot move at all.";
+    }
+    double front_edge_to_center =
+        VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
+    double trimmed_s =
+        path_boundaries->at(path_blocked_idx).s - front_edge_to_center;
+    AINFO << "Trimmed from " << path_boundaries->back().s << " to "
+          << path_boundaries->at(path_blocked_idx).s;
+    while (path_boundaries->size() > 1 &&
+           path_boundaries->back().s > trimmed_s) {
       path_boundaries->pop_back();
     }
   }
