@@ -34,8 +34,8 @@ struct GroundPlaneLiDAR {
     IZero4(params);
     nr_support = 0;
     is_detected = false;
-    is_from_self = 7;
-    invalid_status = 7;
+    is_from_self = "unknown";
+    invalid_status = "invalid";
   }
 
   GroundPlaneLiDAR &operator=(const GroundPlaneLiDAR &pi) {
@@ -123,20 +123,20 @@ struct GroundPlaneLiDAR {
 
   void SetStatus(bool flag) { is_detected = flag; }
 
-  int GetOrigin() const { return is_from_self; }
+  std::string GetOrigin() const { return is_from_self; }
 
-  void SetOrigin(int origin) { is_from_self = origin; }
+  void SetOrigin(std::string origin) { is_from_self = origin; }
 
-  int GetInvalidStatus() const { return invalid_status; }
+  std::string GetInvalidStatus() const { return invalid_status; }
 
-  void SetInvalidStatus(int flag) { invalid_status = flag; }
+  void SetInvalidStatus(std::string flag) { invalid_status = flag; }
 
   float params[4];
 
  private:
   bool is_detected;
-  int is_from_self; // 0: self, 1: neighbor
-  int invalid_status; //0: IsValid, 1: inliers small, 2: NormalToZ big
+  std::string is_from_self; // 0: self, 1: neighbor
+  std::string invalid_status; //0: IsValid, 1: inliers small, 2: NormalToZ big
   int nr_support;
 };
 
@@ -206,6 +206,8 @@ struct PlaneFitGroundDetectorParam {
   float candidate_filter_threshold;
   int nr_ransac_iter_threshold;
   int nr_smooth_iter;
+  int semantic_ground_value;
+  bool use_semantic_info;
   bool use_math_optimize;
   bool single_frame_detect;
   bool debug_output;
@@ -240,6 +242,80 @@ struct PlaneFitPointCandIndices {
   int random_seed;
 };
 
+struct GroundCandidateIndices {
+    void Reserve(int size) { 
+        visited.reserve(size); 
+    }
+    void Resize(int size, bool flag) { 
+        visited.resize(size, flag);
+        indices_size = size;
+    }
+    void Clear() { 
+        visited.clear();
+        ground_height = 0.0;
+        ground_count = 0;
+        ground_flag = false;
+        valid_height = 0.0;
+        valid_count = 0.0;
+        valid_flag = false;
+        indices_size = 0;
+    }
+    int GetIndicesSize() {
+        return indices_size;
+    }
+    bool GetIndicesVisitedFlag(int indice) {
+        return visited.at(indice);
+    }
+    void SetVisitedTrue(int index) {
+        assert(index < indices_size);
+        visited[index] = true;
+    }
+    void SetGroundHeight(float value) {
+        ground_height = value;
+    }
+    float GetGroundHeight() {
+        return ground_height; 
+    }
+    void SetGroundCount(int value) {
+        ground_count = value;
+    }
+    int GetGroundCount() {
+        return ground_count;
+    }
+    void SetGroundFlag(bool flag) {
+        ground_flag = flag;
+    }
+    bool GetGroundFlag() {
+        return ground_flag;
+    }
+    void SetValidHeight(float value) {
+        valid_height = value;
+    }
+    float GetValidHeight() {
+        return valid_height;
+    }
+    void SetValidCount(int value) {
+        valid_count = value;
+    }
+    int GetValidCount() {
+        return valid_count;
+    }
+    void SetValidFlag(bool flag) {
+        valid_flag = flag;
+    }
+    bool GetValidFlag() {
+        return valid_flag;
+    }
+    std::vector<bool> visited;
+    float ground_height = 0.0;
+    int ground_count = 0;
+    bool ground_flag = false;
+    float valid_height = 0.0;
+    int valid_count = 0;
+    bool valid_flag = false;
+    int indices_size = 0;
+};
+
 void IPlaneEucliToSpher(const GroundPlaneLiDAR &src, GroundPlaneSpherical *dst);
 
 void IPlaneSpherToEucli(const GroundPlaneSpherical &src, GroundPlaneLiDAR *dst);
@@ -251,9 +327,9 @@ class BaseGroundDetector {
   explicit BaseGroundDetector(PlaneFitGroundDetectorParam &param)
       : param_(param) {}
   virtual ~BaseGroundDetector() {}
-  virtual bool Detect(const float *point_cloud, float *height_above_ground,
-                      unsigned int nr_points,
-                      unsigned int nr_point_elements) = 0;
+  virtual bool Detect(const float *point_cloud,  const int* semantic_value,
+      float *height_above_ground, unsigned int nr_points,
+      unsigned int nr_point_elements) = 0;
 
  protected:
   // const PlaneFitGroundDetectorParam &param_;
@@ -268,8 +344,9 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   explicit PlaneFitGroundDetector(PlaneFitGroundDetectorParam &param);
   ~PlaneFitGroundDetector();
   bool Init();
-  bool Detect(const float *point_cloud, float *height_above_ground,
-              unsigned int nr_points, unsigned int nr_point_elements);
+  bool Detect(const float *point_cloud, const int* semantic_value,
+      float *height_above_ground,
+      unsigned int nr_points, unsigned int nr_point_elements);
   void ResetParams(float ori_z_lower, float ori_z_upper);
   void UpdateParams(float parsing_ground_z, float buffer, double timestamp);
   const char *GetLabel() const;
@@ -304,6 +381,14 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
                     std::vector<std::pair<int, int>> *neighbors);
   float CalculateAngleDist(const GroundPlaneLiDAR &plane,
                            const std::vector<std::pair<int, int>> &neighbors);
+  void SelectGroundCandidate(const float *point_cloud,
+      const int *semantic_list, const std::vector<int> &indices,
+      PlaneFitPointCandIndices *candi, GroundCandidateIndices *ground_candi,
+      unsigned int nr_point_element);
+  int NeighborGroundCandidate(int row, int col, const float *point_cloud,
+      const int *semantic_list, const std::vector<int> &indices,
+      PlaneFitPointCandIndices *candi, unsigned int nr_point_element);
+  void SelectCandidates();
   int Filter();
   int FilterLine(unsigned int r);
   int FilterGrid(const Voxel<float> &vg, const float *point_cloud,
@@ -348,6 +433,7 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   GroundPlaneLiDAR **ground_planes_;
   GroundPlaneSpherical **ground_planes_sphe_;
   PlaneFitPointCandIndices **local_candis_;
+  GroundCandidateIndices **ground_candidates_;
   std::pair<float, bool> **ground_z_;
   float **pf_thresholds_;
   unsigned int *map_fine_to_coarse_;

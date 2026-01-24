@@ -53,17 +53,17 @@ DEFINE_string(test_previous_planning_file, "",
 void PlanningTestBase::SetUpTestCase() {
   FLAGS_use_multi_thread_to_add_obstacles = false;
   FLAGS_traffic_rule_config_filename =
-      "modules/planning/planning_component/conf/"
+      "/apollo/modules/planning/planning_component/conf/"
       "traffic_rule_config.pb.txt";
   FLAGS_smoother_config_filename =
-      "modules/planning/planning_component/conf/"
+      "/apollo/modules/planning/planning_component/conf/"
       "qp_spline_smoother_config.pb.txt";
-  FLAGS_map_dir = "modules/planning/planning_base/testdata";
+  FLAGS_map_dir = "/apollo/modules/planning/planning_base/testdata";
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
   FLAGS_test_routing_response_file = "";
   FLAGS_test_planning_config_file =
-      "modules/planning/planning_component/conf/planning_config.pb.txt";
+      "/apollo/modules/planning/planning_component/conf/planning_config.pb.txt";
   FLAGS_test_previous_planning_file = "";
   FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;

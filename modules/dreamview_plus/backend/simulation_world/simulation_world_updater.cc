@@ -912,6 +912,31 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   //       websocket_->SendData(conn, response.dump());
   //     });
 
+  websocket_->RegisterMessageHandler(
+      "CheckCycleRouting",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response, result;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to check cycle routing: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        if (CheckCycleRouting(json, result)) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["data"]["isCycle"] = result["isCycle"];
+          response["data"]["info"]["message"] = result["message"];
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = result["message"];
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
   plugin_ws_->RegisterMessageHandler(
       "PluginRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -1275,6 +1300,42 @@ bool SimulationWorldUpdater::DeleteDefaultRouting(
 //   }
 //   return true;
 // }
+
+bool SimulationWorldUpdater::CheckCycleRouting(const Json &json,
+                                               nlohmann::json &result) {
+  Json start_json, end_json;
+  std::vector<std::string> json_path = {"data", "info", "start"};
+  if (!JsonUtil::GetJsonByPath(json, json_path, &start_json)) {
+    AERROR << "Failed to check cycle routing: Miss start point.";
+    result["message"] = "Miss start point";
+    return false;
+  }
+  json_path[json_path.size() - 1] = "end";
+  if (!JsonUtil::GetJsonByPath(json, json_path, &end_json)) {
+    AERROR << "Failed to check cycle routing: Miss end point.";
+    result["message"] = "Miss end point";
+    return false;
+  }
+  apollo::external_command::Pose start, end;
+  if (JsonStringToMessage(start_json.dump(), &start).ok() &&
+      JsonStringToMessage(end_json.dump(), &end).ok()) {
+    double x_dis = start.x() - end.x();
+    double y_dis = start.y() - end.y();
+    if (x_dis * x_dis + y_dis * y_dis <
+        FLAGS_threshold_for_destination_check *
+            FLAGS_threshold_for_destination_check) {
+      result["message"] = "Success";
+      result["isCycle"] = 1;
+      return true;
+    }
+    result["message"] = "Unable to form a cycle routing";
+    result["isCycle"] = 0;
+    return true;
+  }
+  AERROR << "Failed to parse MapElementIds from json";
+  result["message"] = "Failed to parse MapElementIds from json";
+  return false;
+}
 
 }  // namespace dreamview
 }  // namespace apollo

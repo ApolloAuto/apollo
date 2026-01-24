@@ -65,46 +65,58 @@ namespace drivers {
 template <typename T>
 class SyncQueue {
  public:
-  inline size_t push(const T& value) {
-    std::lock_guard<std::mutex> lg(mtx_);
-    queue_.push(value);
-    return queue_.size();
-  }
+    inline size_t push(const T& value) {
+        bool empty = false;
+        size_t size = 0;
 
-  inline T pop() {
-    T value;
+        {
+            std::lock_guard<std::mutex> lg(mtx_);
+            empty = queue_.empty();
+            queue_.push(value);
+            size = queue_.size();
+        }
 
-    std::lock_guard<std::mutex> lg(mtx_);
-    if (!queue_.empty()) {
-      value = queue_.front();
-      queue_.pop();
+        if (empty)
+            cv_.notify_one();
+        return size;
     }
 
-    return value;
-  }
+    inline T pop() {
+        T value;
 
-  inline bool popWait(T& ret_ele, unsigned int usec = 1000000) {
-    {
-      std::lock_guard<std::mutex> lg(mtx_);
-      if (!queue_.empty()) {
-        ret_ele = queue_.front();
-        queue_.pop();
-        return true;
-      }
+        std::lock_guard<std::mutex> lg(mtx_);
+        if (!queue_.empty()) {
+            value = queue_.front();
+            queue_.pop();
+        }
+
+        return value;
     }
-    std::this_thread::sleep_for(std::chrono::microseconds(usec));
-    return false;
-  }
 
-  inline void clear() {
-    std::queue<T> empty;
-    std::lock_guard<std::mutex> lg(mtx_);
-    swap(empty, queue_);
-  }
+    inline bool popWait(T& ret_ele, unsigned int usec = 1000000) {
+        {
+            std::lock_guard<std::mutex> lg(mtx_);
+            if (!queue_.empty()) {
+                ret_ele = queue_.front();
+                queue_.pop();
+                return true;
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+        return false;
+    }
+
+    inline void clear() {
+        std::queue<T> empty;
+        std::lock_guard<std::mutex> lg(mtx_);
+        swap(empty, queue_);
+    }
 
  private:
-  std::queue<T> queue_;
-  std::mutex mtx_;
+    std::queue<T> queue_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
 };
 
 }  // namespace drivers

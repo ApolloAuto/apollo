@@ -37,7 +37,7 @@ class HybridATest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_planner_open_space_config_filename =
-        "modules/planning/planning_base/testdata/conf/"
+        "/apollo/modules/planning/planning_base/testdata/conf/"
         "open_space_standard_parking_lot.pb.txt";
 
     ACHECK(apollo::cyber::common::GetProtoFromFile(

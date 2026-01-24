@@ -4,8 +4,8 @@ module_config {
     class_name: "RadarDetectionComponent"
     config {
       name: "FrontRadarDetection"
-      config_file_path: "modules/perception/radar_detection/conf/front_radar_detection_config.pb.txt"
-      flag_file_path: "modules/perception/data/flag/perception_common.flag"
+      config_file_path: "/apollo/modules/perception/radar_detection/conf/front_radar_detection_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/apollo/sensor/radar/front"
       }

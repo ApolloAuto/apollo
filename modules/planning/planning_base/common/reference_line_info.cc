@@ -1291,6 +1291,14 @@ PathBoundary* ReferenceLineInfo::mutable_reference_line_towing_path_boundary() {
   return &reference_line_towing_path_boundary_;
 }
 
+const std::vector<SLPolygon>& ReferenceLineInfo::obs_sl_polygons() const {
+  return obs_sl_polygons_;
+}
+
+std::vector<SLPolygon>* ReferenceLineInfo::mutable_obs_sl_polygons() {
+  return &obs_sl_polygons_;
+}
+
 void ReferenceLineInfo::PrintReferenceSegmentDebugString() {
   PrintCurves print_curve;
   const auto& lane_segments = reference_line_.GetMapPath().lane_segments();

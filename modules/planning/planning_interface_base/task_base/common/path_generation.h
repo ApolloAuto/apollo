@@ -79,6 +79,7 @@ class PathGeneration : public Task {
                      SLBoundary* const sl_boundary);
 
   SLState init_sl_state_;
+  std::vector<SLPolygon> obs_sl_polygons_;
 };
 
 }  // namespace planning

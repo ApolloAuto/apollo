@@ -105,15 +105,16 @@ bool DataParser::Init() {
   return true;
 }
 
-void DataParser::ParseRawData(const std::string &msg) {
+void DataParser::ParseRawData(const std::string &msg, const uint8_t &channel) {
   if (!init_flag_) {
     AERROR << "Data parser not init.";
     return;
   }
 
+  std::lock_guard<std::mutex> lock(data_mutex_);
   data_parser_->Update(msg);
   MessageInfoVec messages;
-  data_parser_->GetMessages(&messages);
+  data_parser_->GetMessagesByChannel(channel, &messages);
   for (auto &message : messages) {
     DispatchMessage(message);
   }

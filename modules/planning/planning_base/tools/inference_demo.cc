@@ -21,7 +21,7 @@
 
 DEFINE_string(
     model_file,
-    "modules/planning/planning_base/tools/planning_demo_model.pt",
+    "/apollo/modules/planning/planning_base/tools/planning_demo_model.pt",
     "pytorch model file.");
 
 int main(int argc, char** argv) {

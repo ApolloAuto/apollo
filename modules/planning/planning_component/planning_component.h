@@ -30,6 +30,7 @@
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/planning/planning_base/proto/learning_data.pb.h"
 #include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/common_msgs/control_msgs/control_interactive_msg.pb.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
@@ -74,8 +75,7 @@ class PlanningComponent final
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
   std::shared_ptr<cyber::Reader<storytelling::Stories>> story_telling_reader_;
   std::shared_ptr<cyber::Reader<PlanningCommand>> planning_command_reader_;
-  std::shared_ptr<cyber::Reader<control::ControlInteractiveMsg>>
-      control_interactive_reader_;
+  std::shared_ptr<cyber::Reader<control::ControlInteractiveMsg>> control_interactive_reader_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;

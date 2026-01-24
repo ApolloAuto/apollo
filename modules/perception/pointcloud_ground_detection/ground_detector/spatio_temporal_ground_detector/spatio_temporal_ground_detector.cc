@@ -22,6 +22,7 @@
 #include "modules/perception/common/algorithm/point_cloud_processing/common.h"
 #include "modules/perception/common/lidar/common/lidar_log.h"
 #include "modules/perception/common/lidar/common/lidar_point_label.h"
+#include "modules/perception/common/algorithm/geometry/basic.h"
 #include "modules/perception/pointcloud_ground_detection/ground_detector/proto/spatio_temporal_ground_detector_config.pb.h"
 
 #include "modules/perception/common/algorithm/i_lib/geometry/i_plane.h"
@@ -63,6 +64,7 @@ bool SpatioTemporalGroundDetector::Init(
   grid_size_ = config_params.small_grid_size();
 
   param_->roi_near_rad = config_params.near_range();
+  near_range_ = config_params.near_range();
   param_->sample_region_z_lower = config_params.near_z_min();
   ori_sample_z_lower_ = config_params.near_z_min();
   param_->sample_region_z_upper = config_params.near_z_max();
@@ -75,9 +77,11 @@ bool SpatioTemporalGroundDetector::Init(
   param_->candidate_filter_threshold = config_params.smooth_z_thres();
   param_->nr_inliers_min_threshold = config_params.inliers_min_threshold();
   param_->nr_smooth_iter = config_params.nr_smooth_iter();
+  param_->use_semantic_info = config_params.use_semantic_ground();
   param_->use_math_optimize = config_params.use_math_optimize();
   param_->debug_output = config_params.debug_output();
   param_->single_frame_detect = config_params.single_ground_detect();
+  param_->semantic_ground_value = static_cast<int>(PointSemanticLabel::GROUND);
 
   pfdetector_ = new algorithm::PlaneFitGroundDetector(*param_);
   pfdetector_->Init();
@@ -85,6 +89,7 @@ bool SpatioTemporalGroundDetector::Init(
   point_attribute_.resize(default_point_size_);
   point_indices_temp_.resize(default_point_size_);
   data_.resize(default_point_size_ * 3);
+  semantic_data_.resize(default_point_size_);
   ground_height_signed_.resize(default_point_size_);
 
   ground_service_content_.Init(
@@ -110,6 +115,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   }
 
   unsigned int data_id = 0;
+  unsigned int semantic_data_id = 0;
   unsigned int valid_point_num = 0;
   unsigned int valid_point_num_cur = 0;
   size_t i = 0;
@@ -144,60 +150,99 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
     point_attribute_.resize(default_point_size_);
     point_indices_temp_.resize(default_point_size_);
     data_.resize(default_point_size_ * 3);
+    semantic_data_.resize(default_point_size_);
     ground_height_signed_.resize(default_point_size_);
   }
 
   // copy point data, filtering lower points under ground
   // and use semantic filter
+  // compute near-by semantic-ground average value for non-semantic data
+  size_t near_ground_count = 0;
+  float near_ground_z = 0.0;
   if (use_roi_) {
     for (i = 0; i < num_points; ++i) {
       index = frame->roi_indices.indices[i];
-      if (use_semantic_ground_ && static_cast<PointSemanticLabel>(
-              frame->cloud->points_semantic_label(index) & 15) !=
-                    PointSemanticLabel::GROUND) {
-          point_attribute_[i] = std::make_pair(index, -1);
-          continue;
-      }
+      // if (use_semantic_ground_ && static_cast<PointSemanticLabel>(
+      //         frame->cloud->points_semantic_label(index) & 15) !=
+      //               PointSemanticLabel::GROUND) {
+      //     point_attribute_[i] = std::make_pair(index, -1);
+      //     continue;
+      // }
       point_attribute_[i] = std::make_pair(index, valid_point_num);
       point_indices_temp_[valid_point_num++] = index;
+      bool ground_flag = IsSemanticLabelEqual(PointSemanticLabel::GROUND,
+          frame->cloud->points_semantic_label(index));
       if (single_ground_detect_) {
           const auto& pt = frame->cloud->at(index);
           data_[data_id++] = static_cast<float>(pt.x);
           data_[data_id++] = static_cast<float>(pt.y);
           data_[data_id++] = static_cast<float>(pt.z);
+          semantic_data_[semantic_data_id++] = static_cast<int>(
+              GetSemanticLabel(frame->cloud->points_semantic_label(index)));
+          if (ground_flag &&
+              fabs(pt.x) <= near_range_ && fabs(pt.y) <= near_range_) {
+              near_ground_count++;
+              near_ground_z += pt.z;
+          }
       } else {
           const auto& pt = frame->world_cloud->at(index);
           data_[data_id++] = static_cast<float>(pt.x - cloud_center_(0));
           data_[data_id++] = static_cast<float>(pt.y - cloud_center_(1));
           data_[data_id++] = static_cast<float>(pt.z - cloud_center_(2));
+          semantic_data_[semantic_data_id++] = static_cast<int>(
+              GetSemanticLabel(frame->cloud->points_semantic_label(index)));
+          if (ground_flag &&
+              fabs(pt.x - cloud_center_(0)) <= near_range_ &&
+              fabs(pt.y - cloud_center_(1)) <= near_range_) {
+              near_ground_count++;
+              near_ground_z += pt.z;
+          }
       }
     }
   } else {
     for (i = 0; i < num_points; ++i) {
-      if (use_semantic_ground_ && static_cast<PointSemanticLabel>(
-              frame->cloud->points_semantic_label(i) & 15) !=
-                  PointSemanticLabel::GROUND) {
-          point_attribute_[i] = std::make_pair(i, -1);
-          continue;
-      }
+      // if (use_semantic_ground_ && static_cast<PointSemanticLabel>(
+      //         frame->cloud->points_semantic_label(i) & 15) !=
+      //             PointSemanticLabel::GROUND) {
+      //     point_attribute_[i] = std::make_pair(i, -1);
+      //     continue;
+      // }
       point_attribute_[i] = std::make_pair(i, valid_point_num);
       point_indices_temp_[valid_point_num++] = static_cast<int>(i);
+      bool ground_flag = IsSemanticLabelEqual(PointSemanticLabel::GROUND,
+          frame->cloud->points_semantic_label(i));
       if (single_ground_detect_) {
           const auto& pt = frame->cloud->at(i);
           data_[data_id++] = static_cast<float>(pt.x);
           data_[data_id++] = static_cast<float>(pt.y);
           data_[data_id++] = static_cast<float>(pt.z);
+          semantic_data_[semantic_data_id++] = static_cast<int>(
+              GetSemanticLabel(frame->cloud->points_semantic_label(index)));
+          if (ground_flag &&
+              fabs(pt.x) <= near_range_ && fabs(pt.y) <= near_range_) {
+              near_ground_count++;
+              near_ground_z += pt.z;
+          }
       } else {
           const auto& pt = frame->world_cloud->at(i);
           data_[data_id++] = static_cast<float>(pt.x - cloud_center_(0));
           data_[data_id++] = static_cast<float>(pt.y - cloud_center_(1));
           data_[data_id++] = static_cast<float>(pt.z - cloud_center_(2));
+          semantic_data_[semantic_data_id++] = static_cast<int>(
+              GetSemanticLabel(frame->cloud->points_semantic_label(index)));
+          if (ground_flag &&
+              fabs(pt.x - cloud_center_(0)) <= near_range_ &&
+              fabs(pt.y - cloud_center_(1)) <= near_range_) {
+              near_ground_count++;
+              near_ground_z += pt.z;
+          }
       }
     }
   }
 
   CHECK_GE(num_points, valid_point_num);
   CHECK_EQ(data_id, valid_point_num * 3);
+  CHECK_EQ(semantic_data_id, valid_point_num);
   base::PointIndices& non_ground_indices = frame->non_ground_indices;
 
   AINFO << "spatial temporal seg: use roi " << use_roi_ << " roi points "
@@ -205,11 +250,16 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
 
   pfdetector_->ResetParams(ori_sample_z_lower_, ori_sample_z_upper_);
   if (use_semantic_ground_) {
-      pfdetector_->UpdateParams(frame->parsing_ground_height,
-          parsing_height_buffer_, frame->timestamp);
+      if (near_ground_count > 0) {
+          pfdetector_->UpdateParams(near_ground_z * 1.0f / near_ground_count,
+              parsing_height_buffer_, frame->timestamp);
+      } else {
+          pfdetector_->UpdateParams(frame->parsing_ground_height,
+              parsing_height_buffer_, frame->timestamp);
+      }
   }
-  if (!pfdetector_->Detect(data_.data(), ground_height_signed_.data(),
-                           valid_point_num, nr_points_element)) {
+  if (!pfdetector_->Detect(data_.data(),  semantic_data_.data(),
+    ground_height_signed_.data(), valid_point_num, nr_points_element)) {
     ADEBUG << "failed to call ground detector!";
     non_ground_indices.indices.insert(
         non_ground_indices.indices.end(), point_indices_temp_.begin(),
@@ -262,6 +312,8 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
           pc[1] = pt.y - cloud_center_(1);
           pc[2] = pt.z - cloud_center_(2);
       }
+      // impossible equal -1, but reserve temporarily
+      // in case of other corner case
       if (count == -1) {
           int cur_row, cur_col = 0;
           std::vector<std::pair<int, int>> neighbors;
@@ -343,21 +395,24 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
       out1.open("semantic/" + std::to_string(frame->timestamp) + ".txt");
       if (out1.is_open()) {
           for (size_t i = 0; i < frame->cloud->size(); i++) {
-              int index = static_cast<int>(static_cast<PointSemanticLabel>(
-                  frame->cloud->points_semantic_label(i) & 15));
+              int parsing_index = static_cast<int>(GetSemanticLabel(
+                  frame->cloud->points_semantic_label(i)));
+              int sbr_index = static_cast<int>(GetMotionLabel(
+                  frame->cloud->points_semantic_label(i)));
               int label_index = static_cast<uint8_t>(
                   frame->cloud->points_label(i));
               if (single_ground_detect_) {
                   const auto& pt = frame->cloud->at(i);
                   out1 << pt.x << ", " << pt.y << ", " << pt.z << ", "
-                       << pt.intensity << ", " << index << ", " << label_index
-                       << std::endl;
+                       << pt.intensity << ", " << parsing_index << ", "
+                       << sbr_index << ", " << label_index << std::endl;
               } else {
                   const auto& pt = frame->world_cloud->at(i);
                   out1 << pt.x - cloud_center_(0) << ", "
                        << pt.y - cloud_center_(1) << ", "
                        << pt.z - cloud_center_(2) << ", " << pt.intensity
-                       << ", " << index << ", " << label_index << std::endl;
+                       << ", " << parsing_index << ", " << sbr_index << ", "
+                       << label_index << std::endl;
               }
           }
       }

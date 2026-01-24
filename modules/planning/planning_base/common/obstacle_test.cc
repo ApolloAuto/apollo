@@ -62,7 +62,7 @@ class ObstacleTest : public ::testing::Test {
   virtual void SetUp() {
     prediction::PredictionObstacles prediction_obstacles;
     ASSERT_TRUE(cyber::common::GetProtoFromFile(
-        "modules/planning/planning_base/testdata/common/"
+        "/apollo/modules/planning/planning_base/testdata/common/"
         "sample_prediction.pb.txt",
         &prediction_obstacles));
     auto obstacles = Obstacle::CreateObstacles(prediction_obstacles);

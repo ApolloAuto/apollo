@@ -5,7 +5,7 @@ module_config {
     class_name : "MotionServiceComponent"
     config {
       name: "MotionServiceComponent"
-      config_file_path: "modules/perception/motion_service/conf/motion_service_config.pb.txt"
+      config_file_path: "/apollo/modules/perception/motion_service/conf/motion_service_config.pb.txt"
     }
   }
 }

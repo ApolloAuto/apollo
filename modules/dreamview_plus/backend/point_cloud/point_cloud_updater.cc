@@ -34,16 +34,13 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionEdgeInfo;
 using apollo::transform::TransformStampeds;
 using Json = nlohmann::json;
 
 boost::shared_mutex PointCloudUpdater::mutex_;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
-    : UpdaterWithChannelsBase({"PointCloud", "PerceptionEdgeInfo"},
-                              {"sensor", "edge"}),
-      node_(cyber::CreateNode("point_cloud")),
+    : node_(cyber::CreateNode("point_cloud")),
       websocket_(websocket) {
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
@@ -60,23 +57,12 @@ PointCloudChannelUpdater* PointCloudUpdater::GetPointCloudChannelUpdater(
   if (channel_updaters_.find(channel_name) == channel_updaters_.end()) {
     channel_updaters_[channel_name] =
         new PointCloudChannelUpdater(channel_name);
-    if (channel_name == FLAGS_perception_edge_info_topic) {
-      channel_updaters_[channel_name]->perception_edge_reader_ =
-          node_->CreateReader<PerceptionEdgeInfo>(
-              channel_name,
-              [channel_name,
-               this](const std::shared_ptr<PerceptionEdgeInfo> &msg) {
-                UpdatePerceptionEdge(msg, channel_name);
-              });
-    } else {
-      channel_updaters_[channel_name]->point_cloud_reader_ =
-          node_->CreateReader<drivers::PointCloud>(
-              channel_name,
-              [channel_name,
-               this](const std::shared_ptr<drivers::PointCloud> &msg) {
-                UpdatePointCloud(msg, channel_name);
-              });
-    }
+    channel_updaters_[channel_name]->point_cloud_reader_ =
+        node_->CreateReader<drivers::PointCloud>(
+            channel_name, [channel_name, this](
+                              const std::shared_ptr<drivers::PointCloud> &msg) {
+              UpdatePointCloud(msg, channel_name);
+            });
   }
   return channel_updaters_[channel_name];
 }
@@ -127,10 +113,7 @@ void PointCloudUpdater::PublishMessage(const std::string &channel_name) {
   PointCloudChannelUpdater *updater = GetPointCloudChannelUpdater(channel_name);
   std::string to_send;
   // the channel has no data input, clear the sending object.
-  if ((updater->point_cloud_reader_ &&
-       !updater->point_cloud_reader_->HasWriter()) ||
-      (updater->perception_edge_reader_ &&
-       !updater->perception_edge_reader_->HasWriter())) {
+  if (!updater->point_cloud_reader_->HasWriter()) {
     updater->last_point_cloud_time_ = 0.0;
     updater->point_cloud_str_ = "";
     to_send = "";
@@ -160,7 +143,7 @@ void PointCloudUpdater::PublishMessage(const std::string &channel_name) {
 
 void PointCloudUpdater::GetChannelMsg(std::vector<std::string> *channels) {
   enabled_ = true;
-  GetChannelMsgWithFilter(channels);
+  GetChannelMsgWithFilter(channels, "PointCloud", "sensor");
 }
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudUpdater::ConvertPCLPointCloud(
@@ -189,34 +172,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudUpdater::ConvertPCLPointCloud(
   TransformPointCloud(pcl_ptr, point_cloud->header().frame_id());
 
   return pcl_ptr;
-}
-
-void PointCloudUpdater::UpdatePerceptionEdge(
-    const std::shared_ptr<PerceptionEdgeInfo> &perception_edge,
-    const std::string &channel_name) {
-  PointCloudChannelUpdater *updater = GetPointCloudChannelUpdater(channel_name);
-  if (perception_edge->header().has_timestamp_sec()) {
-    updater->last_point_cloud_time_ = perception_edge->header().timestamp_sec();
-  }
-  if (std::fabs(last_localization_time_ - updater->last_point_cloud_time_) >
-      0.1) {
-    AWARN << "skipping outdated perception edge data";
-    return;
-  }
-  apollo::dreamview::PointCloud point_cloud_pb;
-  point_cloud_pb.set_is_edge(true);
-  for (size_t idx = 0; idx < perception_edge->edge_point_size(); ++idx) {
-    auto pt = perception_edge->edge_point(idx);
-    if (!std::isnan(pt.x()) && !std::isnan(pt.y()) && !std::isnan(pt.z())) {
-      point_cloud_pb.add_num(pt.x());
-      point_cloud_pb.add_num(pt.y());
-      point_cloud_pb.add_num(pt.z());
-    }
-  }
-  {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    point_cloud_pb.SerializeToString(&updater->point_cloud_str_);
-  }
 }
 
 void PointCloudUpdater::UpdatePointCloud(

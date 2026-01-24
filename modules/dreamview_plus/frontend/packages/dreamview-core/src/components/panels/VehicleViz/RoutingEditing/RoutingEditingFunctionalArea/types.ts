@@ -3,6 +3,8 @@ export enum FunctionalNameEnum {
     WAYPOINT = 'waypoint',
     LOOP = 'loop',
     FAVORITE = 'favorite',
+    // 室内定位
+    INDOOR_LOCALIZATION = 'indoor_localization',
     RULE = 'Rule',
     COPY = 'Copy',
 }
@@ -14,6 +16,8 @@ export enum MutexToolNameEnum {
     LOOP = 'loop',
     RULE = 'Rule',
     COPY = 'Copy',
+    // 室内定位
+    INDOOR_LOCALIZATION = 'indoor_localization',
 }
 
 export enum CheckCycleRouting {

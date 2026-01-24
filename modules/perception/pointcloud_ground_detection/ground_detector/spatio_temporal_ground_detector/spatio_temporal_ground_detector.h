@@ -71,6 +71,7 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   algorithm::PlaneFitGroundDetectorParam* param_ = nullptr;
   algorithm::PlaneFitGroundDetector* pfdetector_ = nullptr;
   std::vector<float> data_;
+  std::vector<int> semantic_data_;
   std::vector<float> ground_height_signed_;
   std::vector<int> point_indices_temp_;
   std::vector<std::pair<int, int>> point_attribute_;
@@ -88,6 +89,7 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   float ori_sample_z_lower_ = -3.0;
   float ori_sample_z_upper_ = -1.0;
   float parsing_height_buffer_ = 0.2;
+  float near_range_ = 15.0;
   bool debug_output_ = false;
   bool single_ground_detect_ = true;
 

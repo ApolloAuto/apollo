@@ -167,18 +167,18 @@ Chassis Neolix_eduController::chassis() {
   // 3
   chassis_.set_engine_started(true);
 
-  // 3 speed_mps
+  // 3 speed_mps && wheel_speed
+  auto wheelspeed = chassis_.mutable_wheel_speed();
   if (chassis_detail.has_aeb_frontwheelspeed_353() &&
       chassis_detail.has_aeb_rearwheelspeed_354()) {
-    auto wheelspeed = chassis_.mutable_wheel_speed();
     wheelspeed->set_wheel_spd_fl(
-        chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fl());
+        chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fl() / 3.6);
     wheelspeed->set_wheel_spd_fr(
-        chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fr());
+        chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fr() / 3.6);
     wheelspeed->set_wheel_spd_rl(
-        chassis_detail.aeb_rearwheelspeed_354().wheelspeed_rl());
+        chassis_detail.aeb_rearwheelspeed_354().wheelspeed_rl() / 3.6);
     wheelspeed->set_wheel_spd_rr(
-        chassis_detail.aeb_rearwheelspeed_354().wheelspeed_rr());
+        chassis_detail.aeb_rearwheelspeed_354().wheelspeed_rr() / 3.6);
     chassis_.set_speed_mps(
         (chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fl() +
          chassis_detail.aeb_frontwheelspeed_353().wheelspeed_fr() +
@@ -188,6 +188,41 @@ Chassis Neolix_eduController::chassis() {
   } else {
     chassis_.set_speed_mps(0);
   }
+  // wheel_speed direction
+  if (chassis_detail.has_vcu_vehicle_status_report_101() &&
+      chassis_detail.vcu_vehicle_status_report_101()
+          .has_vcu_motor_direction()) {
+    if (chassis_detail.vcu_vehicle_status_report_101().vcu_motor_direction() ==
+        0) {
+      wheelspeed->set_wheel_direction_fl(WheelSpeed::STANDSTILL);
+      wheelspeed->set_wheel_direction_fr(WheelSpeed::STANDSTILL);
+      wheelspeed->set_wheel_direction_rl(WheelSpeed::STANDSTILL);
+      wheelspeed->set_wheel_direction_rr(WheelSpeed::STANDSTILL);
+    } else if (chassis_detail.vcu_vehicle_status_report_101()
+                   .vcu_motor_direction() == 1) {
+      wheelspeed->set_wheel_direction_fl(WheelSpeed::FORWARD);
+      wheelspeed->set_wheel_direction_fr(WheelSpeed::FORWARD);
+      wheelspeed->set_wheel_direction_rl(WheelSpeed::FORWARD);
+      wheelspeed->set_wheel_direction_rr(WheelSpeed::FORWARD);
+    } else if (chassis_detail.vcu_vehicle_status_report_101()
+                   .vcu_motor_direction() == 2) {
+      wheelspeed->set_wheel_direction_fl(WheelSpeed::BACKWARD);
+      wheelspeed->set_wheel_direction_fr(WheelSpeed::BACKWARD);
+      wheelspeed->set_wheel_direction_rl(WheelSpeed::BACKWARD);
+      wheelspeed->set_wheel_direction_rr(WheelSpeed::BACKWARD);
+    } else {
+      wheelspeed->set_wheel_direction_fl(WheelSpeed::INVALID);
+      wheelspeed->set_wheel_direction_fr(WheelSpeed::INVALID);
+      wheelspeed->set_wheel_direction_rl(WheelSpeed::INVALID);
+      wheelspeed->set_wheel_direction_rr(WheelSpeed::INVALID);
+    }
+  } else {
+    wheelspeed->clear_wheel_direction_fl();
+    wheelspeed->clear_wheel_direction_fr();
+    wheelspeed->clear_wheel_direction_rl();
+    wheelspeed->clear_wheel_direction_rr();
+  }
+
   // 4 SOC
   if (chassis_detail.has_vcu_vehicle_status_report_101() &&
       chassis_detail.vcu_vehicle_status_report_101().has_vcu_display_soc()) {

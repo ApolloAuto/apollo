@@ -1,23 +1,23 @@
 cyber_modules {
   key: "GPS"
   value: {
-    dag_files: "modules/drivers/gnss/dag/gnss.dag"
-    dag_files: "modules/localization/dag/dag_streaming_rtk_localization.dag"
-    dag_files: "modules/transform/dag/static_transform.dag"
+    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"
   }
 }
 cyber_modules {
   key: "Velodyne"
   value: {
-    dag_files: "modules/drivers/lidar/velodyne/dag/velodyne.dag"
+    dag_files: "/apollo/modules/drivers/lidar/velodyne/dag/velodyne.dag"
   }
 }
 cyber_modules {
   key: "Camera"
   value: {
-    dag_files: "modules/drivers/camera/dag/camera.dag"
-    dag_files: "modules/drivers/video/dag/video.dag"
+    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
+    dag_files: "/apollo/modules/drivers/video/dag/video.dag"
   }
 }
 modules {
@@ -39,7 +39,7 @@ monitored_components {
     resource {
       disk_spaces {
         # For logs.
-        path: "data"
+        path: "/apollo/data"
         insufficient_space_warning: 8
         insufficient_space_error: 2
       }
@@ -57,7 +57,7 @@ monitored_components {
   value: {
     process {
       command_keywords: "mainboard"
-      command_keywords: "modules/drivers/gnss/dag/gnss.dag"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     }
     # We also have a special GPSMonitor to check message status.
   }

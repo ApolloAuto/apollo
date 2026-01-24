@@ -8,7 +8,7 @@ config_base {
 }
 
 model: LSLIDAR_C16_V4
-device_ip: "127.0.0.1"
+device_ip: "192.168.1.200"
 msop_port: 2368
 difop_port: 2369
 return_mode: 1

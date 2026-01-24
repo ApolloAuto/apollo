@@ -27,8 +27,6 @@ import { RouteOrigin, RoutePoint } from './RoutingEditing/RouteManager/type';
 import { VizCurMode } from './types';
 import CountedSubject from '../../../util/CountedSubject';
 import { FunctionalKey } from '../../../store/EventHandlersStore';
-import { getLocalVizCurbPointCloudChannelName, getLocalVizPointCloudChannelName } from './util';
-import { channelType, subscriptionRefType } from './type';
 
 type ISimulationWorld = apollo.dreamview.ISimulationWorld;
 type IMap = apollo.hdmap.IMap;
@@ -49,11 +47,7 @@ function Viz() {
     const [pointCloudVisible, setPointCloudVisible] = useState(
         getCurrentLayerParams().Perception.pointCloud.currentVisible,
     );
-    const [curbPointCloudVisible, setCurbPointCloudVisible] = useState(
-        getCurrentLayerParams().Perception.curbPointCloud?.currentVisible,
-    );
-    const [curPCChannel, setCurPCChannel] = useState(null);
-    const [curCurbPCChannel, setCurCurbPCChannel] = useState(null);
+    const [curChannel, setCurChannel] = useState(null);
     const [boudingBoxVisible, setBoudingBoxVisible] = useState(
         getCurrentLayerParams().Map.boudingBox?.currentVisible ?? false,
     );
@@ -67,37 +61,6 @@ function Viz() {
         getCurrentLayerParams().Planning.planningTrajectoryLine?.currentVisible ?? false,
     );
 
-    const setPCVisible = (v: boolean, type: channelType = 'pointCloud') => {
-        if (type === 'pointCloud') {
-            setPointCloudVisible(v);
-        }
-        if (type === 'curbPointCloud') {
-            setCurbPointCloudVisible(v);
-        }
-    };
-
-    const setPCChannel = (v: string, type: channelType = 'pointCloud') => {
-        if (type === 'pointCloud') {
-            setCurPCChannel(v);
-        }
-        if (type === 'curbPointCloud') {
-            setCurCurbPCChannel(v);
-        }
-    };
-
-    const getPCChannel = useCallback(
-        // eslint-disable-next-line consistent-return
-        (type: channelType = 'pointCloud') => {
-            if (type === 'pointCloud') {
-                return curPCChannel;
-            }
-            if (type === 'curbPointCloud') {
-                return curCurbPCChannel;
-            }
-        },
-        [curPCChannel, curCurbPCChannel],
-    );
-
     const getVizCurMode = useMemo(() => {
         if (hmi.currentOperation === HMIModeOperation.WAYPOINT_FOLLOW) {
             return VizCurMode.FOLLOW;
@@ -108,9 +71,11 @@ function Viz() {
     const [vizCurMode, setVizCurMode] = useState(getVizCurMode);
 
     const animationFrameIdRef = useRef<number>();
-    const subscriptionRef = useRef<subscriptionRefType>({});
+    const subscriptionRef = useRef<{
+        name: string;
+        subscription: Subscription;
+    }>(null);
     const pointCloudSubscriptionRef = useRef<Subscription>(null);
-    const curbPointCloudSubscriptionRef = useRef<Subscription>(null);
 
     const [fps, setFps] = useState<number>(0);
     const [triangles, setTriangles] = useState<number>(0);
@@ -148,9 +113,6 @@ function Viz() {
     const render = () => {
         rendFps();
         carviz?.render();
-        if (animationFrameIdRef.current) {
-            cancelIdleCallback(animationFrameIdRef.current);
-        }
         animationFrameIdRef.current = requestIdleCallback(
             () => {
                 render();
@@ -161,30 +123,24 @@ function Viz() {
         );
     };
 
-    const closeChannel = (type: channelType = 'pointCloud') => {
-        if (type === 'pointCloud') {
-            if (pointCloudSubscriptionRef?.current) {
-                pointCloudSubscriptionRef.current.unsubscribe();
-            }
-        } else if (type === 'curbPointCloud') {
-            if (curbPointCloudSubscriptionRef?.current) {
-                curbPointCloudSubscriptionRef.current.unsubscribe();
-            }
-        }
-
-        if (subscriptionRef.current[type]?.subscription) {
-            subscriptionRef.current[type].subscription.unsubscribe();
-            subscriptionRef.current[type] = null;
-        }
-
+    const closeChannel = () => {
         carviz?.updateData({
             object: [],
             autoDrivingCar: {},
         });
         carviz?.render();
+
+        if (pointCloudSubscriptionRef?.current) {
+            pointCloudSubscriptionRef.current.unsubscribe();
+        }
+
+        if (subscriptionRef.current && subscriptionRef.current.subscription) {
+            subscriptionRef.current.subscription.unsubscribe();
+            subscriptionRef.current = null;
+        }
     };
 
-    const updatePointcloudChannel = (v: string, type: channelType = 'pointCloud') => {
+    const updatePointcloudChannel = (v: string) => {
         closeChannel();
         const newConnectedSubj: CountedSubject<unknown> = streamApi.subscribeToDataWithChannel(
             StreamDataNames.POINT_CLOUD,
@@ -195,9 +151,8 @@ function Viz() {
             carviz?.updatePointCloud(pointCloudData);
         });
 
-        subscriptionRef.current[type] = {
+        subscriptionRef.current = {
             name: StreamDataNames.POINT_CLOUD,
-            channel: v,
             subscription: newSubscription,
         };
     };
@@ -473,8 +428,7 @@ function Viz() {
         return '';
     }, [metadata]);
 
-    const localVizPointCloueChannelManager = useLocalStorage(getLocalVizPointCloudChannelName(panelId));
-    const localVizCurPointCloueChannelManager = useLocalStorage(getLocalVizCurbPointCloudChannelName(panelId));
+    const localVizPointCloueChannelManager = useLocalStorage(`${panelId}-viz-pointcloud-channel`);
     useEffect(() => {
         let pointCloudConnectedSubj: any = null;
         if (isMainConnected) {
@@ -493,7 +447,7 @@ function Viz() {
                             carviz?.updatePointCloud(pointCloudData);
                         },
                     );
-                    setPCChannel(prevSelectedChannel, 'pointCloud');
+                    setCurChannel(prevSelectedChannel);
                 }
             }
         }
@@ -505,43 +459,9 @@ function Viz() {
         };
     }, [metadata, pointCloudVisible, isMainConnected]);
 
-    useEffect(() => {
-        let curbPointCloudConnectedSubj: any = null;
-        if (isMainConnected) {
-            const prevSelectedCurbChannel = localVizCurPointCloueChannelManager.get() || '/apollo/perception/edge';
-
-            if (curbPointCloudVisible) {
-                curbPointCloudConnectedSubj = subscribeToData({
-                    name: StreamDataNames.POINT_CLOUD,
-                    channel: prevSelectedCurbChannel,
-                    needChannel: true,
-                });
-                if (curbPointCloudConnectedSubj) {
-                    curbPointCloudSubscriptionRef.current = curbPointCloudConnectedSubj.subscribe(
-                        (pointCloudData: IPointCloud) => {
-                            if (!pointCloudData) return;
-                            carviz?.updateCurbPointCloud(pointCloudData);
-                        },
-                    );
-                    setPCChannel(prevSelectedCurbChannel, 'curbPointCloud');
-                }
-            }
-        }
-        return () => {
-            if (curbPointCloudSubscriptionRef.current) {
-                curbPointCloudSubscriptionRef.current.unsubscribe();
-            }
-            carviz.curbPointCloud.disposeLastFrame();
-        };
-    }, [metadata, curbPointCloudVisible, isMainConnected]);
-
     useEffect(
         () => () => {
-            Object.keys(subscriptionRef.current).forEach((key) => {
-                if (subscriptionRef.current[key as channelType]?.subscription) {
-                    subscriptionRef.current[key as channelType].subscription.unsubscribe();
-                }
-            });
+            subscriptionRef.current?.subscription?.unsubscribe();
         },
         [],
     );
@@ -550,9 +470,9 @@ function Viz() {
         <LayerMenu
             carviz={carviz}
             pointCloudFusionChannel={pointCloudFusionChannel}
-            handlePointCloudVisible={setPCVisible}
-            getCurChannel={getPCChannel}
-            setCurChannel={setPCChannel}
+            handlePointCloudVisible={setPointCloudVisible}
+            curChannel={curChannel}
+            setCurChannel={setCurChannel}
             pointcloudChannels={channels}
             updatePointcloudChannel={updatePointcloudChannel}
             closeChannel={closeChannel}
@@ -573,7 +493,8 @@ function Viz() {
                 <div className={classes['viz-rend-fps-item']}>
                     <header className='FPS-display'>
                         <p>
-                            fps: {fps} &nbsp; triangles: {triangles}
+                            fps: {fps} &nbsp;
+                            triangles: {triangles}
                         </p>
                     </header>
                 </div>
@@ -614,7 +535,7 @@ function IndexInit() {
 
     const routeManagerMix = {
         currentRouteLoop: {
-            currentRouteLoopState: true,
+            currentRouteLoopState: false,
         },
     };
 

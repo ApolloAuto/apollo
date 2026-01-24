@@ -118,10 +118,6 @@ void UndistortionHandler::InitUndistortRectifyMap(
   float p1 = distortion(2, 0);
   float p2 = distortion(3, 0);
   float k3 = distortion(4, 0);
-  float k4 = distortion(5, 0);  // add k4,k5,k6 for Rational model
-  float k5 = distortion(6, 0);
-  float k6 = distortion(7, 0);
-
   Eigen::Matrix3f Rinv = R.inverse();
 
   for (int v = 0; v < height_; ++v) {
@@ -135,10 +131,7 @@ void UndistortionHandler::InitUndistortRectifyMap(
       double nx = XYW(0, 0) / XYW(2, 0);
       double ny = XYW(1, 0) / XYW(2, 0);
       double r_square = nx * nx + ny * ny;
-      double r_quad = r_square * r_square;
-      double r_sextic = r_quad * r_square;
-      double scale = (1 + r_square * k1 + r_quad * k2 + r_sextic * k3) /
-                     (1 + r_square * k4 + r_quad * k5 + r_sextic * k6);
+      double scale = (1 + r_square * (k1 + r_square * (k2 + r_square * k3)));
       double nnx =
           nx * scale + 2 * p1 * nx * ny + p2 * (r_square + 2 * nx * nx);
       double nny =

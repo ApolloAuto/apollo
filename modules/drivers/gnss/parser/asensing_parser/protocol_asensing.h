@@ -25,13 +25,10 @@
 typedef struct {
   /*俯仰角*/
   float Pitch_deg;
-  float Pitch_rad;
   /*横滚角*/
   float Roll_deg;
-  float Roll_rad;
   /*航向角*/
   float Yaw_deg;
-  float Yaw_rad;
 
   float GyroX;
   float GyroY;
@@ -40,9 +37,13 @@ typedef struct {
   float AccY_g; /* 零偏修正后加速度计 */
   float AccZ_g; /* 零偏修正后加速度计 */
 
-  double Lon_deg; /*融合后Longitude (deg)*/
-  double Lat_deg; /*融合后Latitude (deg)*/
-  float Alt_m;    /*融合后Altitude (m)*/
+  double Lon_gnss_deg;  // RTK融合后Longitude (deg)
+  double Lat_gnss_deg;  // RTK融合后Latitude (deg)
+  float Alt_gnss_m;     // RTK融合后Altitude (m)
+
+  double Lon_deg;  // IMU融合后Longitude (deg)
+  double Lat_deg;  // IMU融合后Latitude (deg)
+  float Alt_m;     // IMU融合后Altitude (m)
 
   float VelN_mps; /*融合后 NED north velocity (m/s) */
   float VelE_mps; /*融合后 NED east velocity (m/s) */

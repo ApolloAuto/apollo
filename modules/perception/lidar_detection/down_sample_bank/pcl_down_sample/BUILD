@@ -15,6 +15,7 @@ apollo_plugin(
         "//cyber",
         "//modules/perception/common:perception_common_util",
         "//modules/perception/common/lidar:apollo_perception_common_lidar",
+        "//modules/perception/common/interface:base_down_sample",
         "//modules/perception/lidar_detection:apollo_perception_lidar_detection",
         "//modules/perception/lidar_detection/down_sample_bank/pcl_down_sample/proto:pcl_down_sample_proto",
     ],

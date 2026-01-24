@@ -58,6 +58,7 @@ message MlfMotionRefinerConfig {
   optional double claping_speed_threshold = 2 [default = 1.0];
   optional double cyc_refine_speed = 3 [default = 1.2];
   optional double car_refine_speed = 4 [default = 1.0];
+  optional bool use_movable_state_check = 5 [default = false];
 }
 
 message MlfShapeFilterConfig {
@@ -74,6 +75,17 @@ message MlfTypeFilterConfig {
   optional bool print_type_filter_log = 6 [default = false];
 }
 
+message MlfDirectionFilterConfig {
+  optional double init_direction_variance = 1 [default=25.0];
+  optional double variance_bound = 2 [default=25.0];
+  optional double max_angular_thresh = 3 [default=50.0];
+  optional double converged_confidence_minimum = 4 [default=0.6];
+  optional double angular_scale = 5 [default=0.8];
+  optional uint32 angular_window_size = 6 [default=5];
+  optional double predict_noise_per_sqrsec = 7 [default=100.0];
+  optional double angular_confidence_thresh = 8 [default=0.7];
+}
+
 message MlfEngineConfig {
   optional bool use_histogram_for_match = 1 [default = true];
   optional uint32 histogram_bin_size = 2 [default = 10];
@@ -84,4 +96,5 @@ message MlfEngineConfig {
   optional bool print_debug_log = 7 [default = false];
   optional double delay_time_output = 8 [default = 0.25];
   optional uint32 pub_track_times = 9 [default = 1];
+  optional bool merge_foreground_background = 10 [default = false];
 }

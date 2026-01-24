@@ -21,7 +21,7 @@ namespace algorithm {
 
 /* TODO(all): to be added back
 TEST(SensorManagerTest, test) {
-  FLAGS_work_root = "modules/perception/testdata/"
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "common/sensor_manager/";
   FLAGS_obs_sensor_meta_path = "data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
@@ -105,7 +105,7 @@ TEST(SensorManagerTest, test) {
 TEST(SensorManagerTest, test_init_error) {
   SensorManager* sensor_manager = SensorManager::Instance();
   sensor_manager->inited_ = false;
-  FLAGS_work_root = "modules/perception/testdata/"
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "common/sensor_manager/";
 
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta_error.pt";

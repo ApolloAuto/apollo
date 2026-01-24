@@ -91,6 +91,9 @@ const mainConfig = (params) => (env, argv) => {
                 __PLATFORM__: JSON.stringify('web'),
             }),
             new ReactRefreshPlugin(),
+            new CleanWebpackPlugin({
+                cleanOnceBeforeBuildPatterns: [params.outputPath],
+            }),
             new CopyPlugin({
                 patterns: [
                     {
@@ -144,16 +147,6 @@ const mainConfig = (params) => (env, argv) => {
                         singleton: true,
                         eager: true,
                         requiredVersion: packageJson.dependencies['react-dom'],
-                    },
-                    '@dreamview/dreamview-lang': {
-                        singleton: true,
-                        eager: true,
-                        requiredVersion: '^1.1.7',
-                    },
-                    '@dreamview/dreamview-theme': {
-                        singleton: true,
-                        eager: true,
-                        requiredVersion: '^1.3.4',
                     },
                 },
             }),

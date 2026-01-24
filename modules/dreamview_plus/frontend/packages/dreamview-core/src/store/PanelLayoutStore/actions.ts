@@ -8,7 +8,6 @@ import {
     REFRESH_PANEL,
     RESET_LAYOUT,
     EXPAND_MODE_LAYOUT_RELATION,
-    INIT_PANEL_LAYOUT,
 } from './actionTypes';
 import { CURRENT_MODE } from '../HmiStore';
 
@@ -43,16 +42,6 @@ export interface IExpandModeLayoutRelation {
     layout: MosaicNode<string>;
 }
 
-export type IInitLayoutState = MosaicNode<string>;
-
-export type ICurrentLayoutState = MosaicNode<string>;
-
-export interface IInitLayoutPayload {
-    mode: string;
-    initLatout: IInitLayoutState;
-    currentLayout: ICurrentLayoutState;
-}
-
 type UpdateLayoutAction = PayloadAction<typeof UPDATE, IUpdateLayoutPayload>;
 
 type AddPanelFromOutsideAction = PayloadAction<typeof ADD_PANEL_FROM_OUTSIDE, AddPanelFromOutsidePayload>;
@@ -62,8 +51,6 @@ type IResetLayoutByModeAction = PayloadAction<typeof RESET_LAYOUT, IResetLayoutB
 type RefreshPanelAction = PayloadAction<typeof REFRESH_PANEL, RefreshPanelPayload>;
 
 type IExpandModeLayoutRelationAction = PayloadAction<typeof EXPAND_MODE_LAYOUT_RELATION, IExpandModeLayoutRelation>;
-
-type IInitPanelLayoutAction = PayloadAction<typeof INIT_PANEL_LAYOUT, IInitLayoutPayload>;
 
 export const update = (payload: IUpdateLayoutPayload): UpdateLayoutAction => ({
     type: UPDATE,
@@ -86,15 +73,9 @@ export const expandModeLayoutRelation = (payload: IExpandModeLayoutRelation): IE
     payload,
 });
 
-export const initPanelLayout = (payload: IInitLayoutPayload): IInitPanelLayoutAction => ({
-    type: INIT_PANEL_LAYOUT,
-    payload,
-});
-
 export type CombineAction =
     | UpdateLayoutAction
     | AddPanelFromOutsideAction
     | RefreshPanelAction
     | IResetLayoutByModeAction
-    | IExpandModeLayoutRelationAction
-    | IInitPanelLayoutAction;
+    | IExpandModeLayoutRelationAction;

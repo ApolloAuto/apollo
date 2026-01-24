@@ -100,7 +100,7 @@ void MicrophoneComponent::run() {
 }
 
 MicrophoneComponent::~MicrophoneComponent() {
-  delete[] buffer_;
+  free(buffer_);
   if (running_.load()) {
     running_.exchange(false);
     async_result_.wait();

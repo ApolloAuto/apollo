@@ -18,10 +18,10 @@
 
 DEFINE_int32(cache_signal_time, 3, "The time to cache signal");
 DEFINE_string(torch_siren_detection_model,
-              "modules/audio/data/torch_siren_detection_model.pt",
+              "/apollo/modules/audio/data/torch_siren_detection_model.pt",
               "Siren detection model file");
 
 DEFINE_string(audio_records_dir, "", "The dir path to offline cyber records");
 DEFINE_string(audio_conf_file,
-              "modules/audio/conf/audio_conf.pb.txt",
+              "/apollo/modules/audio/conf/audio_conf.pb.txt",
               "Default conf file for audio module");

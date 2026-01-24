@@ -5,7 +5,7 @@ module_config {
     class_name : "LaneDetectionComponent"
     config {
       name: "LaneComponent"
-      config_file_path: "modules/perception/lane_detection/conf/lane_detection_config.pb.txt"
+      config_file_path: "/apollo/modules/perception/lane_detection/conf/lane_detection_config.pb.txt"
     }
   }
 }

@@ -503,14 +503,29 @@ void RawStream::DataSpin() {
     if (length > 0) {
       std::shared_ptr<RawData> msg_pub = std::make_shared<RawData>();
       if (!msg_pub) {
-        AERROR << "New data sting msg failed.";
+        AERROR << "New data raw msg failed.";
         continue;
       }
       msg_pub->set_data(reinterpret_cast<const char *>(buffer_), length);
       raw_writer_->Write(msg_pub);
-      data_parser_ptr_->ParseRawData(msg_pub->data());
+      data_parser_ptr_->ParseRawData(msg_pub->data(), 0);
       if (push_location_) {
         PushGpgga(length);
+      }
+    }
+    // other data stream
+    if (out_rtk_stream_ && config_.rtk_to().is_data_stream() &&
+        (out_rtk_stream_->get_status() == Stream::Status::CONNECTED)) {
+      size_t length = out_rtk_stream_->read(buffer_, BUFFER_SIZE);
+      if (length > 0) {
+        std::shared_ptr<RawData> msg_pub = std::make_shared<RawData>();
+        if (!msg_pub) {
+          AERROR << "New data raw msg failed.";
+          continue;
+        }
+        msg_pub->set_data(reinterpret_cast<const char *>(buffer_), length);
+        raw_writer_->Write(msg_pub);
+        data_parser_ptr_->ParseRawData(msg_pub->data(), 1);
       }
     }
     StreamStatusCheck();

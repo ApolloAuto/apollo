@@ -45,10 +45,10 @@ TEST(MatcherTest, test_generate_unassign) {
 }
 
 TEST(MatcherTest, test_all) {
-  FLAGS_work_root = "modules/perception/testdata/"
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "fusion/hm_data_association";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
-  FLAGS_obs_sensor_intrinsic_path = "modules/perception/testdata/"
+  FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
       "fusion/hm_data_association/params";
   Eigen::Matrix4d pose;
   pose << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;

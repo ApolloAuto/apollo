@@ -54,23 +54,6 @@ double Polygon2d::DistanceTo(const Vec2d &point) const {
   return distance;
 }
 
-double Polygon2d::DistanceTo(const Vec2d &point, Vec2d& closest_point) const {
-  CHECK_GE(points_.size(), 3U);
-  if (IsPointIn(point)) {
-    return 0.0;
-  }
-  double distance = std::numeric_limits<double>::infinity();
-  Vec2d closest_point_tmp;
-  for (int i = 0; i < num_points_; ++i) {
-    double dis = line_segments_[i].DistanceTo(point, &closest_point_tmp);
-    if (dis < distance) {
-      distance = dis;
-      closest_point = closest_point_tmp;
-    }
-  }
-  return distance;
-}
-
 double Polygon2d::DistanceSquareTo(const Vec2d &point) const {
   CHECK_GE(points_.size(), 3U);
   if (IsPointIn(point)) {
@@ -107,49 +90,6 @@ double Polygon2d::DistanceTo(const LineSegment2d &line_segment) const {
   return distance;
 }
 
-double Polygon2d::DistanceTo(const LineSegment2d &line_segment,
-                             Vec2d& polygon_closest_point,
-                             Vec2d& segment_closest_point) const {
-  if (line_segment.length() <= kMathEpsilon) {
-    segment_closest_point = line_segment.start();
-    return DistanceTo(line_segment.start(), polygon_closest_point);
-  }
-  CHECK_GE(points_.size(), 3U);
-
-  if (IsPointIn(line_segment.center())) {
-    return 0.0;
-  }
-  if (std::any_of(line_segments_.begin(), line_segments_.end(),
-                  [&](const LineSegment2d &poly_seg) {
-                    return poly_seg.HasIntersect(line_segment);
-                  })) {
-    return 0.0;
-  }
-  double distance = std::numeric_limits<double>::infinity();
-  Vec2d start_closest_point, end_closest_point;
-  double distance_start = DistanceTo(line_segment.start(), start_closest_point);
-  double distance_end = DistanceTo(line_segment.end(), end_closest_point);
-  if (distance_start <= distance_end) {
-    segment_closest_point = line_segment.start();
-    polygon_closest_point = start_closest_point;
-    distance = distance_start;
-  } else {
-    segment_closest_point = line_segment.end();
-    polygon_closest_point = end_closest_point;
-    distance = distance_end;
-  }
-  Vec2d closest_point_tmp;
-  for (int i = 0; i < num_points_; ++i) {
-      double dis = line_segment.DistanceTo(points_[i], &closest_point_tmp);
-      if (dis < distance) {
-        distance = dis;
-        segment_closest_point = closest_point_tmp;
-        polygon_closest_point = points_[i];
-      }
-  }
-  return distance;
-}
-
 double Polygon2d::DistanceTo(const Box2d &box) const {
   CHECK_GE(points_.size(), 3U);
   return DistanceTo(Polygon2d(box));
@@ -168,25 +108,6 @@ double Polygon2d::DistanceTo(const Polygon2d &polygon) const {
   double distance = std::numeric_limits<double>::infinity();
   for (int i = 0; i < num_points_; ++i) {
     distance = std::min(distance, polygon.DistanceTo(line_segments_[i]));
-  }
-  return distance;
-}
-
-double Polygon2d::DistanceTo(const Polygon2d& polygon,
-                             Vec2d& self_closest_point,
-                             Vec2d& other_closest_point) const {
-  CHECK_GE(points_.size(), 3U);
-  CHECK_GE(polygon.num_points(), 3);
-  double distance = std::numeric_limits<double>::infinity();
-  Vec2d segment_closest_point_tmp, polygon_closest_point_tmp;
-  for (int i = 0; i < num_points_; ++i) {
-    double dis = polygon.DistanceTo(line_segments_[i],
-            polygon_closest_point_tmp, segment_closest_point_tmp);
-    if (dis < distance) {
-      distance = dis;
-      self_closest_point = segment_closest_point_tmp;
-      other_closest_point = polygon_closest_point_tmp;
-    }
   }
   return distance;
 }

@@ -4,8 +4,8 @@ module_config {
     class_name : "LidarTrackingComponent"
     config {
       name : "LidarTracking"
-      config_file_path : "modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt"
-      flag_file_path: "modules/perception/data/flag/perception_common.flag"
+      config_file_path : "/apollo/modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
       readers {
         channel: "/perception/lidar/detection_filter"
       }

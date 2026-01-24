@@ -16,6 +16,7 @@ function RoutingEditingFunctionalItem(
 ) {
     const checked = useMemo(() => checkedItem === functionalName, [functionalName, checkedItem]);
 
+    // @ts-ignore
     const { classes, cx } = useStyle({});
 
     const icon = useMemo(() => {
@@ -47,6 +48,12 @@ function RoutingEditingFunctionalItem(
                         <IconPark name='IcCommonRoutin' />
                     </i>
                 );
+            case FunctionalNameEnum.INDOOR_LOCALIZATION:
+                return (
+                    <i>
+                        <IconPark name='IcIndoorIocation' />
+                    </i>
+                );
             default:
                 return null;
         }
@@ -60,7 +67,7 @@ function RoutingEditingFunctionalItem(
                 [classes['hover-color-change']]: !checked,
                 [classes['routing-editing-functional__item--disable']]: disable,
             })}
-            onClick={onClick}
+            onClick={!disable ? onClick : () => null}
         >
             <div className={classes['routing-editing-functional__icon']}>{icon}</div>
         </div>

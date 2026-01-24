@@ -48,7 +48,7 @@ DEFINE_int64(spat_period, 150, "SPAT message period in ms");
 DEFINE_double(check_time, 0.5, "SPAT message period in s");
 DEFINE_int64(rsu_whitelist_period, 3 * 1000,
              "get whitelist period in ms");  // 3s
-DEFINE_string(rsu_whitelist_name, "modules/v2x/conf/rsu_whitelist.txt",
+DEFINE_string(rsu_whitelist_name, "/apollo/modules/v2x/conf/rsu_whitelist.txt",
               "file name for RSU whitelist");
 
 }  // namespace v2x

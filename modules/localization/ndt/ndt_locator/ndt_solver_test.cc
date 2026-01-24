@@ -89,13 +89,13 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_source(
       new pcl::PointCloud<pcl::PointXYZ>());
   const std::string input_source_file =
-      "modules/localization/ndt/test_data/pcds/1.pcd";
+      "/apollo/modules/localization/ndt/test_data/pcds/1.pcd";
   int ret = pcl::io::loadPCDFile(input_source_file, *cloud_source);
   EXPECT_LE(ret, 0);
 
   // Load input target.
   const std::string map_folder =
-      "modules/localization/ndt/test_data/ndt_map";
+      "/apollo/modules/localization/ndt/test_data/ndt_map";
   std::list<MapNodeIndex> buf;
   GetAllMapIndex(map_folder, &buf);
   std::cout << "index size: " << buf.size() << std::endl;

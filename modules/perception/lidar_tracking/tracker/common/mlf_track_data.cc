@@ -35,6 +35,7 @@ void MlfTrackData::Reset() {
   is_current_state_predicted_ = true;
   is_front_critical_track_ = false;
   is_reserve_blind_cone_ = false;
+  foreground_track_prob_ = 0.0;
   sensor_history_objects_.clear();
   cached_objects_.clear();
   predict_.Reset();
@@ -231,6 +232,32 @@ void MlfTrackData::GetLatestKObjects(size_t k,
     }
 }
 
+void MlfTrackData::GetObjectsInInterval(double time,
+    std::vector<TrackedObjectPtr>* objects) {
+  objects->clear();
+  for (auto obj_it = history_objects_.rbegin();
+      obj_it != history_objects_.rend(); ++obj_it) {
+    if (obj_it->second->timestamp >= time) {
+      objects->push_back(obj_it->second);
+    } else {
+      break;
+    }
+  }
+}
+
+void MlfTrackData::GetObjectsInInterval(double time,
+    std::vector<TrackedObjectConstPtr>* objects) const {
+  objects->clear();
+  for (auto obj_it = history_objects_.rbegin();
+      obj_it != history_objects_.rend(); ++obj_it) {
+    if (obj_it->second->timestamp >= time) {
+      objects->push_back(obj_it->second);
+    } else {
+      break;
+    }
+  }
+}
+
 void MlfTrackData::GetObjectsInIntervalByOrder(double time,
     std::vector<TrackedObjectConstPtr>* objects) {
     for (auto obj_it = history_objects_.begin();
@@ -249,6 +276,37 @@ void MlfTrackData::GetObjectsInIntervalByOrder(double time,
             objects->push_back(obj_it->second);
         }
     }
+}
+
+void MlfTrackData::UpdateTrackableState(TrackedObjectPtr obj) {
+  if (age_ == 0) {
+    foreground_track_prob_ =
+      obj->object_ptr->lidar_supplement.is_clustered ? 0.0 : 1.0;
+  } else {
+    if (IsForegroundTrack() || IsBackgroundMovable(obj)) {
+      obj->object_ptr->lidar_supplement.is_background = false;
+      obj->is_background = false;
+    }
+    if (!obj->object_ptr->lidar_supplement.is_clustered) {
+      foreground_track_prob_ = 1.0;
+    } else {
+      foreground_track_prob_ *= 0.9;
+    }
+  }
+}
+
+bool MlfTrackData::IsForegroundTrack() const {
+  return (foreground_track_prob_ > 0.5);
+}
+
+bool MlfTrackData::IsBackgroundMovable(TrackedObjectPtr obj) {
+  bool is_background_movable =
+    (obj->object_ptr->lidar_supplement.dynamic_state ==
+      base::MotionState::MOVING) ||
+    (obj->object_ptr->lidar_supplement.semantic_type ==
+      base::ObjectSemanticType::OBJECT);
+
+  return is_background_movable;
 }
 
 }  // namespace lidar

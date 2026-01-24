@@ -68,6 +68,7 @@ DECLARE_double(x_front);
 DECLARE_double(x_back);
 DECLARE_double(y_front);
 DECLARE_double(y_back);
+DECLARE_double(max_points_height);
 
 // blind TrafficCone (in NOVATEL system)
 DECLARE_bool(need_reserve_blind_cone);

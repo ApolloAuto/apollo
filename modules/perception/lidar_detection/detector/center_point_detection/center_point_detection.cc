@@ -843,167 +843,363 @@ void CenterPointDetection::FilterForegroundPoints(
 }
 
 void CenterPointDetection::FilterObjectsbyClassNMS(
-    std::vector<std::shared_ptr<base::Object>> *objects) {
-    auto ordinary_nms_strategy = [&](size_t i, size_t j,
-        bool use_strategy = false) {
-        // return FILTER_INDEX
-        size_t type_i = static_cast<size_t>(objects->at(i)->type);
-        size_t type_j = static_cast<size_t>(objects->at(j)->type);
-        size_t filter_index =
+  std::vector<std::shared_ptr<base::Object>> *objects) {
+  auto ordinary_nms_strategy = [&](size_t i, size_t j,
+    bool use_strategy = false) {
+    // return FILTER_INDEX
+    size_t type_i = static_cast<size_t>(objects->at(i)->type);
+    size_t type_j = static_cast<size_t>(objects->at(j)->type);
+    size_t filter_index =
             (objects->at(i)->confidence < objects->at(j)->confidence) ? i : j;
         // ordinary_nms_strategy: VEHICLE > BICYCLE > PEDESTRIAN > TRAFFICCONE
-        if (nms_strategy_ || use_strategy) {
-            return type_i > type_j ? j : i;
-        }
-        return filter_index;
+    if (nms_strategy_ || use_strategy) {
+      return type_i > type_j ? j : i;
+    }
+      return filter_index;
     };
 
-    auto special_nms_strategy = [&](size_t keep_index,
-          base::ObjectType keep_type, size_t filter_index,
-          base::ObjectType filter_type, float conf_buffer) {
-        if (nms_strategy_) {
-            return;
-        }
-        objects->at(keep_index)->lidar_supplement.raw_probs.clear();
-        objects->at(keep_index)->type_probs.clear();
+  auto special_nms_strategy = [&](size_t keep_index,
+    base::ObjectType keep_type, size_t filter_index,
+    base::ObjectType filter_type, float conf_buffer) {
+    if (nms_strategy_) {
+      return;
+    }
+    objects->at(keep_index)->lidar_supplement.raw_probs.clear();
+    objects->at(keep_index)->type_probs.clear();
 
-        objects->at(keep_index)->lidar_supplement.raw_probs.push_back(
-            std::vector<float>(static_cast<int>(
-                base::ObjectType::MAX_OBJECT_TYPE), 0.f));
-        float sum_confidence = objects->at(keep_index)->confidence +
-                               objects->at(filter_index)->confidence;
-        float filter_prob = 1.0 * (objects->at(filter_index)->confidence
-              + conf_buffer) / (sum_confidence + conf_buffer);
-        float keep_prob = 1.0 * objects->at(keep_index)->confidence /
-              (sum_confidence + conf_buffer);
-        objects->at(keep_index)->lidar_supplement.raw_probs.back()[
-            static_cast<int>(filter_type)] = filter_prob;
-        objects->at(keep_index)->lidar_supplement.raw_probs.back()[
-            static_cast<int>(keep_type)] = keep_prob;
-        objects->at(keep_index)->type_probs.assign(
+    objects->at(keep_index)->lidar_supplement.raw_probs.push_back(
+                                  std::vector<float>(static_cast<int>(
+                                  base::ObjectType::MAX_OBJECT_TYPE), 0.f));
+    float sum_confidence = objects->at(keep_index)->confidence +
+                           objects->at(filter_index)->confidence;
+    float filter_prob = 1.0 * (objects->at(filter_index)->confidence
+                        + conf_buffer) / (sum_confidence + conf_buffer);
+    float keep_prob = 1.0 * objects->at(keep_index)->confidence /
+                      (sum_confidence + conf_buffer);
+    objects->at(keep_index)->lidar_supplement.raw_probs.back()[
+             static_cast<int>(filter_type)] = filter_prob;
+    objects->at(keep_index)->lidar_supplement.raw_probs.back()[
+             static_cast<int>(keep_type)] = keep_prob;
+    objects->at(keep_index)->type_probs.assign(
             objects->at(keep_index)->lidar_supplement.raw_probs.back().begin(),
             objects->at(keep_index)->lidar_supplement.raw_probs.back().end());
-    };
+  };
 
-    std::vector<bool> delete_array(objects->size(), false);
-    std::vector<bool> nms_visited(objects->size(), false);
-    std::vector<std::vector<size_t>> nms_pairs;
-    nms_pairs.resize(objects->size());
-    // different class nms
-    for (size_t i = 0; i < objects->size(); i++) {
-        auto &obj_i = objects->at(i);
-        if (!obj_i || nms_visited[i]) {
-            continue;
-        }
-        for (size_t j = i + 1; j < objects->size(); j++) {
-            auto &obj_j = objects->at(j);
-            if (!obj_j) {
-                continue;
-            }
-            if (get_3dbox_iou(obj_i, obj_j) <= diff_class_iou_) {
-                continue;
-            }
-            nms_visited[j] = true;
-            nms_pairs[i].push_back(j);
-        }
-    }
-    // do NMS
-    for (size_t i = 0; i < objects->size(); i++) {
-        if (nms_pairs[i].size() == 0) {
-            continue;
-        }
-        if (nms_pairs[i].size() == 1) {
-            size_t filter_index = ordinary_nms_strategy(i, nms_pairs[i][0]);
-            size_t keep_index = filter_index == i ? nms_pairs[i][0] : i;
+  auto get_corners = [&](const base::ObjectPtr obj) {
+    std::vector<float> box_corner;
+    box_corner.resize(8);
+    float x = obj->center(0);
+    float y = obj->center(1);
+    float l = obj->size(0);
+    float w = obj->size(1);
+    float r = obj->theta;
+    // if (length_enlarge_value_ > 0) {
+    //     l = l + length_enlarge_value_;
+    // }
+    // if (width_enlarge_value_ > 0) {
+    //     w = w + width_enlarge_value_;
+    // }
+    float cos_r = cos(r);
+    float sin_r = sin(r);
+    float hl = l * 0.5;
+    float hw = w * 0.5;
+    float x1 = (-hl) * cos_r - (-hw) * sin_r + x;
+    float y1 = (-hl) * sin_r + (-hw) * cos_r + y;
+    float x2 = (hl) * cos_r - (-hw) * sin_r + x;
+    float y2 = (hl) * sin_r + (-hw) * cos_r + y;
+    float x3 = (hl) * cos_r - (hw) * sin_r + x;
+    float y3 = (hl) * sin_r + (hw) * cos_r + y;
+    float x4 = (-hl) * cos_r - (hw) * sin_r + x;
+    float y4 = (-hl) * sin_r + (hw) * cos_r + y;
+    box_corner[0] = x1;
+    box_corner[1] = y1;
+    box_corner[2] = x2;
+    box_corner[3] = y2;
+    box_corner[4] = x3;
+    box_corner[5] = y3;
+    box_corner[6] = x4;
+    box_corner[7] = y4;
+      return box_corner;
+  };
 
-            delete_array[keep_index] = false;
-            delete_array[filter_index] = true;
+  auto trangle_area_cpu = [&](float* a, float* b, float* c) {
+    return ((a[0] - c[0]) * (b[1] - c[1]) -
+            (a[1] - c[1]) * (b[0] - c[0])) / 2.f;
+  };
 
-            // special-nms-strategy
-            auto filter_type = objects->at(filter_index)->type;
-            auto reserve_type = objects->at(keep_index)->type;
-            // Only trafficcone reserve but bicycle filter -> add bicycle conf
-            if (filter_type == base::ObjectType::BICYCLE &&
-                reserve_type == base::ObjectType::UNKNOWN) {
-                special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
-                    filter_index, base::ObjectType::BICYCLE, 0.3);
-            }
-            // Only pedestrian reserve but bicycle filter -> add bicycle conf
-            if (filter_type == base::ObjectType::BICYCLE &&
-                reserve_type == base::ObjectType::PEDESTRIAN) {
-                special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
-                    filter_index, base::ObjectType::BICYCLE, 0.2);
-            }
-            // Only trafficcone reserve but ped filter -> add ped conf
-            // if (filter_type == base::ObjectType::PEDESTRIAN &&
-            //     reserve_type == base::ObjectType::UNKNOWN) {
-            //     special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
-            //         filter_index, base::ObjectType::PEDESTRIAN, 0.2);
-            // }
-            // Only ped reserve but trafficcone filter -> add trafficcone conf
-            if (filter_type == base::ObjectType::UNKNOWN &&
-                reserve_type == base::ObjectType::PEDESTRIAN) {
-                special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
-                  filter_index, base::ObjectType::UNKNOWN, 0.2);
-            }
-            ADEBUG << "Only Two NMS: reserve " << keep_index
-                   << " filter " << filter_index;
-        }
-        if (nms_pairs[i].size() >= 2) {
-            // car strategy
-            bool have_car = false;
-            if (objects->at(i)->type == base::ObjectType::VEHICLE) {
-                have_car = true;
-            }
-            for (size_t k = 0; k < nms_pairs[i].size() && !have_car; k++) {
-                auto type = objects->at(nms_pairs[i][k])->type;
-                if (type == base::ObjectType::VEHICLE) {
-                    have_car = true;
-                    break;
-                }
-            }
-            // no car -> BICYCLE priorTo PEDESTRIAN priorTo TRAFFICCONE
-            // have car -> confidence
-            if (have_car) {
-                auto keep_conf = objects->at(i)->confidence;
-                auto keep_index = i;
-                for (size_t k = 0; k < nms_pairs[i].size(); k++) {
-                    if (objects->at(nms_pairs[i][k])->confidence > keep_conf) {
-                        delete_array[keep_index] = true;
-                        keep_conf = objects->at(nms_pairs[i][k])->confidence;
-                        keep_index = nms_pairs[i][k];
-                    } else {
-                        delete_array[nms_pairs[i][k]] = true;
-                        ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
-                    }
-                }
-            } else {
-                auto keep_type = static_cast<size_t>(objects->at(i)->type);
-                auto keep_index = i;
-                for (size_t k = 0; k < nms_pairs[i].size(); k++) {
-                    if (static_cast<size_t>(
-                        objects->at(nms_pairs[i][k])->type) > keep_type) {
-                        delete_array[keep_index] = true;
-                        keep_type = static_cast<size_t>(
-                            objects->at(nms_pairs[i][k])->type);
-                        keep_index = nms_pairs[i][k];
-                    } else {
-                        delete_array[nms_pairs[i][k]] = true;
-                        ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
-                    }
-                }
-            }
-        }
+  auto sort_vertex_in_convex_polygon_cpu = [&](float* int_pts,
+                                               int num_of_inter) {
+    if (num_of_inter == 0) {
+      return;
     }
-    size_t valid_num = 0;
-    for (size_t i = 0; i < objects->size(); i++) {
-        auto &object = objects->at(i);
-        if (!delete_array[i]) {
-            objects->at(valid_num) = object;
-            valid_num++;
-        }
+    float center_x = 0.f;
+    float center_y = 0.f;
+    for (int i = 0; i < num_of_inter; i++) {
+      center_x += int_pts[2 * i];
+      center_y += int_pts[2 * i + 1];
     }
-    objects->resize(valid_num);
+    center_x /= num_of_inter;
+    center_y /= num_of_inter;
+    float v0;
+    float v1;
+    float vs[16];
+    for (int i = 0; i < num_of_inter; i++) {
+      v0 = int_pts[2 * i] - center_x;
+      v1 = int_pts[2 * i + 1] - center_y;
+      float d = sqrt(v0 * v0 + v1 * v1);
+      v0 = v0 / d;
+      v1 = v1 / d;
+      if (v1 < 0) {
+        v0 = -2 - v0;
+      }
+      vs[i] = v0;
+    }
+    int j = 0;
+    float temp = 0.f;
+    for (int i = 0; i < num_of_inter; i++) {
+      if (vs[i - 1] > vs[i]) {
+        temp = vs[i];
+        float tx = int_pts[2 * i];
+        float ty = int_pts[2 * i + 1];
+        j = i;
+        while (j > 0 && vs[j - 1] > temp) {
+          vs[j] = vs[j - 1];
+          int_pts[j * 2] = int_pts[j * 2 - 2];
+          int_pts[j * 2 + 1] = int_pts[j * 2 - 1];
+          j -= 1;
+        }
+        vs[j] = temp;
+        int_pts[j * 2] = tx;
+        int_pts[j * 2 + 1] = ty;
+      }
+    }
+  };
+
+  auto line_segment_intersection_cpu = [&](const float* pts1, const float* pts2,
+                                           int i, int j, float* temp_pts) {
+    float A0 = pts1[2 * i];
+    float A1 = pts1[2 * i + 1];
+
+    float B0 = pts1[2 * ((i + 1) % 4)];
+    float B1 = pts1[2 * ((i + 1) % 4) + 1];
+
+    float C0 = pts2[2 * j];
+    float C1 = pts2[2 * j + 1];
+
+    float D0 = pts2[2 * ((j + 1) % 4)];
+    float D1 = pts2[2 * ((j + 1) % 4) + 1];
+    float BA0 = B0 - A0;
+    float BA1 = B1 - A1;
+    float DA0 = D0 - A0;
+    float CA0 = C0 - A0;
+    float DA1 = D1 - A1;
+    float CA1 = C1 - A1;
+    bool acd = DA1 * CA0 > CA1 * DA0;
+    bool bcd = (D1 - B1) * (C0 - B0) > (C1 - B1) * (D0 - B0);
+    if (acd != bcd) {
+      bool abc = CA1 * BA0 > BA1 * CA0;
+      bool abd = DA1 * BA0 > BA1 * DA0;
+      if (abc != abd) {
+        float DC0 = D0 - C0;
+        float DC1 = D1 - C1;
+        float ABBA = A0 * B1 - B0 * A1;
+        float CDDC = C0 * D1 - D0 * C1;
+        float DH = BA1 * DC0 - BA0 * DC1;
+        float Dx = ABBA * DC0 - BA0 * CDDC;
+        float Dy = ABBA * DC1 - BA1 * CDDC;
+        temp_pts[0] = Dx / DH;
+        temp_pts[1] = Dy / DH;
+        return true;
+      }
+    }
+    return false;
+  };
+
+  auto point_in_quadrilateral_cpu = [&](float pt_x, float pt_y,
+                                        const float* corners) {
+    float ab0 = corners[2] - corners[0];
+    float ab1 = corners[3] - corners[1];
+    float ad0 = corners[6] - corners[0];
+    float ad1 = corners[7] - corners[1];
+    float ap0 = pt_x - corners[0];
+    float ap1 = pt_y - corners[1];
+    float abab = ab0 * ab0 + ab1 * ab1;
+    float abap = ab0 * ap0 + ab1 * ap1;
+    float adad = ad0 * ad0 + ad1 * ad1;
+    float adap = ad0 * ap0 + ad1 * ap1;
+    return abab >= abap && abap >= 0 && adad >= adap && adap >= 0;
+  };
+
+  auto rotate_inter = [&](const float *corners1, const float *corners2) {
+    float intersection_corners[16];
+    // quadrilateral_intersection
+    int num_of_inter = 0;
+    for (int i = 0; i < 4; i++) {
+      if (point_in_quadrilateral_cpu(corners1[2 * i],
+                                    corners1[2 * i + 1], corners2)) {
+        intersection_corners[num_of_inter * 2] = corners1[2 * i];
+        intersection_corners[num_of_inter * 2 + 1] = corners1[2 * i + 1];
+        num_of_inter += 1;
+      }
+      if (point_in_quadrilateral_cpu(corners2[2 * i],
+                                     corners2[2 * i + 1], corners1)) {
+        intersection_corners[num_of_inter * 2] = corners2[2 * i];
+        intersection_corners[num_of_inter * 2 + 1] = corners2[2 * i + 1];
+        num_of_inter += 1;
+      }
+    }
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (line_segment_intersection_cpu(corners1, corners2, i, j,
+                              intersection_corners + num_of_inter * 2)) {
+          ++num_of_inter;
+        }
+      }
+    }
+    sort_vertex_in_convex_polygon_cpu(intersection_corners, num_of_inter);
+    // area
+    float area_val = 0.f;
+    for (int i = 0; i < num_of_inter - 2; i++) {
+      area_val += abs(trangle_area_cpu(intersection_corners,
+          intersection_corners + 2 * (i + 1),
+          intersection_corners + 2 * (i + 2)));
+    }
+    return area_val;
+  };
+
+  auto calculate_nms = [&](base::ObjectPtr obj1, base::ObjectPtr obj2) {
+    std::vector<float> box_corner1 = get_corners(obj1);
+    std::vector<float> box_corner2 = get_corners(obj2);
+    float area_inter = rotate_inter(box_corner1.data(), box_corner2.data());
+    float overlap = area_inter / std::max(
+      obj1->size(0) * obj1->size(1) +
+      obj2->size(0) * obj2->size(1) - area_inter,
+      0.001f);
+    return overlap;
+  };
+
+  std::vector<bool> delete_array(objects->size(), false);
+  std::vector<bool> nms_visited(objects->size(), false);
+  std::vector<std::vector<size_t>> nms_pairs;
+  nms_pairs.resize(objects->size());
+  // different class nms
+  for (size_t i = 0; i < objects->size(); i++) {
+    auto &obj_i = objects->at(i);
+    if (!obj_i || nms_visited[i]) {
+      continue;
+    }
+    for (size_t j = i + 1; j < objects->size(); j++) {
+      auto &obj_j = objects->at(j);
+      if (!obj_j) {
+        continue;
+      }
+      if (calculate_nms(obj_i, obj_j) <= diff_class_iou_) {
+        continue;
+      }
+      if (static_cast<int>(obj_i->type) == static_cast<int>(obj_j->type)) {
+        continue;
+      }
+      nms_visited[j] = true;
+      nms_pairs[i].push_back(j);
+    }
+  }
+  // do NMS
+  for (size_t i = 0; i < objects->size(); i++) {
+    if (nms_pairs[i].size() == 0) {
+      continue;
+    }
+    if (nms_pairs[i].size() == 1) {
+      size_t filter_index = ordinary_nms_strategy(i, nms_pairs[i][0]);
+      size_t keep_index = filter_index == i ? nms_pairs[i][0] : i;
+
+      delete_array[keep_index] = false;
+      delete_array[filter_index] = true;
+
+      // special-nms-strategy
+      auto filter_type = objects->at(filter_index)->type;
+      auto reserve_type = objects->at(keep_index)->type;
+      // Only trafficcone reserve but bicycle filter -> add bicycle conf
+      if (filter_type == base::ObjectType::BICYCLE &&
+          reserve_type == base::ObjectType::UNKNOWN) {
+        special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
+            filter_index, base::ObjectType::BICYCLE, 0.3);
+      }
+      // Only pedestrian reserve but bicycle filter -> add bicycle conf
+      if (filter_type == base::ObjectType::BICYCLE &&
+          reserve_type == base::ObjectType::PEDESTRIAN) {
+        special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
+            filter_index, base::ObjectType::BICYCLE, 0.2);
+      }
+      // Only trafficcone reserve but ped filter -> add ped conf
+      // if (filter_type == base::ObjectType::PEDESTRIAN &&
+      //     reserve_type == base::ObjectType::UNKNOWN) {
+      //     special_nms_strategy(keep_index, base::ObjectType::UNKNOWN,
+      //         filter_index, base::ObjectType::PEDESTRIAN, 0.2);
+      // }
+      // Only ped reserve but trafficcone filter -> add trafficcone conf
+      if (filter_type == base::ObjectType::UNKNOWN &&
+          reserve_type == base::ObjectType::PEDESTRIAN) {
+        special_nms_strategy(keep_index, base::ObjectType::PEDESTRIAN,
+          filter_index, base::ObjectType::UNKNOWN, 0.2);
+      }
+      ADEBUG << "Only Two NMS: reserve " << keep_index
+              << " filter " << filter_index;
+    }
+    if (nms_pairs[i].size() >= 2) {
+      // car strategy
+      bool have_car = false;
+      if (objects->at(i)->type == base::ObjectType::VEHICLE) {
+        have_car = true;
+      }
+      for (size_t k = 0; k < nms_pairs[i].size() && !have_car; k++) {
+        auto type = objects->at(nms_pairs[i][k])->type;
+        if (type == base::ObjectType::VEHICLE) {
+          have_car = true;
+          break;
+        }
+      }
+      // no car -> BICYCLE priorTo PEDESTRIAN priorTo TRAFFICCONE
+      // have car -> confidence
+      if (have_car) {
+        auto keep_conf = objects->at(i)->confidence;
+        auto keep_index = i;
+        for (size_t k = 0; k < nms_pairs[i].size(); k++) {
+          if (objects->at(nms_pairs[i][k])->confidence > keep_conf) {
+            delete_array[keep_index] = true;
+            keep_conf = objects->at(nms_pairs[i][k])->confidence;
+            keep_index = nms_pairs[i][k];
+          } else {
+            delete_array[nms_pairs[i][k]] = true;
+            ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
+          }
+        }
+      } else {
+        auto keep_type = static_cast<size_t>(objects->at(i)->type);
+        auto keep_index = i;
+        for (size_t k = 0; k < nms_pairs[i].size(); k++) {
+          if (static_cast<size_t>(
+            objects->at(nms_pairs[i][k])->type) > keep_type) {
+            delete_array[keep_index] = true;
+            keep_type = static_cast<size_t>(
+                objects->at(nms_pairs[i][k])->type);
+            keep_index = nms_pairs[i][k];
+          } else {
+            delete_array[nms_pairs[i][k]] = true;
+            ADEBUG << "NMS filter_index: " << nms_pairs[i][k];
+          }
+        }
+      }
+    }
+  }
+  size_t valid_num = 0;
+  for (size_t i = 0; i < objects->size(); i++) {
+    auto &object = objects->at(i);
+    if (!delete_array[i]) {
+      objects->at(valid_num) = object;
+      valid_num++;
+    }
+  }
+  objects->resize(valid_num);
 }
 
 void CenterPointDetection::FilterObjectsbySemanticType(

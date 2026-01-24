@@ -41,6 +41,7 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_tracker.cc",
         "tracker/multi_lidar_fusion/mlf_type_filter.cc",
         "tracker/multi_lidar_fusion/util.cc",
+        "tracker/multi_lidar_fusion/mlf_direction_filter.cc",
         "tracker/type_fusion/ccrf_type_fusion.cc",
         "tracker/type_fusion/util.cc"
     ],
@@ -71,6 +72,7 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_tracker.h",
         "tracker/multi_lidar_fusion/mlf_type_filter.h",
         "tracker/multi_lidar_fusion/util.h",
+        "tracker/multi_lidar_fusion/mlf_direction_filter.h",
         "tracker/type_fusion/ccrf_type_fusion.h",
         "tracker/type_fusion/type_fusion_interface.h",
         "tracker/type_fusion/util.h"

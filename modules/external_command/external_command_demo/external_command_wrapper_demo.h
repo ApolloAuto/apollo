@@ -78,7 +78,7 @@ class ExternalCommandWrapperDemo final : public apollo::cyber::TimerComponent {
       const std::vector<apollo::external_command::Point>& way_points,
       const apollo::external_command::Pose& end);
 
-  void SendZoneCoverCommand(const std::string overlap_id);
+  void SendZoneCoverCommand(const std::string zone_cover_area_id);
 
   void ReadPathFromPathRecord(
       const std::string& record_file,

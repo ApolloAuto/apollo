@@ -29,9 +29,9 @@ namespace fusion {
 
 TEST(DstTypeFusionTest, test_update_with_measurement) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   EXPECT_TRUE(algorithm::SensorManager::Instance()->Init());
 
@@ -117,9 +117,9 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
 
 TEST(DstTypeFusionTest, test_update_without_measurement) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   algorithm::SensorManager *sensor_manager =
       algorithm::SensorManager::Instance();

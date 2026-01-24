@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
@@ -47,7 +48,7 @@ class DataParser {
              const std::shared_ptr<apollo::cyber::Node> &node);
   ~DataParser() {}
   bool Init();
-  void ParseRawData(const std::string &msg);
+  void ParseRawData(const std::string &msg, const uint8_t &channel = 0);
 
  private:
   void DispatchMessage(const MessageInfo &message_info);
@@ -94,6 +95,8 @@ class DataParser {
   std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
       epochobservation_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<Heading>> heading_writer_ = nullptr;
+
+  std::mutex data_mutex_;
 };
 
 }  // namespace gnss

@@ -16,6 +16,7 @@ apollo_py_binary(
         "//modules/common_msgs/external_command_msgs:action_command_py_pb2",
         "//modules/common_msgs/external_command_msgs:external_geometry_py_pb2",
         "//modules/common_msgs/external_command_msgs:precise_parking_command_py_pb2",
+        "//modules/common_msgs/external_command_msgs:zone_cover_command_py_pb2",
         "//modules/common_msgs/routing_msgs:routing_py_pb2",
         "//modules/common_msgs/external_command_msgs:command_status_py_pb2",
         "//modules/tools/common:proto_utils"

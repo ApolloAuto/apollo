@@ -12,7 +12,7 @@ module_config {
       class_name : "VelodyneDriverComponent"
       config {
         name : "velodyne_64_driver"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne64_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne64_conf.pb.txt"
       }
     }
     # 16_front_up
@@ -20,7 +20,7 @@ module_config {
       class_name : "VelodyneDriverComponent"
       config {
         name : "velodyne_16_front_up_driver"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_front_up_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_up_conf.pb.txt"
       }
     }
     # 16_front_center
@@ -28,7 +28,7 @@ module_config {
       class_name : "VelodyneDriverComponent"
       config {
         name : "velodyne_16_front_center_driver"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
       }
     }
     # 16_rear_left
@@ -36,7 +36,7 @@ module_config {
       class_name : "VelodyneDriverComponent"
       config {
         name : "velodyne_16_rear_left_driver"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
       }
     }
     # 16_rear_right
@@ -44,7 +44,7 @@ module_config {
       class_name : "VelodyneDriverComponent"
       config {
         name : "velodyne_16_rear_right_driver"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
       }
     }
 }
@@ -61,7 +61,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_64_convert"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne64_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne64_conf.pb.txt"
         readers {
           channel: "/apollo/sensor/velodyne64/VelodyneScan"
         }
@@ -72,7 +72,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_16_front_up_convert"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_front_up_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_up_conf.pb.txt"
         readers {
           channel: "/apollo/sensor/lidar16/front/up/Scan"
         }
@@ -83,7 +83,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_16_front_center_convert"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
         readers {
           channel: "/apollo/sensor/lidar16/front/center/Scan"
         }
@@ -94,7 +94,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_16_rear_left_convert"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_rear_left_conf.pb.txt"
         readers {
           channel: "/apollo/sensor/lidar16/rear/left/Scan"
         }
@@ -105,7 +105,7 @@ module_config {
       class_name : "VelodyneConvertComponent"
       config {
         name : "velodyne_16_rear_right_convert"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_rear_right_conf.pb.txt"
         readers {
           channel: "/apollo/sensor/lidar16/rear/right/Scan"
         }
@@ -124,7 +124,7 @@ module_config {
       class_name : "PriSecFusionComponent"
       config {
         name : "velodyne_fusion"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne_fusion_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne_fusion_conf.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/front/center/PointCloud2"}
       }
     }
@@ -142,7 +142,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "velodyne16_fusion_compensator"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
       }
     }
@@ -155,7 +155,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "velodyne16_front_up_compensator"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne16_front_up_compensator.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_up_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/front/up/PointCloud2"}
       }
     }
@@ -168,7 +168,7 @@ module_config {
       class_name : "CompensatorComponent"
       config {
         name : "velodyne64_compensator"
-        config_file_path : "modules/drivers/lidar/velodyne/conf/velodyne64_compensator.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne64_compensator.pb.txt"
         readers {channel: "/apollo/sensor/velodyne64/PointCloud2"}
       }
     }

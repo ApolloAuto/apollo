@@ -119,11 +119,11 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = path_bound;
-  std::vector<SLPolygon> obs_sl_polygons;
-  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
+  obs_sl_polygons_.clear();
+  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons_,
                                        init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          *reference_line_info_, &obs_sl_polygons, init_sl_state_, &path_bound,
+          *reference_line_info_, &obs_sl_polygons_, init_sl_state_, &path_bound,
           &blocking_obstacle_id, &path_narrowest_width)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
@@ -272,6 +272,8 @@ bool LaneFollowPath::AssessPath(std::vector<PathData>* candidate_path_data,
   reference_line_info_->MutableCandidatePathData()->push_back(*final_path);
   reference_line_info_->SetBlockingObstacle(
       curr_path_data.blocking_obstacle_id());
+  // move obs_sl_polygon to reference_line_info, it will be empty, do not use it
+  *(reference_line_info_->mutable_obs_sl_polygons()) = std::move(obs_sl_polygons_);
   return true;
 }
 

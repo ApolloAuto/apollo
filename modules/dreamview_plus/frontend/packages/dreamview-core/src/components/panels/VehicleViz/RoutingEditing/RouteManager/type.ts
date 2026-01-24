@@ -6,6 +6,7 @@ export enum RouteOrigin {
 export enum PointType {
     INITIAL_POINT = 'initial_point',
     WAY_POINT = 'way_point',
+    INDOOR_LOCALIZATION_POINT = 'indoor_localization_point',
 }
 export interface RoutePoint {
     x: number;

@@ -289,5 +289,17 @@ void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
   }
 }
 
+OSQPSettings* PiecewiseJerkPathProblem::SolverDefaultSettings() {
+  // Define Solver default settings
+  OSQPSettings* settings =
+      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  osqp_set_default_settings(settings);
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->scaled_termination = true;
+  settings->time_limit = FLAGS_path_speed_osqp_setting_time_limit;
+  return settings;
+}
+
 }  // namespace planning
 }  // namespace apollo

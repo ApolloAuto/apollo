@@ -87,7 +87,8 @@ class STBoundaryMapper {
    */
   bool CheckOverlap(const common::PathPoint& path_point,
                     const common::math::Polygon2d& obs_polygon,
-                    const double l_buffer) const;
+                    const double l_buffer,
+                    common::math::Polygon2d* collision_ego_polygon = nullptr) const;
 
   /** @brief Maps the closest STOP decision onto the ST-graph. This STOP
    * decision can be stopping for blocking obstacles, or can be due to

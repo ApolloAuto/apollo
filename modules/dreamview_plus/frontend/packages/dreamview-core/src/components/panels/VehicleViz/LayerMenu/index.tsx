@@ -8,8 +8,6 @@ import { usePanelContext } from '../../base/store/PanelStore';
 import { StreamDataNames } from '../../../../services/api/types';
 import useWebSocketServices from '../../../../services/hooks/useWebSocketServices';
 import ChannelSelect from '../../base/ChannelSelect';
-import { getLocalVizCurbPointCloudChannelName, getLocalVizPointCloudChannelName } from '../util';
-import { channelType } from '../type';
 
 function LayerMenu(props: any) {
     const { classes, cx } = useStyle();
@@ -19,7 +17,7 @@ function LayerMenu(props: any) {
         handlePointCloudVisible,
         pointcloudChannels,
         updatePointcloudChannel,
-        getCurChannel,
+        curChannel,
         setCurChannel,
         handleReferenceLineVisible,
         handleBoundaryLineVisible,
@@ -42,24 +40,11 @@ function LayerMenu(props: any) {
             //     )?.channels;
             //
             //     if (Array.isArray(pointCloudChannels)) {
-            // eslint-disable-next-line max-len
             //         const hasCompensator = pointCloudChannels.some((item) => item.channelName.includes('compensator'));
             //         const hasFusion = pointCloudChannels.some((item) => item.channelName.includes('fusion'));
             //         return !(hasCompensator || hasFusion);
             //     }
             // }
-            if (key === 'curbPointCloud') {
-                const pointCloudChannels = metadata.find(
-                    (item) => item.dataName === StreamDataNames.POINT_CLOUD,
-                )?.channels;
-
-                if (Array.isArray(pointCloudChannels)) {
-                    const hasEdge = pointCloudChannels.some((item) =>
-                        item.channelName.includes('/apollo/perception/edge'),
-                    );
-                    return !hasEdge;
-                }
-            }
             return false;
         },
         [metadata],
@@ -74,7 +59,6 @@ function LayerMenu(props: any) {
     const [currentMenu, setCurrentMenu] = useState(menu[0]);
     const [subMenu, setSubMenu] = useState(layerMenu[currentMenu]);
     const pointCloudCheckedRef = useRef<boolean>();
-    const curbPointCloudCheckedRef = useRef<boolean>();
 
     const resetLayerMenu = () => {
         setLayerMenu(() => layerMenuParams);
@@ -82,16 +66,11 @@ function LayerMenu(props: any) {
         localLayerMenuParamsManager.set(layerMenuParams);
     };
 
-    const localVizPointCloudChannel = useLocalStorage(getLocalVizPointCloudChannelName(panelId));
-    const localVizCurbPointCloudChannel = useLocalStorage(getLocalVizCurbPointCloudChannelName(panelId));
-    const onChange = (v: any, type: channelType = 'pointCloud') => {
-        setCurChannel(v, type);
-        updatePointcloudChannel(v, type);
-        if (type === 'pointCloud') {
-            localVizPointCloudChannel.set(v);
-        } else {
-            localVizCurbPointCloudChannel.set(v);
-        }
+    const localVizPointCloudChannel = useLocalStorage(`${panelId}-viz-pointcloud-channel`);
+    const onChange = (v: any) => {
+        setCurChannel(v);
+        updatePointcloudChannel(v);
+        localVizPointCloudChannel.set(v);
     };
 
     const pointCloudInfoBox = useMemo(() => {
@@ -107,15 +86,18 @@ function LayerMenu(props: any) {
                         onChange={(e) => {
                             const checked = e.target.checked;
                             pointCloudCheckedRef.current = checked;
-                            const newLayerMenu = Object.keys(layerMenu).reduce((acc, key) => {
-                                acc[key] = layerMenu[key];
-                                acc[key].pointCloud = acc[key].pointCloud || layerMenu.Perception.pointCloud;
-                                acc[key].pointCloud.currentVisible = checked;
-                                return acc;
-                            }, {} as any);
+                            const newMenu = {
+                                ...layerMenu[currentMenu],
+                                pointCloud: {
+                                    ...layerMenu[currentMenu].pointCloud,
+                                    currentVisible: checked,
+                                },
+                            };
 
-                            const newMenu = newLayerMenu[currentMenu];
-
+                            const newLayerMenu = {
+                                ...layerMenu,
+                                [currentMenu]: newMenu,
+                            };
                             setSubMenu(() => newMenu);
                             setLayerMenu(() => newLayerMenu);
                             carviz.option.updateLayerOption(formatLayerParams(newLayerMenu), 'vehicle');
@@ -123,13 +105,13 @@ function LayerMenu(props: any) {
                             // if (checked && !checkBoxDisabled('pointCloud') && pointCloudFusionChannel) {
                             if (checked) {
                                 if (handlePointCloudVisible) {
-                                    handlePointCloudVisible(e.target.checked, 'pointCloud');
+                                    handlePointCloudVisible(e.target.checked);
                                 }
                             }
 
                             if (!checked) {
                                 if (handlePointCloudVisible) {
-                                    handlePointCloudVisible(e.target.checked, 'pointCloud');
+                                    handlePointCloudVisible(e.target.checked);
                                 }
                             }
                         }}
@@ -148,93 +130,6 @@ function LayerMenu(props: any) {
         pointCloudFusionChannel,
         t,
     ]);
-
-    const curbPointCloudInfoBox = useMemo(() => {
-        const { currentVisible } = layerMenu[currentMenu].curbPointCloud || {};
-        curbPointCloudCheckedRef.current = currentVisible;
-        return (
-            <li className={classes['layer-menu-content-right-li']} data-width='min' key='pointCloud'>
-                <span className={classes['layer-menu-content-right-switch']}>
-                    <Checkbox
-                        checked={currentVisible}
-                        // disabled={checkBoxDisabled('pointCloud')}
-                        defaultChecked={currentVisible}
-                        onChange={(e) => {
-                            const checked = e.target.checked;
-                            curbPointCloudCheckedRef.current = checked;
-                            const newLayerMenu = Object.keys(layerMenu).reduce((acc, key) => {
-                                acc[key] = layerMenu[key];
-                                acc[key].curbPointCloud = acc[key].curbPointCloud || layerMenu.Perception.pointCloud;
-                                acc[key].curbPointCloud.currentVisible = checked;
-                                return acc;
-                            }, {} as any);
-
-                            const newMenu = newLayerMenu[currentMenu];
-
-                            setSubMenu(() => newMenu);
-                            setLayerMenu(() => newLayerMenu);
-                            carviz.option.updateLayerOption(formatLayerParams(newLayerMenu), 'vehicle');
-                            localLayerMenuParamsManager.set(newLayerMenu);
-                            // if (checked && !checkBoxDisabled('pointCloud') && pointCloudFusionChannel) {
-                            if (checked) {
-                                if (handlePointCloudVisible) {
-                                    handlePointCloudVisible(e.target.checked, 'curbPointCloud');
-                                }
-                            }
-
-                            if (!checked) {
-                                if (handlePointCloudVisible) {
-                                    handlePointCloudVisible(e.target.checked, 'curbPointCloud');
-                                }
-                            }
-                        }}
-                    />
-                </span>
-                <span className={classes['layer-menu-content-right-label']}>{t('curbPointCloud')}</span>
-            </li>
-        );
-    }, [
-        carviz.option,
-        checkBoxDisabled,
-        classes,
-        currentMenu,
-        handlePointCloudVisible,
-        layerMenu,
-        pointCloudFusionChannel,
-        t,
-    ]);
-
-    const renderPointCloudBlock = useCallback(
-        () => (
-            <>
-                {pointCloudInfoBox}
-                <ChannelSelect
-                    disabled={!pointCloudCheckedRef.current}
-                    value={getCurChannel('pointCloud')}
-                    options={pointcloudChannels.filter((item: any) => !item.value.includes('/apollo/perception/edge'))}
-                    onChange={(v) => onChange(v, 'pointCloud')}
-                />
-                <div className={classes['layer-menu-horizontal-line']} />
-            </>
-        ),
-        [classes, getCurChannel, onChange, pointCloudInfoBox, pointcloudChannels],
-    );
-
-    const renderCurbPointCloudBlock = useCallback(
-        () => (
-            <>
-                {curbPointCloudInfoBox}
-                <ChannelSelect
-                    disabled={!curbPointCloudCheckedRef.current}
-                    value={getCurChannel('curbPointCloud')}
-                    options={pointcloudChannels.filter((item: any) => item.value.includes('/apollo/perception/edge'))}
-                    onChange={(v) => onChange(v, 'curbPointCloud')}
-                />
-                <div className={classes['layer-menu-horizontal-line']} />
-            </>
-        ),
-        [classes, getCurChannel, onChange, curbPointCloudInfoBox, pointcloudChannels],
-    );
 
     return (
         <div className={classes['layer-menu-container']}>
@@ -340,11 +235,17 @@ function LayerMenu(props: any) {
                         </>
                     )}
 
-                    {renderPointCloudBlock()}
-                    {renderCurbPointCloudBlock()}
+                    {pointCloudInfoBox}
+                    <ChannelSelect
+                        disabled={!pointCloudCheckedRef.current}
+                        value={curChannel}
+                        options={pointcloudChannels}
+                        onChange={(v) => onChange(v)}
+                    />
+                    <div className={classes['layer-menu-horizontal-line']} />
 
                     {Object.keys(subMenu).map((key) => {
-                        if (key === 'pointCloud' || key === 'curbPointCloud') {
+                        if (key === 'pointCloud') {
                             return null;
                         }
 
@@ -352,7 +253,7 @@ function LayerMenu(props: any) {
                         return (
                             key !== 'polygon' &&
                             key !== 'boundingbox' && (
-                                <li className={classes['layer-menu-content-right-li']} data-width='minMax' key={key}>
+                                <li className={classes['layer-menu-content-right-li']} key={key}>
                                     <span className={classes['layer-menu-content-right-switch']}>
                                         <Checkbox
                                             checked={currentVisible}
@@ -390,9 +291,9 @@ function LayerMenu(props: any) {
                                                     }
                                                 }
 
-                                                if (!checked && (key === 'pointCloud' || key === 'curbPointCloud')) {
+                                                if (!checked && key === 'pointCloud') {
                                                     if (handlePointCloudVisible) {
-                                                        handlePointCloudVisible(e.target.checked, key);
+                                                        handlePointCloudVisible(e.target.checked);
                                                     }
                                                 }
                                                 if (key === 'planningReferenceLine') {

@@ -36,7 +36,7 @@ class FrameTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     ASSERT_TRUE(cyber::common::GetProtoFromFile(
-        "modules/planning/planning_base/testdata/common/"
+        "/apollo/modules/planning/planning_base/testdata/common/"
         "sample_prediction.pb.txt",
         &prediction_obstacles_));
   }

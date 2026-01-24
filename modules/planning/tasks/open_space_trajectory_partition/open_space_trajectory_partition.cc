@@ -398,16 +398,25 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
   // Decide initial gear
   const auto& first_path_point = raw_trajectory.front().path_point();
   const auto& second_path_point = raw_trajectory[1].path_point();
+  const auto& last_path_point = raw_trajectory.back().path_point();
   double heading_angle = first_path_point.theta();
   const Vec2d init_tracking_vector(
       second_path_point.x() - first_path_point.x(),
       second_path_point.y() - first_path_point.y());
   double tracking_angle = init_tracking_vector.Angle();
-  *gear =
-      std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
-              (M_PI_2)
-          ? canbus::Chassis::GEAR_DRIVE
-          : canbus::Chassis::GEAR_REVERSE;
+  if (first_path_point.x() == second_path_point.x() &&
+      first_path_point.y() == second_path_point.y() &&
+      first_path_point.x() == last_path_point.x() &&
+      first_path_point.y() == last_path_point.y()) {
+    *gear = injector_->vehicle_state()->vehicle_state().gear();
+  } else {
+    *gear =
+        std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+                (M_PI_2)
+            ? canbus::Chassis::GEAR_DRIVE
+            : canbus::Chassis::GEAR_REVERSE;
+  }
+  AINFO << "First trajectory segment gear: " << std::to_string(*gear);
 
   // Set accumulated distance
   Vec2d last_pos_vec(first_path_point.x(), first_path_point.y());
@@ -417,19 +426,34 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
   for (size_t i = 0; i < horizon - 1; ++i) {
     const TrajectoryPoint& trajectory_point = raw_trajectory.at(i);
     const TrajectoryPoint& next_trajectory_point = raw_trajectory.at(i + 1);
+    const TrajectoryPoint& last_trajectory_point = raw_trajectory.back();
 
     // Check gear change
     heading_angle = trajectory_point.path_point().theta();
-    const Vec2d tracking_vector(next_trajectory_point.path_point().x() -
-                                    trajectory_point.path_point().x(),
-                                next_trajectory_point.path_point().y() -
-                                    trajectory_point.path_point().y());
-    tracking_angle = tracking_vector.Angle();
-    auto cur_gear =
-        std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
-                (M_PI_2)
-            ? canbus::Chassis::GEAR_DRIVE
-            : canbus::Chassis::GEAR_REVERSE;
+
+    apollo::canbus::Chassis::GearPosition cur_gear;
+    if (next_trajectory_point.path_point().x() ==
+            trajectory_point.path_point().x() &&
+        next_trajectory_point.path_point().y() ==
+            trajectory_point.path_point().y() &&
+        last_trajectory_point.path_point().x() ==
+            trajectory_point.path_point().x() &&
+        last_trajectory_point.path_point().y() ==
+            trajectory_point.path_point().y()) {
+      AINFO << "Current trajectory point is same, set the gear with current gear!";
+      cur_gear = injector_->vehicle_state()->vehicle_state().gear();
+    } else {
+      const Vec2d tracking_vector(next_trajectory_point.path_point().x() -
+                                      trajectory_point.path_point().x(),
+                                  next_trajectory_point.path_point().y() -
+                                      trajectory_point.path_point().y());
+      tracking_angle = tracking_vector.Angle();
+      cur_gear = std::abs(common::math::NormalizeAngle(
+                     tracking_angle - heading_angle)) < (M_PI_2)
+                     ? canbus::Chassis::GEAR_DRIVE
+                     : canbus::Chassis::GEAR_REVERSE;
+    }
+    AINFO << "cur_gear: " << std::to_string(cur_gear);
 
     if (cur_gear != *gear) {
       is_trajectory_last_point = true;

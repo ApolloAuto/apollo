@@ -19,20 +19,13 @@ message Stream {
 
     ASENSING_TEXT = 14;
     ASENSING_BINARY = 15;
+    ASENSING_CAN = 16;
 
     UBLOX_TEXT = 20;
     UBLOX_BINARY = 21;
 
     BROADGNSS_TEXT = 30;
     BROADGNSS_BINARY = 31;
-
-    ENBROAD_TEXT = 40;
-    ENBROAD_BINARY = 41;
-    
-    FORSENSE_TEXT = 50;
-
-    CXZL_TEXT = 60;
-
   }
   optional Format format = 1;
 
@@ -70,6 +63,7 @@ message Stream {
     apollo.drivers.canbus.CANCardParameter can_card_parameter = 6;
   }
   optional bool push_location = 7;
+  optional bool is_data_stream = 8 [default = false];
 }
 
 // Device-specific configuration.
@@ -140,4 +134,5 @@ message Config {
   optional string wheel_parameters = 13;
   optional string gpsbin_folder = 14;
   optional bool use_gnss_time = 15 [default = true];
+  optional bool auto_fill_gps_msg = 16 [default = false];
 }

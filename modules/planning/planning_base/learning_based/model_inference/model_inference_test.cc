@@ -45,20 +45,20 @@ class ModelInferenceTest : public ::testing::Test {
  public:
   virtual ~ModelInferenceTest() = default;
   virtual void SetUp() {
-    FLAGS_map_dir = "modules/map/data/sunnyvale_with_two_offices";
+    FLAGS_map_dir = "/apollo/modules/map/data/sunnyvale_with_two_offices";
     FLAGS_base_map_filename = "base_map.bin";
   }
 };
 
 TEST_F(ModelInferenceTest, trajectory_imitation_libtorch_inference) {
   FLAGS_test_model_inference_task_config_file =
-      "modules/planning/planning_base/testdata/model_inference_test/"
+      "/apollo/modules/planning/planning_base/testdata/model_inference_test/"
       "test_libtorch_inference_task_config.pb.txt";
   FLAGS_test_data_frame_file =
-      "modules/planning/planning_base/testdata/model_inference_test/"
+      "/apollo/modules/planning/planning_base/testdata/model_inference_test/"
       "learning_data_sunnyvale_with_two_offices.bin";
   FLAGS_planning_birdview_img_feature_renderer_config_file =
-      "modules/planning/planning_component/conf/"
+      "/apollo/modules/planning/planning_component/conf/"
       "planning_semantic_map_config.pb.txt";
 
   LearningModelInferenceTaskConfig config;

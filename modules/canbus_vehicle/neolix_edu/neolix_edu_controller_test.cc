@@ -39,7 +39,7 @@ class Neolix_eduControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/"
+        "/apollo/modules/canbus/testdata/conf/"
         "neolix_edu_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();

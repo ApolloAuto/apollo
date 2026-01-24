@@ -41,10 +41,10 @@ TEST(CameraUtilTest, test_is_pt_in_frustum) {
 
 TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
 
   // create a lidar sensor object
   base::ObjectPtr base_lidar_object(new base::Object());

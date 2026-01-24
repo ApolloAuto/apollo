@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/common/base/object_types.h"
 #include "modules/perception/lidar_tracking/tracker/common/track_data.h"
 
 namespace apollo {
@@ -152,11 +153,23 @@ class MlfTrackData : public TrackData {
   void GetLatestKObjects(size_t k,
     std::vector<TrackedObjectConstPtr>* objects) const;
 
+  void GetObjectsInInterval(double time,
+      std::vector<TrackedObjectPtr>* objects);
+
+  void GetObjectsInInterval(double time,
+      std::vector<TrackedObjectConstPtr>* objects) const;
+
   void GetObjectsInIntervalByOrder(double time,
     std::vector<TrackedObjectConstPtr>* objects);
 
   void GetObjectsInIntervalByOrder(double time,
     std::vector<TrackedObjectConstPtr>* objects) const;
+
+  void UpdateTrackableState(TrackedObjectPtr obj);
+
+  bool IsForegroundTrack() const;
+
+  bool IsBackgroundMovable(TrackedObjectPtr obj);
 
  public:
   typedef std::map<double, TrackedObjectPtr> TimedObjects;
@@ -175,6 +188,8 @@ class MlfTrackData : public TrackData {
   bool is_current_state_predicted_ = true;
   bool is_front_critical_track_ = false;
   bool is_reserve_blind_cone_ = false;
+
+  float foreground_track_prob_ = 0.0;
 
   static const double kMaxHistoryTime;
 };

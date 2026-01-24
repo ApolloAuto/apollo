@@ -5,7 +5,7 @@ module_config {
         class_name : "ControlComponent"
         config {
             name: "control"
-            flag_file_path: "modules/control/conf/control.conf"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
             interval: 10
         }
     }
@@ -14,7 +14,7 @@ module_config {
         class_name : "PreprocessorSubmodule"
         config {
             name: "PreprocessorSubmodule"
-            flag_file_path: "modules/control/conf/control.conf"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
                 {
                     channel:"/apollo/control/localview"
@@ -27,7 +27,7 @@ module_config {
         class_name : "LatLonControllerSubmodule"
         config {
             name: "LatLonControllerSubmodule"
-            flag_file_path: "modules/control/conf/control.conf"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
                 {
                     channel:"/apollo/control/preprocessor"
@@ -40,7 +40,7 @@ module_config {
         class_name : "PostprocessorSubmodule"
         config {
             name: "PostprocessorSubmodule"
-            flag_file_path: "modules/control/conf/control.conf"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
                 {
                     channel:"/apollo/control/controlcore"

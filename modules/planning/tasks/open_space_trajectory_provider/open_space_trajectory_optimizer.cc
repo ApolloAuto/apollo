@@ -96,8 +96,8 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
   AINFO << "origin_heading:" << std::setprecision(9) << rotate_angle << ",";
   AINFO << "init_point: ( " << std::setprecision(9) << init_x << "," << init_y
         << ")";
-  AINFO << "end_pose: (" << std::setprecision(9) << end_pose[0] << ","
-        << end_pose[1] << ")";
+  AINFO << "end_pose: (" << std::setprecision(9) << end_pose[0] << "," << end_pose[1]
+        << ")";
 
   // Rotate and scale the state
   PathPointNormalizing(rotate_angle, translate_origin, &init_x, &init_y,

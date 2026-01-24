@@ -30,7 +30,7 @@ class TransitVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "modules/canbus_vehicle/transit/testdata/"
+        "/apollo/modules/canbus_vehicle/transit/testdata/"
         "transit_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();

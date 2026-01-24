@@ -48,8 +48,6 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
 
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
-  const double ego_front_to_center =
-      vehicle_config.vehicle_param().front_edge_to_center();
   double index = 0;
   const auto& reference_line_towing_l =
       reference_line_info.reference_line_towing_l();
@@ -58,7 +56,7 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
                               std::fmax(FLAGS_path_bounds_horizon,
                                         reference_line_info.GetCruiseSpeed() *
                                             FLAGS_trajectory_time_length),
-                          reference_line.Length() - ego_front_to_center);
+                          reference_line.Length());
        curr_s += FLAGS_path_bounds_decider_resolution) {
     path_bound->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                              std::numeric_limits<double>::max());
@@ -229,10 +227,14 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
     center_l.push_back(
         (path_boundary->front().l_upper.l + path_boundary->front().l_lower.l) *
         0.5);
-    max_nudge_check_distance = FLAGS_max_nudge_check_distance_in_lk;
+    max_nudge_check_distance =
+        std::max(FLAGS_max_nudge_check_distance_in_lk,
+                 2 * VehicleConfigHelper::GetConfig().vehicle_param().length());
   } else {
     center_l.push_back(0.0);
-    max_nudge_check_distance = FLAGS_max_nudge_check_distance_in_lc;
+    max_nudge_check_distance =
+        std::max(FLAGS_max_nudge_check_distance_in_lc,
+                 2 * VehicleConfigHelper::GetConfig().vehicle_param().length());
   }
 
   *narrowest_width =
@@ -243,6 +245,9 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
       size_t(max_nudge_check_distance / FLAGS_path_bounds_decider_resolution);
   double last_max_nudge_l = center_l.front();
   // bool obs_overlap_with_refer_center = false;
+  const double adc_end_s = reference_line_info.AdcSlBoundary().end_s() + 1.0;
+  const double adc_start_s = reference_line_info.AdcSlBoundary().start_s();
+  const double adc_end_l = reference_line_info.AdcSlBoundary().end_l();
 
   for (size_t i = 1; i < path_boundary->size(); ++i) {
     double path_boundary_s = path_boundary->at(i).s;
@@ -255,6 +260,22 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
         begin_it, center_l.end(),
         [](double a, double b) { return std::fabs(a) < std::fabs(b); });
     AINFO << "last max nudge l: " << last_max_nudge_l;
+    bool is_left_width = false;
+    double eq_width = util::CalculateEquivalentEgoWidth(
+        reference_line_info, path_boundary_s, &is_left_width);
+    double left_half_width, right_half_width;
+    if (is_left_width) {
+      left_half_width = eq_width + FLAGS_obstacle_lat_buffer;
+      right_half_width =
+          VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0 +
+          FLAGS_obstacle_lat_buffer;
+    } else {
+      left_half_width =
+          VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0 +
+          FLAGS_obstacle_lat_buffer;
+      right_half_width = eq_width + FLAGS_obstacle_lat_buffer;
+    }
+
     for (size_t j = 0; j < sl_polygon->size(); j++) {
       if (sl_polygon->at(j).NudgeInfo() == SLPolygon::IGNORE) {
         AINFO << "UpdatePathBoundaryBySLPolygon, ignore obs: "
@@ -274,17 +295,18 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
       if (min_s > path_boundary_s) {
         break;
       }
-      double adc_obs_edge_buffer = GetBufferBetweenADCCenterAndEdge();
+      // double adc_obs_edge_buffer = GetBufferBetweenADCCenterAndEdge();
       sl_polygon->at(j).UpdatePassableInfo(left_bound.l, right_bound.l,
-                                           adc_obs_edge_buffer);
+                                           right_half_width, left_half_width,
+                                           path_boundary_s);
 
       double l_lower = sl_polygon->at(j).GetRightBoundaryByS(path_boundary_s);
       double l_upper = sl_polygon->at(j).GetLeftBoundaryByS(path_boundary_s);
       PathBoundPoint obs_left_nudge_bound(
-          path_boundary_s, l_upper + adc_obs_edge_buffer, left_bound.l);
+          path_boundary_s, l_upper + right_half_width, left_bound.l);
       obs_left_nudge_bound.towing_l = path_boundary->at(i).towing_l;
       PathBoundPoint obs_right_nudge_bound(path_boundary_s, right_bound.l,
-                                           l_lower - adc_obs_edge_buffer);
+                                           l_lower - left_half_width);
       obs_right_nudge_bound.towing_l = path_boundary->at(i).towing_l;
       // obs_overlap_with_refer_center =
       //     left_bound.l < path_boundary->at(i).towing_l ||
@@ -300,6 +322,18 @@ bool PathBoundsDeciderUtil::UpdatePathBoundaryBySLPolygon(
             if (std::fabs(obs_l - mid_l) < 0.4 &&
                 std::fabs(path_boundary_s - init_sl_state.first[0]) < 5.0) {
               if (init_sl_state.second[0] < obs_l) {
+                sl_polygon->at(j).SetNudgeInfo(SLPolygon::RIGHT_NUDGE);
+                AINFO << sl_polygon->at(j).id()
+                      << " right nudge with init_sl_state";
+              } else {
+                sl_polygon->at(j).SetNudgeInfo(SLPolygon::LEFT_NUDGE);
+                AINFO << sl_polygon->at(j).id()
+                      << " left nudge width init_sl_state";
+              }
+            } else if (path_boundary_s - adc_start_s > 0 &&
+                       path_boundary_s - adc_end_s < 0) {
+              // check obs in side of ego
+              if (adc_end_l < obs_l) {
                 sl_polygon->at(j).SetNudgeInfo(SLPolygon::RIGHT_NUDGE);
                 AINFO << sl_polygon->at(j).id()
                       << " right nudge with init_sl_state";
@@ -1041,8 +1075,10 @@ bool PathBoundsDeciderUtil::RelaxObsCornerBoundary(
   for (auto& extra_path_bound : *(path_boundary->mutable_extra_path_bound())) {
     double delta_s = extra_path_bound.rear_axle_s - init_pt.s;
     if (delta_s > FLAGS_relax_path_s_threshold) {
+      AINFO << "RelaxObsCornerBoundary delta_s: " << delta_s << " break";
       break;
     }
+    AINFO << "RelaxObsCornerBoundary check delta_s: " << delta_s;
 
     // calculate the left side
     if (left_calculate_success) {

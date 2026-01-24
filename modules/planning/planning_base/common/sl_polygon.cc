@@ -27,8 +27,14 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
+
+using apollo::common::VehicleConfigHelper;
+
 
 using apollo::common::VehicleConfigHelper;
 
@@ -177,15 +183,19 @@ double SLPolygon::GetInterpolatedSFromBoundary(
 }
 
 void SLPolygon::UpdatePassableInfo(double left_bound, double right_bound,
-                                   double buffer) {
+                                   double left_buffer, double right_buffer,
+                                   double check_s) {
   if (!is_passable_[0] && !is_passable_[1]) {
     return;
   }
-  is_passable_[0] = left_bound > max_l_point_.l() + buffer;
-  is_passable_[1] = right_bound < min_l_point_.l() - buffer;
+  double l_lower = GetRightBoundaryByS(check_s);
+  double l_upper = GetLeftBoundaryByS(check_s);
+  is_passable_[0] = left_bound > l_upper + left_buffer;
+  is_passable_[1] = right_bound < l_lower - right_buffer;
 }
 
-double SLPolygon::MinRadiusStopDistance(double check_l) {
+double SLPolygon::MinRadiusStopDistance(double adc_min_l, double adc_max_l,
+                                        double ego_half_width) {
   if (min_radius_stop_distance_ > 0) {
     return min_radius_stop_distance_;
   }
@@ -197,13 +207,15 @@ double SLPolygon::MinRadiusStopDistance(double check_l) {
       VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   double lateral_diff = 0.0;
   double expand_adc_half_width =
-      adc_param.width() / 2.0 + FLAGS_nonstatic_obstacle_nudge_l_buffer;
+      ego_half_width + FLAGS_nonstatic_obstacle_nudge_l_buffer;
   min_turn_radius += expand_adc_half_width;
   AINFO << "expand min_turn_radius: " << min_turn_radius;
   if (nudge_type_ == NudgeType::LEFT_NUDGE) {
-    lateral_diff = expand_adc_half_width - check_l + max_l_point_.l();
+    lateral_diff =
+        max_l_point_.l() - adc_min_l + FLAGS_nonstatic_obstacle_nudge_l_buffer;
   } else if (nudge_type_ == NudgeType::RIGHT_NUDGE) {
-    lateral_diff = expand_adc_half_width + check_l - min_l_point_.l();
+    lateral_diff =
+        adc_max_l + FLAGS_nonstatic_obstacle_nudge_l_buffer - min_l_point_.l();
   }
   lateral_diff = std::max(0.0, lateral_diff);
   const double kEpison = 1e-5;
@@ -222,7 +234,8 @@ double SLPolygon::MinRadiusStopDistance(double check_l) {
   min_radius_stop_distance_ =
       std::min(min_radius_stop_distance_, FLAGS_max_stop_distance_obstacle);
   min_radius_stop_distance_ =
-      std::max(min_radius_stop_distance_, FLAGS_min_stop_distance_obstacle);
+      std::max(min_radius_stop_distance_, FLAGS_min_stop_distance_obstacle +
+                                              adc_param.front_edge_to_center());
   AINFO << "obs: " << id_
         << ", min_radius_stop_distance: " << min_radius_stop_distance_;
   return min_radius_stop_distance_;

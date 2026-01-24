@@ -166,11 +166,6 @@ export function compareLineSame(oldLine, newLine) {
 
 // 根据点云数量修改点云绘制点的大小
 export function getPointSize(pointCount: number) {
-    // 0~100，返回0.3
-    if (pointCount < 100) {
-        return 0.3;
-    }
-    // 100~3000，返回1
     if (pointCount < 3000) {
         return 1;
     }

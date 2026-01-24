@@ -4,7 +4,7 @@ module_config {
         class_name : "HesaiComponent2"
         config {
           name : "at128_driver"
-          config_file_path : "modules/drivers/lidar/hslidar/conf/hslidar.pb.txt"
+          config_file_path : "/apollo/modules/drivers/lidar/hslidar/conf/hslidar.pb.txt"
         }
     }
 }

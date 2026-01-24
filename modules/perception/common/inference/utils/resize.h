@@ -38,11 +38,7 @@ bool ResizeGPU(const base::Image8U &src,
                std::shared_ptr<apollo::perception::base::Blob<float>> dst,
                int stepwidth, int start_axis, float mean_b, float mean_g,
                float mean_r, bool channel_axis, float scale);
-bool ResizeGPU(const base::Image8U &src,
-               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
-               int stepwidth, int start_axis, float mean_b, float mean_g,
-               float mean_r, bool channel_axis, float std_b, float std_g,
-               float std_r);
+
 bool ImageZeroPadding(const base::Image8U &src, base::Image8U *dst,
                       int stepwidth, int left_pad, int right_pad, int top_pad,
                       int bottom_pad, int value, cudaStream_t stream,

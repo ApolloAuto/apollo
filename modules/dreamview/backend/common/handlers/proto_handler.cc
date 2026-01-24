@@ -14,12 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/common/handlers/proto_handler.h"
-
 #include <fstream>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/dreamview/backend/common/handlers/proto_handler.h"
 
 namespace apollo {
 namespace dreamview {
@@ -68,32 +67,8 @@ bool ProtoHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
 }
 
 bool ProtoHandler::FindProtoPath(const std::string file_relative_path,
-                                 std::string *file_abs_path) {
+                                 std::string* file_abs_path) {
   std::string tmp_file_path;
-
-  const char *apollo_env_workroot = std::getenv("APOLLO_ROOT_DIR");
-  if (apollo_env_workroot != nullptr) {
-    tmp_file_path = std::string(apollo_env_workroot) + file_relative_path;
-    if (apollo::cyber::common::PathExists(tmp_file_path)) {
-      ADEBUG << "find proto file in APOLLO_ROOT_DIR: " << tmp_file_path;
-      *file_abs_path = tmp_file_path;
-      return true;
-    }
-  }
-
-  const char *apollo_distribution_home =
-      std::getenv("APOLLO_DISTRIBUTION_HOME");
-  if (apollo_distribution_home != nullptr) {
-    tmp_file_path =
-        std::string(apollo_distribution_home) + "/src" + file_relative_path;
-    if (apollo::cyber::common::PathExists(tmp_file_path)) {
-      ADEBUG << "find proto file in APOLLO_DISTRIBUTION_HOME: "
-             << tmp_file_path;
-      *file_abs_path = tmp_file_path;
-      return true;
-    }
-  }
-
   // source code
   tmp_file_path = "/apollo" + file_relative_path;
   if (apollo::cyber::common::PathExists(tmp_file_path)) {

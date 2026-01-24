@@ -23,7 +23,7 @@ namespace perception {
 
 // sensor_manager
 DEFINE_string(obs_sensor_intrinsic_path,
-              "modules/perception/data/params",
+              "/apollo/modules/perception/data/params",
               "The intrinsics/extrinsics dir.");
 
 DEFINE_string(obs_sensor_meta_file, "sensor_meta.pb.txt",
@@ -33,31 +33,31 @@ DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 
 // config_manager
 DEFINE_string(config_manager_path, "./", "The ModelConfig config paths.");
-DEFINE_string(work_root, "modules/perception",
+DEFINE_string(work_root, "/apollo/modules/perception",
               "Project work root direcotry.");
 
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
-              "modules/perception/camera"
+              "/apollo/modules/perception/camera"
               "/lib/obstacle/detector/yolov4/model/yolov4_1_3_416_416.onnx",
               "The onnx model file for emergency detection");
 DEFINE_string(onnx_test_input_path,
-              "modules/perception/inference"
+              "/apollo/modules/perception/inference"
               "/onnx/testdata/dog.jpg",
               "The test input image file for onnx inference");
 DEFINE_string(onnx_test_input_name_file,
-              "modules/perception/inference"
+              "/apollo/modules/perception/inference"
               "/onnx/testdata/coco.names",
               "The test input coco name file for onnx inference");
 DEFINE_string(onnx_prediction_image_path,
-              "modules/perception/inference"
+              "/apollo/modules/perception/inference"
               "/onnx/testdata/prediction.jpg",
               "The prediction output image file for onnx inference");
 DEFINE_int32(num_classes, 80, "number of classes for onnx inference");
 
 // emergency detection libtorch
 DEFINE_string(torch_detector_model,
-              "modules/perception/camera"
+              "/apollo/modules/perception/camera"
               "/lib/obstacle/detector/yolov4/model/yolov4.pt",
               "The torch model file for emergency detection");
 
@@ -82,7 +82,7 @@ DEFINE_bool(collect_shape_info, false,
 DEFINE_bool(use_dynamicshape, true,
             "Whether to use dynamic shape when using tensorrt");
 DEFINE_string(dynamic_shape_file,
-              "modules/perception/data/models/"
+              "/apollo/modules/perception/data/models/"
               "center_point_paddle/collect_shape_info_3lidar_20.pbtxt",
               "Path of a dynamic shape file for tensorrt");
 
@@ -100,6 +100,7 @@ DEFINE_double(x_front, 3.0, "reserve range smaller than X");
 DEFINE_double(x_back, -3.0, "reserve range bigger than X");
 DEFINE_double(y_front, 8.0, "reserve range smaller than Y");
 DEFINE_double(y_back, 0.0, "reserve range bigger than Y");
+DEFINE_double(max_points_height, 0.3, "set to small-object if smaller than");
 
 // blind TrafficCone (in NOVATEL system)
 DEFINE_bool(need_reserve_blind_cone, false,

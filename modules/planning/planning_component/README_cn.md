@@ -13,12 +13,11 @@ planning模块由以下几个目录构成：
 - **planning_component**: 包含planning组件类和planning程序的启动以及配置文件。
 - **planning_interface_base**: 包含planning中几个重要的插件类型（scenario, task, traffic rule和planner）的父类接口文件。
 - **planning_base**: 包含planning的基础数据结构和算法库。
-- **planning_open_space**: 包含planning openspace的算法库。
 - **planner**: 包含planning模块的几种规划器子类插件。
 - **pnc_map**: 生成参考线基于的pnc_map类，根据输入的planning导航命令或地图等信息，生成参考线数据，作为planning局部路径规划的路线参考。
-- **scenarios**: planning模块支持的场景插件，每个目录下包含一个独立的场景插件包，包含scenario和stage类的定义。
-- **tasks**: planning模块中支持的任务插件，每个目录下包含一个独立的任务插件包，包含task类的定义。
-- **traffic_rules**: planning模块支持的通用交通规则插件，每个目录下包含一个独立的traffic rule插件包，traffic rules作用于所有运行的场景中。
+- **scenarios**: lanning模块支持的场景插件，每个目录下包含一个独立的场景插件包，包含scenario和stage类的定义。
+- **tasks**: lanning模块中支持的任务插件，每个目录下包含一个独立的任务插件包，包含task类的定义。
+- **traffic_rules**: lanning模块支持的通用交通规则插件，每个目录下包含一个独立的traffic rule插件包，traffic rules作用于所有运行的场景中。
 
 ### planning框架介绍
 

@@ -30,30 +30,54 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-BroadGnssBaseParser::BroadGnssBaseParser(const config::Config& config) {}
+BroadGnssBaseParser::BroadGnssBaseParser(const config::Config& config)
+    : auto_fill_gps_msg_(config.auto_fill_gps_msg()) {}
 
 void BroadGnssBaseParser::GetMessages(MessageInfoVec* messages) {
+  return GetMessages(0, messages);
+}
+
+void BroadGnssBaseParser::GetMessages(const uint8_t& channel,
+                                      MessageInfoVec* messages) {
   if (data_ == nullptr) {
     return;
   }
-  if (!PrepareMessage()) {
+  if (!PrepareMessage(channel)) {
     return;
   }
 
-  FillGnssBestpos();
-  FillImu();
-  FillHeading();
-  FillIns();
-  FillInsStat();
+  if (broadgnss_message_.message_type == BESTPOSA_MESSAGE_ID) {
+    FillGnssBestpos();
+    messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
+                                    reinterpret_cast<MessagePtr>(&bestpos_)});
+    return;
+  }
 
-  if (bestpos_ratecontrol_.check()) {
+  if (broadgnss_message_.message_type == HEADINGA_MESSAGE_ID) {
+    FillHeading();
+    messages->push_back(MessageInfo{MessageType::HEADING,
+                                    reinterpret_cast<MessagePtr>(&heading_)});
+    return;
+  }
+
+  if (auto_fill_gps_msg_ && broadgnss_message_.best_latitude < 0 &&
+      bestpos_ratecontrol_.check()) {
+    FillGnssBestpos();
     messages->push_back(MessageInfo{MessageType::BEST_GNSS_POS,
                                     reinterpret_cast<MessagePtr>(&bestpos_)});
   }
+
+  if (auto_fill_gps_msg_ && broadgnss_message_.gps_heading < -0.1) {
+    FillHeading();
+    messages->push_back(MessageInfo{MessageType::HEADING,
+                                    reinterpret_cast<MessagePtr>(&heading_)});
+  }
+
+  FillImu();
+  FillIns();
+  FillInsStat();
   messages->push_back(
       MessageInfo{MessageType::IMU, reinterpret_cast<MessagePtr>(&imu_)});
-  messages->push_back(MessageInfo{MessageType::HEADING,
-                                  reinterpret_cast<MessagePtr>(&heading_)});
   messages->push_back(
       MessageInfo{MessageType::INS, reinterpret_cast<MessagePtr>(&ins_)});
   messages->push_back(MessageInfo{MessageType::INS_STAT,
@@ -102,9 +126,21 @@ void BroadGnssBaseParser::FillGnssBestpos() {
   bestpos_.set_measurement_time(broadgnss_message_.gps_timestamp_sec);
   bestpos_.set_sol_status(broadgnss_message_.solution_status);
   bestpos_.set_sol_type(broadgnss_message_.solution_type);
-  bestpos_.set_latitude(broadgnss_message_.latitude);
-  bestpos_.set_longitude(broadgnss_message_.longitude);
-  bestpos_.set_height_msl(broadgnss_message_.altitude);
+  if (broadgnss_message_.best_latitude > 0) {
+    // 使用BESTPOS结果
+    bestpos_.set_latitude(broadgnss_message_.best_latitude);
+    bestpos_.set_longitude(broadgnss_message_.best_longitude);
+    bestpos_.set_height_msl(broadgnss_message_.best_altitude);
+    bestpos_.set_undulation(broadgnss_message_.undulation);
+    bestpos_.set_differential_age(broadgnss_message_.differential_age);
+    bestpos_.set_solution_age(broadgnss_message_.solution_age);
+  } else {
+    // 使用融合结果
+    bestpos_.set_latitude(broadgnss_message_.latitude);
+    bestpos_.set_longitude(broadgnss_message_.longitude);
+    bestpos_.set_height_msl(broadgnss_message_.altitude);
+  }
+
   bestpos_.set_latitude_std_dev(broadgnss_message_.lat_std);
   bestpos_.set_longitude_std_dev(broadgnss_message_.lon_std);
   bestpos_.set_height_std_dev(broadgnss_message_.alti_std);
@@ -165,8 +201,13 @@ void BroadGnssBaseParser::FillHeading() {
   heading_.set_solution_status(broadgnss_message_.solution_status);
   heading_.set_position_type(broadgnss_message_.solution_type);
   heading_.set_measurement_time(broadgnss_message_.gps_timestamp_sec);
-  heading_.set_heading(broadgnss_message_.heading);
-  heading_.set_pitch(broadgnss_message_.pitch);
+  if (broadgnss_message_.gps_heading > -0.1) {
+    heading_.set_heading(broadgnss_message_.gps_heading);
+    heading_.set_pitch(broadgnss_message_.gps_pitch);
+  } else {
+    heading_.set_heading(broadgnss_message_.heading);
+    heading_.set_pitch(broadgnss_message_.pitch);
+  }
   heading_.set_heading_std_dev(broadgnss_message_.yaw_std);
   heading_.set_pitch_std_dev(broadgnss_message_.pitch_std);
   // heading_.set_station_id("0");

@@ -15,21 +15,19 @@
  *****************************************************************************/
 
 #include <fcntl.h>
-#include <linux/netlink.h>
-#include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <termios.h>
 #include <unistd.h>
+
 #include <cerrno>
 #include <cstring>
 #include <ctime>
 #include <thread>
 
 #include "cyber/cyber.h"
-
 #include "modules/drivers/gnss/stream/stream.h"
 
 namespace apollo {
@@ -284,7 +282,7 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
   ssize_t bytes_read = 0;
   ssize_t bytes_current_read = 0;
 
-  wait_readable(10000);  // wait 10ms
+  wait_readable(5000);  // wait 5ms
 
   while (max_length > 0) {
     bytes_current_read = ::read(fd_, buffer, max_length);

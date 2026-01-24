@@ -84,7 +84,8 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::Status CheckInput(LocalView *local_view);
   common::Status CheckTimestamp(const LocalView &local_view);
   common::Status CheckPad();
-  void ResetAndProduceZeroControlCommand(ControlCommand *control_command);
+  void ResetAndProduceZeroControlCommand(const canbus::Chassis *chassis,
+                                         ControlCommand *control_command);
   void GetVehiclePitchAngle(ControlCommand *control_command);
   void CheckAutoMode(const canbus::Chassis *chassis);
   void PublishControlInteractiveMsg();
@@ -140,6 +141,10 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
 
   bool is_auto_ = false;
   bool from_else_to_auto_ = false;
+
+  uint16_t localization_timeout_count_ = 0;
+  uint16_t trajectory_timeout_count_ = 0;
+  uint16_t chassis_timeout_count_ = 0;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)

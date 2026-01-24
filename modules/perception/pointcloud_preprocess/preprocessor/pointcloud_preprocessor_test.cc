@@ -30,7 +30,7 @@ class PointCloudPreprocessorTest : public testing::Test {
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root =
-        "modules/perception/testdata/"
+        "/apollo/modules/perception/testdata/"
         "lidar/lib/pointcloud_preprocessor";
   }
   void TearDown() {}

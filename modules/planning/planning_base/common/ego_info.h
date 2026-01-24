@@ -25,11 +25,13 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common_msgs/routing_msgs/geometry.pb.h"
+#include "modules/common_msgs/routing_msgs/geometry.pb.h"
 
 #include "cyber/common/macros.h"
 #include "modules/planning/planning_base/common/obstacle.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
+#include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 #include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 
 namespace apollo {
@@ -59,6 +61,10 @@ class EgoInfo {
 
   void CalculateCurrentRouteInfo(
       const ReferenceLineProvider* reference_line_provider);
+
+  double distance_to_destination() const { return distance_to_destination_; }
+
+  apollo::hdmap::LaneWaypoint adc_waypoint() const { return adc_waypoint_; }
 
  private:
   FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);

@@ -75,7 +75,7 @@ class LaneFollowMap : public PncMapBase {
   bool GetNearestPointFromRouting(
       const common::VehicleState &state,
       apollo::hdmap::LaneWaypoint *waypoint) const override;
-
+  
   double GetDistanceToDestination() const override;
   apollo::hdmap::LaneWaypoint GetAdcWaypoint() const override;
 
@@ -186,6 +186,7 @@ class LaneFollowMap : public PncMapBase {
   std::unordered_set<std::string> range_lane_ids_;
   std::unordered_set<std::string> all_lane_ids_;
   std::unordered_set<std::string> route_segments_lane_ids_;
+  routing::LaneSegment dest_lane_segment_;
 
   /**
    * The routing request waypoints

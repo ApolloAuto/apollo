@@ -1,9 +1,0 @@
-tracking_time_window: 0.5
-matcher_param {
-  name: "HMMatcher"
-  config_path: "perception/camera_detection_occupancy/data"
-  config_file: "hm_matcher.pb.txt"
-}
-chosen_filter: "AdaptiveKalmanFilter"
-tracked_times_threshold: 3
-use_filter: true

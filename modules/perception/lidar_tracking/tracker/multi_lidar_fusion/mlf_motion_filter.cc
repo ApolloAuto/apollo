@@ -68,8 +68,7 @@ void MlfMotionFilter::UpdateWithObject(const MlfFilterOptions& options,
     return;
   }
   if (new_object->is_background) {
-    new_object->output_velocity.setZero();
-    new_object->output_velocity_uncertainty = Eigen::Matrix3d::Identity();
+    InitializeTrackState(new_object);
     return;
   }
   // 1. compute measurement

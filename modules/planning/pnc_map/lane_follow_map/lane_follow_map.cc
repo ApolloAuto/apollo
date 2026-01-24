@@ -242,6 +242,7 @@ bool LaneFollowMap::UpdatePlanningCommand(
   range_lane_ids_.clear();
   route_indices_.clear();
   all_lane_ids_.clear();
+  route_segments_lane_ids_.clear();
   for (int road_index = 0; road_index < routing.road_size(); ++road_index) {
     const auto &road_segment = routing.road(road_index);
     for (int passage_index = 0; passage_index < road_segment.passage_size();
@@ -258,6 +259,11 @@ bool LaneFollowMap::UpdatePlanningCommand(
           return false;
         }
         route_indices_.back().index = {road_index, passage_index, lane_index};
+
+        if (road_index == routing.road_size() - 1 &&
+            lane_index == passage.segment_size() - 1 && passage.can_exit()) {
+          dest_lane_segment_ = passage.segment(lane_index);
+        }
       }
     }
   }
@@ -706,6 +712,24 @@ bool LaneFollowMap::ExtendSegments(
   if (found_loop) {
     return true;
   }
+
+  // adjust end_s to match reference_line_endpoint_extend_length
+  double last_lane_segment_length =
+      segments.back().end_s - segments.back().start_s;
+  auto last_lane = segments.back().lane;
+  bool last_lane_can_exit =
+      last_lane->id().id() == dest_lane_segment_.id() &&
+      (adc_waypoint_.lane->id().id() != dest_lane_segment_.id() ||
+       (adc_waypoint_.lane->id().id() == dest_lane_segment_.id() &&
+        adc_waypoint_.s < dest_lane_segment_.end_s() + 1.0));
+  if (last_lane_can_exit) {
+    end_s =
+        std::max(router_s - kRouteEpsilon,
+                 router_s - last_lane_segment_length +
+                     dest_lane_segment_.end_s() - dest_lane_segment_.start_s() +
+                     FLAGS_reference_line_endpoint_extend_length);
+  }
+
   // Extend the trajectory towards the end of the trajectory.
   if (router_s < end_s && !truncated_segments->empty()) {
     auto &back = truncated_segments->back();
@@ -716,17 +740,33 @@ bool LaneFollowMap::ExtendSegments(
       router_s += back.end_s - origin_end_s;
     }
   }
-  auto last_lane = segments.back().lane;
+
   while (router_s < end_s - kRouteEpsilon) {
     last_lane = GetRouteSuccessor(last_lane);
     if (last_lane == nullptr ||
         unique_lanes.find(last_lane->id().id()) != unique_lanes.end()) {
       break;
     }
+
+    bool last_lane_can_exit =
+        last_lane->id().id() == dest_lane_segment_.id() &&
+        (adc_waypoint_.lane->id().id() != dest_lane_segment_.id() ||
+         (adc_waypoint_.lane->id().id() == dest_lane_segment_.id() &&
+          adc_waypoint_.s < dest_lane_segment_.end_s() + 1.0));
+
+    // adjust end_s to match reference_line_endpoint_extend_length
+    if (last_lane_can_exit) {
+      end_s = std::max(router_s + 1.0,
+                       router_s + dest_lane_segment_.end_s() -
+                           dest_lane_segment_.start_s() +
+                           FLAGS_reference_line_endpoint_extend_length);
+    }
+
     const double length = std::min(end_s - router_s, last_lane->total_length());
     truncated_segments->emplace_back(last_lane, 0, length);
     unique_lanes.insert(last_lane->id().id());
     router_s += length;
+    AINFO << last_lane->id().id() << ", add length: " << length << ", router_s: " << router_s << ", end_s: " << end_s;
   }
   return true;
 }

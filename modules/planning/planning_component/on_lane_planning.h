@@ -100,6 +100,8 @@ class OnLanePlanning : public PlanningBase {
   void AddFallbackTrajectory(const planning_internal::Debug& debug_info,
                              planning_internal::Debug* debug_chart);
 
+  void AddADCDrivingStateInfo(planning_internal::Debug* const debug);
+
  private:
   PlanningCommand last_command_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;

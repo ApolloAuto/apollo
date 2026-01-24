@@ -26,7 +26,7 @@
 #include "cyber/common/log.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/perception/common/base/point_cloud.h"
-#include "modules/perception/lidar_detection/interface/base_down_sample.h"
+#include "modules/perception/common/interface/base_down_sample.h"
 
 namespace apollo {
 namespace perception {

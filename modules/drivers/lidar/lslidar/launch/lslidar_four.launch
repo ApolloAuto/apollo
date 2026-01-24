@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>lslidar</name>
-        <dag_conf>modules/drivers/lidar/lslidar/dag/lslidar_four.dag</dag_conf>
-        <process_name>lslidar</process_name>
-    </module>
-</cyber>

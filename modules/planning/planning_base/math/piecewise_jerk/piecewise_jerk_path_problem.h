@@ -72,6 +72,8 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
                                  std::vector<c_int>* A_indptr,
                                  std::vector<c_float>* lower_bounds,
                                  std::vector<c_float>* upper_bounds) override;
+  
+  OSQPSettings* SolverDefaultSettings() override;
 
  private:
   ObsCornerConstraints extra_constraints_;

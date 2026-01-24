@@ -14,7 +14,6 @@ export const layerMenu = {
 
     Perception: '感知',
     pointCloud: '点云',
-    curbPointCloud: '路沿点云',
     pedestrian: '行人',
     vehicle: '车辆',
     bicycle: '自行车',

@@ -36,13 +36,13 @@ TEST(Fusion, get_km_result) {
   std::vector<base::Object> objects4;
   EXPECT_FALSE(
       fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));
-  LoadData("modules/v2x/fusion/test_data/fusion_object1", &objects1,
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object1", &objects1,
            "camera1");
-  LoadData("modules/v2x/fusion/test_data/fusion_object2", &objects2,
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object2", &objects2,
            "camera2");
-  LoadData("modules/v2x/fusion/test_data/fusion_object3", &objects3,
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object3", &objects3,
            "camera3");
-  LoadData("modules/v2x/fusion/test_data/fusion_object4", &objects4,
+  LoadData("/apollo/modules/v2x/fusion/test_data/fusion_object4", &objects4,
            "camera4");
   EXPECT_TRUE(
       fusion.CombineNewResource(objects1, &fused_objects, &fusion_result));

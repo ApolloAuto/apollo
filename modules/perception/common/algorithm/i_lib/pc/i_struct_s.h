@@ -311,6 +311,7 @@ class VoxelGridXY {
       this->nr_voxel_y_ = vg.NrVoxelY();
       this->nr_voxel_z_ = vg.NrVoxelZ();
       this->data_ = vg.const_data();
+      this->semantic_data_ = vg.const_semantic_data();
       vg.GetGridDimension(&this->dim_x_[0], &this->dim_x_[1], &this->dim_y_[0],
                           &this->dim_y_[1], &this->dim_z_[0], &this->dim_z_[1]);
       this->voxels_.resize(vg.NrVoxel());
@@ -336,14 +337,15 @@ class VoxelGridXY {
              T spatial_bound_y_min, T spatial_bound_y_max,
              T spatial_bound_z_min, T spatial_bound_z_max);
 
-  bool Set(const T *data, unsigned int nr_points,
+  bool Set(const T *data, const int *semantic_data, unsigned int nr_points,
            unsigned int nr_point_element);
 
   // sse2 version: only for float type input Data
-  bool SetS(const float *data, unsigned int nr_points,
-            unsigned int nr_point_element);
+  bool SetS(const float *data, const int *semantic_data,
+      unsigned int nr_points, unsigned int nr_point_element);
 
-  bool Set(const T *data, unsigned int nr_points, unsigned int nr_point_element,
+  bool Set(const T *data, const int *semantic_data,
+      unsigned int nr_points, unsigned int nr_point_element,
            unsigned int nr_voxel_x, unsigned int nr_voxel_y,
            T spatial_bound_x_min, T spatial_bound_x_max, T spatial_bound_y_min,
            T spatial_bound_y_max, T spatial_bound_z_min, T spatial_bound_z_max,
@@ -432,6 +434,8 @@ class VoxelGridXY {
 
   void SetPointCloudsData(const T *data) { data_ = data; }
 
+  void SetSematicValueData(const int *data) { semantic_data_ = data; }
+
   void SetInitialized(bool initialized) { initialized_ = initialized; }
 
   // int GetAllIndices(std::vector<int> &indices) const;
@@ -478,6 +482,10 @@ class VoxelGridXY {
 
   const T *const_data() const { return (data_); }
 
+  int *SemanticData() { return (semantic_data_); }
+
+  const int *const_semantic_data() const { return (semantic_data_); }
+
  private:
   void Reserve();
   bool AllocAlignedMemory();
@@ -489,6 +497,7 @@ class VoxelGridXY {
   unsigned int nr_voxel_y_ = 0;
   unsigned int nr_voxel_z_ = 0;
   const T *data_ = nullptr;  // point clouds memory
+  const int* semantic_data_ = nullptr; // semantic value memory
   bool initialized_ = false;
   T dim_x_[2], dim_y_[2], dim_z_[2], voxel_dim_[3];
   float *mem_aligned16_f32_ = nullptr;
@@ -504,6 +513,7 @@ VoxelGridXY<T>::VoxelGridXY()
       nr_voxel_y_(0),
       nr_voxel_z_(1),
       data_(nullptr),
+      semantic_data_(nullptr),
       initialized_(false),
       mem_aligned16_f32_(nullptr),
       mem_aligned16_i32_(nullptr) {
@@ -518,6 +528,7 @@ template <typename T>
 void VoxelGridXY<T>::CleanUp() {
   initialized_ = false;
   data_ = nullptr;
+  semantic_data_ = nullptr;
   nr_points_ = nr_point_element_ = nr_voxel_x_ = nr_voxel_y_ = 0;
   nr_voxel_z_ = 1;
   IZero2(dim_x_);
@@ -696,15 +707,16 @@ bool VoxelGridXY<T>::Alloc(unsigned int nr_voxel_x, unsigned int nr_voxel_y,
 }
 
 template <typename T>
-bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
-                         unsigned int nr_point_element) {
+bool VoxelGridXY<T>::Set(const T *data, const int *semantic_data,
+  unsigned int nr_points, unsigned int nr_point_element) {
   if (!data || !nr_points || !nr_point_element || !nr_voxel_x_ ||
-      !nr_voxel_y_ || nr_voxel_z_ != 1) {
+      !semantic_data || !nr_voxel_y_ || nr_voxel_z_ != 1) {
     initialized_ = false;
     return initialized_;
   }
 
   data_ = data;
+  semantic_data_ = semantic_data;
   nr_points_ = nr_points;
   nr_point_element_ = nr_point_element;
 
@@ -744,15 +756,16 @@ bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
 }
 
 template <typename T>
-bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
-                          unsigned int nr_point_element) {
+bool VoxelGridXY<T>::SetS(const float *data, const int *semantic_data,
+  unsigned int nr_points, unsigned int nr_point_element) {
   if (!data || !nr_points || !nr_point_element || !nr_voxel_x_ ||
-      !nr_voxel_y_ || nr_voxel_z_ != 1) {
+      !semantic_data || !nr_voxel_y_ || nr_voxel_z_ != 1) {
     initialized_ = false;
     return initialized_;
   }
 
   data_ = data;
+  semantic_data_ = semantic_data;
   nr_points_ = nr_points;
   nr_point_element_ = nr_point_element;
 
@@ -899,18 +912,18 @@ bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
 }
 
 template <typename T>
-bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
-                         unsigned int nr_point_element, unsigned int nr_voxel_x,
-                         unsigned int nr_voxel_y, T spatial_bound_x_min,
-                         T spatial_bound_x_max, T spatial_bound_y_min,
-                         T spatial_bound_y_max, T spatial_bound_z_min,
-                         T spatial_bound_z_max, bool force_bound) {
+bool VoxelGridXY<T>::Set(const T *data, const int *semantic_data,
+  unsigned int nr_points, unsigned int nr_point_element,
+  unsigned int nr_voxel_x, unsigned int nr_voxel_y, T spatial_bound_x_min,
+  T spatial_bound_x_max, T spatial_bound_y_min, T spatial_bound_y_max,
+  T spatial_bound_z_min, T spatial_bound_z_max, bool force_bound) {
   if (!data || !nr_points || !nr_point_element || !nr_voxel_x || !nr_voxel_y) {
     initialized_ = false;
     return initialized_;
   }
 
   data_ = data;
+  semantic_data_ = semantic_data;
   nr_points_ = nr_points;
   nr_point_element_ = nr_point_element;
   nr_voxel_x_ = nr_voxel_x;

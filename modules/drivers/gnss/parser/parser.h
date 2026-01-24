@@ -80,11 +80,9 @@ class Parser {
   // Return a pointer to a parser. The caller should take ownership.
   static Parser *CreateNovatel(const config::Config &config);
   static Parser *CreateHuaCeText(const config::Config &config);
-  static Parser *CreateAsensing(const config::Config &config);
+  static Parser *CreateAsensingBinary(const config::Config &config);
+  static Parser *CreateAsensingCan(const config::Config &config);
   static Parser *CreateBroadGnssText(const config::Config &config);
-  static Parser *CreateEnbroad(const config::Config &config);
-  static Parser *CreateCxzlCfg(const config::Config &config);
-  static Parser *CreateForsenseText(const config::Config &config);
 
   static Parser *CreateParser(const config::Config &config) {
     switch (config.data().format()) {
@@ -93,15 +91,11 @@ class Parser {
       case config::Stream::HUACE_TEXT:
         return Parser::CreateHuaCeText(config);
       case config::Stream::ASENSING_BINARY:
-        return Parser::CreateAsensing(config);
+        return Parser::CreateAsensingBinary(config);
+      case config::Stream::ASENSING_CAN:
+        return Parser::CreateAsensingCan(config);
       case config::Stream::BROADGNSS_TEXT:
         return Parser::CreateBroadGnssText(config);
-      case config::Stream::ENBROAD_BINARY:
-        return Parser::CreateEnbroad(config);
-      case config::Stream::CXZL_TEXT:
-        return Parser::CreateCxzlCfg(config);
-      case config::Stream::FORSENSE_TEXT:
-        return Parser::CreateForsenseText(config);
       default:
         return nullptr;
     }
@@ -129,6 +123,16 @@ class Parser {
   virtual MessageType GetMessage(MessagePtr *message_ptr) {
     return MessageType::NONE;
   }
+
+  void GetMessagesByChannel(const uint8_t &channel, MessageInfoVec *messages) {
+    if (channel == 0) {
+      GetMessages(messages);
+    } else {
+      GetMessages(channel, messages);
+    }
+  }
+
+  virtual void GetMessages(const uint8_t &channel, MessageInfoVec *messages) {}
 
   virtual void GetMessages(MessageInfoVec *messages) {}
 

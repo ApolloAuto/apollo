@@ -32,18 +32,18 @@
 
 DEFINE_string(
     chassis_test_file,
-    "modules/control/testdata/control_tester/chassis.pb.txt",
+    "/apollo/modules/control/testdata/control_tester/chassis.pb.txt",
     "Used for sending simulated Chassis content to the control node.");
 DEFINE_string(
     localization_test_file,
-    "modules/control/testdata/control_tester/localization.pb.txt",
+    "/apollo/modules/control/testdata/control_tester/localization.pb.txt",
     "Used for sending simulated localization to the control node.");
 DEFINE_string(pad_msg_test_file,
-              "modules/control/testdata/control_tester/pad_msg.pb.txt",
+              "/apollo/modules/control/testdata/control_tester/pad_msg.pb.txt",
               "Used for sending simulated PadMsg content to the control node.");
 DEFINE_string(
     planning_test_file,
-    "modules/control/testdata/control_tester/planning.pb.txt",
+    "/apollo/modules/control/testdata/control_tester/planning.pb.txt",
     "Used for sending simulated Planning content to the control node.");
 DEFINE_int32(num_seconds, 10, "Length of execution.");
 DEFINE_int32(feed_frequency, 10,

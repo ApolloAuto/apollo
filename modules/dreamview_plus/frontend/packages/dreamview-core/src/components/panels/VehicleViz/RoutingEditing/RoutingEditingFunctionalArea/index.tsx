@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { message } from '@dreamview/dreamview-ui';
 import Popover from '@dreamview/dreamview-core/src/components/CustomPopoverSpec';
 import { RoutingEditor } from '@dreamview/dreamview-carviz';
 import { Nullable } from '@dreamview/dreamview-core/src/util/similarFunctions';
@@ -7,11 +8,10 @@ import {
     FunctionalOperation,
     PointData,
 } from '@dreamview/dreamview-carviz/src/render/type';
-import { message } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import useStyle from './useStyle';
 import RoutingEditingFunctionalItem from './RoutingEditingFunctionalItem';
-import { FunctionalNameEnum, MutexToolNameEnum, CommonRoutingOrigin } from './types';
+import { CommonRoutingOrigin, FunctionalNameEnum, MutexToolNameEnum } from './types';
 import { FunctionalItemNoActiveEnum } from './const';
 import FunctionalItemNoActive from './RoutingEditingFunctionalItemNoActive';
 import RoutingEditingFunctionalRelocate from './RoutingEditingFunctionalRelocate';
@@ -19,9 +19,9 @@ import RoutingEditingFunctionalWay from './RoutingEditingFunctionalWay';
 import RoutingEditingFunctionalLoop from './RoutingEditingFunctionalLoop';
 import RoutingEditingFunctionalFavorite from './RoutingEditingFunctionalFavorite';
 import { useVizStore } from '../../VizStore';
-import { RouteInfo, RouteOrigin, PointType } from '../RouteManager/type';
+import { PointType, RouteInfo, RouteOrigin } from '../RouteManager/type';
 import useWebSocketServices from '../../../../../services/hooks/useWebSocketServices';
-import { usePickHmiStore, HMIModeOperation } from '../../../../../store/HmiStore';
+import { HMIModeOperation, usePickHmiStore } from '../../../../../store/HmiStore';
 
 interface IRoutingEditingFunctionalAreaProps {
     carviz: RoutingEditor;
@@ -32,7 +32,7 @@ interface IRoutingEditingFunctionalAreaProps {
 function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps) {
     const { carviz, changeActiveName, activeName } = props;
 
-    const [hmi, dispatch] = usePickHmiStore();
+    const [hmi] = usePickHmiStore();
 
     const [{ routeManager, routingEditor }] = useVizStore();
 
@@ -46,7 +46,35 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
 
     const relocateDisState = hmi.currentOperation === HMIModeOperation.AUTO_DRIVE;
 
+    const indoorLocationDisState = useMemo(() => hmi.modules.get('IndoorLocalization'), [hmi.modules]);
+    // todo： 测试使用
+    // const indoorLocationDisState = useMemo(() => true, [hmi.modules]);
+
+    // @ts-ignore
     const { classes, cx } = useStyle({ relocateDisState });
+
+    const indoorLocationTimestepRef = useRef<number>(0);
+
+    // 检查定位状态
+    const checkIndoorLocationState = () =>
+        new Promise<void>((resolve, reject) => {
+            mainApi
+                .checkIndoorLocalizationInitPointStatus()
+                .then(() => {
+                    resolve();
+                })
+                .catch(() => {
+                    reject();
+                });
+        });
+
+    const isTimeDiffLimit30S = useCallback(() => {
+        const currentTime = new Date().getTime();
+        if (currentTime - indoorLocationTimestepRef.current > 30000) {
+            return true;
+        }
+        return false;
+    }, [indoorLocationTimestepRef]);
 
     const routeChange = useCallback(
         (operation: FunctionalOperation, point: PointData | CreatePathwayMarkerCallbackRes) => {
@@ -58,6 +86,71 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                 },
             };
             if (!point) return;
+
+            if ((point as CreatePathwayMarkerCallbackRes)?.origin === FunctionalNameEnum.INDOOR_LOCALIZATION) {
+                if (operation === 'edit') {
+                    if (!isTimeDiffLimit30S()) {
+                        // 当前存在定时器，不允许执行，撤销点操作
+                        carviz.indoorLocalizationMarker.undo();
+                        return;
+                    }
+                    indoorLocationTimestepRef.current = new Date().getTime();
+                    // ts-ignore
+                    const start = point?.lastPosition;
+                    message({
+                        type: 'loading',
+                        content:
+                            'The Initialization point has been sent and is waiting for the indoor localization module to complete initialization',
+                        key: 'sendIndoorLocalizationInitPoint',
+                        duration: 30,
+                    });
+                    mainApi
+                        .sendIndoorLocalizationInitPoint(start)
+                        .then(() => {
+                            // 发送成功，开启检查定位定时器
+                            const timer = setInterval(() => {
+                                checkIndoorLocationState().then(
+                                    () => {
+                                        message.destory('sendIndoorLocalizationInitPoint');
+                                        clearInterval(timer);
+                                        carviz.indoorLocalizationMarker.reset();
+                                        message({
+                                            type: 'success',
+                                            content: 'IndoorLocalization Success',
+                                            key: 'checkIndoorLocalizationState',
+                                        });
+                                        mainApi?.getStartPoint().then((p) => {
+                                            // 识别的起始位置信息
+                                            carviz.initiationMarker.init(p);
+                                        });
+                                    },
+                                    () => {
+                                        const isTimeDiff = isTimeDiffLimit30S();
+                                        if (isTimeDiff) {
+                                            clearInterval(timer);
+                                            carviz.indoorLocalizationMarker.reset();
+                                            message({
+                                                type: 'error',
+                                                content: 'IndoorLocalization Fail',
+                                                key: 'checkIndoorLocalizationState',
+                                            });
+                                        }
+                                    },
+                                );
+                            }, 10000);
+                        })
+                        .catch(() => {
+                            // 发送失败
+                            message({
+                                type: 'error',
+                                content: 'send IndoorLocalization Init Point Fail',
+                                key: 'sendIndoorLocalizationInitPoint',
+                            });
+                        });
+                }
+
+                return;
+            }
 
             if ('lastPosition' in point) {
                 // 当前逻辑用于途经点
@@ -88,7 +181,11 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
             // 非互斥工具，不做修改
             return;
         }
-        if (![MutexToolNameEnum.RELOCATE, MutexToolNameEnum.WAYPOINT].includes(activeName)) {
+        if (
+            ![MutexToolNameEnum.RELOCATE, MutexToolNameEnum.WAYPOINT, MutexToolNameEnum.INDOOR_LOCALIZATION].includes(
+                activeName,
+            )
+        ) {
             setCheckedItem(null);
         }
     }, [activeName, carviz]);
@@ -110,6 +207,15 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                     setCheckedItem(FunctionalNameEnum.WAYPOINT);
                     changeActiveName?.(MutexToolNameEnum.WAYPOINT);
                     carviz?.pathwayMarker.active(routeChange);
+                }
+            }
+
+            if (e.key === 'i') {
+                if (checkedItem !== FunctionalNameEnum.INDOOR_LOCALIZATION) {
+                    carviz?.deactiveAll();
+                    setCheckedItem(FunctionalNameEnum.INDOOR_LOCALIZATION);
+                    changeActiveName?.(MutexToolNameEnum.INDOOR_LOCALIZATION);
+                    carviz?.indoorLocalizationMarker.active(routeChange);
                 }
             }
 
@@ -154,41 +260,31 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                     changeActiveName?.(MutexToolNameEnum.WAYPOINT);
                     carviz?.pathwayMarker.active(routeChange);
                     break;
-                // case FunctionalNameEnum.LOOP:
-                //     // eslint-disable-next-line no-case-declarations
-                //     const wayCount = routingEditor.pathwayMarker.positionsCount;
-                //     if (wayCount > 0) {
-                //         if (isMainConnected) {
-                //             mainApi.getStartPoint().then((res) => {
-                //                 const startPoint = { x: res.x, y: res.y, heading: res?.heading };
-                //                 const endPoint = routingEditor.pathwayMarker.lastPosition;
-                //                 mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
-                //                     if (cycle.isCycle) {
-                //                         setCheckedItem(name);
-                //                         carviz?.deactiveAll();
-                //                     } else {
-                //                         const currentRouteMixValue = {
-                //                             currentRouteLoop: { currentRouteLoopState: false },
-                //                         };
-                //                         routeManagerMix.setCurrentRouteMix(currentRouteMixValue);
-                //                         message({
-                //                             type: 'error',
-                //                             content: t('NoLoopMessage'),
-                //                         });
-                //                     }
-                //                 });
-                //             });
-                //         }
-                //     } else {
-                //         message({ type: 'error', content: t('NoWayPointMessage') });
-                //     }
-                //     break;
                 case FunctionalNameEnum.LOOP:
                     // eslint-disable-next-line no-case-declarations
                     const wayCount = routingEditor.pathwayMarker.positionsCount;
                     if (wayCount > 0) {
-                        setCheckedItem(name);
-                        carviz?.deactiveAll();
+                        if (isMainConnected) {
+                            mainApi.getStartPoint().then((res) => {
+                                const startPoint = { x: res.x, y: res.y, heading: res?.heading };
+                                const endPoint = routingEditor.pathwayMarker.lastPosition;
+                                mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
+                                    if (cycle.isCycle) {
+                                        setCheckedItem(name);
+                                        carviz?.deactiveAll();
+                                    } else {
+                                        const currentRouteMixValue = {
+                                            currentRouteLoop: { currentRouteLoopState: false },
+                                        };
+                                        routeManagerMix.setCurrentRouteMix(currentRouteMixValue);
+                                        message({
+                                            type: 'error',
+                                            content: t('NoLoopMessage'),
+                                        });
+                                    }
+                                });
+                            });
+                        }
                     } else {
                         message({ type: 'error', content: t('NoWayPointMessage') });
                     }
@@ -196,6 +292,12 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                 case FunctionalNameEnum.FAVORITE:
                     setCheckedItem(name);
                     carviz?.deactiveAll();
+                    break;
+                case FunctionalNameEnum.INDOOR_LOCALIZATION:
+                    setCheckedItem(name);
+                    carviz?.deactiveAll();
+                    changeActiveName?.(MutexToolNameEnum.INDOOR_LOCALIZATION);
+                    carviz?.indoorLocalizationMarker.active(routeChange);
                     break;
                 default:
                     break;
@@ -239,6 +341,19 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
             />
         );
 
+    const functionalIndoorLocation = useMemo(
+        () => (
+            <FunctionalItemNoActive
+                functionalItemNoActiveText={
+                    indoorLocationDisState
+                        ? FunctionalItemNoActiveEnum.FunctionalIndoorLocationNoActive
+                        : FunctionalItemNoActiveEnum.FunctionalIndoorLocationNoActiveDis
+                }
+            />
+        ),
+        [indoorLocationDisState],
+    );
+
     return (
         <div className={classes['routing-editing-function-area']}>
             <div className={classes['routing-editing-function-area__group']}>
@@ -255,6 +370,7 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                             : classes['custom-popover-ordinary'],
                     )}
                 >
+                    {/* @ts-ignore */}
                     <div className={cx({ [classes['func-relocate-ele']]: relocateDisState })}>
                         <RoutingEditingFunctionalItem
                             functionalName={FunctionalNameEnum.RELOCATE}
@@ -282,6 +398,28 @@ function RoutingEditingFunctionalArea(props: IRoutingEditingFunctionalAreaProps)
                             functionalName={FunctionalNameEnum.WAYPOINT}
                             checkedItem={checkedItem}
                             onClick={handleClicked(FunctionalNameEnum.WAYPOINT)}
+                        />
+                    </div>
+                </Popover>
+                {/* 室内定位点 */}
+                <Popover
+                    content={functionalIndoorLocation}
+                    trigger='hover'
+                    placement='right'
+                    mouseLeaveDelay={0.5}
+                    destroyTooltipOnHide
+                    rootClassName={cx(
+                        checkedItem === FunctionalNameEnum.INDOOR_LOCALIZATION
+                            ? classes['custom-popover-functinal']
+                            : classes['custom-popover-ordinary'],
+                    )}
+                >
+                    <div>
+                        <RoutingEditingFunctionalItem
+                            functionalName={FunctionalNameEnum.INDOOR_LOCALIZATION}
+                            checkedItem={checkedItem}
+                            onClick={handleClicked(FunctionalNameEnum.INDOOR_LOCALIZATION)}
+                            disable={!indoorLocationDisState}
                         />
                     </div>
                 </Popover>

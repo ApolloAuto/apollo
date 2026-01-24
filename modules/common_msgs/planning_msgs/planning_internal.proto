@@ -14,6 +14,7 @@ import "modules/common_msgs/planning_msgs/navigation.proto";
 import "modules/common_msgs/planning_msgs/sl_boundary.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
 import "modules/common_msgs/routing_msgs/geometry.proto";
+import "modules/common_msgs/map_msgs/map_lane.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -220,6 +221,7 @@ message PlanningData {
   optional SmootherDebug smoother = 28;
   optional PullOverDebug pull_over = 29;
   optional HybridModelDebug hybrid_model = 30;
+  optional ADCDrivingState adc_driving_state = 31;
 }
 
 message LatticeStPixel {
@@ -266,4 +268,46 @@ message HybridModelDebug {
   optional double learning_model_output_usage_ratio = 2;
   optional string learning_model_output_fail_reason = 3;
   optional apollo.common.Path evaluated_path_reference = 4;
+}
+
+message NudgeObstacleDebug {
+  enum NudgeType {
+    NO_NUDGE = 1;
+    LEFT_NUDGE = 2;
+    RIGHT_NUDGE = 3;
+  }
+  optional NudgeType type = 1;
+  optional ObstacleDebug obstacle = 2;
+  optional bool is_blocked = 3;
+}
+
+enum LaneChangeType {
+  NO_CHANGE = 1;
+  LEFT_CHANGE = 2;
+  RIGHT_CHANGE = 3;
+}
+
+enum LaneBorrowType {
+  NO_BORROW = 1;
+  LEFT_BORROW = 2;
+  RIGHT_BORROW = 3;
+}
+
+message LaneTurnInfo {
+  optional apollo.hdmap.Lane.LaneTurn turn_type = 1 [default = NO_TURN];
+  optional double dis_to_turn = 2 [default = -1.0];
+}
+
+message ADCDrivingState {
+  optional string lane_id = 1;
+  optional double s_in_lane = 2;
+  optional double distance_to_destination = 3;
+  optional LaneChangeType lane_change_type = 4 [default = NO_CHANGE];
+  optional LaneBorrowType lane_borrow_type = 5 [default = NO_BORROW];
+  optional apollo.hdmap.Lane.LaneTurn cur_turn_info = 6;
+  optional LaneTurnInfo next_turn_info = 7;
+  optional bool is_in_junction = 8 [default = false];
+  optional bool is_fallback = 9 [default = false];
+  optional bool is_nudging = 10 [default = false];
+  repeated NudgeObstacleDebug nudge_obstacle = 11;
 }

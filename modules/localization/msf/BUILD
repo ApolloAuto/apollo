@@ -162,7 +162,7 @@ apollo_cc_library(
         "@com_google_absl//:absl",
         "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@fastdds",
+        "@fastrtps",
         "@local_config_pcl//:pcl",
         "@localization_msf",
         "@opencv//:highgui",

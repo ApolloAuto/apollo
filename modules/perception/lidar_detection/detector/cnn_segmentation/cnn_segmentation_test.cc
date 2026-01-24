@@ -77,7 +77,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   unsetenv("CYBER_PATH");
   unsetenv("MODULE_PATH");
   FLAGS_work_root =
-      "modules/perception/common/testdata/"
+      "/apollo/modules/perception/common/testdata/"
       "lidar/lib/segmentation/cnnseg/";
 
   auto segmentation = std::shared_ptr<CNNSegmentation>(new CNNSegmentation);
@@ -93,7 +93,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_sequence_test) {
   EXPECT_TRUE(segmentation->InitClusterAndBackgroundSegmentation());
 
   std::string pcd_path =
-      "modules/perception/common/testdata/lidar/app/data/";
+      "/apollo/modules/perception/common/testdata/lidar/app/data/";
   std::vector<std::string> pcd_file_names;
   algorithm::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
@@ -123,20 +123,20 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
   unsetenv("CYBER_PATH");
   unsetenv("MODULE_PATH");
   FLAGS_work_root =
-      "modules/perception/common/testdata/"
+      "/apollo/modules/perception/common/testdata/"
       "lidar/lib/segmentation/cnnseg/";
 
   // load pcd data
   auto pcl_ptr = std::shared_ptr<base::PointFCloud>(new base::PointFCloud);
   std::string filename =
-      "modules/perception/common/testdata/lidar/app/data/0002_00.pcd";
+      "/apollo/modules/perception/common/testdata/lidar/app/data/0002_00.pcd";
   bool ret = LoadPCDFile(filename, pcl_ptr);
   ACHECK(ret) << "Failed to load " << filename;
   // load non ground indices
   base::PointIndices non_ground_indices;
   //  auto& indices = non_ground_indices.indices;
   //  std::ifstream in_file(
-  //      "modules/perception/common/testdata/lidar/app/data/perception/lidar/files/0002_00.txt");
+  //      "/apollo/modules/perception/common/testdata/lidar/app/data/perception/lidar/files/0002_00.txt");
   //  ASSERT_TRUE(in_file.good());
   //  std::string line;
   //  while (getline(in_file, line)) {

@@ -9,8 +9,10 @@ message ZoneCoverCommand {
   optional apollo.common.Header header = 1;
   // Unique identification for command.
   optional int64 command_id = 2 [default = -1];
-  required string overlap_id = 3;
-  optional double target_speed = 4;
-  repeated RoiPolygon non_drivable_roi = 5;
-  optional RoiPolygon drivable_roi = 6;
+  // If the start pose is set as the first point of "way_point".
+  optional bool is_start_pose_set = 3 [default = false];
+  required string zone_cover_area_id = 4;
+  optional double target_speed = 5;
+  repeated RoiPolygon non_drivable_roi = 6;
+  optional RoiPolygon drivable_roi = 7;
 }

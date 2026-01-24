@@ -28,10 +28,10 @@ using apollo::perception::base::SensorInfo;
 
 TEST(ProbabliticFusionTest, test_init) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();
@@ -95,10 +95,10 @@ TEST(ProbabliticFusionTest, test_init) {
 
 TEST(ProbabliticFusionTest, test_update) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
 
   sensor_manager->Reset();
@@ -146,10 +146,10 @@ TEST(ProbabliticFusionTest, test_update) {
 
 TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   FLAGS_work_root =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/data/params";
+      "/apollo/modules/perception/data/params";
   SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();

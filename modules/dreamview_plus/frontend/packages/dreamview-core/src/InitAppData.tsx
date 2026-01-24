@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     updateStatus,
     usePickHmiStore,
@@ -15,23 +15,14 @@ import {
 } from '@dreamview/dreamview-core/src/services/WebSocketManager';
 import DreamviewConfig from '@dreamview/dreamview-core/package.json';
 import { useRegistryInitEvent, IAppInitStatus } from '@dreamview/dreamview-core/src/store/AppInitStore';
-import { debounce, isEmpty } from 'lodash';
 import { message } from '@dreamview/dreamview-ui';
 import { noop } from './util/similarFunctions';
 import useWebSocketServices from './services/hooks/useWebSocketServices';
-import { StreamDataNames, OBJECT_STORE_TYPE } from './services/api/types';
+import { StreamDataNames } from './services/api/types';
 import { useUserInfoStore } from './store/UserInfoStore';
 import { updateSubscribe, initUserInfo } from './store/UserInfoStore/actions';
-
 import useComponentDisplay from './hooks/useComponentDisplay';
 import { menuStoreUtils, useMenuStore } from './store/MenuStore';
-import {
-    ICurrentLayoutState,
-    IInitLayoutState,
-    initPanelLayout,
-    useGetCurrentLayout,
-    usePanelLayoutStore,
-} from './store/PanelLayoutStore';
 
 // @ts-ignore
 window.dreamviewVersion = DreamviewConfig.version;
@@ -243,10 +234,6 @@ function useInitUserMixInfo() {
                 });
         }
     }, [pluginApi, CertSuccessState]);
-
-    useEffect(() => {
-        dispatchDreamviewEvent('dreamviewWebSocketManager', webSocketManager, true);
-    }, []);
 }
 
 function useInitHmiStatus() {
@@ -313,103 +300,7 @@ function useInitDreamviewVersion() {
     }, []);
 }
 
-/**
- * @description
- * 将一个对象转换为配置文件的JSON格式。
- * 如果传入的值是字符串，则直接返回一个包含该字符串的content属性的对象。
- * 否则，遍历传入的对象，将其中的direction和splitPercentage属性复制到结果对象中，
- * 对于first和second属性，也进行相应的处理，使用toConfJson函数再次处理。
- *
- * @param value {any} 需要转换的对象或字符串，可以为空
- * @returns {object|null} 返回一个包含转换后的JSON格式的对象，如果传入的值为空，则返回null
- */
-function toConfJson(value: any) {
-    if (!value) {
-        return null;
-    }
-    const isLefaeNode = typeof value === 'string';
-    if (isLefaeNode) {
-        return {
-            type: value,
-        };
-    }
-    const result: any = {};
-    Object.entries(value).forEach(([key, subValue]) => {
-        if (key === 'direction' || key === 'splitPercentage') {
-            result[key] = subValue;
-            return;
-        }
-        if (key === 'first' || key === 'second') {
-            result[key] = toConfJson(subValue);
-        }
-    });
-    return result;
-}
-
-/**
- * @description
- * 使用hooks来初始化布局。在组件加载时会触发一次，并且只会触发一次。
- * 该函数会监听主连接的状态，如果主连接已经建立则开始初始化布局。
- * 初始化过程中会更新应用状态和主连接的对象存储，并且会根据当前布局更新主连接的对象存储。
- * 初始化完成后会调用changeHandler方法更新应用状态。
- *
- * @returns {void} 无返回值
- */
-function useInitLayout() {
-    const { mainApi, isMainConnected } = useWebSocketServices();
-    const [, dispatch] = usePanelLayoutStore();
-    const currentLayout = useGetCurrentLayout();
-    const [hmi] = usePickHmiStore();
-
-    useEffect(() => {
-        if (!isMainConnected || !hmi.currentMode || hmi.currentMode === 'none') {
-            return;
-        }
-
-        Promise.all([mainApi.getCurrentLayout(), mainApi.getDefaultLayout()]).then((value) => {
-            const [current, initLayout] = value as [IInitLayoutState, ICurrentLayoutState];
-
-            dispatch(
-                initPanelLayout({
-                    mode: hmi.currentMode,
-                    initLatout: initLayout,
-                    currentLayout: current,
-                }),
-            );
-        });
-    }, [isMainConnected, hmi.currentMode]);
-
-    const debounceUpdateObject = useCallback(
-        debounce((layout, mode) => {
-            if (isEmpty(layout)) {
-                return;
-            }
-            mainApi.putObjectStore({
-                type: mode,
-                value: layout,
-            });
-        }, 500),
-        [mainApi],
-    );
-
-    const isLoad = useRef(true);
-    useEffect(() => {
-        if (isLoad.current) {
-            isLoad.current = false;
-            return;
-        }
-        debounceUpdateObject(toConfJson(currentLayout), hmi.currentMode);
-    }, [currentLayout]);
-}
-
-/**
- *
- * 初始化应用数据函数
- *
- * @returns {JSX.Element} 返回一个空的 JSX 元素
- */
 export default function InitAppData() {
-    useInitLayout();
     useInitHmiStatus();
     useInitUserMixInfo();
     useInitAppData();

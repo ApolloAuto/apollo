@@ -59,5 +59,22 @@ apollo_cc_binary(
     linkstatic = True,
 )
 
+apollo_cc_binary(
+    name = "calibration_table_debug",
+    srcs = ["calibration_table_debug.cc"],
+    deps = [
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util:util_tool",
+        "//modules/control/control_component/controller_task_base/common:controllers_control_task_base_common",
+        "//modules/control/control_component/common:control_gflags",
+        "//modules/common_msgs/control_msgs:control_cmd_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+        "//modules/control/control_component/proto:calibration_table_cc_proto",
+        "//modules/control/control_component/proto:calibration_debug_proto",
+    ],
+    linkstatic = True,
+)
+
 apollo_package()
 cpplint()

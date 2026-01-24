@@ -44,13 +44,13 @@ export enum MainApiTypes {
     AddObjectStore = 'AddOrModifyObjectToDB',
     DeleteObjectStore = 'DeleteObjectToDB',
     PutObjectStore = 'AddOrModifyObjectToDB',
-    putChartObjectStore = 'AddOrModifyObjectToDB',
     GetObjectStore = 'GetObjectFromDB',
     GetTuplesObjectStore = 'GetTuplesWithTypeFromDB',
     StartTerminal = 'StartTerminal',
     RequestRoutePath = 'RequestRoutePath',
-    GetCurrentLayout = 'GetCurrentLayout',
-    GetDefaultLayout = 'GetDefaultLayout',
+    SendIndoorLocalizationInitPointRequest = 'SendIndoorLocalizationInitPointRequest',
+    GetMapStartPoint = 'GetMapStartPoint',
+    CheckIndoorLocalizationInitPointStatus = 'CheckIndoorLocalizationInitPointStatus',
 }
 
 /**
@@ -406,8 +406,6 @@ export type HDMapSwitchInfo = {
 
 export enum OBJECT_STORE_TYPE {
     CHART = 'chart',
-    CURRENT_LAYOUT = 'CurrentLayout',
-    INIT_LATOUR = 'InitLayout',
 }
 export interface IAddObjectStoreParams {
     key: string;

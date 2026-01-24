@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.control;
 
 import "modules/common_msgs/control_msgs/control_cmd.proto";
+import "modules/common_msgs/control_msgs/control_interactive_msg.proto";
 import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/basic_msgs/geometry.proto";
 import "modules/common_msgs/basic_msgs/pnc_point.proto";
@@ -18,7 +19,7 @@ message ControlDebugInfo {
   optional SimpleAntiSlopeDebug simple_anti_slope_debug = 5;
   optional CleaningSafetyCheckDebug cleaning_safety_check_debug = 6;
   optional ControlComponentDebug control_component_debug = 7;
-  optional apollo.common.Header debug_header = 8;
+  optional ReplanDebug replan_debug = 8;
 }
 
 message ControlComponentDebug {
@@ -221,6 +222,16 @@ message SimpleLateralPlusDebug {
   optional double com_change = 92;
   optional int32 current_sign = 93;
   optional int32 current_min_error_point = 94;
+
+  // track point debug
+  optional apollo.common.PointENU lat_track_com_position = 95;
+  optional apollo.common.TrajectoryPoint track_point_com = 96;
+  optional double lateral_error_track_com = 97;
+  optional double heading_error_track_com = 98;
+
+  optional double lateral_error_lqr_input_change = 99;
+  optional double heading_error_lqr_input_change = 100;
+  optional double curvature_change = 101;
 }
 
 message AHCValue {
@@ -356,6 +367,9 @@ message SimpleAntiSlopeDebug {
   optional double hill_start_first_acc = 18;
   optional double slope_start_acc = 19;
   optional double slope_offset_compensation = 20;
+  optional double calibration_value_anti = 21;
+  optional double anti_acc_lookup = 22;
+  optional string anti_stage = 23;
 }
 
 message CleaningSafetyCheckDebug {
@@ -369,4 +383,11 @@ message CleaningSafetyCheckDebug {
   optional double post_process_throttle_cmd = 8;
   optional double post_process_brake_cmd = 9;
   optional bool is_in_large_curvature = 10;
+}
+
+message ReplanDebug {
+  optional string control_task_name = 1;
+  optional bool trajectory_replan = 2;
+  optional bool is_need_replan = 3;
+  optional ReplanRequestReasonCode replan_req_reason_code = 4;
 }

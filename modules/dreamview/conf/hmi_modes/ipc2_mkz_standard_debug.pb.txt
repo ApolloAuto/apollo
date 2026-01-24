@@ -1,19 +1,19 @@
 cyber_modules {
   key: "Control"
   value: {
-    dag_files: "modules/control/control_component/dag/control.dag"
+    dag_files: "/apollo/modules/control/control_component/dag/control.dag"
   }
 }
 cyber_modules {
   key: "Planning"
   value: {
-    dag_files: "modules/planning/planning_component/dag/planning.dag"
-    dag_files: "modules/external_command/process_component/dag/external_command_process.dag"
+    dag_files: "/apollo/modules/planning/planning_component/dag/planning.dag"
+    dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
   }
 }
 cyber_modules {
   key: "Prediction"
   value: {
-    dag_files: "modules/prediction/dag/prediction.dag"
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
   }
 }

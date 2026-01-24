@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
-
 import modules.common_msgs.planning_msgs.planning_command_pb2 as planning_command_pb2
 import modules.common_msgs.external_command_msgs.free_space_command_pb2 as free_space_command_pb2
 import modules.common_msgs.external_command_msgs.command_status_pb2 as command_status_pb2
 import modules.common_msgs.external_command_msgs.action_command_pb2 as action_pb2
 import modules.common_msgs.external_command_msgs.precise_parking_command_pb2 as precise_parking_command_pb2
 import modules.common_msgs.external_command_msgs.valet_parking_command_pb2 as parking_pb2
+import modules.common_msgs.external_command_msgs.zone_cover_command_pb2 as zone_cover_command_pb2
 import google.protobuf.any_pb2 as any_pb2
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
@@ -91,9 +90,11 @@ if __name__ == '__main__':
         "/apollo/external_command/valet_parking", parking_pb2.ValetParkingCommand, command_status_pb2.CommandStatus)
     client_precise_parking = node.create_client(
         "/apollo/external_command/precise_parking", precise_parking_command_pb2.PreciseParkingCommand, command_status_pb2.CommandStatus)
+    client_zone_cover = node.create_client(
+        "/apollo/external_command/zone_cover", zone_cover_command_pb2.ZoneCoverCommand, command_status_pb2.CommandStatus)
     while not cyber.is_shutdown():
         m = input(
-            "0:lanefollow 1: pullover 2: parking 3:parking out 4:freespace 1 5: freespace 2 6: precise_parking\n")
+            "0:lanefollow 1: pullover 2: parking 3:parking out 4:freespace 1 5: freespace 2 6: precise_parking 7: zone_cover\n")
         planning_command = planning_command_pb2.PlanningCommand()
         add_header(planning_command)
         print(m)
@@ -153,5 +154,12 @@ if __name__ == '__main__':
             # msg.Pack(fsc, str(fsc))
             # planning_command.custom_command.CopyFrom(msg)
             # writer.write(planning_command)
+        elif m == "7":  # zone_cover
+            fsc = zone_cover_command_pb2.ZoneCoverCommand()
+            area_id = input("please input area_id: ")
+            add_header(fsc)
+            fsc.zone_cover_area_id = area_id
+            print(fsc)
+            client_zone_cover.send_request(fsc)
 
     cyber.shutdown()

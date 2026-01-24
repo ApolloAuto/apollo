@@ -2,7 +2,7 @@ import { makeStyles } from '@dreamview/dreamview-theme';
 
 export default makeStyles((theme) => ({
     'routing-editing-function-area': {
-        width: 32,
+        width: 40,
         position: 'absolute',
         top: 25,
         left: 24,
@@ -15,10 +15,10 @@ export default makeStyles((theme) => ({
         marginBottom: 10,
     },
     'routing-editing-functional__item': {
-        width: 32,
-        minWidth: 32,
-        height: 32,
-        minHeight: 32,
+        width: 40,
+        minWidth: 40,
+        height: 40,
+        minHeight: 40,
         background: theme.components.layerMenu.menuItemBg,
         borderRadius: 6,
         color: theme.components.layerMenu.menuItemColor,
@@ -36,7 +36,9 @@ export default makeStyles((theme) => ({
     'routing-editing-functional__item--active': {
         color: '#3388FA',
     },
-    'routing-editing-functional__icon': {},
+    'routing-editing-functional__icon': {
+        fontSize: 20,
+    },
 
     'custom-popover-ordinary': {
         '& .dreamview-popover-inner, & .dreamview-popover-arrow::after': {

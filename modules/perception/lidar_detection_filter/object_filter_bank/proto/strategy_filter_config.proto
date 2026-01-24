@@ -8,6 +8,7 @@ message StrategyFilterConfig {
   optional bool allow_fore_merge = 3 [default = true];
   optional bool is_filter_below_objects = 4 [default = true];
   optional float below_threshold = 5 [default = 0.5];
-  optional bool is_filter_small_size = 6 [default = false];
-  optional float small_size_thres = 7 [default = 0.01];
+  optional float below_range = 6 [default = 3.0];
+  optional bool is_filter_small_size = 7 [default = false];
+  optional float small_size_thres = 8 [default = 0.01];
 }

@@ -342,21 +342,49 @@ void PathOptimizerUtil::UpdatePathRefWithBound(
   ref_l->resize(path_boundary.size());
   weight_ref_l->resize(path_boundary.size());
   const double kEpison = 1e-2;
+  bool need_update_by_left_boundary = false;
+  bool need_update_by_right_boundary = false;
   for (size_t i = 0; i < ref_l->size(); i++) {
-    bool is_need_update_path_ref =
-        (path_boundary[i].l_lower.type == BoundType::OBSTACLE ||
-         path_boundary[i].l_upper.type == BoundType::OBSTACLE) &&
-        (path_boundary[i].l_lower.l > path_boundary[i].towing_l - kEpison ||
-         path_boundary[i].l_upper.l < path_boundary[i].towing_l + kEpison);
-    if (is_need_update_path_ref) {
-      ref_l->at(i) =
-          (path_boundary[i].l_lower.l + path_boundary[i].l_upper.l) / 2.0;
-      weight_ref_l->at(i) = weight;
-      AINFO << "need_update_path_ref: s: " << path_boundary[i].s
-            << ", l: " << ref_l->at(i);
-    } else {
+    need_update_by_left_boundary =
+        path_boundary[i].l_upper.type == BoundType::OBSTACLE &&
+        path_boundary[i].l_upper.l < path_boundary[i].towing_l + kEpison;
+    need_update_by_right_boundary =
+        path_boundary[i].l_lower.type == BoundType::OBSTACLE &&
+        path_boundary[i].l_lower.l > path_boundary[i].towing_l - kEpison;
+
+    if (!need_update_by_left_boundary && !need_update_by_right_boundary) {
       weight_ref_l->at(i) = 0;
+      continue;
     }
+
+    double center_ref_l =
+        (path_boundary[i].l_lower.l + path_boundary[i].l_upper.l) / 2.0;
+    weight_ref_l->at(i) = weight;
+
+    if ((path_boundary[i].l_upper.l - path_boundary[i].l_lower.l) <
+        (2 * FLAGS_path_obs_ref_shift_distance + kEpison)) {
+      ref_l->at(i) = center_ref_l;
+      continue;
+    }
+
+    if (need_update_by_left_boundary &&
+        std::fabs(path_boundary[i].l_upper.l -
+                  FLAGS_path_obs_ref_shift_distance - ref_l->at(i)) <
+            std::fabs(center_ref_l - ref_l->at(i))) {
+      center_ref_l =
+          path_boundary[i].l_upper.l - FLAGS_path_obs_ref_shift_distance;
+    }
+    if (need_update_by_right_boundary &&
+        std::fabs(path_boundary[i].l_lower.l +
+                  FLAGS_path_obs_ref_shift_distance - ref_l->at(i)) <
+            std::fabs(center_ref_l - ref_l->at(i))) {
+      center_ref_l =
+          path_boundary[i].l_lower.l + FLAGS_path_obs_ref_shift_distance;
+    }
+    ref_l->at(i) = center_ref_l;
+
+    AINFO << "need_update_path_ref: s: " << path_boundary[i].s
+          << ", l: " << ref_l->at(i);
   }
 }
 
