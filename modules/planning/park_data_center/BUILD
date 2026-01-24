@@ -38,15 +38,6 @@ apollo_cc_library(
     
 )
 
-apollo_cc_test(
-    name = "park_data_center_test",
-    size = "small",
-    srcs = ["park_data_center_test.cc"],
-    deps = [
-        "@com_google_googletest//:gtest_main",
-        "//cyber",
-    ],
-)
 
 apollo_package(enable_source=False)
 

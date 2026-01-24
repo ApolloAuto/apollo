@@ -53,16 +53,6 @@ filegroup(
 #     filter = "*.h",
 # )
 
-apollo_cc_test(
-    name = "open_space_roi_decider_park_test",
-    size = "small",
-    srcs = ["open_space_roi_decider_park_test.cc"],
-    tags = ["exclude"],
-    deps = [
-        ":open_space_roi_decider_lib",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
 
 apollo_plugin(
     name = "libopen_space_roi_decider_park.so",

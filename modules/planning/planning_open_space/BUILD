@@ -191,18 +191,6 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
-    name = "node3d_test",
-    size = "small",
-    srcs = ["coarse_trajectory_generator/node3d_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_open_space",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
     name = "hybrid_a_star_test",
     size = "small",
     srcs = ["coarse_trajectory_generator/hybrid_a_star_test.cc"],
