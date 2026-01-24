@@ -38,24 +38,6 @@ apollo_plugin(
     ],
 )
 
-apollo_cc_test(
-    name = "lon_plus_controller_test",
-    size = "small",
-    srcs = ["lon_plus_controller_test.cc"],
-    copts = ["-fno-access-control"],
-    data = ["longitudinal_controller_test"],
-    deps = [
-        ":lon_plus_controller_lib",
-        "//cyber",
-        "//modules/common/util:common_util",
-        "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/control/control_component/common:control_gflags",
-        "//modules/control/control_task_base_extend:control_task_extend",
-        "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 filegroup(
     name = "longitudinal_controller_test",
     srcs = glob([

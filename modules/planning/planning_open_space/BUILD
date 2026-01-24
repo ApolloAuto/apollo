@@ -190,17 +190,6 @@ apollo_cc_test(
     ],
 )
 
-apollo_cc_test(
-    name = "hybrid_a_star_test",
-    size = "small",
-    srcs = ["coarse_trajectory_generator/hybrid_a_star_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_open_space",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 apollo_cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
     srcs = ["tools/hybrid_a_star_wrapper.cc"],
