@@ -35,9 +35,9 @@
 #include "cyber/node/reader_base.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/service_discovery/topology_manager.h"
-#include "cyber/statistics/statistics.h"
 #include "cyber/time/time.h"
 #include "cyber/transport/transport.h"
+#include "cyber/statistics/statistics.h"
 
 namespace apollo {
 namespace cyber {
@@ -275,17 +275,16 @@ bool Reader<MessageT>::Init() {
       this->reader_func_(msg);
       // sampling proc latency in microsecond
       proc_done_time = Time::Now().ToMicrosecond();
-      proc_start_time =
-          static_cast<uint64_t>(latest_recv_time_sec_ * 1000000UL);
+      proc_start_time = static_cast<uint64_t>(latest_recv_time_sec_*1000000UL);
 
       statistics::Statistics::Instance()->SamplingProcLatency<uint64_t>(
-          this->role_attr_, (proc_done_time - proc_start_time));
+                      this->role_attr_, (proc_done_time-proc_start_time));
       if (statistics::Statistics::Instance()->GetProcStatus(
-              this->role_attr_, &process_start_time)) {
+                            this->role_attr_, &process_start_time)) {
         auto cyber_latency = proc_start_time - process_start_time;
         if (process_start_time > 0 && cyber_latency > 0) {
           statistics::Statistics::Instance()->SamplingCyberLatency(
-              this->role_attr_, cyber_latency);
+                                        this->role_attr_, cyber_latency);
         }
       }
     };

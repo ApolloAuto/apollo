@@ -120,9 +120,9 @@ TEST(FileTest, Glob) {
   EXPECT_THAT(
       Glob("/apol?o/modules/p*"),
       testing::AllOf(
-          testing::Contains(std::string("modules/perception")),
-          testing::Contains(std::string("modules/planning")),
-          testing::Contains(std::string("modules/prediction"))));
+          testing::Contains(std::string("/apollo/modules/perception")),
+          testing::Contains(std::string("/apollo/modules/planning")),
+          testing::Contains(std::string("/apollo/modules/prediction"))));
 }
 
 TEST(FileTest, GetAbsolutePath) {

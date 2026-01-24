@@ -1,5 +1,0 @@
-name: "nav"
-apollo_channel_name_0: "/apollo/sensor/gnss/best_pose"
-apollo_channel_name_1: "/apollo/sensor/gnss/ins_stat"
-ros_topic_name_0: "/gps/fix"
-

@@ -20,6 +20,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
+#include "cyber/common/log.h"
 #include "cyber/common/util.h"
 #include "cyber/init.h"
 #include "cyber/message/raw_message.h"

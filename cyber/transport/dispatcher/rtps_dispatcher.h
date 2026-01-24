@@ -17,7 +17,6 @@
 #ifndef CYBER_TRANSPORT_DISPATCHER_RTPS_DISPATCHER_H_
 #define CYBER_TRANSPORT_DISPATCHER_RTPS_DISPATCHER_H_
 
-#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -27,24 +26,26 @@
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/statistics/statistics.h"
 #include "cyber/time/time.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
-#include "cyber/transport/dispatcher/subscriber_listener.h"
-#include "cyber/transport/qos/qos_filler.h"
 #include "cyber/transport/rtps/attributes_filler.h"
 #include "cyber/transport/rtps/participant.h"
-#include "cyber/transport/rtps/subscriber.h"
+#include "cyber/transport/rtps/sub_listener.h"
+#include "cyber/statistics/statistics.h"
 
 namespace apollo {
 namespace cyber {
 namespace transport {
 
+struct Subscriber {
+  Subscriber() : sub(nullptr), sub_listener(nullptr) {}
+
+  eprosima::fastrtps::Subscriber* sub;
+  SubListenerPtr sub_listener;
+};
+
 class RtpsDispatcher;
 using RtpsDispatcherPtr = RtpsDispatcher*;
-
-using ParticipantPtr =
-    std::shared_ptr<Participant>;
 
 class RtpsDispatcher : public Dispatcher {
  public:
@@ -61,7 +62,7 @@ class RtpsDispatcher : public Dispatcher {
                    const RoleAttributes& opposite_attr,
                    const MessageListener<MessageT>& listener);
 
-  void SetParticipant(const ParticipantPtr& participant) {
+  void set_participant(const ParticipantPtr& participant) {
     participant_ = participant;
   }
 
@@ -71,9 +72,7 @@ class RtpsDispatcher : public Dispatcher {
                  const MessageInfo& msg_info);
   void AddSubscriber(const RoleAttributes& self_attr);
   // key: channel_id
-  std::unordered_map<uint64_t,
-                     std::shared_ptr<transport::Subscriber>>
-      subs_;
+  std::unordered_map<uint64_t, Subscriber> subs_;
   std::mutex subs_mutex_;
 
   ParticipantPtr participant_;
@@ -89,16 +88,15 @@ void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                               const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
-    uint64_t recv_time = Time::Now().ToNanosecond();
+    uint64_t recv_time = Time::Now().ToMicrosecond();
     uint64_t send_time = msg_info.send_time();
     if (send_time > recv_time) {
-      AWARN << "The message is received (" << recv_time
-            << ") earlier than the message is sent (" << send_time << ")";
+      AWARN << "The message is received earlier than the message is sent";
     } else {
       uint64_t diff = recv_time - send_time;
       // sample transport latency in microsecond
-      statistics::Statistics::Instance()->SamplingTranLatency<uint64_t>(
-          self_attr, diff);
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                          uint64_t>(self_attr, diff);
     }
     statistics::Statistics::Instance()->SetProcStatus(self_attr, recv_time);
     listener(msg, msg_info);
@@ -117,16 +115,15 @@ void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                               const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
-    uint64_t recv_time = Time::Now().ToNanosecond();
+    uint64_t recv_time = Time::Now().ToMicrosecond();
     uint64_t send_time = msg_info.send_time();
     if (send_time > recv_time) {
-      AWARN << "The message is received (" << recv_time
-            << ") earlier than the message is sent (" << send_time << ")";
+      AWARN << "The message is received earlier than the message is sent";
     } else {
       uint64_t diff = recv_time - send_time;
       // sample transport latency in microsecond
-      statistics::Statistics::Instance()->SamplingTranLatency<uint64_t>(
-          self_attr, diff);
+      statistics::Statistics::Instance()->SamplingTranLatency<
+                                        uint64_t>(self_attr, diff);
     }
     statistics::Statistics::Instance()->SetProcStatus(self_attr, recv_time);
     listener(msg, msg_info);

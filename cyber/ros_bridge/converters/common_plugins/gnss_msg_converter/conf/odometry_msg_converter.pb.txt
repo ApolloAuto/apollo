@@ -1,3 +1,0 @@
-name: "odometry"
-apollo_channel_name_0: "/apollo/sensor/gnss/odometry"
-ros_topic_name_0: "/odometry"

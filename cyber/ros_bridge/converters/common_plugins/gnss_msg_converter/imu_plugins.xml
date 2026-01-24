@@ -1,3 +1,0 @@
-<library path="cyber/ros_bridge/converters/common_plugins/gnss_msg_converter/libimu_msg_converter.so">
-    <class type="apollo::cyber::ImuMsgConverter" base_class="apollo::cyber::MessageConverter"></class>
-</library>

@@ -52,24 +52,23 @@ class Transmitter : public Endpoint {
   virtual bool Transmit(const MessagePtr& msg);
   virtual bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) = 0;
 
-  uint64_t NextSeqNum() {
-    (*seq_num_) << 1;
-    return seq_num_->get_value();
-  }
+  uint64_t NextSeqNum() { return ++seq_num_; }
 
-  uint64_t seq_num() const { return seq_num_->get_value(); }
+  uint64_t seq_num() const { return seq_num_; }
 
  protected:
+  uint64_t seq_num_;
   MessageInfo msg_info_;
-  std::shared_ptr<::bvar::Adder<int>> seq_num_;
+  std::shared_ptr<::bvar::Adder<int>> msg_counter_;
 };
 
 template <typename M>
-Transmitter<M>::Transmitter(const RoleAttributes& attr) : Endpoint(attr) {
+Transmitter<M>::Transmitter(const RoleAttributes& attr)
+    : Endpoint(attr), seq_num_(0) {
   msg_info_.set_sender_id(this->id_);
-  msg_info_.set_seq_num(0);
-  seq_num_ =
-      statistics::Statistics::Instance()->CreateAdder<int>(Endpoint::attr_);
+  msg_info_.set_seq_num(this->seq_num_);
+  msg_counter_ =
+    statistics::Statistics::Instance()->CreateAdder<int>(Endpoint::attr_);
 }
 
 template <typename M>
@@ -77,7 +76,9 @@ Transmitter<M>::~Transmitter() {}
 
 template <typename M>
 bool Transmitter<M>::Transmit(const MessagePtr& msg) {
+  (*msg_counter_) << 1;
   msg_info_.set_seq_num(NextSeqNum());
+  msg_info_.set_msg_seq_num(msg_counter_->get_value());
   msg_info_.set_send_time(Time::Now().ToNanosecond());
   PerfEventCache::Instance()->AddTransportEvent(
       TransPerf::TRANSMIT_BEGIN, attr_.channel_id(), msg_info_.seq_num());

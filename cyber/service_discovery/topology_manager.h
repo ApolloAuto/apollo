@@ -66,9 +66,9 @@ class TopologyManager {
   using ChangeSignal = base::Signal<const ChangeMsg&>;
   using ChangeFunc = std::function<void(const ChangeMsg&)>;
   using ChangeConnection = base::Connection<const ChangeMsg&>;
-  using ParticipantPtr = std::shared_ptr<transport::Participant>;
   using PartNameContainer =
       std::map<eprosima::fastrtps::rtps::GUID_t, std::string>;
+  using PartInfo = eprosima::fastrtps::ParticipantDiscoveryInfo;
 
   virtual ~TopologyManager();
 
@@ -114,10 +114,8 @@ class TopologyManager {
   bool InitServiceManager();
 
   bool CreateParticipant();
-  void OnParticipantChange(
-      const eprosima::fastrtps::rtps::ParticipantDiscoveryInfo& info);
-  bool Convert(const eprosima::fastrtps::rtps::ParticipantDiscoveryInfo& info,
-               ChangeMsg* change_msg);
+  void OnParticipantChange(const PartInfo& info);
+  bool Convert(const PartInfo& info, ChangeMsg* change_msg);
   bool ParseParticipantName(const std::string& participant_name,
                             std::string* host_name, int* process_id);
 
@@ -125,7 +123,9 @@ class TopologyManager {
   NodeManagerPtr node_manager_;        /// shared ptr of NodeManager
   ChannelManagerPtr channel_manager_;  /// shared ptr of ChannelManager
   ServiceManagerPtr service_manager_;  /// shared ptr of ServiceManager
-  ParticipantPtr participant_;
+  /// rtps participant to publish and subscribe
+  transport::ParticipantPtr participant_;
+  ParticipantListener* participant_listener_;
   ChangeSignal change_signal_;           /// topology changing signal,
                                          ///< connect to `ChangeFunc`s
   PartNameContainer participant_names_;  /// other participant in the topology

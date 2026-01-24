@@ -16,8 +16,6 @@
 
 #include "cyber/mainboard/module_argument.h"
 
-#include "cyber/common/environment.h"
-
 #include <getopt.h>
 #include <libgen.h>
 
@@ -46,12 +44,12 @@ void ModuleArgument::DisplayUsage() {
            "mode of plugins, use disable_plugin_autoload to ingore autoload\n"
         << "    -c, --cpuprofile: enable gperftools cpu profile\n"
         << "    -o, --profile_filename=filename: the filename to dump the "
-           "profile to, default value is ${process_group}_cpu.prof. Only work "
-           "with -c option\n"
+            "profile to, default value is ${process_group}_cpu.prof. Only work "
+            "with -c option\n"
         << "    -H, --heapprofile: enable gperftools heap profile\n"
         << "    -O, --heapprofile_filename=filename: the filename to dump the "
-           "profile to, default value is ${process_group}_mem.prof. Only work "
-           "with -c option\n"
+            "profile to, default value is ${process_group}_mem.prof. Only work "
+            "with -c option\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
         << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "
@@ -72,24 +70,11 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   }
 
   if (enable_cpuprofile_ && profile_filename_.empty()) {
-    auto pwd = common::GetEnv("PWD");
-    profile_filename_ = pwd + "/" + process_group_ + std::string("_cpu.prof");
-  }
-
-  if (profile_filename_[0] != '/') {
-    auto pwd = common::GetEnv("PWD");
-    profile_filename_ = pwd + "/" + profile_filename_;
+    profile_filename_ = process_group_ + std::string("_cpu.prof");
   }
 
   if (enable_heapprofile_ && heapprofile_filename_.empty()) {
-    auto pwd = common::GetEnv("PWD");
-    heapprofile_filename_ =
-        pwd + "/" + process_group_ + std::string("_mem.prof");
-  }
-
-  if (heapprofile_filename_[0] != '/') {
-    auto pwd = common::GetEnv("PWD");
-    heapprofile_filename_ = pwd + "/" + heapprofile_filename_;
+    heapprofile_filename_ = process_group_ + std::string("_mem.prof");
   }
 
   GlobalData::Instance()->SetProcessGroup(process_group_);
@@ -159,7 +144,7 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
         plugin_description_list_.emplace_back(std::string(optarg));
         break;
       case ARGS_OPT_CODE_DISABLE_PLUGIN_AUTOLOAD:
-        disable_plugin_autoload_ = true;
+          disable_plugin_autoload_ = true;
         break;
       case 'c':
 #ifndef BASE_PROFILER_H_

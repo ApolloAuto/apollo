@@ -16,7 +16,6 @@
 
 #ifndef CYBER_PYTHON_INTERNAL_PY_CYBER_H_
 #define CYBER_PYTHON_INTERNAL_PY_CYBER_H_
-#define PY_SSIZE_T_CLEAN
 
 #include <unistd.h>
 

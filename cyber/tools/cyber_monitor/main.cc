@@ -19,7 +19,6 @@
 
 #include "cyber/init.h"
 #include "cyber/service_discovery/topology_manager.h"
-#include "cyber/task/task.h"
 #include "cyber/tools/cyber_monitor/cyber_topology_message.h"
 #include "cyber/tools/cyber_monitor/general_channel_message.h"
 #include "cyber/tools/cyber_monitor/screen.h"
@@ -83,7 +82,8 @@ int main(int argc, char *argv[]) {
     case HELP:
       printHelp(argv[0]);
       return 0;
-    default: {}
+    default: {
+    }
   }
 
   apollo::cyber::Init(argv[0]);
@@ -95,18 +95,12 @@ int main(int argc, char *argv[]) {
 
   auto topology_callback =
       [&topology_msg](const apollo::cyber::proto::ChangeMsg &change_msg) {
-        apollo::cyber::Async([&topology_msg, change_msg] {
-          topology_msg.TopologyChanged(change_msg);
-        });
+        topology_msg.TopologyChanged(change_msg);
       };
 
   auto channel_manager =
       apollo::cyber::service_discovery::TopologyManager::Instance()
           ->channel_manager();
-  if (channel_manager == nullptr) {
-    AERROR << "Cyber Service Discovery is not ready.";
-    return -1;
-  }
   channel_manager->AddChangeListener(topology_callback);
 
   std::vector<apollo::cyber::proto::RoleAttributes> role_vec;

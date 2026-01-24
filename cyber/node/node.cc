@@ -16,8 +16,13 @@
 
 #include "cyber/node/node.h"
 
+#include "cyber/common/global_data.h"
+#include "cyber/time/time.h"
+
 namespace apollo {
 namespace cyber {
+
+using proto::RoleType;
 
 Node::Node(const std::string& node_name, const std::string& name_space)
     : node_name_(node_name), name_space_(name_space) {

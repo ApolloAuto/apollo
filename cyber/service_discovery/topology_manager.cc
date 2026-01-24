@@ -29,7 +29,8 @@ TopologyManager::TopologyManager()
       node_manager_(nullptr),
       channel_manager_(nullptr),
       service_manager_(nullptr),
-      participant_(nullptr) {
+      participant_(nullptr),
+      participant_listener_(nullptr) {
   Init();
 }
 
@@ -46,6 +47,9 @@ void TopologyManager::Shutdown() {
   channel_manager_->Shutdown();
   service_manager_->Shutdown();
   participant_->Shutdown();
+
+  delete participant_listener_;
+  participant_listener_ = nullptr;
 
   change_signal_.DisconnectAllSlots();
 }
@@ -76,6 +80,8 @@ bool TopologyManager::Init() {
   if (!result) {
     AERROR << "init manager failed.";
     participant_ = nullptr;
+    delete participant_listener_;
+    participant_listener_ = nullptr;
     node_manager_ = nullptr;
     channel_manager_ = nullptr;
     service_manager_ = nullptr;
@@ -87,34 +93,29 @@ bool TopologyManager::Init() {
 }
 
 bool TopologyManager::InitNodeManager() {
-  return node_manager_->StartDiscovery(participant_);
+  return node_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::InitChannelManager() {
-  return channel_manager_->StartDiscovery(participant_);
+  return channel_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::InitServiceManager() {
-  return service_manager_->StartDiscovery(participant_);
+  return service_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::CreateParticipant() {
   std::string participant_name =
       common::GlobalData::Instance()->HostName() + '+' +
       std::to_string(common::GlobalData::Instance()->ProcessId());
+  participant_listener_ = new ParticipantListener(std::bind(
+      &TopologyManager::OnParticipantChange, this, std::placeholders::_1));
   participant_ = std::make_shared<transport::Participant>(
-      participant_name, 11511,
-      new ParticipantListener(std::bind(&TopologyManager::OnParticipantChange,
-                                        this, std::placeholders::_1)));
-  if (!participant_->Init()) {
-    AERROR << "init participant failed";
-    return false;
-  }
+      participant_name, 11511, participant_listener_);
   return true;
 }
 
-void TopologyManager::OnParticipantChange(
-    const eprosima::fastrtps::rtps::ParticipantDiscoveryInfo& info) {
+void TopologyManager::OnParticipantChange(const PartInfo& info) {
   ChangeMsg msg;
   if (!Convert(info, &msg)) {
     return;
@@ -134,39 +135,28 @@ void TopologyManager::OnParticipantChange(
   change_signal_(msg);
 }
 
-bool TopologyManager::Convert(
-    const eprosima::fastrtps::rtps::ParticipantDiscoveryInfo& info,
-    ChangeMsg* msg) {
-  auto guid = info.info.m_guid;
+bool TopologyManager::Convert(const PartInfo& info, ChangeMsg* msg) {
+  auto guid = info.rtps.m_guid;
+  auto status = info.rtps.m_status;
   std::string participant_name("");
-  OperateType opt_type;
+  OperateType opt_type = OperateType::OPT_JOIN;
 
-  switch (info.status) {
-    case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERY_STATUS::
-        DISCOVERED_PARTICIPANT:
-      participant_name = info.info.m_participantName;
-      AINFO << "discovery participant name:" << participant_name;
+  switch (status) {
+    case eprosima::fastrtps::rtps::DISCOVERY_STATUS::DISCOVERED_RTPSPARTICIPANT:
+      participant_name = info.rtps.m_RTPSParticipantName;
       participant_names_[guid] = participant_name;
       opt_type = OperateType::OPT_JOIN;
       break;
-    case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERY_STATUS::
-        REMOVED_PARTICIPANT:
+
+    case eprosima::fastrtps::rtps::DISCOVERY_STATUS::REMOVED_RTPSPARTICIPANT:
+    case eprosima::fastrtps::rtps::DISCOVERY_STATUS::DROPPED_RTPSPARTICIPANT:
       if (participant_names_.find(guid) != participant_names_.end()) {
         participant_name = participant_names_[guid];
-        AINFO << "remove participant name:" << participant_name;
         participant_names_.erase(guid);
       }
       opt_type = OperateType::OPT_LEAVE;
       break;
-    case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERY_STATUS::
-        DROPPED_PARTICIPANT:
-      if (participant_names_.find(guid) != participant_names_.end()) {
-        participant_name = participant_names_[guid];
-        AINFO << "dropped participant name:" << participant_name;
-        participant_names_.erase(guid);
-      }
-      opt_type = OperateType::OPT_LEAVE;
-      break;
+
     default:
       break;
   }

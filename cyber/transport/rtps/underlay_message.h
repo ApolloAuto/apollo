@@ -24,8 +24,6 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/base/macros.h"
-
 #include "fastcdr/Cdr.h"
 
 namespace apollo {
@@ -77,36 +75,36 @@ class UnderlayMessage {
    * @brief This function sets a value in member timestamp
    * @param _timestamp New value for member timestamp
    */
-  inline void timestamp(uint64_t _timestamp) { m_timestamp = _timestamp; }
+  inline void timestamp(int32_t _timestamp) { m_timestamp = _timestamp; }
 
   /*!
    * @brief This function returns the value of member timestamp
    * @return Value of member timestamp
    */
-  inline uint64_t timestamp() const { return m_timestamp; }
+  inline int32_t timestamp() const { return m_timestamp; }
 
   /*!
    * @brief This function returns a reference to member timestamp
    * @return Reference to member timestamp
    */
-  inline uint64_t& timestamp() { return m_timestamp; }
+  inline int32_t& timestamp() { return m_timestamp; }
   /*!
    * @brief This function sets a value in member seq
    * @param _seq New value for member seq
    */
-  inline void seq(uint64_t _seq) { m_seq = _seq; }
+  inline void seq(int32_t _seq) { m_seq = _seq; }
 
   /*!
    * @brief This function returns the value of member seq
    * @return Value of member seq
    */
-  inline uint64_t seq() const { return m_seq; }
+  inline int32_t seq() const { return m_seq; }
 
   /*!
    * @brief This function returns a reference to member seq
    * @return Reference to member seq
    */
-  inline uint64_t& seq() { return m_seq; }
+  inline int32_t& seq() { return m_seq; }
   /*!
    * @brief This function copies the value in member data
    * @param _data New value to be copied in member data
@@ -130,6 +128,31 @@ class UnderlayMessage {
    * @return Reference to member data
    */
   inline std::string& data() { return m_data; }
+  /*!
+   * @brief This function copies the value in member datatype
+   * @param _datatype New value to be copied in member datatype
+   */
+  inline void datatype(const std::string& _datatype) { m_datatype = _datatype; }
+
+  /*!
+   * @brief This function moves the value in member datatype
+   * @param _datatype New value to be moved in member datatype
+   */
+  inline void datatype(std::string&& _datatype) {
+    m_datatype = std::move(_datatype);
+  }
+
+  /*!
+   * @brief This function returns a constant reference to member datatype
+   * @return Constant reference to member datatype
+   */
+  inline const std::string& datatype() const { return m_datatype; }
+
+  /*!
+   * @brief This function returns a reference to member datatype
+   * @return Reference to member datatype
+   */
+  inline std::string& datatype() { return m_datatype; }
 
   /*!
    * @brief This function returns the maximum serialized size of an object
@@ -183,9 +206,10 @@ class UnderlayMessage {
   void serializeKey(eprosima::fastcdr::Cdr& cdr) const;  // NOLINT
 
  private:
-  uint64_t m_timestamp;
-  uint64_t m_seq;
+  int32_t m_timestamp;
+  int32_t m_seq;
   std::string m_data;
+  std::string m_datatype;
 };
 
 }  // namespace transport

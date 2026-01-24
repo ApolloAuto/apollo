@@ -38,7 +38,7 @@ apollo_cc_library(
         "//cyber",
         "//cyber/common:cyber_common",
         "//cyber/proto:record_cc_proto",
-        "@fastdds",
+        "@fastrtps",
     ],
 )
 

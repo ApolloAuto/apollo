@@ -19,22 +19,19 @@
 
 #include <atomic>
 #include <functional>
-#include <memory>
 #include <mutex>
 #include <string>
 
-#include "cyber/base/macros.h"
-
-#include "fastdds/dds/publisher/qos/PublisherQos.hpp"
-#include "fastdds/dds/subscriber/qos/SubscriberQos.hpp"
-
-#include "cyber/proto/topology_change.pb.h"
+#include "fastrtps/Domain.h"
+#include "fastrtps/attributes/PublisherAttributes.h"
+#include "fastrtps/attributes/SubscriberAttributes.h"
+#include "fastrtps/participant/Participant.h"
+#include "fastrtps/publisher/Publisher.h"
+#include "fastrtps/subscriber/Subscriber.h"
 
 #include "cyber/base/signal.h"
+#include "cyber/proto/topology_change.pb.h"
 #include "cyber/service_discovery/communication/subscriber_listener.h"
-#include "cyber/transport/rtps/participant.h"
-#include "cyber/transport/rtps/publisher.h"
-#include "cyber/transport/rtps/subscriber.h"
 
 namespace apollo {
 namespace cyber {
@@ -56,9 +53,11 @@ class Manager {
   using ChangeSignal = base::Signal<const ChangeMsg&>;
   using ChangeFunc = std::function<void(const ChangeMsg&)>;
   using ChangeConnection = base::Connection<const ChangeMsg&>;
-  using ParticipantPtr = std::shared_ptr<transport::Participant>;
-  using PublisherPtr = std::shared_ptr<transport::Publisher>;
-  using SubscriberPtr = std::shared_ptr<transport::Subscriber>;
+
+  using RtpsParticipant = eprosima::fastrtps::Participant;
+  using RtpsPublisherAttr = eprosima::fastrtps::PublisherAttributes;
+  using RtpsSubscriberAttr = eprosima::fastrtps::SubscriberAttributes;
+
   /**
    * @brief Construct a new Manager object
    */
@@ -76,7 +75,7 @@ class Manager {
    * @return true if start successfully
    * @return false if start fail
    */
-  bool StartDiscovery(const ParticipantPtr& participant);
+  bool StartDiscovery(RtpsParticipant* participant);
 
   /**
    * @brief Stop topology discovery
@@ -137,8 +136,8 @@ class Manager {
                                  int process_id) = 0;
 
  protected:
-  bool CreatePublisher(const ParticipantPtr& participant);
-  bool CreateSubscriber(const ParticipantPtr& participant);
+  bool CreatePublisher(RtpsParticipant* participant);
+  bool CreateSubscriber(RtpsParticipant* participant);
 
   virtual bool Check(const RoleAttributes& attr) = 0;
   virtual void Dispose(const ChangeMsg& msg) = 0;
@@ -149,7 +148,7 @@ class Manager {
 
   void Notify(const ChangeMsg& msg);
   bool Publish(const ChangeMsg& msg);
-  void OnRemoteChange(const std::shared_ptr<std::string>& msg_str);
+  void OnRemoteChange(const std::string& msg_str);
   bool IsFromSameProcess(const ChangeMsg& msg);
 
   std::atomic<bool> is_shutdown_;
@@ -159,10 +158,10 @@ class Manager {
   std::string host_name_;
   int process_id_;
   std::string channel_name_;
-  PublisherPtr publisher_;
-  SubscriberPtr subscriber_;
-  ParticipantPtr participant_;
+  eprosima::fastrtps::Publisher* publisher_;
   std::mutex lock_;
+  eprosima::fastrtps::Subscriber* subscriber_;
+  SubscriberListener* listener_;
 
   ChangeSignal signal_;
 };

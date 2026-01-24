@@ -1,3 +1,0 @@
-name: "lidar"
-apollo_channel_name_0: "/apollo/sample/pointcloud2"
-ros_topic_name_0: "/sample_pointcloud2"

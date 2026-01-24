@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "cyber/service_discovery/specific_manager/service_manager.h"
+#include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {

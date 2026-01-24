@@ -1,13 +1,9 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/proto:proto.bzl", "proto_library", "apollo_py_binary")
+load("//tools/proto:proto.bzl", "proto_library")
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-apollo_py_binary(
-    name = "cyber_benchmark",
-    srcs = ["cyber_benchmark.py"],
-)
 
 apollo_cc_binary(
     name = "cyber_benchmark_reader",
@@ -37,7 +33,6 @@ apollo_cc_binary(
     ],
     deps = [
         "//cyber",
-        "//cyber/time:cyber_time",
         ":benchmark_msg_proto",
     ],
 )

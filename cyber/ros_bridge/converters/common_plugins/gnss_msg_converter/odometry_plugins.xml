@@ -1,3 +1,0 @@
-<library path="cyber/ros_bridge/converters/common_plugins/gnss_msg_converter/libodometry_parser.so">
-    <class type="apollo::cyber::OdometryParser" base_class="apollo::cyber::MessageConverter"></class>
-</library>
