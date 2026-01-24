@@ -15,10 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 declare -A dic
-models_dir="${TOP_DIR}/modules/perception/data/models/"
+models_dir="/apollo/modules/perception/data/models/"
 
 dic=([3d-r4-half_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/3d-r4-half_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A05%3A17Z%2F-1%2Fhost%2F5575ba1e6b5c33e5e989b3b379e16aa9e6546ab28e6f45a54162fadc5dce0ffa" \
      [cnnseg128_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/cnnseg128_caffe.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A06%3A36Z%2F-1%2Fhost%2Faec61e93a98ba3a70edfde89fbc5635294df057dc2f5774a59060332f182067a" \
@@ -34,10 +33,9 @@ dic=([3d-r4-half_caffe.zip]="http://apollo-perception.bj.bcebos.com/core_model/3
      [point_pillars_radar4d_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/point_pillars_radar4d_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A09%3A49Z%2F-1%2Fhost%2Ff7bfb72f9cdbb866d5965a16828fa42275d97844b9f546237bfa000de252063d" \
      [point_pillars_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/point_pillars_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A10%3A07Z%2F-1%2Fhost%2F4d0ad2d272b36fcccb7c0a8280e3af1d665cc1dff393a877ce90b7ca0ea5a5ff" \
      [mask_pillars_torch.zip]="http://apollo-perception.bj.bcebos.com/core_model/mask_pillars_torch.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A10%3A20Z%2F-1%2Fhost%2Feb4e3afe11c4a58be4421cb5271d780e4f648feb2c18b1b9d022aed04da1d838" \
-     [apollo_bevnet_onnx.zip]="http://apollo-perception.bj.bcebos.com/core_model/apollo_bevnet_onnx.zip?authorization=bce-auth-v1%2FALTAK6fleneBT08Sn61Gseah1T%2F2024-11-19T03%3A19%3A47Z%2F-1%2Fhost%2Fcff6ed21d22bb27395182790e07582b95edbed4059f611211db1224aad93acc7" \
     )
 
-pushd "${TOP_DIR}"
+cd "/apollo"
 
 for key in $(echo ${!dic[*]}); do
     download_link=${dic[$key]}
@@ -49,5 +47,3 @@ for key in $(echo ${!dic[*]}); do
     done
     rm -rf ${key::-4} ${key}
   done
-
-popd

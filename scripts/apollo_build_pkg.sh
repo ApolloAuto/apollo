@@ -19,7 +19,7 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-source "${TOP_DIR}/scripts/apollo.bashrc"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 ARCH="$(uname -m)"
 
@@ -28,12 +28,11 @@ USE_GPU=-1
 USE_OPT=-1
 
 ENABLE_PROFILER=true
-ADDTIONAL_OPTIONS=
+
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
-
 DISABLED_TARGETS=
-ACTION=
+
 APOLLO_BUILD=0
 
 function _determine_perception_disabled() {
@@ -75,10 +74,10 @@ function determine_build_targets() {
     local build_targets
     if [ "${component}" = "cyber" ]; then
       build_targets="cyber"
-    elif [[ -d "${TOP_DIR}/modules/${component}" ]]; then
+    elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
       build_targets="modules/${component}"
     else
-      error "Directory ${TOP_DIR}/modules/${component} not found. Exiting ..."
+      error "Directory <APOLLO_ROOT_DIR>/modules/${component} not found. Exiting ..."
       exit 1
     fi
     if [ -z "${targets_all}" ]; then
@@ -140,35 +139,18 @@ function parse_cmdline_arguments() {
   for ((pos = 1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
     local opt="${!pos}"
     local optarg
-    local gpuset=1
-    local optset=1
-    local additional_args=
 
     case "${opt}" in
-      --test)
-        ACTION="test"
-        ;;
-      --build)
-        ACTION="build"
-        ;;
       --config=*)
         optarg="${opt#*=}"
-        if echo "$optarg" | grep -qE '^(cpu|gpu|opt|dbg)$'; then
-          _chk_n_set_gpu_arg "${optarg}"
-          _chk_n_set_opt_arg "${optarg}"
-        else
-          additional_args="${additional_args} \-\-config=${optarg}"
-        fi
+        _chk_n_set_gpu_arg "${optarg}"
+        _chk_n_set_opt_arg "${optarg}"
         ;;
       --config)
         ((++pos))
         optarg="${!pos}"
-        if echo "$optarg" | grep -qE '^(cpu|gpu|opt|dbg)$'; then
-          _chk_n_set_gpu_arg "${optarg}"
-          _chk_n_set_opt_arg "${optarg}"
-        else
-          additional_args="${additional_args} \-\-config=${optarg}"  
-        fi
+        _chk_n_set_gpu_arg "${optarg}"
+        _chk_n_set_opt_arg "${optarg}"
         ;;
       *)
         remained_args="${remained_args} ${opt}"
@@ -177,7 +159,7 @@ function parse_cmdline_arguments() {
   done
   # Strip leading whitespaces
   remained_args="$(echo "${remained_args}" | sed -e 's/^[[:space:]]*//')"
-  [[ ! -z ${additional_args} ]] && ADDTIONAL_OPTIONS="-a \"${additional_args}\""
+
   CMDLINE_OPTIONS="${known_options}"
   SHORTHAND_TARGETS="${remained_args}"
 }
@@ -272,9 +254,16 @@ function run_bazel_build() {
   info "${TAB}Disabled:          ${YELLOW}${disabled_targets}${NO_COLOR}"
 
   local job_args="-j=$(nproc) -m=0.7"
-  [[ -z $ACTION ]] && ACTION="build"
-  [[ $ACTION == "test" ]] && job_args="" && CMDLINE_OPTIONS=""
-  buildtool $ACTION ${CMDLINE_OPTIONS} ${job_args} -p ${build_targets} ${ADDTIONAL_OPTIONS}
+
+  # keep the bazel-extend-tools used in core and park consistent
+  if [[ ! -e /opt/apollo/neo/src/tools ]]; then
+    sudo apt install apollo-neo-bazel-extend-tools
+  fi
+  ln -snf /apollo/tools /opt/apollo/neo/src/tools 
+  rm -rf /opt/apollo/neo/packages/bazel-extend-tools/latest/src
+  ln -snf /apollo/tools /opt/apollo/neo/packages/bazel-extend-tools/latest/src 
+
+  buildtool build ${CMDLINE_OPTIONS} ${job_args} -p ${build_targets}
 
   [[ $? -ne 0 ]] && error "Build failed!" && exit -1
 }
@@ -285,6 +274,7 @@ function main() {
     exit 1
   fi
 
+  env_prepare
   parse_cmdline_arguments "$@"
   determine_build_arguments
 
@@ -298,4 +288,3 @@ function main() {
 }
 
 main "$@"
-
