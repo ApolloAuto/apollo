@@ -27,21 +27,21 @@ load(
     "config_repo_label",
     "err_out",
     "execute",
-    "flag_enabled",
     "get_bash_bin",
     "get_cpu_value",
-    "get_crosstool_verbose",
     "get_host_environ",
+    "get_crosstool_verbose",
     "get_python_bin",
-    "make_copy_dir_rule",
-    "make_copy_files_rule",
     "raw_exec",
     "read_dir",
     "realpath",
+    "make_copy_files_rule",
+    "make_copy_dir_rule",
     "to_list_of_strings",
-    "tpl_gpus",
-    "tpl_gpus_path",
+    "flag_enabled",
     "which",
+    "tpl_gpus_path",
+    "tpl_gpus",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -1169,7 +1169,6 @@ def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
 
 def _cuda_autoconf_impl(repository_ctx):
     """Implementation of the cuda_autoconf repository rule."""
-
     # always retrun valid cuda lib for cpu compile
     # if not enable_cuda(repository_ctx):
     #     _create_dummy_repository(repository_ctx)

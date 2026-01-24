@@ -10,12 +10,6 @@ def clean_dep(dep):
 def repo():
     http_archive(
         name = "ad_rss_lib",
-        patches = [
-            "//third_party/ad_rss_lib:fix_header_missing.patch",
-        ],
-        patch_args = [
-            "-p1",
-        ],
         build_file = clean_dep("//third_party/ad_rss_lib:ad_rss_lib.BUILD"),
         sha256 = "10c161733a06053f79120f389d2d28208c927eb65759799fb8d7142666b61b9f",
         strip_prefix = "ad-rss-lib-1.1.0",

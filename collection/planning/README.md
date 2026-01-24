@@ -1,0 +1,51 @@
+# module-planning
+
+## Introduction
+module-planning contains all packages, plugins of planning.
+
+## Depend
+* planning
+* planning-lane-follow-map
+* planning-scenario-bare-intersection-unprotected
+* planning-scenario-emergency-pull-over
+* planning-scenario-emergency-stop
+* planning-scenario-lane-follow
+* planning-scenario-park-and-go
+* planning-scenario-pull-over
+* planning-scenario-stop-sign-unprotected
+* planning-scenario-traffic-light-protected
+* planning-scenario-traffic-light-unprotected-left-turn
+* planning-scenario-traffic-light-unprotected-right-turn
+* planning-scenario-valet-parking
+* planning-scenario-yield-sign
+* planning-task-fallback-path
+* planning-task-lane-borrow-path
+* planning-task-lane-change-path
+* planning-task-lane-follow-path
+* planning-task-open-space-fallback-decider
+* planning-task-open-space-pre-stop-decider
+* planning-task-open-space-roi-decider
+* planning-task-open-space-trajectory-partition
+* planning-task-open-space-trajectory-provider
+* planning-task-path-decider
+* planning-task-path-reference-decider
+* planning-task-path-time-heuristic
+* planning-task-piecewise-jerk-speed
+* planning-task-piecewise-jerk-speed-nonlinear
+* planning-task-pull-over-path
+* planning-task-reuse-path
+* planning-task-rss-decider
+* planning-task-rule-based-stop-decider
+* planning-task-speed-bounds-decider
+* planning-task-speed-decider
+* planning-task-st-bounds-decider
+* planning-traffic-rules-backside-vehicle
+* planning-traffic-rules-crosswalk
+* planning-traffic-rules-destination
+* planning-traffic-rules-keepclear
+* planning-traffic-rules-reference-line-end
+* planning-traffic-rules-rerouting
+* planning-traffic-rules-stop-sign
+* planning-traffic-rules-traffic-light
+* planning-traffic-rules-yield-sign
+* 

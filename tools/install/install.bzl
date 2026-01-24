@@ -51,11 +51,9 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
         return path
 
     owner = input_file.owner
-    if owner.workspace_name != "" and owner.workspace_name != "apollo_src":
+    if owner.workspace_name != "":
         dest = join_paths("third_party", owner.workspace_name, owner.package, input_file.basename)
     else:
-        if owner.workspace_name == "apollo_src":
-            return input_file.basename
         dest = join_paths(owner.package, input_file.basename)
 
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
@@ -98,8 +96,8 @@ def _install_action(
         strip_prefixes = [],
         rename = {},
         warn_foreign = True,
-        py_bin = False,
-        py_path = None,
+        py_runfiles = False,
+        py_runfiles_path = None,
         plugin = False):
     """Compute install action for a single file.
 
@@ -128,43 +126,39 @@ def _install_action(
         )
     else:
         strip_prefix = strip_prefixes
-    if py_bin:
+    if py_runfiles:
         file_dest = join_paths(
             dest,
-            py_path,
-        )
-    elif "@" not in dest:
-        file_dest = join_paths(
-            dest,
-            _output_path(ctx, artifact, strip_prefix, warn_foreign),
+            py_runfiles_path,
         )
     else:
-        file_dest = dest
+        if "@" not in dest:     
+            file_dest = join_paths(
+                dest,
+                _output_path(ctx, artifact, strip_prefix, warn_foreign),
+            )
+        else:
+            file_dest = dest
     file_dest = _rename(file_dest, rename)
 
     target_name = None
     if hasattr(ctx.attr, "tags") and len(ctx.attr.tags) >= 2 and "export_library" in ctx.attr.tags:
         for i in ctx.attr.tags:
-            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library" or i == "exclude":
+            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library":
                 continue
             else:
                 target_name = i
     package_path = "None"
     if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
-        package_path = ctx.attr.package_path
+        package_path = ctx.attr.package_path 
     if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
         install_type = ctx.attr.type
     else:
-        install_type = "NONE"
+        install_type = "NONE" 
     if plugin:
         install_type = "neo"
-    return struct(
-        src = artifact,
-        dst = file_dest,
-        target_name = target_name,
-        package_path = package_path,
-        type = install_type,
-    )
+    return struct(src = artifact, dst = file_dest, 
+        target_name = target_name, package_path = package_path, type = install_type)
 
 #------------------------------------------------------------------------------
 def _install_actions(
@@ -289,41 +283,33 @@ def _install_cc_actions(ctx, target):
 # Compute install actions for a py_library or py_binary.
 # TODO(jamiesnape): Install native shared libraries that the target may use.
 def _install_py_actions(ctx, target):
-    actions = []
-    for f in _depset_to_list(target.files):
-        if not f.basename.endswith("py"):
-            continue
-        actions.append(
+    actions = _install_actions(
+        ctx,
+        [target],
+        ctx.attr.py_dest,
+        ctx.attr.py_strip_prefix,
+        rename = ctx.attr.rename,
+    )
+
+    runfile_actions = []
+    runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
+    runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
+
+    for f in _depset_to_list(target.default_runfiles.files):
+        runfile_actions.append(
             _install_action(
                 ctx,
                 f,
-                ctx.attr.py_dest,
+                runfiles_dest,
                 ctx.attr.py_strip_prefix,
-                rename = ctx.attr.rename,
-                py_bin = True,
-                py_path = f.basename.replace(".py", ""),
+                ctx.attr.rename,
+                True,
+                True,
+                join_paths("%s" % ctx.workspace_name, f.short_path),
             ),
         )
 
-    # runfile_actions = []
-    # runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
-    # runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
-
-    # for f in _depset_to_list(target.default_runfiles.files):
-    #     runfile_actions.append(
-    #         _install_action(
-    #             ctx,
-    #             f,
-    #             runfiles_dest,
-    #             ctx.attr.py_strip_prefix,
-    #             ctx.attr.rename,
-    #             True,
-    #             True,
-    #             join_paths("%s" % ctx.workspace_name, f.short_path),
-    #         ),
-    #     )
-
-    # actions += runfile_actions
+    actions += runfile_actions
 
     return actions
 
@@ -345,24 +331,15 @@ def _install_code(action, ctx):
         if hasattr(action, "package_path") and action.package_path != "NONE":
             if action.target_name != None:
                 return "install(%r, %r, %r, %r, %r, %r)" % (
-                    action.src.short_path,
-                    action.dst,
-                    action.type,
-                    action.package_path,
-                    "export_library",
-                    action.target_name,
-                )
-            else:
+                    action.src.short_path, action.dst, action.type,
+                    action.package_path, "export_library", action.target_name)
+            else: 
                 return "install(%r, %r, %r, %r)" % (
-                    action.src.short_path,
-                    action.dst,
-                    action.type,
-                    action.package_path,
-                )
+                    action.src.short_path, action.dst, action.type, action.package_path)
         else:
             fail("Dont't run the install target which is not auto generated!")
     else:
-        return "install(%r, %r)" % (action.src.short_path, action.dst)
+        return "install(%r, %r)" % (action.src.short_path, action.dst) 
 
 #------------------------------------------------------------------------------
 # Generate install code for an install_src action.
@@ -709,7 +686,6 @@ def _install_src_files_impl(ctx):
         else:
             files.append(a.src)
     files = ctx.runfiles(files)
-
     # files = ctx.runfiles(
     #     files = [a.src for a in actions],
     # )

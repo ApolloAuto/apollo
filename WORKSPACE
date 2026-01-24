@@ -4,13 +4,6 @@ workspace(name = "apollo")
 load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# FIXME: replace boringssl with another method or use boringssl instead
-new_local_repository(
-    name = "boringssl",
-    build_file = "third_party/openssl/openssl.BUILD",
-    path = "/opt/apollo/pkgs/openssl",
-)
-
 http_archive(
     name = "rules_foreign_cc",
     sha256 = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc",
@@ -29,12 +22,12 @@ apollo_repositories()
 
 http_archive(
     name = "rules_cc",
-    patches = ["//tools/package:rules_cc.patch"],
-    sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
     urls = [
         "https://apollo-system.cdn.bcebos.com/archive/8.0/rules_cc-0.0.1.tar.gz",
         "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",
     ],
+    sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
+    patches = ["//tools/package:rules_cc.patch"],
 )
 
 http_archive(
@@ -83,14 +76,13 @@ http_archive(
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
-    patches = ["//third_party/absl:grpc.patch"],
     sha256 = "2378b608557a4331c6a6a97f89a9257aee2f8e56a095ce6619eea62e288fcfbe",
+    patches = ["//third_party/absl:grpc.patch"],
     strip_prefix = "grpc-1.30.0",
     urls = [
         "https://apollo-system.cdn.bcebos.com/archive/8.0/v1.30.0-apollo.tar.gz",
     ],
 )
-
 http_archive(
     name = "zlib",
     build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
