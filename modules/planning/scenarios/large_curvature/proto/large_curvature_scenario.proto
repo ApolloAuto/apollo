@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioLargeCurvatureConfig {
+  optional double min_curvature = 1 [default = 0.2];
+  optional double curvature_check_delta_s = 2 [default = 0.3];
+  optional double curvature_check_distance = 3 [default = 3.0];
+  optional double curvature_check_max = 4 [default = 0.1];
+  optional double curvature_ratio = 5 [default = 1.0];
+}

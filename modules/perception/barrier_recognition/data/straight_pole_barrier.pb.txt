@@ -1,0 +1,10 @@
+extend_dist_w: 0.0
+extend_dist_h: 0.0
+extend_dist_l: 0.0
+x_offset: 0.0
+y_offset: 0.0
+z_threshold_low: -1.2
+z_interval_threshold: 0.2
+min_points: 5
+use_semantic_filter: false
+use_foreground_filter: true

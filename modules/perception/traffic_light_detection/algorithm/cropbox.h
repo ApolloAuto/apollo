@@ -22,66 +22,73 @@ namespace perception {
 namespace trafficlight {
 
 class IGetBox {
- public:
-  /**
-   * @brief Get the crop box object.
-   * 
-   * @param width 
-   * @param height 
-   * @param light 
-   * @param crop_box 
-   */
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box) = 0;
+public:
+    /**
+     * @brief Get the crop box object.
+     *
+     * @param width
+     * @param height
+     * @param light
+     * @param crop_box
+     */
+    virtual void getCropBox(
+            const int width,
+            const int height,
+            const base::TrafficLightPtr &light,
+            base::RectI *crop_box)
+            = 0;
 };
 
 class CropBox : public IGetBox {
- public:
-  /**
-   * @brief Construct a new crop box object.
-   * 
-   * @param crop_scale 
-   * @param min_crop_size 
-   */
-  CropBox(float crop_scale, int min_crop_size);
-  /**
-   * @brief Initialize crop box object parameters.
-   * 
-   * @param crop_scale 
-   * @param min_crop_size 
-   */
-  void Init(float crop_scale, int min_crop_size);
-  /**
-   * @brief Get the crop box object.
-   * 
-   * @param width 
-   * @param height 
-   * @param light 
-   * @param crop_box 
-   */
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box);
+public:
+    /**
+     * @brief Construct a new crop box object.
+     *
+     * @param crop_scale
+     * @param min_crop_size
+     */
+    CropBox(float crop_scale, int min_crop_size);
+    /**
+     * @brief Initialize crop box object parameters.
+     *
+     * @param crop_scale
+     * @param min_crop_size
+     */
+    void Init(float crop_scale, int min_crop_size);
+    /**
+     * @brief Get the crop box object.
+     *
+     * @param width
+     * @param height
+     * @param light
+     * @param crop_box
+     */
+    virtual void getCropBox(
+            const int width,
+            const int height,
+            const base::TrafficLightPtr &light,
+            base::RectI *crop_box);
 
- private:
-  float crop_scale_ = 2.5f;
-  int min_crop_size_ = 270;
+private:
+    float crop_scale_ = 2.5f;
+    int min_crop_size_ = 270;
 };
 
 class CropBoxWholeImage : public IGetBox {
- public:
-  /**
-   * @brief Get the crop box object.
-   * 
-   * @param width 
-   * @param height 
-   * @param light 
-   * @param crop_box 
-   */
-  virtual void getCropBox(const int width, const int height,
-                          const base::TrafficLightPtr &light,
-                          base::RectI *crop_box);
+public:
+    /**
+     * @brief Get the crop box object.
+     *
+     * @param width
+     * @param height
+     * @param light
+     * @param crop_box
+     */
+    virtual void getCropBox(
+            const int width,
+            const int height,
+            const base::TrafficLightPtr &light,
+            base::RectI *crop_box);
 };
 
 }  // namespace trafficlight

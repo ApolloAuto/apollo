@@ -1,0 +1,2 @@
+guardian_decision_topic: "/apollo/safety/decision"
+guardian_decision_msg_pending_queue_size: 10

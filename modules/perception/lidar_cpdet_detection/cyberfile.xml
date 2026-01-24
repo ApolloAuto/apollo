@@ -1,0 +1,40 @@
+<package format="2">
+  <name>perception-lidar-cpdet-detection</name>
+  <version>local</version>
+  <description>
+    The perception module incorporates the capability of using multiple cameras, radars (front and rear) and
+    LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list.
+    The obstacle sub-module detects, classifies and tracks obstacles.
+    This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
+    For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane
+    relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/lidar_cpdet_detection</src_path>
+
+  <depend repo_name="libtorch_gpu" lib_names="libtorch_gpu">3rd-libtorch-gpu</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="perception-model-centerpoint-pytorch" type="binary">perception-model-centerpoint-pytorch</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
+  <depend repo_name="perception-plugin-onnx-multibatch-inference" type="binary">perception-plugin-onnx-multibatch-inference</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
+  <depend expose="False">3rd-centerpoint-infer-op</depend>
+  <depend expose="False">3rd-tensorrt</depend>
+  <depend expose="False">3rd-gpus</depend>
+
+  <depend>libtinyxml2-dev</depend>
+  <depend>libleveldb-dev</depend>
+  <depend>libnuma-dev</depend>
+  <depend>3rd-magma</depend>
+
+</package>

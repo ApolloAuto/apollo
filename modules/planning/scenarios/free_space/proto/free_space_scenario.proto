@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioFreeSpaceConfig {
+  optional bool enabled_perception_obstacles = 1 [default = true];
+  // relative distance threshold to filter out ignored obstacle
+  optional double filtering_distance = 2 [default = 1000.0];  // meter
+  // buffer distance for perception obstacle
+  optional double perception_obstacle_buffer = 3;
+}

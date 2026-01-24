@@ -1,0 +1,24 @@
+enable_path_planning_thread: true
+enable_vertical_parking_last_trajectory_straight: true
+warm_start_config {
+    xy_grid_resolution: 0.3
+    phi_grid_resolution: 0.1
+    next_node_num: 16
+    step_size: 0.1
+    traj_forward_penalty: 2.0
+    traj_back_penalty: 2.0
+    traj_gear_switch_penalty: 5.0
+    traj_steer_penalty: 2.5
+    traj_steer_change_penalty: 3.0
+    traj_short_length_penalty: 1.0
+    grid_a_star_xy_resolution: 0.25
+    node_radius: 0.2
+    traj_kappa_contraint_ratio: 0.95
+    max_explored_num: 20000
+    desired_explored_num: 100
+    traj_expected_shortest_length: 1.0
+    astar_max_search_time: 10.0
+    esdf_range: 2.0
+    soft_boundary_penalty: 8.0
+    use_esdf: true
+}

@@ -1,0 +1,7 @@
+gpu_id: 0
+plugin_param {
+  name: "TrafficLightTLDetectorYolox"
+  config_path: "perception/traffic_light_detection/data"
+  config_file: "detection_yolox.pb.txt"
+}
+detection_output_channel_name:"/perception/inner/Retection"

@@ -1,0 +1,3 @@
+<library path="modules/perception/perception_plugin/lidar_detection_filter/object_split_filter/libobject_split_filter.so">
+    <class type="apollo::perception::lidar::ObjectSplitFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>

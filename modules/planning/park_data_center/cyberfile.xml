@@ -1,0 +1,27 @@
+<package format="2">
+  <name>planning-park-data-center</name>
+  <version>local</version>
+  <description>
+    Compared with previous versions, Apollo 7.0 adds park data center.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/planning/park_data_center</src_path>
+
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend type="binary" repo_name="planning-base">planning-base</depend>
+  <depend>bazel-extend-tools</depend>
+  <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu">3rd-libtorch-cpu</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  
+</package>

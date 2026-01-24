@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+message FilterConfig {
+  required string frame_id = 1;
+  optional float max_x = 2;
+  optional float min_x = 3;
+  optional float max_y = 4;
+  optional float min_y = 5;
+  optional float max_z = 6;
+  optional float min_z = 7;
+}
+
+message FusionAndCompensatorConfig {
+  optional uint32 max_interval_ms = 1;
+  optional bool drop_expired_data = 2;
+  repeated string input_channel = 3;
+  optional float wait_time_s = 4;
+  optional string output_channel = 5;
+  optional float transform_query_timeout = 6 [default = 0.02];
+  optional string world_frame_id = 7 [default = "world"];
+  optional string target_frame_id = 8;
+  optional bool rotation_compensation = 9 [default = false];
+  optional bool translation_compensation = 10 [default = true];
+
+  repeated FilterConfig filter_config = 11;
+}

@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/lane_borrow_path_generic/liblane_borrow_path_generic.so">
+    <class type="apollo::planning::LaneBorrowPathGeneric" base_class="apollo::planning::Task"></class>
+</library>

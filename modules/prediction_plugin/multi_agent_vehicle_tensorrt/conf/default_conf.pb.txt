@@ -1,0 +1,1 @@
+model_path: "/apollo/modules/prediction_plugin/multi_agent_vehicle_tensorrt/data/MultiAgentVehicleModelFp16.trt"

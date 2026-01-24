@@ -1,0 +1,3 @@
+<library path="modules/control/controllers/lon_based_pid_plus_controller/liblon_plus_controller.so">
+    <class type="apollo::control::LonPlusController" base_class="apollo::control::ControlTask"></class>
+</library>

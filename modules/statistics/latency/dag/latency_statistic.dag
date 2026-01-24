@@ -1,0 +1,11 @@
+module_config {
+    module_library : "modules/statistics/latency/liblatency_statistic_component.so"
+    timer_components {
+        class_name : "LatencyStatisticComponent"
+        config {
+            name: "latency_statistic"
+            flag_file_path: "/apollo/modules/statistics/latency/conf/latency_statistic_gflags.conf"
+            interval: 1000
+        }
+    }
+}

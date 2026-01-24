@@ -1,0 +1,53 @@
+info {
+  name: "tl_detection_yolox"
+  version: "2021-01-15"
+  dataset: "L4"
+  task_type: CustomTask
+  sensor_type: Camera
+  framework: Onnx
+  infer_plugin: "MultiBatchInference"
+
+  proto_file {
+    file: "yolox.onnx"
+  }
+  weight_file {
+    file: "yolox.onnx"
+  }
+  inputs {
+    name: "images"
+    shape: 1
+    shape: 3
+    shape: 384
+    shape: 384
+  }
+  outputs {
+    name: "bbox"
+    shape: 1
+    shape: 3024
+    shape: 4
+  }
+  outputs {
+    name: "conf"
+    shape: 1
+    shape: 3024
+  }
+  outputs {
+    name: "cls"
+    shape: 1
+    shape: 3024
+  }
+}
+
+resize_image_hight: 384
+resize_image_width: 384
+max_batch_size: 3
+pad_th: 1.0
+cls_th: 0.24
+min_crop_size: 400
+crop_method: 0
+crop_scale: 2.5
+
+nms_param {
+    type: "NormalNMS"
+    threshold: 0.5
+}

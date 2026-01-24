@@ -1,0 +1,35 @@
+optimizer_config {
+  traj_resolution: 16
+  wei_sta_obs: 1000.0
+  wei_dyn_obs: 5000.0
+  wei_feas: 2500.0
+  wei_sqrvar: 500.0           
+  wei_time: 500.0
+  dyn_obs_clearance: 0.4
+  max_forward_acc: 8.0
+  max_backward_acc: 4.0
+  max_frontend_cur: 1.0
+  traj_piece_duration: 1.0
+  half_margin: 0.15
+  des_traj_resolution: 32
+  max_phidot: 10000.0
+  max_forward_vel: 5.0
+  max_backward_vel: 2.0
+  max_forward_cur: 1.0
+  max_backward_cur: 1.0
+  max_latacc: 5.0
+  max_nonsv: 0.1
+  gearopt: true
+  lbfgs_memsize: 256
+  lbfgs_past: 3
+  lbfgs_delta: 0.0001
+  mini_t: 0.1
+  
+  max_frontend_forward_vel: 5.0
+  max_frontend_forward_acc: 8.0
+  max_frontend_backward_vel: 2.0
+  max_frontend_backward_acc: 4.0
+
+  non_sinv: 0.05
+  wei_smooth: 1.0
+}

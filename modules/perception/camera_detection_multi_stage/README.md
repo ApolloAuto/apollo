@@ -9,7 +9,7 @@ such as image data preprocessing, detection, result post-processing and so on.
 ## Directory Structure
 
 ```
-├── camera_detection_multi_stage // camera detect 2d module
+├── camera_detection_multi_stage // camera detect multi stage module
     ├── conf            // module configuration files
     ├── dag             // dag files
     ├── data            // model params
@@ -33,19 +33,15 @@ apollo::perception::camera::CameraDetectionMultiStageComponent
 
 #### Input
 
-| Name  | Type                     | Description         | Input channal |
-| ----- | ------------------------ | ------------------- | ------------- |
-| `msg` | `apollo::drivers::Image` | camera sensor image | /apollo/sensor/camera/front_6mm/image |
-
->Note: Enter the data type defined by proto. The default trigger camera channel is `/apollo/sensor/camera/front_6mm/image`. The detailed input channel information is in `modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_yolox3d.dag` file.
+| Name  | Type                     | Description         |
+| ----- | ------------------------ | ------------------- |
+| `msg` | `apollo::drivers::Image` | camera sensor image |
 
 #### Output
 
-| Name    | Type                                       | Description          | Output channal |
-| ------- | ------------------------------------------ | -------------------- | -------------- |
-| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message | /perception/inner/Detection |
-
->Note: The output channel is structure type data. The message is defined in the `modules/perception/common/onboard/inner_component_messages/camera_detection_component_messages.h` file. The output channel message data can be subscribed by components in the same process. The detailed output channel information is in `modules/perception/camera_detection_multi_stage/conf/camera_detection_multi_stage_yolox3d_config.pb.txt` file.
+| Name    | Type                                       | Description          |
+| ------- | ------------------------------------------ | -------------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |
 
 #### How to Launch
 

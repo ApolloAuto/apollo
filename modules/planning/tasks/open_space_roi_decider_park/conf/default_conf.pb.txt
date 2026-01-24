@@ -1,0 +1,12 @@
+roi_longitudinal_range_start: 15
+roi_longitudinal_range_end: 15
+parking_start_range: 20.0
+parking_inwards: false
+enable_perception_obstacles: true
+parking_depth_buffer: 0.2
+roi_line_segment_min_angle: 0.15
+roi_line_segment_length: 1.0
+perception_obstacle_filtering_distance: 1000.0
+perception_obstacle_buffer: 0.0
+curb_heading_tangent_change_upper_limit: 0.01
+use_road_boundary_from_map: false

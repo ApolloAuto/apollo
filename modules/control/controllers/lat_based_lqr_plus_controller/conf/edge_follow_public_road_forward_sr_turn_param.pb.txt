@@ -1,0 +1,193 @@
+ts: 0.01
+preview_window: 0
+cf: 126050
+cr: 126050
+mass_fl: 100
+mass_fr: 100
+mass_rl: 100
+mass_rr: 100
+eps: 0.01
+matrix_q: 6.0
+matrix_q: 1.0
+matrix_q: 3.0
+matrix_q: 0.0
+cutoff_freq: 5
+mean_filter_window_size: 10
+max_iteration: 1000
+max_lateral_acceleration: 4.0
+enable_reverse_leadlag_compensation: false
+enable_steer_mrac_control: false
+enable_look_ahead_back_control: false
+use_new_look_ahead_back: false
+lookahead_station: 0.5
+lookback_station: 0.85
+lookahead_station_high_speed: 0.0
+lookback_station_high_speed: 0.0
+switch_speed: 2.0
+switch_speed_window: 0.0
+query_relative_time: 0.0
+enable_navigation_mode_position_update: true
+trajectory_transform_to_com_reverse: false
+trajectory_transform_to_com_drive: false
+enable_feedback_augment_on_high_speed: false
+enable_maximum_steer_rate_limit: false
+lock_steer_speed: -0.081
+query_time_nearest_point_only: false
+enable_navigation_mode_error_filter: false
+reverse_feedforward_ratio: 0.5
+reverse_use_dynamic_model: false
+min_large_ref_cur: 0.05
+
+straight_steering_percentage: 5
+straight_min_velocity: 0.5
+straight_max_ref_cur: 0.01
+
+use_heading_auto_compensation: false
+AHC_container_size: 300
+AHC_mean_value_low_threshold: 0.01
+AHC_mean_value_high_threshold: 0.05
+AHC_peak_value_threshold: 0.02
+
+enable_enhance_qparam: false
+first_handle_heading_window: 0
+out_first_handle_heading_window: 0
+handle_lat_err_window: 120
+handle_heading_err_window: 120
+first_handle_heading_stage_prarm: 100
+handle_lat_err_prarm_domain: 5
+handle_lat_err_prarm_ignore: 0.5
+handle_heading_err_parm_domain: 30
+handle_heading_err_parm_ignore: 0.5
+heading_err_threshold: 0.12
+lat_err_threshold: 0.1
+openspace_enhance_curv: 0.1
+lat_err_position_add: 0.6
+check_continous_errors_window: 5
+com_change_rate:0.05
+lat_continous_err_threshold: 0.1
+use_continous_errors_check: false
+choose_ref_point: USE_LAT_ABSOLUTE_LOCAL
+
+is_need_turn_out_lane: true
+turn_out_lane_com_length: 0.0
+
+choose_track_point: USE_LAT_ABSOLUTE_LOCAL
+track_com_length: 0.1
+
+use_turbulence_check: false
+com_quit_turbulence_change_rate: 0.1
+
+reverse_leadlag_conf {
+  innerstate_saturation_level: 3000
+  alpha: 1.0
+  beta: 1.0
+  tau: 0.0
+}
+
+steer_mrac_conf {
+  mrac_model_order: 1
+  reference_time_constant: 0.01
+  reference_natural_frequency: 10
+  reference_damping_ratio: 0.9
+  adaption_state_gain: 1.0
+  adaption_desired_gain: 1.0
+  adaption_nonlinear_gain: 1.0
+  adaption_matrix_p: 1.0
+  mrac_saturation_level: 1.0
+  anti_windup_compensation_gain: 0.0
+}
+
+speed_segment: 1.0
+speed_segment: 2.0
+speed_segment: 3.0
+speed_segment: 5.0
+
+changing_rate: 0.01
+changing_rate: 0.005
+changing_rate: 0.003
+changing_rate: 0.001
+
+lat_speed_input:0.1
+lat_speed_input:0.5
+lat_speed_input:1.0
+lat_speed_input:2.0
+lat_speed_input:3.0
+lat_speed_input:4.0
+lat_speed_input:5.0
+
+lat_err_speed_gain_output:0.8
+lat_err_speed_gain_output:1.5
+lat_err_speed_gain_output:1.0
+lat_err_speed_gain_output:1.0
+lat_err_speed_gain_output:1.0
+lat_err_speed_gain_output:1.0
+lat_err_speed_gain_output:1.0
+
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+lat_err_delta_speed_gain_output:1.0
+
+heading_err_speed_gain_output:2.0
+heading_err_speed_gain_output:1.5
+heading_err_speed_gain_output:1.0
+heading_err_speed_gain_output:0.8
+heading_err_speed_gain_output:0.6
+heading_err_speed_gain_output:0.4
+heading_err_speed_gain_output:0.1
+
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+heading_err_delta_speed_gain_output:1.0
+
+lat_curvature_input:0.01
+lat_curvature_input:0.05
+lat_curvature_input:0.10
+lat_curvature_input:0.20
+lat_curvature_input:0.30
+lat_curvature_input:0.40
+
+lat_err_curvature_gain_output:1.0
+lat_err_curvature_gain_output:3.0
+lat_err_curvature_gain_output:5.0
+lat_err_curvature_gain_output:10.0
+lat_err_curvature_gain_output:15.0
+lat_err_curvature_gain_output:20.0
+
+lat_err_delta_curvature_gain_output:1.0
+lat_err_delta_curvature_gain_output:1.0
+lat_err_delta_curvature_gain_output:1.0
+lat_err_delta_curvature_gain_output:1.0
+lat_err_delta_curvature_gain_output:1.0
+lat_err_delta_curvature_gain_output:1.0
+
+heading_err_curvature_gain_output:3.0
+heading_err_curvature_gain_output:8.0
+heading_err_curvature_gain_output:5.0
+heading_err_curvature_gain_output:1.0
+heading_err_curvature_gain_output:1.0
+heading_err_curvature_gain_output:1.0
+
+heading_err_delta_curvature_gain_output:1.0
+heading_err_delta_curvature_gain_output:1.0
+heading_err_delta_curvature_gain_output:1.0
+heading_err_delta_curvature_gain_output:1.0
+heading_err_delta_curvature_gain_output:1.0
+heading_err_delta_curvature_gain_output:1.0
+
+lat_safety_check_conf {
+  check_threshold {
+    max_lateral_error_e: 0.1
+    max_lateral_error_w: 0.06
+  }
+  use_lateral_error_e_check: true
+  use_lateral_error_w_check: true
+}
+use_safety_check_output: false

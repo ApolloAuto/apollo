@@ -1,0 +1,20 @@
+<package format="2">
+  <name>perception-barrier-recognition</name>
+  <version>local</version>
+  <description>
+    The perception module aims to accurately identify the location and status of the gate barrier.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/barrier_recognition</src_path>
+
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
+
+</package>

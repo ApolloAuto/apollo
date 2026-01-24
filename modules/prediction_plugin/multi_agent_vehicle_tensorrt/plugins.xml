@@ -1,0 +1,3 @@
+<library path="modules/prediction_plugin/multi_agent_vehicle_tensorrt/libmodel.so">
+    <class type="apollo::prediction::MultiAgentVehicleTensorrt" base_class="apollo::prediction::ModelBase"></class>
+</library>

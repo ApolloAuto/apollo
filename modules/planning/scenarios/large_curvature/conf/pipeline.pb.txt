@@ -1,0 +1,29 @@
+stage: {
+  name: "LARGE_CURVATURE"
+  type: "StageLargeCurvature"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_REPLAN_DECIDER"
+    type: "OpenSpaceReplanDecider"
+  }
+  task {
+    name: "OPEN_SPACE_ROI_DECIDER_PARK"
+    type: "OpenSpaceRoiDeciderPark"
+  }
+  task {
+    name: "OPEN_SPACE_PATH_PLANNING"
+    type: "OpenSpacePathPlanning"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_OPTIMIZER_PARK"
+    type: "OpenSpaceTrajectoryOptimizerPark"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_POST_PROCESS"
+    type: "OpenSpaceTrajectoryPostProcess"
+  }
+  task {
+    name: "OPEN_SPACE_FALLBACK_DECIDER_PARK"
+    type: "OpenSpaceFallbackDeciderPark"
+  }
+}

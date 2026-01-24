@@ -1,0 +1,5 @@
+<library path="modules/planning/scenarios/square/libsquare_scenario.so">
+    <class type="apollo::planning::SquareScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::SquareLaneFollowStage" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::ExtricateStage" base_class="apollo::planning::Stage"></class>
+</library>

@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.latency_statistic;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+// latency metrics message
+message LatencyMetrics {
+  message Metric {
+    optional uint32 min = 1;
+    optional uint32 max = 2;
+    optional uint32 avg = 3;
+    optional uint32 sample_size = 4;
+  }
+  message Item {
+    // ms from module recv msg to end of module processing
+    optional Metric proc_ms = 1;
+    // ms from recv lidar pointcloud to end of module processing
+    optional Metric chain_ms = 2; 
+  }
+  optional apollo.common.Header header = 1;
+  optional Item lidar_compensator = 2;
+  optional Item perception = 3;
+  optional Item prediction = 4;
+  optional Item planning = 5;
+  optional Item control = 6;
+}

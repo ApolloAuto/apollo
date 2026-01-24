@@ -1,0 +1,3 @@
+roi_type: PARKING
+expand_polygon_of_obstacle_by_distance: true
+perception_obstacle_buffer: 0.3

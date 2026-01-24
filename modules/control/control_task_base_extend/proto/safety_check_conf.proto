@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message SafetyCheckThreshold {
+  optional double max_lateral_error_e = 1;
+  optional double max_lateral_error_w = 2;
+  optional double max_heading_error_e = 3;
+  optional double max_heading_error_w = 4;
+  optional double max_station_error_e = 5;
+  optional double max_station_error_w = 6;
+  optional double max_speed_error_e = 7;
+  optional double max_speed_error_w = 8;
+}
+
+message SafetyCheckConf {
+  optional SafetyCheckThreshold check_threshold = 1;
+  optional bool use_lateral_error_e_check = 2;
+  optional bool use_lateral_error_w_check = 3;
+  optional bool use_heading_error_e_check = 4;
+  optional bool use_heading_error_w_check = 5;
+  optional bool use_station_error_e_check = 6;
+  optional bool use_station_error_w_check = 7;
+  optional bool use_speed_error_e_check = 8;
+  optional bool use_speed_error_w_check = 9;
+}

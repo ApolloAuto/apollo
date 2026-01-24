@@ -1,0 +1,3 @@
+<library path="modules/perception/barrier_recognition/detector/straight_pole_recognizer/libstraight_pole_recognizer.so">
+    <class type="apollo::perception::lidar::StraightPoleRecognizer" base_class="apollo::perception::lidar::BaseBarrierRecognizer"></class>
+</library>

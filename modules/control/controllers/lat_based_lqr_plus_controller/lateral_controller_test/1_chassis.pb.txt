@@ -1,0 +1,26 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 0
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.04387
+brake_percentage: 22.879377
+steering_percentage: 1.0212766
+steering_torque_nm: -0.0625
+parking_brake: false
+driving_mode: COMPLETE_MANUAL
+error_code: NO_ERROR
+gear_location: GEAR_NEUTRAL
+steering_timestamp: 1494373003.6840091
+header {
+  timestamp_sec: 1494373003.7010145
+  module_name: "chassis"
+  sequence_num: 718141
+}
+signal {
+  turn_signal: TURN_NONE
+  high_beam: false
+  low_beam: false
+  horn: false
+  emergency_light: false
+}

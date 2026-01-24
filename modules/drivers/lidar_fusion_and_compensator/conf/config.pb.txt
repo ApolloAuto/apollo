@@ -1,0 +1,29 @@
+max_interval_ms: 50
+drop_expired_data : true
+input_channel: [
+    "/apollo/sensor/lidar16/left/PointCloud2",
+    "/apollo/sensor/lidar16/right/PointCloud2"
+]
+# wait time after main channel receive msg, unit second
+wait_time_s: 0.02
+world_frame_id: "world"
+transform_query_timeout: 0.02
+output_channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
+rotation_compensation: false
+
+
+# filter e.g.
+# filter_config {
+#     frame_id: "vanjee_back"
+#     max_x: 1.6
+#     min_x: -1.5
+#     max_y: 0.75
+#     min_y: -0.75
+#     max_z: 2.0
+# }
+
+# filter_config {
+#     frame_id: "livox_front_left"
+#     max_x: 1.6
+#     max_y: 0.6
+# }

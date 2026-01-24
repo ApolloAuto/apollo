@@ -1,0 +1,3 @@
+<library path="modules/perception/perception_plugin/lidar_detection_filter/bigmot_refine_filter/libbigmot_refine_filter.so">
+    <class type="apollo::perception::lidar::BigmotRefineFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>

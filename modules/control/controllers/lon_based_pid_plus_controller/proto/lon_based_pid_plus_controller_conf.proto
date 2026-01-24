@@ -1,0 +1,180 @@
+syntax = "proto2";
+
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_task_base_extend/proto/pid_plus_conf.proto";
+
+package apollo.control;
+
+message PlusFilterConf {
+  optional int32 cutoff_freq = 1;
+}
+
+message LonBasedPidPlusControllerConf{
+  // longitudinal controller sampling time
+  optional double ts = 1 [default = 0.01];
+  // min brake cmd
+  optional double brake_minimum_action = 2 [default = 0.0];
+  // min throttle cmd
+  optional double throttle_minimum_action = 3 [default = 0.0];
+  // speed pid controller input max
+  optional double speed_controller_input_limit = 4 [default = 2.5];
+  // station pid controller input max
+  optional double station_error_limit = 5 [default = 2.5];
+  // preview time window
+  optional double preview_window = 6 [default = 20.0];
+  // dec when full stop
+  optional double standstill_acceleration = 7 [default = -3.0];
+  // dec when full stop soft
+  optional double standstill_narmal_acceleration = 8 [default = -1.0];
+  // dec when full stop exceed path remian distance
+  optional double stop_gain_acceleration = 9 [default = -1.0];
+
+  // station pid config
+  optional PidPlusConf station_pid_conf = 10;
+  // speed pid config
+  optional PidPlusConf speed_pid_conf = 11;
+
+  // pitch angle filter config
+  optional PlusFilterConf pitch_angle_filter_conf = 12;
+
+  // station leadlag config
+  optional LeadlagConf station_leadlag_conf = 13;
+  // speed leadlag config
+  optional LeadlagConf speed_leadlag_conf = 14;
+  // swith to enable reverse leadlag control
+  optional bool enable_reverse_leadlag_compensation = 15 [default = false];
+
+  // switch to enable speed station preview
+  optional bool enable_speed_station_preview = 16 [default = false];
+  // switch to enable acc slope offset compensation
+  optional bool enable_slope_offset = 17 [default = false];
+  // switch to enable acceleration lookup max
+  optional bool use_acceleration_lookup_limit = 18 [default = false];
+  // switch to enable preview reference check
+  optional bool use_preview_reference_check = 19 [default = false];
+
+  // max interval between steer cmd and chassis steering percentage
+  optional double steer_cmd_interval = 20 [default = 100.0];
+  // switch to enable steering check
+  optional bool use_steering_check = 21 [default = false];
+
+  // wait time when pedestrian stop to decide to epb brake
+  optional double pedestrian_stop_time = 22 [default = 10.0];
+  // wait time when in destination to decide to epb brake
+  optional double full_stop_long_time = 23 [default = 300.0];
+
+  // check time in overtake pit
+  optional double pit_replan_check_time = 24 [default = 14.0];
+  // check count in overtake pit
+  optional int32 pit_replan_check_count = 25 [default = 3];
+
+  // epb signal time count
+  optional int32 epb_change_count = 26 [default = 2];
+  // switch to enable vehicle epb, not use instead of gflag
+  optional bool use_vehicle_epb = 27 [deprecated = true];
+
+  optional double speed_threshold_in_backslip = 28 [deprecated = true];
+  optional double backslip_check_min_pitch = 29 [deprecated = true];
+  optional double speed_threshold_out_backslip = 30 [deprecated = true];
+  optional double min_dec_hold_on_slope = 31 [deprecated = true];
+
+  repeated double pitch_segment = 32 [deprecated = true];
+  repeated double dec_prepare_change_rate = 33 [deprecated = true];
+
+  optional double min_dec_rate_in_stop_ctrl = 34 [deprecated = true];
+  optional double dec_ctrl_rate_antislip = 35 [deprecated = true];
+  optional double speed_diff_threshold_enter_stop = 36 [deprecated = true];
+  optional double max_dec_rate_in_stop_ctrl = 37 [deprecated = true];
+  optional double speed_threshold_enter_stop = 38 [deprecated = true];
+  optional double dec_addition_speed_error = 39 [deprecated = true];
+  optional double dec_addition_station_error = 40 [deprecated = true];
+  optional double dec_addition_hold_on_slope = 41 [deprecated = true];
+  optional bool use_new_fullstop = 42 [deprecated = true];
+  
+  // when car goes into fullstop,the path remain will be added to avoid unfullstop
+  optional double full_stop_path_remain_gain = 43;
+  // switch to enable opposite slope angle
+  optional int32 use_opposite_slope_compensation = 44 [default = 1];
+  // switch to enable overtake pit
+  optional bool use_check_pit = 45 [default = false];
+  // simulate epb brake cmd
+  optional double epb_brake = 46 [default = 60.0];
+  optional double emergency_quit_fullstop_minspeed = 47 [deprecated = true];
+
+  //if the dcc is smaller than this,the car will not enter fullstop function
+  optional double emergency_quit_fullstop_mindec = 48 [default = -3.0];
+  // path distance from current vehicle position to planning destination
+  optional double path_remain = 49 [default = 0.2];
+  
+  // the car will not enter fullstop when speed is over release_end_brake_speed
+  optional double release_end_brake_speed = 50 [default = 2.0];
+  // the brake cmd will rise in the fullstop_window
+  optional int32 fullstop_window = 51 [default = 200];
+  // if the path remain is over fullstop_pathremain, the fullstop function will not be used
+  optional double fullstop_pathremain = 52 [default = 2.0];
+  // the brake cmd will be added aditionally when station error is less than 0
+  optional double full_stop_station_err_rate = 53 [default = 1.0];
+  // the fullstop max brake will change due to the pitch
+  optional double full_stop_pitch_brake_param = 54 [default = 150];
+  // max brake cmd in full stop
+  optional double full_stop_max_brake = 55 [default = 20.0];
+  // the fullstop window will change due to the pitch
+  optional double full_stop_pitch_window_param = 56 [default = 300];
+  // the brake cmd will change no more than this rate every control ts when in fullstop condition
+  optional double max_brk_downhill_change_rate = 57 [default = 0.4];
+  // the path remain will change due to the pitch
+  optional double pitch_path_remain_param = 58 [default = 9.0];
+  // if the pitch is over pitch_path_remain_param_min, the path remain will not change
+  optional double pitch_path_remain_param_min = 59 [default = -3.0];
+  // the path remain will not change when the speed is lower than downhill_full_stop_min_speed
+  optional double downhill_full_stop_min_speed = 60 [default = 0.4];
+  
+  // wether to use speed interface
+  optional bool use_speed_itfc = 61 [default = false];
+  // when in speed itfc ,the car will not enter fullstop if speed is over speed_itfc_full_stop_speed
+  optional double speed_itfc_full_stop_speed = 62 [default = 0.09];
+  // when in speed itfc ,the car will not enter fullstop when the path remain is less than speed_itfc_path_remain_min
+  optional double speed_itfc_path_remain_min = 63 [default = 0.10];
+  // if the preview dcc is lower than speed_itfc_dcc_emergency, the car will not enter fullstop
+  optional double speed_itfc_dcc_emergency = 64 [default = -1.5];
+  // when in fullstop the speed cmd will change to speed_itfc_speed_cmd
+  optional double speed_itfc_speed_cmd = 65 [default = 0.10];
+  // the car will not enter fullstop when the path remain is over speed_itfc_path_remain_max
+  optional double speed_itfc_path_remain_max = 66 [default = 0.60];
+  // when in speed itfc ,the car will not enter fullstop when the acc is over speed_itfc_acc_thres
+  optional double speed_itfc_acc_thres = 67 [default = 0.0];
+  // if the speed ref is over speed_itfc_stop_speed, the speed cmd will be set to speed_itfc_speed_cmd
+  optional double speed_itfc_stop_speed = 68 [default = 0.05];
+
+  // open space speed control path remain
+  optional double speed_path_remain = 69 [default = 0.11];
+  // wether to use open space speed control
+  optional bool use_parking_speed_control = 70 [default = false];
+  // if current speed is lower than speed_control_min_speed, the car is considered to be stopped
+  optional double speed_control_min_speed = 71 [default = 0.05];
+  // the standard speed of openspace speed control
+  optional double openspace_r_std_v = 72 [default = 0.25];
+  // when current speed is over openspace_r_std_v+openspace_r_err, throttle cmd will decrease
+  optional double openspace_r_err = 73 [default = 0.03];
+  // the throttle will change by openspace_cmd_change in every control ts
+  optional double openspace_cmd_change = 74 [default = 0.02];
+  // if the pitch is lower than speed_control_pitch_thres,the car will enter antislip
+  optional double speed_control_pitch_thres = 75 [default = -1.0];
+  // the car will stand still if throttle cmd is lower than pitch_start_throttle
+  optional double pitch_start_throttle = 76 [default = 8.0];
+  // the car will stand still whin the openspace_start_num
+  optional int32 openspace_start_num = 78 [default = 60];
+  // when current speed is over openspace_r_std_v+openspace_r_err_big, brake cmd will rise
+  optional double openspace_r_err_big = 79 [default = 0.04];
+  // the brake will change by openspace_brk_change in every control ts
+  optional double openspace_brk_change = 80 [default = 0.1];
+  // the max brake cmd
+  optional double openspace_max_brk = 81 [default = 10.0];
+  optional double battery_threshold = 82;
+  // the min throttle that can let the car move
+  optional double openspace_start_throttle = 83 [default = 20.0];
+  // the throttle that will keep the car moving
+  optional double openspace_maintain_throttle = 84 [default = 13.0];
+  // wether to use openspace_maintain_throttle
+  optional bool use_maintain_throttle = 85 [default = false];
+}

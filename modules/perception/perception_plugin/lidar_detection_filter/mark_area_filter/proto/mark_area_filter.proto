@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+
+message MarkArea {
+  optional string id = 1;
+  optional apollo.common.Polygon boundary = 2;
+  optional bool isuse = 3 [default = true];
+  optional int32 filter_type = 4 [default = 0];
+  repeated string filter_foreground_type = 5;
+}
+
+message MarkAreaFilterConfig {
+  repeated MarkArea area = 1;
+  optional float filter_ratio = 2 [default = 30.0];
+}

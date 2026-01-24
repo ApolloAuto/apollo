@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+
+message StraightPoleBarrierConfig {
+  optional float extend_dist_w = 1 [default = 0.];
+  optional float extend_dist_h = 2 [default = 0.];
+  optional float extend_dist_l = 3 [default = 0.];
+  optional float x_offset = 4 [default = 0.];
+  optional float y_offset = 5 [default = 0.];
+  optional float z_threshold_low = 6 [default = -5.];
+  optional float z_interval_threshold = 7 [default = 0.3];
+  optional int32 min_points = 8 [default = 2];
+  optional bool use_semantic_filter = 9 [default = false];
+  optional bool use_foreground_filter = 10 [default = false];
+}

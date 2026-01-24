@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight;
+
+import "modules/perception/common/proto/model_info.proto";
+
+message EfficientNetParam {
+  optional common.ModelInfo info = 1;
+  optional float classify_threshold = 2;
+  optional int32 classify_resize_width = 3;
+  optional int32 classify_resize_height = 4;
+  optional float scale = 5;
+  optional float mean_b = 6;
+  optional float mean_g = 7;
+  optional float mean_r = 8;
+  optional bool is_bgr = 9 [default = true];
+  optional int32 max_batch_size = 10;
+  optional string base_sensor_name = 11;
+}

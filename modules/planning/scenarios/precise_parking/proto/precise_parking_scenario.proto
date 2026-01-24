@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioPreciseParkingConfig {
+  optional double precise_trajectory_length = 1 [default = 3];
+  optional bool enable_perception_obstacles = 2 [default = true];
+  optional bool expand_polygon_of_obstacle_by_distance = 3 [default = true];
+  optional double perception_obstacle_buffer = 4 [default = 0.5];
+  optional double max_heading_error = 5 [default = 0.4];
+  optional double max_lat_error = 6 [default = 0.12];
+  optional double max_lon_error = 7 [default = 0.12];
+}

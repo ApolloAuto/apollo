@@ -1,0 +1,122 @@
+syntax = "proto2";
+
+package apollo.safety_manager;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message Filter {
+  required uint32 required_cycles = 1;
+  required uint32 total_cycles = 2;
+}
+
+message SafetyRule {
+  // If no message received during the timeout seconds, status will be set to
+  // OK.
+  optional double timeout = 1;
+  // Duration seconds required for the status from PENDING to real,
+  // include WARN_PENDING to WARN, ERROR_PENDING to ERROR, FATAL_PENDING to
+  // FATAL, it takes at least two cycles to caculate.
+  optional double duration = 2;
+  // Filter conditions, such as 1/2, 3/3, PENDING status will be set before
+  // unsatisfied.
+  optional Filter filter = 3;
+  // Note: at most one rule can be configured at the same time,
+  // if multi rules are configured, the result may not be what you expected.
+
+  // fault removal time in seconds, set -1 if never removed.
+  optional int32 fault_removed_secs = 4 [default = 5];
+}
+
+message Matcher {
+  // Full name match, ["CPU Usage", "CPU Temp"] means name equal "CPU Usage" or
+  // "CPU Temp".
+  repeated string name = 1;
+  // Name contains match, ["CPU", "MEM"] means name contain CPU or MEM.
+  repeated string contains = 2;
+  // Name prefix match.
+  repeated string prefix = 3;
+  // Name regex match.
+  repeated string regex = 4;
+  // Tags contains at least one, ["resource", "net"] means contain resource or
+  // net tag.
+  repeated string tags_contains_one = 5;
+  // Tags contain many, e.g. ["resource", "net"] means contain both resource and
+  // net tag.
+  repeated string tags_contains_many = 6;
+}
+
+message RuleMatcher {
+  required Matcher matcher = 1;
+  required SafetyRule rule = 2;
+}
+
+message RuleMatcherList {
+  repeated RuleMatcher rule_matcher = 1;
+}
+
+message SafetyStatus {
+  enum Status {
+    // Normal status.
+    OK = 1;
+    // Pending status will be set util the rule conditions are satisfied.
+    WARN_PENDING = 2;
+    ERROR_PENDING = 3;
+    FATAL_PENDING = 4;
+    // Warn status only send an alert notice.
+    WARN = 5;
+    // Error status trigger comfortable braking normally.
+    ERROR = 6;
+    // Fatal status trigger emergency braking normally.
+    FATAL = 7;
+    // wait removed status.
+    WAIT_REMOVED = 8;
+  }
+  message Item {
+    // item basic info
+    required string name = 1;
+    optional uint64 code = 2;
+    optional string type = 3;
+    optional string level = 4;
+    optional string conditions = 5;
+    optional string description = 6;
+    // item status info
+    optional Status status = 7;
+    optional string value = 8;
+    optional string message = 9;
+  }
+  optional apollo.common.Header header = 1;
+  // Name as the unique identifier.
+  required string name = 2;
+  required Status status = 3;
+  optional string message = 4;
+  // Used for status detailed desciption.
+  map<string, string> values = 5;
+  repeated string tags = 6;
+  optional SafetyRule rule = 7;
+  repeated Item items = 8;
+}
+
+message SafetyStatusAggr {
+  optional apollo.common.Header header = 1;
+  repeated SafetyStatus status_array = 2;
+}
+
+message SafetyDecision {
+  optional apollo.common.Header header = 1;
+  // If we have this field, safety_mode should be triggered.
+  // We'll check the system action and driver action continuously. If no proper
+  // action was taken in a specified period of time (such as 10 seconds), EStop
+  // will be sent to bring the vehicle into emergency full stop.
+  optional double safety_mode_trigger_time = 2;
+  optional bool require_emergency_stop = 3;
+}
+
+message SafetyFaultRemoveRequest {
+  required double timestamp = 1;  // in seconds
+  repeated string names = 2;
+}
+
+message SafetyFaultRemoveResponse {
+  required bool success = 1;
+  optional string message = 2;
+}

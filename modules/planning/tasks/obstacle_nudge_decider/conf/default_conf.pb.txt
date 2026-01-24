@@ -1,0 +1,19 @@
+enbale_nugde_static_obs: true
+enbale_nugde_dynamic_obs: false
+min_forward_check_dis: 30.0
+max_forward_check_dis: 60.0
+
+max_lateral_left_nudge_dis: 3.0
+max_lateral_right_nudge_dis: 3.0
+
+expand_polygon_buffer: 0.2
+
+obs_passable_buffer: 0.7
+
+obs_nudge_time_out_threshold: 3.0
+
+obs_clean_time_out_threshold: 2.0
+
+full_nudge_buffer: 1.5
+
+nudge_key_point_extend_length_coefficient: 0.7

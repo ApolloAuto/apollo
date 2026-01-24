@@ -1,0 +1,6 @@
+output_channel_name: "/perception/lidar/pointcloud_semantic"
+plugin_param {
+  name: "PointWiseUnet"
+  config_path: "perception/pointcloud_semantics/data"
+  config_file: "pointwise_unet_param.pb.txt"
+}

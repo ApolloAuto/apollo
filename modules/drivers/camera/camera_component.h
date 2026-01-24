@@ -31,35 +31,30 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-using apollo::cyber::Component;
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
-using apollo::drivers::Image;
-using apollo::drivers::camera::config::Config;
+class CameraComponent : public apollo::cyber::Component<> {
+public:
+    bool Init() override;
+    ~CameraComponent();
 
-class CameraComponent : public Component<> {
- public:
-  bool Init() override;
-  ~CameraComponent();
+private:
+    void run();
 
- private:
-  void run();
-
-  std::shared_ptr<Writer<Image>> writer_ = nullptr;
-  std::shared_ptr<Writer<Image>> raw_writer_ = nullptr;
-  std::unique_ptr<UsbCam> camera_device_;
-  std::shared_ptr<Config> camera_config_;
-  CameraImagePtr raw_image_ = nullptr;
-  CameraImagePtr raw_image_for_compress_ = nullptr;
-  std::vector<std::shared_ptr<Image>> pb_image_buffer_;
-  std::vector<std::shared_ptr<Image>> raw_image_buffer_;
-  uint32_t spin_rate_ = 200;
-  uint32_t device_wait_ = 2000;
-  int index_ = 0;
-  int buffer_size_ = 16;
-  const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
-  std::future<void> async_result_;
-  std::atomic<bool> running_ = {false};
+    std::shared_ptr<apollo::cyber::Writer<
+        apollo::drivers::Image>> writer_ = nullptr;
+    std::shared_ptr<apollo::cyber::Writer<
+        apollo::drivers::Image>> raw_writer_ = nullptr;
+    std::unique_ptr<UsbCam> camera_device_;
+    std::shared_ptr<
+        apollo::drivers::camera::config::Config> camera_config_;
+    CameraImagePtr raw_image_ = nullptr;
+    CameraImagePtr raw_image_for_compress_ = nullptr;
+    uint32_t spin_rate_ = 200;
+    uint32_t device_wait_ = 2000;
+    int index_ = 0;
+    int buffer_size_ = 16;
+    const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+    std::future<void> async_result_;
+    std::atomic<bool> running_ = {false};
 };
 
 CYBER_REGISTER_COMPONENT(CameraComponent)

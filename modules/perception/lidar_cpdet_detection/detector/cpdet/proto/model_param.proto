@@ -1,0 +1,108 @@
+syntax = "proto2";
+
+package apollo.perception.lidar.cpdet;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+import "modules/perception/common/proto/plugin_param.proto";
+
+message CPDetPreProcessParam {
+    // pointcloud_range
+    optional float min_x_range = 1 [default = -51.2];
+    optional float max_x_range = 2 [default = 51.2];
+    optional float min_y_range = 3 [default = -51.2];
+    optional float max_y_range = 4 [default = 51.2];
+    optional float min_z_range = 5 [default = -3.5];
+    optional float max_z_range = 6 [default = 3.5]; 
+    optional float voxel_x_size = 7 [default = 0.2];
+    optional float voxel_y_size = 8 [default = 0.2];
+    optional float voxel_z_size = 9 [default = 7];
+    optional int32 point_dim = 10 [default = 4];
+    optional bool enable_rotate_45degree = 11 [default = true];
+    optional bool use_input_norm = 12 [default = true];
+
+    // feature_generator
+    optional bool use_gpu_generate_feature = 13 [default = true];
+    optional int32 num_classes = 14 [default = 3];
+    optional int32 max_voxel_num = 15 [default = 40000];
+    optional int32 max_points_in_voxel = 16 [default = 20];
+    optional int32 voxel_feature_dim = 17 [default = 9];
+    optional int32 pillar_feature_dim = 18 [default = 64];
+    
+    // cnnseg feature
+    optional bool use_cnnseg_features = 19 [default = true];
+    optional uint32 cnnseg_feature_dim = 20 [default = 16];
+    optional float height_bin_min_height = 21 [default = -3];
+    optional float height_bin_max_height = 22 [default = 2];
+    optional float height_bin_voxel_size = 23 [default = 0.5];
+
+    // pointcloud downsample
+    optional bool enable_downsample_pointcloud = 24 [default = false];
+}
+
+message CPDetPostProcessParam {
+    message subTask {
+        optional string class_name = 1;
+        optional int32 class_index = 2;
+        optional float score_thresh = 3 [default = 0.1];
+    }
+    message Task {
+        repeated subTask sub_task = 1;
+    }
+    message Head {
+        optional string head_name = 1 [default = ""];
+        optional int32 head_shape = 2 [default = 0];
+    }
+    repeated Task task = 1;
+    repeated Head det_head = 2;
+    optional int32 downsample_size = 3 [default = 4];
+    optional int32 nms_pre_max_size = 4 [default = 1000];
+    optional int32 nms_post_max_size = 5 [default = 500];
+    optional float score_thresh = 6 [default = 0.1];
+    optional float nms_overlap_thresh = 7 [default = 0.01];
+    optional float top_enlarge_height = 8 [default = 0.0];
+    optional float bottom_enlarge_height = 9 [default = 0.0];
+    optional float width_enlarge_value = 10 [default = 0.0];
+    optional float length_enlarge_value = 11 [default = 0.0];
+    optional bool use_cpu_get_objects = 12 [default = true];
+    optional bool use_cpu_assign_points = 13 [default = true];
+}
+
+message CPDetModelParam {
+    optional string model_type = 1 [default = "Onnx"];
+    optional common.ModelInfo pfn_model_info = 2;
+    optional common.ModelInfo backbone_model_info = 3;
+    optional common.PointCloudPreProcess preprocess = 4;
+
+    optional string input_voxels = 5;                 // pfe input_blob
+    optional string pillar_feature_blob = 6;          // pfe output
+    optional string input_canvas_feature = 7;         // backbone input blob
+    optional string output_box = 8 [default = "bbox_preds"];  // backbone output
+    optional string output_cls = 9 [default = "scores"];      // backbone output
+    optional string output_dir = 10 [default = "dir_scores"]; // backbone output
+}
+
+message CPDetFilter {
+    optional bool remove_semantic_ground = 1 [default = false];
+    optional bool remove_raw_ground = 2 [default = false];
+    optional bool point_unique = 3 [default = false];
+    optional bool filter_by_semantic_type = 4 [default = false];
+    message ForeSemanticFilter {
+        optional int32 semantic_type = 1 [default = 0];
+        optional float roi_out_ratio = 2 [default = 0.8];
+        optional float filter_range = 3 [default = 10.0];
+    }
+    repeated ForeSemanticFilter fore_semantic_filter = 5;
+    optional bool inter_class_nms = 6 [default = true];
+    optional float class_nms_iou_thres = 7 [default = 0.25];
+    optional bool nms_strategy = 8 [default = false];
+    optional int32 min_points_threshold = 9 [default = 3];
+}
+
+message CPDetConfig {
+    optional CPDetPreProcessParam pre_process = 1;
+    optional CPDetPostProcessParam post_process = 2;
+    optional CPDetModelParam model_param = 3;
+    optional CPDetFilter filter_param = 4;
+    optional PluginParam plugins = 5;
+}

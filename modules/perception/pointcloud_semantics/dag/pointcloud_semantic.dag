@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/pointcloud_semantics/libpointcloud_semantic_component.so"
+  components {
+    class_name : "PointCloudSemanticComponent"
+    config {
+      name : "PointCloudSemantic"
+      config_file_path : "/apollo/modules/perception/pointcloud_semantics/conf/pointcloud_semantic.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/pointcloud_map_based_roi"
+      }
+    }
+  }
+}

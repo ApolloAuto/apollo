@@ -1,0 +1,11 @@
+module_config {
+    module_library : "modules/drivers/lidar_fusion_and_compensator/liblidar_fusion_and_compensator_component.so"
+    components {
+      class_name : "FusionAndCompensatorComponent"
+      config {
+        name : "fusion_and_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar_fusion_and_compensator/conf/config.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
+      }
+    }
+}

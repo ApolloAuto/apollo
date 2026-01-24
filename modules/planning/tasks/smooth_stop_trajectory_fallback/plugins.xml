@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/smooth_stop_trajectory_fallback/libsmooth_stop_trajectory_fallback.so">
+    <class type="apollo::planning::SmoothStopTrajectoryFallback" base_class="apollo::planning::Task"></class>
+</library>

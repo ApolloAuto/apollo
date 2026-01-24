@@ -1,0 +1,15 @@
+module_config {
+  module_library : "modules/perception/traffic_light_detection/libcomponent_traffic_light_detect.so"
+
+  components {
+    class_name : "TrafficLightDetectComponent"
+    config {
+      name: "TrafficLightDetectComponent"
+      config_file_path: "/apollo/modules/perception/traffic_light_detection/conf/traffic_light_detection_yolox_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/inner/Detection"
+      }
+    }
+  }
+}

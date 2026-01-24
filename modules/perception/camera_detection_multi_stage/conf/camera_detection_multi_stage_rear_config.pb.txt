@@ -1,4 +1,4 @@
-camera_name: "front_12mm"
+camera_name: "camera_rear"
 timestamp_offset: 0.0
 plugin_param {
   name: "YoloObstacleDetector"

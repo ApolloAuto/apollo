@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+// OpenSpaceReplanDeciderConfig
+
+message OpenSpaceReplanDeciderConfig {
+
+}

@@ -1,0 +1,3 @@
+<library path="modules/prediction_plugin/semantic_lstm_vehicle_tensorrt/libmodel.so">
+    <class type="apollo::prediction::SemanticLstmVehicleTensorrt" base_class="apollo::prediction::ModelBase"></class>
+</library>

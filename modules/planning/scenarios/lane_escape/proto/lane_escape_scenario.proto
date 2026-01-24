@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioLaneEscapeConfig {
+  optional double escape_reverse_distance = 1 [default = 5.0];
+  optional double escape_stop_distance = 2 [default = 1.0];
+  optional int32 success_path_count = 3 [default = 10];
+  optional int32 stop_check_window = 6 [default = 10];
+  optional double forward_path_length = 7 [default = 15.0];
+}

@@ -1,0 +1,114 @@
+ts: 0.01
+epb_brake_cmd: 60
+slope_offset_threhold: 0.5
+path_remain_threshold: 0.5
+new_dest_path_remain_threshold: 5.0
+use_opposite_slope_compensation: 1
+enable_slope_offset: true
+hill_start_pitch_threshold: -2.0
+hill_start_preview_window: 300
+hill_start_min_speed: 0.1
+hill_start_acc_window: 200
+hill_start_brake_window: 150
+gravity_hill_start_gain: 0.9
+enable_hill_start: true
+min_hill_start_station_remain: 1.0
+hill_start_quit_window: 250
+hill_start_still_speed: 0.01
+downhill_brake_rate: 0.5
+cut_hill_up_throttle_speed: -0.2
+cut_hill_up_throttle_rate: 0.05
+hill_up_acc_rate: 0.7
+hill_start_brake_standby_window: 75
+kill_downhill_brake_rate: 0.5
+downhill_cut_brake_v_err: 0.4
+quit_hill_start_v_err: 0.0
+release_end_brake_speed: 0.1
+uphill_start_pitch: 1.0
+normal_start_pitch: -3.0
+normal_start_gain_window: 50
+normal_start_maintain_window: 200
+normal_acc_rate: 0.8
+
+obstacle_speed_safety_threshold: 0.1
+obstacle_acc_threshold: 0.1
+obstacle_stop_window_threshold: 50
+quit_opbstacle_window: 500
+obstacle_throttle_cmd_threshold: 10.0
+obstacle_brake_cmd_threshold: 5.0
+in_obstacle_preview_speed: 0.25
+obs_throttle_add_rate: 0.5
+obs_throttle_add_default: 10.0
+min_throttle_time_window: 70
+quit_opbstacle_safety_high_speed: 0.5
+speed_stable_window: 70
+speed_stable: 0.3
+
+uphill_fullstop_pathremain: 0.2
+uphill_fullstop_window: 75
+
+downhill_brake_change: 0.04
+
+cncl_brake_min_path: 0.2
+cncl_brake_max_path: 3.0
+cncl_max_brake: 10.0
+maintain_min_speed: 0.5
+cut_unusual_brk_speed_error: 0.2
+
+downhill_brake_change_max: 0.1
+
+brake_minimum_action:4.0
+enable_normal_start: false
+
+emergency_acc: -0.5
+preview_min_speed_threshold: 0.1
+
+slope_pitch_acc_gain_scheduler {
+  pitch_scheduler {
+    pitch: -10.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: -6.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: -3.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: -1.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: -0.4
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: 0.0
+    ratio: 0.0
+  }
+  pitch_scheduler {
+    pitch: 0.2
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: 1.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: 3.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: 6.0
+    ratio: 1.0
+  }
+  pitch_scheduler {
+    pitch: 10.0
+    ratio: 1.0
+  }
+}
+pitch_angle_filter_conf {
+  cutoff_freq: 5
+}

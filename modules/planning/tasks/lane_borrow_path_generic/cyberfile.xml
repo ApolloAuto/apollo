@@ -1,0 +1,17 @@
+<package>
+    <name>planning-task-lane-borrow-path-generic</name>
+    <version>local</version>
+    <description>
+     lane borrow path generic
+    </description>
+    <maintainer email="apollo-support">apollo-support@baidu.com</maintainer>
+    <type>module</type>
+    <src_path>//modules/planning/tasks/lane_borrow_path_generic</src_path>
+    <license>Apache License 2.0</license>
+    <author>Apollo</author>
+    <depend>bazel-extend-tools</depend>
+    <depend type="binary" repo_name="planning-interface-base">planning-interface-base</depend>
+    <depend type="binary" repo_name="planning-park-data-center">planning-park-data-center</depend>
+    
+    <builder>bazel</builder>
+  </package>

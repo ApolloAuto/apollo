@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message BarrierTrackerConfig {
+  optional double tracking_time_window = 1 [default = 0.80];
+  optional double status_change_threshold = 2 [default = 0.10];
+  optional double open_threshold = 3 [default = 0.95];
+  optional double close_threshold = 4 [default = 0.10];
+}

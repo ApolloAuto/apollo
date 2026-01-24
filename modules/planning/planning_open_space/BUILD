@@ -33,6 +33,7 @@ apollo_cc_library(
         "trajectory_smoother/dual_variable_warm_start_problem.cc",
         "trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.cc",
         "trajectory_smoother/iterative_anchoring_smoother.cc",
+        "utils/open_space_fallback_util.cc",
         "utils/open_space_roi_util.cc",
         "utils/open_space_trajectory_optimizer_util.cc",
     ],
@@ -55,6 +56,7 @@ apollo_cc_library(
         "trajectory_smoother/dual_variable_warm_start_problem.h",
         "trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h",
         "trajectory_smoother/iterative_anchoring_smoother.h",
+        "utils/open_space_fallback_util.h",
         "utils/open_space_roi_util.h",
         "utils/open_space_trajectory_optimizer_util.h",
     ],
@@ -250,6 +252,6 @@ apollo_cc_binary(
     ],
 )
 
-apollo_package()
+apollo_package(enable_source=False)
 
 cpplint()

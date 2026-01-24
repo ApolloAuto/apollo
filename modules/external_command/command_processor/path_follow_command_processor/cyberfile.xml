@@ -1,0 +1,17 @@
+<package>
+    <name>external-command-path-follow</name>
+    <version>local</version>
+    <description>
+     path follow command processor.
+    </description>
+    <maintainer email="apollo-support">apollo-support@baidu.com</maintainer>
+    <type>module</type>
+    <src_path>//modules/external_command/command_processor/path_follow_command_processor</src_path>
+    <license>Apache License 2.0</license>
+    <author>Apollo</author>
+    <depend>bazel-extend-tools</depend>
+    <depend type="binary" repo_name="common" lib_names="common">common</depend>
+    <depend type="binary" repo_name="external-command-processor-base">external-command-processor-base</depend>
+    <depend repo_name="routing" type="binary">routing</depend>
+    <builder>bazel</builder>
+  </package>

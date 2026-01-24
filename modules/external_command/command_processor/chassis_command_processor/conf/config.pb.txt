@@ -1,0 +1,3 @@
+input_command_name: "/apollo/external_command/chassis"
+output_command_name: "/apollo/canbus/chassis_control"
+input_command_status_name: "/apollo/canbus/chassis"

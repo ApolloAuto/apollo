@@ -30,44 +30,44 @@ namespace perception {
 namespace trafficlight {
 
 class TrafficLightRecognition final : public BaseTrafficLightRecognitor {
- public:
-  /**
-   * @brief Construct a new Traffic Light Recognition object
-   * 
-   */
-  TrafficLightRecognition() = default;
-  /**
-   * @brief Destroy the Traffic Light Recognition object
-   * 
-   */
-  ~TrafficLightRecognition() = default;
-  /**
-   * @brief Initialize traffic light recognitor parameters.
-   * 
-   * @param options 
-   * @return true 
-   * @return false 
-   */
-  bool Init(const TrafficLightRecognitorInitOptions& options) override;
+public:
+    /**
+     * @brief Construct a new Traffic Light Recognition object
+     *
+     */
+    TrafficLightRecognition() = default;
+    /**
+     * @brief Destroy the Traffic Light Recognition object
+     *
+     */
+    ~TrafficLightRecognition() = default;
+    /**
+     * @brief Initialize traffic light recognitor parameters.
+     *
+     * @param options
+     * @return true
+     * @return false
+     */
+    bool Init(const TrafficLightRecognitorInitOptions& options) override;
 
-  /**
-   * @brief recogn traffic_light from image.
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
-   */
-  bool Detect(camera::TrafficLightFrame* frame) override;
+    /**
+     * @brief recogn traffic_light from image.
+     *
+     * @param frame
+     * @return true
+     * @return false
+     */
+    bool Detect(camera::TrafficLightFrame* frame) override;
 
- private:
-  std::shared_ptr<ClassifyBySimple> classify_vertical_;
-  std::shared_ptr<ClassifyBySimple> classify_quadrate_;
-  std::shared_ptr<ClassifyBySimple> classify_horizontal_;
+private:
+    std::shared_ptr<ClassifyBySimple> classify_vertical_;
+    std::shared_ptr<ClassifyBySimple> classify_quadrate_;
+    std::shared_ptr<ClassifyBySimple> classify_horizontal_;
 
-  TrafficLightRecognitionConfig recognize_param_;
-  std::string recognition_root_dir;
+    TrafficLightRecognitionConfig recognize_param_;
+    std::string recognition_root_dir;
 
-  DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);
+    DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);
 };
 
 }  // namespace trafficlight

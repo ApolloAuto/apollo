@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+package apollo.perception.lidar.motion_unet;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message MotionUnetModelParam {
+  optional bool use_gpu = 1;
+  // pfn model
+  optional common.ModelInfo pfn_info = 2;
+  // model
+  optional common.ModelInfo info = 3;
+  optional common.PointCloudPreProcess preprocess = 4;
+  optional UnetParam unet_params = 5;
+  optional float fuse_time_interval = 6;
+  optional float z_offset = 7;
+}
+
+message UnetParam {
+  optional float resolution = 1;
+  optional int32 unet_width = 2;
+  optional int32 unet_length = 3;
+  // z
+  optional float min_height = 4;
+  optional float max_height = 5;
+  // x
+  optional float min_x = 6;
+  optional float max_x = 7;
+  // y
+  optional float min_y = 8;
+  optional float max_y = 9;
+
+  // max point number
+  optional int32 max_point_number = 10;
+}

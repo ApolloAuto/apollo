@@ -1,0 +1,4 @@
+tracking_time_window: 0.4
+status_change_threshold: 0.1
+open_threshold: 0.95
+close_threshold: 0.10

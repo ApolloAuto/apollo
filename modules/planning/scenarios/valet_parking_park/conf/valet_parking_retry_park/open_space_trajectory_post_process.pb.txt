@@ -1,0 +1,16 @@
+gear_shift_max_t: 3.0
+gear_shift_unit_t: 0.02
+gear_shift_period_duration: 2.0
+interpolated_pieces_num: 10
+initial_gear_check_horizon: 15
+heading_search_range: 0.24
+heading_track_range: 1.57
+distance_search_range: 0.5
+heading_offset_to_midpoint: 1.79
+lateral_offset_to_midpoint: 1.5
+longitudinal_offset_to_midpoint: 0.4
+vehicle_box_iou_threshold_to_midpoint: 0.25
+speed_replan_distance:2.0
+linear_velocity_threshold_on_ego: 0.1
+use_gear_shift_trajectory: true
+stop_check_window: 10

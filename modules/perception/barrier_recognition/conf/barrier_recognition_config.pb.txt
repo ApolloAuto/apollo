@@ -1,0 +1,13 @@
+output_channel_name: "/apollo/perception/barrier"
+frame_id : "world"
+child_frame_id : "novatel"
+recognizer_param {
+    name: "BarrierRecognizerBank"
+    config_path: "perception/barrier_recognition/data"
+    config_file: "barrier_bank.pb.txt"
+}
+tracker_param {
+    name: "BarrierStatusTracker"
+    config_path: "perception/barrier_recognition/data"
+    config_file: "barrier_tracker.pb.txt"
+}

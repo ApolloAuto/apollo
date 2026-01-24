@@ -1,0 +1,3 @@
+general_process {
+  regex: [".*/apollo/scripts/.*", "cyber_recorder record .*", "dreamview.*", ".*data_cleaner.*"]
+}

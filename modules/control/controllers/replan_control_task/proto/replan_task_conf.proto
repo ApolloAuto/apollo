@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message ReplanTaskConf{
+  optional string guardian_decision_topic = 1 [default = "/apollo/safety/decision"];
+  optional int32 guardian_decision_msg_pending_queue_size = 2 [default = 10];
+}

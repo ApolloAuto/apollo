@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/speed_setting/libspeed_setting.so">
+    <class type="apollo::planning::SpeedSetting" base_class="apollo::planning::TrafficRule"></class>
+</library>

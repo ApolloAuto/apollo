@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message LidarSegmentationComponentConfig {
+  optional string output_channel_name = 1;
+  optional string segmentor = 2;
+  optional perception.PluginParam plugin_param = 3;
+}

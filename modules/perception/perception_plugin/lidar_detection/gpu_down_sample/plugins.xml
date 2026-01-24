@@ -1,0 +1,3 @@
+<library path="modules/perception/perception_plugin/lidar_detection/gpu_down_sample/libgpu_down_sample.so">
+    <class type="apollo::perception::lidar::GpuDownSample" base_class="apollo::perception::lidar::BaseDownSample"></class>
+</library>

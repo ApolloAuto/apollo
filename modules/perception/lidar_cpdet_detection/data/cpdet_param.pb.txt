@@ -1,0 +1,177 @@
+model_param {
+  model_type: "Onnx"
+  pfn_model_info {
+    name: "cpdet"
+    version: ""
+    dataset: "apollo"
+    task_type: CustomTask
+    sensor_type: Lidar
+    framework: Onnx
+    infer_plugin: "MultiBatchInference"
+    proto_file {
+      file: "cpdet_pfe.onnx"
+    }
+    inputs {
+       name: "voxels"
+       shape: 100000
+       shape: 9
+    }
+    outputs {
+       name: "pillar_feature"
+       shape: 100000
+       shape: 48
+    }
+  }
+  backbone_model_info {
+    name: "cpdet"
+    version: ""
+    dataset: "apollo"
+    task_type: CustomTask
+    sensor_type: Lidar
+    framework: Onnx
+    infer_plugin: "MultiBatchInference"
+    proto_file {
+      file: "cpdet_backbone.onnx"
+    }
+    inputs {
+        name: "canvas_feature"
+        shape: 1
+        shape: 64
+	    shape: 512
+        shape: 512
+    }
+    outputs {
+        name: "bbox_preds"
+        shape: 1
+        shape: 24
+	    shape: 128
+        shape: 128
+    }
+    outputs {
+        name: "scores"
+        shape: 1
+        shape: 4
+	    shape: 128
+        shape: 128
+    }
+    outputs {
+        name: "dir_scores"
+        shape: 1
+        shape: 8
+	    shape: 128
+        shape: 128
+    }
+  }
+  preprocess {
+    gpu_id: 0
+  }
+}
+
+pre_process {
+  min_x_range: -51.2
+  max_x_range: 51.2
+  min_y_range: -51.2
+  max_y_range: 51.2
+  min_z_range: -3.5
+  max_z_range: 3.5
+  voxel_x_size: 0.2
+  voxel_y_size: 0.2
+  voxel_z_size: 7
+  point_dim: 4
+  enable_rotate_45degree: true
+  use_input_norm: true
+
+  use_gpu_generate_feature: true
+  num_classes: 4
+  max_voxel_num: 160000
+  max_points_in_voxel: 30
+  voxel_feature_dim: 9
+  pillar_feature_dim: 48
+  
+  # cnnseg feature
+  use_cnnseg_features: true
+  cnnseg_feature_dim: 16
+  height_bin_min_height: -3
+  height_bin_max_height: 2
+  height_bin_voxel_size: 0.5
+  
+  # pointcloud downsample
+  enable_downsample_pointcloud: false
+}
+
+post_process {
+  task {
+    sub_task {
+        class_name: "Car"
+        class_index: 0
+	    score_thresh: 0.25
+    }
+  }
+  task {
+    sub_task {
+        class_name: "Pedestrian"
+        class_index: 1
+	    score_thresh: 0.20
+    }
+  }
+  task {
+    sub_task {
+        class_name: "Bicycle"
+        class_index: 2
+	    score_thresh: 0.40
+    }
+  }
+  task {
+    sub_task {
+        class_name: "TrafficCone"
+        class_index: 3
+	    score_thresh: 0.40
+    }
+  }
+  det_head {
+    head_name: "reg"
+    head_shape: 2
+  }
+  det_head {
+    head_name: "hei"
+    head_shape: 1
+  }
+  det_head {
+    head_name: "dim"
+    head_shape: 3
+  }
+  det_head {
+    head_name: "rot"
+    head_shape: 2
+  }
+
+  # backbone head config
+  downsample_size: 4
+  nms_pre_max_size: 4096
+  nms_post_max_size: 500
+  score_thresh: 0.1
+  nms_overlap_thresh: 0.99
+  top_enlarge_height: 0.25
+  bottom_enlarge_height: 0.25
+  width_enlarge_value: 0.10
+  length_enlarge_value: 0.10
+  use_cpu_get_objects: true
+  use_cpu_assign_points: true
+}
+
+filter_param {
+    remove_semantic_ground: false
+    remove_raw_ground: false
+    point_unique: false
+    filter_by_semantic_type: false
+    inter_class_nms: true
+    class_nms_iou_thres: 0.25
+    nms_strategy: false
+    min_points_threshold: 3
+}
+
+plugins {
+    name: "PclDownSample"
+    config_path: "perception/lidar_cpdet_detection/data/plugins"
+    config_file: "pcl_down_sample.pb.txt"
+}

@@ -1,0 +1,21 @@
+<package format="2">
+  <name>prediction-plugin-semantic-vehicle-tensorrt</name>
+  <version>local</version>
+  <description>
+    The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
+    Prediction receives obstacle data along with basic perception information including positions, headings, velocities, 
+    accelerations, and then generates predicted trajectories with probabilities for those obstacles.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend type="binary" repo_name="prediction" lib_names="prediction">prediction</depend>
+  <depend expose="False">3rd-tensorrt</depend>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/prediction_plugin/semantic_lstm_vehicle_tensorrt</src_path>
+
+</package>

@@ -27,44 +27,43 @@ namespace perception {
 namespace trafficlight {
 
 class Select {
- public:
-  /**
-   * @brief Construct a new select object.
-   * 
-   */
-  Select() = default;
-  /**
-   * @brief Initialize select object parameters.
-   * 
-   * @param rows 
-   * @param cols 
-   * @return true 
-   * @return false 
-   */
-  bool Init(int rows, int cols);
-  /**
-   * @brief Choose traffic lights using Gaussian calculation scores.
-   * 
-   * @param refined_bboxes 
-   * @param hdmap_bboxes 
-   */
-  void SelectTrafficLights(
-      const std::vector<base::TrafficLightPtr> &refined_bboxes,
-      std::vector<base::TrafficLightPtr> *hdmap_bboxes);
-  /**
-   * @brief Calculate 2d Gaussian score.
-   * 
-   * @param p1 
-   * @param p2 
-   * @param sigma1 
-   * @param sigma2 
-   * @return double 
-   */
-  double Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2, float sigma1,
-                             float sigma2);
+public:
+    /**
+     * @brief Construct a new select object.
+     *
+     */
+    Select() = default;
+    /**
+     * @brief Initialize select object parameters.
+     *
+     * @param rows
+     * @param cols
+     * @return true
+     * @return false
+     */
+    bool Init(int rows, int cols);
+    /**
+     * @brief Choose traffic lights using Gaussian calculation scores.
+     *
+     * @param refined_bboxes
+     * @param hdmap_bboxes
+     */
+    void SelectTrafficLights(
+            const std::vector<base::TrafficLightPtr> &refined_bboxes,
+            std::vector<base::TrafficLightPtr> *hdmap_bboxes);
+    /**
+     * @brief Calculate 2d Gaussian score.
+     *
+     * @param p1
+     * @param p2
+     * @param sigma1
+     * @param sigma2
+     * @return double
+     */
+    double Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2, float sigma1, float sigma2);
 
- private:
-  algorithm::HungarianOptimizer<float> munkres_;
+private:
+    algorithm::HungarianOptimizer<float> munkres_;
 };
 }  // namespace trafficlight
 }  // namespace perception

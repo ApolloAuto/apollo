@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+import "modules/control/control_component/proto/pid_conf.proto";
+
+package apollo.control;
+
+message PidPlusConf {
+  optional PidConf pid_conf = 1;
+  repeated double speed_input = 2;
+  repeated double kp_speed_gain_output = 3;
+  repeated double ki_speed_gain_output = 4;
+  repeated double kd_speed_gain_output = 5;
+}

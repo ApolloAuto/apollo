@@ -5,6 +5,7 @@ info {
   task_type: Detection3D
   sensor_type: Camera
   framework: Onnx
+  infer_plugin: "MultiBatchInference"
 
   proto_file {
     file: "yolox3d_onnx_model_2d.onnx"
@@ -52,12 +53,12 @@ info_3d{
     task_type: Detection3D
     sensor_type: Camera
     framework: Onnx
-
+    infer_plugin: "MultiBatchInference"
     proto_file {
-      file: "yolo_onnx_model_3d.onnx"
+      file: "yolo_onnx_model_3d_fp16.onnx"
     }
     weight_file {
-      file: "yolo_onnx_model_3d.onnx"
+      file: "yolo_onnx_model_3d_fp16.onnx"
     }
     inputs {
       name: "image"
@@ -99,12 +100,12 @@ with_box3d: true
 car_template {
   h: 1.56446
   w: 1.75112
-  l: 4.24444
+  l: 4.54444
 }
 ped_template {
   h: 1.6874
-  w: 0.5205
-  l: 0.4904
+  w: 0.5005
+  l: 0.3504
 }
 cyclist_template {
   h: 1.5082
@@ -112,7 +113,7 @@ cyclist_template {
   l: 1.6186
 }
 trafficcone_template {
-  h: 0.50
-  w: 0.25
-  l: 0.21
+  h: 0.64
+  w: 0.34
+  l: 0.34
 }

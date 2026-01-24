@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package apollo.process_statistic;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+
+message ProcessStatisticConf {
+  message GeneralProcess {
+    // note: support regular matching, e.g. ".*/apollo/.*"
+    // as we use c++ regex function, you can not write a raw string,
+    // such as [\w]+ should be [\\w]+
+    repeated string regex = 1;
+  }
+  // disk config
+  optional GeneralProcess general_process = 1;
+}
+
+// active process message
+message ProcessMetrics {
+  message MainboardDag {
+    // dag name
+    repeated string name = 1;
+  }
+  message MainboardProcessGroup {
+    // mainboard process name
+    repeated string name = 1;
+  }
+  message GeneralProcess {
+    // general process name
+    repeated string name = 1;
+  }
+  optional apollo.common.Header header = 1;
+  optional MainboardDag mainboard_dag = 2;
+  optional MainboardProcessGroup mainboard_process_group = 3;
+  optional GeneralProcess general_process = 4;
+}

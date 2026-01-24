@@ -1,0 +1,8 @@
+roi_type: LARGE_CURVATURE
+roi_longitudinal_range_start: 20
+roi_longitudinal_range_end: 40
+parking_depth_buffer: 0.3
+expand_polygon_of_obstacle_by_distance: false
+perception_obstacle_buffer: 0.3
+roi_line_segment_min_angle: 0.1
+roi_line_segment_length: 0.1

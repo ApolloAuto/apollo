@@ -1,0 +1,29 @@
+grid_radius: 50.0
+height_threshold: 2.5
+partition_cell_size: 0.01
+vehicle_filter_cell_size: 0.3
+pedestrian_filter_cell_size: 0.1
+outlier_length: 0.2
+outlier_width: 0.2
+outlier_height: 0.1
+outlier_min_num_points: 5
+
+ncut_param:  {
+    grid_radius: 20.0
+    connect_radius: 0.1
+    super_pixel_cell_size: 0.25
+    num_cuts: 3
+    ncuts_stop_threshold: 0.4
+    ncuts_enable_classifier_threshold: 0.3
+    sigma_space: 1.5
+    sigma_feature: 1.5
+    skeleton_cell_size: 0.2
+    patch_size: 3
+    outlier_width_threshold: 0.1
+    outlier_height_threshold: 0.1
+    outlier_num_points_threshold: 10
+    overlap_factor: 0.05
+    felzenszwalb_sigma: 0.5
+    felzenszwalb_k: 30.0
+    felzenszwalb_min_size: 10
+}

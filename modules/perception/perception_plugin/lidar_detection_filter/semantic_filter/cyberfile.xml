@@ -1,0 +1,20 @@
+<package format="2">
+  <name>perception-semantic-filter</name>
+  <version>local</version>
+  <description>
+    Semantic filter.
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
+  <depend type="binary" repo_name="perception-lidar-detection-filter" lib_names="perception-lidar-detection-filter">perception-lidar-detection-filter</depend>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/perception_plugin/lidar_detection_filter/semantic_filter</src_path>
+
+</package>
