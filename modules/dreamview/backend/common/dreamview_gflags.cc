@@ -25,12 +25,12 @@ DEFINE_int32(
     "Dreamview profiling duration in ms. Negative value will not restrict the "
     "profiling time");
 
-DEFINE_string(static_file_dir, "/apollo/modules/dreamview/frontend/dist",
+DEFINE_string(static_file_dir, "/apollo/modules/dreamview_plus/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");
 
 DEFINE_string(
-    server_ports, "8899",
+    server_ports, "8888",
     "Comma-separated list of ports to listen on. If the port is SSL, "
     "a letter s must be appended, for example, 80,443s will open "
     "port 80 and port 443.Dreamview always use 8899 and Dreamview Plus"
@@ -92,14 +92,14 @@ DEFINE_int32(monitor_msg_pending_queue_size, 10,
              "Max monitor message pending queue size");
 
 DEFINE_string(default_data_collection_config_path,
-              "/apollo/modules/dreamview/conf/data_collection_table.pb.txt",
+              "/apollo/modules/dreamview_plus/conf/data_collection_table.pb.txt",
               "Data collection table config path.");
 
 DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
              "Loop routing distance threshold: start to end");
 
 DEFINE_string(default_preprocess_config_path,
-              "/apollo/modules/dreamview/conf/preprocess_table.pb.txt",
+              "/apollo/modules/dreamview_plus/conf/preprocess_table.pb.txt",
               "Sensor calibration preprocess table config path.");
 
 DEFINE_string(vehicle_calibration_mode, "Vehicle Calibration",
@@ -184,7 +184,7 @@ DEFINE_string(valet_parking_command_topic,
 
 DEFINE_string(action_command_topic, "/apollo/external_command/action",
               "Action command topic name.");
-DEFINE_string(data_handler_config_path, "",
+DEFINE_string(data_handler_config_path, "/apollo/modules/dreamview_plus/conf/data_handler.conf",
               "Data handler config path.");
 
 DEFINE_string(data_recorder_command_keyword, "cyber_recorder record",
@@ -219,7 +219,7 @@ DEFINE_string(terminal_stop_cmd, "pkill -9 -f \"cyber_shell\" ",
 DEFINE_string(cyber_channels_key, "apollo.dreamview.Cyber",
               "Cyber channels key");
 DEFINE_string(vehicle_data_config_filename,
-              "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
+              "/apollo/modules/dreamview_plus/conf/vehicle_data.pb.txt",
               "Vehicle data config file.");
             
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
@@ -227,7 +227,7 @@ DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
               "Key to store hmi_status.current_mode in KV DB.");
 
-DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
+DEFINE_string(default_hmi_mode, "Default",
               "Default HMI Mode when there is no cache.");
 
 DEFINE_string(default_rtk_record_file, "/apollo/data/log/garage.csv",

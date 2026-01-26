@@ -7,6 +7,7 @@
 GDB，GNU项目调试器，允许您查看另一个程序在执行时“内部”发生了什么，或者其他程序在崩溃时正在做什么。
 
 GDB可以做四种主要的事情（加上其他支持这些事情的事情）来帮助您在行动中捕捉错误：
+
 - 启动程序，指定任何可能影响其行为的内容
 - 使程序在指定条件下停止
 - 检查程序停止时发生了什么
@@ -51,9 +52,10 @@ gdb --args mainboard -d modules/my_component/dag/my_component.dag
 设置断点的命令是break, 缩写形式为b
 
 - 设置断点在MyComponent::Init()函数入口处
-```shell
-(gdb) b MyComponent::Init
-```
+  
+  ```shell
+  (gdb) b MyComponent::Init
+  ```
 
 ![](images/gdb_b_init.png)
 
@@ -70,7 +72,6 @@ gdb --args mainboard -d modules/my_component/dag/my_component.dag
 在上一步中我们在MyComponent::Init函数处设置了断点，通过info break，我们可以看到设置的断点信息
 
 ![](images/gdb_info_command.png)
-
 
 ##### 运行程序
 
@@ -111,7 +112,6 @@ step: 单步执行程序，进入函数调用
 ```
 
 ![](images/gdb_bt_command.png)
-
 
 ##### 继续运行，直到结束
 

@@ -348,15 +348,15 @@ aem profile use sample
 
 ### build
 
-这个子命令是 buildtool build action 的一个简单包装。详细用法请参考 [buildtool 文档](docs/user_guidelines/tool_buildtool_cn.md)。
+这个子命令是 buildtool build action 的一个简单包装。详细用法请参考 [buildtool 文档](../user_guidelines/tool_buildtool_cn.md)。
 
 ### install
 
-这个子命令是 buildtool install action的一个简单包装。详细用法请参考 [buildtool 文档](docs/user_guidelines/tool_buildtool_cn.md)。
+这个子命令是 buildtool install action的一个简单包装。详细用法请参考 [buildtool 文档](../user_guidelines/tool_buildtool_cn.md)。
 
 ### init
 
-这个子命令是 buildtool init action的一个简单包装。详细用法请参考 [buildtool 文档](docs/user_guidelines/tool_buildtool_cn.md)。
+这个子命令是 buildtool init action的一个简单包装。详细用法请参考 [buildtool 文档](../user_guidelines/tool_buildtool_cn.md)。
 
 ### 环境变量
 

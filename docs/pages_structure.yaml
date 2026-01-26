@@ -11,6 +11,12 @@ pages:
     pages:
       - title: 开发调试教程
         pages:
+          - title: Apollo百舸实践
+            pages:
+              - title: 综述
+              - title: Apollo-BEV-Train
+              - title: Apollo-BEV-Model-Export
+              - title: Apollo-Model-Deployment
           - title: Dreamview+
             pages:
               - title: Dreamview +快速使用
@@ -60,6 +66,9 @@ pages:
           - title: Apollo规划实践
             pages:
               - title: 规划模块综述
+              - title: Apollo贴边行驶
+                pages:
+                  - title: 贴边行驶使用教程
               - title: 基于命令发布开发
                 pages:
                   - title: 开发模式说明
@@ -185,6 +194,9 @@ pages:
           - title: 地图编辑
             pages:
               - title: 概述
+              - title: 道闸
+              - title: 路沿
+              - title: 区域
               - title: 车道
               - title: 路口
               - title: 线
@@ -251,4 +263,3 @@ pages:
   - title: 附录
     pages:
       - title: 外部接口使用指南
-      - title: CyberRT 性能报告

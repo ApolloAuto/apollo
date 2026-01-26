@@ -15,27 +15,35 @@ Dreamview+ 是一个 web 应用程序，提供如下的功能：
 - 侧边栏：显示菜单按钮：**Mode Settings/模式设置** 、 **Add Panel/添加面板** 、 **Resource Manager/资源中心** 、 **Personnal Center/个人中心** 。
 
 - 菜单窗口：显示各菜单按钮的详细信息。
-
+  
   - Mode Settings/模式设置：模式设置工具栏，详细介绍参见 [Mode Settings](<Apollo_alpha_doc/使用指南/可视化交互工具 Dreamview+/Mode Settings.md>)。
+  
   - Add Panel/添加面板：添加面板，包括控制台、模块延时、车辆可视化、相机视图、点云视图、车辆仪表盘视图等面板。关于面板详细介绍，参见 [Add Panel](<Apollo_alpha_doc/使用指南/可视化交互工具 Dreamview+/Add Panel.md>)。
+  
   - Resource Manager/资源管理：Apollo 提供的车云一体的配置中心，提供车辆、模型、数据包、仿真场景等素材的下载功能。您可以点击需要的数据包、车辆、模型、仿真场景等元素进行下载。详细介绍参见 [Resource Manager](<Apollo_alpha_doc/使用指南/可视化交互工具 Dreamview+/Resource Manager.md>)。
+  
   - Personal Center/个人中心：
-
+    
     - Settings/设置：
-
+      
       - General/通用设置：在通用设置中，可以设置语言为中文或英文。
       - Privacy/隐私政策：可通过此处设置向我们提供反馈个性化内容和功能，用于提升您的体验。
       - About/关于我们：Dreamview 相关版本及版权信息。
-
+    
     - Cloud Profile/资源中心：登录云端 Studio。
+    
     - Use Guide/新手指引：如果您是新用户，可以根据提示按照步骤操作。
+    
     - Product Documentation/产品手册：关于产品简介及产品使用指南。
+    
     - Apollo Developer Community：Apollo 开发者社区。
+    
     - Advice and Suggestion：意见与建议，如果您在使用中遇到任何问题，请您提交反馈，我们会根据您的建议进行优化改进。
 
 - 面板区：展示⾃动驾驶开发调试的可视化⾯板。不同模式下展示的⾯板类型不同，同时⽀持⽤户⾃定义添加⾯板类型。
-- 操作底栏：操作底栏是⾃动驾驶开发调试过程中，对数据的操作、处理区。
 
+- 操作底栏：操作底栏是⾃动驾驶开发调试过程中，对数据的操作、处理区。
+  
   - 播放数据包：设置路由后开始仿真场景，
   - Dump：下载某时刻的 channel 信息到本地，
   - Clear：清空 Simulation world 的所有信息并重置动力学模型。
