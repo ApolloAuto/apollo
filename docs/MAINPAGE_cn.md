@@ -1,7 +1,5 @@
-# Apollo 自动驾驶开放平台
-
-![Apollo_logo.png](./02_Quick%20Start/demo_guide/images/Apollo_logo.png)
-
+ 
+![Apollo_logo.png](./附录/images/Apollo_logo.png)
 您好，开发者，欢迎来到 Apollo 自动驾驶开放平台。
 
 
@@ -49,7 +47,7 @@ Apollo 云端服务平台通过云端的方式解决了数据利用效率的问�
 辆配置，之后通过仿真验证，最后再部署到 Apollo 车端，无缝连接。这整个过程其实包含了 2 个迭代循环，一个是模型配置迭代，一
 个是代码迭代，都通过数据来驱动。
 
-![Apollo_11.0.png](./02_Quick%20Start/demo_guide/images/Apollo_11_0.png)
+![Apollo_11.0.png](./附录/images/Apollo_11_0.png)
 
 根据 Apollo 开放的能力和提供的服务，开发者可以既省心又省力的快速搭建和部署自己的自动驾驶系统。
 
@@ -87,7 +85,7 @@ Apollo 开放平台为开发者提供预先编译好的 Apollo 安装包，节�
 
 [框架设计](./框架设计/系统与环境/概述.md)：介绍 Apollo 的框架设计
 
-[工具使用](./工具使用/Dreamview+/Dreamview+%20概述.md)：介绍 Apollo 相关工具使用
+[工具使用](./工具使用/Dreamview+/Dreamview+概述.md)：介绍 Apollo 相关工具使用
 
 [源代码文档](files.html)：根据源码和注释生成的文档，方便阅读和查询
 

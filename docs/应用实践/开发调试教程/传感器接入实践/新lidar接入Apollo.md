@@ -50,7 +50,7 @@ Apollo 自动驾驶开放平台主要为园区、教育、低速场景提供完�
 
 ### 开发工作
 
-1. Fork Apollo 代码库：进入 https://github.com/ApolloAuto， 点击左上角 Fork 按钮；
+1. Fork Apollo 代码库：进入 [https://github.com/ApolloAuto](https://github.com/ApolloAuto), 点击左上角 Fork 按钮；
 2. 以禾赛、速腾驱动为模板，开发新的激光雷达驱动；
 3. 通过 cyber tools 查看驱动输出信息；
 4. 提交代码，通过评审，合入代码。

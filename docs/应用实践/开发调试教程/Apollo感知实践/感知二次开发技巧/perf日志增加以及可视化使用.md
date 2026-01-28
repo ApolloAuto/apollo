@@ -1,6 +1,6 @@
 ## perf性能日志增加
 
-**目的**：包管理模式或者源码方式下使用cyber中的perf工具统计每个阶段的程序耗时，方便进行性能分析，定位问题。
+ **目的** ：包管理模式或者源码方式下使用cyber中的perf工具统计每个阶段的程序耗时，方便进行性能分析，定位问题。
 
 讲述下述demo（包管理模式）如何使用perf工具。
 
@@ -106,4 +106,4 @@ aperf cost --file=data/perf.INFO
 aperf timeline --file=data/perf.INFO
 ```
 
-![img](./timeline.png )
+![img](./timeline.png)
