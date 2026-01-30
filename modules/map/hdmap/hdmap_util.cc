@@ -31,7 +31,7 @@ namespace {
 std::string FindFirstExist(const std::string& dir, const std::string& files) {
   const std::vector<std::string> candidates = absl::StrSplit(files, '|');
   for (const auto& filename : candidates) {
-    const std::string file_path = absl::StrCat(FLAGS_map_dir, "/", filename);
+    const std::string file_path = absl::StrCat(dir, "/", filename);
     if (cyber::common::PathExists(file_path)) {
       return file_path;
     }
@@ -39,7 +39,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
   AERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
   ACHECK(!candidates.empty()) << "Please specify at least one map.";
-  return absl::StrCat(FLAGS_map_dir, "/", candidates[0]);
+  return absl::StrCat(dir, "/", candidates[0]);
 }
 
 }  // namespace
