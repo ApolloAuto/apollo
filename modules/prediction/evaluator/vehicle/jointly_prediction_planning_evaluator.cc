@@ -325,7 +325,7 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   torch::Tensor adc_trajectory = torch::zeros({1, 30, 6});
   const auto& adc_traj = adc_trajectory_container->adc_trajectory();
   size_t adc_traj_points_num = adc_traj.trajectory_point().size();
-  if (adc_traj_points_num < 1) {
+  if (adc_traj_points_num < 2) {
     AERROR << "adc_traj points num is " << adc_traj_points_num
            << " adc traj points are not enough";
     return false;
