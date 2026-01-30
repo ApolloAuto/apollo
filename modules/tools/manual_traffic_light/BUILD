@@ -33,6 +33,7 @@ apollo_component(
         "//modules/map:apollo_map",
         "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
     ],
+    alwayslink = True,
 )
 
 apollo_package()
