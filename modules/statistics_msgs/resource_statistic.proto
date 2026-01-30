@@ -1,0 +1,64 @@
+syntax = "proto2";
+
+package apollo.resource_statistic;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message ResourceStatisticConf {
+  message DiskConf {
+    // note: support regular matching,
+    // such as sd[a-z].*, nvme.*
+    // as we use c++ regex function, you can not write a raw string,
+    // such as [\w]+ should be [\\w]+
+
+    // device name list that need statistic load, such as sda*, nvme0n1
+    repeated string device = 1;
+  }
+  // disk config
+  optional DiskConf disk_conf = 1;
+}
+
+message CpuMetric {
+  // cpu average usage percent
+  optional float usage = 1;
+  // maximum temperature of all cpu cores
+  optional float temperature = 2;
+}
+message MemoryMetric {
+  // memory used MB
+  optional uint64 used_mb = 1;
+  // memory available MB
+  optional uint64 available_mb = 2;
+  // memory total MB
+  optional uint64 total_mb = 3;
+  // memory use percent
+  optional float usage = 4;
+}
+message DiskMetric {
+  message Metric {
+    // device name
+    required string name = 1;
+    // in GB
+    optional uint32 used_gb = 2;
+    optional uint32 available_gb = 3;
+    optional uint32 total_gb = 4;
+    // use rate
+    optional float usage = 5;
+    // load rate
+    optional float load = 6;
+  }
+  repeated Metric devices = 1;
+}
+message GpuMetric {
+  // gpu average usage percent
+  optional float usage = 2;
+  // gpu device temperature
+  optional float temperature = 3;
+}
+message ResourceMetrics {
+  optional apollo.common.Header header = 1;
+  optional CpuMetric cpu = 2;
+  optional MemoryMetric memory = 3;
+  optional DiskMetric disk = 4;
+  optional GpuMetric gpu = 5;
+}

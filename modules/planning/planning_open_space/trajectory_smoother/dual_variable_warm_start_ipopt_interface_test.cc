@@ -28,91 +28,95 @@ namespace apollo {
 namespace planning {
 
 class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
- public:
-  virtual void SetUp() {
-    FLAGS_planner_open_space_config_filename =
-        "modules/planning/planning_base/testdata/conf/"
-        "open_space_standard_parking_lot.pb.txt";
+public:
+    virtual void SetUp() {
+        FLAGS_planner_open_space_config_filename
+                = "/apollo/modules/planning/planning_base/testdata/conf/"
+                  "open_space_standard_parking_lot.pb.txt";
 
-    ACHECK(apollo::cyber::common::GetProtoFromFile(
-        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-        << "Failed to load open space config file "
-        << FLAGS_planner_open_space_config_filename;
+        ACHECK(apollo::cyber::common::GetProtoFromFile(
+                FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+                << "Failed to load open space config file " << FLAGS_planner_open_space_config_filename;
 
-    ProblemSetup();
-  }
+        ProblemSetup();
+    }
 
- protected:
-  void ProblemSetup();
+protected:
+    void ProblemSetup();
 
- protected:
-  size_t horizon_ = 5;
-  size_t obstacles_num_ = 10;
-  double ts_ = 0.01;
-  Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
-  Eigen::MatrixXi obstacles_edges_num_;
-  Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
-  Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
-  int num_of_variables_ = 0;
-  double rx_ = 0.0;
-  double ry_ = 0.0;
-  double r_yaw_ = 0.0;
+protected:
+    size_t horizon_ = 5;
+    size_t obstacles_num_ = 10;
+    double ts_ = 0.01;
+    Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
+    Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
+    Eigen::MatrixXi obstacles_edges_num_;
+    Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
+    Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
+    int num_of_variables_ = 0;
+    double rx_ = 0.0;
+    double ry_ = 0.0;
+    double r_yaw_ = 0.0;
 
-  int num_of_constraints_ = 0;
+    int num_of_constraints_ = 0;
 
-  std::unique_ptr<DualVariableWarmStartIPOPTInterface> ptop_ = nullptr;
-  PlannerOpenSpaceConfig planner_open_space_config_;
+    std::unique_ptr<DualVariableWarmStartIPOPTInterface> ptop_ = nullptr;
+    PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
-  obstacles_edges_num_ = 4 * Eigen::MatrixXi::Ones(obstacles_num_, 1);
-  Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
-  ptop_.reset(new DualVariableWarmStartIPOPTInterface(
-      horizon_, ts_, ego_, obstacles_edges_num_, obstacles_num_, obstacles_A_,
-      obstacles_b_, xWS, planner_open_space_config_));
+    obstacles_edges_num_ = 4 * Eigen::MatrixXi::Ones(obstacles_num_, 1);
+    Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
+    ptop_.reset(new DualVariableWarmStartIPOPTInterface(
+            horizon_,
+            ts_,
+            ego_,
+            obstacles_edges_num_,
+            obstacles_num_,
+            obstacles_A_,
+            obstacles_b_,
+            xWS,
+            planner_open_space_config_));
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {
-  EXPECT_NE(ptop_, nullptr);
+    EXPECT_NE(ptop_, nullptr);
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_bounds_info) {
-  int kNumOfVariables = 540;
-  int kNumOfConstraints = 240;
-  double x_l[kNumOfVariables];
-  double x_u[kNumOfVariables];
-  double g_l[kNumOfConstraints];
-  double g_u[kNumOfConstraints];
-  bool res = ptop_->get_bounds_info(kNumOfVariables, x_l, x_u,
-                                    kNumOfConstraints, g_l, g_u);
-  EXPECT_TRUE(res);
+    int kNumOfVariables = 540;
+    int kNumOfConstraints = 240;
+    double x_l[kNumOfVariables];
+    double x_u[kNumOfVariables];
+    double g_l[kNumOfConstraints];
+    double g_u[kNumOfConstraints];
+    bool res = ptop_->get_bounds_info(kNumOfVariables, x_l, x_u, kNumOfConstraints, g_l, g_u);
+    EXPECT_TRUE(res);
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_starting_point) {
-  int kNumOfVariables = 540;
-  int kNumOfConstraints = 240;
-  bool init_x = true;
-  bool init_z = false;
-  bool init_lambda = false;
-  double x[kNumOfVariables];
-  double z_L[kNumOfVariables];
-  double z_U[kNumOfVariables];
-  double lambda[kNumOfVariables];
-  bool res =
-      ptop_->get_starting_point(kNumOfVariables, init_x, x, init_z, z_L, z_U,
-                                kNumOfConstraints, init_lambda, lambda);
-  EXPECT_TRUE(res);
+    int kNumOfVariables = 540;
+    int kNumOfConstraints = 240;
+    bool init_x = true;
+    bool init_z = false;
+    bool init_lambda = false;
+    double x[kNumOfVariables];
+    double z_L[kNumOfVariables];
+    double z_U[kNumOfVariables];
+    double lambda[kNumOfVariables];
+    bool res = ptop_->get_starting_point(
+            kNumOfVariables, init_x, x, init_z, z_L, z_U, kNumOfConstraints, init_lambda, lambda);
+    EXPECT_TRUE(res);
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, eval_f) {
-  int kNumOfVariables = 540;
-  double obj_value;
-  double x[kNumOfVariables];
-  std::fill_n(x, kNumOfVariables, 1.2);
-  bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
-  EXPECT_DOUBLE_EQ(obj_value, 72.000000000000085);
-  EXPECT_TRUE(res);
+    int kNumOfVariables = 540;
+    double obj_value;
+    double x[kNumOfVariables];
+    std::fill_n(x, kNumOfVariables, 1.2);
+    bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
+    EXPECT_DOUBLE_EQ(obj_value, 72.000000000000085);
+    EXPECT_TRUE(res);
 }
 
 }  // namespace planning

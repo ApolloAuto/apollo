@@ -50,11 +50,7 @@ bool ReadProtoFromBinaryFile(const std::string &filename,
   }
   google::protobuf::io::FileInputStream raw_input(fd);
   google::protobuf::io::CodedInputStream coded_input(&raw_input);
-#if GOOGLE_PROTOBUF_VERSION >= 3002000
-  coded_input.SetTotalBytesLimit(std::numeric_limits<int>::max());
-#else
   coded_input.SetTotalBytesLimit(std::numeric_limits<int>::max(), 536870912);
-#endif
 
   bool success = proto->ParseFromCodedStream(&coded_input);
 

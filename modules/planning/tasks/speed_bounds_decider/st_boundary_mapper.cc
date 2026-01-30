@@ -214,6 +214,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
   const auto& trajectory = obstacle.Trajectory();
   const double obstacle_length = obstacle.Perception().length();
   const double obstacle_width = obstacle.Perception().width();
+  PrintCurves print_path_collision;
   if (trajectory.trajectory_point().empty()) {
     bool box_check_collision = false;
 
@@ -248,7 +249,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           break;
         }
         const Polygon2d& obs_polygon = obstacle.PerceptionPolygon();
-        if (CheckOverlap(curr_point_on_path, obs_polygon, l_buffer)) {
+        Polygon2d ego_collision_polygon;
+        if (CheckOverlap(curr_point_on_path, obs_polygon, l_buffer, &ego_collision_polygon)) {
           // If there is overlapping, then plot it on ST-graph.
           double low_s =
               std::fmax(0.0, curr_point_on_path.s() + backward_distance);
@@ -256,22 +258,22 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
                                     curr_point_on_path.s() + forward_distance);
           AINFO << "check colllision for obstacle[" << obstacle.Id()
                 << "], at: " << curr_point_on_path.DebugString();
+          for (const auto& point : ego_collision_polygon.points()) {
+            print_path_collision.AddPoint(obstacle.Id() + "_collision_path_point",
+                                        point.x(), point.y());
+          }
+          print_path_collision.AddPoint(obstacle.Id() + "_collision_path_point", ego_collision_polygon.points().front().x(), ego_collision_polygon.points().front().y());
           // It is an unrotated rectangle appearing on the ST-graph.
           // TODO(jiacheng): reconsider the backward_distance, it might be
           // unnecessary, but forward_distance is indeed meaningful though.
-          lower_points->emplace_back(
-              low_s - speed_bounds_config_.point_extension(), 0.0);
-          lower_points->emplace_back(
-              low_s - speed_bounds_config_.point_extension(),
-              planning_max_time_);
-          upper_points->emplace_back(
-              high_s + speed_bounds_config_.point_extension(), 0.0);
-          upper_points->emplace_back(
-              high_s + speed_bounds_config_.point_extension(),
-              planning_max_time_);
+          lower_points->emplace_back(low_s - speed_bounds_config_.point_extension(), 0.0);
+          lower_points->emplace_back(low_s - speed_bounds_config_.point_extension(), planning_max_time_);
+          upper_points->emplace_back(high_s + speed_bounds_config_.point_extension(), 0.0);
+          upper_points->emplace_back(high_s + speed_bounds_config_.point_extension(), planning_max_time_);
           break;
         }
       }
+      print_path_collision.PrintToLog();
     }
   } else {
     // For those with predicted trajectories (moving obstacles):
@@ -491,7 +493,8 @@ bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
 
 bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Polygon2d& obs_polygon,
-                                    const double l_buffer) const {
+                                    const double l_buffer,
+                                    Polygon2d* collision_ego_polygon) const {
   // Convert reference point from center of rear axis to center of ADC.
   Vec2d ego_center_map_frame((vehicle_param_.front_edge_to_center() -
                               vehicle_param_.back_edge_to_center()) *
@@ -506,10 +509,18 @@ bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
   // Compute the ADC bounding box.
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
                 vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
+  
 
   // Check whether ADC polygon overlaps with obstacle polygon.
   Polygon2d adc_polygon(adc_box);
-  return obs_polygon.HasOverlap(adc_polygon);
+  if (obs_polygon.HasOverlap(adc_polygon)) {
+    if (collision_ego_polygon != nullptr) {
+      *collision_ego_polygon = adc_polygon;
+    }
+    return true;
+  } else {
+    return false;
+  }
 }
 
 }  // namespace planning

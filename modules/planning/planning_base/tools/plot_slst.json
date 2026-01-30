@@ -66,6 +66,11 @@
             "subplot": "xy"
         },
         {
+          "label": ".*collision_path_point",
+          "marker": ".-",
+          "subplot": "xy"
+        },
+        {
             "label": ".*BlockSLPolygons",
             "marker": "*-",
             "subplot": "sl"

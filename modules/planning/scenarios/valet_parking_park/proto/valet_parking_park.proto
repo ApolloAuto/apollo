@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioValetParkingParkConfig {
+  // Only when the distance between the vehicle and parking spot is smaller 
+  // than this value, "ValetParkingScenario" can be entered
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+  // Only when the distance between the vehicle and pre-stop distance is smaller
+  // than this value, "StageApproachingParkingSpot" can be finished
+  optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+  // If greater than the threshold go to parking_retry
+  optional double max_heading_error = 3 [default = 0.1];  // rad
+  // If greater than the threshold go to parking_retry
+  optional double max_lat_error = 4 [default = 0.3];  // meter
+  // If greater than the threshold go to parking_retry
+  optional double max_lon_error = 5 [default = 0.1];  // meter
+  optional bool enable_parallel_retry_parking = 6 [default = false];
+}

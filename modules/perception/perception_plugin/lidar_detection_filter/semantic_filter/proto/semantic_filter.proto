@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message FrontCriticalFilter {
+    optional string semantic_type = 1 [default = ""];
+    optional int32 filter_strategy = 2 [default = 0];
+    optional float height_thres = 3 [default = 0.5];
+}
+
+message SemanticFilterConfig {
+  repeated string filter_type = 1;
+  optional float ground_prob_thr = 2;
+  optional float ground_height_thr = 3;
+  optional bool is_filter_cone = 4 [default = false];
+  repeated FrontCriticalFilter front_critical_filter = 5;
+  optional bool only_filter_cluster = 6 [default = false];
+}

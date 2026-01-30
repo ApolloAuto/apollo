@@ -35,99 +35,108 @@ namespace apollo {
 namespace planning {
 
 class DualVariableWarmStartSlackOSQPInterface {
- public:
-  DualVariableWarmStartSlackOSQPInterface(
-      size_t horizon, double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const Eigen::MatrixXd& xWS,
-      const PlannerOpenSpaceConfig& planner_open_space_config);
+public:
+    DualVariableWarmStartSlackOSQPInterface(
+            size_t horizon,
+            double ts,
+            const Eigen::MatrixXd& ego,
+            const Eigen::MatrixXi& obstacles_edges_num,
+            const size_t obstacles_num,
+            const Eigen::MatrixXd& obstacles_A,
+            const Eigen::MatrixXd& obstacles_b,
+            const Eigen::MatrixXd& xWS,
+            const PlannerOpenSpaceConfig& planner_open_space_config);
 
-  virtual ~DualVariableWarmStartSlackOSQPInterface() = default;
+    virtual ~DualVariableWarmStartSlackOSQPInterface() = default;
 
-  void get_optimization_results(Eigen::MatrixXd* l_warm_up,
-                                Eigen::MatrixXd* n_warm_up,
-                                Eigen::MatrixXd* s_warm_up) const;
+    void get_optimization_results(Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* s_warm_up)
+            const;
 
-  bool optimize();
+    bool optimize();
 
-  void assembleP(std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-                 std::vector<c_int>* P_indptr);
+    void assembleP(std::vector<c_float>* P_data, std::vector<c_int>* P_indices, std::vector<c_int>* P_indptr);
 
-  void assembleConstraint(std::vector<c_float>* A_data,
-                          std::vector<c_int>* A_indices,
-                          std::vector<c_int>* A_indptr);
+    void assembleConstraint(std::vector<c_float>* A_data, std::vector<c_int>* A_indices, std::vector<c_int>* A_indptr);
 
-  void assembleA(const int r, const int c, const std::vector<c_float>& P_data,
-                 const std::vector<c_int>& P_indices,
-                 const std::vector<c_int>& P_indptr);
+    void assembleA(
+            const int r,
+            const int c,
+            const std::vector<c_float>& P_data,
+            const std::vector<c_int>& P_indices,
+            const std::vector<c_int>& P_indptr);
 
-  void checkSolution(const Eigen::MatrixXd& l_warm_up,
-                     const Eigen::MatrixXd& n_warm_up);
+    void checkSolution(const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up);
 
-  void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,
-                   const std::vector<c_int>& P_indices,
-                   const std::vector<c_int>& P_indptr);
+    void printMatrix(
+            const int r,
+            const int c,
+            const std::vector<c_float>& P_data,
+            const std::vector<c_int>& P_indices,
+            const std::vector<c_int>& P_indptr);
 
- private:
-  OSQPConfig osqp_config_;
+private:
+    OSQPConfig osqp_config_;
 
-  int num_of_variables_;
-  int num_of_constraints_;
-  int horizon_;
-  double ts_;
-  Eigen::MatrixXd ego_;
-  int lambda_horizon_ = 0;
-  int miu_horizon_ = 0;
-  int slack_horizon_ = 0;
-  double beta_ = 0.0;
+    int num_of_variables_;
+    int num_of_constraints_;
+    int horizon_;
+    double ts_;
+    Eigen::MatrixXd ego_;
+    int lambda_horizon_ = 0;
+    int miu_horizon_ = 0;
+    int slack_horizon_ = 0;
+    double beta_ = 0.0;
 
-  Eigen::MatrixXd l_warm_up_;
-  Eigen::MatrixXd n_warm_up_;
-  Eigen::MatrixXd slacks_;
-  double wheelbase_;
+    Eigen::MatrixXd l_warm_up_;
+    Eigen::MatrixXd n_warm_up_;
+    Eigen::MatrixXd slacks_;
+    double wheelbase_;
 
-  double w_ev_;
-  double l_ev_;
-  std::vector<double> g_;
-  double offset_;
-  Eigen::MatrixXi obstacles_edges_num_;
-  int obstacles_num_;
-  int obstacles_edges_sum_;
+    double w_ev_;
+    double l_ev_;
+    std::vector<double> g_;
+    double offset_;
+    Eigen::MatrixXi obstacles_edges_num_;
+    int obstacles_num_;
+    int obstacles_edges_sum_;
 
-  double min_safety_distance_;
+    double min_safety_distance_;
 
-  // lagrangian l start index
-  int l_start_index_ = 0;
+    // lagrangian l start index
+    int l_start_index_ = 0;
 
-  // lagrangian n start index
-  int n_start_index_ = 0;
+    // lagrangian n start index
+    int n_start_index_ = 0;
 
-  // slack s start index
-  int s_start_index_ = 0;
+    // slack s start index
+    int s_start_index_ = 0;
 
-  // obstacles_A
-  Eigen::MatrixXd obstacles_A_;
+    // obstacles_A
+    Eigen::MatrixXd obstacles_A_;
 
-  // obstacles_b
-  Eigen::MatrixXd obstacles_b_;
+    // obstacles_b
+    Eigen::MatrixXd obstacles_b_;
 
-  // states of warm up stage
-  Eigen::MatrixXd xWS_;
+    // states of warm up stage
+    Eigen::MatrixXd xWS_;
 
-  // constraint A matrix in eigen format
-  Eigen::MatrixXf constraint_A_;
+    // constraint A matrix in eigen format
+    Eigen::MatrixXf constraint_A_;
 
-  bool check_mode_;
+    bool check_mode_;
 
-// park generic
- public:
-  DualVariableWarmStartSlackOSQPInterface(
-      size_t horizon, double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const Eigen::MatrixXd& xWS,
-      const DualVariableWarmStartConfig& dual_variable_warm_start_config);
+    // park generic
+public:
+    DualVariableWarmStartSlackOSQPInterface(
+            size_t horizon,
+            double ts,
+            const Eigen::MatrixXd& ego,
+            const Eigen::MatrixXi& obstacles_edges_num,
+            const size_t obstacles_num,
+            const Eigen::MatrixXd& obstacles_A,
+            const Eigen::MatrixXd& obstacles_b,
+            const Eigen::MatrixXd& xWS,
+            const DualVariableWarmStartConfig& dual_variable_warm_start_config);
 };
 
 }  // namespace planning

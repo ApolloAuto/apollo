@@ -98,8 +98,11 @@ class SLPolygon {
   }
 
   std::array<bool, 2>& is_passable() { return is_passable_; }
-  void UpdatePassableInfo(double left_bound, double right_bound, double buffer);
-  double MinRadiusStopDistance(double check_l);
+  void UpdatePassableInfo(double left_bound, double right_bound,
+                          double left_buffer, double right_buffer,
+                          double check_s);
+  double MinRadiusStopDistance(double adc_min_l, double adc_max_l,
+                               double ego_half_width);
   PerceptionObstacle::Type ObstacleType() const { return obstacle_type_; }
 
  private:

@@ -11,6 +11,12 @@ pages:
     pages:
       - title: 开发调试教程
         pages:
+          - title: Apollo百舸实践
+            pages:
+              - title: 综述
+              - title: Apollo-BEV-Train
+              - title: Apollo-BEV-Model-Export
+              - title: Apollo-Model-Deployment
           - title: Dreamview+
             pages:
               - title: Dreamview +快速使用
@@ -57,9 +63,16 @@ pages:
                 pages:
                   - title: 插件开发模式说明
                   - title: 基于插件进行开发
+              - title: 感知二次开发技巧
+                pages:
+                  - title: centerpoint模型fp16部署
+                  - title: perf日志增加以及可视化使用
           - title: Apollo规划实践
             pages:
               - title: 规划模块综述
+              - title: Apollo贴边行驶
+                pages:
+                  - title: 贴边行驶使用教程
               - title: 基于命令发布开发
                 pages:
                   - title: 开发模式说明
@@ -127,8 +140,6 @@ pages:
               - title: Cyber RT 组件机制
               - title: Cyber RT 插件机制
               - title: Cyber RT 调度机制
-              - title: Cyber RT 性能分析工具
-              - title: Cyber RT 与 ROS 通信
           - title: 核心模块
             type: apollomodules
             pages:
@@ -157,7 +168,7 @@ pages:
     pages:
       - title: Dreamview+
         pages:
-          - title: Dreamview+ 概述
+          - title: Dreamview+概述
           - title: Mode Settings
           - title: Resource Manager
           - title: Add Panel
@@ -185,6 +196,9 @@ pages:
           - title: 地图编辑
             pages:
               - title: 概述
+              - title: 道闸
+              - title: 路沿
+              - title: 区域
               - title: 车道
               - title: 路口
               - title: 线
@@ -251,4 +265,3 @@ pages:
   - title: 附录
     pages:
       - title: 外部接口使用指南
-      - title: CyberRT 性能报告

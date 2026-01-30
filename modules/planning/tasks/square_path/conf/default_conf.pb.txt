@@ -1,0 +1,10 @@
+max_lateral_distance:6.0
+enable_road_boundary_constraint: true
+path_optimizer_config {
+  l_weight: 10.0
+  dl_weight: 2.0
+  ddl_weight: 10.0
+  dddl_weight: 500.0
+  lateral_derivative_bound_default: 2.0
+  path_reference_l_weight:2000
+}

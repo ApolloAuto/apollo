@@ -5,8 +5,8 @@ module_config {
         class_name : "TaskManagerComponent"
         config {
             name : "task_manager"
-            config_file_path: "modules/task_manager/conf/task_manager_config.pb.txt"
-            flag_file_path: "modules/task_manager/conf/task_manager.conf"
+            config_file_path: "/apollo/modules/task_manager/conf/task_manager_config.pb.txt"
+            flag_file_path: "/apollo/modules/task_manager/conf/task_manager.conf"
             readers: [
                 {
                     channel: "/apollo/task_manager"

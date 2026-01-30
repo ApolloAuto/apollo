@@ -98,12 +98,17 @@ class MlfMotionRefiner {
         double* vel_change_angle,
         double* velocity_heading_angle) const;
 
+  bool NeedAssignMovableObjectSpeed(
+        const TrackedObjectConstPtr& latest_object,
+        const TrackedObjectConstPtr& new_object) const;
+
  protected:
   double claping_acceleration_threshold_ = 10;
   double claping_speed_threshold_ = 1.0;
   double cyc_refine_speed_ = 1.2;
   double car_refine_speed_ = 1.0;
   const double EPSION_TIME = 1e-3;
+  bool use_movable_state_check_ = false;
 };  // class MlfMotionRefiner
 
 }  // namespace lidar

@@ -75,6 +75,8 @@ bool MessageInfo::SerializeTo(std::string* dst) const {
     reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   dst->append(spare_id_.data(), ID_SIZE);
   dst->append(reinterpret_cast<const char*>(
+    &msg_seq_num_), sizeof(msg_seq_num_));
+  dst->append(reinterpret_cast<const char*>(
     &send_time_), sizeof(send_time_));
   return true;
 }
@@ -95,6 +97,9 @@ bool MessageInfo::SerializeTo(char* dst, std::size_t len) const {
   ptr += sizeof(seq_num_);
   std::memcpy(ptr, spare_id_.data(), ID_SIZE);
   ptr += ID_SIZE;
+  std::memcpy(ptr,
+    reinterpret_cast<const char*>(&msg_seq_num_), sizeof(msg_seq_num_));
+  ptr += sizeof(msg_seq_num_);
   std::memcpy(ptr,
     reinterpret_cast<const char*>(&send_time_), sizeof(send_time_));
   return true;
@@ -122,6 +127,9 @@ bool MessageInfo::DeserializeFrom(const char* src, std::size_t len) {
   ptr += sizeof(seq_num_);
   spare_id_.set_data(ptr);
   ptr += ID_SIZE;
+  std::memcpy(
+    reinterpret_cast<char*>(&msg_seq_num_), ptr, sizeof(msg_seq_num_));
+  ptr += sizeof(msg_seq_num_);
   std::memcpy(
     reinterpret_cast<char*>(&send_time_), ptr, sizeof(send_time_));
   return true;

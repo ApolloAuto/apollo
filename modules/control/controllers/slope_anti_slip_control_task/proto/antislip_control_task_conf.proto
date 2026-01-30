@@ -1,0 +1,84 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+
+message AntiSlipControlTaskConf{
+  enum VehicleMoveState {
+    CLOSING_DESTNATION = 0;
+    MOVING_START_POINT = 1;
+    MOVING_DEFAULT_DESTNATION = 2;
+  }
+
+  message FilterConf {
+    optional int32 cutoff_freq = 1;
+  }
+
+  optional double ts = 1;  // sampling time
+  optional double slope_offset_threhold = 2 [default = 0.0]; // unit: deg
+  optional bool use_vehicle_epb = 3 [default = false];
+  optional double epb_brake_cmd = 4;
+  optional FilterConf pitch_angle_filter_conf = 5;
+  optional double path_remain_threshold = 6 [default = 0.0];
+  optional double new_dest_path_remain_threshold = 7 [default = 0.0];
+  optional int32 use_opposite_slope_compensation = 8 [default = 1];
+  optional apollo.control.GainScheduler slope_pitch_acc_gain_scheduler = 9;
+  optional bool enable_slope_offset = 10 [default = false];
+  optional bool enable_hill_start = 11 [default = false];
+  optional double hill_start_pitch_threshold = 12 [default = -1.0];
+  optional int32 hill_start_preview_window = 13 [default = 300];
+  optional double hill_start_min_speed = 14 [default = 0.1];
+  optional int32 hill_start_acc_window = 15 [default = 300];
+  optional int32 hill_start_brake_window = 16 [default = 100];
+  optional double gravity_hill_start_gain = 17 [default = 1.1];
+  optional double min_hill_start_station_remain = 18 [default = 4.0];
+  optional int32 hill_start_quit_window = 19 [default = 600];
+  optional double hill_start_still_speed = 20 [default = 0.01];
+  optional double downhill_brake_rate = 21 [default = 0.3];
+  optional double cut_hill_up_throttle_speed = 22 [default = -0.15];
+  optional double cut_hill_up_throttle_rate = 23 [default = 0.2];
+  optional double hill_up_acc_rate = 24 [default = 0.7];
+  optional int32 hill_start_brake_standby_window = 25 [default = 75];
+  optional int32 min_hill_start_hill_start_trajs = 26 [default = 20];
+  optional double kill_downhill_brake_rate = 27 [default = 0.5];
+  optional double downhill_cut_brake_v_err = 28 [default = 0.1];
+  optional double quit_hill_start_v_err = 29 [default = -0.1];
+  optional double release_end_brake_speed = 30 [default = 0.1];
+  optional double obstacle_speed_safety_threshold = 31 [default = 0.1];
+  optional double obstacle_acc_threshold = 32 [default = 0.1];
+  optional int32 obstacle_stop_window_threshold = 33 [default = 50];
+  optional int32 quit_opbstacle_window = 34 [default = 300];
+  optional double obstacle_throttle_cmd_threshold = 35 [default = 10.0];
+  optional double obstacle_brake_cmd_threshold = 36 [default = 5.0];
+  optional double in_obstacle_preview_speed = 37 [default = 0.3];
+  optional double obs_throttle_add_rate = 38 [default = 0.1];
+  optional int32 min_throttle_time_window = 40 [default = 70];
+  optional double quit_opbstacle_safety_high_speed = 41 [default = 0.4];
+  optional int32 speed_stable_window = 42 [default = 70];
+  optional double speed_stable = 43 [default = 0.3];
+  optional double obs_throttle_add_default = 44 [default = 10.0];
+  optional double uphill_fullstop_pathremain = 45 [default = 0.2];
+  optional int32 uphill_fullstop_window = 46 [default = 75];
+  optional double uphill_start_pitch = 47 [default = 1.0];
+  optional double normal_start_pitch = 48 [default = -1.0];
+  optional int32 normal_start_gain_window = 49 [default = 50];
+  optional int32 normal_start_maintain_window = 50 [default = 250];
+  optional double normal_acc_rate = 51 [default = 0.8];
+  optional double downhill_brake_change = 52 [default = 0.2];
+  optional double maintain_min_speed = 53 [default = 1.0];
+  optional double cncl_brake_min_path = 54 [default = 0.2];
+  optional double cncl_brake_max_path = 55 [default = 1.2];
+  optional double cncl_max_brake = 56 [default = 10.0];
+  optional double cut_unusual_brk_speed_error = 57 [default = -0.4];
+  optional int32 gear_drive_count_num = 58 [default = 50];
+  optional double downhill_brake_change_max = 59 [default = 0.1];
+  optional double brake_minimum_action = 60 [default = 4.0];
+  optional bool enable_normal_start = 61 [default = false];
+  optional double preview_min_speed_threshold = 62 [default = 0.1];
+  optional double emergency_acc = 63 [default = -0.5];
+  optional bool judge_safety_check = 64 [default = true];
+  optional double cancle_safety_check_pitch = 65 [default = 3.0];
+  optional double cancle_safety_check_acc = 66 [default = 0.2];
+  optional double cancle_safety_check_speed = 67 [default = 0.7];
+}

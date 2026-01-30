@@ -8,10 +8,12 @@ message ControlInteractiveMsg {
   optional bool replan_request = 2;   // request replan. true: need replan, false: don't need replan
   optional ReplanRequestReasonCode replan_req_reason_code = 3; // request replan reason code
   optional string replan_request_reason = 4; // request replan reason
+  optional bool is_need_safety_check = 5;
 }
 
 enum ReplanRequestReasonCode {
   REPLAN_REQ_ALL_REPLAN = 1;
   REPLAN_REQ_STATION_REPLAN = 2;
   REPLAN_REQ_SPEED_REPLAN = 3;
+  NONE_REPLAN = 4;
 }

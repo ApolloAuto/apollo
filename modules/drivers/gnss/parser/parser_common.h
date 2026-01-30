@@ -17,7 +17,10 @@
 #pragma once
 
 #include <cmath>
+#include <deque>
 #include <limits>
+#include <string>
+#include <vector>
 
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 
@@ -42,7 +45,7 @@ constexpr double azimuth_deg_to_yaw_rad(double azimuth) {
 // A helper that fills an Point3D object (which uses the FLU frame) using RFU
 // measurements.
 inline void rfu_to_flu(double r, double f, double u,
-                       ::apollo::common::Point3D* flu) {
+                       ::apollo::common::Point3D *flu) {
   flu->set_x(f);
   flu->set_y(-r);
   flu->set_z(u);
@@ -64,6 +67,46 @@ class RateControl {
  private:
   uint64_t period_ns_;
   uint64_t latest_ns_ = 0;
+};
+
+class ASCIIParser {
+ public:
+  ASCIIParser() {}
+
+  void Add(const uint8_t *data_start, const uint8_t *data_end,
+           const uint8_t channel = 0) {
+    message_.clear();
+    std::string &message = channel_messages_[channel];
+    // merge message
+    message.append(reinterpret_cast<const char *>(data_start),
+                   std::distance(data_start, data_end));
+    std::string::iterator it_s = message.begin();
+    for (auto it = message.begin(); it != message.end(); ++it) {
+      if (*it == '$' || *it == '#') {
+        it_s = it;
+        continue;
+      }
+      if (*it == 0x0A) {
+        if (*it_s == '$' || *it_s == '#') {
+          message_.assign(it_s, it);
+        } else {
+          AERROR << "invalid ascii message: " << message;
+        }
+        it_s = it + 1;
+      }
+    }
+    if (it_s != message.end()) {
+      message.assign(it_s, message.end());
+    } else {
+      message.clear();
+    }
+  }
+
+  const std::string &GetMessage() { return message_; }
+
+ private:
+  std::vector<std::string> channel_messages_{5};
+  std::string message_;
 };
 
 }  // namespace gnss

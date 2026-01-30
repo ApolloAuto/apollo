@@ -32,49 +32,47 @@ namespace perception {
 namespace trafficlight {
 
 class ClassifyBySimple {
- public:
-  /**
-   * @brief Construct a new classify by simple object.
-   * 
-   */
-  ClassifyBySimple() = default;
-  /**
-   * @brief Destroy the new classify by simple object.
-   * 
-   */
-  ~ClassifyBySimple() = default;
-  /**
-   * @brief Initialize traffic light classify parameters.
-   * 
-   * @param model_config 
-   * @param gpu_id 
-   */
-  void Init(const ClassifyParam& model_config, const int gpu_id);
-  /**
-   * @brief Classify model inference process.
-   * 
-   * @param frame 
-   * @param lights 
-   */
-  void Perform(const camera::TrafficLightFrame* frame,
-               std::vector<base::TrafficLightPtr>* lights);
+public:
+    /**
+     * @brief Construct a new classify by simple object.
+     *
+     */
+    ClassifyBySimple() = default;
+    /**
+     * @brief Destroy the new classify by simple object.
+     *
+     */
+    ~ClassifyBySimple() = default;
+    /**
+     * @brief Initialize traffic light classify parameters.
+     *
+     * @param model_config
+     * @param gpu_id
+     */
+    void Init(const ClassifyParam& model_config, const int gpu_id);
+    /**
+     * @brief Classify model inference process.
+     *
+     * @param frame
+     * @param lights
+     */
+    void Perform(const camera::TrafficLightFrame* frame, std::vector<base::TrafficLightPtr>* lights);
 
- private:
-  void Prob2Color(const float* out_put_data, float threshold,
-                  base::TrafficLightPtr light);
+private:
+    void Prob2Color(const float* out_put_data, float threshold, base::TrafficLightPtr light);
 
-  std::shared_ptr<inference::Inference> rt_net_ = nullptr;
-  camera::DataProvider::ImageOptions data_provider_image_option_;
-  std::shared_ptr<base::Image8U> image_ = nullptr;
-  std::shared_ptr<base::Blob<float>> mean_buffer_;
-  std::shared_ptr<base::Blob<float>> mean_;
-  std::vector<std::string> net_inputs_;
-  std::vector<std::string> net_outputs_;
-  int resize_width_;
-  int resize_height_;
-  float unknown_threshold_;
-  float scale_;
-  int gpu_id_ = 0;
+    std::shared_ptr<inference::Inference> rt_net_ = nullptr;
+    camera::DataProvider::ImageOptions data_provider_image_option_;
+    std::shared_ptr<base::Image8U> image_ = nullptr;
+    std::shared_ptr<base::Blob<float>> mean_buffer_;
+    std::shared_ptr<base::Blob<float>> mean_;
+    std::vector<std::string> net_inputs_;
+    std::vector<std::string> net_outputs_;
+    int resize_width_;
+    int resize_height_;
+    float unknown_threshold_;
+    float scale_;
+    int gpu_id_ = 0;
 };
 
 }  // namespace trafficlight

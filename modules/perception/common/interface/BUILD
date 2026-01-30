@@ -24,5 +24,17 @@ apollo_cc_library(
     ]
 )
 
+apollo_cc_library(
+    name = "base_down_sample",
+    hdrs = [
+        "base_down_sample.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/lib:apollo_perception_common_lib",
+    ]
+)
+
 apollo_package()
 cpplint()

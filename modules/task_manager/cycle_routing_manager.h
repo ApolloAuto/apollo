@@ -42,7 +42,7 @@ class CycleRoutingManager {
    * @brief module initialization function
    * @return initialization status
    */
-  common::Status Init(const task_manager::CycleRoutingTask& cycle_routing_task);
+  common::Status Init(const localization::Pose& pose, const task_manager::CycleRoutingTask& cycle_routing_task);
 
   /**
    * @brief Get new routing if the vehicle reaches the begin/end point

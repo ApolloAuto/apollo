@@ -17,7 +17,6 @@
 #ifndef CYBER_TRANSPORT_TRANSMITTER_RTPS_TRANSMITTER_H_
 #define CYBER_TRANSPORT_TRANSMITTER_RTPS_TRANSMITTER_H_
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
@@ -25,11 +24,13 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/statistics/statistics.h"
 #include "cyber/time/time.h"
-#include "cyber/transport/dispatcher/subscriber_listener.h"
 #include "cyber/transport/rtps/attributes_filler.h"
 #include "cyber/transport/rtps/participant.h"
-#include "cyber/transport/rtps/publisher.h"
 #include "cyber/transport/transmitter/transmitter.h"
+#include "fastrtps/Domain.h"
+#include "fastrtps/attributes/PublisherAttributes.h"
+#include "fastrtps/participant/Participant.h"
+#include "fastrtps/publisher/Publisher.h"
 
 namespace apollo {
 namespace cyber {
@@ -39,7 +40,6 @@ template <typename M>
 class RtpsTransmitter : public Transmitter<M> {
  public:
   using MessagePtr = std::shared_ptr<M>;
-  using ParticipantPtr = std::shared_ptr<Participant>;
 
   RtpsTransmitter(const RoleAttributes& attr,
                   const ParticipantPtr& participant);
@@ -59,7 +59,7 @@ class RtpsTransmitter : public Transmitter<M> {
   bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   ParticipantPtr participant_;
-  PublisherPtr publisher_;
+  eprosima::fastrtps::Publisher* publisher_;
 };
 
 template <typename M>
@@ -97,9 +97,11 @@ void RtpsTransmitter<M>::Enable() {
 
   RETURN_IF_NULL(participant_);
 
-  publisher_ = participant_->CreatePublisher(this->attr_.channel_name(),
-                                             this->attr_.qos_profile());
-
+  eprosima::fastrtps::PublisherAttributes pub_attr;
+  RETURN_IF(!AttributesFiller::FillInPubAttr(
+      this->attr_.channel_name(), this->attr_.qos_profile(), &pub_attr));
+  publisher_ = eprosima::fastrtps::Domain::createPublisher(
+      participant_->fastrtps_participant(), pub_attr);
   RETURN_IF_NULL(publisher_);
   this->enabled_ = true;
 }
@@ -121,21 +123,35 @@ bool RtpsTransmitter<M>::Transmit(const MessagePtr& msg,
 template <typename M>
 bool RtpsTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   if (!this->enabled_) {
-    ADEBUG << "RtpsTransmitter not enable.";
+    ADEBUG << "not enable.";
     return false;
   }
 
   UnderlayMessage m;
   RETURN_VAL_IF(!message::SerializeToString(msg, &m.data()), false);
-  m.timestamp(msg_info.send_time());
-  m.seq(msg_info.seq_num());
+
+  uint64_t send_time = msg_info.send_time();
+
+  m.timestamp(0x0fffffff & send_time);
+  m.seq(msg_info.msg_seq_num());
+
+  eprosima::fastrtps::rtps::WriteParams wparams;
+
+  char* ptr =
+      reinterpret_cast<char*>(&wparams.related_sample_identity().writer_guid());
+
+  memcpy(ptr, msg_info.sender_id().data(), ID_SIZE);
+  memcpy(ptr + ID_SIZE, msg_info.spare_id().data(), ID_SIZE);
+
+  wparams.related_sample_identity().sequence_number().high =
+      (int32_t)((msg_info.seq_num() & 0xFFFFFFFF00000000) >> 32);
+  wparams.related_sample_identity().sequence_number().low =
+      (int32_t)(msg_info.seq_num() & 0xFFFFFFFF);
 
   if (participant_->is_shutdown()) {
     return false;
   }
-
-  RETURN_VAL_IF_NULL(publisher_, NULL);
-  return publisher_->Write(m, msg_info);
+  return publisher_->write(reinterpret_cast<void*>(&m), wparams);
 }
 
 }  // namespace transport

@@ -1,0 +1,40 @@
+# efficient_net parameters
+info {
+  name: "efficient_net"
+  version: ""
+  dataset: "apollo"
+  task_type: CustomTask
+  sensor_type: Camera
+  framework: Onnx
+  infer_plugin: "MultiBatchInference"
+  proto_file {
+    file: "efficient_net.onnx"
+  }
+  inputs {
+    name: "inputs"
+    shape: 1
+    shape: 3
+    shape: 96
+    shape: 96
+  }
+  outputs {
+    name: "outputs_cls"
+    shape: 1
+    shape: 4
+  }
+  outputs {
+    name: "outputs_status"
+    shape: 1
+    shape: 1
+  }
+}
+
+classify_threshold: 0.5
+classify_resize_width: 96
+classify_resize_height: 96
+scale: 0.00392157  # 1.0/255.0
+mean_b: 0
+mean_g: 0
+mean_r: 0
+is_bgr: true
+max_batch_size: 3

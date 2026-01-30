@@ -1,23 +1,35 @@
 ## 激光雷达接入要求
+
 Apollo 自动驾驶开放平台主要为园区、教育、低速场景提供完整的解决方案。Apollo 以激光雷达为主，支持市场中主流的机械、半固态激光雷达方案。目前 Apollo 已经支持禾赛、速腾、镭神、Velodyne、法雷奥、LeddarTech 等品牌的部分激光雷达接入。
 
 激光雷达的发展日新月异，设备厂商开发出更多、更好、更具性价比的激光雷达，为了帮助厂商更快建立激光雷达测试环境，帮助开发者使用最新的激光雷达，本指导手册详细说明了Apollo激光雷达驱动开发、驱动测试、驱动代码贡献的方法。
+
 ## 激光雷达接入流程
 
-### 驱动开发与测试 
+### 驱动开发与测试
+
 - 根据本文指引，以及参考代码，完成激光雷达驱动开发；
+
 - 调度、运行代码，确认驱动输出内容满足Apollo要求；
-### 成为贡献者 
+  
+  ### 成为贡献者
+
 - 连接真实设备，运行代码，确认输出信息正确；
+
 - 录制测试视频、激光雷达输出信息；
+
 - 提供测试过程数据、开发者信息到 Apollo 团队；
+
 - 提交代码到 Github，等待 Apollo 团队审核。
-### 贡献者宣传 
+  
+  ### 贡献者宣传
 
 - 硬件设备进入 Apollo 开发平台官网硬件展示；
+
 - 作为贡献者，信息在 Apollo 官网展示。
 
 ## 激光雷达技术要求
+
 * 【强制】lidar 支持网口通过 TCP 或者 UDP 协议输出点云数据；
 * 【强制】lidar 能够稳定以 10HZ 频率输出点云；
 * 【强制】可以获取每个 lidar 点的 x、y、z、强度值以及时间戳信息；
@@ -27,7 +39,9 @@ Apollo 自动驾驶开放平台主要为园区、教育、低速场景提供完�
 * 【强制】【不支持】Apollo 感知算法暂不支持基于 2D 激光雷达的感知，故暂不支持2D激光雷达的接入。使用 2D 激光雷达，建议由对 Apollo 系统有良好的认知专家介入。
 
 ## 开发流程说明
+
 ### 准备工作
+
 1. 学习 [Apollo 组件开发流程](https://apollo.baidu.com/community/Apollo-Homepage-Document?doc=BYFxAcGcC4HpYIbgPYBtXIHQCMEEsATAV0wGNkBbWA5UyRFdZWVBEAU0hFjwDsD2AD0ygKqIA)；
 2. 学习 github pull request 相关资料 [拉取请求文档](https://docs.github.com/zh/pull-requests)；
 3. 准备好 lidar SDK 驱动，在 x86_64、aarch64 架构编译 Linux 动态库；
@@ -35,7 +49,8 @@ Apollo 自动驾驶开放平台主要为园区、教育、低速场景提供完�
 5. 了解 apollo lidar 驱动框架，选择轮询或订阅方式开发驱动。
 
 ### 开发工作
-1. Fork Apollo 代码库：进入 https://github.com/ApolloAuto， 点击左上角 Fork 按钮；
+
+1. Fork Apollo 代码库：进入 [https://github.com/ApolloAuto](https://github.com/ApolloAuto), 点击左上角 Fork 按钮；
 2. 以禾赛、速腾驱动为模板，开发新的激光雷达驱动；
 3. 通过 cyber tools 查看驱动输出信息；
 4. 提交代码，通过评审，合入代码。
@@ -45,15 +60,16 @@ Apollo 自动驾驶开放平台主要为园区、教育、低速场景提供完�
 ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_a2f71a5.png)
 
 激光雷达驱动运行框架需要满足下面的两个目标：
+
 - 读取激光雷达设备数据，并将设备原始数据转换成感知组件需要的点云数据格式。
 - 为了保障自动驾驶落盘过程中尽量节省磁盘空间，数据落盘默认只保存原始数据。
 
 点云数据占用的空间远高于原始数据包，故而在驱动框架设计时，提供`ONLINE_LIDAR`和`RAW_PACKET`两种模式，分别是从连接 lidar 的网卡读取二进制数据和从 scan 通道读取二进制数据。在自动驾驶过程中应使用`ONLINE_LIDAR`模式从连接 lidar 的网口读入，并输出原始数据以及点云数据。在数据落盘后，启动`RAW_PACKET`模式可根据落盘的原始数据还原出当时的点云数据。
 
-
 ## Lidar驱动代码开发
 
 ### 驱动开发目录
+
 lidar 驱动目录统一放在 Apollo 源码的`drivers/lidar`目录下，新设备需要创建新的目录结构，目录内容如下所示。
 
 ```bash
@@ -66,7 +82,7 @@ xxlidar： # 以lidar类型名创建目录
     - README_cn.md  # lidar驱动的中文说明
     - README_en.md  # lidar驱动的英文说明
 ```
-    
+
 ### Lidar SDK 准备
 
 考虑到厂商代码维护，也考虑到第三方代码库与 Apollo 代码规范/编译工具的兼容，Apollo 建议通过提供 SDK 包引入方式加速驱动开发。
@@ -86,15 +102,16 @@ SDK 引用方式：参考样例的 hesai、rslidar下面的 BUILD 和 cyberfile.
 自己调试阶段时，直接把编译产出安装到`/usr/`或者`/usr/local`目录下即可。
 
 ### 配置文件说明
+
 驱动配置需包含 lidar 驱动基础配置以及自定义配置。
 用户自定义配置主要是定义一些 lidar 型号、IP、端口、过滤规则等，一份完整配置样例如下：
 
 ```bash
 # 基本配置
 base_config {
-	scan_channel: "/apollo/sensor/hesai40/Scan"
-	frame_id: "hesai40"
-	pointcloud_channel: "/apollo/sensor/hesai40/PointCloud2"
+    scan_channel: "/apollo/sensor/hesai40/Scan"
+    frame_id: "hesai40"
+    pointcloud_channel: "/apollo/sensor/hesai40/PointCloud2"
     source_type: ONLINE_LIDAR
 }
 # 自定义配置
@@ -105,7 +122,7 @@ gps_recv_port: 10110
 start_angle: 0
 time_zone: 8
 ```
- 
+
 基础配置主要是一些共性配置，Apollo 驱动中已经定义好，格式为：
 
 ```bash
@@ -120,6 +137,7 @@ message LidarComponentBaseConfig {
 ```
 
 ### Lidar 驱动开发接口说明
+
 Apollo 官方提供了 Lidar 驱动组件基类，新 lidar 驱动需继承此基类，基类的接口如下：
 
 **Lidar驱动组件基类**
@@ -138,10 +156,10 @@ public:
 protected:
    // 基类中实现: 完成Scan/Pcd writer等创建
    bool InitBase(const driver::lidar::BaseConfig& base_config);
-   
+
    // 基类中实现: 写scan channel数据
    bool WriteScan(const std::shared_ptr<T>& scan_packet);
-   
+
    // 基类中实现:分配一个点云对象，注意需要使用此方法获取输出点云对象，否则可能会引入性能问题；
    std::shared_ptr<driver::PointCloud> AllocatePointCloud();
 
@@ -157,10 +175,11 @@ lidar 驱动库的 common 目录提供基类 LidarComponentBase，该基类会�
 * 驱动初始化：用户实现 Init 函数，用于配置 SDK 的网卡数据监听，并根据上述两种输入模式设置 SDK 的行为；并在此过程中，调用 InitBase 函数完成初始化配置。
 
 * 调用 scan 发布函数：LidarComponentBase 提供了封装和发布 scan 数据的函数 WriteScan，适配者需要在接收到数据包时，传入二进制的数据包。执行后将会完成 scan 数据在配置通道的发布。
-
-  >注意：确保只在`ONLINE_LIDAR`模式下调用该函数。
+  
+  > 注意：确保只在`ONLINE_LIDAR`模式下调用该函数。
 
 * 实现 scan 通道数据写入：用户实现 ReadScanCallback 函数，将自定义类型的 scan 数据输入 SDK。
+
 * 调用 pcd 发布相关函数：LidarComponentBase 提供了封装和发布 scan 数据的函数 AllocatePointCloud 和 WritePointCloud。用户需要调用 AllocatePointCloud 分配点云内存空间，在点云信息写入完毕后调用 WritePointCloud 发布。
 
 速腾驱动适配参考伪代码：
@@ -172,8 +191,8 @@ public:
   bool Init() override; 
   // 收到apollo scan数据的处理方式
   void ReadScanCallback(const std::shared_ptr<ScanType>& scan_message) override;
-	
- 	// 适配者自定义的点云回调函数，返回sdk对应类型的点云数据
+
+     // 适配者自定义的点云回调函数，返回sdk对应类型的点云数据
   void RsPointCloudCallback(raw_pcd_message);
   void RsPacketCallback(raw_scan_message);
 }
@@ -186,7 +205,7 @@ void RslidarComponent::Init() override {
   // 注册sdk scan帧回调函数、点云帧回调函数
   sdk->regiest(this->RsPacketCallback);
   sdk->regiest(this->RsPointCloudCallback);
- 	
+
   // 调用父类方法，初始化cyber节点
   InitBase(base_config);
 }
@@ -197,9 +216,9 @@ int RslidarConvertCompoment::ReadScanCallback(shared_ptr<ScanType> scan_message)
 }
 
 void RslidarPacketComponent::packetCallback(const RslidarPacket& rslidar_packet) {
-  	std::shared_ptr<ScanType> scan_packet;
-  	// convert RslidarPacket to ScanType ...
-  	
+      std::shared_ptr<ScanType> scan_packet;
+      // convert RslidarPacket to ScanType ...
+
     WriteScan(scan_packet);
     // 调用LidarComponentBase父类提供的方法，用于封装和广播scan数据
 }
@@ -207,7 +226,7 @@ void RslidarPacketComponent::packetCallback(const RslidarPacket& rslidar_packet)
 // 适配者自定义的点云回调函数，返回sdk对应类型的点云数据
 void RslidarConvertCompoment::pointCloudPutCallback(const RslidarRawMessage& raw_message) {
   shared_ptr<ApolloMsg> pcd_message = AllocatePointCloud(); //调用父类提供方法，获取已分配好内存的空点云
-    
+
   // 适配者将raw_message写入pcd_message
   for (int i = 0; i < raw_message.size(); ++i) {
     pcd_message.mutable_point(i).set_x(raw_message.point(i).x());

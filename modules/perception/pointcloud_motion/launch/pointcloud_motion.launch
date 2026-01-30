@@ -1,0 +1,10 @@
+<cyber>
+    <desc>Apollo PointClous motion</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>pointcloud_motion</name>
+        <dag_conf>/apollo/modules/perception/pointcloud_motion/dag/pointcloud_motion.dag</dag_conf>
+        <process_name>pointcloud_motion</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

@@ -1,0 +1,20 @@
+<package>
+    <name>control-controller-antislip-control-task</name>
+    <version>local</version>
+    <description>
+      control task for preventing slope sliding.
+    </description>
+    <maintainer email="apollo-support">apollo-support@baidu.com</maintainer>
+    <type>module</type>
+    <src_path>//modules/control/controllers/slope_anti_slip_control_task</src_path>
+    <license>Apache License 2.0</license>
+    <author>Apollo</author>
+    <depend>bazel-extend-tools</depend>
+    <depend type="binary" repo_name="control">control</depend>
+    <depend type="binary" repo_name="control-task-base-extend">control-task-base-extend</depend>
+    <depend type="binary" repo_name="common" lib_names="common">common</depend>
+    <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+    <depend repo_name="eigen">3rd-eigen3</depend>
+    <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+    <builder>bazel</builder>
+  </package>

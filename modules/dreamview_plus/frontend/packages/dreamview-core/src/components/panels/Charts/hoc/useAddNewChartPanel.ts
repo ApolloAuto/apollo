@@ -9,14 +9,6 @@ import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
 import { initChartValue } from '../const';
 
-/**
- * @description
- * 使用useAddNewChartPanel函数来添加一个新的图表面板。
- * 该函数会触发主API的putChartObjectStore方法，将新的图表对象存储到服务端。
- * 然后，它会更新面板布局状态，并在左侧添加新的图表面板。
- *
- * @returns {Function} - 返回一个函数，当点击添加新图表面板时调用该函数。
- */
 export function useAddNewChartPanel() {
     const { mainApi } = useWebSocketServices();
     const [, dispatch] = usePanelLayoutStore();
@@ -34,7 +26,7 @@ export function useAddNewChartPanel() {
             },
         ];
         mainApi
-            .putChartObjectStore({
+            .putObjectStore({
                 type: OBJECT_STORE_TYPE.CHART,
                 panelId: newPanelId,
                 value: configList,

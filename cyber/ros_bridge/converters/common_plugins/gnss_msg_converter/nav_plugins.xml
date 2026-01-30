@@ -1,3 +1,0 @@
-<library path="cyber/ros_bridge/converters/common_plugins/gnss_msg_converter/libnav_msg_converter.so">
-    <class type="apollo::cyber::NavMsgConverter" base_class="apollo::cyber::MessageConverter"></class>
-</library>

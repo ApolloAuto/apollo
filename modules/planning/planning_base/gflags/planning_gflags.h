@@ -43,6 +43,7 @@ DECLARE_bool(enable_smooth_reference_line);
 DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);
 DECLARE_double(smoothed_reference_line_max_diff);
+DECLARE_double(reference_line_endpoint_extend_length);
 
 // parameters for trajectory planning
 DECLARE_bool(enable_trajectory_stitcher);
@@ -171,6 +172,7 @@ DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 DECLARE_bool(enable_parallel_hybrid_a);
 
+DECLARE_double(path_speed_osqp_setting_time_limit);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
@@ -306,3 +308,7 @@ DECLARE_bool(enable_control_interactive_replan);
 
 DECLARE_int32(close_range_obstacle_nudge_range_remain_farmes);
 DECLARE_double(close_range_obstacle_nudge_pedestrian_waiting_time);
+
+DECLARE_double(path_obs_ref_shift_distance);
+
+DECLARE_double(driving_state_nudge_check_l);

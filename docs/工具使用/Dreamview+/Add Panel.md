@@ -25,11 +25,11 @@
 您可以通过点击左侧面板名称添加面板，还可以通过长按鼠标拖拽添加面板。本小节以添加 **Vehicle Visualization/车辆可视化** 面板为例介绍如何新增面板并自定义面板位置。
 
 1. 在左侧导航栏点击 **Add Panel/添加面板**。
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Doc_CN_9_0/image_3195b4b.png)
 
 2. 选择需要新增的面板类型 **Vehicle Visualization/车辆可视化**，拖动至右侧主操作区的期望位置，如下图蓝色半透明区域所示：
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Doc_CN_9_0/image_7aeaf54.png)
 
 3. 对新增面板做需要的配置，此处以修改视角为例。将 **View/视角** 设置为 **Map/地图** 视角。

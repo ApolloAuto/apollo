@@ -1,14 +1,14 @@
 import React from 'react';
-import {createRoot, Root} from 'react-dom/client';
+import { createRoot, Root } from 'react-dom/client';
 import FloatingLayer from '@dreamview/dreamview-carviz/src/EventBus/eventListeners/FloatingLayer';
-import type {CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
+import type { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import * as THREE from 'three';
-import {FunctionalClass} from './FunctionalClass';
-import {eventBus, MouseEventType} from '../../EventBus';
-import {IThreeContext} from '../type';
+import { FunctionalClass } from './FunctionalClass';
+import { eventBus, MouseEventType } from '../../EventBus';
+import { IThreeContext } from '../type';
 import type Coordinates from '../coordinates';
 import CopyMessage from '../../EventBus/eventListeners/CopyMessage';
-import {disposeMesh,} from '../../utils/common';
+import { disposeMesh } from '../../utils/common';
 
 export interface IFunctionalClassContext extends IThreeContext {
     coordinates: Coordinates;
@@ -58,9 +58,10 @@ export class BaseMarker implements FunctionalClass {
         // 摄像机距离地平面的距离
         const camera = this.context.camera;
         const distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
-        const vFOV = THREE.MathUtils.degToRad(camera.fov);  // 将视角转换为弧度
+        const vFOV = THREE.MathUtils.degToRad(camera.fov); // 将视角转换为弧度
         const visibleHeight = 2 * Math.tan(vFOV / 2) * distance;
-        const worldUnitPerPixel = visibleHeight / window.innerHeight;
+        const worldUnitPerPixel =
+            visibleHeight / (this.context.renderer?.domElement?.clientHeight || window.innerHeight);
         return pixelSize * worldUnitPerPixel;
     }
 
@@ -148,9 +149,9 @@ export class BaseMarker implements FunctionalClass {
         const raycasterTemp = new THREE.Raycaster();
         raycasterTemp.setFromCamera(new THREE.Vector2(nx, ny), camera);
 
-        let ParkingSpaceModels = [];
+        const ParkingSpaceModels = [];
         scene.children.forEach((model) => {
-            if (model.name === "ParkingSpace") {
+            if (model.name === 'ParkingSpace') {
                 ParkingSpaceModels.push(model);
             }
         });
@@ -163,10 +164,12 @@ export class BaseMarker implements FunctionalClass {
             const element = ParkingSpaceModels[index];
             mesh.geometry.dispose();
             const positions = element.geometry.attributes.position;
-            let vertices = [];
-            for ( let i = 0; i < positions.count-1; i++) {
-                let index = i*3;
-                vertices.push(new THREE.Vector3(positions.array[index], positions.array[index+1], positions.array[index+2]));
+            const vertices = [];
+            for (let i = 0; i < positions.count - 1; i++) {
+                const index = i * 3;
+                vertices.push(
+                    new THREE.Vector3(positions.array[index], positions.array[index + 1], positions.array[index + 2]),
+                );
             }
             const shape = new THREE.Shape(vertices);
             mesh.geometry = new THREE.ShapeGeometry(shape);
@@ -181,16 +184,16 @@ export class BaseMarker implements FunctionalClass {
     }
 
     createShapeMesh() {
-        let vertices = [
+        const vertices = [
             new THREE.Vector2(0, 0),
             new THREE.Vector2(0, 0),
             new THREE.Vector2(0, 0),
             new THREE.Vector2(0, 0),
         ];
 
-        let shape = new THREE.Shape(vertices);
+        const shape = new THREE.Shape(vertices);
         const geometry = new THREE.ShapeGeometry(shape);
-        const material = new THREE.MeshBasicMaterial({color: 0xff0000, visible: false });
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000, visible: false });
         const mesh = new THREE.Mesh(geometry, material);
 
         return mesh;

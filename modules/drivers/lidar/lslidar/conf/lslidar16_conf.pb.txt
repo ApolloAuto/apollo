@@ -32,6 +32,6 @@ top_right_x: 0.0               #右上 x值
 top_right_y: 0.0               #右上 y值
 
 calibration: false
-calibration_file: "modules/drivers/lidar/lslidar/params/LS16_calibration.yaml"
+calibration_file: "/apollo/modules/drivers/lidar/lslidar/params/LS16_calibration.yaml"
 pcap_path: ""                    #读取pcap包，测试时使用，连接雷达的时候，将此值设置为空
 

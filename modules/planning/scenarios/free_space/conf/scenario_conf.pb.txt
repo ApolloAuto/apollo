@@ -1,0 +1,2 @@
+enabled_perception_obstacles: true
+perception_obstacle_buffer: 0.2

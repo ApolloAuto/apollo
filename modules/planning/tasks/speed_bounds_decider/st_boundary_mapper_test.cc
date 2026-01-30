@@ -67,7 +67,7 @@ class StBoundaryMapperTest : public ::testing::Test {
 
     prediction::PredictionObstacles prediction_obstacles;
     ASSERT_TRUE(cyber::common::GetProtoFromFile(
-        "modules/planning/planning_base/testdata/"
+        "/apollo/modules/planning/planning_base/testdata/"
         "common/sample_prediction.pb.txt",
         &prediction_obstacles));
     auto obstacles = Obstacle::CreateObstacles(prediction_obstacles);
@@ -79,7 +79,7 @@ class StBoundaryMapperTest : public ::testing::Test {
 
  protected:
   const std::string map_file =
-      "modules/planning/planning_base/testdata/garage_map/base_map.txt";
+      "/apollo/modules/planning/planning_base/testdata/garage_map/base_map.txt";
   hdmap::HDMap hdmap_;
   common::math::Vec2d vehicle_position_;
   std::unique_ptr<ReferenceLine> reference_line_;

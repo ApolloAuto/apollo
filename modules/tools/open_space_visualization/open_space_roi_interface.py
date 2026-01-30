@@ -23,7 +23,10 @@ from ctypes import cdll, c_ushort, c_int, c_char_p, c_double, POINTER
 
 APOLLO_DISTRIBUTION_HOME = os.environ.get(
     'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
-lib_path = f"{APOLLO_DISTRIBUTION_HOME}/lib/modules/planning/planning_open_space/open_space_roi_wrapper_lib.so"
+if APOLLO_DISTRIBUTION_HOME.startswith('/opt/apollo/neo'):
+    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/lib/modules/planning/planning_base/open_space_roi_wrapper_lib.so"
+else:
+    lib_path = f"{APOLLO_DISTRIBUTION_HOME}/bazel-bin/modules/planning/planning_base/open_space_roi_wrapper_lib.so"  
 
 lib = cdll.LoadLibrary(lib_path)
 

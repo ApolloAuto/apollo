@@ -17,7 +17,6 @@
 #include "cyber/transport/transport.h"
 
 #include "cyber/common/global_data.h"
-#include "cyber/transport/dispatcher/rtps_dispatcher.h"
 
 namespace apollo {
 namespace cyber {
@@ -29,7 +28,7 @@ Transport::Transport() {
   intra_dispatcher_ = IntraDispatcher::Instance();
   shm_dispatcher_ = ShmDispatcher::Instance();
   rtps_dispatcher_ = RtpsDispatcher::Instance();
-  rtps_dispatcher_->SetParticipant(participant_);
+  rtps_dispatcher_->set_participant(participant_);
 }
 
 Transport::~Transport() { Shutdown(); }
@@ -54,11 +53,7 @@ void Transport::CreateParticipant() {
   std::string participant_name =
       common::GlobalData::Instance()->HostName() + "+" +
       std::to_string(common::GlobalData::Instance()->ProcessId());
-  participant_ = std::make_shared<
-      Participant>(participant_name, 11512);
-  if (!participant_->Init()) {
-    AERROR << "Transport inner participant init failed!";
-  }
+  participant_ = std::make_shared<Participant>(participant_name, 11512);
 }
 
 }  // namespace transport

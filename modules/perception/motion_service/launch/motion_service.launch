@@ -5,7 +5,7 @@
     <version>1.0.0</version>
     <module>
         <name>motion_service</name>
-        <dag_conf>modules/perception/motion_service/dag/motion_service.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/motion_service/dag/motion_service.dag</dag_conf>
         <process_name>motion_service</process_name>
         <version>1.0.0</version>
     </module>

@@ -1,0 +1,23 @@
+<package format="2">
+  <name>module-drivers</name>
+  <version>local</version>
+  <description>
+    Apollo drivers module.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//collection/drivers</src_path>
+  <depend repo_name="drivers-camera" type="binary">drivers-camera</depend>
+  <depend repo_name="drivers-canbus" type="binary">drivers-canbus</depend>
+  <depend repo_name="drivers-gnss" type="binary">drivers-gnss</depend>
+  <depend repo_name="drivers-image-decompress" type="binary">drivers-image-decompress</depend>
+  <depend repo_name="drivers-lidar" type="binary">drivers-lidar</depend>
+  <depend repo_name="drivers-radar" type="binary">drivers-radar</depend>
+
+</package>

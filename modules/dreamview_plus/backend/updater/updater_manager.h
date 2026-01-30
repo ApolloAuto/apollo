@@ -23,12 +23,10 @@
 #pragma once
 #include <map>
 #include <string>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/dreamview/backend/common/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/updater/updater_base.h"
-#include "modules/dreamview_plus/backend/updater/updater_with_channels_base.h"
 
 namespace apollo {
 namespace dreamview {
@@ -74,16 +72,6 @@ class UpdaterManager {
    * @param path_name The path name of the data updater.
    */
   UpdaterBase* GetUpdater(const std::string &path_name);
-
-  /**
-   * @brief Check if the channel belongs to an updater.
-   * @param path_name The path name of the data updater.
-   * @param message_type The type of message in channel.
-   * @param channel_name The name of channel.
-   */
-  bool IsChannelInUpdater(const std::string &path_name,
-                          const std::string &message_type,
-                          const std::string &channel_name);
 
  private:
   std::map<std::string, UpdaterBase *> updater_map_;

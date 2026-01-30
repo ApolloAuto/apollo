@@ -1,0 +1,40 @@
+params_declare {
+  config_name: "public_road_forward_param"
+  config_path: "public_road_forward_param.pb.txt"
+}
+params_declare {
+  config_name: "open_space_forward_param"
+  config_path: "open_space_forward_param.pb.txt"
+}
+params_declare {
+  config_name: "open_space_backward_param"
+  config_path: "open_space_backward_param.pb.txt"
+}
+calibration_table_declare {
+  config_name: "default_calibration_table"
+  config_path: "calibration_table.pb.txt"
+}
+calibration_table_declare {
+  config_name: "high_battery_calibration_table"
+  config_path: "calibration_table.pb.txt"
+}
+calibration_table_declare {
+  config_name: "normal_battery_calibration_table"
+  config_path: "calibration_table.pb.txt"
+}
+params_declare {
+  config_name: "precise_backward_param"
+  config_path: "precise_backward_param.pb.txt"
+}
+params_declare {
+  config_name: "precise_forward_param"
+  config_path: "precise_forward_param.pb.txt"
+}
+params_declare {
+  config_name: "zone_cover_backward_param"
+  config_path: "zone_cover_backward_param.pb.txt"
+}
+params_declare {
+  config_name: "zone_cover_forward_param"
+  config_path: "zone_cover_forward_param.pb.txt"
+}

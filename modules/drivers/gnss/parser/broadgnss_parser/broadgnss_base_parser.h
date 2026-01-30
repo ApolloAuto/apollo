@@ -40,8 +40,9 @@ class BroadGnssBaseParser : public Parser {
   BroadGnssBaseParser() {}
   explicit BroadGnssBaseParser(const config::Config &config);
 
-  virtual bool PrepareMessage() = 0;
+  virtual bool PrepareMessage(const uint8_t &channel) = 0;
 
+  virtual void GetMessages(const uint8_t &channel, MessageInfoVec *messages);
   virtual void GetMessages(MessageInfoVec *messages);
 
  protected:
@@ -63,6 +64,7 @@ class BroadGnssBaseParser : public Parser {
   Heading heading_;
   Ins ins_;
   InsStat ins_stat_;
+  bool auto_fill_gps_msg_;
 };
 
 }  // namespace gnss

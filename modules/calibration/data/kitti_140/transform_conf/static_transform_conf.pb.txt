@@ -1,45 +1,45 @@
 extrinsic_file {
     frame_id: "novatel"
     child_frame_id: "velodyne64"
-    file_path: "modules/drivers/lidar/velodyne/params/velodyne64_novatel_extrinsics.yaml"
+    file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne64_novatel_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
     frame_id: "localization"
     child_frame_id: "novatel"
-    file_path: "modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+    file_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
     frame_id: "velodyne64"
     child_frame_id: "camera"
-    file_path: "modules/perception/data/params/camera_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/camera_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
     frame_id: "camera_00"
     child_frame_id: "camera_00"
-    file_path: "modules/perception/data/params/camera_00_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/camera_00_extrinsics.yaml"
     enable: true
 }
 extrinsic_file {
     frame_id: "camera_00"
     child_frame_id: "camera_01"
-    file_path: "modules/perception/data/params/camera_01_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/camera_01_extrinsics.yaml"
     enable: true
 }
 extrinsic_file {
     frame_id: "camera_00"
     child_frame_id: "camera_02"
-    file_path: "modules/perception/data/params/camera_02_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/camera_02_extrinsics.yaml"
     enable: true
 }
 extrinsic_file {
     frame_id: "camera_00"
     child_frame_id: "camera_03"
-    file_path: "modules/perception/data/params/camera_03_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/camera_03_extrinsics.yaml"
     enable: true
 }

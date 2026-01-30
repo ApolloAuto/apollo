@@ -44,6 +44,7 @@
 #include "modules/planning/planning_base/common/st_graph_data.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planning_base/common/sl_polygon.h"
 
 namespace apollo {
 namespace planning {
@@ -286,6 +287,9 @@ class ReferenceLineInfo {
   const PathBoundary& reference_line_towing_path_boundary() const;
   PathBoundary* mutable_reference_line_towing_path_boundary();
 
+  const std::vector<SLPolygon>& obs_sl_polygons() const;
+  std::vector<SLPolygon>* mutable_obs_sl_polygons();
+
  private:
   void InitFirstOverlaps();
 
@@ -396,6 +400,7 @@ class ReferenceLineInfo {
   std::string id_ = "";
   std::size_t key_ = 0;
   std::size_t index_ = 0;
+  std::vector<SLPolygon> obs_sl_polygons_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

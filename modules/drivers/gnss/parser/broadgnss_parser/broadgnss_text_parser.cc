@@ -37,52 +37,33 @@ class BroadGnssTextParser : public BroadGnssBaseParser {
  public:
   explicit BroadGnssTextParser(const config::Config &config)
       : BroadGnssBaseParser(config) {}
-  bool PrepareMessage() override;
+  bool PrepareMessage(const uint8_t &channel) override;
 
  private:
   void PrepareMessageCommon(const std::vector<std::string> &fields);
   void PrepareMessageGIAVP(const std::vector<std::string> &fields);
   void PrepareMessageGPINS(const std::vector<std::string> &fields);
+  void PrepareMessageBESTPOSA(const std::vector<std::string> &fields);
+  void PrepareMessageHEADINGA(const std::vector<std::string> &fields);
 
-  BroadGnssTextProtocol protocol_;
   std::string input_str_;
+  ASCIIParser ascii_parser_;
 };
 
 Parser *Parser::CreateBroadGnssText(const config::Config &config) {
   return new BroadGnssTextParser(config);
 }
 
-bool BroadGnssTextParser::PrepareMessage() {
+bool BroadGnssTextParser::PrepareMessage(const uint8_t &channel) {
   ADEBUG << "BroadGnss ASCII is: " << data_;
 
-  // message may be truncated, just save the last message
-  const uint8_t *data_start = data_end_;
-  for (; data_start != data_; --data_start) {
-    if (*data_start == '$') {
-      break;
-    }
-  }
-  if (data_start != data_) {
-    AINFO << "BroadGnss message has been truncated: " << data_;
-  }
-
-  if (*data_start != '$') {
-    input_str_.append(reinterpret_cast<const char *>(data_start),
-                      std::distance(data_start, data_end_));
-  } else {
-    input_str_.assign(reinterpret_cast<const char *>(data_start),
-                      std::distance(data_start, data_end_));
-  }
-
-  if (*(data_end_ - 1) != 0x0A) {
-    AINFO << "BroadGnss ASCII message is not complete: " << data_start;
+  ascii_parser_.Add(data_, data_end_, channel);
+  auto &message = ascii_parser_.GetMessage();
+  if (message.empty()) {
     return false;
-  } else {
-    ADEBUG << "BroadGnss ASCII message is complete";
   }
 
-  // find cs pos
-  std::stringstream ss(input_str_.substr(0, input_str_.rfind('*')));
+  std::stringstream ss(message.substr(0, message.rfind('*')));
   std::vector<std::string> fields;
   for (std::string field; std::getline(ss, field, ',');) {
     fields.push_back(field);
@@ -95,17 +76,19 @@ bool BroadGnssTextParser::PrepareMessage() {
       if (fields[i].empty()) {
         fields[i] = "0";
       } else if (fields[i].find_first_not_of("0123456789.- ") !=
-                 std::string::npos) {
+                     std::string::npos ||
+                 fields[i].find_first_of("0123456789") == std::string::npos) {
         AERROR << "BroadGnss ASCII message field error: " << fields[i]
-               << ", input str: " << input_str_;
+               << ", input str: " << message;
         return false;
       }
     }
     return true;
   };
-  if (fields[0] == protocol_.GIAVP) {
-    if (fields.size() != protocol_.GIAVP_SIZE) {
-      AERROR << "BroadGnss GIAVP message format error: " << data_;
+  broadgnss_message_.message_type = fields[0];
+  if (fields[0] == GIAVP_MESSAGE_ID) {
+    if (fields.size() != GIAVP_MESSAGE_SIZE) {
+      AERROR << "BroadGnss GIAVP message format error: " << message;
       return false;
     }
     if (!valid_fields()) {
@@ -113,15 +96,29 @@ bool BroadGnssTextParser::PrepareMessage() {
     }
     PrepareMessageGIAVP(fields);
     return true;
-  } else if (fields[0] == protocol_.GPINS) {
-    if (fields.size() != protocol_.GPINS_SIZE) {
-      AERROR << "BroadGnss GPINS message format error:" << data_;
+  } else if (fields[0] == GPINS_MESSAGE_ID) {
+    if (fields.size() != GPINS_MESSAGE_SIZE) {
+      AERROR << "BroadGnss GPINS message format error:" << message;
       return false;
     }
     if (!valid_fields()) {
       return false;
     }
     PrepareMessageGPINS(fields);
+    return true;
+  } else if (fields[0] == BESTPOSA_MESSAGE_ID) {
+    if (fields.size() != BESTPOSA_MESSAGE_SIZE) {
+      AERROR << "BroadGnss BESTPOSA message format error: " << message;
+      return false;
+    }
+    PrepareMessageBESTPOSA(fields);
+    return true;
+  } else if (fields[0] == HEADINGA_MESSAGE_ID) {
+    if (fields.size() != HEADINGA_MESSAGE_SIZE) {
+      AERROR << "BroadGnss HEADINGA message format error: " << message;
+      return false;
+    }
+    PrepareMessageHEADINGA(fields);
     return true;
   }
   return false;
@@ -170,6 +167,27 @@ void BroadGnssTextParser::PrepareMessageGPINS(
   broadgnss_message_.gyro_x = std::stod(fields[24]) * DEG_TO_RAD;
   broadgnss_message_.gyro_y = std::stod(fields[25]) * DEG_TO_RAD;
   broadgnss_message_.gyro_z = std::stod(fields[26]) * DEG_TO_RAD;
+}
+
+void BroadGnssTextParser::PrepareMessageBESTPOSA(
+    const std::vector<std::string> &fields) {
+  broadgnss_message_.best_latitude = std::stod(fields[11]);
+  broadgnss_message_.best_longitude = std::stod(fields[12]);
+  broadgnss_message_.best_altitude = std::stof(fields[13]);
+  broadgnss_message_.undulation = std::stof(fields[14]);
+  broadgnss_message_.lat_std = std::stof(fields[16]);
+  broadgnss_message_.lon_std = std::stof(fields[17]);
+  broadgnss_message_.alti_std = std::stof(fields[18]);
+  broadgnss_message_.differential_age = std::stof(fields[20]);
+  broadgnss_message_.solution_age = std::stof(fields[21]);
+}
+
+void BroadGnssTextParser::PrepareMessageHEADINGA(
+    const std::vector<std::string> &fields) {
+  broadgnss_message_.gps_heading = std::stof(fields[12]);
+  broadgnss_message_.gps_pitch = std::stof(fields[13]);
+  broadgnss_message_.yaw_std = std::stof(fields[15]);
+  broadgnss_message_.pitch_std = std::stof(fields[16]);
 }
 
 }  // namespace gnss

@@ -29,46 +29,44 @@ namespace perception {
 namespace trafficlight {
 
 struct TrafficLightRecognitorInitOptions : public BaseInitOptions {
-  std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
+    std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
 };
 
 class BaseTrafficLightRecognitor {
- public:
-  /**
-   * @brief Construct a new base traffic light recognitor object.
-   * 
-   */
-  BaseTrafficLightRecognitor() = default;
-  /**
-   * @brief Destroy the base traffic light recognitor object.
-   * 
-   */
-  virtual ~BaseTrafficLightRecognitor() = default;
-  /**
-   * @brief Initialize traffic light recognitor parameters.
-   * 
-   * @param options 
-   * @return true 
-   * @return false 
-   */
-  virtual bool Init(const TrafficLightRecognitorInitOptions& options =
-                        TrafficLightRecognitorInitOptions()) = 0;
+public:
+    /**
+     * @brief Construct a new base traffic light recognitor object.
+     *
+     */
+    BaseTrafficLightRecognitor() = default;
+    /**
+     * @brief Destroy the base traffic light recognitor object.
+     *
+     */
+    virtual ~BaseTrafficLightRecognitor() = default;
+    /**
+     * @brief Initialize traffic light recognitor parameters.
+     *
+     * @param options
+     * @return true
+     * @return false
+     */
+    virtual bool Init(const TrafficLightRecognitorInitOptions& options = TrafficLightRecognitorInitOptions()) = 0;
 
-  /**
-   * @brief recogn traffic_light from image.
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
-   */
-  virtual bool Detect(camera::TrafficLightFrame* frame) = 0;
+    /**
+     * @brief recogn traffic_light from image.
+     *
+     * @param frame
+     * @return true
+     * @return false
+     */
+    virtual bool Detect(camera::TrafficLightFrame* frame) = 0;
 
-  DISALLOW_COPY_AND_ASSIGN(BaseTrafficLightRecognitor);
+    DISALLOW_COPY_AND_ASSIGN(BaseTrafficLightRecognitor);
 };  // class BaseTrafficLightRecognitor
 
 PERCEPTION_REGISTER_REGISTERER(BaseTrafficLightRecognitor);
-#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseTrafficLightRecognitor, name)
+#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseTrafficLightRecognitor, name)
 
 }  // namespace trafficlight
 }  // namespace perception

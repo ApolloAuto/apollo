@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding:UTF-8 -*-
 ###############################################################################
 # Copyright 2023 The Apollo Authors. All Rights Reserved.

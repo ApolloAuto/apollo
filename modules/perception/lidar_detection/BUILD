@@ -159,7 +159,6 @@ apollo_cc_library(
         "detector/point_pillars_detection/point_pillars_detection.h",
         "detector/point_pillars_detection/preprocess_points.h",
         "interface/base_lidar_detector.h",
-        "interface/base_down_sample.h",
     ],
     copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
@@ -180,6 +179,7 @@ apollo_cc_library(
         "//modules/perception/common/lidar:apollo_perception_common_lidar",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/common/proto:perception_config_schema_cc_proto",
+        "//modules/perception/common/interface:base_down_sample",
         "//modules/perception/lidar_detection/detector/center_point_detection/proto:center_point_model_param_cc_proto",
         "//modules/perception/lidar_detection/detector/cnn_segmentation/proto:model_param_cc_proto",
         "//modules/perception/lidar_detection/detector/mask_pillars_detection/proto:model_param_cc_proto",

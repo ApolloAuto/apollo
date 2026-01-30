@@ -245,16 +245,6 @@ export class MainApi {
         });
     }
 
-    getPanelPluginInitData() {
-        return this.request<any, any>({
-            data: {
-                name: '',
-                info: {},
-            },
-            type: 'GetDvPluginPanelsJson',
-        }).then((r) => JSON.parse(r || '[]'));
-    }
-
     loadDynamic() {
         return this.requestWithoutRes({
             data: {
@@ -844,45 +834,7 @@ export class MainApi {
         });
     }
 
-    /**
-     * @description
-     * 将对象存储到本地数据库中。
-     * 如果对象已经存在，则会覆盖原有的对象。
-     *
-     * @param {object} prop - 包含两个属性的对象：
-     * - `type` {string} - 对象类型，用于区分不同类型的对象；
-     * - `value` {any} - 需要存储的对象值。
-     *
-     * @returns {Promise<T>} - Promise 对象，resolve 回调函数参数为传入的 `value`。
-     *
-     * @throws {Error} - 当 `type` 或 `value` 未提供时抛出错误。
-     */
-    putObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; value: T }) {
-        return this.request<IPutObjectStoreParams, T>({
-            data: {
-                name: '',
-                info: {
-                    key: prop.type,
-                    value: JSON.stringify(prop.value),
-                },
-            },
-            type: MainApiTypes.PutObjectStore,
-        });
-    }
-
-    /**
-     * @description
-     * 将图表对象存储到数据库中，并返回一个 Promise。
-     * 如果传入的 `prop` 参数中的 `type` 和 `panelId` 属性都不为空，则会在请求中携带这些信息。
-     *
-     * @param prop {object} 包含以下属性的对象：
-     * - type {string} 对象存储类型，可选值为 'chart'、'dashboard'、'workbench'。默认值为 'chart'。
-     * - panelId {string} 面板 ID，可选值为字符串。默认值为 ''。
-     * - value {T} 需要存储的值，类型为 T。
-     *
-     * @returns {Promise<T>} 返回一个 Promise，resolve 时会返回传入的 `prop.value`，reject 时会返回错误信息。
-     */
-    putChartObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string; value: T }) {
+    putObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string; value: T }) {
         return this.request<IPutObjectStoreParams, T>({
             data: {
                 name: '',
@@ -907,19 +859,7 @@ export class MainApi {
         });
     }
 
-    /**
-     * @description
-     * 获取图表对象存储，返回 Promise，resolve 值为指定类型的数组或空数组。
-     *
-     * @param prop {object} - 包含以下属性：
-     * - type {string} - 对象存储类型，可选值为 'chart'、'filter'、'linkage'。
-     * - panelId {string} - 面板 ID。
-     *
-     * @returns {Promise<T>} - Promise，resolve 值为指定类型的数组或空数组。
-     *
-     * @throws {Error} - 如果请求失败，则 reject 一个 Error 对象。
-     */
-    getChartObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string }) {
+    getObjectStore<T>(prop: { type: OBJECT_STORE_TYPE; panelId: string }) {
         return this.request<IGetObjectStoreParams, string>({
             data: {
                 name: '',
@@ -929,56 +869,6 @@ export class MainApi {
             },
             type: MainApiTypes.GetObjectStore,
         }).then((r) => JSON.parse(r || '[]') as T);
-    }
-
-    /**
-     * @description
-     * 获取对象存储，返回 Promise<T>。其中 T 为指定类型的对象。
-     *
-     * @param {object} prop - 包含 type 属性的对象，表示对象存储的类型。
-     * @param {string} prop.type - 必需，字符串类型，表示对象存储的类型。
-     *
-     * @returns {Promise<T>} - Promise 对象，resolve 时返回 T 类型的对象，reject 时抛出错误信息。
-     */
-    getObjectStore<T>(prop: { type: OBJECT_STORE_TYPE }) {
-        return this.request<IGetObjectStoreParams, string>({
-            data: {
-                name: '',
-                info: {
-                    key: prop.type,
-                },
-            },
-            type: MainApiTypes.GetObjectStore,
-        }).then((r) => JSON.parse(r || '{}') as T);
-    }
-
-    /**
-     * 获取当前布局信息
-     *
-     * @returns {Promise<any>} Promise对象，resolve返回一个JSON对象，reject返回错误信息
-     */
-    getCurrentLayout() {
-        return this.request<any, any>({
-            data: {
-                name: '',
-                info: {},
-            },
-            type: MainApiTypes.GetCurrentLayout,
-        }).then((r) => JSON.parse(r || '{}'));
-    }
-
-    /**
-     * @description 获取默认布局，返回一个 Promise，resolve 值为一个对象，包含 name、info 两个属性
-     * @returns {Promise<Object>} resolve 的对象包含 name、info 两个属性，name 是字符串类型，info 是任意类型的对象
-     */
-    getDefaultLayout() {
-        return this.request<any, any>({
-            data: {
-                name: '',
-                info: {},
-            },
-            type: MainApiTypes.GetDefaultLayout,
-        }).then((r) => JSON.parse(r || '{}'));
     }
 
     getTuplesObjectStore<T>(prop: { type: OBJECT_STORE_TYPE }) {
@@ -1090,6 +980,41 @@ export class MainApi {
                 },
             },
             type: MainApiTypes.ExportMapFile,
+        });
+    }
+
+    // 室内定位发送初始化点
+    sendIndoorLocalizationInitPoint(start: { x: number; y: number; z: number; heading?: number }) {
+        return this.request({
+            data: {
+                name: '',
+                info: {
+                    start,
+                },
+            },
+            type: MainApiTypes.SendIndoorLocalizationInitPointRequest,
+        });
+    }
+
+    // 获取起始点失败时，获取虚拟起点用于地图渲染
+    getVirtualStartPoint() {
+        return this.request<'', GetStartPointInfo>({
+            data: {
+                name: '',
+                info: null,
+            },
+            type: MainApiTypes.GetMapStartPoint,
+        });
+    }
+
+    // 检测室内定位状态
+    checkIndoorLocalizationInitPointStatus() {
+        return this.request({
+            data: {
+                name: '',
+                info: null,
+            },
+            type: MainApiTypes.CheckIndoorLocalizationInitPointStatus,
         });
     }
 }

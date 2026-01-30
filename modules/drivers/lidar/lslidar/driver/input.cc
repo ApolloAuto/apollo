@@ -81,7 +81,7 @@ InputSocket::~InputSocket(void) {
 }
 
 int InputSocket::GetPacket(LslidarPacket *pkt) {
-    // double time1 = apollo::cyber::Time().Now().ToSecond();
+    double time1 = apollo::cyber::Time().Now().ToSecond();
     struct pollfd fds[1];
     fds[0].fd = sockfd_;
     fds[0].events = POLLIN;
@@ -140,8 +140,8 @@ int InputSocket::GetPacket(LslidarPacket *pkt) {
 
     // Average the times at which we begin and end reading.  Use that to
     // estimate when the scan occurred.
-    // double time2 = apollo::cyber::Time().Now().ToSecond();
-    // AINFO << apollo::cyber::Time((time2 + time1) / 2.0).ToNanosecond();
+    double time2 = apollo::cyber::Time().Now().ToSecond();
+    AINFO << apollo::cyber::Time((time2 + time1) / 2.0).ToNanosecond();
     return 0;
 }
 

@@ -83,6 +83,7 @@ proto_library(
         "//modules/common_msgs/perception_msgs:traffic_light_detection_proto",
         "//modules/common_msgs/routing_msgs:routing_geometry_proto",
         "//modules/common_msgs/routing_msgs:routing_proto",
+        "//modules/common_msgs/map_msgs:map_lane_proto",
     ],
 )
 

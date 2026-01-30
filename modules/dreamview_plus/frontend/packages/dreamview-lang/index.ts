@@ -21,8 +21,6 @@ import { initReactI18next } from 'react-i18next';
 import * as en from './en';
 import * as zh from './zh';
 
-export { useTranslation } from 'react-i18next';
-
 export const translations = { en, zh };
 
 export type Language = keyof typeof translations;

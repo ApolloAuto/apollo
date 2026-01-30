@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message CalibrationDebug {
+  optional apollo.common.Header header = 1;
+  optional double input_speed = 2;
+  optional double input_acceleration_lookup = 3;
+  optional double output_calibration_value = 4;
+  optional double input_throttle_cmd = 5;
+  optional double input_brake_cmd = 6;
+  optional double output_throttle_cmd = 7;
+  optional double output_brake_cmd = 8;
+}

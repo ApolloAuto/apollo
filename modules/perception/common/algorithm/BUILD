@@ -4,6 +4,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
+
 apollo_cc_library(
     name = "apollo_perception_common_algorithm",
     srcs = [
@@ -49,6 +51,7 @@ apollo_cc_library(
         "point_cloud_processing/downsampling.h",
         "sensor_manager/sensor_manager.h",
     ] + if_aarch64(["i_lib/pc/sse2neon.h",]),
+    copts = PERCEPTION_COPTS,
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

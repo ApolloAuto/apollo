@@ -30,51 +30,51 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class CameraDetectionMultiStageComponent final
-    : public cyber::Component<drivers::Image> {
- public:
-  CameraDetectionMultiStageComponent() = default;
-  ~CameraDetectionMultiStageComponent() = default;
-  /**
-   * @brief Init for amera detection 2d compoment
-   *
-   * @return true
-   * @return false
-   */
-  bool Init() override;
-  /**
-   * @brief Process of camera detection 2d compoment
-   *
-   * @param msg image msg
-   * @return true
-   * @return false
-   */
-  bool Proc(const std::shared_ptr<drivers::Image>& msg) override;
+class CameraDetectionMultiStageComponent final : public cyber::Component<drivers::Image> {
+public:
+    CameraDetectionMultiStageComponent() = default;
+    ~CameraDetectionMultiStageComponent() = default;
+    /**
+     * @brief Init for amera detection 2d compoment
+     *
+     * @return true
+     * @return false
+     */
+    bool Init() override;
+    /**
+     * @brief Process of camera detection 2d compoment
+     *
+     * @param msg image msg
+     * @return true
+     * @return false
+     */
+    bool Proc(const std::shared_ptr<drivers::Image>& msg) override;
 
- private:
-  bool InitCameraFrame(const CameraDetectionMultiStage& detection_param);
+private:
+    bool InitCameraFrame(const CameraDetectionMultiStage& detection_param);
 
-  bool InitObstacleDetector(const CameraDetectionMultiStage& detection_param);
+    bool InitObstacleDetector(const CameraDetectionMultiStage& detection_param);
 
-  bool InitTransformWrapper(const CameraDetectionMultiStage& detection_param);
+    bool InitTransformWrapper(const CameraDetectionMultiStage& detection_param);
 
-  bool InternalProc(const std::shared_ptr<apollo::drivers::Image>& msg,
-                    const std::shared_ptr<onboard::CameraFrame>& out_message);
+    bool InternalProc(
+            const std::shared_ptr<apollo::drivers::Image>& msg,
+            const std::shared_ptr<onboard::CameraFrame>& out_message);
 
- private:
-  int image_height_;
-  int image_width_;
-  int frame_id_ = 0;
-  double timestamp_offset_;
-  Eigen::Matrix3f camera_k_matrix_ = Eigen::Matrix3f::Identity();
+private:
+    int image_height_;
+    int image_width_;
+    int frame_id_ = 0;
+    double timestamp_offset_;
+    Eigen::Matrix3f camera_k_matrix_ = Eigen::Matrix3f::Identity();
 
-  std::shared_ptr<BaseObstacleDetector> detector_;
-  std::shared_ptr<camera::DataProvider> data_provider_;
+    std::shared_ptr<BaseObstacleDetector> detector_;
+    std::shared_ptr<camera::DataProvider> data_provider_;
 
-  std::shared_ptr<cyber::Writer<onboard::CameraFrame>> writer_;
-  std::shared_ptr<onboard::TransformWrapper> trans_wrapper_;
+    std::shared_ptr<cyber::Writer<onboard::CameraFrame>> writer_;
+    std::shared_ptr<onboard::TransformWrapper> trans_wrapper_;
 
-  DISALLOW_COPY_AND_ASSIGN(CameraDetectionMultiStageComponent);
+    DISALLOW_COPY_AND_ASSIGN(CameraDetectionMultiStageComponent);
 };
 
 CYBER_REGISTER_COMPONENT(CameraDetectionMultiStageComponent);

@@ -50,6 +50,8 @@ class Inference {
 
   virtual base::BlobPtr<float> get_blob(const std::string &name) = 0;
 
+  virtual void SetStream(cudaStream_t stream) {}
+
   void set_max_batch_size(const int &batch_size);
 
   void set_gpu_id(const int &gpu_id);

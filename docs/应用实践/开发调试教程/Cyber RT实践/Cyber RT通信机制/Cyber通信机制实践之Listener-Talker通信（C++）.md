@@ -21,23 +21,23 @@ https://apollo.baidu.com/community/course/37
 ### 1. 编写代码
 
 1. 创建代码结构目录。
-
+   
    ```bash
    buildtool create --template component communication
    touch /apollo_workspace/communication/listener.cc
    touch /apollo_workspace/communication/talker.cc
    ```
-
+   
    检验目录结构是否正确。
-
+   
    输入指令：
-
+   
    ```bash
    tree communication/
    ```
-
+   
    目录结构：
-
+   
    ```bash
    communication
     ├── BUILD
@@ -59,12 +59,12 @@ https://apollo.baidu.com/community/course/37
    ```
 
 2. 定义此次通信消息的数据结构，编写`proto/communication.proto`文件，内容如下：
-
-   ```proto
+   
+   ```bash
    syntax = "proto2";
-
+   
    package apollo.communication.proto;
-
+   
     //定义一个车的消息，车的型号，车主，车的车牌号,已跑公里数,车速
     message Car{
         optional string plate = 1;
@@ -76,15 +76,15 @@ https://apollo.baidu.com/community/course/37
    ```
 
 3. 编写发送方 talker 代码，talker.cc 代码如下：
-
-    ```cpp
-    #include "communication/proto/communication.pb.h"
+   
+   ```bash
+   #include "communication/proto/communication.pb.h"
     #include "cyber/cyber.h"
     #include "cyber/time/rate.h"
-
+   
     //car数据定义的引用，可以看出其定义来源于一个proto
     using apollo::communication::proto::Car;
-
+   
     int main(int argc, char *argv[]) {
       // 初始化一个cyber框架
       apollo::cyber::Init(argv[0]);
@@ -93,7 +93,7 @@ https://apollo.baidu.com/community/course/37
       // 从节点创建一个Topic,来实现对车速的查看
       auto talker = talker_node->CreateWriter<Car>("car_speed");
       AINFO << "I'll start telling you the current speed of the car.";
-
+   
       //设置初始速度为0，然后速度每秒增加5km/h
       uint64_t speed = 0;
       while (apollo::cyber::OK()) {
@@ -106,22 +106,22 @@ https://apollo.baidu.com/community/course/37
       }
       return 0;
     }
-    ```
+   ```
 
 4. 编写接受方 listener 代码，listener.cc 代码如下：
-
-    ```cpp
-    #include "communication/proto/communication.pb.h"
+   
+   ```bash
+   #include "communication/proto/communication.pb.h"
     #include "cyber/cyber.h"
-
+   
     using apollo::communication::proto::Car;
-
+   
     //接收到消息后的响应函数
     void message_callback(
             const std::shared_ptr<Car>& msg) {
         AINFO << "now speed is: " << msg->speed();
     }
-
+   
     int main(int argc, char* argv[]) {
         //初始化cyber框架
         apollo::cyber::Init(argv[0]);
@@ -133,16 +133,16 @@ https://apollo.baidu.com/community/course/37
         apollo::cyber::WaitForShutdown();
         return 0;
     }
-    ```
+   ```
 
 5. 修改 BUILD 文件，将新写的代码加入到编译中，`communication/BUILD`文件修改如下：
-
-    ```bash
-    load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
+   
+   ```bash
+       load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
     load("//tools:cpplint.bzl", "cpplint")
-
+   
     package(default_visibility = ["//visibility:public"])
-
+   
     apollo_cc_binary(
         name = "talker",
         srcs = ["talker.cc"],
@@ -161,9 +161,9 @@ https://apollo.baidu.com/community/course/37
         ],
         linkstatic = True,
     )
-
+   
     apollo_package()
-
+   
     cpplint()
    ```
 

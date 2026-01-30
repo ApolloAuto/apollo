@@ -37,7 +37,7 @@ DEFINE_string(
     "Traffic rule config filename");
 
 DEFINE_string(smoother_config_filename,
-              "modules/planning/planning_component/conf/"
+              "/apollo/modules/planning/planning_component/conf/"
               "qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
@@ -88,6 +88,9 @@ DEFINE_double(default_reference_line_width, 4.0,
 DEFINE_double(smoothed_reference_line_max_diff, 5.0,
               "Maximum position difference between the smoothed and the raw "
               "reference lines.");
+
+DEFINE_double(reference_line_endpoint_extend_length, 10.0,
+              "Extended length of reference line endpoint");
 
 DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
@@ -313,7 +316,7 @@ DEFINE_bool(enable_planning_pad_msg, false,
 
 // TODO(all): open space planner, merge with planning conf
 DEFINE_string(planner_open_space_config_filename,
-              "modules/planning/planning_component/conf/"
+              "/apollo/modules/planning/planning_component/conf/"
               "planner_open_space_config.pb.txt",
               "The open space planner configuration file");
 
@@ -336,6 +339,8 @@ DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
+DEFINE_double(path_speed_osqp_setting_time_limit, 0.09,
+              "Run time limit for OSQP in seconds.");
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 
@@ -378,7 +383,7 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
 
 DEFINE_bool(planning_offline_learning, false,
             "offline learning. read record files and dump learning_data");
-DEFINE_string(planning_data_dir, "modules/planning/planning_base/data/",
+DEFINE_string(planning_data_dir, "/apollo/modules/planning/planning_base/data/",
               "Prefix of files to store feature data");
 DEFINE_string(planning_offline_bags, "",
               "a list of source files or directories for offline mode. "
@@ -388,7 +393,7 @@ DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
 DEFINE_string(planning_birdview_img_feature_renderer_config_file,
-              "modules/planning/planning_component/conf/"
+              "/apollo/modules/planning/planning_component/conf/"
               "planning_semantic_map_config.pb.txt",
               "config file for renderer singleton");
 
@@ -546,3 +551,9 @@ DEFINE_int32(close_range_obstacle_nudge_range_remain_farmes, 5,
              "remain the nudge range in frames");
 DEFINE_double(close_range_obstacle_nudge_pedestrian_waiting_time, 2.0,
               "waiting time for pedestrians");
+
+DEFINE_double(path_obs_ref_shift_distance, 0.8,
+              "shift the reference to avoid obstacle for path");
+
+DEFINE_double(driving_state_nudge_check_l, 0.2,
+              "uudge lateral check threshold for the ego's driving status");

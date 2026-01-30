@@ -143,5 +143,5 @@ sudo apt-get install -y nvidia-docker2
 sudo systemctl restart docker
 ```
 
-至此，基础软件与 Apollo 环境管理工具及已经安装完成，接下来请跟着 [快速开始](docs/installation_instructions/quick_start_cn.md) 文档根据不同的使用场景按需安
+至此，基础软件与 Apollo 环境管理工具及已经安装完成，接下来请跟着 [快速开始](../installation_instructions/quick_start_cn.md) 文档根据不同的使用场景按需安
 装不同的模块。

@@ -1,0 +1,138 @@
+ts: 0.01
+brake_minimum_action: 0.0
+throttle_minimum_action: 0.0
+speed_controller_input_limit: 2.5
+station_error_limit: 2.5
+preview_window: 20.0
+standstill_acceleration: -2.0
+standstill_narmal_acceleration: -0.5
+stop_gain_acceleration: -1.0
+
+station_pid_conf {
+  pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.3
+    kp: 0.3
+    ki: 0.3
+    kd: 0.0
+  }
+
+  speed_input: 0.0
+  speed_input: 0.55
+  speed_input: 1.05
+  speed_input: 2.0
+  speed_input: 5.0
+
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+
+  ki_speed_gain_output:0.0
+  ki_speed_gain_output:0.0
+  ki_speed_gain_output:0.0
+  ki_speed_gain_output:0.0
+  ki_speed_gain_output:0.0
+
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+}
+
+speed_pid_conf {
+  pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.3
+    kp: 0.5
+    ki: 0.05
+    kd: 0.0
+  }
+
+  speed_input: 0.0
+  speed_input: 0.95
+  speed_input: 1.05
+  speed_input: 2.0
+  speed_input: 5.0
+
+  kp_speed_gain_output:1.6
+  kp_speed_gain_output:1.6
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+
+  ki_speed_gain_output:4.0
+  ki_speed_gain_output:4.0
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+}
+
+pitch_angle_filter_conf {
+  cutoff_freq: 5
+}
+
+station_leadlag_conf {
+  innerstate_saturation_level: 1000
+  alpha: 1.0
+  beta: 0.8
+  tau: 0.0
+}
+
+speed_leadlag_conf {
+  innerstate_saturation_level: 1000
+  alpha: 1.0
+  beta: 1.0
+  tau: 0.0
+}
+enable_reverse_leadlag_compensation: false
+
+enable_speed_station_preview: false
+enable_slope_offset: false
+use_acceleration_lookup_limit: false
+use_preview_reference_check: false
+
+steer_cmd_interval: 20.0
+use_steering_check: true
+
+pedestrian_stop_time: 15
+full_stop_long_time: 5.0
+full_stop_path_remain_gain: 0.5
+
+epb_change_count: 40
+
+speed_threshold_in_backslip: -0.001
+backslip_check_min_pitch: -0.01
+speed_threshold_out_backslip: -0.0001
+min_dec_hold_on_slope: -0.4
+min_dec_rate_in_stop_ctrl: -0.2
+dec_ctrl_rate_antislip: -3.0
+speed_diff_threshold_enter_stop: 0.1
+max_dec_rate_in_stop_ctrl: -3.0
+speed_threshold_enter_stop: 0.2
+dec_addition_speed_error: 0.6
+dec_addition_station_error: 0.4
+dec_addition_hold_on_slope: 2.0
+pitch_segment: -4
+pitch_segment: -2
+pitch_segment: 0
+pitch_segment: 2
+pitch_segment: 4
+dec_prepare_change_rate: 0.060
+dec_prepare_change_rate: 0.040
+dec_prepare_change_rate: 0.020
+dec_prepare_change_rate: 0.020
+dec_prepare_change_rate: 0.020
+emergency_quit_fullstop_minspeed: 0.4
+emergency_quit_fullstop_mindec: -1.2
+
+use_check_pit: false
+epb_brake: 60.0

@@ -598,6 +598,18 @@ import { message } from 'antd';
     message.success('复制成功');
   }}><IconPark name="IcIm" /></a>
 </td><td align="center" style={{paddingTop: 20}}>
+  <IconPark name="IcIndoorIocation" width="16" height="16"/>
+  <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
+    var copyipt = document.createElement("input");
+    var text = '<IconPark name="IcIndoorIocation" />';
+    copyipt.setAttribute("value", text);
+    document.body.appendChild(copyipt);
+    copyipt.select();
+    document.execCommand("copy");
+    document.body.removeChild(copyipt);
+    message.success('复制成功');
+  }}><IconPark name="IcIndoorIocation" /></a>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcLeftTurnDefault" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -609,7 +621,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcLeftTurnDefault" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcLoading" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -657,7 +669,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcMap" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcModel" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -669,7 +681,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcModel" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcMove" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -717,7 +729,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcNotExpanded" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcNotVisual" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -729,7 +741,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcNotVisual" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcOver" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -777,7 +789,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcPlay" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcPlayHover" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -789,7 +801,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcPlayHover" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcProductDocumentation" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -837,7 +849,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcProfileMangerHover" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcProfileMangerNormal" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -849,7 +861,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcProfileMangerNormal" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcProfileMpangerHover" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -897,7 +909,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcRanging" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcRecord" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -909,7 +921,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcRecord" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcRecorder" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -957,7 +969,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcRemoveAllPoints" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcResetView" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -969,7 +981,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcResetView" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcRoutingEditing" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1017,7 +1029,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcSaveModeHover" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcScenarivGroups" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1029,7 +1041,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcScenarivGroups" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcScreen" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1077,7 +1089,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcSettingHover" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcSettingNormal" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1089,7 +1101,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcSettingNormal" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcSissue" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1137,7 +1149,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcStart" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcStartForbidden" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1149,7 +1161,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcStartForbidden" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcStopPlaying" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1197,7 +1209,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcSuggest" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcToBeDownloaded" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1209,7 +1221,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcToBeDownloaded" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcToBeUpdated" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1257,7 +1269,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcToastWarning" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcUse" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1269,7 +1281,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcUse" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcUseRetry" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1317,7 +1329,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcVisual" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcWarningMessage" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1329,7 +1341,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="IcWarningMessage" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="IcWayPoint" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1377,7 +1389,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="Overview" /></a>
-</td><td align="center" style={{paddingTop: 20}}>
+</td></tr><tr><td align="center" style={{paddingTop: 20}}>
   <IconPark name="Refresh" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");
@@ -1389,7 +1401,7 @@ import { message } from 'antd';
     document.body.removeChild(copyipt);
     message.success('复制成功');
   }}><IconPark name="Refresh" /></a>
-</td></tr><tr><td align="center" style={{paddingTop: 20}}>
+</td><td align="center" style={{paddingTop: 20}}>
   <IconPark name="Reset" width="16" height="16"/>
   <br/> <a style={{ cursor: 'pointer' }} onClick={() => {
     var copyipt = document.createElement("input");

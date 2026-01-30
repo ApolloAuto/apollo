@@ -4,11 +4,11 @@
 
 您需要先阅读以下内容：
 
-- [概览](docs/应用实践/车辆集成教程/准备符合Apollo协议的车辆/概览.md)
+- [概览](../应用实践/车辆集成教程/准备符合Apollo协议的车辆/概览.md)
 
-- [符合 Apollo 线控标准的车辆](docs/应用实践/车辆集成教程/准备符合Apollo协议的车辆/符合Apollo线控标准的车辆.md)
+- [符合 Apollo 线控标准的车辆](../应用实践/车辆集成教程/准备符合Apollo协议的车辆/符合Apollo线控标准的车辆.md)
 
-- [利用 Apollo 工具生成 CANBUS 适配代码](docs/应用实践/车辆集成教程/准备符合Apollo协议的车辆/利用Apollo工具生成CANBUS适配代码.md)
+- [利用 Apollo 工具生成 CANBUS 适配代码](../应用实践/车辆集成教程/准备符合Apollo协议的车辆/利用Apollo工具生成CANBUS适配代码.md)
 
 ## 车辆底盘开环验证 DBC
 

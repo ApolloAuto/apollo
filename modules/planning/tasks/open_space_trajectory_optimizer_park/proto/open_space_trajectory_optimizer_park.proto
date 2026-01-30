@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+import "modules/planning/planning_open_space/proto/planner_open_space_config.proto";
+package apollo.planning;
+
+// OpenSpaceTrajectoryOptimizerParkConfig
+
+message OpenSpaceTrajectoryOptimizerParkConfig {
+  optional bool enable_trajectory_optimize_thread = 1 [default = true];
+  // Dual Variable Warm Start
+  optional DualVariableWarmStartConfig dual_variable_warm_start_config = 2;
+  // Distance Approach Configs
+  optional DistanceApproachConfig distance_approach_config = 3;
+  // Iterative Anchoring Configs
+  optional IterativeAnchoringConfig iterative_anchoring_smoother_config = 4;
+}

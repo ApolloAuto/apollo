@@ -1,0 +1,10 @@
+<cyber>
+    <desc>Apollo PointClous semantics</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>pointcloud_semantics</name>
+        <dag_conf>/apollo/modules/perception/pointcloud_semantics/dag/pointcloud_semantic.dag</dag_conf>
+        <process_name>pointcloud_semantics</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

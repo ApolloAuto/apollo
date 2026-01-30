@@ -17,6 +17,7 @@
 #define APOLLO_LIDAR_COMPONENT_BASE_H
 
 #include <memory>
+
 #include "modules/drivers/lidar/common/lidar_component_base_impl.h"
 
 namespace apollo {
@@ -25,32 +26,32 @@ namespace lidar {
 template <typename ScanType>
 class LidarComponentBase : public LidarComponentBaseImpl<ScanType> {
  public:
-    using BaseComponent = LidarComponentBaseImpl<ScanType>;
+  using BaseComponent = LidarComponentBaseImpl<ScanType>;
 
-    virtual ~LidarComponentBase() = default;
+  virtual ~LidarComponentBase() = default;
 
-    virtual bool Init() = 0;
+  virtual bool Init() = 0;
 
-    virtual void ReadScanCallback(const std::shared_ptr<ScanType>& scan_message)
-            = 0;
+  virtual void ReadScanCallback(
+      const std::shared_ptr<ScanType>& scan_message) = 0;
 
-    bool InitBase(const LidarConfigBase& lidar_config_base) override {
-        RETURN_VAL_IF(!this->InitPacket(lidar_config_base), false);
-        RETURN_VAL_IF(!this->InitConverter(lidar_config_base), false);
-        return true;
-    }
+  bool InitBase(const LidarConfigBase& lidar_config_base) override {
+    RETURN_VAL_IF(!this->InitPacket(lidar_config_base), false);
+    RETURN_VAL_IF(!this->InitConverter(lidar_config_base), false);
+    return true;
+  }
 
-    bool WriteScan(const std::shared_ptr<ScanType>& scan_message) {
-        return BaseComponent::WriteScan(scan_message);
-    }
+  bool WriteScan(const std::shared_ptr<ScanType>& scan_message) {
+    return BaseComponent::WriteScan(scan_message);
+  }
 
-    std::shared_ptr<PointCloud> AllocatePointCloud() {
-        return BaseComponent::AllocatePointCloud();
-    }
+  std::shared_ptr<PointCloud> AllocatePointCloud() {
+    return BaseComponent::AllocatePointCloud();
+  }
 
-    bool WritePointCloud(const std::shared_ptr<PointCloud>& point_cloud) {
-        return BaseComponent::WritePointCloud(point_cloud);
-    }
+  bool WritePointCloud(const std::shared_ptr<PointCloud>& point_cloud) {
+    return BaseComponent::WritePointCloud(point_cloud);
+  }
 };
 
 }  // namespace lidar

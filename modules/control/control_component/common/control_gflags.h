@@ -79,6 +79,8 @@ DECLARE_double(control_period);
 
 DECLARE_double(soft_estop_brake);
 
+DECLARE_double(soft_estop_acceleration);
+
 DECLARE_double(trajectory_period);
 
 DECLARE_double(chassis_period);
@@ -111,3 +113,5 @@ DECLARE_double(speed_smoothing_factor);
 DECLARE_double(throttle_smoothing_factor);
 
 DECLARE_bool(use_calibration_dimension_equal_check);
+
+DECLARE_bool(sim_by_record);

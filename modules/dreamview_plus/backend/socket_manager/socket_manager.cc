@@ -32,6 +32,11 @@ using apollo::common::util::JsonUtil;
 using Json = nlohmann::json;
 using cyber::common::GetProtoFromFile;
 
+std::map<std::string, std::pair<std::string, std::string>> filter_info = {
+    {"apollo.dreamview.Obstacles", {"perception.PerceptionObstacles", ""}},
+    {"apollo.dreamview.CameraUpdate", {"drivers.Image", ""}},
+    {"apollo.dreamview.PointCloud", {"PointCloud", "sensor"}}};
+
 SocketManager::SocketManager(WebSocketHandler *websocket,
                              UpdaterManager *updater_manager,
                              DvPluginManager *dv_plugin_manager)
@@ -361,9 +366,19 @@ void SocketManager::RefreshDataHandlerChannels(
             updater_info;
         continue;
       }
-      bool is_channel_in_updater = updater_manager_->IsChannelInUpdater(
-          (*iter).second.data_name(), message_type, channel_name);
-      if (is_channel_in_updater &&
+
+      int index = 0;
+      if (filter_info.find(data_type) != filter_info.end() &&
+          !filter_info[data_type].first.empty()) {
+        index = message_type.rfind(filter_info[data_type].first);
+      }
+      int index_channel = 0;
+      if (filter_info.find(data_type) != filter_info.end() &&
+          !filter_info[data_type].second.empty()) {
+        index_channel = channel_name.rfind(filter_info[data_type].second);
+      }
+
+      if (index != -1 && index_channel != -1 &&
           (current_record.empty() ||
            std::find(other_record_node_name.begin(),
                      other_record_node_name.end(),

@@ -1,0 +1,6 @@
+<library path="modules/planning/scenarios/precise_parking/libprecise_parking_scenario.so">
+    <class type="apollo::planning::PreciseParkingScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::StageApproachingPreciseParking" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StageArriveParkingSpot" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StagePreciseParking" base_class="apollo::planning::Stage"></class>
+</library>

@@ -1,0 +1,102 @@
+brake_minimum_action: 0.0
+throttle_minimum_action: 0.0
+
+standstill_acceleration: -2.0
+standstill_narmal_acceleration: -0.5
+stop_gain_acceleration: -1.0
+
+station_pid_conf {
+  pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.4
+    kp: 0.4
+    ki: 0.2
+    kd: 0.0
+  }
+
+  speed_input: 0.0
+  speed_input: 0.55
+  speed_input: 1.05
+  speed_input: 2.0
+  speed_input: 5.0
+
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+  kp_speed_gain_output:1.0
+
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+  ki_speed_gain_output:1.0
+
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+}
+
+speed_pid_conf {
+  pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.3
+    kp: 0.5
+    ki: 0.05
+    kd: 0.0
+  }
+
+  speed_input: 0.0
+  speed_input: 0.95
+  speed_input: 1.05
+  speed_input: 2.0
+  speed_input: 5.0
+
+  kp_speed_gain_output:3.0
+  kp_speed_gain_output:3.0
+  kp_speed_gain_output:2.0
+  kp_speed_gain_output:2.0
+  kp_speed_gain_output:1.0
+
+  ki_speed_gain_output:6.0
+  ki_speed_gain_output:6.0
+  ki_speed_gain_output:4.0
+  ki_speed_gain_output:4.0
+  ki_speed_gain_output:1.0
+
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+  kd_speed_gain_output:1.0
+}
+
+speed_itfc_full_stop_speed: 0.09
+speed_itfc_path_remain_min: 0.10
+speed_itfc_dcc_emergency: -1.5
+speed_itfc_speed_cmd: 0.10
+speed_itfc_path_remain_max: 0.6
+speed_itfc_acc_thres: 0.0
+speed_itfc_stop_speed: 0.05
+
+steer_cmd_interval: 20.0
+use_steering_check: true
+
+pedestrian_stop_time: 15
+full_stop_long_time: 300.0
+full_stop_path_remain_gain: 0.5
+
+epb_change_count: 40
+epb_brake: 60.0
+
+full_stop_max_brake: 15
+full_stop_pitch_brake_param: 150
+path_remain: 0.15
+pitch_path_remain_param: 9.0
+pitch_path_remain_param_min: -3.0
+downhill_full_stop_min_speed: 0.4
+max_brk_downhill_change_rate: 0.4
+
+battery_threshold: 90

@@ -166,83 +166,83 @@ DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(evaluator_vehicle_mlp_file,
-              "modules/prediction/data/mlp_vehicle_model.bin",
+              "/apollo/modules/prediction/data/mlp_vehicle_model.bin",
               "mlp model file for vehicle evaluator");
 DEFINE_string(evaluator_vehicle_rnn_file,
-              "modules/prediction/data/rnn_vehicle_model.bin",
+              "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
 DEFINE_string(
     torch_vehicle_jointly_model_file,
-    "modules/prediction/data/"
+    "/apollo/modules/prediction/data/"
     "jointly_prediction_planning_vehicle_model.pt",
     "Vehicle jointly prediction and planning model file");
 DEFINE_string(
     torch_vehicle_jointly_model_cpu_file,
-    "modules/prediction/data/"
+    "/apollo/modules/prediction/data/"
     "jointly_prediction_planning_vehicle_cpu_model.pt",
     "Vehicle jointly prediction and planning cpu model file");
 DEFINE_string(torch_vehicle_junction_mlp_file,
-              "modules/prediction/data/junction_mlp_vehicle_model.pt",
+              "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");
 DEFINE_string(torch_vehicle_junction_map_file,
-              "modules/prediction/data/junction_map_vehicle_model.pt",
+              "/apollo/modules/prediction/data/junction_map_vehicle_model.pt",
               "Vehicle junction map model file");
 DEFINE_string(torch_vehicle_semantic_lstm_file,
-              "modules/prediction/data/semantic_lstm_vehicle_model.pt",
+              "/apollo/modules/prediction/data/semantic_lstm_vehicle_model.pt",
               "Vehicle semantic lstm model file, default for gpu");
 DEFINE_string(
     torch_vehicle_semantic_lstm_cpu_file,
-    "modules/prediction/data/semantic_lstm_vehicle_cpu_model.pt",
+    "/apollo/modules/prediction/data/semantic_lstm_vehicle_cpu_model.pt",
     "Vehicle semantic lstm cpu model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
-              "modules/prediction/data/cruise_go_vehicle_model.pt",
+              "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
 DEFINE_string(torch_vehicle_cruise_cutin_file,
-              "modules/prediction/data/cruise_cutin_vehicle_model.pt",
+              "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.pt",
               "Vehicle cruise cutin model file");
 DEFINE_string(torch_vehicle_lane_scanning_file,
-              "modules/prediction/data/lane_scanning_vehicle_model.pt",
+              "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
 DEFINE_string(torch_vehicle_vectornet_file,
-              "modules/prediction/data/vectornet_vehicle_model.pt",
+              "/apollo/modules/prediction/data/vectornet_vehicle_model.pt",
               "Vehicle vectornet model file");
 DEFINE_string(torch_vehicle_vectornet_cpu_file,
-              "modules/prediction/data/vectornet_vehicle_cpu_model.pt",
+              "/apollo/modules/prediction/data/vectornet_vehicle_cpu_model.pt",
               "Vehicle vectornet cpu model file");
 DEFINE_string(torch_pedestrian_interaction_position_embedding_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "pedestrian_interaction_position_embedding.pt",
               "pedestrian interaction position embedding");
 DEFINE_string(torch_pedestrian_interaction_social_embedding_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "pedestrian_interaction_social_embedding.pt",
               "pedestrian interaction social embedding");
 DEFINE_string(torch_pedestrian_interaction_single_lstm_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "pedestrian_interaction_single_lstm.pt",
               "pedestrian interaction single lstm");
 DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
 DEFINE_string(
     torch_pedestrian_semantic_lstm_file,
-    "modules/prediction/data/semantic_lstm_pedestrian_model.pt",
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_model.pt",
     "Pedestrian semantic lstm model file, default for gpu");
 DEFINE_string(
     torch_pedestrian_semantic_lstm_cpu_file,
-    "modules/prediction/data/semantic_lstm_pedestrian_cpu_model.pt",
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_cpu_model.pt",
     "Pedestrian semantic lstm cpu model file");
 DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "traced_online_obs_enc.pt",
               "lane aggregating obstacle encoding layer");
 DEFINE_string(torch_lane_aggregating_lane_encoding_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "traced_online_lane_enc.pt",
               "lane aggregating lane encoding layer");
 DEFINE_string(torch_lane_aggregating_prediction_layer_file,
-              "modules/prediction/data/"
+              "/apollo/modules/prediction/data/"
               "traced_online_pred_layer.pt",
               "lane aggregating prediction layer");
 DEFINE_int32(max_num_obstacles, 300,

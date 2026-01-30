@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message ReversePathConfig {
+  optional double max_s_distance = 1 [default = 10.0];
+  optional double max_lateral_distance = 2 [default = 3.0];
+  optional bool is_considered_square_boundary = 3[default = false];
+  optional bool is_considered_lane_boundary = 4[default = true];
+  optional PiecewiseJerkPathConfig path_optimizer_config = 5;
+}

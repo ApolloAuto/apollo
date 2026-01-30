@@ -1,0 +1,6 @@
+output_channel_name: "/perception/lidar/segmentation"
+plugin_param {
+  name: "GraphSegmentation"
+  config_path: "perception/lidar_segmentation/data"
+  config_file: "graph_segmentation.pb.txt"
+}

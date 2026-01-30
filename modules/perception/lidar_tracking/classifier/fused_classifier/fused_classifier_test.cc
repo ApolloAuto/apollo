@@ -39,7 +39,7 @@ class FusedClassifierTest : public testing::Test {
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root =
-        "modules/perception/common/testdata/"
+        "/apollo/modules/perception/common/testdata/"
         "lidar/lib/classifier/fused_classifier";
     fused_classifier_ = new FusedClassifier();
     BuildObjects();

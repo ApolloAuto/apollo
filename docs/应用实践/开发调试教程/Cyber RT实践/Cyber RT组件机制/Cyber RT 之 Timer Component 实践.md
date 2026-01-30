@@ -18,24 +18,24 @@ https://apollo.baidu.com/community/course/36
 
 1. 在终端中，执行以下指令，在 component 文件夹下生成 timer_component_sensor 模板实例（功能包）。
 
-    ```bash
-    buildtool create --template timer_component component/timer_component_sensor
-    ```
+   ```bash
+   buildtool create --template timer_component component/timer_component_sensor
+   ```
 
-    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_3bc1b05.png)
+   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_3bc1b05.png)
 
 2. 使用 cd 指令，切换目录到生成的`timer_component_sensor`目录下，使用 tree 命令查看生成的 component 功能包的目录结构。
 
-    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_b89bc55.png)
+   ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_b89bc55.png)
 
-    其中，BUILD 文件为 TimerComponent 的源码编译的规则文件；conf 目录下，`timer_component_sensor.conf`为全局变量配置文件，`timer_component_sensor.pb.txt`为用户在 proto 文件中定义的可配置项的配置文件；`cyberfile.xml`为`timer_component_sensor`功能包的描述文件；dag 目录下的`timer_component_sensor.dag`文件中描述了`timer_component_sensor`功能包的依赖关系；launch 文件夹下的`timer_component_sensor.launch`为`timer_component_sensor`功能包的 launch 启动文件；proto 文件夹下的 BUILD 为用户在 proto 文件夹下定义的 protobuffer 文件的编译规则文件，`timer_component_sensor.proto`文件中用户可以定义自己的消息结构；`timer_component_sensor.cc`和`timer_component_sensor.h`两个文件为 TimerComponent 的源文件和头文件。
+   其中，BUILD 文件为 TimerComponent 的源码编译的规则文件；conf 目录下，`timer_component_sensor.conf`为全局变量配置文件，`timer_component_sensor.pb.txt`为用户在 proto 文件中定义的可配置项的配置文件；`cyberfile.xml`为`timer_component_sensor`功能包的描述文件；dag 目录下的`timer_component_sensor.dag`文件中描述了`timer_component_sensor`功能包的依赖关系；launch 文件夹下的`timer_component_sensor.launch`为`timer_component_sensor`功能包的 launch 启动文件；proto 文件夹下的 BUILD 为用户在 proto 文件夹下定义的 protobuffer 文件的编译规则文件，`timer_component_sensor.proto`文件中用户可以定义自己的消息结构；`timer_component_sensor.cc`和`timer_component_sensor.h`两个文件为 TimerComponent 的源文件和头文件。
 
 ### 2. 定义TimerComponent消息结构
 
 1. 在`timer_component_sensor.proto`中，添加以下消息数据结构。
 
-    ```proto
-    syntax = "proto2";
+   ```bash
+   syntax = "proto2";
 
     package apollo;
 
@@ -52,16 +52,16 @@ https://apollo.baidu.com/community/course/36
       optional string name = 1;
       optional string sensor_topic = 2;
     };
-    ```
+   ```
 
-    在 **TimerComponentSensorMsg** 中添加 content、msg_id 和 timestamp 3 项，分别表示消息内容，消息编号和消息发出时的时间戳。
+   在 **TimerComponentSensorMsg** 中添加 content、msg_id 和 timestamp 3 项，分别表示消息内容，消息编号和消息发出时的时间戳。
 
-    在 **TimerComponentSensorConfig** 中添加可配置项 name 和 sensor_topic，用来配置`timer_component_sensor`的名称和输出数据的 channel。
+   在 **TimerComponentSensorConfig** 中添加可配置项 name 和 sensor_topic，用来配置`timer_component_sensor`的名称和输出数据的 channel。
 
 2. 在 proto 文件夹下的 BUILD 文件中，添加 protobuffer 文件的编译规则。
 
-    ```bash
-    load("//tools:apollo_package.bzl", "apollo_package")
+   ```bash
+       load("//tools:apollo_package.bzl", "apollo_package")
     load("//tools/proto:proto.bzl", "proto_library")
     load("//tools:cpplint.bzl", "cpplint")
 
@@ -75,9 +75,9 @@ https://apollo.baidu.com/community/course/36
     apollo_package()
 
     cpplint()
-    ```
+   ```
 
-    由于没有新增 proto 文件，这里无需修改 BUILD 文件，如若新增 proto 文件，可参考 BUILD 文件中已有的配置规则，添加对应 proto 的编译规则。
+   由于没有新增 proto 文件，这里无需修改 BUILD 文件，如若新增 proto 文件，可参考 BUILD 文件中已有的配置规则，添加对应 proto 的编译规则。
 
 ### 3. 配置TimerComponent的配置文件
 
@@ -94,75 +94,75 @@ sensor_topic:"/sensor/first"
 
 1.  修改`timer_component_sensor.h`文件：
 
-    ```cpp
+    ```bash
     #pragma once
-    #include <memory>
+     #include <memory>
 
-    #include "cyber/common/macros.h"
-    #include "cyber/component/component.h"
-    #include "cyber/component/timer_component.h"
-    #include "cyber/cyber.h"
-    #include "component/timer_component_sensor/proto/timer_component_sensor.pb.h"
+     #include "cyber/common/macros.h"
+     #include "cyber/component/component.h"
+     #include "cyber/component/timer_component.h"
+     #include "cyber/cyber.h"
+     #include "component/timer_component_sensor/proto/timer_component_sensor.pb.h"
 
-    using apollo::cyber::Time;
-    using apollo::cyber::Writer;
+     using apollo::cyber::Time;
+     using apollo::cyber::Writer;
 
-    namespace apollo {
+     namespace apollo {
 
-    class TimerComponentSensor final
-      : public apollo::cyber::TimerComponent {
-    public:
-      bool Init() override;
-      bool Proc() override;
+     class TimerComponentSensor final
+       : public apollo::cyber::TimerComponent {
+      public:
+       bool Init() override;
+       bool Proc() override;
 
-    private:
-      apollo::TimerComponentSensorConfig config_;
-      std::shared_ptr<Writer<TimerComponentSensorMsg>> sensor_writer_ = nullptr;
-    };
+      private:
+       apollo::TimerComponentSensorConfig config_;
+       std::shared_ptr<Writer<TimerComponentSensorMsg>> sensor_writer_ = nullptr;
+     };
 
-    CYBER_REGISTER_COMPONENT(TimerComponentSensor)
+     CYBER_REGISTER_COMPONENT(TimerComponentSensor)
 
-    } // namespace apollo
+     } // namespace apollo
     ```
 
-    在`timer_component_sensor.h`文件中使用 **using** 引入将 **apollo::cyber** 命名空间下的 **Time** 和 **Write** 注入当前作用域中，在 **TimerComponentSensor** 类的中增加私有成员 **sensor_write**，**sensor_write** 是智能指针，指向 **Writer** 对象，**Writer** 对象可以写出 **TimerComponentSensorMsg** 数据。
+        在`timer_component_sensor.h`文件中使用 **using** 引入将 **apollo::cyber** 命名空间下的 **Time** 和 **Write** 注入当前作用域中，在 **TimerComponentSensor** 类的中增加私有成员 **sensor_write**，**sensor_write** 是智能指针，指向 **Writer** 对象，**Writer** 对象可以写出 **TimerComponentSensorMsg** 数据。
 
 2.  修改`timer_component_sensor.cc`文件。
 
-    ```cpp
+    ```bash
     #include "component/timer_component_sensor/timer_component_sensor_component.h"
 
-    namespace apollo {
+     namespace apollo {
 
-    bool TimerComponentSensor::Init() {
+     bool TimerComponentSensor::Init() {
 
-      ACHECK(ComponentBase::GetProtoConfig(&config_))
-          << "failed to load timer_component_sensor config file "
-          << ComponentBase::ConfigFilePath();
+       ACHECK(ComponentBase::GetProtoConfig(&config_))
+           << "failed to load timer_component_sensor config file "
+           << ComponentBase::ConfigFilePath();
 
-      AINFO << "Load config succedded.\n" << config_.DebugString();
-      // TODO: add your own init code here.
-      sensor_writer_ = node_->CreateWriter<TimerComponentSensorMsg>(config_.sensor_topic().c_str());
+       AINFO << "Load config succedded.\n" << config_.DebugString();
+       // TODO: add your own init code here.
+       sensor_writer_ = node_->CreateWriter<TimerComponentSensorMsg>(config_.sensor_topic().c_str());
 
-      AINFO << "Init TimerComponentSensor succedded.";
-      return true;
-    }
+       AINFO << "Init TimerComponentSensor succedded.";
+       return true;
+     }
 
-    bool TimerComponentSensor::Proc() {
-      AINFO << "Proc TimerComponentSensor triggered.";
+     bool TimerComponentSensor::Proc() {
+       AINFO << "Proc TimerComponentSensor triggered.";
 
-      // TODO: add your own proc code here.
-      static int i = 0;
-      auto out_msg = std::make_shared<TimerComponentSensorMsg>();
-      out_msg->set_msg_id(i++);
-      out_msg->set_content(config_.name());
-      out_msg->set_timestamp(Time::Now().ToNanosecond());
-      sensor_writer_->Write(out_msg);
+       // TODO: add your own proc code here.
+       static int i = 0;
+       auto out_msg = std::make_shared<TimerComponentSensorMsg>();
+       out_msg->set_msg_id(i++);
+       out_msg->set_content(config_.name());
+       out_msg->set_timestamp(Time::Now().ToNanosecond());
+       sensor_writer_->Write(out_msg);
 
-      return true;
-    }
+       return true;
+     }
 
-    } // namespace apollo
+     } // namespace apollo
     ```
 
     在 Init 函数中增加智能指针 **sensor_write** 的初始化，
@@ -172,39 +172,39 @@ sensor_topic:"/sensor/first"
 3.  修改 BUILD 文件。
 
     ```bash
-    load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
-    load("//tools:cpplint.bzl", "cpplint")
+        load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_binary", "apollo_package", "apollo_component")
+     load("//tools:cpplint.bzl", "cpplint")
 
-    package(default_visibility = ["//visibility:public"])
+     package(default_visibility = ["//visibility:public"])
 
-    filegroup(
-        name = "timer_component_sensor_files",
-        srcs = glob([
-            "dag/**",
-            "launch/**",
-            "conf/**",
-        ]),
-    )
+     filegroup(
+         name = "timer_component_sensor_files",
+         srcs = glob([
+             "dag/**",
+             "launch/**",
+             "conf/**",
+         ]),
+     )
 
-    apollo_component(
-        name = "libtimer_component_sensor_component.so",
-        srcs = [
-            "timer_component_sensor_component.cc",
-        ],
-        hdrs = [
-            "timer_component_sensor_component.h",
-        ],
-        linkstatic = True,
-        deps = [
-            "//cyber",
-            "//component/timer_component_sensor/proto:timer_component_sensor_proto",
+     apollo_component(
+         name = "libtimer_component_sensor_component.so",
+         srcs = [
+             "timer_component_sensor_component.cc",
+         ],
+         hdrs = [
+             "timer_component_sensor_component.h",
+         ],
+         linkstatic = True,
+         deps = [
+             "//cyber",
+             "//component/timer_component_sensor/proto:timer_component_sensor_proto",
 
-        ],
-    )
+         ],
+     )
 
-    apollo_package()
+     apollo_package()
 
-    cpplint()
+     cpplint()
     ```
 
     由于没有包含其它 proto 文件或者头文件，这里的 BUILD 文件无需修改。
@@ -227,7 +227,7 @@ buildtool build -p  component/timer_component_sensor
 
 在`timer_component_sensor.dag`文件中，将 interval 项的值改为 500，即每 500ms 运行一次。interval 值为 TimerComponent 的运行时间间隔。
 
-```proto
+```bash
 module_config {
   module_library : "component/timer_component_sensor/libtimer_component_sensor_component.so"
   timer_components {
@@ -246,7 +246,7 @@ module_config {
 
 在<dag_conf>标签内的 dag 文件路径前加上“ ./ ” 。由于目前 cyber 与 apollo 绑定的比较紧密，编译完成后，系统会把编译产出及配置文件拷贝到 apollo 相应目录下，且执行文件时，系统会优先执行 apollo 目录下的文件，这样就会导致此处的配置无法起作用，这里加上“ ./ ”，就是告诉系统使用此处的 dag 文件来运行 component。
 
-```xml
+```bash
 <cyber>
   <module>
     <name>timer_component_sensor</name>

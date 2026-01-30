@@ -1,3 +1,28 @@
+# Release 11.0
+Apollo 8.0 introduced the concept of package management for user learning scenarios, making it easier and faster for users to deploy and use Apollo. With Apollo 9.0, we enabled users to more easily perform secondary development on top of Apollo through Package Management 2.0, allowing them to easily build their own autonomous driving applications. Apollo 10.0 focused on a comprehensive upgrade for large-scale scenario-based applications. In terms of performance, it optimized the performance and stability of various levels and modules, and provided rich tools to improve optimization efficiency. Apollo 11.0 focuses on the large-scale deployment of functional autonomous vehicles in high-value scenarios, comprehensively upgrading perception, localization, planning, and development toolchains, significantly lowering the hardware and software development threshold, and helping developers efficiently build end-to-end autonomous driving operating systems.
+
+## Major New Features and Improvements:
+
+## **Expanding Application Scenarios and Achieving End-to-End Operational Closure**
+Apollo 11.0 is tailored for high-value scenarios such as **package delivery, street sweeping, security patrol, and campus shuttle services**, unlocking critical capabilities including:
+
+* **Hill Start & Stop**: Meets vehicle start/stop requirements on complex terrains
+* **Automatic Recovery**: Enhances autonomous recovery under abnormal road conditions
+* **Edge-Hugging Driving**: Enables precise navigation along curbs or boundaries
+
+Apollo 11.0 fully supports an end-to-end automated workflow:
+
+**Vehicle Preparation → Route Planning → Autonomous Driving → Task Execution (e.g., cleaning, retail, passenger transport) → Anomaly Handling / Manual Takeover → Return-to-Depot Parking**
+
+## **Enhanced Multi-Sensor Fusion Localization and Perception for Robust All-Terrain Operation**
+* **Industrial-Grade High-Precision Localization**: Fuses **RTK, SLAM, vision, and wheel odometry** to achieve **centimeter-level accuracy** in GNSS-challenged environments such as **dense urban areas, underground parking garages, and fully indoor spaces**.
+* **New Gate Recognition Capability**: Bridges **public roads and enclosed campuses**, enabling seamless autonomous transitions across domain boundaries.
+* **Perception Upgrades**: Significantly improves detection accuracy for static obstacles including **curbs, barriers, and potholes**.
+* **Upgraded BEV + OCC Perception Architecture**: Deeply integrated with the **Baidu Baige AI Computing Platform**, providing a streamlined pipeline from **model development → training → conversion → export**.
+* **Support for Incremental Training**: Developers can rapidly fine-tune pre-trained models using their own data, accelerating model iteration and customization.
+
+Through tight hardware-software co-design and a comprehensive ecosystem of developer tools, **Apollo 11.0 significantly lowers the R&D barrier and deployment cost for functional autonomous vehicles**, accelerating their commercialization and large-scale adoption.
+
 # Release 10.0
 
 In Apollo 8.0, the concept of package management tailored for user learning scenarios was introduced to enable users to deploy and use Apollo more conveniently and efficiently. In Apollo 9.0, the package management tool was updated to Version 2.0, making it easier for users to conduct secondary development and effortlessly build their own autonomous driving applications based on Apollo. In Apollo 10.0, we realize that autonomous driving cannot remain at the stage of local validation. Instead, it requires a comprehensive upgrade, and needs to be applied to scenarios on a large scale. In terms of performance, the performance and stability of various layers and modules are optimied, and extensive tools are provided to improve optimization efficiency. At the cost level, the hardware costs are recuded by enriching the hardware ecosystem which provides users with more options. Besides, the software development costs are lowered by upgrading the operating system, establishing communication with other frameworks, and reusing ecological software capabilities. Regarding safety, functional safety strategies and functional safety framework capabilities are reinforced.

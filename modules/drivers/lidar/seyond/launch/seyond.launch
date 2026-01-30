@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>seyond</name>
-        <dag_conf>/apollo/modules/drivers/lidar/seyond/dag/seyond.dag</dag_conf>
-        <process_name>seyond</process_name>
-    </module>
-</cyber>

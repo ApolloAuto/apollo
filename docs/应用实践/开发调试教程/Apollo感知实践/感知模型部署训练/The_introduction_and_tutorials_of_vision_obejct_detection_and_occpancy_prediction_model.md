@@ -1,59 +1,66 @@
-## Introduction
+## 1. Introduction
 
-Recently, a new trend is to use multi-camera and bev representation to achieve the 3d object detection and occupancy prediction task. The BEVFormer takes the multi-camera images as inputs, utilizes the transformer architecture to predict 3d object bounding boxes. Meanwhile, occupancy prediction is a geometry-aware representation that quantizes the physical 3D scene into structured grid map with semantic labels per cell, where the voxels represents the corresponding position in the real world being occupied and different colors represent different semantic class. Compared to the form of bounding box, occupancy could capture the fine-grained details of critical obstacles in the scene, and thereby facilitate subsequent tasks.
+In recent years, vision-only + BEV based object detection and occupancy prediction tasks have become research hotspots in autonomous driving. The BEVFormer network proposed in 2022 uses surround-view images as input and employs Transformer architecture to generate BEV features, completing object detection tasks. The occupancy prediction task expresses the real world by predicting 3D voxel grids, as shown in the following figure, where voxels represent occupied positions and different colors represent different semantic classes. Occupancy prediction can effectively handle irregular obstacles in autonomous driving, thus receiving extensive research.
 
 ![vision-detection-intro-1.png](./vision-detection-intro-1.png)
 
 ![vision-detection-intro-2.png](./vision-detection-intro-2.png)
 
-Apollo 10.0 introduce the camera-only model _Apollo-vision-Net_
+Apollo 11.0 upgrades the vision-only model Apollo-vision-Net with the following features:
 
-1. 【 _Advanced_ 】Introduce the _BEV+Transformer_ architecture for 3d object detection and occupancy detection into apollo project.
-2. 【 _Great Performance_ 】Obtain an evident performance gain upon 3d object detection and occupancy detection tasks. We achieve _31.94% mAP_ (6.74 points higher than bevformer), _21.78% miou_ (2.39 points higher than OccNet)
-3. 【 _High Efficiency_ 】Utilize shared backbone and joint training of multi-task, achieves the _5Hz_ inference frame rate on single _jetson orin_ platform
+1. 【 Advanced 】Introduces the mainstream perception paradigm of vision BEV object detection + OCC occupancy network into the Apollo open-source framework, enhancing OCC visualization on the web:
+    * No need to run outside the local container environment. Connect to the server via SSH, and as long as the network is accessible, you can directly view OCC results through the web interface.
+    * Added OCC element display function, providing richer scene information visualization.
+2. 【 Enhanced Performance 】Optimized based on industry-classic models, achieving performance surpassing classical models. Object detection mAP improves by _6.74%_ compared to bevformer (2022 ECCV), and OCC mIoU improves by _2.39%_ compared to OccNet (2023 ICCV). Added model evaluation visualization comparison function: supports outputting comparison charts of model evaluation results, allowing users to flexibly select and compare evaluation results from different models or different training stages.
+3. 【 High Efficiency 】Model shares backbone, multi-task joint training optimization, achieving _5Hz_ inference frame rate on a single _Jetson Orin_ platform, achieving 1+1>2 effect in both performance and efficiency.
+4. 【 Easy-to-Use 】Out-of-the-box engineering deployment: Provides complete BEV perception solution, deployed based on Baidu Baige AI computing platform, offering one-stop development process including model development, model training, model conversion and model export. Simultaneously, compatible with Wenxin large-model-driven programming assistant Comate, providing developers with code generation, unit testing, comment generation and intelligent Q&A support:
+    * Model Training: [Apollo-BEV-Train](https://console.bce.baidu.com/aihc/quickStart/detail?templateId=3928100)
+    * Model Export: [Apollo-BEV-Model-Export](https://console.bce.baidu.com/aihc/quickStart/detail?templateId=5599233)
+    * Seamless Model Deployment to Apollo Environment: [Apollo-Model-Deployment](https://console.bce.baidu.com/aihc/quickStart/detail?templateId=9770074)
 
-## Apollo-vision-Net
+## 2. Apollo-vision-Net Introduction
 
-### Overview
+### Network Architecture
 
-- We feed multi-camera images to the backbone network, and obtain the features of different camera views.
-- Use Transformer encoder to generate the bev features.
-  - The encoder layer contains grid-shaped BEV queries, temporal self-attention, and spatial cross-attention.
-  - In spatial cross- attention, each BEV query only interacts with image features in the regions of interest.
-  - In temporal self-attention, each BEV query interacts with two features: the BEV queries at the current timestamp and the BEV features at the previous timestamp.
-- Taking the BEV features as input, the multi-task head predicts the preception results.
-  - The 3D detection head predicts the 3D bounding box and the class probability like BEVFormer.
-  - The occupancy head first upsamples the BEV features to original resolution and then use linear layer to predict the occupancy probability of each voxel.
+The overall network architecture of Apollo-vision-Net is as follows:
+
+- Input surround-view images, extract image features through image backbone
+- Transformer encoder part
+  - Use temporal self-attention to fuse current frame BEV queries and historical frame BEV queries
+  - Use spatial cross-attention to fuse BEV queries and image features
+  - Output BEV queries after 6 encoder layers
+- Detection head: Takes BEV queries as input, uses GroupDETR network for object detection
+- OCC head: Upsamples BEV queries, then expands height-direction features, finally uses linear layer to predict each voxel's category information
 
 ![vision-detection-vision-net-1.png](./vision-detection-vision-net-1.png)
 
-Our Apollo vision Net proposes several works as follows, significantly improving the performance of 3D detection and occupancy prediction.
+We have optimized Apollo-vision-Net as follows, significantly improving object detection, occupancy prediction scores and model performance:
 
-- Image backbone: Replacing ResNet-50 with pre-trained DLA-34 using depth estimation data (Toyota DDAD15M) reduces model complexity while improving performance.
-- Image neck: Replacing the single scale FPN network with a SecondFPN network improves the performance of the model.
-- Detection head: Using GroupDETR instead of DETR improves object detection performance without increasing time consumption.
-- Occ head: Using low resolution bev queries (50 _ 50) in the Transformer encoder, then upsampling to high resolution (200 _ 200) in the occ head, improve inference speed.
-- OCC loss: Increase the weight of OCC focal loss from 1.0 to 10.0, introduce affinity loss and lovasz softmax loss, and significantly improve the miou of OCC detection.
+- Image backbone: Replace ResNet-50 with DLA-34 pre-trained on depth estimation data (Toyota DDAD15M), reducing model complexity while improving performance
+- Image neck: Replace single-scale FPN network with SecondFPN network, improving overall model performance
+- Detection head: Replace DETR with GroupDETR, significantly improving object detection performance without increasing time consumption
+- OCC head: Use low-resolution BEV queries (50×50) in Transformer encoder part, then upsample to high resolution (200×200) in OCC head, greatly improving model performance
+- OCC loss: Increase OCC focal loss weight from 1.0 to 10.0, introduce affinity loss and lovasz-softmax loss, significantly improving OCC detection performance
 
-### Quantitative Result
+### Quantitative Results
 
-Our approach achieves the 31.94% in terms of mAP metric on the nuScenes val set, and 21.78% in terms of miou metric on the OpenOcc val set, which is 6.74 points higher than bevformer-tiny (2022 ECCV) and 2.39 points higher than OccNet-R50 (2023 ICCV) .
+On the Nuscenes dataset, Apollo-vision-Net object detection mAP score surpasses bevformer-tiny (2022 ECCV) by _6.74%_, and surpasses OccNet-R50 (2023 ICCV) by _2.39%_
 
-|                              | 3d object detection mAP（val dataset） | occupnacy detection miou (OpenOcc val dataset) |
-| :--------------------------: | :------------------------------------: | :--------------------------------------------: |
-| bevformer-tiny （2022 ECCV） |                 25.2%                  |                       -                        |
-|   OccNet-R50 （2023 ICCV）   |                   -                    |                     19.48%                     |
-|   Apollo-vision-Net (ours)   |           31.94% （↑ 6.74%）           |               21.87% （↑ 2.39%）               |
+|                            | Object Detection mAP (val dataset) | Occupancy Prediction mIoU (OpenOcc val dataset) |
+|:--------------------------:|:---------------------:|:------------------------------:|
+| bevformer-tiny (2022 ECCV) | 25.2%                 | -                              |
+| OccNet-R50 (2023 ICCV)     | -                     | 19.48%                         |
+| Apollo-vision-Net (ours)   | 31.94% (↑ 6.74%)      | 21.87% (↑ 2.39%)               |
 
-### Qualitative Result
+### Qualitative Results
 
-#### Nuscenes Dataset
+#### Nuscenes Dataset Results
 
 <table>
   <tr>
-    <th colspan="3">images</th>
-    <th colspan="1">det results</th>
-    <th colspan="1">occ results</th>
+    <th colspan="3">Images</th>
+    <th colspan="1">Object Detection Results</th>
+    <th colspan="1">OCC Results</th>
   </tr>
   <tr>
     <td><img src="./vision-detection-qualitative-nuscenes-image-1.png" width="200"></td>
@@ -69,24 +76,26 @@ Our approach achieves the 31.94% in terms of mAP metric on the nuScenes val set,
   </tr>
 </table>
 
-#### Baidu Dataset
+#### Baidu Autonomous Driving Dataset Results
 
-To further show the effectiveness of Apollo-vision-Net in complex urban scenes, the millions of autonomous driving data from baidu are used to train the model, besides the resolution of occ voxels is improved from 0.5m*0.5m*0.5m to 0.2m*0.2m*0.2m.
+To further verify effectiveness, we trained Apollo-vision-Net using Baidu autonomous driving data while improving OCC resolution (0.5m×0.5m×0.5m → 0.2m×0.2m×0.2m). Apollo-vision-Net can provide accurate object detection and OCC detection in complex urban road scenarios.
 
-[result](https://apollo-docs.cdn.bcebos.com/apollo/perception-vision-obj-detection-occ-prediction-video-1.mp4)
+[Results](https://apollo-docs.cdn.bcebos.com/apollo/perception-vision-obj-detection-occ-prediction-video-1.mp4)
 
-## Run in Apollo
+## 3. Running Vision-Only Model in Apollo
 
-### Pipeline
+### Operation Process
 
-#### Source Code
+#### Enter Source Code Environment
 
-Get into the docker
+First install Apollo environment according to the tutorial, then enter the container
 
 ```bash
 bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
+
+Default ONNX files are located in modules/perception/data/models/bev_occ/
 
 Build
 
@@ -100,16 +109,16 @@ Open Dreamview
 bash scripts/bootstrap.sh start_plus
 ```
 
-#### Enter the package management environment
+#### Enter Package Management Environment
 
-Get into the docker
+Enter container
 
 ```bash
 aem start
 aem enter
 ```
 
-Build
+Install package
 
 ```bash
 buildtool build --gpu -p park-generic --opt
@@ -121,53 +130,57 @@ Open Dreamview
 aem bootstrap start --plus
 ```
 
-#### Play Record
+#### Play Records
 
-The nuscenes records can be downloaded via the following link:
+Download nuscenes records through the following links:
 
-|                id                |                                                                                                                            link                                                                                                                             |
-| :------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| id                               | link                                                                                                                                                                                                                                                                 |
+|:--------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | 6f83169d067343658251f72e1dd17dbc | http://apollo-perception.bj.bcebos.com/nuscenes_occ_records/6f83169d067343658251f72e1dd17dbc.record?authorization=bce-auth-v1%2FALTAKr8RyUUttStVHwGaOsvJyP%2F2024-12-02T08%3A12%3A56Z%2F-1%2Fhost%2F15500778f03ba45f19e6a7818b3af88952a739cbd53761f166d8bd542347821b |
 | 2fc3753772e241f2ab2cd16a784cc680 | http://apollo-perception.bj.bcebos.com/nuscenes_occ_records/2fc3753772e241f2ab2cd16a784cc680.record?authorization=bce-auth-v1%2FALTAKr8RyUUttStVHwGaOsvJyP%2F2024-12-02T08%3A11%3A30Z%2F-1%2Fhost%2Fb7b99869a804ed08c7f6804d8b724e15aebc3e1c13fde45b18b61e459b1b7ae5 |
 | bebf5f5b2a674631ab5c88fd1aa9e87a | http://apollo-perception.bj.bcebos.com/nuscenes_occ_records/bebf5f5b2a674631ab5c88fd1aa9e87a.record?authorization=bce-auth-v1%2FALTAKr8RyUUttStVHwGaOsvJyP%2F2024-12-02T08%3A13%3A18Z%2F-1%2Fhost%2F1c25a91e913f512b8f188dc6e54bd07ffcbb301e1be2d92a3cc7b686e1456d80 |
 
-choose the vehicle——Nuscenes Occ (The package management environment uses aem profile use nuscenes_occ to select vehicle types)
+Select vehicle model - Nuscenes Occ (Use `aem profile use nuscenes_occ` in package management environment to select vehicle type)
 
 ![vision-detection-use-guide-1.png](./vision-detection-use-guide-1.png)
 
-Start the transform dag
+Start transform DAG file
 
 ```bash
 mainboard -d /apollo/modules/transform/dag/static_transform.dag
 ```
 
-Start dag
+Start DAG file
 
 ```bash
 mainboard -d /apollo/modules/perception/camera_detection_occupancy/dag/camera_detection_occupancy_nus.dag
 ```
 
-Wait for model serialization until show following log:
+Wait for model serialization. When the terminal shows the following log, serialization is complete and you can proceed to the next steps
 
 ```bash
 bevformer model init success from apollo_bevnet.onnx
 ```
 
-Play record
+Play record package
 
 ```bash
 cyber_recorder play -f fcbccedd61424f1b85dcbf8f897f9754.record
 ```
 
-The detection results can then be seen on the dv：
+Then you can see object detection results on DV
 
 ![vision-detection-use-guide-2.png](./vision-detection-use-guide-2.png)
 
-#### Check occupancy results
+#### Visualize OCC Results
 
-- set save_occ_result in occ_det_nus.pb.txt to true, set the occ_save_path (data/occ_results by default)
-- run the launch file，the occ bin file will be saved in occ_save_path
-- Create a conda virtual environment outside the apollo docker and activate it.
+To view OCC results, follow these steps:
+
+Set save_occ_result to true in occ_det_nus.pb.txt configuration file, and set saved path occ_save_path (default is data/occ_results)
+
+Run the launch file, OCC results will be automatically saved in occ_save_path
+
+Setup visualization environment outside the container
 
 ```bash
 conda create -n occ_vis python=3.7 -y
@@ -176,68 +189,67 @@ pip install numpy
 pip install mayavi
 ```
 
-- set the occ_path in modules/perception/camera_detection_occupancy/tools/occ_vis.py
-- run the script
+Set occ_path in modules/perception/camera_detection_occupancy/tools/occ_vis.py to occ_save_path
+
+Run visualization script
 
 ```bash
 python modules/perception/camera_detection_occupancy/tools/occ_vis.py
 ```
 
-- then shows the occ results
+OCC results will be displayed
 
 ![vision-detection-use-guide-3.png](./vision-detection-use-guide-3.png)
 
-#### Parameters
-
-Introduce the paramters in occ_det_nus.pb.txt
+#### Parameter Introduction
 
 <table>
   <thead>
     <tr>
-      <th>paramters</th>
-      <th>meanings</th>
-      <th>default</th>
+      <th>Parameter</th>
+      <th>Description</th>
+      <th>Default Value</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>name</td>
-      <td>name of model</td>
+      <td>Model name</td>
       <td>apollo_bevnet_onnx</td>
     </tr>
     <tr>
       <td>version</td>
-      <td>version</td>
+      <td>Version</td>
       <td>-</td>
     </tr>
     <tr>
       <td>dataset</td>
-      <td>training dataset</td>
+      <td>Dataset</td>
       <td>nuScenes</td>
     </tr>
     <tr>
       <td>task_type</td>
-      <td>type of task</td>
+      <td>Task type</td>
       <td>Detection3D</td>
     </tr>
     <tr>
       <td>sensor_type</td>
-      <td>type of sensor</td>
+      <td>Sensor type</td>
       <td>Camera</td>
     </tr>
     <tr>
       <td>framework</td>
-      <td>inference framwor</td>
+      <td>Framework</td>
       <td>Onnx</td>
     </tr>
     <tr>
       <td>proto_file weight_file</td>
-      <td>name of onnx file</td>
+      <td>ONNX file name</td>
       <td>apollo_bevnet.onnx</td>
     </tr>
     <tr>
       <td>inputs</td>
-      <td>the name and shape of inputs</td>
+      <td>Model input names and shapes</td>
       <td>
         <pre>
           <code>
@@ -280,7 +292,7 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>outputs</td>
-      <td>the name and shape of outputs</td>
+      <td>Model output names and shapes</td>
       <td>
         <pre>
           <code>
@@ -316,7 +328,7 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>class_names</td>
-      <td>name of deteciton classes</td>
+      <td>Object detection classes</td>
       <td>
         <pre>
           <code>
@@ -335,7 +347,7 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>resize</td>
-      <td>resize image</td>
+      <td>Input image size</td>
       <td>
         <pre>
           <code>
@@ -349,7 +361,7 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>normalize</td>
-      <td>image norm</td>
+      <td>Image normalization parameters</td>
       <td>
         <pre>
           <code>
@@ -367,29 +379,29 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>score_threshold</td>
-      <td>detection score threshold</td>
+      <td>Object detection confidence threshold</td>
       <td>0.3</td>
     </tr>
     <tr>
       <td>img_scale</td>
-      <td>image scale ratio</td>
+      <td>Image scale ratio</td>
       <td>0.5</td>
     </tr>
     <tr>
       <td>no_pad_image_width no_pad_image_height</td>
-      <td>image size before padding</td>
+      <td>Image size before padding</td>
       <td>450 800</td>
     </tr>
     <tr>
       <td>
-        occ_xmin</br>
-        occ_xmax</br>
-        occ_ymin</br>
-        occ_ymax</br>
-        occ_zmin</br>
+        occ_xmin<br>
+        occ_xmax<br>
+        occ_ymin<br>
+        occ_ymax<br>
+        occ_zmin<br>
         occ_zmax
       </td>
-      <td>range of occunapcy</td>
+      <td>OCC detection range</td>
       <td>
         <pre>
           <code>
@@ -405,58 +417,58 @@ Introduce the paramters in occ_det_nus.pb.txt
     </tr>
     <tr>
       <td>voxel_size</td>
-      <td>occupancy voxel size</td>
+      <td>OCC voxel size</td>
       <td>0.5</td>
     </tr>
     <tr>
       <td>location_dist_threshold</td>
-      <td>distance threshold of successive frames</td>
+      <td>Distance difference threshold between consecutive frames</td>
       <td>10.0</td>
     </tr>
     <tr>
       <td>save_occ_result</td>
-      <td>whether save the occ results</td>
+      <td>Whether to save OCC results</td>
       <td>false</td>
     </tr>
     <tr>
       <td>occ_save_path</td>
-      <td>occ save path</td>
+      <td>OCC results save path</td>
       <td>"data/occ_results"</td>
     </tr>
     <tr>
       <td>occ_threshold</td>
-      <td>occ score threshold</td>
+      <td>OCC threshold, voxels below threshold are considered empty</td>
       <td>0.25</td>
     </tr>
   </tbody>
 </table>
 
-## Training Tutorial
+## 4. Model Training Tutorial
 
-This tutorial introduces how to train the apollo-vision net using nuscenes datasets
+This section introduces how to train Apollo vision-only model using nuscenes dataset
 
-### Installation instructions
+### Environment Setup
 
-Create a conda virtual environment and activate it.
+Create conda virtual environment
 
 ```bash
 conda create -n occ python=3.7 -y
 conda activate occ
 ```
 
-Install PyTorch and torchvision following the [official instructions](https://pytorch.org/).
+Install pytorch following the [official tutorial](https://pytorch.org/)
 
 ```bash
 conda install pytorch==1.10.0 torchvision==0.11.0 torchaudio==0.10.0 cudatoolkit=10.2 -c pytorch
 ```
 
-Install mmcv-full.
+Install mmcv-full
 
 ```bash
 pip install mmcv-full==1.4.1
 ```
 
-Install mmdet and mmseg.
+Install mmdet and mmsegmentation
 
 ```bash
 pip install mmdet==2.19.0
@@ -478,15 +490,15 @@ Install timm
 pip install timm
 ```
 
-Clone code
+Download code
 
 ```bash
 git clone https://github.com/ApolloAuto/Apollo-Vision-Net
 ```
 
-### Prepare Data
+### Data Download
 
-Download nuScenes V1.0 full dataset and can bus data [HERE](https://www.nuscenes.org/download). Organize the folder structure:
+Download Nuscenes V1.0 dataset from [Nuscenes official website](https://www.nuscenes.org/download), file organization structure is as follows
 
 ```text
 ├── data/
@@ -499,27 +511,27 @@ Download nuScenes V1.0 full dataset and can bus data [HERE](https://www.nuscenes
 │   │   ├── v1.0-trainval
 ```
 
-Prepared nuScenes 3D detection data
+Generate 3D object detection pkl files data/nuscenes/nuscenes_infos_temporal_{train,val}.pkl
 
 ```bash
 python tools/create_data.py nuscenes --root-path ./data/nuscenes --out-dir ./data/nuscenes --extra-tag nuscenes --version v1.0 --canbus ./data
 ```
 
-Using the above code will generate the following files data/nuscenes/nuscenes*infos_temporal*{train,val}.pkl
+Prepare 3D Occupancy data, dataset details refer to [Scene as Occupancy](https://arxiv.org/abs/2306.02851)
 
-Prepare 3D Occupancy dataset from [Scene as Occupancy](https://arxiv.org/abs/2306.02851)
+Download data and place in data folder
 
-|       Version       | voxel size |                                          Google Drive                                           |                              Baidu Cloud                              | Size |
-| :-----------------: | :--------: | :---------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------: | :--: |
-| occ_gt_release_v1_0 |    0.5m    | [train_val](https://drive.google.com/file/d/1Ds7NY475sS13A9KErr-MHlOBEY1oFi76/view?usp=sharing) | [train_val](https://pan.baidu.com/s/1O4iCdY7DOWts9KAIuRNT2A?pwd=hgk2) | ~15G |
+| Version             | voxel size | Google Drive                                                                                    | Baidu Cloud                                                           | Size |
+|:-------------------:|:----------:|:-----------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------:|:----:|
+| occ_gt_release_v1_0 | 0.5m       | [train_val](https://drive.google.com/file/d/1Ds7NY475sS13A9KErr-MHlOBEY1oFi76/view?usp=sharing) | [train_val](https://pan.baidu.com/s/1O4iCdY7DOWts9KAIuRNT2A?pwd=hgk2) | ~15G |
 
-unzip the file
+Extract files
 
 ```bash
 tar -zxvf occ_gt_release_v1_0.tar.gz
 ```
 
-You will obtain the folder structure
+File format is as follows
 
 ```text
 ├── data/
@@ -530,21 +542,17 @@ You will obtain the folder structure
 │   │   ├── occ_gt_val.json
 ```
 
-Merge 3D detection and 3D occupancy dataset
+Merge object detection and occupancy pkl files, generate data/occ_gt_release_v1_0/nuscenes_infos_temporal_{train,val}_occ_gt.pkl, download links for new pkl files are provided below
 
 ```bash
 python tools/create_data_with_occ.py
 ```
 
-Using the above code will generate the following files data/occ*gt_release_v1_0/nuscenes_infos_temporal*{train,val}\_occ_gt.pkl
-
-We also provide the downlink of theses pkls.
-
-|       Version       |                                                                                      Google Drive                                                                                      |                                                            Baidu Cloud                                                             |
-| :-----------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: |
+| Version             | Google Drive                                                                                                                                                                           | Baidu Cloud                                                                                                                        |
+|:-------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
 | occ_gt_release_v1_0 | [train](https://drive.google.com/file/d/1iaJk40ieqoYDd_VjZALDbnRJHGpQ3Ybx/view?usp=sharing)\|[val](https://drive.google.com/file/d/1lE9h8t5dFVdZ9dBg01jTg7GeiAWIeytZ/view?usp=sharing) | [train](https://pan.baidu.com/s/1vzFGs6g9g7f_08QrItfVGw?pwd=djsh)\|[val](https://pan.baidu.com/s/1flOglbPh5BDb0i8QfpcIbQ?pwd=ntys) |
 
-The data structure of the project is organized as
+Final file organization structure is as follows
 
 ```text
 ├── data/
@@ -566,17 +574,15 @@ The data structure of the project is organized as
 │   │   ├── nuscenes_infos_temporal_val_occ_gt.pkl
 ```
 
-### Training
+### Model Training
 
-Train model with 8 GPUs
+Training command
 
 ```bash
 ./tools/dist_train.sh ./projects/configs/bevformer/bev_tiny_det_occ_apollo.py 8
 ```
 
-### Validation
-
-Eval model with 8 GPUs
+### Model Evaluation
 
 ```bash
 ./tools/dist_test.sh ./projects/configs/bevformer/bev_tiny_det_occ_apollo.py ./path/to/ckpts.pth 4
@@ -584,26 +590,28 @@ Eval model with 8 GPUs
 
 ### Visualization
 
-Visual the occ results
+Install mayavi according to the [tutorial](https://docs.enthought.com/mayavi/mayavi/installation.html)
+
+Visualize OCC results
 
 ```bash
 python tools/occ_visualization/visualize_occ_gt.py
 ```
 
-## Model Deploy
+## 5. Model Deployment Tutorial
 
-This tutorial introduces how to convert pytorch pth to onnx file, and deploy it to apollo project.
+This section introduces how to export trained models to ONNX format and deploy to Apollo project
 
-### Environment
+### Environment Setup
 
-Create a conda virtual environment and activate it.
+Create conda virtual environment
 
 ```bash
 conda create -n apollo-onnx python=3.7 -y
 conda activate apollo-onnx
 ```
 
-Clone Code
+Download code
 
 ```bash
 git clone https://github.com/ApolloAuto/Apollo-Vision-Net-Deployment.git
@@ -619,7 +627,7 @@ ln -s /path/to/nuscenes nuscenes
 ln -s /path/to/can_bus can_bus
 ```
 
-Organize the folder structure:
+File organization is as follows
 
 ```text
 ${PROJECT_DIR}/data/.
@@ -679,14 +687,16 @@ cd pybind11
 git checkout 70a58c5
 ```
 
-Build Tensorrt（make sure: cmake version >= 3.14.0 gcc version >= 7）
+Compile Tensorrt (ensure cmake version >= 3.14.0 gcc version >= 7)
 
 ```bash
 export MMDEPLOY_DIR=/the/root/path/of/MMDeploy
 export TENSORRT_DIR=/the/path/of/tensorrt
 export CUDNN_DIR=/the/path/of/cuda
 
-export LD_LIBRARY_PATH=$TENSORRT_DIR/lib:$LD_LIBRARY_PATHexport LD_LIBRARY_PATH=$CUDNN_DIR/lib64:$LD_LIBRARY_PATHcd${MMDEPLOY_DIR}
+export LD_LIBRARY_PATH=$TENSORRT_DIR/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$CUDNN_DIR/lib64:$LD_LIBRARY_PATH
+cd ${MMDEPLOY_DIR}
 mkdir -p build
 cd build
 cmake -DCMAKE_CXX_COMPILER=g++-7 -DMMDEPLOY_TARGET_BACKENDS=trt -DTENSORRT_DIR=${TENSORRT_DIR} -DCUDNN_DIR=${CUDNN_DIR} ..
@@ -701,14 +711,14 @@ cd ${MMDEPLOY_DIR}
 pip install -v -e .# "-v" means verbose, or more output# "-e" means installing a project in editable mode,# thus any local modifications made to the code will take effect without reinstallation.
 ```
 
-Install dependences
+Install dependencies
 
 ```bash
 cd ${PROJECT_DIR}
 pip install -r requirements.txt
 ```
 
-【optional】Install Custom TensorRT Plugins（CUDA>=11.4, SM version>=7.5）
+【Optional】Install Custom TensorRT Plugins (CUDA>=11.4, SM version>=7.5)
 
 ```bash
 cd ${PROJECT_DIR}/TensorRT/build
@@ -717,34 +727,34 @@ make -j$(nproc)
 make install
 ```
 
-Build and Install Part of Ops in MMDetection3D
+Build and install MMDetection3D operators
 
 ```bash
 cd ${PROJECT_DIR}/third_party/bev_mmdet3d
 python setup.py build develop
 ```
 
-### ONNX
+### Generate ONNX File
 
-Convert pth to onnx file
+Run the following command, provide pth file to generate ONNX file
 
 ```bash
 python tools/pth2onnx.py configs/apollo_bev/bev_tiny_det_occ_apollo_trt.py path_pth --opset_version 13 --cuda
 ```
 
-### Deploy
+### Apollo Deployment
 
-Get into the docker
+Install Apollo environment according to the tutorial, then enter container
 
 ```bash
 bash docker/scripts/dev_into.sh
 ```
 
-Replace the onnx file in modules/perception/data/models/apollo_bevnet_onnx
+To replace with your own trained ONNX file, need to replace the ONNX file in the directory
 
 ```bash
 sudo rm -rf modules/perception/data/models/apollo_bevnet_onnx/*
 sudo cp your-own-onnx modules/perception/data/models/apollo_bevnet_onnx/
 ```
 
-Then following \<Run in Apollo\> part tutorial and runing the model
+Then follow the tutorial in Section 3 to run the vision-only model

@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/open_space_fallback_decider_park/libopen_space_fallback_decider_park.so">
+    <class type="apollo::planning::OpenSpaceFallbackDeciderPark" base_class="apollo::planning::Task"></class>
+</library>

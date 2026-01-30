@@ -61,7 +61,7 @@ bool ExternalCommandWrapperDemo::Init() {
       apollo::external_command::CommandStatusRequest, CommandStatus>>(
       node_, "/apollo/external_command/command_status");
   apollo::cyber::common::GetProtoFromFile(
-      "modules/external_command/external_command_demo/conf/"
+      "/apollo/modules/external_command/external_command_demo/conf/"
       "demo_config.pb.txt",
       &demo_config_);
   return true;
@@ -205,8 +205,8 @@ bool ExternalCommandWrapperDemo::Proc() {
 
         SendFreespaceCommand(way_points, end_pose);
       } else if (input_command_string == "zone_cover") {
-        std::string overlap_id = demo_config_.overlap_id();
-        SendZoneCoverCommand(overlap_id);
+        std::string zone_cover_area_id = demo_config_.zone_cover_area_id();
+        SendZoneCoverCommand(zone_cover_area_id);
       } else {
         std::cout << "Invalid input!" << input_command_string << std::endl;
       }
@@ -594,11 +594,11 @@ void ExternalCommandWrapperDemo::ReadPathFromLocationRecord(
 }
 
 void ExternalCommandWrapperDemo::SendZoneCoverCommand(
-    const std::string overlap_id) {
+    const std::string zone_cover_area_id) {
   auto command = std::make_shared<apollo::external_command::ZoneCoverCommand>();
   FillCommandHeader(command);
   // Copy way_points
-  command->set_overlap_id(overlap_id);
+  command->set_zone_cover_area_id(zone_cover_area_id);
   std::cout << "Sending lane follow command: " << command->DebugString()
             << std::endl;
   auto response = zone_cover_command_client_->SendRequest(command);

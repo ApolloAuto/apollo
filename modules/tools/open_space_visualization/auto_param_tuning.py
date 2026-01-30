@@ -24,8 +24,8 @@ from google.protobuf.internal import encoder
 
 from modules.common_msgs.planning_msgs import planner_open_space_config_pb2
 import modules.tools.common.proto_utils as proto_utils
-import modules.tools.open_space_visualization.distance_approach_visualizer
-import modules.tools.open_space_visualization.hybrid_a_star_visualizer
+import distance_approach_visualizer
+import hybrid_a_star_visualizer
 
 
 random.seed(99999)

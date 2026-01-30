@@ -32,7 +32,7 @@ class SimpleControlTest : public ControlTestBase {
  public:
   virtual void SetUp() {
     FLAGS_test_data_dir =
-        "modules/control/control_component/testdata/"
+        "/apollo/modules/control/control_component/testdata/"
         "simple_control_test/";
   }
 };

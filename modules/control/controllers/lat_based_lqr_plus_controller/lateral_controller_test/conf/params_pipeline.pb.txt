@@ -1,0 +1,12 @@
+params_declare {
+  config_name: "public_road_forward_param"
+  config_path: "public_road_forward_param.pb.txt"
+}
+params_declare {
+  config_name: "public_road_forward_s_turn_param"
+  config_path: "public_road_forward_s_turn_param.pb.txt"
+}
+params_declare {
+  config_name: "open_space_backward_param"
+  config_path: "open_space_backward_param.pb.txt"
+}

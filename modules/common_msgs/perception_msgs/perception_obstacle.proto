@@ -171,6 +171,14 @@ message PerceptionObstacle {
     SM_MAX_OBJECT_SEMANTIC_LABEL = 9;
   };
   optional SemanticType semantic_type = 29;
+
+  enum MotionType {
+    MT_UNKNOWN = 0;
+    MT_MOVING = 1;
+    MT_STATIONARY = 2;
+    MT_MAX_OBJECT_MOTION_LABEL = 3;
+  };
+  optional MotionType motion_type = 30;
 }
 
 message LaneMarker {

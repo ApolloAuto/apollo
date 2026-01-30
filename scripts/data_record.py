@@ -46,7 +46,8 @@ default_record_dir = os.path.join(APOLLO_ENV_ROOT, 'data/record')
 record_args_dict = {
     "all": "-a",
     "middle": "-a -k '/apollo/.*/image' -k '/apollo/.*/PointCloud2'",
-    "middle_with_compensator": "-a  -k '^(?!.*compensator).*/PointCloud2' -k '/apollo/.*/image'",
+    "middle_with_compensator": 
+        "-a  -k '^(?!.*compensator)(?!.*back).*/PointCloud2' -k /apollo/.*/Scan -k '/apollo/.*/image'",
     "small": "-a -k '/apollo/.*/PointCloud2' -k '/apollo/.*/image'"
 }
 

@@ -97,7 +97,8 @@ void MlfTypeFilter::UpdateWithObject(
 
     // model is unknown: final is unknown -> trafficcone, otherwise -> unknown
     if (new_object->object_ptr->type == base::ObjectType::UNKNOWN) {
-        if (new_object->type == base::ObjectType::UNKNOWN) {
+        if (!new_object->object_ptr->lidar_supplement.is_clustered &&
+            new_object->type == base::ObjectType::UNKNOWN) {
             new_object->object_ptr->sub_type =
                 base::ObjectSubType::TRAFFICCONE;
         } else {

@@ -19,13 +19,12 @@
 import math
 import time
 
-from cyber.python.cyber_py3 import cyber
 from matplotlib import animation
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from modules.tools.open_space_visualization.hybrid_a_star_python_interface import *
+from hybrid_a_star_python_interface import *
 
 
 def HybridAStarPlan(visualize_flag):
@@ -165,6 +164,5 @@ def HybridAStarPlan(visualize_flag):
 
 
 if __name__ == '__main__':
-    cyber.init()
     visualize_flag = True
     HybridAStarPlan(visualize_flag)

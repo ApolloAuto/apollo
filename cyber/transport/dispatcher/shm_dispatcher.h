@@ -191,27 +191,18 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                   //   segment->RemoveBlockReadLock(block_index);
                   // }
                 });
-      auto related_blocks_for_lock =
-          arena_manager->GetMessageRelatedBlocks(msg_wrapper.get());
-      for (int i = 0; i < related_blocks_for_lock.size(); ++i) {
-        auto block_index = related_blocks_for_lock[i];
-        if (!segment->AddBlockReadLock(block_index)) {
-          AWARN << "failed to acquire block for read, channel: "
-                << self_attr.channel_id() << " index: " << block_index;
-          for (int j = 0; j < i; ++j) {
-            // restore the lock
-            segment->RemoveBlockReadLock(related_blocks_for_lock[j]);
-          }
-          return;
-        }
+      for (auto block_index :
+           arena_manager->GetMessageRelatedBlocks(msg_wrapper.get())) {
+        segment->AddBlockReadLock(block_index);
       }
 
       auto send_time = msg_info.send_time();
+      auto msg_seq_num = msg_info.msg_seq_num();
 
       statistics::Statistics::Instance()->AddRecvCount(self_attr,
-                                                       msg_info.seq_num());
-      statistics::Statistics::Instance()->SetTotalMsgsStatus(
-          self_attr, msg_info.seq_num());
+                                                       msg_info.msg_seq_num());
+      statistics::Statistics::Instance()->SetTotalMsgsStatus(self_attr,
+                                                             msg_seq_num);
 
       auto recv_time = Time::Now().ToNanosecond();
 
@@ -244,11 +235,12 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
           rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
 
       auto send_time = msg_info.send_time();
+      auto msg_seq_num = msg_info.msg_seq_num();
 
       statistics::Statistics::Instance()->AddRecvCount(self_attr,
-                                                       msg_info.seq_num());
-      statistics::Statistics::Instance()->SetTotalMsgsStatus(
-          self_attr, msg_info.seq_num());
+                                                       msg_info.msg_seq_num());
+      statistics::Statistics::Instance()->SetTotalMsgsStatus(self_attr,
+                                                             msg_seq_num);
 
       auto recv_time = Time::Now().ToNanosecond();
 
@@ -305,27 +297,18 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                   //   segment->RemoveBlockReadLock(block_index);
                   // }
                 });
-      auto related_blocks_for_lock =
-          arena_manager->GetMessageRelatedBlocks(msg_wrapper.get());
-      for (int i = 0; i < related_blocks_for_lock.size(); ++i) {
-        auto block_index = related_blocks_for_lock[i];
-        if (!segment->AddBlockReadLock(block_index)) {
-          AWARN << "failed to acquire block for read, channel: "
-                << self_attr.channel_id() << " index: " << block_index;
-          for (int j = 0; j < i; ++j) {
-            // restore the lock
-            segment->RemoveBlockReadLock(related_blocks_for_lock[j]);
-          }
-          return;
-        }
+      for (auto block_index :
+           arena_manager->GetMessageRelatedBlocks(msg_wrapper.get())) {
+        segment->AddBlockReadLock(block_index);
       }
 
       auto send_time = msg_info.send_time();
+      auto msg_seq_num = msg_info.msg_seq_num();
 
       statistics::Statistics::Instance()->AddRecvCount(self_attr,
-                                                       msg_info.seq_num());
-      statistics::Statistics::Instance()->SetTotalMsgsStatus(
-          self_attr, msg_info.seq_num());
+                                                       msg_info.msg_seq_num());
+      statistics::Statistics::Instance()->SetTotalMsgsStatus(self_attr,
+                                                             msg_seq_num);
 
       auto recv_time = Time::Now().ToNanosecond();
 
@@ -357,9 +340,10 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
           rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
 
       auto send_time = msg_info.send_time();
-      auto msg_seq_num = msg_info.seq_num();
+      auto msg_seq_num = msg_info.msg_seq_num();
 
-      statistics::Statistics::Instance()->AddRecvCount(self_attr, msg_seq_num);
+      statistics::Statistics::Instance()->AddRecvCount(self_attr,
+                                                       msg_info.msg_seq_num());
       statistics::Statistics::Instance()->SetTotalMsgsStatus(self_attr,
                                                              msg_seq_num);
 

@@ -1029,8 +1029,7 @@ bool ReferenceLineProvider::SmoothReferenceLine(
   return true;
 }
 
-bool ReferenceLineProvider::GetAdcWaypoint(
-    hdmap::LaneWaypoint *waypoint) const {
+bool ReferenceLineProvider::GetAdcWaypoint(hdmap::LaneWaypoint* waypoint) const {
   if (nullptr == current_pnc_map_) {
     AERROR << "Cannot find pnc map to get adc waypoint!";
     return false;

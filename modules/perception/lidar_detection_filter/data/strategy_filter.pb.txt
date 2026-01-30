@@ -3,5 +3,6 @@ expand_bbox_dist: 0.2
 allow_fore_merge: true
 is_filter_below_objects: true
 below_threshold: 0.5
+below_range: 3.0
 is_filter_small_size: false
 small_size_thres: 0.01

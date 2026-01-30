@@ -303,11 +303,11 @@ std::vector<ReferencePoint> ReferenceLine::GetReferencePoints(
 ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front() - 1e-2) {
-    AWARN << "The requested s: " << s << " < 0.";
+    ADEBUG << "The requested s: " << s << " < 0.";
     return reference_points_.front();
   }
   if (s > accumulated_s.back() + 1e-2) {
-    AWARN << "The requested s: " << s
+    ADEBUG << "The requested s: " << s
           << " > reference line length: " << accumulated_s.back();
     return reference_points_.back();
   }

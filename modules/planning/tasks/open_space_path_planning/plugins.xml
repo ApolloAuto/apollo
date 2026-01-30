@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/open_space_path_planning/libopen_space_path_planning.so">
+    <class type="apollo::planning::OpenSpacePathPlanning" base_class="apollo::planning::Task"></class>
+</library>

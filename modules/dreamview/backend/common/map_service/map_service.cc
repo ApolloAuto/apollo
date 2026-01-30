@@ -560,10 +560,12 @@ bool MapService::CheckRoutingPointWithHeading(const double x, const double y,
 }
 
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
-  if (lane->lane().type() != Lane::CITY_DRIVING) {
+  if (lane->lane().type() != Lane::CITY_DRIVING &&
+      lane->lane().type() != Lane::BIKING &&
+      lane->lane().type() != Lane::SHARED) {
     AERROR
         << "Failed to construct LaneWayPoint for RoutingRequest: Expected lane "
-        << lane->id().id() << " to be CITY_DRIVING, but was "
+        << lane->id().id() << " to be CITY_DRIVING, BIKING, SHARED, but was "
         << apollo::hdmap::Lane::LaneType_Name(lane->lane().type());
     return false;
   }
@@ -620,6 +622,9 @@ bool MapService::AddPathFromPassageRegion(
                                                   segment.end_s());
     path_points.insert(path_points.end(), points.begin(), points.end());
   }
+  // Remove duplicate path points that are too close to each other to avoid init
+  // Path failure
+  MapPathPoint::RemoveDuplicates(&path_points);
 
   if (path_points.size() < 2) {
     return false;

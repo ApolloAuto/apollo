@@ -1,4 +1,4 @@
-camera_name: "front_6mm"
+camera_name: "camera_front"
 timestamp_offset: 0.0
 plugin_param {
   name: "Yolox3DObstacleDetector"

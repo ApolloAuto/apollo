@@ -17,6 +17,7 @@
 ###############################################################################
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function setup() {
   bash scripts/canbus.sh start
@@ -34,7 +35,7 @@ function start() {
   fi
 
   if [[ ! -z "$(which rtk_player)" ]]; then
-    rtk_player_binary="rtk_player"
+    rtk_player_binary="rtk_player" 
   elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
     rtk_player_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player"
   else

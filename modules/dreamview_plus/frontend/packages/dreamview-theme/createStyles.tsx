@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /* *****************************************************************************
  * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
@@ -17,7 +16,6 @@
 
 import { createMakeAndWithStyles } from 'tss-react';
 import React, { useMemo } from 'react';
-import { cloneDeep } from 'lodash';
 import { light, IDefaultTheme, drak, ITheme } from './tokens/baseToken';
 
 const context = React.createContext<{
@@ -50,58 +48,11 @@ export function Provider(props: React.PropsWithChildren<ProviderProps>) {
 }
 
 export function useThemeContext() {
-    let ctx;
-    try {
-        ctx = React.useContext(context);
-    } catch (err) {
-        console.log('err', err);
-    }
-    if (!ctx) {
-        console.warn('@dreamview/dreamview-theme context missing');
-    }
-    return ctx;
-}
-
-interface ExpandProviderProps<T> {
-    theme?: ITheme;
-    expand?: {
-        light: T;
-        drak: T;
-    };
-}
-
-export function ExpandProvider<T>(props: ExpandProviderProps<T> & { children?: any }) {
-    const { expand } = props;
-    const themeContext = useThemeContext();
-
-    const theme = props.theme || themeContext?.theme;
-    if (!themeContext) {
-        console.warn('@dreamview/dreamview-theme context missing');
-    }
-
-    const values = useMemo(() => {
-        const lightClone = cloneDeep(light);
-        const drakClone = cloneDeep(drak);
-        if (expand?.light) {
-            Object.assign(lightClone.components, expand.light);
-        }
-        if (expand?.drak) {
-            Object.assign(drakClone.components, expand.drak);
-        }
-        return {
-            theme,
-            tokens: {
-                light: lightClone,
-                drak: drakClone,
-            }[theme],
-        };
-    }, [theme]);
-
-    return <context.Provider value={values}>{props.children}</context.Provider>;
+    return React.useContext(context);
 }
 
 function useTheme() {
-    return React.useContext(context)?.tokens;
+    return React.useContext(context).tokens;
 }
 
 const { makeStyles: initUseStyle } = createMakeAndWithStyles<IDefaultTheme>({

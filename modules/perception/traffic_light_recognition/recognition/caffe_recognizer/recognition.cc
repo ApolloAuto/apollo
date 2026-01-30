@@ -23,56 +23,50 @@ namespace apollo {
 namespace perception {
 namespace trafficlight {
 
-bool TrafficLightRecognition::Init(
-    const TrafficLightRecognitorInitOptions& options) {
-  std::string config_file =
-      GetConfigFile(options.config_path, options.config_file);
+bool TrafficLightRecognition::Init(const TrafficLightRecognitorInitOptions& options) {
+    std::string config_file = GetConfigFile(options.config_path, options.config_file);
 
-  if (!cyber::common::GetProtoFromFile(config_file, &recognize_param_)) {
-    AINFO << "load proto param failed, root dir: " << config_file;
-    return false;
-  }
+    if (!cyber::common::GetProtoFromFile(config_file, &recognize_param_)) {
+        AINFO << "load proto param failed, root dir: " << config_file;
+        return false;
+    }
 
-  classify_quadrate_.reset(new ClassifyBySimple);
-  classify_vertical_.reset(new ClassifyBySimple);
-  classify_horizontal_.reset(new ClassifyBySimple);
+    classify_quadrate_.reset(new ClassifyBySimple);
+    classify_vertical_.reset(new ClassifyBySimple);
+    classify_horizontal_.reset(new ClassifyBySimple);
 
-  classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id);
-  classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id);
-  classify_horizontal_->Init(recognize_param_.horizontal_model(),
-                             options.gpu_id);
+    classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id);
+    classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id);
+    classify_horizontal_->Init(recognize_param_.horizontal_model(), options.gpu_id);
 
-  return true;
+    return true;
 }
 
 bool TrafficLightRecognition::Detect(camera::TrafficLightFrame* frame) {
-  std::vector<base::TrafficLightPtr> candidate(1);
+    std::vector<base::TrafficLightPtr> candidate(1);
 
-  for (base::TrafficLightPtr light : frame->traffic_lights) {
-    if (light->region.is_detected) {
-      candidate[0] = light;
-      if (light->region.detect_class_id ==
-          base::TLDetectionClass::TL_QUADRATE_CLASS) {
-        AINFO << "Recognize Use Quadrate Model!";
-        classify_quadrate_->Perform(frame, &candidate);
-      } else if (light->region.detect_class_id ==
-                 base::TLDetectionClass::TL_VERTICAL_CLASS) {
-        AINFO << "Recognize Use Vertical Model!";
-        classify_vertical_->Perform(frame, &candidate);
-      } else if (light->region.detect_class_id ==
-                 base::TLDetectionClass::TL_HORIZONTAL_CLASS) {
-        AINFO << "Recognize Use Horizonal Model!";
-        classify_horizontal_->Perform(frame, &candidate);
-      } else {
-        return false;
-      }
-    } else {
-      light->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-      light->status.confidence = 0;
+    for (base::TrafficLightPtr light : frame->traffic_lights) {
+        if (light->region.is_detected) {
+            candidate[0] = light;
+            if (light->region.detect_class_id == base::TLDetectionClass::TL_QUADRATE_CLASS) {
+                AINFO << "Recognize Use Quadrate Model!";
+                classify_quadrate_->Perform(frame, &candidate);
+            } else if (light->region.detect_class_id == base::TLDetectionClass::TL_VERTICAL_CLASS) {
+                AINFO << "Recognize Use Vertical Model!";
+                classify_vertical_->Perform(frame, &candidate);
+            } else if (light->region.detect_class_id == base::TLDetectionClass::TL_HORIZONTAL_CLASS) {
+                AINFO << "Recognize Use Horizonal Model!";
+                classify_horizontal_->Perform(frame, &candidate);
+            } else {
+                return false;
+            }
+        } else {
+            light->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+            light->status.confidence = 0;
+        }
     }
-  }
 
-  return true;
+    return true;
 }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightRecognition);

@@ -42,12 +42,15 @@ namespace camera {
  * @param image_height  the image width and height
  * @param objects pointer to the object
  */
-void YoloxGetObjectsCpu(const std::shared_ptr<base::Blob<float>> &objects_blob,
-                        const yolox3d::ModelParam &model_param,
-                        const yolox3d::NMSParam &nms_param, const int width,
-                        const int height, const int image_width,
-                        const int image_height,
-                        std::vector<base::ObjectPtr> *objects);
+void YoloxGetObjectsCpu(
+        const std::shared_ptr<base::Blob<float>> &objects_blob,
+        const yolox3d::ModelParam &model_param,
+        const yolox3d::NMSParam &nms_param,
+        const int width,
+        const int height,
+        const int image_width,
+        const int image_height,
+        std::vector<base::ObjectPtr> *objects);
 /**
  * @brief Get all objects accoring to confidence
  *
@@ -55,13 +58,14 @@ void YoloxGetObjectsCpu(const std::shared_ptr<base::Blob<float>> &objects_blob,
  * @param model_param The parameters of model
  * @param objects pointer to the object
  */
-void YoloxGetAllObjects(const float *data,
-                        const yolox3d::ModelParam &model_param,
-                        const float scale,
-                        std::vector<std::vector<float>> *objects_out);
+void YoloxGetAllObjects(
+        const float *data,
+        const yolox3d::ModelParam &model_param,
+        const float scale,
+        std::vector<std::vector<float>> *objects_out);
 
 /**
- * @brief Get 2dbbox for objects
+ * @brief Get 2d bbox for objects
  *
  * @param detect pointer to the detect blob
  * @param width 640 resized image width
@@ -70,9 +74,13 @@ void YoloxGetAllObjects(const float *data,
  * @param image_height 1080 image height
  * @param obj pointer to the object
  */
-void YoloxFillBase(const std::vector<float> &detect, const int width,
-                   const int height, const int image_width,
-                   const int image_height, base::ObjectPtr obj);
+void YoloxFillBase(
+        const std::vector<float> &detect,
+        const int width,
+        const int height,
+        const int image_width,
+        const int image_height,
+        base::ObjectPtr obj);
 /**
  * @brief Add 3d bbox values for objects
  *
@@ -80,8 +88,7 @@ void YoloxFillBase(const std::vector<float> &detect, const int width,
  * @param detect  output of network
  * @param obj pointer to the object
  */
-void YoloxFillBbox3d(const yolox3d::ModelParam &model_param,
-                     const std::vector<float> &detect, base::ObjectPtr obj);
+void YoloxFillBbox3d(const yolox3d::ModelParam &model_param, const std::vector<float> &detect, base::ObjectPtr obj);
 
 /**
  * @brief Computes IoU between bboxes.
@@ -89,8 +96,7 @@ void YoloxFillBbox3d(const yolox3d::ModelParam &model_param,
  * @param box2 object label
  * @return Returns the IoU of two bboxes
  */
-float YoloxBboxIOU(const std::vector<float> &box1,
-                   const std::vector<float> &box2);
+float YoloxBboxIOU(const std::vector<float> &box1, const std::vector<float> &box2);
 /**
  * @brief object is truncated or not
  *
@@ -100,8 +106,7 @@ float YoloxBboxIOU(const std::vector<float> &box1,
  * @return true
  * @return false
  */
-void YoloxTruncated(base::ObjectPtr obj, const int image_width,
-                    const int image_height);
+void YoloxTruncated(base::ObjectPtr obj, const int image_width, const int image_height);
 
 /**
  * @brief Clamp target value between low and high tools for iou
@@ -112,7 +117,7 @@ void YoloxTruncated(base::ObjectPtr obj, const int image_width,
  */
 template <typename T>
 constexpr T Yoloxclamp(const T &val, const T &low, const T &high) {
-  return val < low ? low : (high < val ? high : val);
+    return val < low ? low : (high < val ? high : val);
 }
 
 }  // namespace camera

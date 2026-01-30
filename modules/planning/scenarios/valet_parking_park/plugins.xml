@@ -1,0 +1,6 @@
+<library path="modules/planning/scenarios/valet_parking_park/libvalet_parking_scenario_park.so">
+    <class type="apollo::planning::ValetParkingParkScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::StageApproachingParkingSpotPark" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StageParkingPark" base_class="apollo::planning::Stage"></class>
+    <class type="apollo::planning::StageParkingRetryPark" base_class="apollo::planning::Stage"></class>
+</library>

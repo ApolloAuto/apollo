@@ -215,10 +215,10 @@ void ControlTestBase::LoadControllerPlugin() {
   std::cout << "lib_path_chars:" << lib_path_chars << std::endl;
   putenv(lib_path_chars);
   std::string lat_controller_plugin_xml_file =
-      "modules/control/control_component/testdata/conf/plugins/"
+      "/apollo/modules/control/control_component/testdata/conf/plugins/"
       "lat_based_lqr_controller/plugins.xml";
   std::string lon_controller_plugin_xml_file =
-      "modules/control/control_component/testdata/conf/plugins/"
+      "/apollo/modules/control/control_component/testdata/conf/plugins/"
       "lon_based_pid_controller/plugins.xml";
   apollo::cyber::plugin_manager::PluginManager::Instance()->LoadPlugin(
       lat_controller_plugin_xml_file);
@@ -228,7 +228,7 @@ void ControlTestBase::LoadControllerPlugin() {
 
 void ControlTestBase::SetUpTestCase() {
   FLAGS_pipeline_file =
-      "modules/control/control_component/testdata/conf/pipeline.pb.txt";
+      "/apollo/modules/control/control_component/testdata/conf/pipeline.pb.txt";
   FLAGS_is_control_test_mode = true;
   FLAGS_is_control_ut_test_mode = true;
   FLAGS_v = 3;

@@ -1,0 +1,3 @@
+input_command_name: "/apollo/external_command/zone_cover"
+output_command_name: "/apollo/planning/command"
+input_command_status_name: "/apollo/planning/command_status"

@@ -5,7 +5,7 @@ module_config {
       class_name : "PriSecFusionComponent"
       config {
         name : "lidar_fusion"
-        config_file_path : "modules/drivers/lidar/fusion/conf/fusion_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/fusion/conf/fusion_conf.pb.txt"
         readers {channel: "/apollo/sensor/lidar/back/PointCloud2"}
       }
     }

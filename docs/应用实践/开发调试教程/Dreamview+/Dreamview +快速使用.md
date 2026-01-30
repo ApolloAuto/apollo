@@ -14,29 +14,29 @@ https://apollo.baidu.com/community/course/1
 ### 步骤一：启动 Dreamview+
 
 1. 在终端中，执行 Dreamview+ 启动指令，执行成功后，点击菜单栏 Dreamview+ 按钮，进入 Dreamview+ 界面。
-
+   
    ```bash
    aem bootstrap start --plus
    ```
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_cb5f4fe.png)
-
+   
    当出现如下界面，表示 Dreamview+ 启动成功了。
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_8455c10.png)
-
+   
    点击左下角 **个人中心** > **设置** > **全局设置**，可以选择界面语言类型。
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_ce0ce76.png)
 
 ### 步骤二：播放自动驾驶离线数据包
 
 1. 点击左侧菜单栏，选择 PnC 模式，操作选择 Record。
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_a601a39.png)
 
 2. 在 环境资源 > 数据包 中选择 demo3.5（如果没有数据包，可以前往资源管理中心下载）。选择完毕后，点击播放按钮，就可以看到离线数据包 demo_3.5 已经被播放出来了。
-
+   
    ![image.png](https://bce.bdstatic.com/doc/Apollo-Homepage-Document/Apollo_Beta_Doc/image_5e8a3a5.png)
 
 ### 步骤三：运行 PNC Monitor 数据监视器

@@ -4,6 +4,8 @@ load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apo
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 apollo_cc_library(
     name = "apollo_drivers_canbus",
     srcs = [
@@ -31,6 +33,7 @@ apollo_cc_library(
         "common/byte.h",
         "common/canbus_consts.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         "//cyber",
         "//modules/common/util:common_util",

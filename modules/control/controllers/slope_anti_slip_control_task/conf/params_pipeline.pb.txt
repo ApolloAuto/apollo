@@ -1,0 +1,9 @@
+params_declare {
+  config_name: "edge_follow_param"
+  config_path: "edge_follow_param.pb.txt"
+}
+params_declare {
+  config_name: "public_road_param"
+  config_path: "public_road_param.pb.txt"
+}
+

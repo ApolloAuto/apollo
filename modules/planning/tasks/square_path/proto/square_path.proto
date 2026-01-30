@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message SquarePathConfig {
+  optional double max_lateral_distance = 1;
+  optional bool enable_road_boundary_constraint = 2 [default = true];
+  optional PiecewiseJerkPathConfig path_optimizer_config = 3;
+}

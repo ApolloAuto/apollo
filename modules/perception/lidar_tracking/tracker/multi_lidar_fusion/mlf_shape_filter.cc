@@ -44,7 +44,7 @@ void MlfShapeFilter::UpdateWithObject(const MlfFilterOptions& options,
                                       TrackedObjectPtr new_object) {
   // compute tight object polygon
   auto& obj = new_object->object_ptr;
-  if (new_object->is_background) {
+  if (obj->lidar_supplement.is_clustered) {
     hull_.GetConvexHull(obj->lidar_supplement.cloud_world, &obj->polygon);
   } else {
     hull_.GetConvexHullWithoutGroundAndHead(
@@ -52,6 +52,7 @@ void MlfShapeFilter::UpdateWithObject(const MlfFilterOptions& options,
         static_cast<float>(bottom_points_ignore_threshold_),
         static_cast<float>(top_points_ignore_threshold_), &obj->polygon);
   }
+  /*
   // simple moving average orientation filtering
   if (track_data->age_ > 0) {
     TrackedObjectConstPtr latest_object = track_data->GetLatestObject().second;
@@ -64,10 +65,11 @@ void MlfShapeFilter::UpdateWithObject(const MlfFilterOptions& options,
         new_object->direction * kMovingAverage;
     new_object->direction.normalize();
   }
+  */
   Eigen::Vector3f local_direction = obj->direction;
   Eigen::Vector3d local_center = obj->center;
   Eigen::Vector3f local_size = obj->size;
-  obj->direction = new_object->direction.cast<float>();  // sync
+  obj->direction = new_object->output_direction.cast<float>();  // sync
   // finally, recompute object shape
   ComputeObjectShapeFromPolygon(obj, true);
   new_object->center = obj->center;

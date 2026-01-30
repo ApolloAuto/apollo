@@ -1,12 +1,12 @@
 <cyber>
     <module>
         <name>localization</name>
-        <dag_conf>modules/localization/dag/dag_streaming_msf_localization.dag</dag_conf>
+        <dag_conf>/apollo/modules/localization/dag/dag_streaming_msf_localization.dag</dag_conf>
         <process_name>localization</process_name>
     </module>
     <module>
         <name>localization_visualizer</name>
-        <dag_conf>modules/localization/dag/dag_streaming_msf_visualizer.dag</dag_conf>
+        <dag_conf>/apollo/modules/localization/dag/dag_streaming_msf_visualizer.dag</dag_conf>
         <process_name>localization_visualizer</process_name>
     </module>
 </cyber>

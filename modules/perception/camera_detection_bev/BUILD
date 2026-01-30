@@ -5,15 +5,6 @@ package(default_visibility = ["//visibility:public"])
 
 PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
-filegroup(
-    name = "camera_detection_bev",
-    srcs = glob([
-        "conf/**",
-        "dag/**",
-        "data/**",
-    ]),
-)
-
 apollo_cc_library(
     name = "apollo_perception_camera_detection_bev",
     srcs = [

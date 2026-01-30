@@ -2,11 +2,11 @@
 
 前提条件
 
-阅读使用该文档前请确保已经参考 [必要软件安装指南](docs/installation_instructions/essential_software_installation_guide_cn.md) 文档 完成 Apollo 环境管理工具以及容器环境的安装
+阅读使用该文档前请确保已经参考 [必要软件安装指南](../installation_instructions/essential_software_installation_guide_cn.md) 文档 完成 Apollo 环境管理工具以及容器环境的安装
 
 ## 综述
 
-本教程涵盖使用软件包管理下载，安装与构建 Apollo 各模块的基础知识。您将设置工作空间并构建一个简单的 C++ 项目，该项目将说明 Apollo 中软件包管理的关键概念，如 .workspace.json 和 .env 文件。完成本教程后，请参阅 [Apollo 研发工具 - buildtool](docs/user_guidelines/tools/tool_buildtool_cn.md)，了解软件包管理中关键工具 buildtool 的高级用法。
+本教程涵盖使用软件包管理下载，安装与构建 Apollo 各模块的基础知识。您将设置工作空间并构建一个简单的 C++ 项目，该项目将说明 Apollo 中软件包管理的关键概念，如 .workspace.json 和 .env 文件。完成本教程后，请参阅 [Apollo 研发工具 - buildtool](../user_guidelines/tools/tool_buildtool_cn.md)，了解软件包管理中关键工具 buildtool 的高级用法。
 
 在本教程中，您将学到：
 * Apollo 软件包管理模式下的新增的配置信息
@@ -248,7 +248,7 @@ apollo_component, apollo_plugin将在下文中介绍如何使用这两个新增�
 
 ### 启动 Apollo 容器
 
-启动 Apollo 容器需要使用 Apollo 环境管理工具 aem，该工具的安装可以查阅[必要软件安装指南](docs/installation_instructions/essential_software_installation_guide_cn.md) 文档。
+启动 Apollo 容器需要使用 Apollo 环境管理工具 aem，该工具的安装可以查阅[必要软件安装指南](../installation_instructions/essential_software_installation_guide_cn.md) 文档。
 
 #### 启动容器
 

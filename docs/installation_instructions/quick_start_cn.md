@@ -2,7 +2,7 @@
 
 前提条件
 
-阅读使用该文档前请确保已经参考 [必要软件安装指南](docs/installation_instructions/essential_software_installation_guide_cn.md) 文档 完成 Apollo 环境管理工具以及容器环境的安装
+阅读使用该文档前请确保已经参考 [必要软件安装指南](../installation_instructions/essential_software_installation_guide_cn.md) 文档 完成 Apollo 环境管理工具以及容器环境的安装
 
 ## 创建工程和安装 Apollo 软件包，并使用 Dreamview+ 播放数据包
 

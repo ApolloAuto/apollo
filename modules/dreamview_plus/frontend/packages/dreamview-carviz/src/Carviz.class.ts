@@ -24,7 +24,8 @@ import CopyMarker from './render/functional/CopyMarker';
 import RulerMarker from './render/functional/RulerMarker';
 import Follow from './render/follow';
 import { checkWebGLSupport, checkWebGPUSupport } from './utils/checkSupport';
-import CurbPointCloud from './render/curbPointCloud';
+import IndoorLocalization from './render/functional/IndoorLocalizationMarker';
+import IndoorLocalizationMarker from './render/functional/IndoorLocalizationMarker';
 
 enum PREVDATA_STATUS {
     EXIT = 'EXIT',
@@ -64,8 +65,6 @@ export class Carviz {
 
     public pointCloud;
 
-    public curbPointCloud;
-
     public routing;
 
     public decision;
@@ -83,6 +82,8 @@ export class Carviz {
     public copyMarker: CopyMarker;
 
     public rulerMarker: RulerMarker;
+
+    public indoorLocalizationMarker: IndoorLocalizationMarker;
 
     public initialized;
 
@@ -358,7 +359,6 @@ export class Carviz {
         this.map = new Map(this.scene, this.text, this.option, this.coordinates, this.colors);
         this.obstacles = new Obstacles(this.scene, this.view, this.text, this.option, this.coordinates, this.colors);
         this.pointCloud = new PointCloud(this.scene, this.adc, this.option, this.colors);
-        this.curbPointCloud = new CurbPointCloud(this.scene, this.adc, this.option, this.coordinates, this.colors);
         this.routing = new Routing(this.scene, this.option, this.coordinates);
         this.decision = new Decision(this.scene, this.option, this.coordinates, this.colors);
         this.prediction = new Prediction(this.scene, this.option, this.coordinates, this.colors);
@@ -378,6 +378,7 @@ export class Carviz {
         this.pathwayMarker = new PathwayMarker(context);
         this.copyMarker = new CopyMarker(context);
         this.rulerMarker = new RulerMarker(context);
+        this.indoorLocalizationMarker = new IndoorLocalizationMarker(context);
     }
 
     init() {
@@ -467,10 +468,6 @@ export class Carviz {
 
     updatePointCloud = (data) => {
         this.pointCloud.update(data);
-    };
-
-    updateCurbPointCloud = (data) => {
-        this.curbPointCloud.update(data);
     };
 
     updateData(datas) {
@@ -596,7 +593,6 @@ export class Carviz {
         this.map.dispose();
         this.obstacles.dispose();
         this.pointCloud.dispose();
-        this.curbPointCloud.dispose();
         this.routing.dispose();
         this.decision.dispose();
         this.prediction.dispose();
@@ -611,6 +607,7 @@ export class Carviz {
         this.pathwayMarker.deactive();
         this.copyMarker.deactive();
         this.rulerMarker.deactive();
+        this.indoorLocalizationMarker.deactive();
     }
 
     handleNoSupport() {

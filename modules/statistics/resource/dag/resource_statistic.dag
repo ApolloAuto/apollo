@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/statistics/resource/libresource_statistic_component.so"
+    timer_components {
+        class_name : "ResourceStatisticComponent"
+        config {
+            name: "resource_statistic"
+            config_file_path: "/apollo/modules/statistics/resource/conf/resource_statistic_conf.pb.txt"
+            flag_file_path: "/apollo/modules/statistics/resource/conf/resource_statistic_gflags.conf"
+            interval: 3000
+        }
+    }
+}

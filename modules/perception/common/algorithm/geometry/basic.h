@@ -104,6 +104,9 @@ T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
   if (sin_theta < 0.0) {
     theta = -theta;
   }
+  if (std::isnan(theta) || std::isinf(theta)) {
+    theta = 0.0;
+  }
   return theta;
 }
 

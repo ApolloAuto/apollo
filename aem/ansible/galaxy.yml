@@ -1,8 +1,0 @@
-namespace: apolloauto
-name: dev_env
-version: 0.1.0
-license:
-  - Apache-2.0
-readme: README.md
-authors:
-  - Apollo Team <apollo_support@baidu.com>

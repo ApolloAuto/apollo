@@ -62,7 +62,7 @@ apollo_cc_library(
         "//cyber/transport:cyber_transport",
         "@com_github_google_glog//:glog",
         "@com_google_protobuf//:protobuf",
-        "@fastdds",
+        "@fastrtps",
     ],
 )
 

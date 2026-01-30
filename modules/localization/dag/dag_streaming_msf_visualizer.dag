@@ -6,7 +6,7 @@ module_config {
       class_name : "OnlineVisualizerComponent"
       config {
         name : "msf_visualizer"
-        flag_file_path : "modules/localization/conf/localization.conf"
+        flag_file_path : "/apollo/modules/localization/conf/localization.conf"
         readers: [
           {
             channel: "/apollo/sensor/lidar128/compensator/PointCloud2"

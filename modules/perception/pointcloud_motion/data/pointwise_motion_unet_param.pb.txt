@@ -1,0 +1,93 @@
+# pointwise unet parameters
+use_gpu: true
+fuse_time_interval: 1.0
+z_offset: 0.0
+
+pfn_info {
+  name: "pointwise_unet"
+  version: ""
+  dataset: "apollo"
+  task_type: CustomTask
+  sensor_type: Lidar
+  framework: Onnx
+  infer_plugin: "MultiBatchInference"
+
+  proto_file {
+    file: "motion_pfn.onnx"
+  }
+  inputs {
+    name: "voxels"
+    shape: 100000
+    shape: 10
+  }
+  outputs {
+    name: "point_feats"
+    shape: 100000
+    shape: 64
+  }
+}
+
+info {
+  name: "pointwise_unet"
+  version: ""
+  dataset: "apollo"
+  task_type: CustomTask
+  sensor_type: Lidar
+  framework: Onnx
+  infer_plugin: "MultiBatchInference"
+
+  proto_file {
+    file: "motion_backbone.onnx"
+  }
+  inputs {
+    name: "coors"
+    shape: 100000
+    shape: 4
+  }
+  inputs {
+    name: "point_feats"
+    shape: 100000
+    shape: 64
+  }
+  inputs {
+    name: "bev_feature"
+    shape: 1
+    shape: 64
+    shape: 160
+    shape: 160
+  }
+  inputs {
+    name: "bev_feature_pre"
+    shape: 1
+    shape: 64
+    shape: 160
+    shape: 160
+  }
+
+  outputs {
+    name: "seg_pred"
+    shape: 100000
+    shape: 4
+  }
+}
+
+preprocess {
+  gpu_id: 0
+}
+
+unet_params {
+  resolution: 0.2
+  unet_width: 160
+  unet_length: 160
+
+  min_height: -5.0
+  max_height: 5.0
+
+  min_x: -8.0
+  max_x: 24.0
+
+  min_y: -16.0
+  max_y: 16.0
+
+  max_point_number: 200000
+}

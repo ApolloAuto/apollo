@@ -203,6 +203,16 @@ struct TrackedObject {
   Eigen::Vector3d motion_score;
 
   // ***************************************************
+  // direction filter correlative infomation
+  // ***************************************************
+  Eigen::Vector3d direction_state;
+  Eigen::Matrix3d direction_state_covariance;
+  Eigen::Vector3d output_angular;
+
+  double direction_convergence_confidence = 0.0;
+  double direction_converged = false;
+
+  // ***************************************************
   // postprocess correlative information
   // ***************************************************
   Eigen::Vector3d output_velocity;

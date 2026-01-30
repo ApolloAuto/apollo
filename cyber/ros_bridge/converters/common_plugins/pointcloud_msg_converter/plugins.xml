@@ -1,3 +1,0 @@
-<library path="cyber/ros_bridge/converters/common_plugins/pointcloud_msg_converter/liblidar_pointcloud_plugin.so">
-    <class type="apollo::cyber::LidarPointcloud" base_class="apollo::cyber::MessageConverter"></class>
-</library>

@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message ParamsPipeline{
+  //The contained control params list of the params pipeline.
+  repeated ParamsDeclareInfo params_declare = 1;
+  repeated ParamsDeclareInfo calibration_table_declare = 2;
+}
+
+message ParamsDeclareInfo {
+  //The config name of the param.
+  required string config_name = 1;
+  //The config path of param.
+  required string config_path = 2;
+}

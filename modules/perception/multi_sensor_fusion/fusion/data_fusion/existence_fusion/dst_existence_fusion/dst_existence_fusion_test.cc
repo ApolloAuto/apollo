@@ -30,10 +30,10 @@ namespace fusion {
 
 /* TODO(all): Initialize() not compiling. to be fixed
 TEST(DstExistFusionTest, test_update_with_measurement) {
-  FLAGS_work_root = "modules/perception/testdata/"
+  FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "fusion/dst_existence_fusion";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/testdata/fusion/dst_existence_fusion/params";
+      "/apollo/modules/perception/testdata/fusion/dst_existence_fusion/params";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   EXPECT_TRUE(common::SensorManager::Instance()->Init());
 

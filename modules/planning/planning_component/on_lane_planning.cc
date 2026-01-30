@@ -39,6 +39,7 @@
 #include "modules/planning/planning_base/common/history.h"
 #include "modules/planning/planning_base/common/planning_context.h"
 #include "modules/planning/planning_base/common/trajectory_stitcher.h"
+#include "modules/planning/planning_base/common/util/driving_state_generator.h"
 #include "modules/planning/planning_base/common/util/util.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
@@ -539,9 +540,6 @@ Status OnLanePlanning::Plan(
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
                                ptr_trajectory_pb);
 
-  ptr_debug->mutable_planning_data()->set_front_clear_distance(
-      injector_->ego_info()->front_clear_distance());
-
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
     frame_->mutable_open_space_info()->sync_debug_instance();
     const auto& publishable_trajectory =
@@ -692,6 +690,8 @@ Status OnLanePlanning::Plan(
         ptr_trajectory_pb->mutable_engage_advice(),
         injector_->planning_context());
   }
+
+  AddADCDrivingStateInfo(ptr_debug);
 
   return status;
 }
@@ -1270,6 +1270,17 @@ void OnLanePlanning::AddPublishedAcceleration(
   (*sliding_line_properties)["lineTension"] = "0";
   (*sliding_line_properties)["fill"] = "false";
   (*sliding_line_properties)["showLine"] = "true";
+}
+
+void OnLanePlanning::AddADCDrivingStateInfo(
+    planning_internal::Debug* const debug) {
+  debug->mutable_planning_data()->set_front_clear_distance(
+      injector_->ego_info()->front_clear_distance());
+
+  DrivingStateGenerator state_generator;
+  state_generator.generate(
+      frame_->DriveReferenceLineInfo(), injector_->ego_info(),
+      debug->mutable_planning_data()->mutable_adc_driving_state());
 }
 
 }  // namespace planning

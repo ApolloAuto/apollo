@@ -5,8 +5,8 @@ module_config {
         class_name : "RoutingComponent"
         config {
             name : "routing"
-            config_file_path: "modules/routing/conf/routing_config.pb.txt"
-            flag_file_path: "modules/routing/conf/routing.conf"
+            config_file_path: "/apollo/modules/routing/conf/routing_config.pb.txt"
+            flag_file_path: "/apollo/modules/routing/conf/routing.conf"
             readers: [
                 {
                     channel: "/apollo/raw_routing_request"

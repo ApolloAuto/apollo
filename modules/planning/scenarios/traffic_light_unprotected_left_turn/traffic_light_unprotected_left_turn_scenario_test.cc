@@ -37,7 +37,7 @@ class TrafficLightUnprotectedLeftTurnScenarioTest : public ::testing::Test {
 
 TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
   std::string scenario_traffic_light_unprotected_left_turn_config_file =
-      "modules/planning/scenarios/traffic_light_unprotected_left_turn/"
+      "/apollo/modules/planning/scenarios/traffic_light_unprotected_left_turn/"
       "conf/scenario_conf.pb.txt";
 
   ScenarioTrafficLightUnprotectedLeftTurnConfig config;

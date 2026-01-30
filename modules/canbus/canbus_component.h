@@ -110,6 +110,7 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
   std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;
   bool is_control_cmd_time_delay_ = false;
   bool is_control_cmd_time_delay_previous_ = false;
+  bool is_chassis_communication_fault_ = false;
 };
 
 CYBER_REGISTER_COMPONENT(CanbusComponent)

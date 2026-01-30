@@ -40,6 +40,7 @@ bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();
   cyc_refine_speed_ = config.cyc_refine_speed();
   car_refine_speed_ = config.car_refine_speed();
+  use_movable_state_check_ = config.use_movable_state_check();
   return true;
 }
 
@@ -78,7 +79,22 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
           << " KEEP MOTION because of extraodinary acceleration.";
     return true;
   }
-  // 2. static hypothesis check
+
+  // 2. motion state check
+  bool need_assign_movable_obj_speed =
+      NeedAssignMovableObjectSpeed(latest_object, new_object);
+  if (use_movable_state_check_ && need_assign_movable_obj_speed) {
+    if (new_object->belief_velocity.head(2).norm() > 0) {
+      new_object->output_velocity = new_object->belief_velocity;
+    } else if (new_object->measured_barycenter_velocity.head(2).norm() > 0) {
+      new_object->output_velocity = new_object->measured_barycenter_velocity;
+    } else {
+      new_object->output_velocity = new_object->measured_center_velocity;
+    }
+    return true;
+  }
+
+  // 3. static hypothesis check
   bool is_static_hypothesis =
       CheckStaticHypothesisByState(latest_object, new_object);
 
@@ -226,6 +242,19 @@ bool MlfMotionRefiner::CheckStaticHypothesisByVelocityAngleChange(
   if (fabs(velocity_angle_change) > reasonable_angle_change_maximum) {
     return true;
   }
+  return false;
+}
+
+bool MlfMotionRefiner::NeedAssignMovableObjectSpeed(
+    const TrackedObjectConstPtr& latest_object,
+    const TrackedObjectConstPtr& new_object) const {
+  base::ObjectPtr obj = new_object->object_ptr;
+  // moving object and have no speed
+  if (obj->motion_state == base::MotionState::MOVING &&
+      new_object->output_velocity.head(2).norm() < 1e-6) {
+    return true;
+  }
+
   return false;
 }
 

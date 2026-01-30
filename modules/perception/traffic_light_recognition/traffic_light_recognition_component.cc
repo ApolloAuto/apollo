@@ -26,83 +26,78 @@ namespace perception {
 namespace trafficlight {
 
 bool TrafficLightRecognComponent::Init() {
-  // init component config
-  if (InitConfig() != cyber::SUCC) {
-    AERROR << "TrafficLightRecognComponent InitConfig failed.";
-    return false;
-  }
-  // init algorithm plugin
-  if (InitAlgorithmPlugin() != cyber::SUCC) {
-    AERROR << "TrafficLightRecognComponent InitAlgorithmPlugin failed.";
-    return false;
-  }
-  AINFO << "Successfully init traffic light recognition component.";
-  return true;
+    // init component config
+    if (InitConfig() != cyber::SUCC) {
+        AERROR << "TrafficLightRecognComponent InitConfig failed.";
+        return false;
+    }
+    // init algorithm plugin
+    if (InitAlgorithmPlugin() != cyber::SUCC) {
+        AERROR << "TrafficLightRecognComponent InitAlgorithmPlugin failed.";
+        return false;
+    }
+    AINFO << "Successfully init traffic light recognition component.";
+    return true;
 }
 
-bool TrafficLightRecognComponent::Proc(
-    const std::shared_ptr<TrafficDetectMessage>& message) {
-  PERF_FUNCTION()
-  auto time_imags = std::to_string(message->timestamp_);
-  AINFO << "Enter recognition component, message timestamp: " << time_imags;
+bool TrafficLightRecognComponent::Proc(const std::shared_ptr<TrafficDetectMessage>& message) {
+    PERF_FUNCTION()
+    auto time_imags = std::to_string(message->timestamp_);
+    AINFO << "Enter recognition component, message timestamp: " << time_imags;
 
-  bool status = InternalProc(message);
-  if (status) {
-    writer_->Write(message);
-    AINFO << "Send trafficlight recognition output message.";
-  }
-  return status;
+    bool status = InternalProc(message);
+    if (status) {
+        writer_->Write(message);
+        AINFO << "Send trafficlight recognition output message.";
+    }
+    return status;
 }
 
 int TrafficLightRecognComponent::InitConfig() {
-  apollo::perception::trafficlight::RecognitionParam traffic_light_param;
-  if (!GetProtoConfig(&traffic_light_param)) {
-    AINFO << "load trafficlights recognition component proto param failed";
-    return cyber::FAIL;
-  }
+    apollo::perception::trafficlight::RecognitionParam traffic_light_param;
+    if (!GetProtoConfig(&traffic_light_param)) {
+        AINFO << "load trafficlights recognition component proto param failed";
+        return cyber::FAIL;
+    }
 
-  PluginParam plugin_param = traffic_light_param.plugin_param();
-  tl_recognitor_name_ = plugin_param.name();
-  config_path_ = plugin_param.config_path();
-  config_file_ = plugin_param.config_file();
+    PluginParam plugin_param = traffic_light_param.plugin_param();
+    tl_recognitor_name_ = plugin_param.name();
+    config_path_ = plugin_param.config_path();
+    config_file_ = plugin_param.config_file();
 
-  gpu_id_ = traffic_light_param.gpu_id();
-  AINFO << "tl_recognitor_name: " << tl_recognitor_name_
-        << " config_path: " << config_path_ << " config_file: " << config_file_
-        << " gpu_id: " << gpu_id_;
+    gpu_id_ = traffic_light_param.gpu_id();
+    AINFO << "tl_recognitor_name: " << tl_recognitor_name_ << " config_path: " << config_path_
+          << " config_file: " << config_file_ << " gpu_id: " << gpu_id_;
 
-  writer_ = node_->CreateWriter<TrafficDetectMessage>(
-      traffic_light_param.recognition_output_channel_name());
+    writer_ = node_->CreateWriter<TrafficDetectMessage>(traffic_light_param.recognition_output_channel_name());
 
-  return cyber::SUCC;
+    return cyber::SUCC;
 }
 
 bool TrafficLightRecognComponent::InitAlgorithmPlugin() {
-  trafficlight::BaseTrafficLightRecognitor* recognitor =
-      trafficlight::BaseTrafficLightRecognitorRegisterer::GetInstanceByName(
-          tl_recognitor_name_);
-  CHECK_NOTNULL(recognitor);
-  recognitor_.reset(recognitor);
-  ACHECK(recognitor_ != nullptr);
-  recognitor_init_options_.gpu_id = gpu_id_;
-  recognitor_init_options_.config_path = config_path_;
-  recognitor_init_options_.config_file = config_file_;
+    trafficlight::BaseTrafficLightRecognitor* recognitor
+            = trafficlight::BaseTrafficLightRecognitorRegisterer::GetInstanceByName(tl_recognitor_name_);
+    CHECK_NOTNULL(recognitor);
+    recognitor_.reset(recognitor);
+    ACHECK(recognitor_ != nullptr);
+    recognitor_init_options_.gpu_id = gpu_id_;
+    recognitor_init_options_.config_path = config_path_;
+    recognitor_init_options_.config_file = config_file_;
 
-  if (!recognitor_->Init(recognitor_init_options_)) {
-    AERROR << "Trafficlight recognitor init failed";
-    return false;
-  }
+    if (!recognitor_->Init(recognitor_init_options_)) {
+        AERROR << "Trafficlight recognitor init failed";
+        return false;
+    }
 
-  return cyber::SUCC;
+    return cyber::SUCC;
 }
 
-bool TrafficLightRecognComponent::InternalProc(
-    const std::shared_ptr<TrafficDetectMessage const>& message) {
-  PERF_BLOCK("traffic_light_recognition")
-  bool status = recognitor_->Detect(message->traffic_light_frame_.get());
-  PERF_BLOCK_END
+bool TrafficLightRecognComponent::InternalProc(const std::shared_ptr<TrafficDetectMessage const>& message) {
+    PERF_BLOCK("traffic_light_recognition")
+    bool status = recognitor_->Detect(message->traffic_light_frame_.get());
+    PERF_BLOCK_END
 
-  return true;
+    return true;
 }
 
 }  // namespace trafficlight

@@ -118,14 +118,6 @@ message CyberModule {
   optional string process_group = 3;
 }
 
-message Layout {
-    optional string type = 1;
-    optional Layout first = 2;
-    optional Layout second = 3;
-    optional string direction = 4;
-    optional double splitPercentage = 5 [default = 50.0];
-}
-
 message HMIMode {
   map<string, CyberModule> cyber_modules = 1;
   map<string, Module> modules = 2;
@@ -133,6 +125,6 @@ message HMIMode {
   map<string, ProcessMonitorConfig> other_components = 4;
   repeated HMIModeOperation operations = 5;
   optional HMIModeOperation default_operation = 6;
-  optional Layout layout = 7;
+  optional string layout = 7;
   map<string, MonitoredComponent> global_components = 8;
 }

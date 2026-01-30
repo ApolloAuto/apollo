@@ -23,8 +23,7 @@ export type IInitState = {
         id: string;
     };
     isLogin: boolean;
-    account?: any;
-    isFirstEnterDreamView?: boolean;
+    account: any;
 };
 
 type InitUserInfoAction = PayloadAction<typeof INIT_USER_INFO, Omit<IInitState, 'account'>>;

@@ -2,7 +2,7 @@
   <name>perception-model-yolox3d</name>
   <version>local</version>
   <description>
-    The yolox and yolx3d model of perception.
+    The yolox and yolo3d model of perception.
   </description>
 
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>

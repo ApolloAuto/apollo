@@ -1,4 +1,0 @@
-name: "lidar"
-apollo_channel_name_0: "/apollo/vanjee/pointcloud2"
-apollo_channel_name_1: "/apollo/localization/pose"
-ros_topic_name_0: "/pose"

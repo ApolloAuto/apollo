@@ -1,0 +1,4 @@
+<library path="modules/planning/scenarios/large_curvature/liblarge_curvature_scenario.so">
+    <class type="apollo::planning::LargeCurvatureScenario" base_class="apollo::planning::Scenario"></class>
+    <class type="apollo::planning::StageLargeCurvature" base_class="apollo::planning::Stage"></class>
+</library>

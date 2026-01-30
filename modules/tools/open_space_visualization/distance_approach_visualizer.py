@@ -19,13 +19,12 @@
 import math
 import time
 
-from cyber.python.cyber_py3 import cyber
 from matplotlib import animation
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 
-from modules.tools.open_space_visualization.distance_approach_python_interface import *
+from distance_approach_python_interface import *
 
 
 result_file = "/tmp/open_space_osqp_ipopt.csv"
@@ -264,7 +263,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
 if __name__ == '__main__':
     # visualize_flag = True
     # SmoothTrajectory(visualize_flag)
-    cyber.init()
+
     visualize_flag = False
     planning_time_stats = []
     hybrid_time_stats = []

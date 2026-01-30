@@ -207,7 +207,7 @@ export default class PathwayMarker extends BaseMarker {
 
     selectParkingSpace(isSelecting: boolean, x?, y?) {
         if (isSelecting) {
-            //first reset the crrent mesh color
+            // first reset the crrent mesh color
             if (this.selectedMesh) {
                 this.selectParkingSpace(false);
             }
@@ -216,13 +216,10 @@ export default class PathwayMarker extends BaseMarker {
                 parkspaceObject.material.color.set(parkspaceObject.userData.selectedColor);
                 this.selectedMesh = parkspaceObject;
             }
+        } else if (this.selectedMesh) {
+            this.selectedMesh.material.color.set(this.selectedMesh.userData.color);
         }
-        else {
-            if (this.selectedMesh) {
-                this.selectedMesh.material.color.set(this.selectedMesh.userData.color);
-            }
-        }
-        const {renderer, camera, scene } = this.context;
+        const { renderer, camera, scene } = this.context;
         renderer.render(scene, camera);
     }
 

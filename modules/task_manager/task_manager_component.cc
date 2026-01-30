@@ -70,7 +70,7 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
 
   if (task->task_type() == CYCLE_ROUTING) {
     cycle_routing_manager_ = std::make_shared<CycleRoutingManager>();
-    cycle_routing_manager_->Init(task->cycle_routing_task());
+    cycle_routing_manager_->Init(localization_.pose(), task->cycle_routing_task());
     lane_follow_command_ = task->cycle_routing_task().lane_follow_command();
     Rate rate(1.0);
 

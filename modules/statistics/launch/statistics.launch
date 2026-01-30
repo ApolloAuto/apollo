@@ -1,0 +1,9 @@
+<cyber>
+    <module>
+        <name>statistics</name>
+        <process_name>statistics</process_name>
+        <dag_conf>/apollo/modules/statistics/resource/dag/resource_statistic.dag</dag_conf>
+        <dag_conf>/apollo/modules/statistics/process/dag/process_statistic.dag</dag_conf>
+        <dag_conf>/apollo/modules/statistics/latency/dag/latency_statistic.dag</dag_conf>
+    </module>
+</cyber>

@@ -1,0 +1,10 @@
+<cyber>
+    <desc>cyber modules list config</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>barrier_recognition</name>
+        <dag_conf>/apollo/modules/perception/barrier_recognition/dag/barrier_recognition.dag</dag_conf>
+        <process_name>barrier_recognition</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

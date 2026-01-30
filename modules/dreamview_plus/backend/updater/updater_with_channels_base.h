@@ -39,25 +39,24 @@ namespace dreamview {
  */
 class UpdaterWithChannelsBase : public UpdaterBase {
  public:
-  UpdaterWithChannelsBase(const std::vector<std::string> &filter_message_types,
-                          const std::vector<std::string> &filter_channels);
-
   /**
    * @brief GetChannelMsg
    */
   virtual void GetChannelMsg(std::vector<std::string> *channels) = 0;
-  void GetChannelMsgWithFilter(std::vector<std::string> *channels);
-
   /**
-   * @brief Check if the channel belongs to current updater.
-   * @param message_type The type of message in channel.
-   * @param channel_name The name of channel.
+   * @brief GetChannelMsgWithFilter:by msg type and channel filter field to filter channels for DataUpdater
+   * @param channels: output channel list
+   * @param filter_message_type: message type to filter channels
+   * @param filter_channel: channel field to filter channels
+   * @param reverse_filter_channel: whether to filter out the channel,default to false,if ture,filter out the channel list that contains filter_channel
+   * else,filter out the channel list that not contains filter_channel
    */
-  bool IsChannelInUpdater(const std::string &message_type,
-                          const std::string &channel_name);
+  void GetChannelMsgWithFilter(std::vector<std::string>* channels,
+                               const std::string& filter_message_type,
+                               const std::string& filter_channel,
+                               bool reverse_filter_channel = false);
+
   std::vector<std::string> channels_;
-  std::vector<std::string> filter_message_types_;
-  std::vector<std::string> filter_channels_;
 };
 
 }  // namespace dreamview

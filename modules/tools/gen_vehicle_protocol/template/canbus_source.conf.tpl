@@ -1,5 +1,5 @@
---flagfile=modules/common/data/global_flagfile.txt
---canbus_conf_file=modules/canbus/conf/canbus_conf.pb.txt
+--flagfile=/apollo/modules/common/data/global_flagfile.txt
+--canbus_conf_file=/apollo/modules/canbus/conf/canbus_conf.pb.txt
 --load_vehicle_library=/apollo/bazel-bin/modules/canbus_vehicle/%(car_type_lower)s/lib%(car_type_lower)s_vehicle_factory_lib.so
 --load_vehicle_class_name=%(car_type_cap)sVehicleFactory
 --enable_chassis_detail_pub

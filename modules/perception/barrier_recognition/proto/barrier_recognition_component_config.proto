@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+
+message BarrierRecognitionComponentConfig {
+  optional string output_channel_name = 1;
+  optional string frame_id = 2;
+  optional string child_frame_id = 3;
+  optional perception.PluginParam recognizer_param = 4;
+  optional perception.PluginParam tracker_param = 5;
+}

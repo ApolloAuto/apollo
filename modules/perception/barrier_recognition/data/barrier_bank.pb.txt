@@ -1,0 +1,5 @@
+plugins {
+    name: "StraightPoleRecognizer"
+    config_path: "perception/barrier_recognition/data"
+    config_file: "straight_pole_barrier.pb.txt"
+}

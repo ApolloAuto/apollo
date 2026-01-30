@@ -1,0 +1,78 @@
+stage: {
+  name: "SQUARE_LANE_FOLLOW_STAGE"
+  type: "SquareLaneFollowStage"
+  enabled: true
+  task {
+    name: "OBSTACLE_NUDGE_DECIDER"
+    type: "ObstacleNudgeDecider"
+  }
+  task {
+    name: "SQUARE_PATH"
+    type: "SquarePath"
+  }
+  task {
+    name: "LANE_BORROW_PATH_GENERIC"
+    type: "LaneBorrowPathGeneric"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+#  task {
+#    name: "PIECEWISE_JERK_SPEED_NONLINEAR"
+#    type: "PiecewiseJerkSpeedNonlinearOptimizer"
+# }
+}
+stage: {
+  name: "EXTRICATE_STAGE"
+  type: "ExtricateStage"
+  enabled: true
+  task {
+    name: "OBSTACLE_NUDGE_DECIDER"
+    type: "ObstacleNudgeDecider"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH_GENERIC"
+    type: "LaneBorrowPathGeneric"
+  }
+  task {
+    name: "REVERSE_PATH"
+    type: "ReversePath"
+  }
+  task {
+    name: "REVERSE_SPEED_DECIDER"
+    type: "ReverseSpeed"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}

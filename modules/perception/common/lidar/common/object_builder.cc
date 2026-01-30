@@ -44,9 +44,10 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
       ComputePolygonSizeCenter(objects->at(i));
       ComputeOtherObjectInformation(objects->at(i));
       ComputeHeightAboveGround(objects->at(i));
-      if (FLAGS_need_judge_front_critical) {
-          JudgeFrontCritical(objects->at(i), frame->lidar2novatel_extrinsics);
-      }
+      // Not necessary
+      // if (FLAGS_need_judge_front_critical) {
+      //   JudgeFrontCritical(objects->at(i), frame->lidar2novatel_extrinsics);
+      // }
     }
   }
   return true;
@@ -216,11 +217,24 @@ void ObjectBuilder::JudgeFrontCritical(
     obj_center = lidar2novatel_pose * obj_center;
     auto x_in_novatel = obj_center(0);
     auto y_in_novatel = obj_center(1);
+    const float invalid_ground = std::numeric_limits<float>::max();
     if (y_in_novatel > FLAGS_y_back && y_in_novatel < FLAGS_y_front &&
         x_in_novatel > FLAGS_x_back && x_in_novatel < FLAGS_x_front &&
         object->lidar_supplement.is_clustered) {
-        object->is_front_critical = true;
-        AINFO << "Object " << object->id << " is FRONT-CRITICAL";
+        float above_max = -100.0f;
+        for (size_t j = 0; j < object->lidar_supplement.cloud.size(); j++) {
+            auto height = object->lidar_supplement.cloud.points_height(j);
+            if (height == invalid_ground) {
+                continue;
+            }
+            above_max = std::max(above_max, height);
+        }
+        if (above_max <= FLAGS_max_points_height) {
+            object->is_front_critical = true;
+            AINFO << "Object lidar_x: " << object->center(0) << ", lidar_y: "
+                  << object->center(1) << ", max_point_height: " << above_max
+                  << " is FRONT-CRITICAL";
+        }
     }
 }
 

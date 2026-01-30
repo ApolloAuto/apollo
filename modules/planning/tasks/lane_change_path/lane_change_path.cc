@@ -126,11 +126,11 @@ bool LaneChangePath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
 
   PathBound temp_path_bound = path_bound;
   std::string blocking_obstacle_id;
-  std::vector<SLPolygon> obs_sl_polygons;
-  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons,
+  obs_sl_polygons_.clear();
+  PathBoundsDeciderUtil::GetSLPolygons(*reference_line_info_, &obs_sl_polygons_,
                                        init_sl_state_);
   if (!PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
-          *reference_line_info_, &obs_sl_polygons, init_sl_state_, &path_bound,
+          *reference_line_info_, &obs_sl_polygons_, init_sl_state_, &path_bound,
           &blocking_obstacle_id, &path_narrowest_width)) {
     AERROR << "Failed to decide fine tune the boundaries after "
               "taking into consideration all static obstacles.";
@@ -222,6 +222,8 @@ bool LaneChangePath::AssessPath(std::vector<PathData>* candidate_path_data,
   }
 
   *final_path = valid_path_data[0];
+  // move obs_sl_polygon to reference_line_info, it will be empty, do not use it
+  *(reference_line_info_->mutable_obs_sl_polygons()) = std::move(obs_sl_polygons_);
   RecordDebugInfo(*final_path, final_path->path_label(), reference_line_info_);
   return true;
 }

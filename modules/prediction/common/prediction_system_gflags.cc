@@ -22,13 +22,13 @@
 DEFINE_string(prediction_module_name, "prediction",
               "Default prediction module name");
 DEFINE_string(prediction_conf_file,
-              "modules/prediction/conf/prediction_conf.pb.txt",
+              "/apollo/modules/prediction/conf/prediction_conf.pb.txt",
               "Default conf file for prediction");
 DEFINE_string(prediction_adapter_config_filename,
-              "modules/prediction/conf/adapter.conf",
+              "/apollo/modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
 DEFINE_string(prediction_data_dir,
-              "modules/prediction/data/prediction/",
+              "/apollo/modules/prediction/data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_string(offline_feature_proto_file_name, "",
               "The bin file including a series of feature proto messages");
@@ -89,11 +89,11 @@ DEFINE_string(perception_obstacles_topic_name,
               "Internal topic of perception obstacles");
 
 // VectorNet
-DEFINE_string(prediction_target_file, "data/train/test.pb.txt",
+DEFINE_string(prediction_target_file, "/apollo/data/train/test.pb.txt",
               "VectorNet target pb file name");
-DEFINE_string(world_coordinate_file, "data/world_coord.bin",
+DEFINE_string(world_coordinate_file, "/apollo/data/world_coord.bin",
               "VectorNet world coordinate file name");
-DEFINE_string(prediction_target_dir, "data/train/",
+DEFINE_string(prediction_target_dir, "/apollo/data/train/",
               "VectorNet target dir");
 DEFINE_double(obstacle_x, 0.0, "obstacle position x");
 DEFINE_double(obstacle_y, 0.0, "obstacle position y");

@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/open_space_trajectory_post_process/libopen_space_trajectory_post_process.so">
+    <class type="apollo::planning::OpenSpaceTrajectoryPostProcess" base_class="apollo::planning::Task"></class>
+</library>

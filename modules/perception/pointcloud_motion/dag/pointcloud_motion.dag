@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/pointcloud_motion/libpointcloud_motion_component.so"
+  components {
+    class_name : "PointCloudMotionComponent"
+    config {
+      name : "PointCloudMotion"
+      config_file_path : "/apollo/modules/perception/pointcloud_motion/conf/pointcloud_motion.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/pointcloud_semantic"
+      }
+    }
+  }
+}

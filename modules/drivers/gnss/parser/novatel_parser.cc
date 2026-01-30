@@ -877,9 +877,9 @@ bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
                    imu->x_velocity_change * accel_scale,
                    -imu->z_velocity_change * accel_scale,
                    ins_.mutable_linear_acceleration());
-        rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
-                   imu->x_velocity_change * accel_scale,
-                   -imu->z_velocity_change * accel_scale,
+        rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
+                   imu->x_angle_change * gyro_scale,
+                   -imu->z_angle_change * gyro_scale,
                    ins_.mutable_angular_velocity());
       }
       break;

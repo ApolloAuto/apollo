@@ -6,7 +6,6 @@ export const layerMenu = {
 
     perception: 'Perception',
     pointCloud: 'Point Cloud',
-    curbPointCloud: 'Curb Point Cloud',
     pedestrian: 'Pedestrian',
     vehicle: 'Vehicle',
     bicycle: 'Bicycle',

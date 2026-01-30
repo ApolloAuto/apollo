@@ -57,7 +57,7 @@ class DiscretePointsReferenceLineSmootherTest : public ::testing::Test {
   }
 
   const std::string map_file =
-      "modules/planning/planning_base/testdata/garage_map/base_map.txt";
+      "/apollo/modules/planning/planning_base/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
   common::math::Vec2d vehicle_position_;

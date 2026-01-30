@@ -85,10 +85,10 @@ class MPCControllerTest : public ::testing::Test, MPCController {
 
 TEST_F(MPCControllerTest, ComputeLateralErrors) {
   auto localization_pb = LoadLocalizaionPb(
-      "modules/control/controllers/mpc_controller/"
+      "/apollo/modules/control/controllers/mpc_controller/"
       "mpc_controller_test_data/1_localization.pb.txt");
   auto chassis_pb = LoadChassisPb(
-      "modules/control/controllers/mpc_controller/"
+      "/apollo/modules/control/controllers/mpc_controller/"
       "mpc_controller_test_data/1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
   auto vehicle_state = injector_->vehicle_state();
@@ -96,7 +96,7 @@ TEST_F(MPCControllerTest, ComputeLateralErrors) {
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(
-      "modules/control/controllers/mpc_controller/"
+      "/apollo/modules/control/controllers/mpc_controller/"
       "mpc_controller_test_data/1_planning.pb.txt");
   TrajectoryAnalyzer trajectory_analyzer(&planning_trajectory_pb);
 

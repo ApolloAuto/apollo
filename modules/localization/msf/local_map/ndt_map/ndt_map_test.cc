@@ -35,12 +35,12 @@ namespace msf {
 
 TEST(MapNdtTestSuite, matrix) {
   const std::string pcd_folder =
-      "modules/localization/msf/local_map/test_data/ndt_map/pcds";
+      "/apollo/modules/localization/msf/local_map/test_data/ndt_map/pcds";
   EXPECT_TRUE(apollo::cyber::common::EnsureDirectory(pcd_folder));
   const std::string pose_files = pcd_folder + "/poses.txt";
 
   const std::string map_base_folder =
-      "modules/localization/msf/local_map/test_data/ndt_map/map_data";
+      "/apollo/modules/localization/msf/local_map/test_data/ndt_map/map_data";
   EXPECT_TRUE(apollo::cyber::common::EnsureDirectory(map_base_folder));
 
   ::apollo::common::EigenAffine3dVec pcd_poses;

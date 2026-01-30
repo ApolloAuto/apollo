@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioSquareConfig {
+optional double filtering_distance = 1 [default = 100];
+optional double perception_obstacle_buffer = 2 [default = 2];
+
+
+}

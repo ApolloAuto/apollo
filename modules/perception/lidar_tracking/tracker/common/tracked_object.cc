@@ -108,6 +108,12 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     belief_velocity = Eigen::Vector3d::Zero();
     belief_acceleration = Eigen::Vector3d::Zero();
 
+    direction_state = Eigen::Vector3d::Zero();
+    direction_state_covariance = Eigen::Matrix3d::Zero();
+    output_angular = Eigen::Vector3d::Zero();
+    direction_convergence_confidence = 0.0;
+    direction_converged = false;
+
     output_velocity = Eigen::Vector3d::Zero();
     output_velocity_uncertainty = Eigen::Matrix3d::Zero();
     output_direction = direction;
@@ -193,6 +199,12 @@ void TrackedObject::Reset() {
   state_covariance = Eigen::Matrix4d::Zero();
 
   motion_score = Eigen::Vector3d(1, 1, 1);
+
+  direction_state = Eigen::Vector3d::Zero();
+  direction_state_covariance = Eigen::Matrix3d::Zero();
+  output_angular = Eigen::Vector3d::Zero();
+  direction_convergence_confidence = 0.0;
+  direction_converged = false;
 
   // output reset
   output_velocity = belief_velocity;

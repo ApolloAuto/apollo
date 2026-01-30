@@ -30,20 +30,9 @@ ParticipantListener::~ParticipantListener() {
   callback_ = nullptr;
 }
 
-/**
- * @brief Event handler for participant discovery.
- *
- * This function is called when a new participant is discovered in the DDS domain.
- *
- * @param p Pointer to the DomainParticipant. This parameter is unused in this function.
- *          DomainParticipant represents an entity that participates in a DDS domain,
- *          allowing publishers and subscribers to communicate.
- * @param info An rvalue reference to the ParticipantDiscoveryInfo, which contains
- *          information about the discovered participant.
- */
-void ParticipantListener::on_participant_discovery(
-    eprosima::fastdds::dds::DomainParticipant* p,
-    eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) {
+void ParticipantListener::onParticipantDiscovery(
+    eprosima::fastrtps::Participant* p,
+    eprosima::fastrtps::ParticipantDiscoveryInfo info) {
   RETURN_IF_NULL(callback_);
   (void)p;
   std::lock_guard<std::mutex> lock(mutex_);

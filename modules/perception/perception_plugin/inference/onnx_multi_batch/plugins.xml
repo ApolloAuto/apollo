@@ -1,0 +1,3 @@
+<library path="modules/perception/perception_plugin/inference/onnx_multi_batch/libonnx_multi_batch.so">
+    <class type="apollo::perception::inference::MultiBatchInference" base_class="apollo::perception::inference::Inference"></class>
+</library>

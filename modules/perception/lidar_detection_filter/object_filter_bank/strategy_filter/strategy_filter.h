@@ -86,6 +86,7 @@ class StrategyFilter : public BaseObjectFilter {
     double merge_time_ = 0.0;
     bool allow_fore_merge_ = false;
     float below_threshold_ = 0.5;
+    float below_range_ = 3.0;
     float small_size_threshold_ = 0.01;
 };  // class StrategyFilter
 

@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight.yolox;
+
+import "modules/perception/common/proto/model_info.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional int32 resize_image_hight = 2 [default = 256];
+  optional int32 resize_image_width = 3 [default = 256];
+  optional int32 max_batch_size = 4 [default = 1]; 
+  optional float pad_th = 5 [default = 1.0];
+  optional float cls_th = 6 [default = 0.26];
+  optional TLDetectorNMSParam nms_param = 7;
+  optional int32 min_crop_size = 8 [default = 270];
+  optional int32 crop_method = 9 [default = 0];
+  optional float crop_scale = 10 [default = 2.5];
+}
+
+message TLDetectorNMSParam {
+    optional string type = 1 [default = "NormalNMS"];
+    optional float threshold = 2 [default = 0.4];
+}

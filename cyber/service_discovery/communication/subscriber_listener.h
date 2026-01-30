@@ -21,33 +21,28 @@
 #include <mutex>
 #include <string>
 
-#include "cyber/base/macros.h"
-
-#include "fastdds/dds/subscriber/DataReader.hpp"
-#include "fastdds/dds/subscriber/SampleInfo.hpp"
-#include "fastdds/dds/subscriber/SubscriberListener.hpp"
-
-#include "cyber/transport/common/common_type.h"
+#include "fastrtps/Domain.h"
+#include "fastrtps/subscriber/SampleInfo.h"
+#include "fastrtps/subscriber/Subscriber.h"
+#include "fastrtps/subscriber/SubscriberListener.h"
 
 namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
-class SubscriberListener : public eprosima::fastdds::dds::SubscriberListener {
+class SubscriberListener : public eprosima::fastrtps::SubscriberListener {
  public:
-  explicit SubscriberListener(
-      const transport::rtps::subsciber_callback& callback);
+  using NewMsgCallback = std::function<void(const std::string&)>;
+
+  explicit SubscriberListener(const NewMsgCallback& callback);
   virtual ~SubscriberListener();
 
-  void on_data_available(eprosima::fastdds::dds::DataReader* reader) override;
-  void on_subscription_matched(
-      eprosima::fastdds::dds::DataReader* reader,
-      const eprosima::fastdds::dds::SubscriptionMatchedStatus& info)
-      override;  // NOLINT
+  void onNewDataMessage(eprosima::fastrtps::Subscriber* sub);
+  void onSubscriptionMatched(eprosima::fastrtps::Subscriber* sub,
+                             eprosima::fastrtps::MatchingInfo& info);  // NOLINT
 
  private:
-  transport::rtps::subsciber_callback callback_;
-  transport::MessageInfo msg_info_;
+  NewMsgCallback callback_;
   std::mutex mutex_;
 };
 

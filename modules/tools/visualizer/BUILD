@@ -48,7 +48,7 @@ apollo_qt_library(
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/common_msgs/sensor_msgs:radar_cc_proto",
         "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
-        "@fastdds",
+        "@fastrtps",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_opengl",

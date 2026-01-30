@@ -1,0 +1,12 @@
+module_config {
+    module_library : "modules/statistics/process/libprocess_statistic_component.so"
+    timer_components {
+        class_name : "ProcessStatisticComponent"
+        config {
+            name: "process_statistic"
+            config_file_path: "/apollo/modules/statistics/process/conf/process_statistic_conf.pb.txt"
+            flag_file_path: "/apollo/modules/statistics/process/conf/process_statistic_gflags.conf"
+            interval: 200
+        }
+    }
+}

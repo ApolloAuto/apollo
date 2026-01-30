@@ -37,101 +37,97 @@ namespace perception {
 namespace camera {
 
 class Yolox3DObstacleDetector : public BaseObstacleDetector {
- public:
-  Yolox3DObstacleDetector() : BaseObstacleDetector() {}
-  virtual ~Yolox3DObstacleDetector() {
-    if (stream_ != nullptr) {
-      cudaStreamDestroy(stream_);
+public:
+    Yolox3DObstacleDetector() : BaseObstacleDetector() {}
+    virtual ~Yolox3DObstacleDetector() {
+        if (stream_ != nullptr) {
+            cudaStreamDestroy(stream_);
+        }
     }
-  }
 
-  /**
-  * @brief Necessary, Init yolox3d model params normal,
-           but now use pipline instead
-  * @param options obstacle detection init options
-  * @return init status, yolox3d detector stage status
-  */
-  bool Init(const ObstacleDetectorInitOptions &options =
-                ObstacleDetectorInitOptions()) override;
+    /**
+    * @brief Necessary, Init yolox3d model params normal,
+             but now use pipline instead
+    * @param options obstacle detection init options
+    * @return init status, yolox3d detector stage status
+    */
+    bool Init(const ObstacleDetectorInitOptions &options = ObstacleDetectorInitOptions()) override;
 
-  /**
-   * @brief Detect stage
-   *
-   */
-  bool Detect(onboard::CameraFrame *frame) override;
+    bool Detect(onboard::CameraFrame *frame) override;
 
-  /**
-   * @brief return detector name
-   * @param None
-   * @return now detector type
-   */
-  std::string Name() const override { return "Yolox3DObstacleDetector"; }
+    /**
+     * @brief return detector name
+     * @param None
+     * @return now detector type
+     */
+    std::string Name() const override {
+        return "Yolox3DObstacleDetector";
+    }
 
- protected:
-  /**
-  * @brief Preprocess of image before inference,
-           resize input data blob and fill image data to blob
-  * @param image image read from camera frame of 6mm camera
-  * @param input_blob image input blob address pointer
-  * @return preprocess status
-  */
-  bool Preprocess(const base::Image8U *image, base::BlobPtr<float> input_blob);
+protected:
+    /**
+    * @brief Preprocess of image before inference,
+             resize input data blob and fill image data to blob
+    * @param image image read from camera frame of 6mm camera
+    * @param input_blob image input blob address pointer
+    * @return preprocess status
+    */
+    bool Preprocess(const base::Image8U *image, base::BlobPtr<float> input_blob);
 
-  /**
-   * @brief Resize model input picture size according to the config
-   *        file
-   * @param model_param yolox3d proto param read from yolox3d.pt
-   * @return None
-   */
-  void LoadInputShape(const yolox3d::ModelParam &model_param);
+    /**
+     * @brief Resize model input picture size according to the config
+     *        file
+     * @param model_param yolox3d proto param read from yolox3d.pt
+     * @return None
+     */
+    void LoadInputShape(const yolox3d::ModelParam &model_param);
 
-  /**
-  * @brief Load yolo libtorch model params from model file
-  * @param yolox3d_param yolox3d proto param read from yolox3d.pt,
-            include ModelParam、NetworkParam and NMSParam
-  * @return None
-  */
-  void LoadParam(const yolox3d::ModelParam &model_param);
-  /**
-   * @brief Load yolo3D libtorch model params from model file
-   *
-   * @param image
-   * @param obj
-   * @return None
-   */
-  void Yolo3DInference(const base::Image8U *image, base::ObjectPtr obj);
-  /**
-   * @brief Init model inference
-   *
-   * @param model_info
-   * @param model_path
-   * @return true
-   * @return false
-   */
-  bool Init3DNetwork(const common::ModelInfo &model_info,
-                     const std::string &model_path);
+    /**
+    * @brief Load yolo libtorch model params from model file
+    * @param yolox3d_param yolox3d proto param read from yolox3d.pt,
+              include ModelParam、NetworkParam and NMSParam
+    * @return None
+    */
+    void LoadParam(const yolox3d::ModelParam &model_param);
+    /**
+     * @brief Load yolo3D libtorch model params from model file
+     *
+     * @param image
+     * @param detect_objs
+     */
+    void Yolo3DInference(const base::Image8U *image, std::vector<base::ObjectPtr> &detect_objs);
+    /**
+     * @brief Init model inference
+     *
+     * @param model_info
+     * @param model_path
+     * @return true
+     * @return false
+     */
+    bool Init3DNetwork(const common::ModelInfo &model_info, const std::string &model_path);
 
- private:
-  ObstacleDetectorInitOptions options_;
-  yolox3d::ModelParam model_param_;
-  yolox3d::NMSParam nms_;
+private:
+    ObstacleDetectorInitOptions options_;
+    yolox3d::ModelParam model_param_;
+    yolox3d::NMSParam nms_;
 
-  std::shared_ptr<inference::Inference> net_3D_;
-  FILE *file_;
+    std::shared_ptr<inference::Inference> net_3D_;
+    FILE *file_;
 
-  int gpu_id_ = 0;
-  cudaStream_t stream_ = nullptr;
+    int gpu_id_ = 0;
+    int max_batch_size_ = 32;
+    cudaStream_t stream_ = nullptr;
 
-  // yolo input image size
-  int width_ = 0;
-  int height_ = 0;
-  // image size of raw image
-  int image_width_ = 0;
-  int image_height_ = 0;
-  float confidence_threshold_ = 0.f;
+    // yolo input image size
+    int width_ = 0;
+    int height_ = 0;
+    // image size of raw image
+    int image_width_ = 0;
+    int image_height_ = 0;
+    float confidence_threshold_ = 0.f;
 
-  float border_ratio_ = 0.f;
-  cv::Mat img_;
+    float border_ratio_ = 0.f;
+    cv::Mat img_;
 };
 
 }  // namespace camera

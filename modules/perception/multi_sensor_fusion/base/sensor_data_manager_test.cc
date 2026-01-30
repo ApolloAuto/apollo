@@ -24,10 +24,10 @@ namespace perception {
 namespace fusion {
 
 TEST(SensorDataManagerTest, test) {
-  FLAGS_work_root = "modules/perception/testdata/fusion/base";
+  FLAGS_work_root = "/apollo/modules/perception/testdata/fusion/base";
   FLAGS_obs_sensor_meta_file = "sensor_meta.pb.txt";
   FLAGS_obs_sensor_intrinsic_path =
-      "modules/perception/testdata/"
+      "/apollo/modules/perception/testdata/"
       "fusion/base/params";
 
   SensorDataManager* sensor_data_manager = SensorDataManager::Instance();

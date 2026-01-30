@@ -95,6 +95,11 @@ apollo_py_library(
     ],
 )
 
+apollo_py_binary(
+    name = "plot_calibration_table",
+    srcs = ["plot_calibration_table.py"],
+)
+
 filegroup(
     name = "runtime_files",
     srcs = glob([

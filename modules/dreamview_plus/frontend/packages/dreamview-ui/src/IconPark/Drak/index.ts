@@ -96,6 +96,8 @@ import IcHelpNormal from './svg/ic_help_normal.svg';
 
 import IcIm from './svg/ic_im.svg';
 
+import IcIndoorIocation from './svg/ic_indoor_iocation.svg';
+
 import IcLeftTurnDefault from './svg/ic_left_turn_default.svg';
 
 import IcLoading from './svg/ic_loading.svg';
@@ -282,6 +284,7 @@ export default {
     IcHelpHover,
     IcHelpNormal,
     IcIm,
+    IcIndoorIocation,
     IcLeftTurnDefault,
     IcLoading,
     IcLocation,

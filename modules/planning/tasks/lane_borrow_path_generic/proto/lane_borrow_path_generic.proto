@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message LaneBorrowPathGenericConfig {
+  optional bool is_allow_lane_borrowing = 1 [default = true];
+  // The max speed of adc condition triggering lane borrow
+  optional double lane_borrow_max_speed = 2 [default = 5.0];
+  // Determine if the obstacle is long-term parking
+  optional int64 long_term_blocking_obstacle_cycle_threshold = 3 [default = 3];
+  optional bool enable_extend_boundary_by_adc = 4 [default = false];
+  optional bool enable_ignore_boundary_type = 5 [default = false];
+  optional PiecewiseJerkPathConfig path_optimizer_config = 6;
+  optional double enable_nudge_destination_threshold = 7 [default = 8.0];
+  optional bool enable_active_trigger = 8 [default = true];
+}

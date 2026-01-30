@@ -59,19 +59,5 @@ UpdaterBase* UpdaterManager::GetUpdater(const std::string& path_name) {
   }
   return updater_map_[path_name];
 }
-
-bool UpdaterManager::IsChannelInUpdater(const std::string& path_name,
-                                        const std::string& message_type,
-                                        const std::string& channel_name) {
-  UpdaterBase* updater = GetUpdater(path_name);
-  UpdaterWithChannelsBase* updater_with_channels =
-      dynamic_cast<UpdaterWithChannelsBase*>(updater);
-  if (updater_with_channels == nullptr) {
-    return false;
-  }
-
-  return updater_with_channels->IsChannelInUpdater(message_type, channel_name);
-}
-
 }  // namespace dreamview
 }  // namespace apollo

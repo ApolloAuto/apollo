@@ -1,0 +1,13 @@
+is_allow_lane_borrowing: true
+lane_borrow_max_speed: 10.0
+long_term_blocking_obstacle_cycle_threshold: 3
+enable_extend_boundary_by_adc: false
+enable_ignore_boundary_type: true
+path_optimizer_config {
+  l_weight: 10.0
+  dl_weight: 2.0
+  ddl_weight: 100.0
+  dddl_weight: 500.0
+  path_reference_l_weight: 2000.0
+  lateral_derivative_bound_default: 2.0
+}

@@ -45,6 +45,8 @@ void PlaneFitGroundDetectorParam::SetDefault() {
   nr_ransac_iter_threshold = 48;
   candidate_filter_threshold = 1.0f;  // 1 meter
   nr_smooth_iter = 1;
+  semantic_ground_value = -1;
+  use_semantic_info = false;
   use_math_optimize = false;
   single_frame_detect = false;
   debug_output = false;
@@ -227,6 +229,12 @@ bool PlaneFitGroundDetector::Init() {
       local_candis_[r][c].Reserve(capacity);
     }
   }
+  // ground candidate
+  ground_candidates_ = IAlloc2<GroundCandidateIndices>(param_.nr_grids_fine,
+      param_.nr_grids_fine);
+  if (!ground_candidates_) {
+    return false;
+  }
   // threeds in ransac, in inhomogeneous coordinates:
   pf_threeds_ =
       IAllocAligned<float>(param_.nr_samples_max_threshold * dim_point_, 4);
@@ -344,6 +352,7 @@ void PlaneFitGroundDetector::CleanUp() {
   IFree2<GroundPlaneSpherical>(&ground_planes_sphe_);
   IFree2<std::pair<float, bool>>(&ground_z_);
   IFree2<PlaneFitPointCandIndices>(&local_candis_);
+  IFree2<GroundCandidateIndices>(&ground_candidates_);
   IFreeAligned<float>(&pf_threeds_);
   IFreeAligned<char>(&labels_);
   IFreeAligned<unsigned int>(&map_fine_to_coarse_);
@@ -683,6 +692,297 @@ int PlaneFitGroundDetector::Filter() {
   return nr_candis;
 }
 
+void PlaneFitGroundDetector::SelectGroundCandidate(const float *point_cloud,
+    const int *semantic_list, const std::vector<int> &indices,
+    PlaneFitPointCandIndices *candi, GroundCandidateIndices *ground_candi,
+    unsigned int nr_point_element) {
+    const float pi = 3.1415926535898;
+    const float *pt_ptr = nullptr;
+    const int *semantic_value = nullptr;
+    // default delta = 0.022
+    float res = param_.roi_region_rad_x * 2 * 1.0f / param_.nr_grids_fine;
+    float delta = tan(param_.planefit_orien_threshold * pi / 180.0) * res;
+    delta /= 2.0;
+    size_t ground_count = 0, valid_count = 0;
+    float ground_hei = 0.0, valid_hei = 0.0;
+    ground_candi->SetGroundFlag(false);
+    ground_candi->SetValidFlag(false);
+    // calculate semantic-ground value
+    for (size_t i = 0; i < indices.size(); i++) {
+        int pos = indices[i];
+        pt_ptr = point_cloud + (pos * nr_point_element);
+        float z = pt_ptr[2];
+        semantic_value = semantic_list + pos;
+        int value = semantic_value[0];
+        if (value == param_.semantic_ground_value) {
+            ground_count++;
+            ground_hei += z;
+        }
+    }
+    if (ground_count > 0.3 * indices.size() && ground_count > 0) {
+        ground_hei = (ground_hei * 1.0f / ground_count);
+        ground_candi->SetGroundFlag(true);
+        ground_candi->SetGroundCount(ground_count);
+        ground_candi->SetGroundHeight(ground_hei);
+        for (size_t i = 0; i < indices.size(); i++) {
+            int pos = indices[i];
+            pt_ptr = point_cloud + (pos * nr_point_element);
+            float z = pt_ptr[2];
+            semantic_value = semantic_list + pos;
+            int value = semantic_value[0];
+            // ground: range is 3 * delta
+            // other-semantic: range is 2 * delta
+            if (value == param_.semantic_ground_value) {
+                if (z > ground_hei - 3 * delta && z < ground_hei + 3 * delta) {
+                    labels_[pos] = 1;
+                    candi->PushIndex(pos);
+                    ground_candi->SetVisitedTrue(i);
+                    valid_count++;
+                    valid_hei += z;
+                    continue;
+                }
+            } else {
+                if (z > ground_hei - 2 * delta && z < ground_hei + 2 * delta) {
+                    labels_[pos] = 1;
+                    candi->PushIndex(pos);
+                    ground_candi->SetVisitedTrue(i);
+                    valid_count++;
+                    valid_hei += z;
+                    continue;
+                }
+            }
+        }
+    }
+    if (valid_count > 0) {
+        valid_hei = (valid_hei * 1.0f / valid_count);
+        ground_candi->SetValidFlag(true);
+        ground_candi->SetValidCount(valid_count);
+        ground_candi->SetValidHeight(valid_hei);
+    }
+}
+
+int PlaneFitGroundDetector::NeighborGroundCandidate(int row, int col,
+    const float *point_cloud, const int *semantic_list,
+    const std::vector<int> &indices, PlaneFitPointCandIndices *candi,
+    unsigned int nr_point_element) {
+    const float pi = 3.1415926535898;
+    unsigned int nr_contradi = 0;
+    const float *pt_ptr = nullptr;
+    const int *semantic_value = nullptr;
+    auto voxel = (*vg_fine_)(row, col);
+    // default delta = 0.022
+    float res = param_.roi_region_rad_x * 2 * 1.0f / param_.nr_grids_fine;
+    float delta = tan(param_.planefit_orien_threshold * pi / 180.0) * res;
+    delta /= 2.0;
+
+    // get neighbors
+    std::vector<std::pair<int, int>> neigh;
+    GetNeighbors(row, col, param_.nr_grids_fine, param_.nr_grids_fine, &neigh);
+    // find around-ground-ave and original candidate methods
+    size_t count = 0;
+    for (size_t i = 0; i < indices.size(); i++) {
+        if (ground_candidates_[row][col].GetIndicesVisitedFlag(i)) {
+            continue;
+        }
+        int pos = indices[i];
+        pt_ptr = point_cloud + (pos * nr_point_element);
+        float z = pt_ptr[2];
+        float candidata_z = 0.0;
+        // condition 3: near around-ground-value
+        if (ground_candidates_[row][col].GetValidFlag()) {
+            candidata_z = ground_candidates_[row][col].GetValidHeight();
+            if (fabs(z - candidata_z) < 2 * delta) {
+                labels_[pos] = 1;
+                candi->PushIndex(pos);
+                ground_candidates_[row][col].SetVisitedTrue(i);
+                count++;
+                continue;
+            }
+        }
+        for (size_t jj = 0; jj < neigh.size(); jj++) {
+            int rr = neigh[jj].first;
+            int cc = neigh[jj].second;
+            if (ground_candidates_[rr][cc].GetValidFlag()) {
+                candidata_z = ground_candidates_[rr][cc].GetValidHeight();
+                if (fabs(z - candidata_z) < 2 * delta) {
+                    labels_[pos] = 1;
+                    candi->PushIndex(pos);
+                    ground_candidates_[row][col].SetVisitedTrue(i);
+                    count++;
+                }
+            }
+        }
+    }
+    int valid_count = ground_candidates_[row][col].GetValidCount();
+    if (count + valid_count > param_.nr_z_comp_candis / 2 ||
+        count + valid_count > 0.9 *
+            ground_candidates_[row][col].GetIndicesSize()) {
+        return count;
+    }
+    // ground info okay. run extreme-scenes
+    if (voxel.Empty()) {
+        return count;
+    }
+    int rseed = I_DEFAULT_SEED;
+    std::vector<float> sample_z;
+    unsigned int voxel_points = voxel.NrPoints();
+    unsigned int nr_samples = IMin(param_.nr_z_comp_candis, voxel_points);
+    unsigned int nr_z_comp_fail_threshold =
+      IMin(param_.nr_z_comp_fail_threshold, (unsigned int)(nr_samples >> 1));
+    sample_z.resize(nr_samples);
+    sample_z.clear();
+    if (voxel_points <= param_.nr_z_comp_candis) {
+        for (size_t ii = 0; ii < voxel_points; ++ii) {
+            int pos = voxel.indices_[ii] * nr_point_element;
+            sample_z[ii] = (point_cloud + pos)[2];
+        }
+    } else {
+        IRandomSample(sampled_indices_,
+            static_cast<int>(param_.nr_z_comp_candis), voxel_points, &rseed);
+        //  sampled z values
+        for (size_t ii = 0; ii < nr_samples; ++ii) {
+            int pos = voxel.indices_[sampled_indices_[ii]] * nr_point_element;
+            sample_z[ii] = (point_cloud + pos)[2];
+        }
+    }
+
+    // if semantic is all-wrong, it seems to degarde to original methods
+    for (size_t i = 0; i < indices.size(); i++) {
+        if (ground_candidates_[row][col].GetIndicesVisitedFlag(i)) {
+            continue;
+        }
+        int pos = indices[i];
+        // is ground
+        semantic_value = semantic_list + pos;
+        int value = semantic_value[0];
+        if (value == param_.semantic_ground_value) {
+            labels_[pos] = 1;
+            candi->PushIndex(pos);
+            count++;
+            continue;
+        }
+        if (count + valid_count > param_.nr_z_comp_candis / 2 ||
+            count + valid_count > 0.9 *
+                ground_candidates_[row][col].GetIndicesSize()) {
+            return count;
+        }
+        pt_ptr = point_cloud + (pos * nr_point_element);
+        float z = pt_ptr[2];
+        // within roi_near_rad
+        if (IAbs(pt_ptr[0]) < param_.roi_near_rad &&
+            IAbs(pt_ptr[1]) < param_.roi_near_rad) {
+            // if (z <= param_.sample_region_z_upper &&
+            //     z >= param_.sample_region_z_lower) {
+            //     labels_[pos] = 1;
+            //     candi->PushIndex(pos);
+            //     count++;
+            //     continue;
+            // } else {
+            //     continue;
+            // }
+            if (z > param_.sample_region_z_upper ||
+                z < param_.sample_region_z_lower) {
+                continue;
+            }
+        }
+        // beyond roi_near_rad
+        if (nr_samples > nr_z_comp_fail_threshold) {
+            for (size_t jj = 0; jj < nr_samples; ++jj) {
+                float delta_z = IAbs(sample_z[jj] - z);
+                if (delta_z > param_.planefit_filter_threshold) {
+                    nr_contradi++;
+                    if (nr_contradi > nr_z_comp_fail_threshold) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (nr_contradi <= nr_z_comp_fail_threshold) {
+            labels_[pos] = 1;
+            candi->PushIndex(pos);
+            count++;
+        }
+    }
+    return count;
+}
+
+void PlaneFitGroundDetector::SelectCandidates() {
+    memset(reinterpret_cast<void *>(labels_), 0,
+        vg_fine_->NrPoints() * sizeof(char));
+    //  Clear candidate list
+    for (size_t i = 0; i < vg_coarse_->NrVoxel(); ++i) {
+        local_candis_[0][i].Clear();
+    }
+    // plane fitting candidates
+    const float *point_cloud = vg_fine_->const_data();
+    const int* semantic_list = vg_fine_->const_semantic_data();
+    unsigned int nr_point_element = vg_fine_->NrPointElement();
+    std::stringstream sstr;
+    sstr << "[GroundCandidateSelect] " << std::to_string(frame_timestamp_)
+         << std::endl;
+    for (size_t r = 0; r < param_.nr_grids_fine; ++r) {
+        unsigned int begin = (r * param_.nr_grids_fine);
+        for (size_t c = 0; c < param_.nr_grids_fine; ++c) {
+            int parent = map_fine_to_coarse_[begin + c];
+            auto voxel = (*vg_fine_)(r, c);
+            //  Clear ground_candidate list
+            ground_candidates_[r][c].Clear();
+            ground_candidates_[r][c].Resize(voxel.indices_.size(), false);
+            if (voxel.indices_.size() < 1) {
+                continue;
+            }
+            SelectGroundCandidate(point_cloud, semantic_list, voxel.indices_,
+                &local_candis_[0][parent], &ground_candidates_[r][c],
+                nr_point_element);
+        }
+    }
+    // use ground to select again
+    for (size_t r = 0; r < param_.nr_grids_fine; ++r) {
+        unsigned int begin = (r * param_.nr_grids_fine);
+        for (size_t c = 0; c < param_.nr_grids_fine; ++c) {
+            auto voxel = (*vg_fine_)(r, c);
+            if (param_.debug_output && voxel.indices_.size() > 0) {
+                sstr << "row = " << r << " col = " << c
+                     << " center_x = " << voxel.v_[0] + voxel.dim_x_ * 0.5f
+                     << " center_y = " << voxel.v_[1] + voxel.dim_y_ * 0.5f
+                     << " total_indices = " << voxel.indices_.size()
+                     << " ground_flag = "
+                     << ground_candidates_[r][c].GetGroundFlag()
+                     << " ground_count = "
+                     << ground_candidates_[r][c].GetGroundCount()
+                     << " ground_height = "
+                     << ground_candidates_[r][c].GetGroundHeight()
+                     << " valid_flag = "
+                     << ground_candidates_[r][c].GetValidFlag()
+                     << " valid_count = "
+                     << ground_candidates_[r][c].GetValidCount()
+                     << " valid_height = "
+                     << ground_candidates_[r][c].GetValidHeight();
+            }
+            // Enough Points -> Do PlaneFit
+            int valid_c = ground_candidates_[r][c].GetValidCount();
+            if (valid_c > param_.nr_z_comp_candis / 2 ||
+                valid_c > 0.8 * ground_candidates_[r][c].GetIndicesSize()) {
+                if (param_.debug_output) {
+                    sstr << " no necessary to get neighbor." << std::endl;
+                }
+                continue;
+            }
+            int parent = map_fine_to_coarse_[begin + c];
+            int count = NeighborGroundCandidate(r, c, point_cloud,
+                semantic_list, voxel.indices_, &local_candis_[0][parent],
+                nr_point_element);
+            if (param_.debug_output && voxel.indices_.size() > 0) {
+                sstr << " after neighbor_count = " << count << std::endl;
+            }
+        }
+    }
+    if (param_.debug_output) {
+        AINFO << sstr.str();
+    }
+    sstr.clear();
+}
+
 int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
                                     PlaneFitPointCandIndices *candi,
                                     GroundPlaneLiDAR *groundplane,
@@ -956,7 +1256,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
     }
     // Assign number of supports
     hypothesis[i].SetNrSupport(nr_inliers);
-    hypothesis[i].SetOrigin(0);
+    hypothesis[i].SetOrigin("self");
 
     if (nr_inliers > nr_inliers_termi) {
       break;
@@ -984,7 +1284,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
         continue;
       }
       hypothesis[i + param_.nr_ransac_iter_threshold].SetNrSupport(nr_inliers);
-      hypothesis[i + param_.nr_ransac_iter_threshold].SetOrigin(1);
+      hypothesis[i + param_.nr_ransac_iter_threshold].SetOrigin("neighbor");
     }
   }
 
@@ -1013,13 +1313,13 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 
   // check if meet the inlier number requirement
   if (!groundplane->IsValid()) {
-    groundplane->SetInvalidStatus(0);
+    groundplane->SetInvalidStatus("groundplane Invalid");
     return 0;
   }
   if (groundplane->GetNrSupport() <
       static_cast<int>(param_.nr_inliers_min_threshold)) {
     groundplane->ForceInvalid();
-    groundplane->SetInvalidStatus(1);
+    groundplane->SetInvalidStatus("inliers Small");
     return 0;
   }
   // iterate samples and check if the point to plane distance is within
@@ -1047,7 +1347,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 
   if (groundplane->GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
     groundplane->ForceInvalid();
-    groundplane->SetInvalidStatus(2);
+    groundplane->SetInvalidStatus("Z Bigger");
     return 0;
   }
 
@@ -1597,19 +1897,21 @@ void PlaneFitGroundDetector::UpdateParams(float parsing_ground_z, float buffer, 
 }
 
 bool PlaneFitGroundDetector::Detect(const float *point_cloud,
-                                    float *height_above_ground,
-                                    unsigned int nr_points,
-                                    unsigned int nr_point_elements) {
+    const int* semantic_value, float *height_above_ground,
+    unsigned int nr_points, unsigned int nr_point_elements) {
   assert(point_cloud != nullptr);
+  assert(semantic_value != nullptr);
   assert(height_above_ground != nullptr);
   assert(nr_points <= param_.nr_points_max);
   assert(nr_point_elements >= 3);
   // setup the fine voxel grid
-  if (!vg_fine_->SetS(point_cloud, nr_points, nr_point_elements)) {
+  if (!vg_fine_->SetS(point_cloud, semantic_value,
+          nr_points, nr_point_elements)) {
     return false;
   }
   // setup the coarse voxel grid
-  if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
+  if (!vg_coarse_->SetS(point_cloud, semantic_value,
+          nr_points, nr_point_elements)) {
     return false;
   }
 
@@ -1628,7 +1930,11 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   unsigned int c = 0;
   // Filter to generate plane fitting candidates
   // int nr_candis =
-  Filter();
+  if (param_.use_semantic_info) {
+      SelectCandidates();
+  } else {
+      Filter();
+  }
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
   //  Fit local plane using ransac
   // nr_valid_grid = Fit();

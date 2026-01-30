@@ -1,0 +1,3 @@
+<library path="modules/external_command/command_processor/chassis_command_processor/libchassis_command_processor.so">
+    <class type="apollo::external_command::ChassisCommandProcessor" base_class="apollo::external_command::CommandProcessorBase"></class>
+</library>

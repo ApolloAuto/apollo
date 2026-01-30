@@ -31,6 +31,7 @@ export type PointData = {
 export type CreatePathwayMarkerCallbackRes = {
     lastPosition: PointData;
     allPositions: PointData[];
+    origin?: string;
 };
 
 export type FunctionalOperation = 'init' | 'edit' | 'undo' | 'reset';

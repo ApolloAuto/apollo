@@ -17,6 +17,7 @@
   <depend type="binary" repo_name="transform" lib_names="transform">transform</depend>
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
   <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="nvjpeg">3rd-nvjpeg</depend>
   <depend repo_name="proj">3rd-proj</depend>
   <depend repo_name="eigen">3rd-eigen3</depend>
   <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>

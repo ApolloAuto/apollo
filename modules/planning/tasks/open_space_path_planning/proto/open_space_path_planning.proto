@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+import "modules/planning/planning_open_space/proto/planner_open_space_config.proto";
+package apollo.planning;
+
+// OpenSpacePathPlanningConfig
+
+message OpenSpacePathPlanningConfig {
+  optional bool enable_path_planning_thread = 1 [default = true];
+  optional WarmStartConfig warm_start_config = 2;
+  optional bool enable_vertical_parking_last_trajectory_straight = 3 [default = true];
+  optional bool enable_parallel_parking_last_trajectory_straight = 4 [default = false];
+}

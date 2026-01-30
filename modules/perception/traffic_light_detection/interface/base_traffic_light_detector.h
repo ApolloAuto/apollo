@@ -29,45 +29,43 @@ namespace perception {
 namespace trafficlight {
 
 struct TrafficLightDetectorInitOptions : public BaseInitOptions {
-  std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
+    std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
 };
 
 class BaseTrafficLightDetector {
- public:
-  /**
-   * @brief Construct a new base traffic light detector object.
-   * 
-   */
-  BaseTrafficLightDetector() = default;
-  /**
-   * @brief Destroy the base traffic light detector object.
-   * 
-   */
-  virtual ~BaseTrafficLightDetector() = default;
-  /**
-   * @brief Initialize traffic light detector parameters.
-   * 
-   * @param options 
-   * @return true 
-   * @return false 
-   */
-  virtual bool Init(const TrafficLightDetectorInitOptions& options =
-                        TrafficLightDetectorInitOptions()) = 0;
-  /**
-   * @brief Detect traffic light from image.
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
-   */
-  virtual bool Detect(camera::TrafficLightFrame* frame) = 0;
+public:
+    /**
+     * @brief Construct a new base traffic light detector object.
+     *
+     */
+    BaseTrafficLightDetector() = default;
+    /**
+     * @brief Destroy the base traffic light detector object.
+     *
+     */
+    virtual ~BaseTrafficLightDetector() = default;
+    /**
+     * @brief Initialize traffic light detector parameters.
+     *
+     * @param options
+     * @return true
+     * @return false
+     */
+    virtual bool Init(const TrafficLightDetectorInitOptions& options = TrafficLightDetectorInitOptions()) = 0;
+    /**
+     * @brief Detect traffic light from image.
+     *
+     * @param frame
+     * @return true
+     * @return false
+     */
+    virtual bool Detect(camera::TrafficLightFrame* frame) = 0;
 
-  DISALLOW_COPY_AND_ASSIGN(BaseTrafficLightDetector);
+    DISALLOW_COPY_AND_ASSIGN(BaseTrafficLightDetector);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseTrafficLightDetector);
-#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name) \
-  PERCEPTION_REGISTER_CLASS(BaseTrafficLightDetector, name)
+#define REGISTER_TRAFFIC_LIGHT_DETECTOR(name) PERCEPTION_REGISTER_CLASS(BaseTrafficLightDetector, name)
 
 }  // namespace trafficlight
 }  // namespace perception

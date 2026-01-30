@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message GpuDownSampleConfig {
+  optional double downsample_voxel_size_x = 1 [default = 0.09];
+  optional double downsample_voxel_size_y = 2 [default = 0.09];
+  optional double downsample_voxel_size_z = 3 [default = 0.09];
+  optional bool downsample_use_centroid = 4 [default = true];
+}

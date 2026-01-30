@@ -30,51 +30,49 @@ namespace trafficlight {
 
 using apollo::perception::onboard::TrafficDetectMessage;
 
-class TrafficLightRecognComponent
-    : public cyber::Component<TrafficDetectMessage> {
- public:
-  /**
-   * @brief Construct a new traffic light recogn component object.
-   * 
-   */
-  TrafficLightRecognComponent() = default;
-  /**
-   * @brief Destroy the traffic light recogn component object.
-   * 
-   */
-  ~TrafficLightRecognComponent() = default;
-  /**
-   * @brief Initialize configuration files, algorithm plug-ins.
-   * 
-   * @return true 
-   * @return false 
-   */
-  bool Init() override;
-  /**
-   * @brief Trigger the recognition process based on
-            the traffic detect message.
-   * 
-   * @param message 
-   * @return true 
-   * @return false 
-   */
-  bool Proc(const std::shared_ptr<TrafficDetectMessage>& message) override;
+class TrafficLightRecognComponent : public cyber::Component<TrafficDetectMessage> {
+public:
+    /**
+     * @brief Construct a new traffic light recogn component object.
+     *
+     */
+    TrafficLightRecognComponent() = default;
+    /**
+     * @brief Destroy the traffic light recogn component object.
+     *
+     */
+    ~TrafficLightRecognComponent() = default;
+    /**
+     * @brief Initialize configuration files, algorithm plug-ins.
+     *
+     * @return true
+     * @return false
+     */
+    bool Init() override;
+    /**
+     * @brief Trigger the recognition process based on
+              the traffic detect message.
+     *
+     * @param message
+     * @return true
+     * @return false
+     */
+    bool Proc(const std::shared_ptr<TrafficDetectMessage>& message) override;
 
- private:
-  int InitConfig();
-  bool InitAlgorithmPlugin();
-  bool InternalProc(
-      const std::shared_ptr<TrafficDetectMessage const>& message);
+private:
+    int InitConfig();
+    bool InitAlgorithmPlugin();
+    bool InternalProc(const std::shared_ptr<TrafficDetectMessage const>& message);
 
- private:
-  trafficlight::TrafficLightRecognitorInitOptions recognitor_init_options_;
-  std::string tl_recognitor_name_;
-  int gpu_id_;
-  std::string config_path_;
-  std::string config_file_;
+private:
+    trafficlight::TrafficLightRecognitorInitOptions recognitor_init_options_;
+    std::string tl_recognitor_name_;
+    int gpu_id_;
+    std::string config_path_;
+    std::string config_file_;
 
-  std::shared_ptr<trafficlight::BaseTrafficLightRecognitor> recognitor_;
-  std::shared_ptr<apollo::cyber::Writer<TrafficDetectMessage>> writer_;
+    std::shared_ptr<trafficlight::BaseTrafficLightRecognitor> recognitor_;
+    std::shared_ptr<apollo::cyber::Writer<TrafficDetectMessage>> writer_;
 };
 
 CYBER_REGISTER_COMPONENT(TrafficLightRecognComponent);

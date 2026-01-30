@@ -1,0 +1,9 @@
+output_channel_name: "/perception/lidar/detection"
+sensor_name: "velodyne64"
+use_object_builder: true
+# cpdet
+plugin_param {
+    name: "CPDetection"
+    config_path: "perception/lidar_cpdet_detection/data"
+    config_file: "cpdet_param.pb.txt"
+}

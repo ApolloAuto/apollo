@@ -34,7 +34,7 @@ namespace control {
 class Interpolation1DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string controllers_dir = "modules/control/controllers/";
+    std::string controllers_dir = "/apollo/modules/control/controllers/";
     std::string control_conf_file =
         controllers_dir +
         "lat_based_lqr_controller/conf/controller_conf.pb.txt";

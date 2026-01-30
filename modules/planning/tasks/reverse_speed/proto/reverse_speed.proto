@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ReverseSpeedConfig {
+  // buffer for static obstacles (meter)
+  optional double speed_limit = 1 [default = 1.0];
+  optional double total_time = 2 [default = 8.0];
+  optional double l_buffer = 3 [default = 0.2];
+  optional double s_buffer = 4 [default = 0.2];
+
+
+}

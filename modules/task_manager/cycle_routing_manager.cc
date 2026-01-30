@@ -19,18 +19,26 @@
 
 namespace apollo {
 namespace task_manager {
-bool CheckPointDistanceInThreshold(external_command::Pose point_a,
-                                   common::PointENU point_b, double distance) {
-  double x_dis = point_a.x() - point_b.x();
-  double y_dis = point_a.y() - point_b.y();
-  return x_dis * x_dis + y_dis * y_dis < distance * distance;
+
+using common::math::Vec2d;
+
+bool CheckPointDistanceInThreshold(external_command::Pose target,
+                                   common::PointENU ego, double distance) {
+  AINFO << ego.x() << " " << ego.y() << " " << target.x() << " " << target.y();
+  Vec2d tar2ego(ego.x() - target.x(), ego.y() - target.y());
+  Vec2d unit = Vec2d::CreateUnitVec2d(target.heading());
+  double dis = unit.InnerProd(tar2ego);
+  return dis < 1e-6 && std::fabs(dis) < distance && tar2ego.Length() < distance;
 }
 
 common::Status CycleRoutingManager::Init(
+    const localization::Pose& pose,
     const CycleRoutingTask& cycle_routing_task) {
   cycle_ = cycle_routing_task.cycle_num();
   auto waypoints = cycle_routing_task.lane_follow_command().way_point();
-  begin_point_ = waypoints[0];
+  begin_point_.set_x(pose.position().x());
+  begin_point_.set_y(pose.position().y());
+  begin_point_.set_heading(pose.heading());
   end_point_ = cycle_routing_task.lane_follow_command().end_pose();
   is_allowed_to_route_ = true;
   original_lane_follow_command_ = cycle_routing_task.lane_follow_command();
@@ -61,10 +69,6 @@ bool CycleRoutingManager::GetNewRouting(
             << "Remaining cycles: " << cycle_;
       lane_follow_command->CopyFrom(original_lane_follow_command_);
       auto cur_point = lane_follow_command->mutable_way_point(0);
-      cur_point->Clear();
-      cur_point->set_x(pose.position().x());
-      cur_point->set_y(pose.position().y());
-      cur_point->set_heading(pose.heading());
       is_allowed_to_route_ = false;
       return true;
     }

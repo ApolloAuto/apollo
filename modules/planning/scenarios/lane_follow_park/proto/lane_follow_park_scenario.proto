@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioLaneFollowParkConfig {
+  optional int32 queue_check_count = 1 [default = 100];
+  optional int32 stable_block_count = 2 [default = 30];
+  optional double passby_min_gap = 3 [default = 0.5];
+  optional double passby_kappa_ratio = 4 [default = 0.5];
+  optional double min_distance_block_obs_to_junction = 5 [default = 22.0];
+  optional bool enable_junction_borrow = 6 [default = false];
+}

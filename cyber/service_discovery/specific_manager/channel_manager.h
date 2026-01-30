@@ -23,7 +23,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "cyber/proto/role_attributes.pb.h"
 #include "cyber/service_discovery/container/graph.h"
 #include "cyber/service_discovery/container/multi_value_warehouse.h"
 #include "cyber/service_discovery/container/single_value_warehouse.h"

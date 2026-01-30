@@ -1,11 +1,11 @@
 ###########################################################################
 # Flags from sensor_manager
 
---flagfile=modules/common/data/global_flagfile.txt
+--flagfile=/apollo/modules/common/data/global_flagfile.txt
 # config file work root
 # type: string
 # default:
---work_root=modules/perception
+--work_root=/apollo/modules/perception
 
 # SensorManager config file
 # type: string
@@ -15,7 +15,7 @@
 # The intrinsics/extrinsics dir
 # type: string
 # default:
---obs_sensor_intrinsic_path=modules/perception/data/params
+--obs_sensor_intrinsic_path=/apollo/modules/perception/data/params
 
 ###########################################################################
 # Flags from common_flags

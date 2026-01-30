@@ -5,7 +5,7 @@ module_config {
       class_name : "CameraDetectionSingleStageComponent"
       config {
         name : "CameraDetectionSingleStageComponent"
-        config_file_path : "modules/perception/camera_detection_single_stage/conf/camera_detection_single_stage_config.pb.txt"
+        config_file_path : "/apollo/modules/perception/camera_detection_single_stage/conf/camera_detection_single_stage_config.pb.txt"
         readers {
           channel: "/apollo/sensor/camera/front_6mm/image"
         }

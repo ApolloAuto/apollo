@@ -1,0 +1,1 @@
+model_path: "/apollo/modules/prediction_plugin/multi_agent_pedestrian_tensorrt/data/MultiAgentPedestrianModelFp16.trt"

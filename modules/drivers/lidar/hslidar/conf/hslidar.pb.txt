@@ -11,8 +11,8 @@ udp_port: 2368
 ptc_port: 9347
 device_ip: "192.168.1.12"
 host_ip: "0.0.0.0"
-correction_file_path: "modules/drivers/lidar/hslidar/correction/angle_correction/AT128_test_angle_correction.dat"
-firetimes_path: "modules/drivers/lidar/hslidar/correction/firetime_correction/AT128_test_firetime_correction.dat"
+correction_file_path: "/apollo/modules/drivers/lidar/hslidar/correction/angle_correction/AT128_test_angle_correction.dat"
+firetimes_path: "/apollo/modules/drivers/lidar/hslidar/correction/firetime_correction/AT128_test_firetime_correction.dat"
 source_type: 1 # The type of data source, 1: real-time lidar connection, 2: pcap, 3: from apollo record
 pcap_path: "/media/apollo_record/at128/0205.pcap"
 frame_start_azimuth: -1

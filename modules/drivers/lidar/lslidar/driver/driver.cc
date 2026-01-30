@@ -56,7 +56,7 @@ void LslidarDriver::Init() {
     } else if (config_.model() == LSLIDAR_CH128X1) {
         packets_rate = 6720;
     } else if (config_.model() == LSLIDAR_LS128S2) {
-        packets_rate = 17500;
+        packets_rate = 12440;
     } else {
         packets_rate = 4561;
     }
@@ -153,11 +153,12 @@ bool LslidarDriver::Poll(
         AINFO << "Get an empty scan from port: " << config_.msop_port();
         return false;
     }
-    // publish message using time of last packet read ADEBUG 
+    // publish message using time of last packet read
+    ADEBUG << "Publishing a full Lslidar scan.";
     LslidarPacket *packet = scan->add_difop_pkts();
     std::unique_lock<std::mutex> lock(mutex_);
     packet->set_data(bytes, FIRING_DATA_PACKET_SIZE);
-    // scan->mutable_header()->set_timestamp_sec(gps_time);
+    scan->mutable_header()->set_timestamp_sec(gps_time);
     ADEBUG << "**************************************************************"
               "GPS "
               "time: "
@@ -165,7 +166,7 @@ bool LslidarDriver::Poll(
     scan->mutable_header()->set_frame_id(config_.frame_id());
     scan->set_model(config_.model());
     scan->set_basetime(gps_time);
-    // scan->mutable_header()->set_timestamp_sec(gps_time);
+    scan->mutable_header()->set_timestamp_sec(gps_time);
     return true;
 }
 
@@ -189,7 +190,7 @@ int LslidarDriver::PollStandard(
                    PKT_DATA_LENGTH);
             packet->set_data(data_ptr, PKT_DATA_LENGTH);
             packet->set_stamp((scan_start.stamp()));
-            // AINFO << "scan->firing_pkts_size(): " << scan->firing_pkts_size();
+            AINFO << "scan->firing_pkts_size(): " << scan->firing_pkts_size();
         }
 
         scan_fill = false;
@@ -325,14 +326,8 @@ int LslidarDriver::PollStandard(
         scan_fill = false;
         int i = 1;
         bool is_found_frame_header = false;
-        // AERROR << "scan->firing_pkts_size(): " << scan->firing_pkts_size() << "  config_.npackets(): " <<config_.npackets();
-        // if(scan->firing_pkts_size() > config_.npackets()) AERROR << "-------------- scan->firing_pkts_size(): " << scan->firing_pkts_size();
         while (scan->firing_pkts_size() < config_.npackets()
                && !is_found_frame_header) {
-        // while (!is_found_frame_header) {
-            // if(scan->firing_pkts_size() > 1400) {
-            //     AERROR << "-------------- scan->firing_pkts_size(): " << scan->firing_pkts_size() << "  config_.npackets(): " << config_.npackets();
-            // }
             LslidarPacket *packet = scan->add_firing_pkts();
             while (true) {
                 // keep reading until full packet received
@@ -511,8 +506,8 @@ int LslidarDriver::PollStandard(
                     && (static_cast<uint16_t>(data[point_idx + 3]) == 0xcc)) {
                     scan_fill = false;
                     is_found_frame_header = true;
-                    // AERROR << "\none circle! scan->firing_pkts_size(): "
-                    //        << scan->firing_pkts_size();
+                    AERROR << "\none circle! scan->firing_pkts_size(): "
+                           << scan->firing_pkts_size();
                     break;
                 }
             }

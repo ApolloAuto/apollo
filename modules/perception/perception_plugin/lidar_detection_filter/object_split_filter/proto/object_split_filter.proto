@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message ObjectSplitFilterConfig {
+  optional float forward_length = 1;
+  optional float backard_length = 2;
+  optional float left_width = 3;
+  optional float right_width = 4;
+  optional bool is_split_foreground_object = 5;
+  optional float split_interval = 6;
+  optional int32 start_id = 7 [default = 10000];
+}

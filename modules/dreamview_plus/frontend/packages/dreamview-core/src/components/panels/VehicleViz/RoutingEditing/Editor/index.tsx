@@ -19,6 +19,7 @@ import { initRoutingEditor } from '../../VizStore/actions';
 import { MutexToolNameEnum } from '../RoutingEditingFunctionalArea/types';
 import RoutingEditingOperationArea from '../RoutingEditingOperationArea';
 import { PointType, RouteOrigin } from '../RouteManager/type';
+import { DefaultPoint } from '../../../../../services/api/types';
 
 export function Editor() {
     const { t } = useTranslation('routeEditing');
@@ -87,6 +88,29 @@ export function Editor() {
         routingEditor.removeAll();
         routingEditor.deactiveAll();
         mapElementsManager.clear();
+
+        const initFunc = (p: DefaultPoint, isInit = true) => {
+            routingEditor.coordinates.initialize(p.x, p.y);
+            if (isInit) routingEditor.initiationMarker.init(p);
+
+            getMapElements(new Vector3(p.x, p.y, 0));
+
+            subScribeCurrentRouteSubscription = routeManager.currentRouteManager.subScribeCurrentRoute(
+                (currentRoute) => {
+                    const { routeOrigin, routePoint } = currentRoute;
+
+                    if (routeOrigin === RouteOrigin.CREATING_ROUTE) {
+                        const routeInitialPoint = routePoint.routeInitialPoint;
+                        const routeWayPoint = routePoint.routeWayPoint;
+
+                        routingEditor.initiationMarker.init(routeInitialPoint);
+
+                        routingEditor.pathwayMarker.init(routeWayPoint);
+                    }
+                },
+            );
+        };
+
         mainApi?.getMapElementIds({ radius: 20 }).then((res) => {
             const [mapElementsAlreadyRender, mapIdsWithoutCache] = mapElementsManager.getMapElement(res);
 
@@ -105,27 +129,17 @@ export function Editor() {
                         routingEditor.render();
                         routingEditor.setCameraUpdateCallback(getMapElements);
 
-                        mainApi?.getStartPoint().then((p) => {
-                            routingEditor.coordinates.initialize(p.x, p.y);
-                            routingEditor.initiationMarker.init(p);
-
-                            getMapElements(new Vector3(p.x, p.y, 0));
-
-                            subScribeCurrentRouteSubscription = routeManager.currentRouteManager.subScribeCurrentRoute(
-                                (currentRoute) => {
-                                    const { routeOrigin, routePoint } = currentRoute;
-
-                                    if (routeOrigin === RouteOrigin.CREATING_ROUTE) {
-                                        const routeInitialPoint = routePoint.routeInitialPoint;
-                                        const routeWayPoint = routePoint.routeWayPoint;
-
-                                        routingEditor.initiationMarker.init(routeInitialPoint);
-
-                                        routingEditor.pathwayMarker.init(routeWayPoint);
-                                    }
-                                },
-                            );
-                        });
+                        mainApi
+                            ?.getStartPoint()
+                            .then((p) => {
+                                initFunc(p);
+                            })
+                            .catch(() => {
+                                // 获取起始点失败，使用虚拟位置
+                                mainApi.getVirtualStartPoint().then((p) => {
+                                    initFunc(p, false);
+                                });
+                            });
                     } catch (e) {
                         console.error('getMapElementById error', e);
                     }

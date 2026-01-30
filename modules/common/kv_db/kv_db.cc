@@ -23,7 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
-DEFINE_string(kv_db_path, "data/kv_db.sqlite",
+DEFINE_string(kv_db_path, "/apollo/data/kv_db.sqlite",
               "Path to Key-value DB file.");
 
 namespace apollo {

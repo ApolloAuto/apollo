@@ -43,13 +43,13 @@ def progressbar(it, length, prefix="", out=sys.stdout,):
             return
         x = int(size * j / count)
         remaining = ((time.time() - start) / j) * (count - j)
-
+        
         mins, sec = divmod(remaining, 60)
         time_str = f"{int(mins):02}:{sec:05.2f}"
-
+        
         print(f"  {prefix}[{'#'*x}{('.'*(size-x))}] {j}/{count} Est wait {time_str}",
             end='\r', file=out, flush=True)
-
+        
     for i, item in enumerate(it):
         yield item
         show(i + 1)
@@ -222,33 +222,33 @@ def install_src_file():
 
     for file_filter in src_install_dirs_dict:
         common_prefix = os.path.commonprefix([src_dir for src_dir in src_install_dirs_dict[file_filter]])
-        # if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
-        # print("[INFO] can not calculate common prefix, install all", file=sys.stderr)
-        pwd = os.getcwd()
-        for i in progressbar(src_install_dirs_dict[file_filter],
-                len(src_install_dirs_dict[file_filter]), "Install Package Source Code:"):
-            dst_full = src_install_dirs_dict[file_filter][i]["dst"]
+        if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
+            print("[INFO] can not calculate common prefix, install all", file=sys.stderr)
+            pwd = os.getcwd() 
+            for i in progressbar(src_install_dirs_dict[file_filter], 
+                    len(src_install_dirs_dict[file_filter]), "Install Package Source Code:"):
+                dst_full = src_install_dirs_dict[file_filter][i]["dst"]
+                if not os.path.exists(dst_full):
+                    os.makedirs(dst_full)
+                if file_filter == "*.h":
+                    # prevent header of proto being deleted
+                    shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                        .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))
+                else:
+                    shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                        .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))   
+        else:  
+            pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
+            dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
             if not os.path.exists(dst_full):
                 os.makedirs(dst_full)
             if file_filter == "*.h":
                 # prevent header of proto being deleted
                 shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
-                    .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))
+                    .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
             else:
                 shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
-                    .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))
-        # else:
-        #     pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
-        #     dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
-        #     if not os.path.exists(dst_full):
-        #         os.makedirs(dst_full)
-        #     if file_filter == "*.h":
-        #         # prevent header of proto being deleted
-        #         shell_cmd("rsync -aLr --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
-        #             .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
-        #     else:
-        #         shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
-        #             .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
+                    .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
 
     for i in remove_path:
         for root, _, files in os.walk(i):

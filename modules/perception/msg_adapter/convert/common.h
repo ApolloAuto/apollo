@@ -95,6 +95,8 @@ bool ConvertObjectToPb(const base::ObjectPtr &object_ptr,
   pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
   pb_msg->set_semantic_type(static_cast<PerceptionObstacle::SemanticType>(
       object_ptr->lidar_supplement.semantic_type));
+  pb_msg->set_motion_type(static_cast<PerceptionObstacle::MotionType>(
+      object_ptr->lidar_supplement.dynamic_state));
 
   constexpr float kFloatMax = std::numeric_limits<float>::max();
   if (object_ptr->lidar_supplement.height_above_ground != kFloatMax) {

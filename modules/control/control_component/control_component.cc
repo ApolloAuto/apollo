@@ -253,7 +253,7 @@ Status ControlComponent::ProduceControlCommand(
   if (!estop_) {
     if (local_view_.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
       control_task_agent_.Reset();
-      AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
+      AINFO_EVERY(100) << "No estop. Reset Controllers in Manual Mode";
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
@@ -273,35 +273,42 @@ Status ControlComponent::ProduceControlCommand(
     }
   }
 
-  if (!local_view_.trajectory().trajectory_point().empty()) {
-    // controller agent
-    Status status_compute = control_task_agent_.ComputeControlCommand(
-        &local_view_.localization(), &local_view_.chassis(),
-        &local_view_.trajectory(), control_command);
-    ADEBUG << "status_compute is " << status_compute;
+  if (!estop_) {
+    if (!local_view_.trajectory().trajectory_point().empty()) {
+      // controller agent
+      Status status_compute = control_task_agent_.ComputeControlCommand(
+          &local_view_.localization(), &local_view_.chassis(),
+          &local_view_.trajectory(), control_command);
+      ADEBUG << "status_compute is " << status_compute;
 
-    if (!status_compute.ok()) {
-      AERROR << "Control main function failed" << " with localization: "
-             << local_view_.localization().ShortDebugString()
-             << " with chassis: " << local_view_.chassis().ShortDebugString()
-             << " with trajectory: "
-             << local_view_.trajectory().ShortDebugString()
-             << " with cmd: " << control_command->ShortDebugString()
-             << " status:" << status_compute.error_message();
-      estop_ = true;
-      estop_reason_ = status_compute.error_message();
-      status = status_compute;
+      if (!status_compute.ok()) {
+        AERROR << "Control main function failed" << " with localization: "
+               << local_view_.localization().ShortDebugString()
+               << " with chassis: " << local_view_.chassis().ShortDebugString()
+               << " with trajectory: "
+               << local_view_.trajectory().ShortDebugString()
+               << " with cmd: " << control_command->ShortDebugString()
+               << " status:" << status_compute.error_message();
+        estop_ = true;
+        estop_reason_ = status_compute.error_message();
+        status = status_compute;
+      }
     }
+  } else {
+    control_task_agent_.Reset();
+    AINFO_EVERY(10) << "Estop trigger, Reset Controllers in Auto Mode";
   }
 
   // if planning set estop, then no control process triggered
   if (estop_) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
-    control_command->set_speed(0);
-    control_command->set_throttle(0);
+    control_command->set_speed(0.0);
+    control_command->set_throttle(0.0);
     control_command->set_brake(FLAGS_soft_estop_brake);
-    control_command->set_gear_location(Chassis::GEAR_DRIVE);
+    control_command->set_acceleration(FLAGS_soft_estop_acceleration);
+    control_command->set_gear_location(latest_chassis_.gear_location());
+    control_command->set_parking_brake(latest_chassis_.parking_brake());
     previous_steering_command_ =
         injector_->previous_control_command_mutable()->steering_target();
     control_command->set_steering_target(previous_steering_command_);
@@ -315,6 +322,7 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
+  AINFO << "control proc start.";
   const auto start_time = Clock::Now();
 
   injector_->control_debug_info_clear();
@@ -433,7 +441,7 @@ bool ControlComponent::Proc() {
     ADEBUG << "Produce control command normal.";
   } else {
     ADEBUG << "Into reset control command.";
-    ResetAndProduceZeroControlCommand(&control_command);
+    ResetAndProduceZeroControlCommand(&latest_chassis_, &control_command);
   }
 
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
@@ -491,7 +499,12 @@ bool ControlComponent::Proc() {
   }
 
   common::util::FillHeader(node_->Name(), &control_command);
+  if (FLAGS_sim_by_record) {
+    control_command.mutable_header()->set_timestamp_sec(
+        latest_chassis_.header().timestamp_sec());
+  }
   ADEBUG << control_command.ShortDebugString();
+
   control_cmd_writer_->Write(control_command);
 
   // save current control command
@@ -506,10 +519,10 @@ bool ControlComponent::Proc() {
   const double process_control_time_diff =
       (end_process_control_time - start_time).ToSecond() * 1e3;
   if (control_command.mutable_latency_stats()->total_time_exceeded()) {
-    AINFO << "control all spend time is: " << process_control_time_diff
-          << " ms.";
+    AINFO << "control all spend time is exceeded.";
   }
-
+  AINFO << "control proc finished, total time spend: "
+        << process_control_time_diff << " ms.";
   return true;
 }
 
@@ -547,46 +560,100 @@ Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
-  double current_timestamp = Clock::NowInSeconds();
+  std::string err_msg = "";
+  double current_timestamp = FLAGS_sim_by_record
+                                 ? latest_chassis_.header().timestamp_sec()
+                                 : Clock::NowInSeconds();
   double localization_diff =
       current_timestamp - local_view.localization().header().timestamp_sec();
+  bool localization_consist_timeout = false;
   if (localization_diff >
       (FLAGS_max_localization_miss_num * FLAGS_localization_period)) {
-    AERROR << "Localization msg lost for " << std::setprecision(6)
-           << localization_diff << "s";
+    localization_consist_timeout = true;
+    localization_timeout_count_++;
+    AERROR << "Localization msg lost for " << std::to_string(localization_diff)
+           << "s";
+    AERROR << "current_timestamp: " << std::to_string(current_timestamp)
+           << ", localization_timestamp: "
+           << std::to_string(
+                  local_view.localization().header().timestamp_sec());
+    err_msg = err_msg + " Localization msg timeout. ";
+  } else {
+    localization_consist_timeout = false;
+    localization_timeout_count_ = 0;
+  }
+  if (localization_consist_timeout &&
+      (localization_timeout_count_ >= FLAGS_max_localization_miss_num)) {
+    localization_timeout_count_ = FLAGS_max_localization_miss_num;
+    AERROR << "write the monitor logger, localization msg lost "
+           << localization_timeout_count_ << " times.";
     monitor_logger_buffer_.ERROR("Localization msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
   }
 
   double chassis_diff =
       current_timestamp - local_view.chassis().header().timestamp_sec();
+  bool chassis_consist_timeout = false;
   if (chassis_diff > (FLAGS_max_chassis_miss_num * FLAGS_chassis_period)) {
-    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
-           << "s";
+    chassis_consist_timeout = true;
+    chassis_timeout_count_++;
+    AERROR << "Chassis msg lost for " << std::to_string(chassis_diff) << "s";
+    AERROR << "current_timestamp: " << std::to_string(current_timestamp)
+           << ", chassis_timestamp: "
+           << std::to_string(local_view.chassis().header().timestamp_sec());
+    err_msg = err_msg + " Chassis msg timeout. ";
+  } else {
+    chassis_consist_timeout = false;
+    chassis_timeout_count_ = 0;
+  }
+  if (chassis_consist_timeout &&
+      (chassis_timeout_count_ >= FLAGS_max_chassis_miss_num)) {
+    chassis_timeout_count_ = FLAGS_max_chassis_miss_num;
+    AERROR << "write the monitor logger, chassis msg lost "
+           << chassis_timeout_count_ << " times.";
     monitor_logger_buffer_.ERROR("Chassis msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
   }
 
   double trajectory_diff =
       current_timestamp - local_view.trajectory().header().timestamp_sec();
+  bool trajectory_consist_timeout = false;
   if (trajectory_diff >
       (FLAGS_max_planning_miss_num * FLAGS_trajectory_period)) {
-    AERROR << "Trajectory msg lost for " << std::setprecision(6)
-           << trajectory_diff << "s";
-    monitor_logger_buffer_.ERROR("Trajectory msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
+    trajectory_consist_timeout = true;
+    trajectory_timeout_count_++;
+    AERROR << "Trajectory msg lost for " << std::to_string(trajectory_diff)
+           << "s";
+    AERROR << "current_timestamp: " << std::to_string(current_timestamp)
+           << ", trajectory_timestamp: "
+           << std::to_string(local_view.trajectory().header().timestamp_sec());
+    err_msg = err_msg + " Trajectory msg lost. ";
+  } else {
+    trajectory_consist_timeout = false;
+    trajectory_timeout_count_ = 0;
   }
-  return Status::OK();
+  if (trajectory_consist_timeout &&
+      (trajectory_timeout_count_ >= FLAGS_max_localization_miss_num)) {
+    trajectory_timeout_count_ = FLAGS_max_localization_miss_num;
+    AERROR << "write the monitor logger, trajectory msg lost "
+           << trajectory_timeout_count_ << " times.";
+    monitor_logger_buffer_.ERROR("Trajectory msg lost");
+  }
+
+  if (!err_msg.empty()) {
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, err_msg);
+  } else {
+    return Status::OK();
+  }
 }
 
 void ControlComponent::ResetAndProduceZeroControlCommand(
-    ControlCommand *control_command) {
+    const canbus::Chassis *chassis, ControlCommand *control_command) {
   control_command->set_throttle(0.0);
   control_command->set_steering_target(0.0);
   control_command->set_steering_rate(0.0);
   control_command->set_speed(0.0);
   control_command->set_brake(0.0);
-  control_command->set_gear_location(Chassis::GEAR_DRIVE);
+  control_command->set_gear_location(chassis->gear_location());
+  control_command->set_parking_brake(chassis->parking_brake());
   control_task_agent_.Reset();
   latest_trajectory_.mutable_trajectory_point()->Clear();
   latest_trajectory_.mutable_path_point()->Clear();

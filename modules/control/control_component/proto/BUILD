@@ -33,6 +33,7 @@ proto_library(
     deps = [
         ":check_status_proto",
         "//modules/common_msgs/control_msgs:control_cmd_proto",
+        "//modules/common_msgs/control_msgs:control_interactive_msg_proto",
         "//modules/common_msgs/basic_msgs:header_proto",
         "//modules/common_msgs/basic_msgs:geometry_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_proto",
@@ -62,6 +63,14 @@ proto_library(
 proto_library(
     name = "calibration_table_proto",
     srcs = ["calibration_table.proto"],
+)
+
+proto_library(
+    name = "calibration_debug_proto",
+    srcs = ["calibration_debug.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ]
 )
 
 proto_library(

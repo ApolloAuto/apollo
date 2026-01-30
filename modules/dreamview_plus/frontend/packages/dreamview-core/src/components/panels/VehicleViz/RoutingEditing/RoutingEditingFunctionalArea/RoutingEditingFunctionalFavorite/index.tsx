@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, message, useImagePrak, IconPark } from '@dreamview/dreamview-ui';
+import { Button, IconPark, message, useImagePrak } from '@dreamview/dreamview-ui';
 import EventEmitter from 'eventemitter3';
 import { useTranslation } from 'react-i18next';
 import { RoutingEditor } from '@dreamview/dreamview-carviz';
@@ -174,21 +174,21 @@ function RoutingEditingFunctionalFavorite(props: RoutingEditingFunctionalFavorit
         setActiveRouting(compareRoutingPoint(routingList, currentRouteManager.getCurrentRoute()));
     }, [routingList]);
 
-    // useEffect(() => {
-    //     if (activeOrigin !== CommonRoutingOrigin.FROM_NOT_FULLSCREEN && isMainConnected) {
-    //         mainApi.getStartPoint().then((res) => {
-    //             const startPoint = { x: res.x, y: res.y, heading: res?.heading };
-    //             const endPoint = routingEditor.pathwayMarker.lastPosition;
-    //             mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
-    //                 if (!cycle.isCycle) {
-    //                     routeManager.currentRouteMix.setCurrentRouteMix({
-    //                         currentRouteLoop: { currentRouteLoopState: false },
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     }
-    // }, [isMainConnected, activeOrigin]);
+    useEffect(() => {
+        if (activeOrigin !== CommonRoutingOrigin.FROM_NOT_FULLSCREEN && isMainConnected) {
+            mainApi.getStartPoint().then((res) => {
+                const startPoint = { x: res.x, y: res.y, heading: res?.heading };
+                const endPoint = routingEditor.pathwayMarker.lastPosition;
+                mainApi.checkCycleRouting({ start: startPoint, end: endPoint }).then((cycle) => {
+                    if (!cycle.isCycle) {
+                        routeManager.currentRouteMix.setCurrentRouteMix({
+                            currentRouteLoop: { currentRouteLoopState: false },
+                        });
+                    }
+                });
+            });
+        }
+    }, [isMainConnected, activeOrigin]);
 
     return (
         <CustomScroll className={classes['favorite-scroll']}>

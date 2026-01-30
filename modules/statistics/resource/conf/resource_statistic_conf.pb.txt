@@ -1,0 +1,4 @@
+disk_conf {
+  # sda1, nvme0n1 and etc
+  device: ["sd[a-z][0-9]*", "nvme[\\w]*", "ssd[\\w]*"]
+}

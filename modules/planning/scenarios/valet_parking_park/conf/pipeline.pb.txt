@@ -1,0 +1,123 @@
+stage: {
+  name: "VALET_PARKING_APPROACHING_PARKING_SPOT_PARK"
+  type: "StageApproachingParkingSpotPark"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_PRE_STOP_DECIDER"
+    type: "OpenSpacePreStopDecider"
+  }
+  task {
+    name: "OBSTACLE_NUDGE_DECIDER"
+    type: "ObstacleNudgeDecider"
+  }
+  task {
+    name: "LANE_CHANGE_PATH_GNERIC"
+    type: "LaneChangePathGeneric"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH_GENERIC"
+    type: "LaneBorrowPathGeneric"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+#  task {
+#    name: "PIECEWISE_JERK_SPEED_NONLINEAR"
+#    type: "PiecewiseJerkSpeedNonlinearOptimizer"
+# }
+  fallback_task: {
+      name: "SMOOTH_STOP_TRAJECTORY_FALLBACK"
+      type: "SmoothStopTrajectoryFallback"
+  }
+}
+stage: {
+  name: "VALET_PARKING_PARKING_PARK"
+  type: "StageParkingPark"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_REPLAN_DECIDER"
+    type: "OpenSpaceReplanDecider"
+  }
+  task {
+    name: "OPEN_SPACE_ROI_DECIDER"
+    type: "OpenSpaceRoiDecider"
+  }
+  task {
+    name: "OPEN_SPACE_PATH_PLANNING"
+    type: "OpenSpacePathPlanning"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_OPTIMIZER_PARK"
+    type: "OpenSpaceTrajectoryOptimizerPark"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_POST_PROCESS"
+    type: "OpenSpaceTrajectoryPostProcess"
+  }
+  task {
+    name: "OPEN_SPACE_FALLBACK_DECIDER_PARK"
+    type: "OpenSpaceFallbackDeciderPark"
+  }
+}
+stage: {
+  name: "VALET_PARKING_RETRY_PARK"
+  type: "StageParkingRetryPark"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_REPLAN_DECIDER"
+    type: "OpenSpaceReplanDecider"
+  }
+  task {
+    name: "OPEN_SPACE_ROI_DECIDER"
+    type: "OpenSpaceRoiDecider"
+  }
+  task {
+    name: "OPEN_SPACE_PATH_PLANNING"
+    type: "OpenSpacePathPlanning"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_OPTIMIZER_PARK"
+    type: "OpenSpaceTrajectoryOptimizerPark"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_POST_PROCESS"
+    type: "OpenSpaceTrajectoryPostProcess"
+  }
+  task {
+    name: "OPEN_SPACE_FALLBACK_DECIDER_PARK"
+    type: "OpenSpaceFallbackDeciderPark"
+  }
+}

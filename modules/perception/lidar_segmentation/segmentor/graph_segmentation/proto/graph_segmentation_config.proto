@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message GraphSegmentationConfig {
+  optional uint32 grid_width = 1;
+  optional uint32 grid_height = 2;
+  optional float resolution = 3;
+  optional float threshold = 4;
+  optional uint32 min_pt_number = 5;
+  optional uint32 search_radius = 6 [default = 3];
+  optional float height_threshold = 7 [default = 2.0];
+  optional float xmin = 8 [default = -30.0];
+  optional float xmax = 9 [default = 30.0];
+  optional float ymin = 10 [default = -10.0];
+  optional float ymax = 11 [default = 30.0];
+  optional float semantic_cost = 12 [default = 1.0];
+  // edge coefficient for semantic label
+  optional float same_semantic_coefficient = 13 [default = 1.0];
+  optional float diff_semantic_coefficient = 14 [default = 1.0];
+  // edge coefficient for motion label
+  optional float same_motion_coefficient = 15 [default = 1.0];
+  optional float diff_motion_coefficient = 16 [default = 1.0];
+  // split params
+  optional float split_aspect_ratio = 17 [default = 15.0];
+  optional float split_distance = 18 [default = 5.0];
+}

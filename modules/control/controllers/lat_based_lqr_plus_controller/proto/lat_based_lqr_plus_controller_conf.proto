@@ -1,0 +1,141 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/mrac_conf.proto";
+import "modules/control/control_task_base_extend/proto/safety_check_conf.proto";
+
+message LatBaseLqrPlusControllerConf{
+  optional double ts = 1;  // sample time (dt) 0.01 now, configurable
+  // preview window n, preview time = preview window * ts
+  optional int32 preview_window = 2;
+  optional double cf = 3;
+  optional double cr = 4;  // N/rad
+  optional int32 mass_fl = 5;
+  optional int32 mass_fr = 6;
+  optional int32 mass_rl = 7;
+  optional int32 mass_rr = 8;
+  optional double eps = 9;        // converge threshold for lqr solver
+  repeated double matrix_q = 10;  // matrix_q size = 4 + preview_window
+  // matrix_q size = 4 + preview_window for reverse gear
+  repeated double reverse_matrix_q = 11;
+  optional int32 cutoff_freq = 12;              // cutoff frequency
+  optional int32 mean_filter_window_size = 13;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
+  optional int32 max_iteration = 14;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 15;  // limit aggressive steering
+  optional apollo.control.GainScheduler lat_err_gain_scheduler = 16;
+  optional apollo.control.GainScheduler heading_err_gain_scheduler = 17;
+  optional LeadlagConf reverse_leadlag_conf = 18;
+  optional bool enable_reverse_leadlag_compensation = 19 [default = false];
+  optional bool enable_look_ahead_back_control = 20 [default = false];
+  optional double lookahead_station = 21 [default = 0.0];
+  optional double lookback_station = 22 [default = 0.0];
+  optional MracConf steer_mrac_conf = 23;
+  optional bool enable_steer_mrac_control = 24 [default = false];
+  optional double lookahead_station_high_speed = 25 [default = 0.0];
+  optional double lookback_station_high_speed = 26 [default = 0.0];
+
+  // from gflags and control_conf.proto
+  optional double lock_steer_speed = 27 [default = 0.081];
+  optional bool enable_navigation_mode_error_filter = 28 [default = false];
+  optional bool enable_navigation_mode_position_update = 29 [default = true];
+  optional double query_relative_time = 30 [default = 0.8];
+  optional bool trajectory_transform_to_com_reverse = 31 [default = false];
+  optional bool trajectory_transform_to_com_drive = 32 [default = false];
+  optional bool enable_feedback_augment_on_high_speed = 33 [default = false];
+  optional bool enable_maximum_steer_rate_limit = 34 [default = false];
+  optional bool query_time_nearest_point_only = 35 [default = false];
+
+  optional double switch_speed = 36;  // low/high speed controller switch speed
+  optional double switch_speed_window = 37 [default = 0.0];
+  optional double reverse_feedforward_ratio = 38 [default = 1.0];
+
+  optional bool reverse_use_dynamic_model = 39 [default = false];
+
+  optional double straight_steering_percentage = 40 [default = 5];
+  optional double straight_min_velocity = 41 [default = 0.5];
+  optional double straight_max_ref_cur = 42 [default = 0.01];
+  optional bool use_heading_auto_compensation = 43 [default = false];
+  optional uint32 AHC_container_size = 44 [default = 300];
+
+  optional double AHC_mean_value_low_threshold = 45 [default = 0.01];
+  optional double AHC_mean_value_high_threshold = 46 [default = 0.05];
+  optional double AHC_peak_value_threshold = 47 [default = 0.02];
+
+  repeated double speed_segment = 48;
+  repeated double changing_rate = 49;
+
+  repeated double lat_speed_input = 50;
+  repeated double lat_err_speed_gain_output = 51;
+  repeated double lat_err_delta_speed_gain_output = 52;
+  repeated double heading_err_speed_gain_output = 53;
+  repeated double heading_err_delta_speed_gain_output = 54;
+
+  repeated double lat_curvature_input = 55;
+  repeated double lat_err_curvature_gain_output = 56;
+  repeated double lat_err_delta_curvature_gain_output = 57;
+  repeated double heading_err_curvature_gain_output = 58;
+  repeated double heading_err_delta_curvature_gain_output = 59;
+
+  optional int32 first_handle_heading_window = 60 [default = 200];
+  optional int32 out_first_handle_heading_window = 61 [default = 50];
+  optional int32 handle_lat_err_window = 62 [default = 75];
+  optional int32 handle_heading_err_window = 63 [default = 75];
+  optional double first_handle_heading_stage_prarm = 64 [default = 100];
+  optional double handle_lat_err_prarm_domain = 65 [default = 10];
+  optional double handle_lat_err_prarm_ignore = 66 [default = 0.5];
+  optional double handle_heading_err_parm_domain = 67 [default = 10];
+  optional double handle_heading_err_parm_ignore = 68 [default = 0.5];
+  optional double heading_err_threshold = 69 [default = 0.12];
+  optional double lat_err_threshold = 70 [default = 0.1];
+  optional double openspace_enhance_curv = 71 [default = 0.1];
+  optional double min_large_ref_cur = 72 [default = 0.1];
+  optional SafetyCheckConf lat_safety_check_conf = 73;
+  optional bool use_safety_check_output = 74 [default = false];
+  optional double lat_err_position_add = 75 [default = 1.0];
+  optional double thres_curvature = 76 [default = 0.08];
+  optional bool use_new_look_ahead_back = 77 [default = false];
+  optional double reverse_dead_steer_left = 78 [default = 70.0];
+  optional double reverse_too_big_lat_err = 79 [default = 0.25];
+  optional double reverse_too_big_heading_err = 80 [default = 0.18];
+  optional double reverse_final_heading_check_path = 81 [default = 0.5];
+  optional double reverse_final_heading_check_heading = 82 [default = 0.03];
+  optional bool enable_enhance_qparam = 83 [default = true];
+  optional uint32 check_continous_errors_window = 84 [default = 4];
+  optional bool use_monotonicity_check = 85 [default = false];
+  optional double com_change_rate = 86 [default = 1.0];
+  optional double lat_continous_err_threshold = 87 [default = 0.0];
+  optional bool use_continous_errors_check = 88 [default = false];
+  optional ChooseRefTrajectoryPoint choose_ref_point = 89;
+  optional ChooseRefTrajectoryPoint choose_track_point = 90;
+  optional double track_com_length = 91 [default = 0.0];
+  optional bool is_need_turn_out_lane = 92 [default = false];
+  optional double turn_out_lane_com_length = 93 [default = 0.1];
+
+  optional double lateral_error_turbulence_threshold = 94 [default = 0.1];
+  optional double heading_error_turbulence_threshold = 95 [default = 0.1];
+  optional bool use_turbulence_check = 96 [default = false];
+  optional double com_quit_turbulence_change_rate = 97 [default = 0.1];
+}
+
+message ReverseLogicStage {
+  enum ReverseStageType {
+    NO_REVERSE = -1;
+    FIRST_HEADING_HANDLE_STAGE = 0;
+    QUIT_FIRST_HEADING_HANDLE_STAGE = 1;
+    HANDLE_LAT_ERR_STAGE = 2;
+    HANDLE_HEADING_ERR_STAGE = 3;
+  }
+}
+
+enum ChooseRefTrajectoryPoint {
+  USE_LAT_TARGET_COM = 1;
+  USE_LAT_MATCH_COM = 2;
+  USE_LAT_MATCH_LOCAL = 3;
+  USE_LAT_ABSOLUTE_LOCAL = 4;
+  USE_LAT_MATCH_LR = 5;
+  USE_LAT_TRACK_COM = 6;
+}

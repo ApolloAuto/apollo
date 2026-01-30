@@ -1,0 +1,3 @@
+<library path="modules/perception/perception_plugin/lidar_detection_filter/semantic_filter/libsemantic_filter.so">
+    <class type="apollo::perception::lidar::SemanticFilter" base_class="apollo::perception::lidar::BaseObjectFilter"></class>
+</library>

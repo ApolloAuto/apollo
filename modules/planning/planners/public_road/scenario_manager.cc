@@ -65,7 +65,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
     }
     if (scenario->IsTransferable(current_scenario_.get(), *frame)) {
       current_scenario_->Exit(frame);
-      AINFO << "switch scenario from" << current_scenario_->Name() << " to "
+      AINFO << "switch scenario from " << current_scenario_->Name() << " to "
             << scenario->Name();
       current_scenario_ = scenario;
       current_scenario_->Reset();

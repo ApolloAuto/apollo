@@ -144,12 +144,12 @@ The following images show the cpu usage, memory usage, message transfer latency,
 
 ### performance of Apollo 10.0 cyberRT in different scenarios for cross-process transfers under platform 1
 
-|                                                    | message size/frequency | cpu usage | latency  | msg loss rate | memory usage                     |
-| -------------------------------------------------- | ---------------------- | --------- | -------- | ------------- | -------------------------------- |
-| Functional Module(perception, planning etc.)       | 64K/10hz               | 9.14%     | 84.6 us  | 0.0%          | 250MB                            |
+|                                                  | message size/frequency | cpu usage | latency  | msg loss rate | memory usage                     |
+| ------------------------------------------------ | ---------------------- | --------- | -------- | ------------- | -------------------------------- |
+| Functional Module(perception, planning etc.)     | 64K/10hz               | 9.14%     | 84.6 us  | 0.0%          | 250MB                            |
 | High Frequencies functional Module（localization） | 64k/100hz              | 9.71%     | 69.54 us | 0.0%          | 250M + 1024M arena shared memory |
-| Normal Sensor Module                               | 1M/10hz                | 8.47%     | 82.29 us | 0.0%          | 250M + 1024M arena shared memory |
-| High-End Sensor Module                             | 10M/10hz               | 5.55%     | 58.95 us | 0.0%          | 250M + 1024M arena shared memory |
+| Normal Sensor Module                             | 1M/10hz                | 8.47%     | 82.29 us | 0.0%          | 250M + 1024M arena shared memory |
+| High-End Sensor Module                           | 10M/10hz               | 5.55%     | 58.95 us | 0.0%          | 250M + 1024M arena shared memory |
 
 ## Cross-machine transfer performance test results
 
@@ -225,9 +225,9 @@ The following images show the cpu usage, memory usage, message transfer latency,
 
 ### Performance of Apollo 10.0 cyberRT in different scenarios for cross-machine transfers under platform 1
 
-|                                                    | message size/frequency | cpu usage | latency  | msg loss rate | memory usage |
-| -------------------------------------------------- | ---------------------- | --------- | -------- | ------------- | ------------ |
-| Functional Module(perception, planning etc.)       | 64K/10hz               | 7.75%     | 391 us   | 0.0%          | 247MB        |
+|                                                  | message size/frequency | cpu usage | latency  | msg loss rate | memory usage |
+| ------------------------------------------------ | ---------------------- | --------- | -------- | ------------- | ------------ |
+| Functional Module(perception, planning etc.)     | 64K/10hz               | 7.75%     | 391 us   | 0.0%          | 247MB        |
 | High Frequencies functional Module（localization） | 64k/100hz              | 10.3%     | 369 us   | 0.0%          | 249M         |
-| Normal Sensor Module                               | 1M/10hz                | 8.84%     | 2124 us  | 0.0%          | 251M         |
-| High-End Sensor Module                             | 10M/10hz               | 18.8%     | 18886 us | 0.0%          | 288M         |
+| Normal Sensor Module                             | 1M/10hz                | 8.84%     | 2124 us  | 0.0%          | 251M         |
+| High-End Sensor Module                           | 10M/10hz               | 18.8%     | 18886 us | 0.0%          | 288M         |

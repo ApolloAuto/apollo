@@ -49,17 +49,13 @@ bool CanbusComponent::Init() {
   AINFO << "The canbus conf file is loaded: " << FLAGS_canbus_conf_file;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
-  std::string vehicle_library_path;
-  if (!apollo::cyber::common::GetFilePathWithEnv(FLAGS_load_vehicle_library,
-                                                 "APOLLO_LIB_PATH",
-                                                 &vehicle_library_path)) {
+  if (!apollo::cyber::common::PathExists(FLAGS_load_vehicle_library)) {
     AERROR << FLAGS_load_vehicle_library << " No such vehicle library";
     return false;
   }
-  AINFO << "Load the vehicle factory library: " << FLAGS_load_vehicle_library
-        << "(" << vehicle_library_path << ")";
+  AINFO << "Load the vehicle factory library: " << FLAGS_load_vehicle_library;
 
-  ClassLoader loader(vehicle_library_path);
+  ClassLoader loader(FLAGS_load_vehicle_library);
   auto vehicle_object = loader.CreateClassObj<AbstractVehicleFactory>(
       FLAGS_load_vehicle_class_name);
   if (!vehicle_object) {
@@ -154,6 +150,10 @@ void CanbusComponent::Clear() {
 
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_object_->publish_chassis();
+  if (is_control_cmd_time_delay_) {
+    AERROR << "cmd time delay";
+    chassis.set_error_code(Chassis::CMD_NOT_IN_PERIOD);
+  }
   common::util::FillHeader(node_->Name(), &chassis);
   chassis_writer_->Write(chassis);
   ADEBUG << chassis.ShortDebugString();
@@ -184,6 +184,9 @@ bool CanbusComponent::Proc() {
   if (vehicle_object_->CheckChassisCommunicationFault()) {
     AERROR << "Can not get the chassis info, please check the chassis "
               "communication!";
+    is_chassis_communication_fault_ = true;
+  } else {
+    is_chassis_communication_fault_ = false;
   }
 
   // publish "/apollo/canbus/chassis"
@@ -240,17 +243,24 @@ void CanbusComponent::OnControlCommandCheck(
   // cmd_time_diff: s
   double cmd_time_diff =
       current_timestamp * 1e-6 - control_command.header().timestamp_sec();
-  if (FLAGS_use_control_cmd_check &&
-      (cmd_time_diff > (FLAGS_max_control_miss_num * FLAGS_control_period))) {
-    AERROR << "Control cmd timeout, sequence_number:"
-           << control_command.header().sequence_num()
-           << ", Time_of_delay:" << cmd_time_diff << " s"
-           << ", time delay threshold: "
-           << (FLAGS_max_control_miss_num * FLAGS_control_period) << " s";
+  if ((FLAGS_use_control_cmd_check &&
+       (cmd_time_diff > (FLAGS_max_control_miss_num * FLAGS_control_period))) ||
+      is_chassis_communication_fault_) {
+    AERROR_IF(cmd_time_diff >
+              (FLAGS_max_control_miss_num * FLAGS_control_period))
+        << "Control cmd timeout, sequence_number:"
+        << control_command.header().sequence_num()
+        << ", Time_of_delay:" << cmd_time_diff << " s"
+        << ", time delay threshold: "
+        << (FLAGS_max_control_miss_num * FLAGS_control_period) << " s"
+        << ", need to process cmd timeout.";
+    AERROR_IF(is_chassis_communication_fault_)
+        << "Chassis communication fault, need to process cmd timeout.";
 
     if (vehicle_object_->Driving_Mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         vehicle_object_->Driving_Mode() == Chassis::AUTO_STEER_ONLY ||
-        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY) {
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY ||
+        FLAGS_chassis_debug_mode || is_chassis_communication_fault_) {
       is_control_cmd_time_delay_ = true;
       GuardianCommand new_guardian_command;
       new_guardian_command.mutable_control_command()->CopyFrom(control_command);
@@ -278,18 +288,21 @@ void CanbusComponent::OnGuardianCommandCheck(
   // cmd_time_diff: s
   double guardian_cmd_time_diff =
       current_timestamp * 1e-6 - guardian_command.header().timestamp_sec();
-  if (FLAGS_use_guardian_cmd_check &&
-      (guardian_cmd_time_diff >
-       (FLAGS_max_guardian_miss_num * FLAGS_guardian_period))) {
+  if ((FLAGS_use_guardian_cmd_check &&
+       (guardian_cmd_time_diff >
+        (FLAGS_max_guardian_miss_num * FLAGS_guardian_period))) ||
+      is_chassis_communication_fault_) {
     AERROR << "Guardain cmd timeout, sequence_number:"
            << guardian_command.header().sequence_num()
            << ", Time_of_delay:" << guardian_cmd_time_diff << " s"
            << ", time delay threshold: "
-           << (FLAGS_max_guardian_miss_num * FLAGS_guardian_period) << " s";
+           << (FLAGS_max_guardian_miss_num * FLAGS_guardian_period) << " s"
+           << ", need to process cmd timeout.";
 
     if (vehicle_object_->Driving_Mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         vehicle_object_->Driving_Mode() == Chassis::AUTO_STEER_ONLY ||
-        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY) {
+        vehicle_object_->Driving_Mode() == Chassis::AUTO_SPEED_ONLY ||
+        is_chassis_communication_fault_) {
       is_control_cmd_time_delay_ = true;
       GuardianCommand new_guardian_command;
       new_guardian_command.CopyFrom(guardian_command);

@@ -56,6 +56,11 @@ void MlfTracker::InitializeTrack(MlfTrackDataPtr new_track_data,
 
 void MlfTracker::UpdateTrackDataWithObject(MlfTrackDataPtr track_data,
                                            TrackedObjectPtr new_object) {
+  // Update trackable state:
+  //   1.change background to foreground if it's matched with foreground track
+  //   2.update foreground_track_prob_
+  //   3.change bacground obj is_background state if it's MOVING or OBJECT
+  track_data->UpdateTrackableState(new_object);
   // 1. state filter and store belief in new_object
   for (auto& filter : filters_) {
     filter->UpdateWithObject(filter_options_, track_data, new_object);

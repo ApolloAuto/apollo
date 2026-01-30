@@ -1,2 +1,0 @@
-apollo_channel_name_0: "/apollo/test2"
-ros_topic_name_0: "/chatter"

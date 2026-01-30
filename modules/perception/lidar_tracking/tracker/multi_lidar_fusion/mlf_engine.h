@@ -156,11 +156,11 @@ class MlfEngine : public BaseMultiTargetTracker {
   bool output_predict_objects_ = false;
   double reserved_invisible_time_ = 0.3;
   bool use_frame_timestamp_ = false;
-  bool set_static_outside_hdmap_ = false;
   bool use_semantic_map_ = false;
   bool print_debug_log_ = false;
   double delay_output_ = 0.3;
   size_t pub_track_times_ = 1;
+  bool merge_foreground_background_ = false;
 };
 
 }  // namespace lidar

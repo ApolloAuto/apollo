@@ -1,6 +1,6 @@
 {
   "name": "@dreamview/dreamview-theme",
-  "version": "1.3.4",
+  "version": "1.2.1",
   "description": "themes of dreamview",
   "author": "adu-sim",
   "homepage": "",
@@ -23,15 +23,13 @@
     "test": "node ./__tests__/frontend.test.js",
     "pub": "npm publish"
   },
-  "peerDependencies": {
-    "react": "^18.0.0"
-  },
   "dependencies": {
     "@ant-design/colors": "^7.0.0",
     "@dreamview/log": "^1.1.4",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@types/react-dom": "^18.2.4",
+    "react": "^18.2.0",
     "lodash": "^4.17.21",
     "tss-react": "^4.8.4"
   },

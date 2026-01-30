@@ -61,7 +61,6 @@ class HMI : public UpdaterBase {
 
   void RegisterMessageHandlers();
   void RegisterDBMessageHandlers();
-  void RegisterFrontendConfMessageHandlers();
 
   apollo::common::monitor::MonitorLogBuffer monitor_log_buffer_;
   std::unique_ptr<HMIWorker> hmi_worker_;

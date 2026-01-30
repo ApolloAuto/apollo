@@ -50,7 +50,7 @@ class ControlComponentTest : public ::testing::Test {
   virtual void SetUp() {
     AINFO << "Into setup";
     FLAGS_pipeline_file =
-        "modules/control/control_component/testdata/conf/"
+        "/apollo/modules/control/control_component/testdata/conf/"
         "pipeline.pb.txt";
     FLAGS_is_control_test_mode = true;
     FLAGS_is_control_ut_test_mode = true;
@@ -245,7 +245,7 @@ void ControlComponentTest::TrimControlCommand(ControlCommand* origin) {
 TEST_F(ControlComponentTest, simple_test) {
   AINFO << "Into the simple test";
   FLAGS_test_data_dir =
-      "modules/control/control_component/testdata/simple_control_test/";
+      "/apollo/modules/control/control_component/testdata/simple_control_test/";
   FLAGS_enable_csv_debug = true;
   FLAGS_test_localization_file = "1_localization.pb.txt";
   FLAGS_test_pad_file = "1_pad.pb.txt";

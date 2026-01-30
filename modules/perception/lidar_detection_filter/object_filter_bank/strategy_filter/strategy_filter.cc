@@ -37,6 +37,7 @@ bool StrategyFilter::Init(const ObjectFilterInitOptions& options) {
     allow_fore_merge_ = config.allow_fore_merge();
     is_filter_below_objects_ = config.is_filter_below_objects();
     below_threshold_ = config.below_threshold();
+    below_range_ = config.below_range();
     is_filter_small_size_ = config.is_filter_small_size();
     small_size_threshold_ = config.small_size_thres();
     AINFO << "[StrategyFilter] expand_dist is " << expand_dist_;
@@ -207,7 +208,11 @@ void StrategyFilter::FilterBelowGroundObjects(LidarFrame* frame) {
     // filter below ground
     for (size_t i = 0; i < objects.size(); ++i) {
         float z_diff = frame->original_ground_z - objects[i]->center(2);
-        if (z_diff >= below_threshold_) {
+        float dist = sqrt(objects[i]->center(0) * objects[i]->center(0) +
+            objects[i]->center(1) * objects[i]->center(1));
+        // type limit
+        bool type_flag = static_cast<int>(objects[i]->type) < 3;
+        if (type_flag && z_diff >= below_threshold_ && dist <= below_range_) {
             AINFO << "[BelowGround] id: " << objects[i]->id
                   << " diff: " << z_diff;
             filter_flag[i] = true;

@@ -94,7 +94,6 @@ void Decode_0B::subData(const uint8_t* sub_address, int& index) {
 
 void Decode_0B::parse0B(const uint8_t* data, int& pos) {
   static const double deg_coefficient = 360.0 / 32768;
-  static const double degree_to_radians = 6.283185307179586232 / 360.0;
   static const double angular_coefficient = 300.0 / 32768;
   static const double acc_coefficient = 12.0 / 32768 * 9.7883105;
   static const double velocity_coefficient = 100.0 / 32768;
@@ -113,10 +112,8 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
     float roll = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
     float pitch = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
     float x = (toValue<int16_t>(data, sub_index)) * deg_coefficient;
-    if (x > 0) {
-      x = 90.0 - x;
-    } else {
-      x = 90.0 - (360.0 + x);
+    if (x < 0) {
+      x = 360.0 + x;
     }
     float yaw = x;
 
@@ -168,13 +165,11 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
 
     // 俯仰角
     insdata.Pitch_deg = pitch;
-    insdata.Pitch_rad = pitch * degree_to_radians;
     // 横滚角
     insdata.Roll_deg = roll;
-    insdata.Roll_rad = roll * degree_to_radians;
     // 航向角
     insdata.Yaw_deg = yaw;
-    insdata.Yaw_rad = yaw * degree_to_radians;
+
     insdata.GyroX = imu_msg_x_angular_velocity * deg_to_rad; /*gx*/
     insdata.GyroY = imu_msg_y_angular_velocity * deg_to_rad;
     insdata.GyroZ = imu_msg_z_angular_velocity * deg_to_rad;
@@ -182,9 +177,10 @@ void Decode_0B::parse0B(const uint8_t* data, int& pos) {
     insdata.AccY_g = imu_msg_y_acc;
     insdata.AccZ_g = imu_msg_z_acc;
 
-    // insdata.Lon_deg = imu_msg_longitude;
-    // insdata.Lat_deg = imu_msg_latitude;/*融合后Latitude (deg)*/
-    // insdata.Alt_m = imu_msg_altitude;/*融合后Altitude (m)*/
+    // 这个是惯导融合后的输出
+    insdata.Lon_deg = imu_msg_longitude;
+    insdata.Lat_deg = imu_msg_latitude;
+    insdata.Alt_m = imu_msg_altitude;
 
     insdata.VelN_mps =
         imu_msg_north_velocity; /*融合后 NED north velocity (m/s) */
@@ -295,9 +291,10 @@ void Decode_0B::parseGnss(const uint8_t* data, int& pos) {
     pos += m_lengthGnss;
 
     insdata.flag_pos = m_gnssMsg_flags_pos;
-    insdata.Lon_deg = m_gnssMsg_longitude;
-    insdata.Lat_deg = m_gnssMsg_latitude; /*融合后Latitude (deg)*/
-    insdata.Alt_m = m_gnssMsg_altitude;   /*融合后Altitude (m)*/
+    // 这是融合rtk的输出
+    insdata.Lon_gnss_deg = m_gnssMsg_longitude;
+    insdata.Lat_gnss_deg = m_gnssMsg_latitude;
+    insdata.Alt_gnss_m = m_gnssMsg_altitude;
     insdata.differential_age = m_gnssMsg_rtk_age;
 
     // Do not write csv.

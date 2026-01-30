@@ -33,6 +33,7 @@ apollo_cc_library(
         "trajectory_smoother/dual_variable_warm_start_problem.cc",
         "trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.cc",
         "trajectory_smoother/iterative_anchoring_smoother.cc",
+        "utils/open_space_fallback_util.cc",
         "utils/open_space_roi_util.cc",
         "utils/open_space_trajectory_optimizer_util.cc",
     ],
@@ -55,6 +56,7 @@ apollo_cc_library(
         "trajectory_smoother/dual_variable_warm_start_problem.h",
         "trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h",
         "trajectory_smoother/iterative_anchoring_smoother.h",
+        "utils/open_space_fallback_util.h",
         "utils/open_space_roi_util.h",
         "utils/open_space_trajectory_optimizer_util.h",
     ],
@@ -188,29 +190,6 @@ apollo_cc_test(
     ],
 )
 
-apollo_cc_test(
-    name = "node3d_test",
-    size = "small",
-    srcs = ["coarse_trajectory_generator/node3d_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_open_space",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-apollo_cc_test(
-    name = "hybrid_a_star_test",
-    size = "small",
-    srcs = ["coarse_trajectory_generator/hybrid_a_star_test.cc"],
-    linkopts = ["-lgomp"],
-    deps = [
-        ":apollo_planning_open_space",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 apollo_cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
     srcs = ["tools/hybrid_a_star_wrapper.cc"],
@@ -250,6 +229,6 @@ apollo_cc_binary(
     ],
 )
 
-apollo_package()
+apollo_package(enable_source=False)
 
 cpplint()

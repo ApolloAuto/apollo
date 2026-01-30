@@ -49,7 +49,8 @@ bool IsDifferentRouting(const PlanningCommand& first,
     const auto& first_header = first.header();
     const auto& second_header = second.header();
     return (first_header.sequence_num() != second_header.sequence_num() ||
-            first_header.module_name() != second_header.module_name());
+            first_header.module_name() != second_header.module_name() ||
+            first_header.timestamp_sec() != second_header.timestamp_sec());
   }
   return true;
 }

@@ -41,4 +41,5 @@ message DemoConfig {
   optional Drivable_roi drivable_roi = 18;
   optional Un_drivable_roi un_drivable_roi = 19;
   optional string overlap_id = 20;
+  optional string zone_cover_area_id = 21;
 }

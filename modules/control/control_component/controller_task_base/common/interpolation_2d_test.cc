@@ -33,7 +33,7 @@ class Interpolation2DTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string control_base_dir =
-        "modules/control/control_component/";
+        "/apollo/modules/control/control_component/";
     std::string control_conf_file =
         control_base_dir + "conf/calibration_table.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file,

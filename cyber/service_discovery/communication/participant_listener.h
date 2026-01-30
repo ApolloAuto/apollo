@@ -20,27 +20,25 @@
 #include <functional>
 #include <mutex>
 
-#include "cyber/base/macros.h"
-
-#include "fastdds/dds/domain/DomainParticipantListener.hpp"
 #include "fastrtps/Domain.h"
+#include "fastrtps/participant/Participant.h"
+#include "fastrtps/participant/ParticipantListener.h"
 
 namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
-class ParticipantListener
-    : public eprosima::fastdds::dds::DomainParticipantListener {
+class ParticipantListener : public eprosima::fastrtps::ParticipantListener {
  public:
   using ChangeFunc = std::function<void(
-      const eprosima::fastrtps::rtps::ParticipantDiscoveryInfo& info)>;
+      const eprosima::fastrtps::ParticipantDiscoveryInfo& info)>;
 
   explicit ParticipantListener(const ChangeFunc& callback);
   virtual ~ParticipantListener();
 
-  void on_participant_discovery(
-      eprosima::fastdds::dds::DomainParticipant* p,
-      eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override;
+  virtual void onParticipantDiscovery(
+      eprosima::fastrtps::Participant* p,
+      eprosima::fastrtps::ParticipantDiscoveryInfo info);
 
  private:
   ChangeFunc callback_;

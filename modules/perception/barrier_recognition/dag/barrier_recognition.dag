@@ -1,0 +1,14 @@
+module_config {
+  module_library : "modules/perception/barrier_recognition/libbarrier_recognition_component.so"
+  components {
+    class_name : "BarrierRecognitionComponent"
+    config {
+      name: "BarrierRecognitionComponent"
+      config_file_path: "/apollo/modules/perception/barrier_recognition/conf/barrier_recognition_config.pb.txt"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      readers {
+        channel: "/perception/lidar/detection"
+      }
+    }
+  }
+}

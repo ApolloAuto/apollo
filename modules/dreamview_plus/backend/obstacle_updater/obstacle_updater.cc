@@ -33,9 +33,7 @@ using apollo::common::util::PairHash;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 ObstacleUpdater::ObstacleUpdater(WebSocketHandler* websocket)
-    : UpdaterWithChannelsBase({"perception.PerceptionObstacles"}, {""}),
-      websocket_(websocket),
-      node_(cyber::CreateNode("obstacle_updater")) {
+    : websocket_(websocket), node_(cyber::CreateNode("obstacle_updater")) {
   Init();
 }
 
@@ -131,7 +129,7 @@ void ObstacleUpdater::PublishMessage(const std::string& channel_name) {
 
 void ObstacleUpdater::GetChannelMsg(std::vector<std::string>* channels) {
   enabled_ = true;
-  GetChannelMsgWithFilter(channels);
+  GetChannelMsgWithFilter(channels, "perception.PerceptionObstacles", "");
 }
 
 void ObstacleUpdater::OnObstacles(

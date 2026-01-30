@@ -44,7 +44,9 @@ export function AppInitProvider(props: PropsWithChildren) {
     const progressChange = useRef([]);
     const onChildStatusChange = (iregistry: IRegistry) => {
         const registryCollection = Object.values(iregistry);
-        const hasAllFinished = registryCollection.every((item) => [IAppInitStatus.DONE].includes(item.status));
+        const hasAllFinished = registryCollection.every((item) =>
+            [IAppInitStatus.FAIL, IAppInitStatus.DONE].includes(item.status),
+        );
         if (!hasAllFinished) {
             return;
         }

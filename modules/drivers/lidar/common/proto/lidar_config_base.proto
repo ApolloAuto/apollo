@@ -13,5 +13,6 @@ message LidarConfigBase {
   required string frame_id = 3;
   required SourceType source_type = 4;
   optional int32 buffer_size = 5 [default = 10];
-
+  optional bool write_scan = 6 [default = true];
+  optional uint32 default_reserved_points_num = 7 [default = 50000];
 }

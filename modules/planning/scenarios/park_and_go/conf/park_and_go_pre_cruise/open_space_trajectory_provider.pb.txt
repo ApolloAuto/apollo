@@ -1,9 +1,6 @@
 open_space_trajectory_optimizer_config {
   planner_open_space_config {
     iterative_anchoring_smoother_config {
-      fem_pos_deviation_smoother_config {
-        use_sqp: true
-      }
       s_curve_config {
         acc_weight: 1.0
         jerk_weight: 1.0

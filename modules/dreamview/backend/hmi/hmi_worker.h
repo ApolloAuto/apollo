@@ -106,7 +106,7 @@ class HMIWorker {
   //                     const std::string& record_status);
   bool LoadRecords();
   bool ReloadVehicles();
-  bool GetScenarioSetPath(const std::string& scenario_set_id,
+  void GetScenarioSetPath(const std::string& scenario_set_id,
                           std::string* scenario_set_path);
   void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
   void UpdatePointCloudChannelToStatus(const std::string& channel_name);
@@ -142,8 +142,8 @@ class HMIWorker {
   void DeleteRecord(const std::string& record_id);
   void DeleteDynamicModel(const std::string& dynamic_model_name);
 
-  bool GetScenarioResourcePath(std::string* scenario_resource_path);
-  bool GetRecordPath(std::string* record_path);
+  void GetScenarioResourcePath(std::string* scenario_resource_path);
+  void GetRecordPath(std::string* record_path);
 
   bool RePlayRecord(const std::string& record_id);
 

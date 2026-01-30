@@ -41,6 +41,11 @@ bool IsPointXYInPolygon2DXY(const PointT &point,
   Type y1 = 0.0;
   Type y2 = 0.0;
   size_t nr_poly_points = polygon.size();
+  if (nr_poly_points < 3) {
+    AINFO << "Polygon points number is smaller than 3.";
+    return false;
+  }
+
   // start with the last point to make the check last point<->first point the
   // first one
   Type xold = polygon.at(nr_poly_points - 1).x;

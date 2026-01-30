@@ -20,8 +20,6 @@
 
 #include "modules/planning/planning_base/common/speed_limit.h"
 
-#include <algorithm>
-
 #include "gtest/gtest.h"
 
 namespace apollo {

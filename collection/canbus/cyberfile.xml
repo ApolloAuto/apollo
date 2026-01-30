@@ -1,0 +1,28 @@
+<package format="2">
+  <name>module-canbus</name>
+  <version>local</version>
+  <description>
+    Apollo canbus module.
+  </description>
+  
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//collection/canbus</src_path>
+  <depend repo_name="canbus" type="binary">canbus</depend>
+  <depend repo_name="canbus-vehicle-ch" type="binary">canbus-vehicle-ch</depend>
+  <depend repo_name="canbus-vehicle-ge3" type="binary">canbus-vehicle-ge3</depend>
+  <depend repo_name="canbus-vehicle-gem" type="binary">canbus-vehicle-gem</depend>
+  <depend repo_name="canbus-vehiclekit" type="binary">canbus-vehiclekit</depend>
+  <depend repo_name="canbus-vehicle-lexus" type="binary">canbus-vehicle-lexus</depend>
+  <depend repo_name="canbus-vehicle-lincoln" type="binary">canbus-vehicle-lincoln</depend>
+  <depend repo_name="canbus-vehicle-neolix-edu" type="binary">canbus-vehicle-neolix-edu</depend>
+  <depend repo_name="canbus-vehicle-transit" type="binary">canbus-vehicle-transit</depend>
+  <depend repo_name="canbus-vehicle-wey" type="binary">canbus-vehicle-wey</depend>
+  <depend repo_name="canbus-vehicle-zhongyun" type="binary">canbus-vehicle-zhongyun</depend>
+
+</package>

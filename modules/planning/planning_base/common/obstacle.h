@@ -162,7 +162,7 @@ class Obstacle {
 
   void set_path_st_boundary(const STBoundary& boundary);
 
-  bool is_path_st_boundary_initialized() {
+  bool is_path_st_boundary_initialized() const {
     return path_st_boundary_initialized_;
   }
 

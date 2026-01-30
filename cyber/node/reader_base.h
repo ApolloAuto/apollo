@@ -158,7 +158,7 @@ class ReaderBase {
 /**
  * @brief One Channel is related to one Receiver.
  * ReceiverManager is in charge of attaching one Receiver to its responding
- * Channel. We pass a DataDispatcher's callback func to this Receiver so when a
+ * Channel. We pass a DataDispatche's callback func to this Receiver so when a
  * message is received, it will be push to the `ChannelBuffer`, and
  * `DataVisitor` will `Fetch` data and pass to `Reader`'s callback func
  *

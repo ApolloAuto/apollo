@@ -57,5 +57,6 @@ export class RoutingEditor extends Carviz {
         this.pathwayMarker.deactive();
         this.copyMarker.deactive();
         this.rulerMarker.deactive();
+        this.indoorLocalizationMarker.deactive();
     }
 }

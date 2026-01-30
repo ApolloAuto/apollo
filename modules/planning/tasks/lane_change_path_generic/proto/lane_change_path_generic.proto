@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message LaneChangePathGenericConfig {
+  optional PiecewiseJerkPathConfig path_optimizer_config = 1;
+  // whether to extend adc bound buffer
+  optional double extend_adc_buffer = 2;
+  // not allowed to change lane this amount of time if just failed
+  optional double change_lane_fail_freeze_time = 3;
+  // not allowed to change lane this amount of time if just finished
+  optional double change_lane_success_freeze_time = 4;
+  // The distance of lane-change preparation on current lane.
+  optional double lane_change_prepare_length = 5;
+  // The distance of lane-change preparation on current lane.
+  optional bool enable_forbidden_zone = 6 [default = true];
+}

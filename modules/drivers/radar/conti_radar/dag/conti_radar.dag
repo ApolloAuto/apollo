@@ -4,14 +4,14 @@ module_config {
         class_name : "ContiRadarCanbusComponent"
         config {
             name: "conti_radar_front"
-            config_file_path:  "modules/drivers/radar/conti_radar/conf/radar_front_conf.pb.txt"
+            config_file_path:  "/apollo/modules/drivers/radar/conti_radar/conf/radar_front_conf.pb.txt"
         }
     }
     components {
         class_name : "ContiRadarCanbusComponent"
         config {
             name: "conti_radar_rear"
-            config_file_path:  "modules/drivers/radar/conti_radar/conf/radar_rear_conf.pb.txt"
+            config_file_path:  "/apollo/modules/drivers/radar/conti_radar/conf/radar_rear_conf.pb.txt"
         }
     }
 }

@@ -1,0 +1,1 @@
+model_path: "/apollo/modules/prediction_plugin/semantic_lstm_pedestrian_tensorrt/data/semantic_lstm_pedestrian_model.trt"

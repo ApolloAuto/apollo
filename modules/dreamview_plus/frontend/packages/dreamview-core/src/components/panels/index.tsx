@@ -23,35 +23,49 @@ interface RemotePanelJsonDesc {
     type: string;
 }
 
-const loadRemotePanels = (
-    remotePanelJsonDesc: RemotePanelJsonDesc[],
+const loadRemotePanels = async (
+    t: TFunction | ((str: string) => string),
     customChartIllustratorImg: string,
-): IPanelMetaInfo[] => {
+): Promise<IPanelMetaInfo[]> => {
     const remotePanels: IPanelMetaInfo[] = [];
-    remotePanels.push(
-        ...remotePanelJsonDesc.map((panel) => ({
-            title: panel.title,
-            type: panel.type,
-            originType: panel.originType,
-            thumbnail: customChartIllustratorImg,
-            description: panel.description,
-            module: () =>
-                loadRemoteEntry(panel.remoteEntry, panel.remoteName)
-                    .then(() => loadComponent(panel.remoteName, panel.exposedModuleName))
-                    .then((Component) => {
-                        return Component;
-                    }),
-        })),
-    );
+    try {
+        const remotePanelJsonDesc: RemotePanelJsonDesc[] = await fetch(
+            '/proto/modules/dreamview_plus_plugin_panels/panel.json',
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                },
+                mode: 'cors',
+            },
+        ).then((res) => res.json());
+        remotePanels.push(
+            ...remotePanelJsonDesc.map((panel) => ({
+                title: panel.title,
+                type: panel.type,
+                originType: panel.originType,
+                thumbnail: customChartIllustratorImg,
+                description: panel.description,
+                module: () =>
+                    loadRemoteEntry(panel.remoteEntry, panel.remoteName)
+                        .then(() => loadComponent(panel.remoteName, panel.exposedModuleName))
+                        .then((Component) => {
+                            return Component;
+                        }),
+            })),
+        );
+        return remotePanels;
+    } catch (e) {
+        console.error(e);
+    }
     return remotePanels;
 };
 
 export const getAllPanels = async (
-    remotePanelJsonDesc: RemotePanelJsonDesc[],
     t: TFunction | ((str: string) => string),
     imgSrc: any,
 ): Promise<IPanelMetaInfo[]> => {
-    console.log('remotePanelJsonDesc', remotePanelJsonDesc);
     const [
         consoleIllustratorImg,
         moudleDelayIllustratorImg,
@@ -64,7 +78,12 @@ export const getAllPanels = async (
         terminalIllustratorImg,
         customChartIllustratorImg,
     ] = imgSrc;
-    const remotePanels: IPanelMetaInfo[] = loadRemotePanels(remotePanelJsonDesc, customChartIllustratorImg);
+    let remotePanels: IPanelMetaInfo[] = [];
+    try {
+        remotePanels = await loadRemotePanels(t, customChartIllustratorImg);
+    } catch (e) {
+        console.error(e);
+    }
 
     const localPanels: IPanelMetaInfo[] = [
         {

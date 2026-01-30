@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/obstacle_nudge_decider/libobstacle_nudge_decider.so">
+    <class type="apollo::planning::ObstacleNudgeDecider" base_class="apollo::planning::Task"></class>
+</library>

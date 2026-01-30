@@ -1,4 +1,4 @@
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_component", "apollo_cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_x86_64", "if_aarch64", "if_gpu")
 
@@ -6,14 +6,23 @@ package(default_visibility = ["//visibility:public"])
 
 CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
+
 apollo_component(
     name = "libcamera_component.so",
     srcs = ["camera_component.cc"],
     hdrs = ["camera_component.h"],
-    copts = CAMERA_COPTS,
     linkopts = [
         "-latomic",
     ],
+    copts = CAMERA_COPTS,
     deps = [
         ":apollo_camera_util",
         "//cyber",
@@ -37,20 +46,16 @@ apollo_component(
         "//modules/common_msgs/basic_msgs:header_cc_proto",
         "//modules/drivers/camera/proto:config_cc_proto",
         "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
-        "@opencv//:core",
-        "@opencv//:highgui",
-        "@opencv//:imgcodecs",
-        "@opencv//:imgproc",
-    ],
-)
-
-filegroup(
-    name = "runtime_data",
-    srcs = glob([
-        "conf/*.txt",
-        "dag/*.dag",
-        "launch/*.launch",
-    ]),
+    ] + if_aarch64(
+        [
+            "@nvjpeg//:nvjpeg"
+        ], [
+            "@opencv//:core",
+            "@opencv//:highgui",
+            "@opencv//:imgcodecs",
+            "@opencv//:imgproc",
+        ],
+    ),
 )
 
 apollo_cc_library(
@@ -86,8 +91,13 @@ apollo_cc_library(
         "@ffmpeg//:avcodec",
     ] + if_x86_64(
         ["@adv_plat"],
+    ) + if_aarch64(
+        ["//modules/drivers/camera/format:convert",]
     ),
+    copts = [ 
+        '-fopenmp',
+    ],
 )
 
-apollo_package()
+apollo_package(enable_source=False)
 cpplint()

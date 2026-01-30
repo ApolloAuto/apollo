@@ -4,5 +4,4 @@ package apollo.dreamview;
 
 message PointCloud {
   repeated float num = 1 [packed = true];
-  optional bool is_edge = 2 [default = false];
 }

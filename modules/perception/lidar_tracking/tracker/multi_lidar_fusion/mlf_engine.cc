@@ -53,10 +53,10 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   output_predict_objects_ = config.output_predict_objects();
   reserved_invisible_time_ = config.reserved_invisible_time();
   use_frame_timestamp_ = config.use_frame_timestamp();
-  set_static_outside_hdmap_ = config.set_static_outside_hdmap();
   print_debug_log_ = config.print_debug_log();
   delay_output_ = config.delay_time_output();
   pub_track_times_ = config.pub_track_times();
+  merge_foreground_background_ = config.merge_foreground_background();
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
@@ -119,7 +119,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
   // Startegy: Set velocity and acceleration to ZERO outside hdmap_struct
   // temporarily located here, best is in mlf_motion_refiner.cc
   auto roi = frame->hdmap_struct;
-  if (!set_static_outside_hdmap_ || roi == nullptr ||
+  if (roi == nullptr ||
       (roi->road_polygons.empty() && roi->junction_polygons.empty() &&
        roi->road_boundary.empty())) {
     AINFO << "MlfEngine publish objects: " << frame->tracked_objects.size()
@@ -128,9 +128,15 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
     return true;
   }
   std::stringstream sstr;
-  sstr << "Object Outside Hdmap. Set velocity to zero. track_id: ";
+  sstr << "Set objects velocity to zero. track_id: ";
   for (auto obj : frame->tracked_objects) {
-    if (algorithm::IsObjectInRoi(roi, obj)) {
+    if (obj->motion_state == base::MotionState::MOVING) {
+      continue;
+    }
+    if (algorithm::IsObjectInRoi(roi, obj) &&
+        obj->lidar_supplement.semantic_type != base::ObjectSemanticType::WALL &&
+        obj->lidar_supplement.semantic_type != base::ObjectSemanticType::FENCE
+        ) {
       continue;
     }
     obj->velocity = Eigen::Vector3f::Zero();
@@ -141,7 +147,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
 
   AINFO << "MlfEngine publish objects: " << frame->tracked_objects.size()
         << " sensor_name: " << frame->sensor_info.name
-        << " at timestamp: " << frame->timestamp;
+        << " at timestamp: " << std::to_string(frame->timestamp);
   return true;
 }
 
@@ -157,15 +163,21 @@ void MlfEngine::SplitAndTransformToTrackedObjects(
     double timestamp = use_frame_timestamp_ ? frame_timestamp : tracked_time;
     tracked_objects[i]->AttachObject(objects[i], sensor_to_local_pose_,
                       global_to_local_offset_, sensor_info, timestamp);
-    if (!objects[i]->lidar_supplement.is_background &&
-        use_histogram_for_match_) {
-      tracked_objects[i]->histogram_bin_size = histogram_bin_size_;
-      tracked_objects[i]->ComputeShapeFeatures();
-    }
-    if (objects[i]->lidar_supplement.is_background) {
-      background_objects_.push_back(tracked_objects[i]);
-    } else {
+
+    if (merge_foreground_background_) {
       foreground_objects_.push_back(tracked_objects[i]);
+    } else {
+      if (!objects[i]->lidar_supplement.is_clustered &&
+          use_histogram_for_match_) {
+        tracked_objects[i]->histogram_bin_size = histogram_bin_size_;
+        tracked_objects[i]->ComputeShapeFeatures();
+      }
+
+      if (!objects[i]->lidar_supplement.is_clustered) {
+        foreground_objects_.push_back(tracked_objects[i]);
+      } else {
+        background_objects_.push_back(tracked_objects[i]);
+      }
     }
   }
   AINFO << "MlfEngine: " << sensor_info.name

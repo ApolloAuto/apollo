@@ -48,7 +48,6 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
       hmi_ws_(hmi_websocket) {
   if (websocket_) {
     RegisterDBMessageHandlers();
-    RegisterFrontendConfMessageHandlers();
     RegisterMessageHandlers();
   }
 }
@@ -222,78 +221,6 @@ void HMI::RegisterDBMessageHandlers() {
       });
 }
 
-void HMI::RegisterFrontendConfMessageHandlers() {
-  websocket_->RegisterMessageHandler(
-      "GetCurrentLayout",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR
-              << "Failed to add or modify object to DB: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        const auto current_mode = hmi_worker_->GetStatus().current_mode();
-        std::string current_layout = hmi_worker_->GetObjectFromDB(current_mode);
-        // If not have current layout, return default layout.
-        if (current_layout.empty()) {
-          AINFO << "There is no current layout, returning the default.";
-          current_layout = hmi_worker_->GetCurrentModeDefaultLayout();
-        }
-        response["data"]["info"]["data"] = current_layout;
-        response["data"]["info"]["code"] = 0;
-        response["data"]["info"]["message"] = "Success";
-        websocket_->SendData(conn, response.dump());
-      });
-  websocket_->RegisterMessageHandler(
-      "GetDefaultLayout",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR
-              << "Failed to add or modify object to DB: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        std::string default_layout = hmi_worker_->GetCurrentModeDefaultLayout();
-        response["data"]["info"]["data"] = default_layout;
-        response["data"]["info"]["code"] = 0;
-        response["data"]["info"]["message"] = "Success";
-        websocket_->SendData(conn, response.dump());
-      });
-  websocket_->RegisterMessageHandler(
-      "GetDvPluginPanelsJson",
-      [this](const Json& json, WebSocketHandler::Connection* conn) {
-        Json response;
-        response["action"] = "response";
-        std::string request_id;
-        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
-          AERROR << "Failed to get dv plugin panels json: requestId not found.";
-          response["data"]["info"]["code"] = -1;
-          response["data"]["info"]["message"] = "Miss requestId";
-          websocket_->SendData(conn, response.dump());
-          return;
-        }
-        response["data"]["requestId"] = request_id;
-        std::string plugin_panels_json_str =
-            hmi_worker_->GetDvPluginPanelsJsonStr();
-        response["data"]["info"]["data"] = plugin_panels_json_str;
-        response["data"]["info"]["code"] = 0;
-        response["data"]["info"]["message"] = "Success";
-        websocket_->SendData(conn, response.dump());
-      });
-}
-
 void HMI::RegisterMessageHandlers() {
   // Send current status and vehicle param to newly joined client.
   // websocket_->RegisterConnectionReadyHandler(
@@ -350,7 +277,7 @@ void HMI::RegisterMessageHandlers() {
               is_ok ? "Success" : "Failed to change map";
           websocket_->SendData(conn, response.dump());
         } else if (hmi_action == HMIAction::CHANGE_OPERATION ||
-                   hmi_action == HMIAction::CHANGE_MODE) {
+                  hmi_action == HMIAction::CHANGE_MODE) {
           response["data"]["info"]["data"]["isOk"] = true;
           response["data"]["info"]["code"] = 0;
           response["data"]["info"]["message"] = "Success";

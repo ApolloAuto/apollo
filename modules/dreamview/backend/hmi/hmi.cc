@@ -197,7 +197,7 @@ void HMI::RegisterMessageHandlers() {
 
         // Gernerate user-specified configuration and run the preprocess script
         std::string output_file =
-            absl::StrCat("modules/tools/sensor_calibration/config/",
+            absl::StrCat("/apollo/modules/tools/sensor_calibration/config/",
                          task_type, "_user.config");
         if (!SetProtoToASCIIFile(preprocess_table, output_file)) {
           AERROR << "Failed to generate user configuration file";

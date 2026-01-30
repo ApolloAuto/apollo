@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ObstacleNudgeDeciderConfig {
+  // whether to nudge static obstacle
+  optional bool enbale_nugde_static_obs = 1;
+  // where to nudge dynamic obstacle
+  optional bool enbale_nugde_dynamic_obs = 2;
+  // nudge obstacle forward check distance
+  optional double min_forward_check_dis = 3;
+  optional double max_forward_check_dis = 4;
+  // left nudge max lateral distance
+  optional double max_lateral_left_nudge_dis = 5;
+  // right nudge max lateral distance
+  optional double max_lateral_right_nudge_dis = 6;
+  // buffer for expand obstacle polygon
+  optional double expand_polygon_buffer = 7;
+  // obs passable check buffer
+  optional double obs_passable_buffer = 8;
+  // nudge static obstacle time out threshold
+  optional double obs_nudge_time_out_threshold = 9;
+
+  optional double obs_clean_time_out_threshold = 10;
+
+  optional double full_nudge_buffer = 11;
+
+  optional double nudge_key_point_extend_length_coefficient = 12;
+}

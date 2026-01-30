@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message PointCloudSemanticComponentConfig {
+  optional string output_channel_name = 1;
+  optional PluginParam plugin_param = 2;
+}

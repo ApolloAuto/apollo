@@ -1,0 +1,6 @@
+output_channel_name: "/perception/lidar/pointcloud_motion"
+plugin_param {
+  name: "MotionUnet"
+  config_path: "perception/pointcloud_motion/data"
+  config_file: "pointwise_motion_unet_param.pb.txt"
+}

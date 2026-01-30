@@ -360,11 +360,11 @@ aem profile use sample
 
 ### build
 
-这个子命令是 buildtool build action 的一个简单包装。详细用法请参考 [buildtool 文档](docs/框架设计/命令行工具/buildtool.md)。
+这个子命令是 buildtool build action 的一个简单包装。详细用法请参考 [buildtool 文档](../框架设计/命令行工具/buildtool.md)。
 
 ### install
 
-这个子命令是 buildtool install action的一个简单包装。详细用法请参考 [buildtool 文档](docs/框架设计/命令行工具/buildtool.md)。
+这个子命令是 buildtool install action的一个简单包装。详细用法请参考 [buildtool 文档](../框架设计/命令行工具/buildtool.md)。
 
 ### 环境变量
 

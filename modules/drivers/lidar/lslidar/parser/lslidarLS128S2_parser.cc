@@ -34,8 +34,8 @@ LslidarLS128S2Parser::LslidarLS128S2Parser(const Config &config) :
         cos_table[j] = cos(angle);
     }
 
-    double mirror_angle[4] = {1.5, -0.5, 0.5, -1.5}; // 摆镜角度   //根据通道不同偏移角度不同
-
+    double mirror_angle[4]
+            = {0, -2, -1, -3};  // 摆镜角度   //根据通道不同偏移角度不同
     for (int i = 0; i < 4; ++i) {
         cos_mirror_angle[i] = cos(DEG2RAD(mirror_angle[i]));
         sin_mirror_angle[i] = sin(DEG2RAD(mirror_angle[i]));
@@ -143,7 +143,7 @@ void LslidarLS128S2Parser::GeneratePointcloud(
         pre_pc.reset(new PointCloud());
     }
     AINFO << "line: " << __LINE__ << "out_msg size: " << out_msg->point_size();
-    // AINFO << "packets_size :" << packets_size;
+    AINFO << "packets_size :" << packets_size;
     if (out_msg->point().empty()) {
         // we discard this pointcloud if empty
         AERROR << "All points is NAN!Please check lslidar:" << config_.model();
@@ -182,7 +182,6 @@ void LslidarLS128S2Parser::Unpack(
                 && (msop_ptr[point_idx + 2] == 0xbb)
                 && (msop_ptr[point_idx + 3] == 0xcc)
                 && (msop_ptr[point_idx + 4] == 0xdd)) {
-                AERROR << "frame header ";
                 continue;
             } else {
                 // Compute the time of the point

@@ -37,7 +37,7 @@ class PullOverScenarioTest : public ::testing::Test {
 
 TEST_F(PullOverScenarioTest, Init) {
   std::string scenario_pull_over_config_file =
-      "modules/planning/scenarios/pull_over/conf/scenario_conf.pb.txt";
+      "/apollo/modules/planning/scenarios/pull_over/conf/scenario_conf.pb.txt";
 
   ScenarioPullOverConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
