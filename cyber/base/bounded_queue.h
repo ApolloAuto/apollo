@@ -71,6 +71,18 @@ class BoundedQueue {
   T* pool_ = nullptr;
   std::unique_ptr<WaitStrategy> wait_strategy_ = nullptr;
   volatile bool break_all_wait_ = false;
+  
+  template<typename U = T>
+  typename std::enable_if<std::is_move_assignable<U>::value, void>::type
+  assign(T* element, uint64_t new_head) {
+      *element = std::move(pool_[GetIndex(new_head)]);
+  }
+
+  template<typename U = T>
+  typename std::enable_if<!std::is_move_assignable<U>::value, void>::type
+  assign(T* element, uint64_t new_head) {
+      *element = pool_[GetIndex(new_head)];
+  }
 };
 
 template <typename T>
@@ -161,10 +173,10 @@ bool BoundedQueue<T>::Dequeue(T* element) {
     if (new_head == commit_.load(std::memory_order_acquire)) {
       return false;
     }
-    *element = pool_[GetIndex(new_head)];
   } while (!head_.compare_exchange_weak(old_head, new_head,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
+  assign(element, new_head);
   return true;
 }
 
