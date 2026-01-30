@@ -7,7 +7,7 @@ The core functions of Cyber RT are developed in C++. We also provide more python
 
 ## 2. Cyber RT Python Interfaces
 
-The python interfaces of Cyber RT are wrapper the corresponding C++ interfaces. The implementation doesn't rely on other third-party tools, e.g. swig, which makes it easier to maintain.
+The python interfaces of Cyber RT are wrappers of the corresponding C++ interfaces. The implementation doesn't rely on other third-party tools, e.g. swig, which makes it easier to maintain.
 
 ## 3. Overview of Python Interfaces in Cyber RT
 
