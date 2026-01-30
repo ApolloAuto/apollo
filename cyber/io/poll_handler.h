@@ -33,7 +33,7 @@ class PollHandler {
   virtual ~PollHandler() = default;
 
   bool Block(int timeout_ms, bool is_read);
-  bool Unblock();
+  bool Unblock(const std::function<void()>& callback);
 
   int fd() const { return fd_; }
   void set_fd(int fd) { fd_ = fd; }

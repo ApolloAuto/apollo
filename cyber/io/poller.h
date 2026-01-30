@@ -44,7 +44,9 @@ class Poller {
   void Shutdown();
 
   bool Register(const PollRequest& req);
-  bool Unregister(const PollRequest& req);
+  bool Unregister(
+    const PollRequest& req,
+    const std::function<void()>& callback = nullptr);
 
  private:
   bool Init();
