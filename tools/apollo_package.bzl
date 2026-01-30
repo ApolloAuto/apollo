@@ -14,7 +14,7 @@ INSTALL_FILE_RULE = "_install_files_rule"
 INSTALL_SRC_RULE = "_install_src_files_rule"
 DATA_RULE = "filegroup"
 PYTHON_LIB_RULE = "py_library"
-PAYTHON_BIN_RULE = "py_binary"
+PYTHON_BIN_RULE = "py_binary"
 PROTO_RULE = "proto_library"
 CPP_PROTO_RULE = "cc_proto_library"
 CPP_TEST_RULE = "cc_test"
@@ -144,7 +144,7 @@ def _add_install_rules(install_actions, install_src_actions,
                     package_path = package_name,
                     visibility = ["//visibility:public"],
                 )
-            elif action["kind"] == PAYTHON_BIN_RULE:
+            elif action["kind"] == PYTHON_BIN_RULE:
                 install(
                     name = action["name"],
                     targets = action["targets"],
@@ -284,7 +284,7 @@ def apollo_package(enable_source=True):
             install_action_instance["files"] = [":%s" % rule["name"]]
             install_action_instance["dest"] = "python/%s" % package_name
             package_install_target.append(install_action_instance)
-        elif rule["kind"] == PAYTHON_BIN_RULE:
+        elif rule["kind"] == PYTHON_BIN_RULE:
             install_action_instance["type"] = "neo"
             install_action_instance["targets"] = [":%s" % rule["name"]]
             install_action_instance["py_dest"] = "bin"
