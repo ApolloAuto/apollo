@@ -227,7 +227,7 @@ void ChannelMonitor::UpdateStatus(
       SummaryMonitor::EscalateStatus(
           ComponentStatus::WARN,
           absl::StrCat(config.name(), " has frequency ", freq,
-                       " < min allowed ", config.max_frequency_allowed()),
+                       " < min allowed ", config.min_frequency_allowed()),
           status);
     }
   }
