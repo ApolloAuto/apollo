@@ -302,6 +302,7 @@ void ExternalCommandDemo::SendPathFollowCommandWithLocationRecord(
           std::make_shared<apollo::external_command::PathFollowCommand>();
   std::vector<std::string> record_files =
       apollo::cyber::common::ListSubPaths(record_dir, DT_REG);
+  std::sort(record_files.begin(), record_files.end()); // Sort file names.
   std::string dir_prefix = record_dir + '/';
   for (const auto file_name : record_files) {
     ReadPathFromLocationRecord(dir_prefix + file_name,
