@@ -28,7 +28,7 @@ cyber.shutdown()
 
 ## Step 2: Write Python rule for Bazel to build
 
-Edit `path/to/BUILD` file, add the followng section:
+Edit `path/to/BUILD` file, add the following section:
 
 ```
 load("@rules_python//python:defs.bzl", "py_binary")
