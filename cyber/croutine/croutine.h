@@ -103,7 +103,7 @@ class CRoutine {
       std::chrono::steady_clock::now();
 
   RoutineFunc func_;
-  RoutineState state_;
+  std::atomic<RoutineState> state_;
 
   std::shared_ptr<RoutineContext> context_;
 

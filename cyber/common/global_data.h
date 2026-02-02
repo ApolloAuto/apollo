@@ -17,6 +17,7 @@
 #ifndef CYBER_COMMON_GLOBAL_DATA_H_
 #define CYBER_COMMON_GLOBAL_DATA_H_
 
+#include <atomic>
 #include <string>
 #include <unordered_map>
 
@@ -109,7 +110,7 @@ class GlobalData {
   std::string sched_name_ = "CYBER_DEFAULT";
 
   // run mode
-  RunMode run_mode_;
+  std::atomic<RunMode> run_mode_;
   ClockMode clock_mode_;
 
   static AtomicHashMap<uint64_t, std::string, 512> node_id_map_;

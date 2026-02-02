@@ -60,25 +60,27 @@ bool Timer::InitTimerTask() {
   }
 
   task_.reset(new TimerTask(timer_id_));
+  task_->active = true;
   task_->interval_ms = timer_opt_.period;
   task_->next_fire_duration_ms = task_->interval_ms;
+  std::weak_ptr<TimerTask> task_weak_ptr = task_;
   if (timer_opt_.oneshot) {
-    std::weak_ptr<TimerTask> task_weak_ptr = task_;
     task_->callback = [callback = this->timer_opt_.callback, task_weak_ptr]() {
       auto task = task_weak_ptr.lock();
-      if (task) {
-        std::lock_guard<std::mutex> lg(task->mutex);
+      if (task->active) {
         callback();
       }
     };
   } else {
-    std::weak_ptr<TimerTask> task_weak_ptr = task_;
     task_->callback = [callback = this->timer_opt_.callback, task_weak_ptr]() {
       auto task = task_weak_ptr.lock();
       if (!task) {
         return;
       }
       std::lock_guard<std::mutex> lg(task->mutex);
+      if (!task->active) {
+        return;
+      }
       auto start = Time::MonoTime().ToNanosecond();
       callback();
       auto end = Time::MonoTime().ToNanosecond();
@@ -146,6 +148,7 @@ void Timer::Stop() {
     auto tmp_task = task_;
     {
       std::lock_guard<std::mutex> lg(tmp_task->mutex);
+      task_->active = false;
       task_.reset();
     }
   }
