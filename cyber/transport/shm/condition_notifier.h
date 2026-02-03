@@ -34,7 +34,7 @@ class ConditionNotifier : public NotifierBase {
   struct Indicator {
     std::atomic<uint64_t> next_seq = {0};
     ReadableInfo infos[kBufLength];
-    uint64_t seqs[kBufLength] = {0};
+    std::atomic<uint64_t> seqs[kBufLength] = {0};
   };
 
  public:
