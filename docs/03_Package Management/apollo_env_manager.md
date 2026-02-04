@@ -17,7 +17,7 @@ $ exit
 Then, use apt to install aem:
 
 ```shell
-$ sudo apt install apollo-neo-env-manager-dev
+$ sudo apt update && sudo apt install apollo-neo-env-manager-dev
 ```
 
 When the installation is completed, you can enter the following command to check whether buildtool has been installed correctly:
