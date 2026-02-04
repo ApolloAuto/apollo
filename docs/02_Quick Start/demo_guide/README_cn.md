@@ -37,8 +37,8 @@ bash scripts/bootstrap.sh
 ## 下载并播放 Apollo 的演示包
 
 ```
-python docs/demo_guide/record_helper.py demo_3.5.record
-cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
+python docs/02_Quick\ Start/demo_guide/record_helper.py demo_3.5.record
+cyber_recorder play -f docs/02_Quick\ Start/demo_guide/demo_3.5.record --loop
 ```
 
 选项 `--loop` 用于设置循环回放模式.
