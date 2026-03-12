@@ -48,7 +48,8 @@ pushd "osqp-${OSQP_VER}"
     cmake .. \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Release \
+        -DEMBEDDED=ON
     make -j$(nproc)
     make install
 popd
