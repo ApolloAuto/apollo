@@ -18,6 +18,8 @@
 #include <memory>
 #include <string>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/camera_location_refinement/location_refiner/proto/location_refiner.pb.h"
 
 #include "modules/perception/camera_location_refinement/interface/base_postprocessor.h"
@@ -72,7 +74,16 @@ class LocationRefinerPostprocessor : public BasePostprocessor {
     return x > left && x < right;
   }
 
+  static ObjPostProcessorOptions BuildPostprocessorOptions(
+      const float bbox2d[4], const float dimension_hwl[3], float rotation_y,
+      const float query_plane[4]);
+
  private:
+  FRIEND_TEST(LocationRefinerPostprocessorTest,
+              build_postprocessor_options_test);
+  FRIEND_TEST(LocationRefinerPostprocessorTest,
+              process_skips_when_ground_plane_unavailable_test);
+
   std::unique_ptr<ObjPostProcessor> postprocessor_;
   std::shared_ptr<BaseCalibrationService> calibration_service_;
   location_refiner::LocationRefinerParam location_refiner_param_;

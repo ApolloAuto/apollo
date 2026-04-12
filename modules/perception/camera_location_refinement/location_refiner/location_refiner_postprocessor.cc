@@ -30,6 +30,19 @@ LocationRefinerPostprocessor::LocationRefinerPostprocessor() {
   postprocessor_.reset(new ObjPostProcessor);
 }
 
+ObjPostProcessorOptions LocationRefinerPostprocessor::BuildPostprocessorOptions(
+    const float bbox2d[4], const float dimension_hwl[3], float rotation_y,
+    const float query_plane[4]) {
+  ObjPostProcessorOptions options;
+  memcpy(options.bbox, bbox2d, sizeof(options.bbox));
+  options.check_lowerbound = true;
+  options.line_segs.emplace_back(bbox2d[0], bbox2d[3], bbox2d[2], bbox2d[3]);
+  memcpy(options.hwl, dimension_hwl, sizeof(options.hwl));
+  options.ry = rotation_y;
+  memcpy(options.plane, query_plane, sizeof(options.plane));
+  return options;
+}
+
 bool LocationRefinerPostprocessor::Init(
     const PostprocessorInitOptions &options) {
   std::string config_file =
@@ -56,6 +69,9 @@ bool LocationRefinerPostprocessor::Process(const PostprocessorOptions &options,
   Eigen::Vector4d plane;
   if (!calibration_service_->QueryGroundPlaneInCameraFrame(&plane)) {
     AINFO << "No valid ground plane in the service.";
+    // Refinement is defined on a calibrated ground plane, so skip cleanly when
+    // the service cannot provide one.
+    return true;
   }
 
   float query_plane[4] = {
@@ -78,7 +94,6 @@ bool LocationRefinerPostprocessor::Process(const PostprocessorOptions &options,
   const int height_image = frame->data_provider->src_height();
   postprocessor_->Init(k_mat, width_image, height_image);
 
-  ObjPostProcessorOptions obj_postprocessor_options;
   int nr_valid_obj = 0;
 
   for (auto &obj : frame->detected_objects) {
@@ -124,17 +139,9 @@ bool LocationRefinerPostprocessor::Process(const PostprocessorOptions &options,
       rotation_y -= 2 * PI;
     }
 
-    // process
-    memcpy(obj_postprocessor_options.bbox, bbox2d, sizeof(float) * 4);
-    obj_postprocessor_options.check_lowerbound = true;
-    camera::LineSegment2D<float> line_seg(bbox2d[0], bbox2d[3], bbox2d[2],
-                                          bbox2d[3]);
-    obj_postprocessor_options.line_segs.push_back(line_seg);
-    memcpy(obj_postprocessor_options.hwl, dimension_hwl, sizeof(float) * 3);
-    obj_postprocessor_options.ry = rotation_y;
-    // refine with calibration service, support ground plane model currently
-    // {0.0f, cos(tilt), -sin(tilt), -camera_ground_height}
-    memcpy(obj_postprocessor_options.plane, query_plane, sizeof(float) * 4);
+    ObjPostProcessorOptions obj_postprocessor_options =
+        BuildPostprocessorOptions(bbox2d, dimension_hwl, rotation_y,
+                                  query_plane);
 
     // changed to touching-ground center
     object_center[1] += dimension_hwl[0] / 2;
