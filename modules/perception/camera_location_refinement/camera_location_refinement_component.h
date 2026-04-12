@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/camera_location_refinement/proto/camera_location_refinement.pb.h"
 
 #include "cyber/cyber.h"
@@ -57,12 +59,20 @@ class CameraLocationRefinementComponent final
   void InitPostprocessor(
       const CameraLocationRefinement& location_refinement_param);
 
+  bool InitStaticCalibration(
+      const CameraLocationRefinement& location_refinement_param);
+
   void SetCameraHeightAndPitch(
       const std::map<std::string, float>& name_camera_ground_height_map,
       const std::map<std::string, float>& name_camera_pitch_angle_diff_map,
       const float& pitch_angle_calibrator_working_sensor);
 
  private:
+  FRIEND_TEST(CameraLocationRefinementComponentTest,
+              init_static_calibration_builds_ground_plane_test);
+  FRIEND_TEST(CameraLocationRefinementComponentTest,
+              init_static_calibration_rejects_non_positive_height_test);
+
   std::shared_ptr<BasePostprocessor> postprocessor_;
   std::shared_ptr<BaseCalibrationService> calibration_service_;
 
