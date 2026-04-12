@@ -38,6 +38,19 @@ apollo_cc_library(
         "//modules/perception/common/camera:apollo_perception_common_camera",
         "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+apollo_cc_test(
+    name = "location_refiner_postprocessor_test",
+    size = "small",
+    srcs = [
+        "location_refiner/location_refiner_postprocessor_test.cc",
+    ],
+    deps = [
+        ":apollo_perception_camera_location_refinement",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

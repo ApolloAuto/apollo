@@ -18,6 +18,8 @@
 #include <memory>
 #include <string>
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/perception/camera_location_refinement/location_refiner/proto/location_refiner.pb.h"
 
 #include "modules/perception/camera_location_refinement/interface/base_postprocessor.h"
@@ -68,11 +70,13 @@ class LocationRefinerPostprocessor : public BasePostprocessor {
     float img_w_half = img_w / 2.0f;
     float slope = img_w_half * algorithm::IRec(img_h - h_down - v);
     float left = img_w_half - slope * (y - v);
-    float right = img_w_half + slope * (y - h_down);
+    float right = img_w_half + slope * (y - v);
     return x > left && x < right;
   }
 
  private:
+  FRIEND_TEST(LocationRefinerPostprocessorTest, roi_is_symmetric_test);
+
   std::unique_ptr<ObjPostProcessor> postprocessor_;
   std::shared_ptr<BaseCalibrationService> calibration_service_;
   location_refiner::LocationRefinerParam location_refiner_param_;
