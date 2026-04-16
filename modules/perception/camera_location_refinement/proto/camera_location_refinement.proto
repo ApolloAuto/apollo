@@ -8,6 +8,8 @@ message CameraLocationRefinement {
   optional PostprocessorParam postprocessor_param = 2;
   optional CalibrationServiceParam calibration_service_param = 3;
   optional RefinementChannel channel = 4;
+  optional float default_camera_pitch = 5 [default = 0.0];
+  optional float default_camera_height = 6 [default = 1.5];
 }
 
 message RefinementChannel {

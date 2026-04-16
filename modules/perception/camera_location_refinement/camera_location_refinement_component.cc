@@ -89,6 +89,33 @@ void CameraLocationRefinementComponent::SetCameraHeightAndPitch(
       pitch_angle_calibrator_working_sensor);
 }
 
+bool CameraLocationRefinementComponent::InitStaticCalibration(
+    const CameraLocationRefinement& location_refinement_param) {
+  if (calibration_service_ == nullptr) {
+    AERROR << "Calibration service is not available";
+    return false;
+  }
+  const float camera_height = location_refinement_param.default_camera_height();
+  if (camera_height <= 0.0f) {
+    AERROR << "default_camera_height must be positive, got: "
+           << camera_height;
+    return false;
+  }
+  std::map<std::string, float> name_camera_ground_height_map = {
+      {location_refinement_param.camera_name(), camera_height}};
+  std::map<std::string, float> name_camera_pitch_angle_diff_map = {
+      {location_refinement_param.camera_name(), 0.0f}};
+  SetCameraHeightAndPitch(name_camera_ground_height_map,
+                          name_camera_pitch_angle_diff_map,
+                          location_refinement_param.default_camera_pitch());
+  if (!calibration_service_->BuildIndex()) {
+    AERROR << "Failed to build calibration service index for "
+           << location_refinement_param.camera_name();
+    return false;
+  }
+  return true;
+}
+
 bool CameraLocationRefinementComponent::Init() {
   CameraLocationRefinement location_refinement_param;
   if (!GetProtoConfig(&location_refinement_param)) {
@@ -97,9 +124,9 @@ bool CameraLocationRefinementComponent::Init() {
   }
 
   InitPostprocessor(location_refinement_param);
-
-  // todo(daohu527): need complete
-  // SetCameraHeightAndPitch();
+  if (!InitStaticCalibration(location_refinement_param)) {
+    return false;
+  }
 
   writer_ = node_->CreateWriter<onboard::CameraFrame>(
       location_refinement_param.channel().output_obstacles_channel_name());

@@ -1,4 +1,6 @@
 camera_name: "front_6mm"
+default_camera_pitch: 0.0
+default_camera_height: 1.5
 postprocessor_param {
   plugin_param {
     name: "LocationRefinerPostprocessor"

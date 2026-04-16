@@ -61,6 +61,19 @@ apollo_component(
         "//modules/perception/common/camera:apollo_perception_common_camera",
         "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+apollo_cc_test(
+    name = "camera_location_refinement_component_test",
+    size = "small",
+    srcs = [
+        "camera_location_refinement_component_test.cc",
+    ],
+    deps = [
+        ":libcamera_location_refinement_component_camera.so",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
