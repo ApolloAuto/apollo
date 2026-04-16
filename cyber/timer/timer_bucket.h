@@ -34,11 +34,11 @@ class TimerBucket {
   }
 
   std::mutex& mutex() { return mutex_; }
-  std::list<std::weak_ptr<TimerTask>>& task_list() { return task_list_; }
+  std::list<std::shared_ptr<TimerTask>>& task_list() { return task_list_; }
 
  private:
   std::mutex mutex_;
-  std::list<std::weak_ptr<TimerTask>> task_list_;
+  std::list<std::shared_ptr<TimerTask>> task_list_;
 };
 
 }  // namespace cyber
