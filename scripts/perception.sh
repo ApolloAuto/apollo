@@ -19,6 +19,16 @@
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
+
+if [[ "${APOLLO_SKIP_PERCEPTION_PREFLIGHT:-0}" != "1" ]]; then
+  if ! python3 "${DIR}/perception_preflight_check.py"; then
+    error "Perception preflight failed. Set APOLLO_SKIP_PERCEPTION_PREFLIGHT=1 to bypass."
+    exit 1
+  fi
+else
+  warning "Skipping perception preflight checks because APOLLO_SKIP_PERCEPTION_PREFLIGHT=1"
+fi
+
 # run function from apollo_base.sh
 # run command_name module_name
 # run perception "$@"
