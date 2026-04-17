@@ -58,9 +58,9 @@ bool PollHandler::Block(int timeout_ms, bool is_read) {
   return result;
 }
 
-bool PollHandler::Unblock() {
+bool PollHandler::Unblock(const std::function<void()>& callback) {
   is_blocking_.store(false);
-  return Poller::Instance()->Unregister(request_);
+  return Poller::Instance()->Unregister(request_, callback);
 }
 
 bool PollHandler::Check(int timeout_ms) {
