@@ -180,6 +180,7 @@ class PiecewiseJerkProblem {
   double weight_dddx_ = 0.0;
 
   double delta_s_ = 1.0;
+  double delta_t_ = 1.0;
 
   bool has_x_ref_ = false;
   double weight_x_ref_ = 0.0;
