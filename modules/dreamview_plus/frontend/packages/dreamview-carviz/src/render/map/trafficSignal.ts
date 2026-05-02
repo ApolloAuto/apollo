@@ -92,7 +92,7 @@ export default class TrafficSignal {
             this.clearSignalStatus();
             const trafficSignalCurMapping = {};
             signals.forEach((signal) => {
-                trafficSignalCurMapping[signal.id.id] = signal.currentSignal;
+                trafficSignalCurMapping[signal.id] = signal.currentSignal;
             });
 
             Object.keys(this.baseSignalMeshs).forEach((id) => {

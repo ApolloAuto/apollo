@@ -282,6 +282,9 @@ function Viz() {
                 if (simWorldConnectedSubj) {
                     simWorldConnectedSubscription = simWorldConnectedSubj.subscribe((simData: ISimulationWorld) => {
                         if (!simData) return;
+                        if (simData.perceivedSignal) {
+                            carviz.updateSignal(simData.perceivedSignal);
+                        }
                         if (Object.keys(simData).length !== 0) {
                             const followData = {
                                 autoDrivingCar: simData.autoDrivingCar,
@@ -314,6 +317,9 @@ function Viz() {
                 if (simWorldConnectedSubj) {
                     simWorldConnectedSubscription = simWorldConnectedSubj.subscribe((simData: ISimulationWorld) => {
                         if (!simData) return;
+                        if (simData.perceivedSignal) {
+                            carviz.updateSignal(simData.perceivedSignal);
+                        }
                         // @ts-ignore
                         const autoDrivingCar = simData.autoDrivingCar;
 
