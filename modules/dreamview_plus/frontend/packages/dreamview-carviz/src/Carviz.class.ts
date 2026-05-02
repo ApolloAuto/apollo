@@ -466,6 +466,10 @@ export class Carviz {
         this.map.update(data, false);
     };
 
+    updateSignal = (data) => {
+        this.map.updateTrafficStatus(data);
+    }
+
     updatePointCloud = (data) => {
         this.pointCloud.update(data);
     };
