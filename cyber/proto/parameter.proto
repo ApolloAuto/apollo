@@ -19,7 +19,7 @@ message Param {
     bool bool_value = 4;
     int64 int_value = 5;
     double double_value = 6;
-    string string_value = 7;
+    bytes string_value = 7;
   }
   optional bytes proto_desc = 8;
 }
