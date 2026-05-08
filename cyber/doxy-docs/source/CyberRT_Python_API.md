@@ -15,7 +15,7 @@ So far, the python interfaces covers:
 
 * access the information of channels
 * server/client communication
-* query informatoin in record files
+* query information in record files
 * read and write from/to record files
 * Time/Duration/Rate related operations
 * Timer

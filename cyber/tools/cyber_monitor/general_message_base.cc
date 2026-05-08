@@ -25,7 +25,7 @@
 
 namespace {
 constexpr int INT_FLOAT_PRECISION = 6;
-constexpr int DOULBE_PRECISION = 9;
+constexpr int DOUBLE_PRECISION = 9;
 
 int CalculateStringLines(const std::string& str, int screen_width) {
   int line_width = 0;
@@ -213,7 +213,7 @@ void GeneralMessageBase::PrintField(
     OUTPUT_FIELD(UINT32, UInt32, INT_FLOAT_PRECISION);
     OUTPUT_FIELD(UINT64, UInt64, INT_FLOAT_PRECISION);
     OUTPUT_FIELD(FLOAT, Float, INT_FLOAT_PRECISION);
-    OUTPUT_FIELD(DOUBLE, Double, DOULBE_PRECISION);
+    OUTPUT_FIELD(DOUBLE, Double, DOUBLE_PRECISION);
     OUTPUT_FIELD(BOOL, Bool, INT_FLOAT_PRECISION);
 #undef OUTPUT_FIELD
 

@@ -28,14 +28,14 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-class IntraTranceiverTest : public ::testing::Test {
+class IntraTransceiverTest : public ::testing::Test {
  protected:
   using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
   using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
 
-  IntraTranceiverTest() : channel_name_("intra_channel") {}
+  IntraTransceiverTest() : channel_name_("intra_channel") {}
 
-  virtual ~IntraTranceiverTest() {}
+  virtual ~IntraTransceiverTest() {}
 
   virtual void SetUp() {
     RoleAttributes attr;
@@ -57,7 +57,7 @@ class IntraTranceiverTest : public ::testing::Test {
   TransmitterPtr transmitter_b_ = nullptr;
 };
 
-TEST_F(IntraTranceiverTest, constructor) {
+TEST_F(IntraTransceiverTest, constructor) {
   RoleAttributes attr;
   TransmitterPtr transmitter =
       std::make_shared<IntraTransmitter<proto::UnitTest>>(attr);
@@ -72,7 +72,7 @@ TEST_F(IntraTranceiverTest, constructor) {
   EXPECT_NE(transmitter_id.ToString(), receiver_id.ToString());
 }
 
-TEST_F(IntraTranceiverTest, enable_and_disable) {
+TEST_F(IntraTransceiverTest, enable_and_disable) {
   // repeated call
   transmitter_a_->Enable();
 
@@ -96,7 +96,7 @@ TEST_F(IntraTranceiverTest, enable_and_disable) {
   receiver_null_cb->Enable();
 
   auto msg = std::make_shared<proto::UnitTest>();
-  msg->set_class_name("IntraTranceiverTest");
+  msg->set_class_name("IntraTransceiverTest");
   msg->set_case_name("enable_and_disable");
 
   EXPECT_TRUE(transmitter_a_->Transmit(msg));
@@ -106,7 +106,7 @@ TEST_F(IntraTranceiverTest, enable_and_disable) {
   EXPECT_EQ(msgs.size(), 2);
 
   for (auto& item : msgs) {
-    EXPECT_EQ(item.class_name(), "IntraTranceiverTest");
+    EXPECT_EQ(item.class_name(), "IntraTransceiverTest");
     EXPECT_EQ(item.case_name(), "enable_and_disable");
   }
 
@@ -126,7 +126,7 @@ TEST_F(IntraTranceiverTest, enable_and_disable) {
   EXPECT_TRUE(transmitter_b_->Transmit(msg));
   EXPECT_EQ(msgs.size(), 1);
   for (auto& item : msgs) {
-    EXPECT_EQ(item.class_name(), "IntraTranceiverTest");
+    EXPECT_EQ(item.class_name(), "IntraTransceiverTest");
     EXPECT_EQ(item.case_name(), "enable_and_disable");
   }
 

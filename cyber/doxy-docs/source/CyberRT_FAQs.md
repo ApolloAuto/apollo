@@ -9,7 +9,7 @@ Apollo's Cyber RT is an open source runtime framework designed specifically for 
 
 ## Why did we decide to work on a new runtime framework?
 
-- During years of development of autonomous driving technologies, we have learned a lot from our previous experience with Apollo. In autonomous driving scenarious, we need an effective centralized computing model, with demands for high performance,  including high concurrency, low latency and high throughput。
+- During years of development of autonomous driving technologies, we have learned a lot from our previous experience with Apollo. In autonomous driving scenarios, we need an effective centralized computing model, with demands for high performance,  including high concurrency, low latency and high throughput。
 
 - The industry is evolving, so does Apollo. Going forward, Apollo has already moved from development to productization, with volume deployments in the real world, we see the demands for the highest robustness and high performance. That’s why we spent years of building Apollo Cyber RT, which addresses that requirements of autonomous driving solutions.
 

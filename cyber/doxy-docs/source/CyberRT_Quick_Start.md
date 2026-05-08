@@ -19,7 +19,7 @@ couple of examples showing different functionalities of Cyber RT under the
 > **Note**: The examples need to run after successfully built within Apollo
 > Docker container.
 
-## Set up directry layout
+## Set up directory layout
 
 Take the sample component under `cyber/examples/common_component_example` for
 example:

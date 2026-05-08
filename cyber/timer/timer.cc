@@ -96,7 +96,7 @@ bool Timer::InitTimerTask() {
             start - task->last_execute_time_ns - task->interval_ms * 1000000;
       }
       ADEBUG << "start: " << start << "\t last: " << task->last_execute_time_ns
-             << "\t execut time:" << execute_time_ms
+             << "\t execute time:" << execute_time_ms
              << "\t accumulated_error_ns: " << task->accumulated_error_ns;
       task->last_execute_time_ns = start;
       if (execute_time_ms >= task->interval_ms) {
