@@ -285,10 +285,9 @@ void DataParser::PublishOdometry(const MessagePtr message) {
 
   // 2. orientation
   Eigen::Quaterniond q =
-      Eigen::AngleAxisd(ins->euler_angles().z() - 90 * DEG_TO_RAD_LOCAL,
-                        Eigen::Vector3d::UnitZ()) *
-      Eigen::AngleAxisd(-ins->euler_angles().y(), Eigen::Vector3d::UnitX()) *
-      Eigen::AngleAxisd(ins->euler_angles().x(), Eigen::Vector3d::UnitY());
+      Eigen::AngleAxisd(ins->euler_angles().z(), Eigen::Vector3d::UnitZ()) *
+      Eigen::AngleAxisd(ins->euler_angles().y(), Eigen::Vector3d::UnitY()) *
+      Eigen::AngleAxisd(ins->euler_angles().x(), Eigen::Vector3d::UnitX());
 
   gps_msg->mutable_orientation()->set_qx(q.x());
   gps_msg->mutable_orientation()->set_qy(q.y());
