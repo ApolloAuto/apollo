@@ -147,6 +147,10 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
           double black_s_end = pred_range->back().EndS();
           if (!IsCloseEnough(black_s_end, pred_node->Length())) {
             pred_set.emplace_back(pred_node, black_s_end, pred_node->Length());
+            const auto &node_to_insert = GetLargestRange(pred_set);
+            curr_passage->nodes.insert(curr_passage->nodes.begin(), node_to_insert);
+            node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
+            pred_set.clear();
           }
         } else {
           pred_set.emplace_back(pred_node, 0.0, pred_node->Length());
