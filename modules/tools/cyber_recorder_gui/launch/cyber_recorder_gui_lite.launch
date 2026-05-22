@@ -1,0 +1,10 @@
+<cyber>
+  <module>
+    <name>cyber_recorder_gui_lite</name>
+    <dag_conf></dag_conf>
+    <type>binary</type>
+    <process_name>
+      bazel-bin/modules/tools/cyber_recorder_gui/cyber_recorder_gui_lite
+    </process_name>
+  </module>
+</cyber>
