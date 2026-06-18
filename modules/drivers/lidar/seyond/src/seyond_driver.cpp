@@ -25,6 +25,8 @@ namespace lidar {
 std::function<void(int32_t, const char *, const char *)>
     SeyondDriver::log_cb_s_ = nullptr;
 
+std::once_flag SeyondDriver::log_init_flag_;
+
 static void coordinate_transfer(PointXYZIT *point, uint32_t coordinate_mode,
                                 float x, float y, float z) {
   switch (coordinate_mode) {
@@ -142,7 +144,9 @@ bool SeyondDriver::setup_lidar() {
 bool SeyondDriver::init(SeyondParam& param) {
   param_ = param;
   set_log_and_message_level();
-  inno_lidar_set_logs(-1, -1, NULL, 0, 0, log_callback_s_, NULL, NULL, 0, 0, 1);
+  std::call_once(log_init_flag_, [this]() {
+    inno_lidar_set_logs(-1, -1, NULL, 0, 0, log_callback_s_, NULL, NULL, 0, 0, 1);
+  });
   return true;
 }
 

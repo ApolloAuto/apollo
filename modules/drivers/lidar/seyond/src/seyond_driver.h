@@ -164,6 +164,8 @@ class SeyondDriver {
   double current_ts_start_;
   uint64_t frame_points_width_;
   std::vector<uint8_t> convert_buffer_;
+
+  static std::once_flag log_init_flag_;
 };
 
 }  // namespace lidar
