@@ -52,6 +52,53 @@ using base::Object;
 using base::PointD;
 using base::PointF;
 
+namespace {
+
+std::vector<Proposal> BuildProposals(const std::vector<float> &detections,
+                                     const std::vector<int64_t> &labels,
+                                     const std::vector<float> &scores,
+                                     int num_output_box_feature) {
+  std::vector<Proposal> proposals;
+  proposals.reserve(scores.size());
+  for (size_t i = 0; i < scores.size(); ++i) {
+    const size_t offset = i * num_output_box_feature;
+    Proposal proposal;
+    proposal.x = detections[offset + 0];
+    proposal.y = detections[offset + 1];
+    proposal.z = detections[offset + 2];
+    proposal.width = detections[offset + 3];
+    proposal.length = detections[offset + 4];
+    proposal.height = detections[offset + 5];
+    proposal.yaw = detections[offset + 6];
+    proposal.score = scores[i];
+    proposal.class_id = static_cast<int>(labels[i]);
+    proposals.push_back(proposal);
+  }
+  return proposals;
+}
+
+void WriteProposals(const std::vector<Proposal> &proposals,
+                    int num_output_box_feature,
+                    std::vector<float> *detections,
+                    std::vector<int64_t> *labels,
+                    std::vector<float> *scores) {
+  for (size_t i = 0; i < proposals.size(); ++i) {
+    const size_t offset = i * num_output_box_feature;
+    const Proposal &proposal = proposals[i];
+    (*detections)[offset + 0] = proposal.x;
+    (*detections)[offset + 1] = proposal.y;
+    (*detections)[offset + 2] = proposal.z;
+    (*detections)[offset + 3] = proposal.width;
+    (*detections)[offset + 4] = proposal.length;
+    (*detections)[offset + 5] = proposal.height;
+    (*detections)[offset + 6] = proposal.yaw;
+    (*scores)[i] = proposal.score;
+    (*labels)[i] = proposal.class_id;
+  }
+}
+
+}  // namespace
+
 // point cloud range
 CenterPointDetection::CenterPointDetection()
     : x_min_range_(Params::kMinXRange),
@@ -97,6 +144,12 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   nms_strategy_ = model_param_.nms_strategy();
   diff_class_iou_ = model_param_.diff_class_iou();
   diff_class_nms_ = model_param_.diff_class_nms();
+
+  if (!proposal_refine_module_.Init(model_param_.proposal_refine())) {
+    AERROR << "Failed to init proposal refine module. mode: "
+           << model_param_.proposal_refine().proposal_refine_mode();
+    return false;
+  }
 
   cone_score_threshold_ = model_param_.postprocess().cone_score_threshold();
   ped_score_threshold_ = model_param_.postprocess().ped_score_threshold();
@@ -329,6 +382,48 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
 
   FilterDiffScore(output_bbox_blob, output_label_blob, output_score_blob,
               &out_detections, &out_labels, &out_scores);
+
+  if (proposal_refine_module_.enabled()) {
+    const int num_output_box_feature =
+        model_param_.postprocess().num_output_box_feature();
+    if (num_output_box_feature < 7) {
+      AERROR << "Invalid num_output_box_feature: " << num_output_box_feature;
+      return false;
+    }
+    if (out_labels.size() != out_scores.size() ||
+        out_detections.size() != out_scores.size() * num_output_box_feature) {
+      AERROR << "Proposal input size mismatch. detections: "
+             << out_detections.size() << " labels: " << out_labels.size()
+             << " scores: " << out_scores.size()
+             << " num_output_box_feature: " << num_output_box_feature;
+      return false;
+    }
+
+    std::vector<Proposal> proposals = BuildProposals(
+        out_detections, out_labels, out_scores, num_output_box_feature);
+    ProposalRefineStats refine_stats;
+    if (!MaybeRefineProposals(&proposal_refine_module_, &proposals,
+                              &refine_stats)) {
+      AERROR << "Proposal refine failed.";
+      if (proposal_refine_module_.strict_refine()) {
+        return false;
+      }
+    } else {
+      WriteProposals(proposals, num_output_box_feature, &out_detections,
+                     &out_labels, &out_scores);
+    }
+    if (proposal_refine_module_.debug_log()) {
+      AINFO << "Proposal refine enabled: true"
+            << " mode: " << proposal_refine_module_.mode()
+            << " proposal_count_before_refine: "
+            << refine_stats.proposal_count
+            << " refined_proposal_count: "
+            << refine_stats.refined_proposal_count
+            << " delta_min: " << refine_stats.delta_min
+            << " delta_max: " << refine_stats.delta_max
+            << " latency_ms: " << refine_stats.latency_ms;
+    }
+  }
 
   GetObjects(frame->lidar2world_pose, out_detections,
              out_labels, out_scores, &frame->segmented_objects);

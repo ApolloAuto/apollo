@@ -18,6 +18,17 @@ filegroup(
 )
 
 apollo_cc_library(
+    name = "center_point_proposal_refine",
+    srcs = ["detector/center_point_detection/proposal_refine.cc"],
+    hdrs = ["detector/center_point_detection/proposal_refine.h"],
+    deps = [
+        "//cyber",
+        "//modules/common/math",
+        "//modules/perception/lidar_detection/detector/center_point_detection/proto:center_point_model_param_cc_proto",
+    ],
+)
+
+apollo_cc_library(
     name = "point_pillars_common",
     hdrs = ["detector/point_pillars_detection/common.h"],
 )
@@ -163,6 +174,7 @@ apollo_cc_library(
     copts = PERCEPTION_COPTS + if_profiler() + ["-DENABLE_PROFILER=1"],
     deps = [
         ":anchor_mask_cuda",
+        ":center_point_proposal_refine",
         ":feature_generator_cuda",
         ":nms_cuda",
         ":pfe_cuda",
@@ -217,6 +229,17 @@ apollo_component(
         "//cyber",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/lidar_detection/proto:lidar_detection_component_config_cc_proto",
+    ],
+)
+
+apollo_cc_test(
+    name = "proposal_refine_test",
+    size = "small",
+    srcs = ["detector/center_point_detection/proposal_refine_test.cc"],
+    deps = [
+        ":center_point_proposal_refine",
+        "//modules/common/math",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

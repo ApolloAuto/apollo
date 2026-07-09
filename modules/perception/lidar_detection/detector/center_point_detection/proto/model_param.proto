@@ -6,6 +6,16 @@ import "modules/perception/common/proto/model_info.proto";
 import "modules/perception/common/proto/model_process.proto";
 import "modules/perception/common/proto/plugin_param.proto";
 
+message ProposalRefineParam {
+  optional bool enable_proposal_refine = 1 [default = false];
+  optional string proposal_refine_mode = 2 [default = "mock_zero"];
+  optional int32 proposal_refine_top_k = 3 [default = -1];
+  optional float proposal_refine_score_threshold = 4 [default = 0.0];
+  optional float proposal_refine_delta_scale = 5 [default = 1.0];
+  optional bool proposal_refine_debug_log = 6 [default = false];
+  optional bool strict_refine = 7 [default = true];
+}
+
 message ModelParam {
   optional common.ModelInfo info = 1;
   optional common.PointCloudPreProcess preprocess = 2;
@@ -21,4 +31,5 @@ message ModelParam {
   optional bool filter_by_semantic_type = 12 [default = false];
   optional bool filter_ground_points = 13 [default = false];
   optional PluginParam plugins = 14;
+  optional ProposalRefineParam proposal_refine = 15;
 }
