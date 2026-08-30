@@ -25,6 +25,10 @@
 namespace apollo {
 namespace cyber {
 
+namespace timer {
+class TimerConcurrencyTest;
+}  // namespace timer
+
 /**
  * @brief The options of timer
  *
@@ -110,6 +114,8 @@ class Timer {
   void Stop();
 
  private:
+  friend class timer::TimerConcurrencyTest;
+
   bool InitTimerTask();
   uint64_t timer_id_;
   TimerOption timer_opt_;
