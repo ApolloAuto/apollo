@@ -31,6 +31,10 @@
 namespace apollo {
 namespace cyber {
 
+namespace timer {
+class TimerConcurrencyTest;
+}  // namespace timer
+
 struct TimerTask;
 
 static const uint64_t WORK_WHEEL_SIZE = 512;
@@ -65,6 +69,8 @@ class TimingWheel {
   inline uint64_t TickCount() const { return tick_count_; }
 
  private:
+  friend class timer::TimerConcurrencyTest;
+
   inline uint64_t GetWorkWheelIndex(const uint64_t index) {
     return index & (WORK_WHEEL_SIZE - 1);
   }

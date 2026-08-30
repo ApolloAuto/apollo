@@ -18,14 +18,21 @@
 
 #include "cyber/timer/timer.h"
 
+#include <atomic>
+#include <chrono>
+#include <cstdint>
+#include <future>
 #include <memory>
+#include <thread>
 #include <utility>
+#include <vector>
 
 #include "gtest/gtest.h"
 
 #include "cyber/common/util.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -33,6 +40,138 @@ namespace timer {
 
 using cyber::Timer;
 using cyber::TimerOption;
+
+namespace {
+
+bool WaitForCount(const std::atomic<uint32_t>& count, uint32_t expected) {
+  const auto deadline =
+      std::chrono::steady_clock::now() + std::chrono::seconds(5);
+  while (std::chrono::steady_clock::now() < deadline) {
+    if (count.load() == expected) {
+      return true;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+  return count.load() == expected;
+}
+
+}  // namespace
+
+class TimerConcurrencyTest : public testing::Test {
+ protected:
+  void SetUp() override {
+    timing_wheel_ = TimingWheel::Instance();
+    timing_wheel_->Shutdown();
+    ASSERT_FALSE(timing_wheel_->tick_thread_.joinable());
+    timing_wheel_->running_ = true;
+  }
+
+  void TearDown() override { timing_wheel_->Shutdown(); }
+
+  bool InitializeTimer(Timer* timer) {
+    if (!timer->InitTimerTask()) {
+      return false;
+    }
+    timer->started_.store(true);
+    return true;
+  }
+
+  std::weak_ptr<TimerTask> QueueTimerCallback(Timer* timer) {
+    auto task = timer->task_;
+    auto& bucket =
+        timing_wheel_->work_wheel_[timing_wheel_->current_work_wheel_index_];
+    bucket.AddTask(task);
+    timing_wheel_->Tick();
+    return task;
+  }
+
+ private:
+  TimingWheel* timing_wheel_ = nullptr;
+};
+
+TEST_F(TimerConcurrencyTest, stop_before_queued_callback_runs) {
+  const uint32_t task_pool_size = scheduler::Instance()->TaskPoolSize();
+  ASSERT_GT(task_pool_size, 0);
+
+  std::atomic<uint32_t> callback_count{0};
+  auto callback_state = std::make_shared<int>(0);
+  std::weak_ptr<int> callback_lifetime = callback_state;
+  auto timer = std::make_unique<Timer>(
+      TIMER_RESOLUTION_MS,
+      [callback_state, &callback_count] {
+        ++(*callback_state);
+        callback_count.fetch_add(1);
+      },
+      true);
+  callback_state.reset();
+  ASSERT_TRUE(InitializeTimer(timer.get()));
+
+  // Occupy every TaskManager consumer so Tick() can only queue the callback.
+  std::promise<void> release_blockers_promise;
+  auto release_blockers = release_blockers_promise.get_future().share();
+  std::atomic<uint32_t> blockers_started{0};
+  std::vector<std::future<void>> blockers;
+  blockers.reserve(task_pool_size);
+  for (uint32_t i = 0; i < task_pool_size; ++i) {
+    blockers.emplace_back(Async([&blockers_started, release_blockers] {
+      blockers_started.fetch_add(1);
+      release_blockers.wait();
+    }));
+  }
+
+  if (!WaitForCount(blockers_started, task_pool_size)) {
+    release_blockers_promise.set_value();
+    for (auto& blocker : blockers) {
+      blocker.wait();
+    }
+    FAIL() << "Failed to occupy the task pool";
+    return;
+  }
+
+  auto task_lifetime = QueueTimerCallback(timer.get());
+  timer->Stop();
+  timer.reset();
+  // Queued work must not retain the stopped task or callback-owned state.
+  EXPECT_TRUE(task_lifetime.expired());
+  EXPECT_TRUE(callback_lifetime.expired());
+
+  // A full second wave is a queue drain fence: its last task cannot start
+  // until the earlier timer callback has finished.
+  std::promise<void> release_drains_promise;
+  auto release_drains = release_drains_promise.get_future().share();
+  std::atomic<uint32_t> drains_started{0};
+  std::vector<std::future<void>> drains;
+  drains.reserve(task_pool_size);
+  for (uint32_t i = 0; i < task_pool_size; ++i) {
+    drains.emplace_back(Async([&drains_started, release_drains] {
+      drains_started.fetch_add(1);
+      release_drains.wait();
+    }));
+  }
+
+  release_blockers_promise.set_value();
+  if (!WaitForCount(drains_started, task_pool_size)) {
+    release_drains_promise.set_value();
+    for (auto& blocker : blockers) {
+      blocker.wait();
+    }
+    for (auto& drain : drains) {
+      drain.wait();
+    }
+    FAIL() << "Failed to drain the queued timer callback";
+    return;
+  }
+
+  release_drains_promise.set_value();
+  for (auto& blocker : blockers) {
+    blocker.get();
+  }
+  for (auto& drain : drains) {
+    drain.get();
+  }
+
+  EXPECT_EQ(callback_count.load(), 0);
+}
 
 TEST(TimerTest, one_shot) {
   int count = 0;
@@ -77,6 +216,23 @@ TEST(TimerTest, start_stop) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     timer.Stop();
   }
+}
+
+TEST(TimerTest, periodic_callback_preserves_state) {
+  std::promise<void> second_fire_promise;
+  auto second_fire = second_fire_promise.get_future();
+  Timer timer(
+      TIMER_RESOLUTION_MS,
+      [count = 0, &second_fire_promise]() mutable {
+        if (++count == 2) {
+          second_fire_promise.set_value();
+        }
+      },
+      false);
+  timer.Start();
+  EXPECT_EQ(second_fire.wait_for(std::chrono::seconds(1)),
+            std::future_status::ready);
+  timer.Stop();
 }
 
 TEST(TimerTest, sim_mode) {
