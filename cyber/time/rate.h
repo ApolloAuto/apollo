@@ -23,18 +23,41 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class Rate
+ * @brief Regulate a loop using monotonic time.
+ * System clock adjustments do not affect the cycle duration or sleep deadline.
+ */
 class Rate {
  public:
   explicit Rate(double frequency);
   explicit Rate(uint64_t nanoseconds);
   explicit Rate(const Duration&);
+
+  /**
+   * @brief Sleep until the next monotonic cycle deadline.
+   * Return immediately if the cycle has already overrun its expected duration.
+   */
   void Sleep();
+
+  /**
+   * @brief Start a new cycle at the current monotonic time.
+   */
   void Reset();
+
+  /**
+   * @brief Get the elapsed cycle time measured by the last Sleep(), before
+   * waiting for the deadline.
+   */
   Duration CycleTime() const;
+
+  /**
+   * @brief Get the configured cycle duration.
+   */
   Duration ExpectedCycleTime() const { return expected_cycle_time_; }
 
  private:
-  Time start_;
+  Time start_;  // Monotonic timestamp, not a wall-clock timestamp.
   Duration expected_cycle_time_;
   Duration actual_cycle_time_;
 };
