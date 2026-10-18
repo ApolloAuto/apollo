@@ -54,5 +54,15 @@ apollo_cc_test(
     ],
 )
 
+apollo_cc_test(
+    name = "rate_test",
+    size = "small",
+    srcs = ["rate_test.cc"],
+    deps = [
+        ":cyber_time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 apollo_package()
 cpplint()

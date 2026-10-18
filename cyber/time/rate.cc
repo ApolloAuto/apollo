@@ -53,60 +53,56 @@
 
 #include "cyber/time/rate.h"
 
+#include <chrono>
+#include <thread>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
 
 Rate::Rate(double frequency)
-    : start_(Time::Now()),
+    : start_(Time::MonoTime()),
       expected_cycle_time_(1.0 / frequency),
       actual_cycle_time_(0.0) {}
 
 Rate::Rate(uint64_t nanoseconds)
-    : start_(Time::Now()),
+    : start_(Time::MonoTime()),
       expected_cycle_time_(static_cast<int64_t>(nanoseconds)),
       actual_cycle_time_(0.0) {}
 
 Rate::Rate(const Duration& d)
-    : start_(Time::Now()), expected_cycle_time_(d), actual_cycle_time_(0.0) {}
+    : start_(Time::MonoTime()),
+      expected_cycle_time_(d),
+      actual_cycle_time_(0.0) {}
 
 void Rate::Sleep() {
-  Time expected_end = start_ + expected_cycle_time_;
+  const Time expected_end = start_ + expected_cycle_time_;
+  const Time actual_end = Time::MonoTime();
+  const Duration sleep_time = expected_end - actual_end;
 
-  Time actual_end = Time::Now();
-
-  // detect backward jumps in time
-  if (actual_end < start_) {
-    AWARN << "Detect backward jumps in time";
-    expected_end = actual_end + expected_cycle_time_;
-  }
-
-  // calculate the time we'll sleep for
-  Duration sleep_time = expected_end - actual_end;
-
-  // set the actual amount of time the loop took in case the user wants to kNow
   actual_cycle_time_ = actual_end - start_;
 
-  // make sure to reset our start time
+  // Advance from the previous deadline so wake-up delays do not accumulate.
   start_ = expected_end;
 
-  // if we've taken too much time we won't sleep
   if (sleep_time < Duration(0.0)) {
-    AWARN << "Detect forward jumps in time";
-    // if we've jumped forward in time, or the loop has taken more than a full
-    // extra cycle, reset our cycle
+    AWARN << "Rate cycle overrun";
+    // Resynchronize if the loop is more than one full cycle behind.
     if (actual_end > expected_end + expected_cycle_time_) {
       start_ = actual_end;
     }
-    // return false to show that the desired rate was not met
     return;
   }
 
-  Time::SleepUntil(expected_end);
+  // Use the same clock as Time::MonoTime(). Time::SleepUntil() expects a
+  // wall-clock timestamp, so it cannot be used with this monotonic deadline.
+  const auto deadline = std::chrono::steady_clock::time_point(
+      std::chrono::nanoseconds(expected_end.ToNanosecond()));
+  std::this_thread::sleep_until(deadline);
 }
 
-void Rate::Reset() { start_ = Time::Now(); }
+void Rate::Reset() { start_ = Time::MonoTime(); }
 
 Duration Rate::CycleTime() const { return actual_cycle_time_; }
 
