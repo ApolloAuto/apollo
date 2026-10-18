@@ -108,6 +108,16 @@ apollo_cc_test(
 )
 
 apollo_cc_test(
+    name = "segment_test",
+    size = "small",
+    srcs = ["shm/segment_test.cc"],
+    deps = [
+        ":cyber_transport",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
     name = "rtps_test",
     size = "small",
     srcs = ["rtps/rtps_test.cc"],
