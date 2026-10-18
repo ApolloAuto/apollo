@@ -111,12 +111,6 @@ bool Segment::AcquireBlockToRead(ReadableBlock* readable_block) {
     return false;
   }
 
-  auto index = readable_block->index;
-  if (index >= conf_.block_num()) {
-    AERROR << "invalid block_index[" << index << "].";
-    return false;
-  }
-
   bool result = true;
   if (state_->need_remap()) {
     result = Remap();
@@ -124,6 +118,14 @@ bool Segment::AcquireBlockToRead(ReadableBlock* readable_block) {
 
   if (!result) {
     AERROR << "segment update failed.";
+    return false;
+  }
+
+  // Validate against the current mapping: remapping can reduce the block count
+  // and invalidate an index from a queued notification.
+  const auto index = readable_block->index;
+  if (index >= conf_.block_num()) {
+    AERROR << "invalid block_index[" << index << "].";
     return false;
   }
 
